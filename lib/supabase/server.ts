@@ -44,18 +44,26 @@ export const cookieMethods: CookieMethodsServer = {
   }
 }
 
-// إنشاء عميل Supabase
-export const supabaseServer = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-  {
-    // تمرير الكوكيز لضمان عمل الجلسات في السيرفر
-    global: {
-      headers: {
-        cookie: cookieMethods.getAll()
-          .map(c => `${c.name}=${c.value}`)
-          .join('; ')
+// Helper function to create Supabase client with proper configuration
+const createSupabaseClient = () => {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    {
+      // تمرير الكوكيز لضمان عمل الجلسات في السيرفر
+      global: {
+        headers: {
+          cookie: cookieMethods.getAll()
+            .map(c => `${c.name}=${c.value}`)
+            .join('; ')
+        }
       }
     }
-  }
-)
+  )
+}
+
+// إنشاء عميل Supabase
+export const supabaseServer = createSupabaseClient()
+
+// تصدير دالة createClient للتوافق مع الاستيراد من المكونات
+export const createClient = createSupabaseClient

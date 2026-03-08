@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Alert, MonthlySummary } from '@/types'
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
