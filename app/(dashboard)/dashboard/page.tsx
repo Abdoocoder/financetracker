@@ -1,140 +1,237 @@
 'use client'
-import { useCallback } from 'react'
+
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useCachedData } from '@/lib/use-cached-data'
-import { PageSkeleton, StatsSkeleton } from '@/components/ui/skeleton'
+import { Skeleton, StatsSkeleton, PageSkeleton } from '@/components/ui/skeleton'
+import Link from 'next/link'
+
+// تعريف الأنواع
+interface Transaction {
+  id: string
+  amount: number
+  type: 'income' | 'expense'
+  category: string
+  description: string
+  date: string
+}
+
+interface Debt {
+  id: string
+  name: string
+  amount: number
+  paid: number
+}
+
+interface Investment {
+  id: string
+  shares: number
+  current_price: number
+  avg_buy_price: number
+}
 
 export default function DashboardPage() {
   const { user, loading: userLoading } = useUser()
   const supabase = createClient()
 
-  const fetchStats = useCallback(async () => {
+  // جلب الملخص المالي (إجمالي الدخل، المصاريف، الرصيد)
+  const { data: summary, loading: summaryLoading } = useCachedData('dashboard-summary', async () => {
     if (!user) return null
     const now = new Date()
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-    const [txRes, debtRes, goalRes, invRes] = await Promise.all([
-      supabase.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-      supabase.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
-      supabase.from('savings_goals').select('target_amount, current_amount').eq('user_id', user.id),
-      supabase.from('investments').select('shares, current_price, avg_buy_price').eq('user_id', user.id),
-    ])
+    // إجمالي الدخل هذا الشهر
+    const { data: incomeData } = await supabase
+      .from('transactions')
+      .select('amount')
+      .eq('user_id', user.id)
+      .eq('type', 'income')
+      .gte('date', startOfMonth)
 
-    const income = txRes.data?.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0) ?? 0
-    const expenses = txRes.data?.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0) ?? 0
-    const totalDebt = debtRes.data?.reduce((a, d) => a + d.remaining_amount, 0) ?? 0
-    const monthlyDebt = debtRes.data?.reduce((a, d) => a + (d.monthly_payment ?? 0), 0) ?? 0
-    const invValue = invRes.data?.reduce((a, i) => a + i.shares * i.current_price, 0) ?? 0
-    const invCost = invRes.data?.reduce((a, i) => a + i.shares * i.avg_buy_price, 0) ?? 0
-    const goalsProgress = goalRes.data?.length
-      ? goalRes.data.reduce((a, g) => a + g.current_amount / g.target_amount, 0) / goalRes.data.length * 100
-      : 0
+    // إجمالي المصاريف هذا الشهر
+    const { data: expenseData } = await supabase
+      .from('transactions')
+      .select('amount')
+      .eq('user_id', user.id)
+      .eq('type', 'expense')
+      .gte('date', startOfMonth)
 
-    return { income, expenses, net: income - expenses, totalDebt, monthlyDebt, invValue, invCost, invPnL: invValue - invCost, goalsProgress, debtCount: debtRes.data?.length ?? 0, goalCount: goalRes.data?.length ?? 0 }
-  }, [user, supabase])
+    // إجمالي الديون المتبقية
+    const { data: debtsData } = await supabase
+      .from('debts')
+      .select('amount, paid')
+      .eq('user_id', user.id)
 
-  const { data: stats, loading } = useCachedData('dashboard-stats', fetchStats, [user?.id])
+    // قيمة المحفظة الاستثمارية
+    const { data: investmentsData } = await supabase
+      .from('investments')
+      .select('shares, current_price, avg_buy_price')
+      .eq('user_id', user.id)
 
-  const today = new Date()
-  const dayName = today.toLocaleDateString('ar-EG', { weekday: 'long' })
-  const dateStr = `${dayName}، ${today.getDate()} ${today.toLocaleDateString('ar-EG', { month: 'long' })} ${today.getFullYear()}`
-  const hour = today.getHours()
-  const greeting = hour < 12 ? 'صباح النور' : hour < 17 ? 'مساء النور' : 'مساء الخير'
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? 'عبدالله'
+    const totalIncome = incomeData?.reduce((acc, t) => acc + (t.amount || 0), 0) || 0
+    const totalExpense = expenseData?.reduce((acc, t) => acc + (t.amount || 0), 0) || 0
+    const totalDebt = debtsData?.reduce((acc, d) => acc + (d.amount - (d.paid || 0)), 0) || 0
+    const totalInvestmentValue = investmentsData?.reduce((acc, i) => acc + (i.shares * i.current_price), 0) || 0
+    const totalInvestmentCost = investmentsData?.reduce((acc, i) => acc + (i.shares * i.avg_buy_price), 0) || 0
+    const investmentPnL = totalInvestmentValue - totalInvestmentCost
 
-  if (userLoading || loading) return <PageSkeleton />
+    return {
+      totalIncome,
+      totalExpense,
+      balance: totalIncome - totalExpense,
+      totalDebt,
+      totalInvestmentValue,
+      investmentPnL,
+    }
+  }, [user])
+
+  // جلب آخر 5 معاملات
+  const { data: recentTransactions, loading: transactionsLoading } = useCachedData('recent-transactions', async () => {
+    if (!user) return []
+    const { data } = await supabase
+      .from('transactions')
+      .select('id, amount, type, category, description, date')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false })
+      .limit(5)
+    return data as Transaction[] || []
+  }, [user])
+
+  // إذا كان التحميل جارياً أو المستخدم ليس موجوداً
+  if (userLoading || summaryLoading) return <PageSkeleton />
 
   return (
-    <div className="space-y-5 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
-      {/* Header */}
+    <div className="space-y-6 animate-fade-in max-w-5xl mx-auto pb-20">
+      {/* الترحيب */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>
-            👋 {greeting}، {firstName}
+          <h1 className="text-2xl font-black" style={{ color: 'var(--text-primary)' }}>
+            مرحباً، {user?.email?.split('@')[0] || 'مستخدم'} 👋
           </h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{dateStr}</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+            ملخص مالي لشهر {new Date().toLocaleString('ar-SA', { month: 'long' })}
+          </p>
         </div>
-        <div className="card px-3 py-2 text-center">
-          <div className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>الراتب الشهري</div>
-          <div className="font-black text-sm font-mono" style={{ color: 'var(--accent-green-light)' }}>
-            JOD {stats?.income.toFixed(2) ?? '0.00'}
+        <Link href="/transactions/new" className="px-4 py-2 rounded-xl gradient-blue text-white text-sm font-black glow-blue">
+          + إضافة معاملة
+        </Link>
+      </div>
+
+      {/* بطاقات الملخص */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard
+          title="الرصيد"
+          value={summary?.balance || 0}
+          prefix="$"
+          color={summary?.balance && summary.balance >= 0 ? 'text-green-400' : 'text-red-400'}
+        />
+        <StatCard
+          title="الدخل"
+          value={summary?.totalIncome || 0}
+          prefix="$"
+          color="text-green-400"
+        />
+        <StatCard
+          title="المصاريف"
+          value={summary?.totalExpense || 0}
+          prefix="$"
+          color="text-red-400"
+        />
+        <StatCard
+          title="الديون المتبقية"
+          value={summary?.totalDebt || 0}
+          prefix="$"
+          color="text-yellow-400"
+        />
+      </div>
+
+      {/* المحفظة والديون */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* بطاقة المحفظة */}
+        <div className="card p-4">
+          <h3 className="font-black mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <span>📈</span> المحفظة الاستثمارية
+          </h3>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span style={{ color: 'var(--text-muted)' }}>القيمة السوقية</span>
+              <span className="font-mono font-bold" style={{ color: 'var(--accent-blue-light)' }}>${summary?.totalInvestmentValue.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span style={{ color: 'var(--text-muted)' }}>الربح/الخسارة</span>
+              <span className={`font-mono font-bold ${(summary?.investmentPnL || 0) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {(summary?.investmentPnL || 0) >= 0 ? '+' : ''}{summary?.investmentPnL.toFixed(2)} $
+              </span>
+            </div>
           </div>
+          <Link href="/investments" className="mt-3 block text-sm text-center py-2 rounded-xl badge-blue hover:opacity-80 transition">
+            عرض التفاصيل
+          </Link>
+        </div>
+
+        {/* بطاقة الديون */}
+        <div className="card p-4">
+          <h3 className="font-black mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <span>💳</span> الديون
+          </h3>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span style={{ color: 'var(--text-muted)' }}>المتبقي</span>
+              <span className="font-mono font-bold text-yellow-400">${summary?.totalDebt.toFixed(2)}</span>
+            </div>
+          </div>
+          <Link href="/debts" className="mt-3 block text-sm text-center py-2 rounded-xl badge-green hover:opacity-80 transition">
+            إدارة الديون
+          </Link>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'الدخل', value: `+${stats?.income.toFixed(0) ?? 0}`, color: 'var(--accent-green-light)', sub: 'JOD' },
-          { label: 'المصاريف', value: `-${stats?.expenses.toFixed(0) ?? 0}`, color: 'var(--accent-red-light)', sub: 'JOD' },
-          { label: 'الصافي', value: `${(stats?.net ?? 0) >= 0 ? '+' : ''}${stats?.net.toFixed(0) ?? 0}`, color: (stats?.net ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', sub: 'JOD' },
-        ].map((s, i) => (
-          <div key={i} className="card p-3 text-center">
-            <div className="text-base font-black font-mono" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
-            <div className="text-xs" style={{ color: 'var(--text-muted)', fontSize: '10px' }}>{s.sub}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Cards */}
-      <div className="space-y-3">
-        {/* الديون */}
-        <div className="card p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">💳</span>
-              <div>
-                <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>إجمالي الديون</div>
-                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stats?.debtCount} دين نشط</div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="font-black font-mono" style={{ color: 'var(--accent-red-light)' }}>{stats?.totalDebt.toFixed(0)} JOD</div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stats?.monthlyDebt.toFixed(0)} شهرياً</div>
-            </div>
-          </div>
-        </div>
-
-        {/* الاستثمارات */}
-        <div className="card p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">📈</span>
-              <div>
-                <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>المحفظة الاستثمارية</div>
-                <div className="text-xs font-mono" style={{ color: (stats?.invPnL ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
-                  {(stats?.invPnL ?? 0) >= 0 ? '+' : ''}{stats?.invPnL.toFixed(2) ?? '0'} USD
+      {/* آخر المعاملات */}
+      <div className="card p-4">
+        <h3 className="font-black mb-3 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+          <span>🔄</span> آخر المعاملات
+        </h3>
+        {transactionsLoading ? (
+          <StatsSkeleton />
+        ) : recentTransactions && recentTransactions.length > 0 ? (
+          <div className="space-y-2">
+            {recentTransactions.map((t) => (
+              <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-700 last:border-0">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
+                    {t.type === 'income' ? '↑' : '↓'}
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ color: 'var(--text-primary)' }}>{t.description || t.category}</p>
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{new Date(t.date).toLocaleDateString('ar-EG')}</p>
+                  </div>
                 </div>
+                <span className={`font-mono font-bold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                  {t.type === 'income' ? '+' : '-'} ${t.amount.toFixed(2)}
+                </span>
               </div>
-            </div>
-            <div className="font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>
-              ${stats?.invValue.toFixed(2) ?? '0'}
-            </div>
+            ))}
           </div>
-        </div>
-
-        {/* الأهداف */}
-        <div className="card p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🎯</span>
-              <div>
-                <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>أهداف الادخار</div>
-                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stats?.goalCount} هدف</div>
-              </div>
-            </div>
-            <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-blue-light)' }}>
-              {stats?.goalsProgress.toFixed(0) ?? 0}%
-            </div>
-          </div>
-          <div className="progress-track">
-            <div className="progress-fill gradient-blue" style={{ width: `${Math.min(stats?.goalsProgress ?? 0, 100)}%` }} />
-          </div>
-        </div>
+        ) : (
+          <p className="text-center py-4" style={{ color: 'var(--text-muted)' }}>لا توجد معاملات بعد</p>
+        )}
+        <Link href="/transactions" className="mt-3 block text-sm text-center py-2 rounded-xl badge-blue hover:opacity-80 transition">
+          عرض كل المعاملات
+        </Link>
       </div>
+    </div>
+  )
+}
+
+// مكون بطاقة إحصائية
+function StatCard({ title, value, prefix, color }: { title: string; value: number; prefix: string; color: string }) {
+  return (
+    <div className="card p-3">
+      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{title}</p>
+      <p className={`text-xl font-black font-mono mt-1 ${color}`}>
+        {prefix}{value.toFixed(2)}
+      </p>
     </div>
   )
 }
