@@ -30,38 +30,21 @@ export default function DashboardPage() {
       try {
         console.log('Fetching data for user:', user.id)
 
-        // محاولة جلب المعاملات باستخدام أسماء مختلفة للتاريخ
-        let txData = null
-        let dateField = ''
+        // جلب كل المعاملات (بدون فلتر شهر) لرؤية البيانات
+        const { data: txData, error: txError } = await supabase
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }) // استخدم created_at افتراضياً
 
-        // قائمة بأسماء الحقول المحتملة للتاريخ
-        const dateFields = ['transaction_date', 'created_at', 'date']
-        
-        for (const field of dateFields) {
-          const { data, error } = await supabase
-            .from('transactions')
-            .select('*')
-            .eq('user_id', user.id)
-            .order(field, { ascending: false })
-            .limit(10)
-
-          if (!error && data) {
-            txData = data
-            dateField = field
-            console.log(`Success with field: ${field}`)
-            break
+        if (txError) {
+          console.error('Error fetching transactions:', txError)
+        } else {
+          console.log(`Found ${txData?.length} transactions`)
+          if (txData && txData.length > 0) {
+            console.log('First transaction fields:', Object.keys(txData[0]))
+            console.log('First transaction data:', txData[0])
           }
-        }
-
-        if (!txData) {
-          // إذا لم تنجح أي محاولة، جلب بدون ترتيب
-          const { data, error } = await supabase
-            .from('transactions')
-            .select('*')
-            .eq('user_id', user.id)
-            .limit(10)
-
-          if (!error) txData = data
         }
 
         // جلب الديون
@@ -80,7 +63,7 @@ export default function DashboardPage() {
 
         if (invError) throw invError
 
-        // حساب الإجماليات
+        // حساب الإجماليات من جميع المعاملات (بدون فلتر)
         const totalIncome = txData?.filter(t => t.type === 'income').reduce((acc, t) => acc + (t.amount || 0), 0) || 0
         const totalExpense = txData?.filter(t => t.type === 'expense').reduce((acc, t) => acc + (t.amount || 0), 0) || 0
         const totalDebt = debtData?.reduce((acc, d) => acc + (d.amount - (d.paid || 0)), 0) || 0
@@ -97,7 +80,7 @@ export default function DashboardPage() {
         })
         setTransactions(txData || [])
       } catch (err: any) {
-        console.error('Error fetching data:', err)
+        console.error('Error:', err)
         setError(err.message)
       } finally {
         setLoading(false)
@@ -111,10 +94,6 @@ export default function DashboardPage() {
     return <div className="flex items-center justify-center h-64 text-white">جاري التحميل...</div>
   }
 
-  if (!user) {
-    return <div className="text-center py-10 text-red-400">الرجاء تسجيل الدخول</div>
-  }
-
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-20" dir="rtl">
       {/* Header */}
@@ -124,12 +103,18 @@ export default function DashboardPage() {
             مرحباً، {user?.email?.split('@')[0] || 'مستخدم'} 👋
           </h1>
           <p className="text-sm mt-1 text-gray-400">
-            ملخص مالي لشهر {new Date().toLocaleString('ar-SA', { month: 'long' })}
+            ملخص مالي (كل المعاملات)
           </p>
         </div>
         <Link href="/transactions/new" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black">
           + إضافة معاملة
         </Link>
+      </div>
+
+      {/* رسالة بعدد المعاملات للتشخيص */}
+      <div className="bg-gray-800 p-3 rounded text-sm text-gray-300">
+        عدد المعاملات: {transactions.length}
+        {error && <div className="text-red-400">خطأ: {error}</div>}
       </div>
 
       {/* بطاقات الإحصائيات */}
@@ -140,7 +125,7 @@ export default function DashboardPage() {
         <StatCard title="الديون المتبقية" value={summary.totalDebt} prefix="$" color="text-yellow-400" />
       </div>
 
-      {/* المحفظة والديون */}
+      {/* المحفظة والديون (مشابهة لما سبق) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* المحفظة */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
@@ -181,35 +166,31 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* آخر المعاملات */}
+      {/* آخر المعاملات (أول 5) */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
         <h3 className="font-black mb-3 flex items-center gap-2 text-white">
           <span>🔄</span> آخر المعاملات
         </h3>
         {transactions.length > 0 ? (
           <div className="space-y-2">
-            {transactions.slice(0, 5).map((t) => {
-              // تحديد حقل التاريخ المتاح
-              const dateValue = t.transaction_date || t.created_at || t.date
-              return (
-                <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
-                      {t.type === 'income' ? '↑' : '↓'}
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">{t.description || t.category}</p>
-                      <p className="text-xs text-gray-500">
-                        {dateValue ? new Date(dateValue).toLocaleDateString('ar-EG') : ''}
-                      </p>
-                    </div>
+            {transactions.slice(0, 5).map((t) => (
+              <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
+                    {t.type === 'income' ? '↑' : '↓'}
                   </div>
-                  <span className={`font-mono font-bold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                    {t.type === 'income' ? '+' : '-'} ${t.amount.toFixed(2)}
-                  </span>
+                  <div>
+                    <p className="font-medium text-white">{t.description || t.category}</p>
+                    <p className="text-xs text-gray-500">
+                      {t.created_at ? new Date(t.created_at).toLocaleDateString('ar-EG') : ''}
+                    </p>
+                  </div>
                 </div>
-              )
-            })}
+                <span className={`font-mono font-bold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                  {t.type === 'income' ? '+' : '-'} ${t.amount.toFixed(2)}
+                </span>
+              </div>
+            ))}
           </div>
         ) : (
           <p className="text-center py-4 text-gray-500">لا توجد معاملات بعد</p>
