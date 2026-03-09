@@ -9,6 +9,8 @@ export default function GoalsPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })
   const [saving, setSaving] = useState(false)
+  const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
+  const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
 
   const load = useCallback(async () => {
@@ -47,7 +49,7 @@ export default function GoalsPage() {
       await supabase.from('savings_goals').insert({
         user_id: user.id, name: form.name,
         target_amount: parseFloat(form.target_amount),
-        current_amount: parseFloat(form.current_amount),
+        current_amount: parseFloat(form.current_amount) || 0,
         target_date: form.target_date || null, icon: form.icon,
       })
     }
@@ -59,15 +61,21 @@ export default function GoalsPage() {
     load()
   }
 
-  async function addSaving(goalId: string, amount: number) {
+  async function addSaving(goalId: string) {
+    const amount = parseFloat(savingAmount)
+    if (!amount || amount <= 0) return
     const goal = goals.find(g => g.id === goalId)
     if (!goal) return
     const newAmount = Math.min(goal.current_amount + amount, goal.target_amount)
     await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
+    setSavingGoalId(null)
+    setSavingAmount('')
     load()
   }
 
   const icons = ['🎯','🏠','✈️','📚','🚗','💍','🎓','💻','📱','🏋️']
+  const totalTarget = goals.reduce((a, g) => a + g.target_amount, 0)
+  const totalSaved = goals.reduce((a, g) => a + g.current_amount, 0)
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
 
@@ -83,6 +91,20 @@ export default function GoalsPage() {
           + إضافة
         </button>
       </div>
+
+      {/* ملخص */}
+      {goals.length > 0 && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="card p-3 text-center">
+            <div className="text-base font-black font-mono" style={{ color: 'var(--accent-green-light)' }}>{totalSaved.toFixed(0)}</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>تم ادخاره JOD</div>
+          </div>
+          <div className="card p-3 text-center">
+            <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>{totalTarget.toFixed(0)}</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>المستهدف JOD</div>
+          </div>
+        </div>
+      )}
 
       {showForm && (
         <div className="card p-4 animate-scale-in" style={{ borderColor: editingId ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.3)' }}>
@@ -104,8 +126,8 @@ export default function GoalsPage() {
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'اسم الهدف', key: 'name', type: 'text', placeholder: 'شراء سيارة', col: 'col-span-2' },
-              { label: 'المبلغ المستهدف', key: 'target_amount', type: 'number', placeholder: '5000', col: '' },
-              { label: 'المبلغ الحالي', key: 'current_amount', type: 'number', placeholder: '0', col: '' },
+              { label: 'المبلغ المستهدف (JOD)', key: 'target_amount', type: 'number', placeholder: '5000', col: '' },
+              { label: 'المبلغ الحالي (JOD)', key: 'current_amount', type: 'number', placeholder: '0', col: '' },
               { label: 'تاريخ الهدف', key: 'target_date', type: 'date', placeholder: '', col: 'col-span-2' },
             ].map(f => (
               <div key={f.key} className={f.col}>
@@ -133,6 +155,7 @@ export default function GoalsPage() {
         {goals.map((goal) => {
           const pct = Math.min((goal.current_amount / goal.target_amount) * 100, 100)
           const remaining = goal.target_amount - goal.current_amount
+          const isAddingToThis = savingGoalId === goal.id
           return (
             <div key={goal.id} className="card p-4">
               <div className="flex items-center gap-3 mb-3">
@@ -140,10 +163,12 @@ export default function GoalsPage() {
                   style={{ background: 'var(--bg-secondary)' }}>{goal.icon || '🎯'}</div>
                 <div className="flex-1 min-w-0">
                   <div className="font-black" style={{ color: 'var(--text-primary)' }}>{goal.name}</div>
-                  {goal.target_date && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>الهدف: {goal.target_date}</div>}
+                  {goal.target_date && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>📅 {goal.target_date}</div>}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <div className="font-black font-mono text-sm ml-1" style={{ color: 'var(--accent-blue-light)' }}>{pct.toFixed(0)}%</div>
+                  <div className="font-black font-mono text-sm ml-1" style={{ color: pct >= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}>
+                    {pct >= 100 ? '✅' : `${pct.toFixed(0)}%`}
+                  </div>
                   <button onClick={() => startEdit(goal)}
                     className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
                     style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--accent-yellow-light)' }}>✏️</button>
@@ -152,26 +177,53 @@ export default function GoalsPage() {
                     style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red-light)' }}>🗑️</button>
                 </div>
               </div>
+
               <div className="progress-track mb-2">
                 <div className="progress-fill gradient-blue" style={{ width: `${pct}%` }} />
               </div>
-              <div className="flex justify-between items-center">
+
+              <div className="flex justify-between items-center mb-2">
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <span className="font-mono">{goal.current_amount.toFixed(0)}</span> / <span className="font-mono">{goal.target_amount.toFixed(0)} JOD</span>
+                  <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span>
+                  {' / '}{goal.target_amount.toFixed(0)} JOD
                 </div>
-                <button onClick={() => {
-                  const amount = prompt('أضف مبلغ الادخار (JOD):')
-                  if (amount && parseFloat(amount) > 0) addSaving(goal.id, parseFloat(amount))
-                }}
-                  className="text-xs px-3 py-1.5 rounded-lg font-bold badge-green">+ ادخار</button>
+                {remaining > 0 && (
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    متبقي: <span className="font-mono">{remaining.toFixed(0)} JOD</span>
+                  </div>
+                )}
               </div>
+
+              {isAddingToThis ? (
+                <div className="flex gap-2 mt-2">
+                  <input type="number" value={savingAmount}
+                    onChange={e => setSavingAmount(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-xl text-sm outline-none text-center"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--accent-green)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
+                    placeholder="المبلغ JOD" autoFocus
+                    onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
+                  <button onClick={() => addSaving(goal.id)}
+                    className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black">✓</button>
+                  <button onClick={() => { setSavingGoalId(null); setSavingAmount('') }}
+                    className="px-3 py-2 rounded-xl text-sm"
+                    style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
+                </div>
+              ) : (
+                remaining > 0 && (
+                  <button onClick={() => { setSavingGoalId(goal.id); setSavingAmount('') }}
+                    className="w-full py-2 rounded-xl text-sm font-bold badge-green mt-1">
+                    + إضافة ادخار
+                  </button>
+                )
+              )}
             </div>
           )
         })}
         {goals.length === 0 && (
           <div className="text-center py-16 card">
             <div className="text-4xl mb-3">🎯</div>
-            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>لا توجد أهداف</div>
+            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>لا توجد أهداف بعد</div>
+            <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>أضف هدفك الأول للبدء</div>
           </div>
         )}
       </div>

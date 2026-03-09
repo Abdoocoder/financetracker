@@ -1,284 +1,218 @@
 'use client'
-
-import { useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
+import { useCachedData } from '@/lib/use-cached-data'
+import { PageSkeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 
 export default function DashboardPage() {
   const { user, loading: userLoading } = useUser()
   const supabase = createClient()
-  const [summary, setSummary] = useState({
-    totalIncome: 0,
-    totalExpense: 0,
-    balance: 0,
-    totalDebt: 0,
-    totalInvestmentValue: 0,
-    investmentPnL: 0
-  })
-  const [transactions, setTransactions] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [errors, setErrors] = useState<string[]>([])
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false)
-      return
+  const fetchStats = useCallback(async () => {
+    if (!user) return null
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+
+    const [txRes, debtRes, goalRes, invRes, alertRes] = await Promise.all([
+      supabase.from('transactions').select('type, amount, description, category, transaction_date').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay).order('transaction_date', { ascending: false }),
+      supabase.from('debts').select('remaining_amount, monthly_payment, original_amount').eq('user_id', user.id).eq('is_paid', false),
+      supabase.from('savings_goals').select('target_amount, current_amount').eq('user_id', user.id),
+      supabase.from('investments').select('shares, current_price, avg_buy_price').eq('user_id', user.id),
+      supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
+    ])
+
+    const income = txRes.data?.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0) ?? 0
+    const expenses = txRes.data?.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0) ?? 0
+    const totalDebt = debtRes.data?.reduce((a, d) => a + d.remaining_amount, 0) ?? 0
+    const monthlyDebt = debtRes.data?.reduce((a, d) => a + (d.monthly_payment ?? 0), 0) ?? 0
+    const totalOriginal = debtRes.data?.reduce((a, d) => a + d.original_amount, 0) ?? 0
+    const debtPct = totalOriginal > 0 ? ((totalOriginal - totalDebt) / totalOriginal * 100) : 0
+    const invValue = invRes.data?.reduce((a, i) => a + i.shares * i.current_price, 0) ?? 0
+    const invCost = invRes.data?.reduce((a, i) => a + i.shares * i.avg_buy_price, 0) ?? 0
+    const goalsProgress = goalRes.data?.length
+      ? goalRes.data.reduce((a, g) => a + g.current_amount / g.target_amount, 0) / goalRes.data.length * 100
+      : 0
+    const unreadAlerts = alertRes.count ?? 0
+
+    return {
+      income, expenses, net: income - expenses,
+      totalDebt, monthlyDebt, debtPct,
+      debtCount: debtRes.data?.length ?? 0,
+      invValue, invCost, invPnL: invValue - invCost,
+      goalsProgress, goalCount: goalRes.data?.length ?? 0,
+      unreadAlerts,
+      recentTx: txRes.data?.slice(0, 5) ?? [],
     }
+  }, [user, supabase])
 
-    const fetchData = async () => {
-      const errorList: string[] = []
-      
-      try {
-        console.log('Fetching data for user:', user.id)
+  const { data: stats, loading } = useCachedData('dashboard-stats', fetchStats, [user?.id])
 
-        // 1. جلب المعاملات
-        const { data: txData, error: txError } = await supabase
-          .from('transactions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
+  const today = new Date()
+  const hour = today.getHours()
+  const greeting = hour < 12 ? 'صباح النور' : hour < 17 ? 'مساء النور' : 'مساء الخير'
+  const dateStr = today.toLocaleDateString('ar-JO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? 'عبدالله'
 
-        if (txError) {
-          errorList.push(`Transactions: ${txError.message}`)
-          console.error('Transactions error:', txError)
-        } else {
-          console.log(`Found ${txData?.length} transactions`)
-          if (txData && txData.length > 0) {
-            console.log('Transaction fields:', Object.keys(txData[0]))
-          }
-        }
+  if (userLoading || loading) return <PageSkeleton />
 
-        // 2. جلب الديون - محاولة أسماء مختلفة للأعمدة
-        let debtData = null
-        let debtError = null
-
-        // جرب أولاً باستخدام total_amount
-        const debtAttempt1 = await supabase
-          .from('debts')
-          .select('*')
-          .eq('user_id', user.id)
-
-        if (!debtAttempt1.error) {
-          debtData = debtAttempt1.data
-          console.log('Debt fields (first attempt):', debtData?.[0] ? Object.keys(debtData[0]) : 'No debts')
-          
-          // تحقق من وجود amount أو total_amount أو original_amount
-          if (debtData && debtData.length > 0) {
-            const firstDebt = debtData[0]
-            const possibleAmountFields = ['amount', 'total_amount', 'original_amount', 'remaining_amount', 'balance']
-            const foundField = possibleAmountFields.find(field => field in firstDebt)
-            
-            if (foundField) {
-              console.log(`Using amount field: ${foundField}`)
-              // احسب إجمالي الديون باستخدام الحقل الموجود
-              const totalDebt = debtData.reduce((acc, d) => {
-                const amount = d[foundField] || 0
-                const paid = d.paid || 0
-                return acc + (amount - paid)
-              }, 0)
-              setSummary(prev => ({ ...prev, totalDebt }))
-            } else {
-              errorList.push('Debts: No amount field found in debt records')
-            }
-          }
-        } else {
-          errorList.push(`Debts: ${debtAttempt1.error.message}`)
-        }
-
-        // 3. جلب الاستثمارات
-        const { data: invData, error: invError } = await supabase
-          .from('investments')
-          .select('*')
-          .eq('user_id', user.id)
-
-        if (invError) {
-          errorList.push(`Investments: ${invError.message}`)
-        } else {
-          console.log(`Found ${invData?.length} investments`)
-          if (invData && invData.length > 0) {
-            console.log('Investment fields:', Object.keys(invData[0]))
-            
-            // حساب قيمة المحفظة
-            const totalValue = invData.reduce((acc, i) => {
-              const shares = i.shares || 0
-              const price = i.current_price || 0
-              return acc + (shares * price)
-            }, 0)
-            
-            const totalCost = invData.reduce((acc, i) => {
-              const shares = i.shares || 0
-              const avgPrice = i.avg_buy_price || 0
-              return acc + (shares * avgPrice)
-            }, 0)
-            
-            setSummary(prev => ({
-              ...prev,
-              totalInvestmentValue: totalValue,
-              investmentPnL: totalValue - totalCost
-            }))
-          }
-        }
-
-        // حساب الدخل والمصاريف من المعاملات
-        if (txData) {
-          const totalIncome = txData
-            .filter(t => t.type === 'income')
-            .reduce((acc, t) => acc + (t.amount || 0), 0)
-          
-          const totalExpense = txData
-            .filter(t => t.type === 'expense')
-            .reduce((acc, t) => acc + (t.amount || 0), 0)
-          
-          setSummary(prev => ({
-            ...prev,
-            totalIncome,
-            totalExpense,
-            balance: totalIncome - totalExpense
-          }))
-          
-          setTransactions(txData)
-        }
-
-        setErrors(errorList)
-      } catch (err: any) {
-        console.error('Unexpected error:', err)
-        setErrors([...errorList, `Unexpected: ${err.message}`])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-  }, [user])
-
-  if (userLoading || loading) {
-    return <div className="flex items-center justify-center h-64 text-white">جاري التحميل...</div>
+  const categoryIcons: Record<string, string> = {
+    'راتب': '💼', 'طعام': '🍽️', 'مواصلات': '🚗', 'فواتير': '⚡',
+    'اتصالات': '📱', 'ديون': '💳', 'ترفيه': '🎬', 'صحة': '🏥',
+    'تعليم': '📚', 'ملابس': '👕', 'متنوع': '📦',
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto pb-20" dir="rtl">
+    <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">
-            مرحباً، {user?.email?.split('@')[0] || 'مستخدم'} 👋
+          <h1 className="text-lg font-black" style={{ color: 'var(--text-primary)' }}>
+            👋 {greeting}، {firstName}
           </h1>
-          <p className="text-sm mt-1 text-gray-400">
-            ملخص مالي (كل المعاملات)
-          </p>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{dateStr}</p>
         </div>
-        <Link href="/transactions/new" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-black">
-          + إضافة معاملة
-        </Link>
+        <div className="card px-3 py-2 text-center">
+          <div className="text-xs font-bold" style={{ color: 'var(--text-muted)' }}>الراتب الشهري</div>
+          <div className="font-black text-sm font-mono" style={{ color: 'var(--accent-green-light)' }}>
+            JOD {stats?.income.toFixed(2) ?? '0.00'}
+          </div>
+        </div>
       </div>
 
-      {/* عرض الأخطاء إن وجدت */}
-      {errors.length > 0 && (
-        <div className="bg-red-900/50 border border-red-700 p-3 rounded text-sm text-red-200">
-          <p className="font-bold mb-1">تم اكتشاف مشاكل:</p>
-          {errors.map((err, i) => <p key={i}>• {err}</p>)}
-        </div>
+      {/* تنبيه غير مقروء */}
+      {(stats?.unreadAlerts ?? 0) > 0 && (
+        <Link href="/dashboard/alerts">
+          <div className="card p-3 flex items-center gap-3 animate-scale-in"
+            style={{ borderColor: 'rgba(59,130,246,0.4)', cursor: 'pointer' }}>
+            <span className="text-xl">🔔</span>
+            <div className="flex-1">
+              <div className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>
+                لديك {stats?.unreadAlerts} تنبيه غير مقروء
+              </div>
+            </div>
+            <span className="text-xs px-2 py-1 rounded-lg gradient-blue text-white font-bold">عرض</span>
+          </div>
+        </Link>
       )}
 
-      {/* عدد المعاملات */}
-      <div className="bg-gray-800 p-3 rounded text-sm text-gray-300">
-        عدد المعاملات: {transactions.length}
+      {/* Stats شهرية */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: 'الدخل', value: `+${stats?.income.toFixed(0) ?? 0}`, color: 'var(--accent-green-light)', sub: 'JOD هذا الشهر' },
+          { label: 'المصاريف', value: `-${stats?.expenses.toFixed(0) ?? 0}`, color: 'var(--accent-red-light)', sub: 'JOD هذا الشهر' },
+          { label: 'الصافي', value: `${(stats?.net ?? 0) >= 0 ? '+' : ''}${stats?.net.toFixed(0) ?? 0}`, color: (stats?.net ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', sub: 'JOD' },
+        ].map((s, i) => (
+          <div key={i} className="card p-3 text-center">
+            <div className="text-base font-black font-mono" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-xs font-bold mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '9px' }}>{s.sub}</div>
+          </div>
+        ))}
       </div>
 
-      {/* بطاقات الإحصائيات */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard title="الرصيد" value={summary.balance} prefix="$" color="text-blue-400" />
-        <StatCard title="الدخل" value={summary.totalIncome} prefix="$" color="text-green-400" />
-        <StatCard title="المصاريف" value={summary.totalExpense} prefix="$" color="text-red-400" />
-        <StatCard title="الديون" value={summary.totalDebt} prefix="$" color="text-yellow-400" />
-      </div>
-
-      {/* المحفظة والديون */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* المحفظة */}
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-          <h3 className="font-black mb-3 flex items-center gap-2 text-white">
-            <span>📈</span> المحفظة الاستثمارية
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400">القيمة السوقية</span>
-              <span className="font-mono font-bold text-blue-400">${summary.totalInvestmentValue.toFixed(2)}</span>
+      {/* الديون */}
+      <Link href="/dashboard/debts">
+        <div className="card p-4" style={{ cursor: 'pointer' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">💳</span>
+              <div>
+                <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>إجمالي الديون</div>
+                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stats?.debtCount} دين · {stats?.monthlyDebt.toFixed(0)} JOD/شهر</div>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">الربح/الخسارة</span>
-              <span className={`font-mono font-bold ${summary.investmentPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                {summary.investmentPnL >= 0 ? '+' : ''}{summary.investmentPnL.toFixed(2)} $
-              </span>
+            <div className="text-right">
+              <div className="font-black font-mono" style={{ color: 'var(--accent-red-light)' }}>{stats?.totalDebt.toFixed(0)} JOD</div>
+              <div className="text-xs font-mono" style={{ color: 'var(--accent-green-light)' }}>{stats?.debtPct.toFixed(0)}% مسدد</div>
             </div>
           </div>
-          <Link href="/investments" className="mt-3 block text-sm text-center py-2 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-800 hover:bg-blue-600/30">
-            عرض التفاصيل
-          </Link>
+          <div className="progress-track">
+            <div className="progress-fill gradient-green" style={{ width: `${Math.min(stats?.debtPct ?? 0, 100)}%` }} />
+          </div>
         </div>
+      </Link>
 
-        {/* الديون */}
-        <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-          <h3 className="font-black mb-3 flex items-center gap-2 text-white">
-            <span>💳</span> الديون
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400">المتبقي</span>
-              <span className="font-mono font-bold text-yellow-400">${summary.totalDebt.toFixed(2)}</span>
+      {/* الاستثمارات */}
+      <Link href="/dashboard/investments">
+        <div className="card p-4" style={{ cursor: 'pointer' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">📈</span>
+              <div>
+                <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>المحفظة الاستثمارية</div>
+                <div className="text-xs font-mono" style={{ color: (stats?.invPnL ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+                  {(stats?.invPnL ?? 0) >= 0 ? '+' : ''}{stats?.invPnL.toFixed(2) ?? '0'} USD
+                </div>
+              </div>
+            </div>
+            <div className="font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>
+              ${stats?.invValue.toFixed(2) ?? '0'}
             </div>
           </div>
-          <Link href="/debts" className="mt-3 block text-sm text-center py-2 rounded-xl bg-yellow-600/20 text-yellow-400 border border-yellow-800 hover:bg-yellow-600/30">
-            إدارة الديون
-          </Link>
         </div>
-      </div>
+      </Link>
+
+      {/* الأهداف */}
+      <Link href="/dashboard/goals">
+        <div className="card p-4" style={{ cursor: 'pointer' }}>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">🎯</span>
+              <div>
+                <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>أهداف الادخار</div>
+                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{stats?.goalCount} هدف</div>
+              </div>
+            </div>
+            <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-blue-light)' }}>
+              {stats?.goalsProgress.toFixed(0) ?? 0}%
+            </div>
+          </div>
+          <div className="progress-track">
+            <div className="progress-fill gradient-blue" style={{ width: `${Math.min(stats?.goalsProgress ?? 0, 100)}%` }} />
+          </div>
+        </div>
+      </Link>
 
       {/* آخر المعاملات */}
-      <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-        <h3 className="font-black mb-3 flex items-center gap-2 text-white">
-          <span>🔄</span> آخر المعاملات
-        </h3>
-        {transactions.length > 0 ? (
-          <div className="space-y-2">
-            {transactions.slice(0, 5).map((t) => (
-              <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
-                    {t.type === 'income' ? '↑' : '↓'}
-                  </div>
-                  <div>
-                    <p className="font-medium text-white">{t.description || t.category}</p>
-                    <p className="text-xs text-gray-500">
-                      {t.created_at ? new Date(t.created_at).toLocaleDateString('ar-EG') : ''}
-                    </p>
-                  </div>
-                </div>
-                <span className={`font-mono font-bold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.type === 'income' ? '+' : '-'} ${t.amount.toFixed(2)}
-                </span>
+      <div className="card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>🔄 آخر المعاملات</div>
+          <Link href="/dashboard/transactions">
+            <span className="text-xs font-bold badge-blue px-2 py-1 rounded-lg">كل المعاملات</span>
+          </Link>
+        </div>
+        <div className="space-y-2">
+          {stats?.recentTx.map((t: any) => (
+            <div key={t.transaction_date + t.amount} className="flex items-center gap-3 py-2"
+              style={{ borderBottom: '1px solid var(--border)' }}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
+                style={{ background: t.type === 'income' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)' }}>
+                {categoryIcons[t.category] ?? (t.type === 'income' ? '💰' : '💸')}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center py-4 text-gray-500">لا توجد معاملات بعد</p>
-        )}
-        <Link href="/transactions" className="mt-3 block text-sm text-center py-2 rounded-xl bg-gray-800 text-gray-300 hover:bg-gray-700">
-          عرض كل المعاملات
-        </Link>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold truncate" style={{ color: 'var(--text-primary)' }}>
+                  {t.description || t.category || '—'}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{t.transaction_date}</div>
+              </div>
+              <div className="font-black font-mono text-sm shrink-0"
+                style={{ color: t.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+                {t.type === 'income' ? '+' : '-'}{Number(t.amount).toFixed(2)}
+              </div>
+            </div>
+          ))}
+          {(stats?.recentTx.length ?? 0) === 0 && (
+            <div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>
+              <div className="text-2xl mb-1">📋</div>
+              <div className="text-xs">لا توجد معاملات هذا الشهر</div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  )
-}
-
-function StatCard({ title, value, prefix, color }: { title: string; value: number; prefix: string; color: string }) {
-  return (
-    <div className="bg-gray-900 rounded-xl p-3 border border-gray-800">
-      <p className="text-xs text-gray-400">{title}</p>
-      <p className={`text-xl font-black font-mono mt-1 ${color}`}>
-        {prefix}{value.toFixed(2)}
-      </p>
     </div>
   )
 }

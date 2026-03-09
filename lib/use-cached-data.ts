@@ -2,22 +2,32 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
 const cache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_TTL = 30000 // 30 seconds
+const CACHE_TTL = 30000 // 30 ثانية
 
-export function useCachedData<T>(key: string, fetcher: () => Promise<T>, deps: any[] = []) {
-  const [data, setData] = useState<T | null>(null)
-  const [loading, setLoading] = useState(true)
+export function useCachedData<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  deps: any[] = []
+) {
+  const [data, setData] = useState<T | null>(() => {
+    const cached = cache.get(key)
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data
+    return null
+  })
+  const [loading, setLoading] = useState(!cache.has(key))
   const [error, setError] = useState<string | null>(null)
   const fetcherRef = useRef(fetcher)
   fetcherRef.current = fetcher
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (force = false) => {
     const cached = cache.get(key)
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    if (!force && cached && Date.now() - cached.timestamp < CACHE_TTL) {
       setData(cached.data)
       setLoading(false)
       return
     }
+    setLoading(true)
+    setError(null)
     try {
       const result = await fetcherRef.current()
       cache.set(key, { data: result, timestamp: Date.now() })
@@ -29,9 +39,20 @@ export function useCachedData<T>(key: string, fetcher: () => Promise<T>, deps: a
     }
   }, [key])
 
-  useEffect(() => {
-    load()
-  }, [load, ...deps])
+  useEffect(() => { load() }, [load, ...deps])
 
-  return { data, loading, error }
+  const refresh = useCallback(() => {
+    cache.delete(key)
+    load(true)
+  }, [key, load])
+
+  return { data, loading, error, refresh }
+}
+
+export function invalidateCache(...keys: string[]) {
+  keys.forEach(k => cache.delete(k))
+}
+
+export function invalidateAllCache() {
+  cache.clear()
 }
