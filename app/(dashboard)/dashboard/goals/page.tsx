@@ -6,6 +6,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
@@ -20,13 +21,50 @@ export default function GoalsPage() {
 
   useEffect(() => { load() }, [load])
 
-  async function addGoal() {
+  function startEdit(g: any) {
+    setEditingId(g.id)
+    setForm({ name: g.name, target_amount: g.target_amount.toString(), current_amount: g.current_amount.toString(), target_date: g.target_date ?? '', icon: g.icon ?? '🎯' })
+    setShowForm(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function cancelForm() {
+    setShowForm(false); setEditingId(null)
+    setForm({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })
+  }
+
+  async function saveGoal() {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('savings_goals').insert({ user_id: user.id, ...form, target_amount: parseFloat(form.target_amount), current_amount: parseFloat(form.current_amount) })
-    setForm({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })
-    setShowForm(false); setSaving(false); load()
+    if (editingId) {
+      await supabase.from('savings_goals').update({
+        name: form.name, target_amount: parseFloat(form.target_amount),
+        current_amount: parseFloat(form.current_amount),
+        target_date: form.target_date || null, icon: form.icon,
+      }).eq('id', editingId)
+    } else {
+      await supabase.from('savings_goals').insert({
+        user_id: user.id, name: form.name,
+        target_amount: parseFloat(form.target_amount),
+        current_amount: parseFloat(form.current_amount),
+        target_date: form.target_date || null, icon: form.icon,
+      })
+    }
+    cancelForm(); setSaving(false); load()
+  }
+
+  async function deleteGoal(id: string) {
+    await supabase.from('savings_goals').delete().eq('id', id)
+    load()
+  }
+
+  async function addSaving(goalId: string, amount: number) {
+    const goal = goals.find(g => g.id === goalId)
+    if (!goal) return
+    const newAmount = Math.min(goal.current_amount + amount, goal.target_amount)
+    await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
+    load()
   }
 
   const icons = ['🎯','🏠','✈️','📚','🚗','💍','🎓','💻','📱','🏋️']
@@ -40,12 +78,17 @@ export default function GoalsPage() {
           <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>أهداف الادخار</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{goals.length} هدف</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="px-4 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue">+ إضافة</button>
+        <button onClick={() => { cancelForm(); setShowForm(true) }}
+          className="px-4 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue" style={{ fontFamily: 'inherit' }}>
+          + إضافة
+        </button>
       </div>
 
       {showForm && (
-        <div className="card p-4 animate-scale-in" style={{ borderColor: 'rgba(59,130,246,0.3)' }}>
-          <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>هدف جديد</h3>
+        <div className="card p-4 animate-scale-in" style={{ borderColor: editingId ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.3)' }}>
+          <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>
+            {editingId ? '✏️ تعديل الهدف' : 'هدف جديد'}
+          </h3>
           <div className="mb-3">
             <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>الأيقونة</label>
             <div className="flex flex-wrap gap-2">
@@ -75,12 +118,13 @@ export default function GoalsPage() {
             ))}
           </div>
           <div className="flex gap-2 mt-4">
-            <button onClick={addGoal} disabled={saving || !form.name || !form.target_amount}
-              className="flex-1 py-3 rounded-xl gradient-blue text-white text-sm font-black disabled:opacity-50">
-              {saving ? '...' : 'حفظ'}
+            <button onClick={saveGoal} disabled={saving || !form.name || !form.target_amount}
+              className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
+              style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
+              {saving ? '...' : editingId ? 'حفظ التعديل' : 'إضافة'}
             </button>
-            <button onClick={() => setShowForm(false)} className="flex-1 py-3 rounded-xl text-sm font-bold"
-              style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>إلغاء</button>
+            <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
+              style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>إلغاء</button>
           </div>
         </div>
       )}
@@ -91,24 +135,35 @@ export default function GoalsPage() {
           const remaining = goal.target_amount - goal.current_amount
           return (
             <div key={goal.id} className="card p-4">
-              <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
                   style={{ background: 'var(--bg-secondary)' }}>{goal.icon || '🎯'}</div>
                 <div className="flex-1 min-w-0">
                   <div className="font-black" style={{ color: 'var(--text-primary)' }}>{goal.name}</div>
                   {goal.target_date && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>الهدف: {goal.target_date}</div>}
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-blue-light)' }}>{pct.toFixed(0)}%</div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <div className="font-black font-mono text-sm ml-1" style={{ color: 'var(--accent-blue-light)' }}>{pct.toFixed(0)}%</div>
+                  <button onClick={() => startEdit(goal)}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
+                    style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--accent-yellow-light)' }}>✏️</button>
+                  <button onClick={() => deleteGoal(goal.id)}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
+                    style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red-light)' }}>🗑️</button>
                 </div>
               </div>
               <div className="progress-track mb-2">
                 <div className="progress-fill gradient-blue" style={{ width: `${pct}%` }} />
               </div>
-              <div className="flex justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
-                <span className="font-mono">{goal.current_amount.toFixed(0)} JOD</span>
-                <span>متبقي: <span className="font-mono font-bold" style={{ color: 'var(--accent-yellow-light)' }}>{remaining.toFixed(0)} JOD</span></span>
-                <span className="font-mono">{goal.target_amount.toFixed(0)} JOD</span>
+              <div className="flex justify-between items-center">
+                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  <span className="font-mono">{goal.current_amount.toFixed(0)}</span> / <span className="font-mono">{goal.target_amount.toFixed(0)} JOD</span>
+                </div>
+                <button onClick={() => {
+                  const amount = prompt('أضف مبلغ الادخار (JOD):')
+                  if (amount && parseFloat(amount) > 0) addSaving(goal.id, parseFloat(amount))
+                }}
+                  className="text-xs px-3 py-1.5 rounded-lg font-bold badge-green">+ ادخار</button>
               </div>
             </div>
           )
@@ -117,7 +172,6 @@ export default function GoalsPage() {
           <div className="text-center py-16 card">
             <div className="text-4xl mb-3">🎯</div>
             <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>لا توجد أهداف</div>
-            <div className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>حدد هدفك الأول وابدأ الادخار</div>
           </div>
         )}
       </div>
