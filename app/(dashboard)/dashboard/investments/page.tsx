@@ -15,6 +15,8 @@ export default function InvestmentsPage() {
   const [editPrice, setEditPrice] = useState<{id: string, price: string} | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const [refreshMsg, setRefreshMsg] = useState('')
+  const [usdToJod, setUsdToJod] = useState<number | null>(null)
+  const [showJod, setShowJod] = useState(false)
   const supabase = createClient()
 
   const load = useCallback(async () => {
@@ -29,16 +31,28 @@ export default function InvestmentsPage() {
     setLoading(false)
   }, [supabase])
 
-  useEffect(() => { load() }, [load])
+  // جلب سعر صرف USD/JOD
+  const fetchExchangeRate = useCallback(async () => {
+    try {
+      const key = process.env.NEXT_PUBLIC_EXCHANGE_RATE_KEY
+      const res = await fetch(`https://v6.exchangerate-api.com/v6/${key}/pair/USD/JOD`)
+      const data = await res.json()
+      if (data.conversion_rate) {
+        setUsdToJod(data.conversion_rate)
+      }
+    } catch {
+      console.error('Exchange rate fetch failed')
+    }
+  }, [])
 
-  // جلب أسعار حية
+  useEffect(() => { load(); fetchExchangeRate() }, [load, fetchExchangeRate])
+
   async function refreshPrices() {
     setRefreshing(true)
     setRefreshMsg('')
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-
       let updated = 0
 
       // BTC من CoinGecko
@@ -46,36 +60,22 @@ export default function InvestmentsPage() {
       if (btcInv) {
         const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
         const data = await res.json()
-        const btcPrice = data?.bitcoin?.usd
-        if (btcPrice) {
-          await supabase.from('investments').update({ current_price: btcPrice }).eq('id', btcInv.id)
+        if (data?.bitcoin?.usd) {
+          await supabase.from('investments').update({ current_price: data.bitcoin.usd }).eq('id', btcInv.id)
           updated++
         }
       }
 
-      // SPUS من Yahoo Finance (غير رسمي)
-      const spusInv = investments.find(i => i.symbol === 'SPUS')
-      if (spusInv) {
-        try {
-          const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/SPUS?interval=1d&range=1d')
-          const data = await res.json()
-          const spusPrice = data?.chart?.result?.[0]?.meta?.regularMarketPrice
-          if (spusPrice) {
-            await supabase.from('investments').update({ current_price: spusPrice }).eq('id', spusInv.id)
-            updated++
-          }
-        } catch {
-          // Yahoo قد يحجب الطلب من المتصفح
-        }
-      }
+      // سعر الصرف
+      await fetchExchangeRate()
 
       await load()
-      setRefreshMsg(updated > 0 ? `✅ تم تحديث ${updated} أصول` : '⚠️ تعذر التحديث، حاول لاحقاً')
+      setRefreshMsg(updated > 0 ? `✅ تم التحديث — 1 USD = ${usdToJod?.toFixed(3)} JOD` : '⚠️ تعذر التحديث')
     } catch {
       setRefreshMsg('❌ خطأ في الاتصال')
     }
     setRefreshing(false)
-    setTimeout(() => setRefreshMsg(''), 3000)
+    setTimeout(() => setRefreshMsg(''), 4000)
   }
 
   async function addInvestment() {
@@ -112,10 +112,11 @@ export default function InvestmentsPage() {
     setEditPrice(null); load()
   }
 
-  const totalValue = investments.reduce((a, i) => a + i.shares * i.current_price, 0)
-  const totalCost = investments.reduce((a, i) => a + i.shares * i.avg_buy_price, 0)
-  const totalPnL = totalValue - totalCost
-  const pnlPct = totalCost > 0 ? (totalPnL / totalCost * 100).toFixed(1) : '0'
+  const totalValueUSD = investments.reduce((a, i) => a + i.shares * i.current_price, 0)
+  const totalCostUSD = investments.reduce((a, i) => a + i.shares * i.avg_buy_price, 0)
+  const totalPnL = totalValueUSD - totalCostUSD
+  const pnlPct = totalCostUSD > 0 ? (totalPnL / totalCostUSD * 100).toFixed(1) : '0'
+  const totalValueJOD = usdToJod ? totalValueUSD * usdToJod : null
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
 
@@ -126,23 +127,33 @@ export default function InvestmentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>المحفظة</h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>SPUS · BTC</p>
+          {usdToJod && (
+            <p className="text-xs mt-0.5 font-mono" style={{ color: 'var(--accent-green-light)' }}>
+              1 USD = {usdToJod.toFixed(3)} JOD 🔄
+            </p>
+          )}
         </div>
         <div className="flex gap-2">
+          {usdToJod && (
+            <button onClick={() => setShowJod(!showJod)}
+              className="px-3 py-2.5 rounded-xl text-xs font-black transition-all badge-blue"
+              style={{ fontFamily: 'inherit' }}>
+              {showJod ? '$ USD' : 'JOD د.أ'}
+            </button>
+          )}
           <button onClick={refreshPrices} disabled={refreshing}
-            className="px-3 py-2.5 rounded-xl text-sm font-black transition-all badge-green disabled:opacity-50"
+            className="px-3 py-2.5 rounded-xl text-sm font-black badge-green disabled:opacity-50"
             style={{ fontFamily: 'inherit' }}>
-            {refreshing ? '⏳' : '🔄 تحديث'}
+            {refreshing ? '⏳' : '🔄'}
           </button>
           <button onClick={() => setShowForm(!showForm)}
             className="px-3 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue"
             style={{ fontFamily: 'inherit' }}>
-            + إضافة
+            +
           </button>
         </div>
       </div>
 
-      {/* Refresh message */}
       {refreshMsg && (
         <div className="p-3 rounded-xl text-sm text-center badge-green animate-scale-in">{refreshMsg}</div>
       )}
@@ -150,27 +161,57 @@ export default function InvestmentsPage() {
       {/* Portfolio summary */}
       <div className="grid grid-cols-3 gap-3">
         <div className="card p-3 text-center glow-blue">
-          <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>${totalValue.toFixed(0)}</div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>القيمة</div>
+          <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>
+            {showJod && totalValueJOD ? `${totalValueJOD.toFixed(0)}` : `$${totalValueUSD.toFixed(0)}`}
+          </div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+            {showJod ? 'JOD' : 'USD'}
+          </div>
+          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>القيمة</div>
         </div>
         <div className="card p-3 text-center">
           <div className="text-base font-black font-mono" style={{ color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
-            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(0)}
+            {showJod && usdToJod
+              ? `${(totalPnL * usdToJod).toFixed(0)}`
+              : `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(0)}`}
           </div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>الربح</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{showJod ? 'JOD' : 'USD'}</div>
+          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>الربح</div>
         </div>
         <div className="card p-3 text-center">
           <div className="text-base font-black font-mono" style={{ color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
             {parseFloat(pnlPct) >= 0 ? '+' : ''}{pnlPct}%
           </div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>العائد</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>&nbsp;</div>
+          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>العائد</div>
         </div>
       </div>
+
+      {/* Exchange rate banner */}
+      {usdToJod && (
+        <div className="card p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">💱</span>
+            <div>
+              <div className="text-xs font-black" style={{ color: 'var(--text-primary)' }}>سعر الصرف الحي</div>
+              <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+                المحفظة = {totalValueJOD?.toFixed(2)} دينار أردني
+              </div>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-teal)' }}>
+              {usdToJod.toFixed(4)}
+            </div>
+            <div className="text-xs" style={{ color: 'var(--text-muted)' }}>USD/JOD</div>
+          </div>
+        </div>
+      )}
 
       {/* Add form */}
       {showForm && (
         <div className="card p-4 animate-scale-in" style={{ borderColor: 'rgba(59,130,246,0.3)' }}>
-          <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>إضافة أصل جديد</h3>
+          <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>إضافة أصل</h3>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: 'الرمز', key: 'symbol', placeholder: 'SPUS' },
@@ -215,15 +256,16 @@ export default function InvestmentsPage() {
       {/* Investment cards */}
       <div className="space-y-3">
         {investments.map((inv) => {
-          const value = inv.shares * inv.current_price
-          const cost = inv.shares * inv.avg_buy_price
-          const pnl = value - cost
-          const pnlP = cost > 0 ? (pnl / cost * 100).toFixed(1) : '0'
+          const valueUSD = inv.shares * inv.current_price
+          const valueJOD = usdToJod ? valueUSD * usdToJod : null
+          const costUSD = inv.shares * inv.avg_buy_price
+          const pnl = valueUSD - costUSD
+          const pnlP = costUSD > 0 ? (pnl / costUSD * 100).toFixed(1) : '0'
           const typeIcons: Record<string,string> = { etf: '📊', stock: '📈', crypto: '🪙', other: '💼' }
 
           return (
             <div key={inv.id} className="card p-4">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl gradient-blue flex items-center justify-center text-white font-black text-xs shrink-0">
                     {inv.symbol.slice(0, 3)}
@@ -236,14 +278,19 @@ export default function InvestmentsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-black font-mono" style={{ color: 'var(--text-primary)' }}>${value.toFixed(2)}</div>
+                  <div className="font-black font-mono" style={{ color: 'var(--text-primary)' }}>
+                    {showJod && valueJOD ? `${valueJOD.toFixed(2)} JOD` : `$${valueUSD.toFixed(2)}`}
+                  </div>
+                  {showJod && valueJOD && (
+                    <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>${valueUSD.toFixed(2)}</div>
+                  )}
                   <div className="text-xs font-mono" style={{ color: pnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
                     {pnl >= 0 ? '+' : ''}{pnlP}%
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-3 gap-2 mb-3">
                 {[
                   { label: 'الوحدات', value: inv.shares.toFixed(4) },
                   { label: 'متوسط الشراء', value: `$${inv.avg_buy_price.toFixed(2)}` },
@@ -304,54 +351,17 @@ export default function InvestmentsPage() {
               ) : (
                 <div className="flex gap-2">
                   <button onClick={() => setShowBuyForm(inv.id)}
-                    className="flex-1 py-2.5 rounded-xl gradient-green text-white text-sm font-black hover:opacity-90"
-                    style={{ fontFamily: 'inherit' }}>
-                    + شراء
-                  </button>
+                    className="flex-1 py-2.5 rounded-xl gradient-green text-white text-sm font-black"
+                    style={{ fontFamily: 'inherit' }}>+ شراء</button>
                   <button onClick={() => setEditPrice({ id: inv.id, price: inv.current_price.toString() })}
-                    className="flex-1 py-2.5 rounded-xl text-sm font-bold badge-blue hover:opacity-80 transition-opacity"
-                    style={{ fontFamily: 'inherit' }}>
-                    ✏️ السعر
-                  </button>
+                    className="flex-1 py-2.5 rounded-xl text-sm font-bold badge-blue"
+                    style={{ fontFamily: 'inherit' }}>✏️ السعر</button>
                 </div>
               )}
             </div>
           )
         })}
       </div>
-
-      {/* Recent transactions */}
-      {transactions.length > 0 && (
-        <div className="card p-4">
-          <h3 className="font-black mb-3 text-sm" style={{ color: 'var(--text-primary)' }}>آخر العمليات</h3>
-          <div className="space-y-2">
-            {transactions.map((t) => {
-              const inv = investments.find(i => i.id === t.investment_id)
-              return (
-                <div key={t.id} className="flex items-center justify-between py-2"
-                  style={{ borderBottom: '1px solid var(--border)' }}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg gradient-blue flex items-center justify-center text-white text-xs font-black">
-                      {t.type === 'buy' ? '↓' : '↑'}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
-                        {inv?.symbol} · {t.type === 'buy' ? 'شراء' : 'بيع'}
-                      </div>
-                      <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>{t.transaction_date}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs font-black font-mono" style={{ color: 'var(--text-primary)' }}>
-                      ${(t.shares * t.price).toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {investments.length === 0 && (
         <div className="text-center py-16 card">
