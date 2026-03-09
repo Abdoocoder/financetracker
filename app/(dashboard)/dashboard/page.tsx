@@ -18,7 +18,7 @@ export default function DashboardPage() {
   })
   const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [errors, setErrors] = useState<string[]>([])
 
   useEffect(() => {
     if (!user) {
@@ -27,61 +27,123 @@ export default function DashboardPage() {
     }
 
     const fetchData = async () => {
+      const errorList: string[] = []
+      
       try {
         console.log('Fetching data for user:', user.id)
 
-        // جلب كل المعاملات (بدون فلتر شهر) لرؤية البيانات
+        // 1. جلب المعاملات
         const { data: txData, error: txError } = await supabase
           .from('transactions')
           .select('*')
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false }) // استخدم created_at افتراضياً
+          .order('created_at', { ascending: false })
 
         if (txError) {
-          console.error('Error fetching transactions:', txError)
+          errorList.push(`Transactions: ${txError.message}`)
+          console.error('Transactions error:', txError)
         } else {
           console.log(`Found ${txData?.length} transactions`)
           if (txData && txData.length > 0) {
-            console.log('First transaction fields:', Object.keys(txData[0]))
-            console.log('First transaction data:', txData[0])
+            console.log('Transaction fields:', Object.keys(txData[0]))
           }
         }
 
-        // جلب الديون
-        const { data: debtData, error: debtError } = await supabase
+        // 2. جلب الديون - محاولة أسماء مختلفة للأعمدة
+        let debtData = null
+        let debtError = null
+
+        // جرب أولاً باستخدام total_amount
+        const debtAttempt1 = await supabase
           .from('debts')
-          .select('amount, paid')
+          .select('*')
           .eq('user_id', user.id)
 
-        if (debtError) throw debtError
+        if (!debtAttempt1.error) {
+          debtData = debtAttempt1.data
+          console.log('Debt fields (first attempt):', debtData?.[0] ? Object.keys(debtData[0]) : 'No debts')
+          
+          // تحقق من وجود amount أو total_amount أو original_amount
+          if (debtData && debtData.length > 0) {
+            const firstDebt = debtData[0]
+            const possibleAmountFields = ['amount', 'total_amount', 'original_amount', 'remaining_amount', 'balance']
+            const foundField = possibleAmountFields.find(field => field in firstDebt)
+            
+            if (foundField) {
+              console.log(`Using amount field: ${foundField}`)
+              // احسب إجمالي الديون باستخدام الحقل الموجود
+              const totalDebt = debtData.reduce((acc, d) => {
+                const amount = d[foundField] || 0
+                const paid = d.paid || 0
+                return acc + (amount - paid)
+              }, 0)
+              setSummary(prev => ({ ...prev, totalDebt }))
+            } else {
+              errorList.push('Debts: No amount field found in debt records')
+            }
+          }
+        } else {
+          errorList.push(`Debts: ${debtAttempt1.error.message}`)
+        }
 
-        // جلب الاستثمارات
+        // 3. جلب الاستثمارات
         const { data: invData, error: invError } = await supabase
           .from('investments')
-          .select('shares, current_price, avg_buy_price')
+          .select('*')
           .eq('user_id', user.id)
 
-        if (invError) throw invError
+        if (invError) {
+          errorList.push(`Investments: ${invError.message}`)
+        } else {
+          console.log(`Found ${invData?.length} investments`)
+          if (invData && invData.length > 0) {
+            console.log('Investment fields:', Object.keys(invData[0]))
+            
+            // حساب قيمة المحفظة
+            const totalValue = invData.reduce((acc, i) => {
+              const shares = i.shares || 0
+              const price = i.current_price || 0
+              return acc + (shares * price)
+            }, 0)
+            
+            const totalCost = invData.reduce((acc, i) => {
+              const shares = i.shares || 0
+              const avgPrice = i.avg_buy_price || 0
+              return acc + (shares * avgPrice)
+            }, 0)
+            
+            setSummary(prev => ({
+              ...prev,
+              totalInvestmentValue: totalValue,
+              investmentPnL: totalValue - totalCost
+            }))
+          }
+        }
 
-        // حساب الإجماليات من جميع المعاملات (بدون فلتر)
-        const totalIncome = txData?.filter(t => t.type === 'income').reduce((acc, t) => acc + (t.amount || 0), 0) || 0
-        const totalExpense = txData?.filter(t => t.type === 'expense').reduce((acc, t) => acc + (t.amount || 0), 0) || 0
-        const totalDebt = debtData?.reduce((acc, d) => acc + (d.amount - (d.paid || 0)), 0) || 0
-        const totalInvestmentValue = invData?.reduce((acc, i) => acc + (i.shares * i.current_price), 0) || 0
-        const totalInvestmentCost = invData?.reduce((acc, i) => acc + (i.shares * i.avg_buy_price), 0) || 0
+        // حساب الدخل والمصاريف من المعاملات
+        if (txData) {
+          const totalIncome = txData
+            .filter(t => t.type === 'income')
+            .reduce((acc, t) => acc + (t.amount || 0), 0)
+          
+          const totalExpense = txData
+            .filter(t => t.type === 'expense')
+            .reduce((acc, t) => acc + (t.amount || 0), 0)
+          
+          setSummary(prev => ({
+            ...prev,
+            totalIncome,
+            totalExpense,
+            balance: totalIncome - totalExpense
+          }))
+          
+          setTransactions(txData)
+        }
 
-        setSummary({
-          totalIncome,
-          totalExpense,
-          balance: totalIncome - totalExpense,
-          totalDebt,
-          totalInvestmentValue,
-          investmentPnL: totalInvestmentValue - totalInvestmentCost
-        })
-        setTransactions(txData || [])
+        setErrors(errorList)
       } catch (err: any) {
-        console.error('Error:', err)
-        setError(err.message)
+        console.error('Unexpected error:', err)
+        setErrors([...errorList, `Unexpected: ${err.message}`])
       } finally {
         setLoading(false)
       }
@@ -111,10 +173,17 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* رسالة بعدد المعاملات للتشخيص */}
+      {/* عرض الأخطاء إن وجدت */}
+      {errors.length > 0 && (
+        <div className="bg-red-900/50 border border-red-700 p-3 rounded text-sm text-red-200">
+          <p className="font-bold mb-1">تم اكتشاف مشاكل:</p>
+          {errors.map((err, i) => <p key={i}>• {err}</p>)}
+        </div>
+      )}
+
+      {/* عدد المعاملات */}
       <div className="bg-gray-800 p-3 rounded text-sm text-gray-300">
         عدد المعاملات: {transactions.length}
-        {error && <div className="text-red-400">خطأ: {error}</div>}
       </div>
 
       {/* بطاقات الإحصائيات */}
@@ -122,10 +191,10 @@ export default function DashboardPage() {
         <StatCard title="الرصيد" value={summary.balance} prefix="$" color="text-blue-400" />
         <StatCard title="الدخل" value={summary.totalIncome} prefix="$" color="text-green-400" />
         <StatCard title="المصاريف" value={summary.totalExpense} prefix="$" color="text-red-400" />
-        <StatCard title="الديون المتبقية" value={summary.totalDebt} prefix="$" color="text-yellow-400" />
+        <StatCard title="الديون" value={summary.totalDebt} prefix="$" color="text-yellow-400" />
       </div>
 
-      {/* المحفظة والديون (مشابهة لما سبق) */}
+      {/* المحفظة والديون */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* المحفظة */}
         <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
@@ -166,7 +235,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* آخر المعاملات (أول 5) */}
+      {/* آخر المعاملات */}
       <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
         <h3 className="font-black mb-3 flex items-center gap-2 text-white">
           <span>🔄</span> آخر المعاملات
