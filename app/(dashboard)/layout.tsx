@@ -1,4 +1,3 @@
-// app/(dashboard)/layout.tsx
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/layout/Sidebar'
@@ -10,24 +9,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single()
+    .from('profiles').select('*').eq('id', user.id).single()
 
-  // Unread alerts count
   const { count: alertsCount } = await supabase
-    .from('alerts')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('is_read', false)
+    .from('alerts').select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id).eq('is_read', false)
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', position: 'relative', zIndex: 10 }}>
       <Sidebar alertsCount={alertsCount ?? 0} />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header profile={profile} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main style={{ flex: 1, overflowY: 'auto', padding: '16px', paddingBottom: '90px' }}>
           {children}
         </main>
       </div>
