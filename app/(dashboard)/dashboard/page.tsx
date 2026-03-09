@@ -19,7 +19,6 @@ export default function DashboardPage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [debug, setDebug] = useState<any>({})
 
   useEffect(() => {
     if (!user) {
@@ -31,61 +30,39 @@ export default function DashboardPage() {
       try {
         console.log('Fetching data for user:', user.id)
 
-        // أولاً: جلب هيكل الجدول لمعرفة أسماء الأعمدة (للتشخيص)
-        const { data: columns, error: columnsError } = await supabase
-          .rpc('get_table_columns', { table_name: 'transactions' }) // هذه دالة مخصصة قد لا تكون موجودة
-          .catch(() => ({ data: null }))
-
-        // جلب المعاملات - نحاول باستخدام transaction_date أولاً
+        // محاولة جلب المعاملات باستخدام أسماء مختلفة للتاريخ
         let txData = null
-        let txError = null
+        let dateField = ''
 
-        // محاولة باستخدام transaction_date
-        const result1 = await supabase
-          .from('transactions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('transaction_date', { ascending: false })
-          .limit(10)
-
-        if (!result1.error) {
-          txData = result1.data
-          console.log('Using transaction_date, data:', txData)
-        } else {
-          console.log('transaction_date failed:', result1.error.message)
-          // إذا فشلت، جرب باستخدام created_at
-          const result2 = await supabase
+        // قائمة بأسماء الحقول المحتملة للتاريخ
+        const dateFields = ['transaction_date', 'created_at', 'date']
+        
+        for (const field of dateFields) {
+          const { data, error } = await supabase
             .from('transactions')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
+            .order(field, { ascending: false })
             .limit(10)
 
-          if (!result2.error) {
-            txData = result2.data
-            console.log('Using created_at, data:', txData)
-          } else {
-            txError = result2.error
-            console.log('created_at also failed:', result2.error.message)
-            // جرب باستخدام date
-            const result3 = await supabase
-              .from('transactions')
-              .select('*')
-              .eq('user_id', user.id)
-              .order('date', { ascending: false })
-              .limit(10)
-
-            if (!result3.error) {
-              txData = result3.data
-              console.log('Using date, data:', txData)
-            } else {
-              txError = result3.error
-              console.log('All attempts failed')
-            }
+          if (!error && data) {
+            txData = data
+            dateField = field
+            console.log(`Success with field: ${field}`)
+            break
           }
         }
 
-        if (txError) throw txError
+        if (!txData) {
+          // إذا لم تنجح أي محاولة، جلب بدون ترتيب
+          const { data, error } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('user_id', user.id)
+            .limit(10)
+
+          if (!error) txData = data
+        }
 
         // جلب الديون
         const { data: debtData, error: debtError } = await supabase
@@ -119,15 +96,9 @@ export default function DashboardPage() {
           investmentPnL: totalInvestmentValue - totalInvestmentCost
         })
         setTransactions(txData || [])
-        setDebug({ 
-          transactionCount: txData?.length,
-          firstTransaction: txData?.[0] ? Object.keys(txData[0]) : [],
-          usedColumn: txData ? 'found' : 'none'
-        })
       } catch (err: any) {
         console.error('Error fetching data:', err)
         setError(err.message)
-        setDebug({ error: err.message })
       } finally {
         setLoading(false)
       }
@@ -218,8 +189,8 @@ export default function DashboardPage() {
         {transactions.length > 0 ? (
           <div className="space-y-2">
             {transactions.slice(0, 5).map((t) => {
-              // تحديد اسم حقل التاريخ المستخدم
-              const dateField = t.transaction_date || t.created_at || t.date || null
+              // تحديد حقل التاريخ المتاح
+              const dateValue = t.transaction_date || t.created_at || t.date
               return (
                 <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
                   <div className="flex items-center gap-3">
@@ -229,7 +200,7 @@ export default function DashboardPage() {
                     <div>
                       <p className="font-medium text-white">{t.description || t.category}</p>
                       <p className="text-xs text-gray-500">
-                        {dateField ? new Date(dateField).toLocaleDateString('ar-EG') : 'تاريخ غير متوفر'}
+                        {dateValue ? new Date(dateValue).toLocaleDateString('ar-EG') : ''}
                       </p>
                     </div>
                   </div>
@@ -247,19 +218,6 @@ export default function DashboardPage() {
           عرض كل المعاملات
         </Link>
       </div>
-
-      {/* معلومات التشخيص - تظهر فقط في وضع التطوير */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-gray-800 p-3 rounded text-xs text-gray-400">
-          <p><strong>Debug Info:</strong></p>
-          <p>User ID: {user.id}</p>
-          <p>Transaction count: {transactions.length}</p>
-          {debug.firstTransaction && (
-            <p>Transaction columns: {debug.firstTransaction.join(', ')}</p>
-          )}
-          {error && <p className="text-red-400">Error: {error}</p>}
-        </div>
-      )}
     </div>
   )
 }
