@@ -9,7 +9,11 @@ interface UserContextType {
   refresh: () => void
 }
 
-const UserContext = createContext<UserContextType>({ user: null, loading: true, refresh: () => {} })
+const UserContext = createContext<UserContextType>({
+  user: null,
+  loading: true,
+  refresh: () => {}
+})
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
