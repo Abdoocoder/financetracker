@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [debug, setDebug] = useState<any>({})
 
   useEffect(() => {
     if (!user) {
@@ -30,16 +31,61 @@ export default function DashboardPage() {
       try {
         console.log('Fetching data for user:', user.id)
 
-        // جلب المعاملات
-        const { data: txData, error: txError } = await supabase
+        // أولاً: جلب هيكل الجدول لمعرفة أسماء الأعمدة (للتشخيص)
+        const { data: columns, error: columnsError } = await supabase
+          .rpc('get_table_columns', { table_name: 'transactions' }) // هذه دالة مخصصة قد لا تكون موجودة
+          .catch(() => ({ data: null }))
+
+        // جلب المعاملات - نحاول باستخدام transaction_date أولاً
+        let txData = null
+        let txError = null
+
+        // محاولة باستخدام transaction_date
+        const result1 = await supabase
           .from('transactions')
           .select('*')
           .eq('user_id', user.id)
-          .order('date', { ascending: false })
+          .order('transaction_date', { ascending: false })
           .limit(10)
 
+        if (!result1.error) {
+          txData = result1.data
+          console.log('Using transaction_date, data:', txData)
+        } else {
+          console.log('transaction_date failed:', result1.error.message)
+          // إذا فشلت، جرب باستخدام created_at
+          const result2 = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10)
+
+          if (!result2.error) {
+            txData = result2.data
+            console.log('Using created_at, data:', txData)
+          } else {
+            txError = result2.error
+            console.log('created_at also failed:', result2.error.message)
+            // جرب باستخدام date
+            const result3 = await supabase
+              .from('transactions')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('date', { ascending: false })
+              .limit(10)
+
+            if (!result3.error) {
+              txData = result3.data
+              console.log('Using date, data:', txData)
+            } else {
+              txError = result3.error
+              console.log('All attempts failed')
+            }
+          }
+        }
+
         if (txError) throw txError
-        console.log('Transactions:', txData)
 
         // جلب الديون
         const { data: debtData, error: debtError } = await supabase
@@ -48,7 +94,6 @@ export default function DashboardPage() {
           .eq('user_id', user.id)
 
         if (debtError) throw debtError
-        console.log('Debts:', debtData)
 
         // جلب الاستثمارات
         const { data: invData, error: invError } = await supabase
@@ -57,7 +102,6 @@ export default function DashboardPage() {
           .eq('user_id', user.id)
 
         if (invError) throw invError
-        console.log('Investments:', invData)
 
         // حساب الإجماليات
         const totalIncome = txData?.filter(t => t.type === 'income').reduce((acc, t) => acc + (t.amount || 0), 0) || 0
@@ -75,9 +119,15 @@ export default function DashboardPage() {
           investmentPnL: totalInvestmentValue - totalInvestmentCost
         })
         setTransactions(txData || [])
+        setDebug({ 
+          transactionCount: txData?.length,
+          firstTransaction: txData?.[0] ? Object.keys(txData[0]) : [],
+          usedColumn: txData ? 'found' : 'none'
+        })
       } catch (err: any) {
         console.error('Error fetching data:', err)
         setError(err.message)
+        setDebug({ error: err.message })
       } finally {
         setLoading(false)
       }
@@ -87,17 +137,11 @@ export default function DashboardPage() {
   }, [user])
 
   if (userLoading || loading) {
-    return <div className="flex items-center justify-center h-64">
-      <div className="text-white">جاري التحميل...</div>
-    </div>
+    return <div className="flex items-center justify-center h-64 text-white">جاري التحميل...</div>
   }
 
   if (!user) {
     return <div className="text-center py-10 text-red-400">الرجاء تسجيل الدخول</div>
-  }
-
-  if (error) {
-    return <div className="text-center py-10 text-red-400">خطأ: {error}</div>
   }
 
   return (
@@ -173,22 +217,28 @@ export default function DashboardPage() {
         </h3>
         {transactions.length > 0 ? (
           <div className="space-y-2">
-            {transactions.slice(0, 5).map((t) => (
-              <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
-                    {t.type === 'income' ? '↑' : '↓'}
+            {transactions.slice(0, 5).map((t) => {
+              // تحديد اسم حقل التاريخ المستخدم
+              const dateField = t.transaction_date || t.created_at || t.date || null
+              return (
+                <div key={t.id} className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${t.type === 'income' ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-red-400'}`}>
+                      {t.type === 'income' ? '↑' : '↓'}
+                    </div>
+                    <div>
+                      <p className="font-medium text-white">{t.description || t.category}</p>
+                      <p className="text-xs text-gray-500">
+                        {dateField ? new Date(dateField).toLocaleDateString('ar-EG') : 'تاريخ غير متوفر'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-white">{t.description || t.category}</p>
-                    <p className="text-xs text-gray-500">{new Date(t.date).toLocaleDateString('ar-EG')}</p>
-                  </div>
+                  <span className={`font-mono font-bold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
+                    {t.type === 'income' ? '+' : '-'} ${t.amount.toFixed(2)}
+                  </span>
                 </div>
-                <span className={`font-mono font-bold ${t.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
-                  {t.type === 'income' ? '+' : '-'} ${t.amount.toFixed(2)}
-                </span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <p className="text-center py-4 text-gray-500">لا توجد معاملات بعد</p>
@@ -198,12 +248,18 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Debug info - يمكنك إزالته بعد التأكد من العمل */}
-      <div className="bg-gray-800 p-2 text-xs text-gray-400 rounded">
-        <p>User ID: {user.id}</p>
-        <p>عدد المعاملات: {transactions.length}</p>
-        <p>آخر خطأ: {error || 'لا يوجد'}</p>
-      </div>
+      {/* معلومات التشخيص - تظهر فقط في وضع التطوير */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-gray-800 p-3 rounded text-xs text-gray-400">
+          <p><strong>Debug Info:</strong></p>
+          <p>User ID: {user.id}</p>
+          <p>Transaction count: {transactions.length}</p>
+          {debug.firstTransaction && (
+            <p>Transaction columns: {debug.firstTransaction.join(', ')}</p>
+          )}
+          {error && <p className="text-red-400">Error: {error}</p>}
+        </div>
+      )}
     </div>
   )
 }
