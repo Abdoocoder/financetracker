@@ -17,6 +17,7 @@ export default function InvestmentsPage() {
   const [refreshMsg, setRefreshMsg] = useState('')
   const [usdToJod, setUsdToJod] = useState<number | null>(null)
   const [showJod, setShowJod] = useState(false)
+  const [priceStatus, setPriceStatus] = useState<Record<string, 'live' | 'manual'>>({})
   const supabase = createClient()
 
   const load = useCallback(async () => {
@@ -31,18 +32,13 @@ export default function InvestmentsPage() {
     setLoading(false)
   }, [supabase])
 
-  // جلب سعر صرف USD/JOD
   const fetchExchangeRate = useCallback(async () => {
     try {
       const key = process.env.NEXT_PUBLIC_EXCHANGE_RATE_KEY
       const res = await fetch(`https://v6.exchangerate-api.com/v6/${key}/pair/USD/JOD`)
       const data = await res.json()
-      if (data.conversion_rate) {
-        setUsdToJod(data.conversion_rate)
-      }
-    } catch {
-      console.error('Exchange rate fetch failed')
-    }
+      if (data.conversion_rate) setUsdToJod(data.conversion_rate)
+    } catch {}
   }, [])
 
   useEffect(() => { load(); fetchExchangeRate() }, [load, fetchExchangeRate])
@@ -50,32 +46,65 @@ export default function InvestmentsPage() {
   async function refreshPrices() {
     setRefreshing(true)
     setRefreshMsg('')
+    const newStatus: Record<string, 'live' | 'manual'> = {}
+    let updated = 0
+    let failed: string[] = []
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      let updated = 0
 
-      // BTC من CoinGecko
-      const btcInv = investments.find(i => i.symbol === 'BTC')
-      if (btcInv) {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-        const data = await res.json()
-        if (data?.bitcoin?.usd) {
-          await supabase.from('investments').update({ current_price: data.bitcoin.usd }).eq('id', btcInv.id)
-          updated++
+      for (const inv of investments) {
+        try {
+          if (inv.symbol === 'BTC') {
+            // BTC من CoinGecko
+            const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
+            const data = await res.json()
+            const price = data?.bitcoin?.usd
+            if (price) {
+              await supabase.from('investments').update({ current_price: price }).eq('id', inv.id)
+              newStatus[inv.id] = 'live'
+              updated++
+            } else {
+              failed.push(inv.symbol)
+              newStatus[inv.id] = 'manual'
+            }
+          } else {
+            // أسهم وETF من Yahoo Finance عبر API Route
+            const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
+            const data = await res.json()
+            if (data.price) {
+              await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id)
+              newStatus[inv.id] = 'live'
+              updated++
+            } else {
+              failed.push(inv.symbol)
+              newStatus[inv.id] = 'manual'
+            }
+          }
+        } catch {
+          failed.push(inv.symbol)
+          newStatus[inv.id] = 'manual'
         }
       }
 
-      // سعر الصرف
       await fetchExchangeRate()
-
       await load()
-      setRefreshMsg(updated > 0 ? `✅ تم التحديث — 1 USD = ${usdToJod?.toFixed(3)} JOD` : '⚠️ تعذر التحديث')
+      setPriceStatus(newStatus)
+
+      if (updated === investments.length) {
+        setRefreshMsg(`✅ تم تحديث جميع الأسعار (${updated} أصول)`)
+      } else if (updated > 0) {
+        setRefreshMsg(`⚠️ تم تحديث ${updated} — تعذّر: ${failed.join(', ')}`)
+      } else {
+        setRefreshMsg(`❌ تعذّر التحديث التلقائي`)
+      }
     } catch {
       setRefreshMsg('❌ خطأ في الاتصال')
     }
+
     setRefreshing(false)
-    setTimeout(() => setRefreshMsg(''), 4000)
+    setTimeout(() => setRefreshMsg(''), 5000)
   }
 
   async function addInvestment() {
@@ -122,21 +151,20 @@ export default function InvestmentsPage() {
 
   return (
     <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>المحفظة</h1>
           {usdToJod && (
             <p className="text-xs mt-0.5 font-mono" style={{ color: 'var(--accent-green-light)' }}>
-              1 USD = {usdToJod.toFixed(3)} JOD 🔄
+              1 USD = {usdToJod.toFixed(3)} JOD 💱
             </p>
           )}
         </div>
         <div className="flex gap-2">
           {usdToJod && (
             <button onClick={() => setShowJod(!showJod)}
-              className="px-3 py-2.5 rounded-xl text-xs font-black transition-all badge-blue"
+              className="px-3 py-2.5 rounded-xl text-xs font-black badge-blue"
               style={{ fontFamily: 'inherit' }}>
               {showJod ? '$ USD' : 'JOD د.أ'}
             </button>
@@ -148,14 +176,15 @@ export default function InvestmentsPage() {
           </button>
           <button onClick={() => setShowForm(!showForm)}
             className="px-3 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue"
-            style={{ fontFamily: 'inherit' }}>
-            +
-          </button>
+            style={{ fontFamily: 'inherit' }}>+</button>
         </div>
       </div>
 
       {refreshMsg && (
-        <div className="p-3 rounded-xl text-sm text-center badge-green animate-scale-in">{refreshMsg}</div>
+        <div className="p-3 rounded-xl text-sm text-center animate-scale-in"
+          style={{ background: refreshMsg.startsWith('✅') ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)', color: 'var(--text-primary)' }}>
+          {refreshMsg}
+        </div>
       )}
 
       {/* Portfolio summary */}
@@ -164,45 +193,36 @@ export default function InvestmentsPage() {
           <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>
             {showJod && totalValueJOD ? `${totalValueJOD.toFixed(0)}` : `$${totalValueUSD.toFixed(0)}`}
           </div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-            {showJod ? 'JOD' : 'USD'}
-          </div>
-          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>القيمة</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{showJod ? 'JOD' : 'USD'} · القيمة</div>
         </div>
         <div className="card p-3 text-center">
           <div className="text-base font-black font-mono" style={{ color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
-            {showJod && usdToJod
-              ? `${(totalPnL * usdToJod).toFixed(0)}`
-              : `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(0)}`}
+            {showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)}` : `${totalPnL >= 0 ? '+' : ''}$${totalPnL.toFixed(0)}`}
           </div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{showJod ? 'JOD' : 'USD'}</div>
-          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>الربح</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{showJod ? 'JOD' : 'USD'} · الربح</div>
         </div>
         <div className="card p-3 text-center">
           <div className="text-base font-black font-mono" style={{ color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
             {parseFloat(pnlPct) >= 0 ? '+' : ''}{pnlPct}%
           </div>
-          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>&nbsp;</div>
-          <div className="text-xs" style={{ color: 'var(--text-muted)' }}>العائد</div>
+          <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>العائد</div>
         </div>
       </div>
 
       {/* Exchange rate banner */}
-      {usdToJod && (
+      {usdToJod && totalValueJOD && (
         <div className="card p-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">💱</span>
             <div>
               <div className="text-xs font-black" style={{ color: 'var(--text-primary)' }}>سعر الصرف الحي</div>
               <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-                المحفظة = {totalValueJOD?.toFixed(2)} دينار أردني
+                المحفظة = {totalValueJOD.toFixed(2)} دينار
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-teal)' }}>
-              {usdToJod.toFixed(4)}
-            </div>
+            <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-teal)' }}>{usdToJod.toFixed(4)}</div>
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>USD/JOD</div>
           </div>
         </div>
@@ -262,6 +282,8 @@ export default function InvestmentsPage() {
           const pnl = valueUSD - costUSD
           const pnlP = costUSD > 0 ? (pnl / costUSD * 100).toFixed(1) : '0'
           const typeIcons: Record<string,string> = { etf: '📊', stock: '📈', crypto: '🪙', other: '💼' }
+          const isLive = priceStatus[inv.id] === 'live'
+          const isManual = priceStatus[inv.id] === 'manual'
 
           return (
             <div key={inv.id} className="card p-4">
@@ -271,8 +293,11 @@ export default function InvestmentsPage() {
                     {inv.symbol.slice(0, 3)}
                   </div>
                   <div>
-                    <div className="font-black" style={{ color: 'var(--text-primary)' }}>
-                      {inv.symbol} {inv.is_halal && <span className="text-xs">✅</span>}
+                    <div className="flex items-center gap-1">
+                      <span className="font-black" style={{ color: 'var(--text-primary)' }}>{inv.symbol}</span>
+                      {inv.is_halal && <span className="text-xs">✅</span>}
+                      {isLive && <span className="text-xs px-1.5 py-0.5 rounded-md font-bold" style={{ background: 'rgba(16,185,129,0.15)', color: 'var(--accent-green-light)', fontSize: '10px' }}>LIVE</span>}
+                      {isManual && <span className="text-xs px-1.5 py-0.5 rounded-md font-bold" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', fontSize: '10px' }}>يدوي</span>}
                     </div>
                     <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{typeIcons[inv.type]} {inv.name}</div>
                   </div>
@@ -281,9 +306,7 @@ export default function InvestmentsPage() {
                   <div className="font-black font-mono" style={{ color: 'var(--text-primary)' }}>
                     {showJod && valueJOD ? `${valueJOD.toFixed(2)} JOD` : `$${valueUSD.toFixed(2)}`}
                   </div>
-                  {showJod && valueJOD && (
-                    <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>${valueUSD.toFixed(2)}</div>
-                  )}
+                  {showJod && valueJOD && <div className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>${valueUSD.toFixed(2)}</div>}
                   <div className="text-xs font-mono" style={{ color: pnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
                     {pnl >= 0 ? '+' : ''}{pnlP}%
                   </div>
