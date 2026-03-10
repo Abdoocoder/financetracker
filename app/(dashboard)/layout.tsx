@@ -4,8 +4,7 @@ import { UserProvider } from '@/lib/user-context'
 import { useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
-import { ToastProvider } from '@/lib/toast-context'
-import ToastContainer from '@/components/ui/ToastContainer'
+import { ToastProvider } from '@/components/ui/toast'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -37,7 +36,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       }}>
         {children}
       </main>
-      <ToastContainer />
     </div>
   )
 }

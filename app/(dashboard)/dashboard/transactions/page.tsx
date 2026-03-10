@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/toast'
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
@@ -10,7 +11,9 @@ export default function TransactionsPage() {
   const [filter, setFilter] = useState<'all' | 'income' | 'expense'>('all')
   const [form, setForm] = useState({ type: 'expense', amount: '', category: '', description: '', transaction_date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const supabase = createClient()
+  const { success, error, warning } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -30,36 +33,43 @@ export default function TransactionsPage() {
   }
 
   function cancelForm() {
-    setShowForm(false)
-    setEditingId(null)
+    setShowForm(false); setEditingId(null)
     setForm({ type: 'expense', amount: '', category: '', description: '', transaction_date: new Date().toISOString().split('T')[0] })
   }
 
   async function saveTransaction() {
+    if (!form.amount || !form.category) { warning('يرجى تعبئة المبلغ والفئة'); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     if (editingId) {
-      await supabase.from('transactions').update({
+      const { error: err } = await supabase.from('transactions').update({
         type: form.type, amount: parseFloat(form.amount),
         category: form.category, description: form.description, transaction_date: form.transaction_date,
       }).eq('id', editingId)
+      if (err) { error('فشل تعديل المعاملة'); setSaving(false); return }
+      success('تم تعديل المعاملة بنجاح ✏️')
     } else {
-      await supabase.from('transactions').insert({
+      const { error: err } = await supabase.from('transactions').insert({
         user_id: user.id, type: form.type, amount: parseFloat(form.amount),
         category: form.category, description: form.description, transaction_date: form.transaction_date,
       })
+      if (err) { error('فشل إضافة المعاملة'); setSaving(false); return }
+      success(form.type === 'income' ? 'تم تسجيل الدخل 💰' : 'تم تسجيل المصروف 💸')
     }
     cancelForm(); setSaving(false); load()
   }
 
   async function deleteTransaction(id: string) {
-    await supabase.from('transactions').delete().eq('id', id)
-    load()
+    setDeletingId(id)
+    const { error: err } = await supabase.from('transactions').delete().eq('id', id)
+    if (err) { error('فشل حذف المعاملة') }
+    else { success('تم حذف المعاملة'); load() }
+    setDeletingId(null)
   }
 
   const filtered = filter === 'all' ? transactions : transactions.filter(t => t.type === filter)
-  const income = transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+  const income   = transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
   const expenses = transactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
   const net = income - expenses
 
@@ -86,9 +96,9 @@ export default function TransactionsPage() {
 
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'الدخل', value: `+${income.toFixed(0)}`, color: 'var(--accent-green-light)' },
-          { label: 'المصاريف', value: `-${expenses.toFixed(0)}`, color: 'var(--accent-red-light)' },
-          { label: 'الصافي', value: `${net >= 0 ? '+' : ''}${net.toFixed(0)}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+          { label: 'الدخل',    value: `+${income.toFixed(0)}`,                                          color: 'var(--accent-green-light)' },
+          { label: 'المصاريف', value: `-${expenses.toFixed(0)}`,                                        color: 'var(--accent-red-light)'   },
+          { label: 'الصافي',   value: `${net >= 0 ? '+' : ''}${net.toFixed(0)}`,                       color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
         ].map((s, i) => (
           <div key={i} className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: s.color }}>{s.value}</div>
@@ -150,7 +160,7 @@ export default function TransactionsPage() {
                 style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
             </div>
             <div className="flex gap-2">
-              <button onClick={saveTransaction} disabled={saving || !form.amount || !form.category}
+              <button onClick={saveTransaction} disabled={saving}
                 className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
                 style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
                 {saving ? '...' : editingId ? 'حفظ التعديل' : 'إضافة'}
@@ -181,9 +191,11 @@ export default function TransactionsPage() {
               <button onClick={() => startEdit(t)}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
                 style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--accent-yellow-light)' }}>✏️</button>
-              <button onClick={() => deleteTransaction(t.id)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
-                style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red-light)' }}>🗑️</button>
+              <button onClick={() => deleteTransaction(t.id)} disabled={deletingId === t.id}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-xs disabled:opacity-40"
+                style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red-light)' }}>
+                {deletingId === t.id ? '⏳' : '🗑️'}
+              </button>
             </div>
           </div>
         ))}
