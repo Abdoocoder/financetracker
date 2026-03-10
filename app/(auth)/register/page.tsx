@@ -23,7 +23,10 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: {
+          full_name: fullName,
+          monthly_income: monthlyIncome ? parseFloat(monthlyIncome) : null
+        },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     })
@@ -31,13 +34,6 @@ export default function RegisterPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      // Update profile with income
-      if (monthlyIncome) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          await supabase.from('profiles').update({ monthly_income: parseFloat(monthlyIncome) }).eq('id', user.id)
-        }
-      }
       router.push('/dashboard')
       router.refresh()
     }
