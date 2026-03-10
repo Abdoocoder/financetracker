@@ -125,3 +125,4 @@ export default function SettingsPage() {
     </div>
   )
 }
+// Push section added via script — see PushSection component
