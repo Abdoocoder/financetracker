@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/toast'
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<any[]>([])
@@ -8,6 +9,7 @@ export default function AlertsPage() {
   const [generating, setGenerating] = useState(false)
   const [msg, setMsg] = useState('')
   const supabase = createClient()
+  const { success, error } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -28,14 +30,12 @@ export default function AlertsPage() {
     setGenerating(true)
     setMsg('')
     try {
-      // جلب الـ session token الحالي
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) {
-        setMsg('❌ يجب تسجيل الدخول أولاً')
+        error('يجب تسجيل الدخول أولاً')
         setGenerating(false)
         return
       }
-
       const res = await fetch('/api/alerts', {
         method: 'POST',
         headers: {
@@ -43,20 +43,17 @@ export default function AlertsPage() {
           'Authorization': `Bearer ${session.access_token}`
         }
       })
-
       const data = await res.json()
-
       if (!res.ok) {
-        setMsg(`❌ ${data.error ?? 'حدث خطأ'}`)
+        error(data.error ?? 'حدث خطأ')
       } else {
-        setMsg(data.message ?? '✅ تم توليد التنبيهات')
+        success(data.message ?? '✅ تم توليد التنبيهات')
         await load()
       }
     } catch (err: any) {
-      setMsg(`❌ خطأ في الاتصال: ${err.message}`)
+      error(`خطأ في الاتصال`)
     }
     setGenerating(false)
-    setTimeout(() => setMsg(''), 6000)
   }
 
   async function markRead(id: string) {
@@ -69,6 +66,7 @@ export default function AlertsPage() {
     if (!user) return
     await supabase.from('alerts').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false)
     setAlerts(prev => prev.map(a => ({ ...a, is_read: true })))
+    success('تم تعيين الكل كمقروء')
   }
 
   async function deleteAlert(id: string) {
@@ -81,15 +79,16 @@ export default function AlertsPage() {
     if (!user) return
     await supabase.from('alerts').delete().eq('user_id', user.id)
     setAlerts([])
+    success('تم حذف كل التنبيهات')
   }
 
   const unread = alerts.filter(a => !a.is_read).length
 
   const cfg: Record<string, { icon: string; bg: string; border: string }> = {
-    warning:     { icon: '⚠️', bg: 'rgba(239,68,68,0.08)',    border: 'rgba(239,68,68,0.25)' },
-    motivation:  { icon: '💪', bg: 'rgba(59,130,246,0.08)',   border: 'rgba(59,130,246,0.25)' },
-    reminder:    { icon: '⏰', bg: 'rgba(245,158,11,0.08)',   border: 'rgba(245,158,11,0.25)' },
-    achievement: { icon: '🏆', bg: 'rgba(16,185,129,0.08)',   border: 'rgba(16,185,129,0.25)' },
+    warning:     { icon: '⚠️', bg: 'rgba(239,68,68,0.08)',    border: 'rgba(239,68,68,0.25)'   },
+    motivation:  { icon: '💪', bg: 'rgba(59,130,246,0.08)',   border: 'rgba(59,130,246,0.25)'  },
+    reminder:    { icon: '⏰', bg: 'rgba(245,158,11,0.08)',   border: 'rgba(245,158,11,0.25)'  },
+    achievement: { icon: '🏆', bg: 'rgba(16,185,129,0.08)',   border: 'rgba(16,185,129,0.25)'  },
   }
 
   if (loading) return (
@@ -139,18 +138,6 @@ export default function AlertsPage() {
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>تحليل وضعك المالي وإنشاء توصيات مخصصة</div>
           </div>
         </div>
-
-        {msg && (
-          <div className="p-3 rounded-xl text-sm mb-3 animate-scale-in"
-            style={{
-              background: msg.startsWith('✅') ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
-              color: msg.startsWith('✅') ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
-              border: `1px solid ${msg.startsWith('✅') ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-            }}>
-            {msg}
-          </div>
-        )}
-
         <button onClick={generateNow} disabled={generating}
           className="w-full py-3 rounded-xl gradient-blue text-white font-black text-sm disabled:opacity-50 transition-all"
           style={{ fontFamily: 'inherit' }}>
@@ -201,14 +188,11 @@ export default function AlertsPage() {
             </div>
           )
         })}
-
         {alerts.length === 0 && (
           <div className="text-center py-16 card">
             <div className="text-5xl mb-4">🔔</div>
             <div className="font-black text-lg" style={{ color: 'var(--text-secondary)' }}>لا توجد تنبيهات</div>
-            <div className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
-              اضغط الزر أعلاه لتحليل وضعك المالي
-            </div>
+            <div className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>اضغط الزر أعلاه لتحليل وضعك المالي</div>
           </div>
         )}
       </div>
