@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendPushToUser } from '@/app/api/push-send/route'
+import { sendPushToUser } from '@/lib/push-send'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
