@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/toast'
 import type { Debt } from '@/types'
 
 export default function DebtsPage() {
@@ -12,7 +13,9 @@ export default function DebtsPage() {
   const [saving, setSaving] = useState(false)
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null)
   const [paymentAmount, setPaymentAmount] = useState('')
+  const [payingSaving, setPayingSaving] = useState(false)
   const supabase = createClient()
+  const { success, error, warning } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -37,48 +40,61 @@ export default function DebtsPage() {
   }
 
   async function saveDebt() {
+    if (!form.name || !form.original_amount) { warning('يرجى تعبئة اسم الدين والمبلغ'); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     if (editingId) {
-      await supabase.from('debts').update({
+      const { error: err } = await supabase.from('debts').update({
         name: form.name, original_amount: parseFloat(form.original_amount),
         remaining_amount: parseFloat(form.remaining_amount),
         monthly_payment: parseFloat(form.monthly_payment) || 0,
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null,
       }).eq('id', editingId)
+      if (err) { error('فشل تعديل الدين'); setSaving(false); return }
+      success('تم تعديل الدين بنجاح ✏️')
     } else {
-      await supabase.from('debts').insert({
+      const { error: err } = await supabase.from('debts').insert({
         user_id: user.id, name: form.name,
         original_amount: parseFloat(form.original_amount),
         remaining_amount: parseFloat(form.original_amount),
         monthly_payment: parseFloat(form.monthly_payment) || 0,
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null,
       })
+      if (err) { error('فشل إضافة الدين'); setSaving(false); return }
+      success('تم إضافة الدين بنجاح 💳')
     }
     cancelForm(); setSaving(false); load()
   }
 
   async function deleteDebt(id: string) {
-    await supabase.from('debts').delete().eq('id', id)
+    const { error: err } = await supabase.from('debts').delete().eq('id', id)
+    if (err) { error('فشل حذف الدين'); return }
+    success('تم حذف الدين')
     load()
   }
 
   async function makePayment(debtId: string) {
     const amount = parseFloat(paymentAmount)
-    if (!amount || amount <= 0) return
+    if (!amount || amount <= 0) { warning('أدخل مبلغاً صحيحاً'); return }
+    setPayingSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const debt = debts.find(d => d.id === debtId)
     if (!debt) return
     const newRemaining = Math.max(0, debt.remaining_amount - amount)
-    await supabase.from('debt_payments').insert({ debt_id: debtId, user_id: user.id, amount, payment_date: new Date().toISOString().split('T')[0] })
+    const { error: err } = await supabase.from('debt_payments').insert({
+      debt_id: debtId, user_id: user.id, amount, payment_date: new Date().toISOString().split('T')[0]
+    })
+    if (err) { error('فشل تسجيل الدفعة'); setPayingSaving(false); return }
     await supabase.from('debts').update({ remaining_amount: newRemaining, is_paid: newRemaining === 0 }).eq('id', debtId)
-    setPaymentDebtId(null); setPaymentAmount(''); load()
+    if (newRemaining === 0) success(`🎉 تهانينا! تم سداد "${debt.name}" بالكامل`)
+    else success(`تم تسجيل دفعة ${amount} JOD ✅`)
+    setPaymentDebtId(null); setPaymentAmount(''); setPayingSaving(false); load()
   }
 
   const totalRemaining = debts.reduce((a, d) => a + d.remaining_amount, 0)
-  const totalOriginal = debts.reduce((a, d) => a + d.original_amount, 0)
+  const totalOriginal  = debts.reduce((a, d) => a + d.original_amount, 0)
   const paidPct = totalOriginal > 0 ? ((totalOriginal - totalRemaining) / totalOriginal * 100) : 0
   const priorityColor = ['', '#ef4444', '#f59e0b', '#3b82f6', '#94a3b8', '#94a3b8']
 
@@ -100,8 +116,8 @@ export default function DebtsPage() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'إجمالي الديون', value: `${totalRemaining.toFixed(0)}`, color: 'var(--accent-red-light)' },
-          { label: 'نسبة السداد', value: `${paidPct.toFixed(0)}%`, color: 'var(--accent-green-light)' },
-          { label: 'عدد الديون', value: `${debts.length}`, color: 'var(--accent-blue-light)' },
+          { label: 'نسبة السداد',   value: `${paidPct.toFixed(0)}%`,       color: 'var(--accent-green-light)' },
+          { label: 'عدد الديون',    value: `${debts.length}`,              color: 'var(--accent-blue-light)' },
         ].map((s, i) => (
           <div key={i} className="card p-3 text-center">
             <div className="text-lg font-black font-mono" style={{ color: s.color }}>{s.value}</div>
@@ -144,7 +160,7 @@ export default function DebtsPage() {
             ))}
           </div>
           <div className="flex gap-2 mt-4">
-            <button onClick={saveDebt} disabled={saving || !form.name || !form.original_amount}
+            <button onClick={saveDebt} disabled={saving}
               className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
               style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
               {saving ? '...' : editingId ? 'حفظ التعديل' : 'إضافة'}
@@ -192,10 +208,13 @@ export default function DebtsPage() {
                     <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)}
                       className="w-20 px-2 py-1.5 rounded-lg text-xs outline-none text-center"
                       style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                      placeholder="المبلغ" autoFocus />
-                    <button onClick={() => makePayment(debt.id)}
-                      className="px-3 py-1.5 rounded-lg gradient-green text-white text-xs font-black">✓</button>
-                    <button onClick={() => setPaymentDebtId(null)}
+                      placeholder="المبلغ" autoFocus
+                      onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)} />
+                    <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
+                      className="px-3 py-1.5 rounded-lg gradient-green text-white text-xs font-black disabled:opacity-50">
+                      {payingSaving ? '⏳' : '✓'}
+                    </button>
+                    <button onClick={() => { setPaymentDebtId(null); setPaymentAmount('') }}
                       className="px-3 py-1.5 rounded-lg text-xs font-bold"
                       style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
                   </div>
