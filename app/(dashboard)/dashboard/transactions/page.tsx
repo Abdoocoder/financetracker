@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast'
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
@@ -14,7 +14,6 @@ export default function TransactionsPage() {
   const [saving, setSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const supabase = createClient()
-  const { success, error, warning } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -39,7 +38,7 @@ export default function TransactionsPage() {
   }
 
   async function saveTransaction() {
-    if (!form.amount || !form.category) { warning('يرجى تعبئة المبلغ والفئة'); return }
+    if (!form.amount || !form.category) { toast.warning('يرجى تعبئة المبلغ والفئة'); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -48,15 +47,15 @@ export default function TransactionsPage() {
         type: form.type, amount: parseFloat(form.amount),
         category: form.category, description: form.description, transaction_date: form.transaction_date,
       }).eq('id', editingId)
-      if (err) { error('فشل تعديل المعاملة'); setSaving(false); return }
-      success('تم تعديل المعاملة بنجاح ✏️')
+      if (err) { toast.error('فشل تعديل المعاملة'); setSaving(false); return }
+      toast.success('تم تعديل المعاملة بنجاح ✏️')
     } else {
       const { error: err } = await supabase.from('transactions').insert({
         user_id: user.id, type: form.type, amount: parseFloat(form.amount),
         category: form.category, description: form.description, transaction_date: form.transaction_date,
       })
-      if (err) { error('فشل إضافة المعاملة'); setSaving(false); return }
-      success(form.type === 'income' ? 'تم تسجيل الدخل 💰' : 'تم تسجيل المصروف 💸')
+      if (err) { toast.error('فشل إضافة المعاملة'); setSaving(false); return }
+      toast.success(form.type === 'income' ? 'تم تسجيل الدخل 💰' : 'تم تسجيل المصروف 💸')
     }
     cancelForm(); setSaving(false); load()
   }
@@ -64,8 +63,8 @@ export default function TransactionsPage() {
   async function deleteTransaction(id: string) {
     setDeletingId(id)
     const { error: err } = await supabase.from('transactions').delete().eq('id', id)
-    if (err) { error('فشل حذف المعاملة') }
-    else { success('تم حذف المعاملة'); load() }
+    if (err) { toast.error('فشل حذف المعاملة') }
+    else { toast.success('تم حذف المعاملة'); load() }
     setDeletingId(null)
   }
 

@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast'
 import type { Debt } from '@/types'
 
 export default function DebtsPage() {
@@ -16,7 +16,6 @@ export default function DebtsPage() {
   const [paymentAmount, setPaymentAmount] = useState('')
   const [payingSaving, setPayingSaving] = useState(false)
   const supabase = createClient()
-  const { success, error, warning } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -41,7 +40,7 @@ export default function DebtsPage() {
   }
 
   async function saveDebt() {
-    if (!form.name || !form.original_amount) { warning('يرجى تعبئة اسم الدين والمبلغ'); return }
+    if (!form.name || !form.original_amount) { toast.warning('يرجى تعبئة اسم الدين والمبلغ'); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -52,8 +51,8 @@ export default function DebtsPage() {
         monthly_payment: parseFloat(form.monthly_payment) || 0,
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null,
       }).eq('id', editingId)
-      if (err) { error('فشل تعديل الدين'); setSaving(false); return }
-      success('تم تعديل الدين بنجاح ✏️')
+      if (err) { toast.error('فشل تعديل الدين'); setSaving(false); return }
+      toast.success('تم تعديل الدين بنجاح ✏️')
     } else {
       const { error: err } = await supabase.from('debts').insert({
         user_id: user.id, name: form.name,
@@ -62,22 +61,22 @@ export default function DebtsPage() {
         monthly_payment: parseFloat(form.monthly_payment) || 0,
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null,
       })
-      if (err) { error('فشل إضافة الدين'); setSaving(false); return }
-      success('تم إضافة الدين بنجاح 💳')
+      if (err) { toast.error('فشل إضافة الدين'); setSaving(false); return }
+      toast.success('تم إضافة الدين بنجاح 💳')
     }
     cancelForm(); setSaving(false); load()
   }
 
   async function deleteDebt(id: string) {
     const { error: err } = await supabase.from('debts').delete().eq('id', id)
-    if (err) { error('فشل حذف الدين'); return }
-    success('تم حذف الدين')
+    if (err) { toast.error('فشل حذف الدين'); return }
+    toast.success('تم حذف الدين')
     load()
   }
 
   async function makePayment(debtId: string) {
     const amount = parseFloat(paymentAmount)
-    if (!amount || amount <= 0) { warning('أدخل مبلغاً صحيحاً'); return }
+    if (!amount || amount <= 0) { toast.warning('أدخل مبلغاً صحيحاً'); return }
     setPayingSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -87,10 +86,10 @@ export default function DebtsPage() {
     const { error: err } = await supabase.from('debt_payments').insert({
       debt_id: debtId, user_id: user.id, amount, payment_date: new Date().toISOString().split('T')[0]
     })
-    if (err) { error('فشل تسجيل الدفعة'); setPayingSaving(false); return }
+    if (err) { toast.error('فشل تسجيل الدفعة'); setPayingSaving(false); return }
     await supabase.from('debts').update({ remaining_amount: newRemaining, is_paid: newRemaining === 0 }).eq('id', debtId)
-    if (newRemaining === 0) success(`🎉 تهانينا! تم سداد "${debt.name}" بالكامل`)
-    else success(`تم تسجيل دفعة ${amount} JOD ✅`)
+    if (newRemaining === 0) toast.success(`🎉 تهانينا! تم سداد "${debt.name}" بالكامل`)
+    else toast.success(`تم تسجيل دفعة ${amount} JOD ✅`)
     setPaymentDebtId(null); setPaymentAmount(''); setPayingSaving(false); load()
   }
 
