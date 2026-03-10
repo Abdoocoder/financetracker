@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useToast } from '@/components/ui/toast'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
@@ -12,6 +13,7 @@ export default function GoalsPage() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
+  const { success, error, warning } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -36,46 +38,54 @@ export default function GoalsPage() {
   }
 
   async function saveGoal() {
+    if (!form.name || !form.target_amount) { warning('يرجى تعبئة اسم الهدف والمبلغ'); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     if (editingId) {
-      await supabase.from('savings_goals').update({
+      const { error: err } = await supabase.from('savings_goals').update({
         name: form.name, target_amount: parseFloat(form.target_amount),
         current_amount: parseFloat(form.current_amount),
         target_date: form.target_date || null, icon: form.icon,
       }).eq('id', editingId)
+      if (err) { error('فشل تعديل الهدف'); setSaving(false); return }
+      success('تم تعديل الهدف بنجاح ✏️')
     } else {
-      await supabase.from('savings_goals').insert({
+      const { error: err } = await supabase.from('savings_goals').insert({
         user_id: user.id, name: form.name,
         target_amount: parseFloat(form.target_amount),
         current_amount: parseFloat(form.current_amount) || 0,
         target_date: form.target_date || null, icon: form.icon,
       })
+      if (err) { error('فشل إضافة الهدف'); setSaving(false); return }
+      success('تم إضافة الهدف 🎯')
     }
     cancelForm(); setSaving(false); load()
   }
 
   async function deleteGoal(id: string) {
-    await supabase.from('savings_goals').delete().eq('id', id)
+    const { error: err } = await supabase.from('savings_goals').delete().eq('id', id)
+    if (err) { error('فشل حذف الهدف'); return }
+    success('تم حذف الهدف')
     load()
   }
 
   async function addSaving(goalId: string) {
     const amount = parseFloat(savingAmount)
-    if (!amount || amount <= 0) return
+    if (!amount || amount <= 0) { warning('أدخل مبلغاً صحيحاً'); return }
     const goal = goals.find(g => g.id === goalId)
     if (!goal) return
     const newAmount = Math.min(goal.current_amount + amount, goal.target_amount)
-    await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
-    setSavingGoalId(null)
-    setSavingAmount('')
-    load()
+    const { error: err } = await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
+    if (err) { error('فشل تسجيل الادخار'); return }
+    if (newAmount >= goal.target_amount) success(`🎉 تهانينا! تحقق هدف "${goal.name}"`)
+    else success(`تم إضافة ${amount} JOD 💰`)
+    setSavingGoalId(null); setSavingAmount(''); load()
   }
 
   const icons = ['🎯','🏠','✈️','📚','🚗','💍','🎓','💻','📱','🏋️']
   const totalTarget = goals.reduce((a, g) => a + g.target_amount, 0)
-  const totalSaved = goals.reduce((a, g) => a + g.current_amount, 0)
+  const totalSaved  = goals.reduce((a, g) => a + g.current_amount, 0)
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
 
@@ -92,7 +102,6 @@ export default function GoalsPage() {
         </button>
       </div>
 
-      {/* ملخص */}
       {goals.length > 0 && (
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-3 text-center">
@@ -140,7 +149,7 @@ export default function GoalsPage() {
             ))}
           </div>
           <div className="flex gap-2 mt-4">
-            <button onClick={saveGoal} disabled={saving || !form.name || !form.target_amount}
+            <button onClick={saveGoal} disabled={saving}
               className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
               style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
               {saving ? '...' : editingId ? 'حفظ التعديل' : 'إضافة'}
@@ -166,7 +175,8 @@ export default function GoalsPage() {
                   {goal.target_date && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>📅 {goal.target_date}</div>}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <div className="font-black font-mono text-sm ml-1" style={{ color: pct >= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}>
+                  <div className="font-black font-mono text-sm ml-1"
+                    style={{ color: pct >= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}>
                     {pct >= 100 ? '✅' : `${pct.toFixed(0)}%`}
                   </div>
                   <button onClick={() => startEdit(goal)}
@@ -177,27 +187,19 @@ export default function GoalsPage() {
                     style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red-light)' }}>🗑️</button>
                 </div>
               </div>
-
               <div className="progress-track mb-2">
                 <div className="progress-fill gradient-blue" style={{ width: `${pct}%` }} />
               </div>
-
               <div className="flex justify-between items-center mb-2">
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span>
                   {' / '}{goal.target_amount.toFixed(0)} JOD
                 </div>
-                {remaining > 0 && (
-                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    متبقي: <span className="font-mono">{remaining.toFixed(0)} JOD</span>
-                  </div>
-                )}
+                {remaining > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>متبقي: <span className="font-mono">{remaining.toFixed(0)} JOD</span></div>}
               </div>
-
               {isAddingToThis ? (
                 <div className="flex gap-2 mt-2">
-                  <input type="number" value={savingAmount}
-                    onChange={e => setSavingAmount(e.target.value)}
+                  <input type="number" value={savingAmount} onChange={e => setSavingAmount(e.target.value)}
                     className="flex-1 px-3 py-2 rounded-xl text-sm outline-none text-center"
                     style={{ background: 'var(--bg-secondary)', border: '1px solid var(--accent-green)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
                     placeholder="المبلغ JOD" autoFocus
@@ -223,7 +225,6 @@ export default function GoalsPage() {
           <div className="text-center py-16 card">
             <div className="text-4xl mb-3">🎯</div>
             <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>لا توجد أهداف بعد</div>
-            <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>أضف هدفك الأول للبدء</div>
           </div>
         )}
       </div>
