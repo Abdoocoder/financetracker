@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sendPushToUser } from '@/app/api/push-send/route'
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
@@ -223,6 +224,19 @@ async function generateAlerts(userId?: string) {
 
   if (toInsert.length > 0) {
     await supabase.from('alerts').insert(toInsert)
+
+    // Push Notification لكل مستخدم
+    const byUser = new Map<string, typeof toInsert>()
+    for (const a of toInsert) {
+      const uid = a.user_id as string
+      if (!byUser.has(uid)) byUser.set(uid, [])
+      byUser.get(uid)!.push(a)
+    }
+    for (const [uid, list] of byUser) {
+      const title = list.length === 1 ? String(list[0].title) : `🔔 ${list.length} تنبيهات جديدة`
+      const message = list.length === 1 ? String(list[0].message).slice(0, 100) : list.map(a => String(a.title)).join(' • ').slice(0, 100)
+      await sendPushToUser(uid, title, message, '/dashboard/alerts', 'finance-daily')
+    }
   }
 
   return toInsert.length

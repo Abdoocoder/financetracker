@@ -10,6 +10,7 @@ const cairo = Cairo({
 })
 
 export const metadata: Metadata = {
+  manifest: '/manifest.json',
   title: 'FinanceTracker — إدارة شؤونك المالية',
   description: 'تتبع دخلك، مصاريفك، ديونك واستثماراتك في مكان واحد',
   icons: { icon: '/favicon.ico' },
