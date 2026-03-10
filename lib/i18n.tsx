@@ -1,0 +1,412 @@
+'use client'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+
+export type Lang = 'ar' | 'en'
+
+const translations = {
+  ar: {
+    // Nav
+    nav_home:        'الرئيسية',
+    nav_transactions:'المعاملات',
+    nav_debts:       'الديون',
+    nav_investments: 'الاستثمار',
+    nav_goals:       'الأهداف',
+    nav_alerts:      'التنبيهات',
+    nav_settings:    'الإعدادات',
+    nav_logout:      'تسجيل الخروج',
+    app_name:        'FinanceTracker',
+    app_subtitle:    'إدارة مالية ذكية',
+
+    // Dashboard
+    dash_title:         'لوحة التحكم',
+    dash_monthly:       'ملخص هذا الشهر',
+    dash_income:        'الدخل',
+    dash_expenses:      'المصاريف',
+    dash_net:           'الصافي',
+    dash_debts:         'إجمالي الديون',
+    dash_investments:   'قيمة الاستثمارات',
+    dash_goals:         'أهداف الادخار',
+    dash_recent:        'آخر المعاملات',
+    dash_unread_alerts: 'تنبيه غير مقروء',
+    dash_view_all:      'عرض الكل',
+    dash_no_transactions: 'لا توجد معاملات',
+
+    // Transactions
+    trans_title:       'المعاملات',
+    trans_add:         'إضافة',
+    trans_new:         'معاملة جديدة',
+    trans_edit:        'تعديل معاملة',
+    trans_income:      'دخل',
+    trans_expense:     'مصروف',
+    trans_all:         'الكل',
+    trans_amount:      'المبلغ',
+    trans_category:    'الفئة',
+    trans_description: 'الوصف',
+    trans_date:        'التاريخ',
+    trans_save:        'إضافة',
+    trans_save_edit:   'حفظ التعديل',
+    trans_cancel:      'إلغاء',
+    trans_empty:       'لا توجد معاملات',
+    trans_total_income:   'الدخل الكلي',
+    trans_total_expenses: 'المصاريف الكلية',
+    trans_total_net:      'الصافي',
+
+    // Debts
+    debts_title:          'إدارة الديون',
+    debts_add:            'إضافة',
+    debts_new:            'إضافة دين جديد',
+    debts_edit:           'تعديل الدين',
+    debts_name:           'اسم الدين',
+    debts_original:       'المبلغ الأصلي',
+    debts_remaining:      'المبلغ المتبقي',
+    debts_monthly:        'القسط الشهري',
+    debts_due_date:       'تاريخ الاستحقاق',
+    debts_notes:          'ملاحظات',
+    debts_save:           'إضافة',
+    debts_save_edit:      'حفظ التعديل',
+    debts_cancel:         'إلغاء',
+    debts_total:          'إجمالي الديون',
+    debts_paid_pct:       'نسبة السداد',
+    debts_count:          'عدد الديون',
+    debts_progress:       'التقدم الإجمالي',
+    debts_paid:           'مسدد',
+    debts_payment_add:    '+ دفعة',
+    debts_active:         'دين نشط',
+    debts_empty:          'لا توجد ديون!',
+    debts_per_month:      '/شهر',
+
+    // Investments
+    inv_title:         'المحفظة الاستثمارية',
+    inv_add:           'إضافة',
+    inv_new:           'استثمار جديد',
+    inv_edit:          'تعديل الاستثمار',
+    inv_symbol:        'الرمز',
+    inv_name:          'الاسم',
+    inv_shares:        'الوحدات',
+    inv_avg_price:     'متوسط سعر الشراء',
+    inv_current_price: 'السعر الحالي',
+    inv_type:          'النوع',
+    inv_notes:         'ملاحظات',
+    inv_save:          'إضافة',
+    inv_save_edit:     'حفظ التعديل',
+    inv_cancel:        'إلغاء',
+    inv_total_value:   'القيمة الإجمالية',
+    inv_total_profit:  'الربح/الخسارة',
+    inv_assets:        'الأصول',
+    inv_profit:        'ربح',
+    inv_loss:          'خسارة',
+    inv_live:          'حي',
+    inv_manual:        'يدوي',
+    inv_refresh:       'تحديث الأسعار',
+    inv_refreshing:    'جاري التحديث...',
+    inv_empty:         'لا توجد استثمارات',
+    inv_halal:         'حلال ✅',
+    inv_usd:           'USD',
+    inv_jod:           'JOD',
+
+    // Goals
+    goals_title:    'أهداف الادخار',
+    goals_add:      'إضافة',
+    goals_new:      'هدف جديد',
+    goals_edit:     'تعديل الهدف',
+    goals_name:     'اسم الهدف',
+    goals_target:   'المبلغ المستهدف',
+    goals_current:  'المبلغ الحالي',
+    goals_date:     'تاريخ الهدف',
+    goals_icon:     'الأيقونة',
+    goals_save:     'إضافة',
+    goals_save_edit:'حفظ التعديل',
+    goals_cancel:   'إلغاء',
+    goals_saved:    'تم ادخاره',
+    goals_target_lbl:'المستهدف',
+    goals_remaining:'متبقي',
+    goals_add_saving:'+ إضافة ادخار',
+    goals_empty:    'لا توجد أهداف بعد',
+    goals_count:    'هدف',
+
+    // Alerts
+    alerts_title:     'التنبيهات',
+    alerts_generate:  'توليد تنبيهات الآن',
+    alerts_generating:'⏳ جاري التحليل...',
+    alerts_auto:      'يعمل تلقائياً كل يوم الساعة 7:00 صباحاً',
+    alerts_mark_all:  'قراءة الكل',
+    alerts_delete_all:'حذف الكل',
+    alerts_unread:    'غير مقروء',
+    alerts_empty:     'لا توجد تنبيهات',
+    alerts_empty_sub: 'اضغط الزر أعلاه لتحليل وضعك المالي',
+    alerts_bot_title: 'توليد تنبيهات ذكية',
+    alerts_bot_sub:   'تحليل وضعك المالي وإنشاء توصيات مخصصة',
+
+    // Settings
+    settings_title:    'الإعدادات',
+    settings_subtitle: 'بيانات حسابك الشخصي',
+    settings_name:     'الاسم الكامل',
+    settings_income:   'الراتب الشهري',
+    settings_currency: 'العملة',
+    settings_language: 'اللغة',
+    settings_save:     'حفظ التغييرات',
+    settings_saving:   'جاري الحفظ...',
+    settings_logout:   'تسجيل الخروج',
+    settings_account:  'الحساب',
+    settings_lang_ar:  'العربية',
+    settings_lang_en:  'English',
+
+    // Common
+    loading:   'جاري التحميل...',
+    save:      'حفظ',
+    cancel:    'إلغاء',
+    delete:    'حذف',
+    edit:      'تعديل',
+    add:       'إضافة',
+    confirm_delete: 'هل أنت متأكد من الحذف؟',
+    jod:       'دينار',
+    usd:       'دولار',
+
+    // Toast
+    toast_saved:        'تم الحفظ بنجاح ✅',
+    toast_deleted:      'تم الحذف',
+    toast_error_save:   'فشل الحفظ',
+    toast_error_delete: 'فشل الحذف',
+    toast_fill_required:'يرجى تعبئة الحقول المطلوبة',
+    toast_income_added: 'تم تسجيل الدخل 💰',
+    toast_expense_added:'تم تسجيل المصروف 💸',
+    toast_edited:       'تم التعديل بنجاح ✏️',
+    toast_debt_added:   'تم إضافة الدين بنجاح 💳',
+    toast_payment_done: 'تم تسجيل الدفعة ✅',
+    toast_debt_paid:    '🎉 تهانينا! تم سداد الدين بالكامل',
+    toast_goal_added:   'تم إضافة الهدف 🎯',
+    toast_goal_reached: '🎉 تهانينا! تحقق الهدف',
+    toast_saving_added: 'تم إضافة الادخار 💰',
+    toast_settings_saved:'تم حفظ الإعدادات بنجاح ✅',
+    toast_alerts_done:  'تم توليد التنبيهات ✅',
+    toast_marked_read:  'تم تعيين الكل كمقروء',
+    toast_all_deleted:  'تم حذف كل التنبيهات',
+  },
+  en: {
+    // Nav
+    nav_home:        'Home',
+    nav_transactions:'Transactions',
+    nav_debts:       'Debts',
+    nav_investments: 'Investments',
+    nav_goals:       'Goals',
+    nav_alerts:      'Alerts',
+    nav_settings:    'Settings',
+    nav_logout:      'Logout',
+    app_name:        'FinanceTracker',
+    app_subtitle:    'Smart Finance',
+
+    // Dashboard
+    dash_title:         'Dashboard',
+    dash_monthly:       'This Month',
+    dash_income:        'Income',
+    dash_expenses:      'Expenses',
+    dash_net:           'Net',
+    dash_debts:         'Total Debts',
+    dash_investments:   'Investments',
+    dash_goals:         'Savings Goals',
+    dash_recent:        'Recent Transactions',
+    dash_unread_alerts: 'unread alert',
+    dash_view_all:      'View All',
+    dash_no_transactions: 'No transactions yet',
+
+    // Transactions
+    trans_title:       'Transactions',
+    trans_add:         'Add',
+    trans_new:         'New Transaction',
+    trans_edit:        'Edit Transaction',
+    trans_income:      'Income',
+    trans_expense:     'Expense',
+    trans_all:         'All',
+    trans_amount:      'Amount',
+    trans_category:    'Category',
+    trans_description: 'Description',
+    trans_date:        'Date',
+    trans_save:        'Add',
+    trans_save_edit:   'Save Changes',
+    trans_cancel:      'Cancel',
+    trans_empty:       'No transactions yet',
+    trans_total_income:   'Total Income',
+    trans_total_expenses: 'Total Expenses',
+    trans_total_net:      'Net',
+
+    // Debts
+    debts_title:          'Debt Manager',
+    debts_add:            'Add',
+    debts_new:            'Add New Debt',
+    debts_edit:           'Edit Debt',
+    debts_name:           'Debt Name',
+    debts_original:       'Original Amount',
+    debts_remaining:      'Remaining Amount',
+    debts_monthly:        'Monthly Payment',
+    debts_due_date:       'Due Date',
+    debts_notes:          'Notes',
+    debts_save:           'Add',
+    debts_save_edit:      'Save Changes',
+    debts_cancel:         'Cancel',
+    debts_total:          'Total Debt',
+    debts_paid_pct:       'Paid',
+    debts_count:          'Active Debts',
+    debts_progress:       'Overall Progress',
+    debts_paid:           'paid',
+    debts_payment_add:    '+ Payment',
+    debts_active:         'active debt',
+    debts_empty:          'No debts! 🎉',
+    debts_per_month:      '/mo',
+
+    // Investments
+    inv_title:         'Portfolio',
+    inv_add:           'Add',
+    inv_new:           'New Investment',
+    inv_edit:          'Edit Investment',
+    inv_symbol:        'Symbol',
+    inv_name:          'Name',
+    inv_shares:        'Shares',
+    inv_avg_price:     'Avg Buy Price',
+    inv_current_price: 'Current Price',
+    inv_type:          'Type',
+    inv_notes:         'Notes',
+    inv_save:          'Add',
+    inv_save_edit:     'Save Changes',
+    inv_cancel:        'Cancel',
+    inv_total_value:   'Total Value',
+    inv_total_profit:  'P&L',
+    inv_assets:        'Assets',
+    inv_profit:        'Profit',
+    inv_loss:          'Loss',
+    inv_live:          'LIVE',
+    inv_manual:        'Manual',
+    inv_refresh:       'Refresh Prices',
+    inv_refreshing:    'Refreshing...',
+    inv_empty:         'No investments yet',
+    inv_halal:         'Halal ✅',
+    inv_usd:           'USD',
+    inv_jod:           'JOD',
+
+    // Goals
+    goals_title:    'Savings Goals',
+    goals_add:      'Add',
+    goals_new:      'New Goal',
+    goals_edit:     'Edit Goal',
+    goals_name:     'Goal Name',
+    goals_target:   'Target Amount',
+    goals_current:  'Current Amount',
+    goals_date:     'Target Date',
+    goals_icon:     'Icon',
+    goals_save:     'Add',
+    goals_save_edit:'Save Changes',
+    goals_cancel:   'Cancel',
+    goals_saved:    'Saved',
+    goals_target_lbl:'Target',
+    goals_remaining:'Remaining',
+    goals_add_saving:'+ Add Savings',
+    goals_empty:    'No goals yet',
+    goals_count:    'goal',
+
+    // Alerts
+    alerts_title:     'Alerts',
+    alerts_generate:  'Generate Alerts Now',
+    alerts_generating:'⏳ Analyzing...',
+    alerts_auto:      'Runs automatically every day at 7:00 AM',
+    alerts_mark_all:  'Mark All Read',
+    alerts_delete_all:'Delete All',
+    alerts_unread:    'unread',
+    alerts_empty:     'No alerts yet',
+    alerts_empty_sub: 'Click the button above to analyze your finances',
+    alerts_bot_title: 'Smart Alert Generator',
+    alerts_bot_sub:   'Analyze your finances and get personalized insights',
+
+    // Settings
+    settings_title:    'Settings',
+    settings_subtitle: 'Your account preferences',
+    settings_name:     'Full Name',
+    settings_income:   'Monthly Income',
+    settings_currency: 'Currency',
+    settings_language: 'Language',
+    settings_save:     'Save Changes',
+    settings_saving:   'Saving...',
+    settings_logout:   'Logout',
+    settings_account:  'Account',
+    settings_lang_ar:  'العربية',
+    settings_lang_en:  'English',
+
+    // Common
+    loading:   'Loading...',
+    save:      'Save',
+    cancel:    'Cancel',
+    delete:    'Delete',
+    edit:      'Edit',
+    add:       'Add',
+    confirm_delete: 'Are you sure you want to delete?',
+    jod:       'JOD',
+    usd:       'USD',
+
+    // Toast
+    toast_saved:        'Saved successfully ✅',
+    toast_deleted:      'Deleted',
+    toast_error_save:   'Failed to save',
+    toast_error_delete: 'Failed to delete',
+    toast_fill_required:'Please fill required fields',
+    toast_income_added: 'Income recorded 💰',
+    toast_expense_added:'Expense recorded 💸',
+    toast_edited:       'Updated successfully ✏️',
+    toast_debt_added:   'Debt added 💳',
+    toast_payment_done: 'Payment recorded ✅',
+    toast_debt_paid:    '🎉 Debt fully paid off!',
+    toast_goal_added:   'Goal added 🎯',
+    toast_goal_reached: '🎉 Goal achieved!',
+    toast_saving_added: 'Savings added 💰',
+    toast_settings_saved:'Settings saved ✅',
+    toast_alerts_done:  'Alerts generated ✅',
+    toast_marked_read:  'All marked as read',
+    toast_all_deleted:  'All alerts deleted',
+  }
+} as const
+
+export type TranslationKey = keyof typeof translations.ar
+
+interface I18nContextType {
+  lang: Lang
+  setLang: (l: Lang) => void
+  t: (key: TranslationKey) => string
+  isRTL: boolean
+}
+
+const I18nContext = createContext<I18nContextType>({
+  lang: 'ar',
+  setLang: () => {},
+  t: (key) => key,
+  isRTL: true,
+})
+
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+  const [lang, setLangState] = useState<Lang>('ar')
+
+  useEffect(() => {
+    const saved = localStorage.getItem('lang') as Lang
+    if (saved === 'ar' || saved === 'en') setLangState(saved)
+  }, [])
+
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l)
+    localStorage.setItem('lang', l)
+    document.documentElement.lang = l
+    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+  }, [lang])
+
+  const t = useCallback((key: TranslationKey): string => {
+    return translations[lang][key] ?? translations.ar[key] ?? key
+  }, [lang])
+
+  return (
+    <I18nContext.Provider value={{ lang, setLang, t, isRTL: lang === 'ar' }}>
+      {children}
+    </I18nContext.Provider>
+  )
+}
+
+export const useI18n = () => useContext(I18nContext)

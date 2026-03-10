@@ -1,10 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { UserProvider } from '@/lib/user-context'
-import { useUser } from '@/lib/user-context'
+import { UserProvider, useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
 import { ToastProvider } from '@/components/ui/toast'
+import { I18nProvider } from '@/lib/i18n'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -43,9 +43,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <UserProvider>
-      <ToastProvider>
-        <DashboardContent>{children}</DashboardContent>
-      </ToastProvider>
+      <I18nProvider>
+        <ToastProvider>
+          <DashboardContent>{children}</DashboardContent>
+        </ToastProvider>
+      </I18nProvider>
     </UserProvider>
   )
 }
