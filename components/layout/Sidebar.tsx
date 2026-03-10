@@ -5,12 +5,13 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 const navItems = [
-  { href: '/dashboard', icon: '🏠', label: 'الرئيسية' },
-  { href: '/dashboard/transactions', icon: '💰', label: 'المعاملات' },
-  { href: '/dashboard/debts', icon: '💳', label: 'الديون' },
-  { href: '/dashboard/investments', icon: '📈', label: 'الاستثمار' },
-  { href: '/dashboard/goals', icon: '🎯', label: 'الأهداف' },
-  { href: '/dashboard/alerts', icon: '🔔', label: 'التنبيهات' },
+  { href: '/dashboard',              icon: '🏠', label: 'الرئيسية'   },
+  { href: '/dashboard/transactions', icon: '💰', label: 'المعاملات'  },
+  { href: '/dashboard/debts',        icon: '💳', label: 'الديون'     },
+  { href: '/dashboard/investments',  icon: '📈', label: 'الاستثمار'  },
+  { href: '/dashboard/goals',        icon: '🎯', label: 'الأهداف'    },
+  { href: '/dashboard/alerts',       icon: '🔔', label: 'التنبيهات'  },
+  { href: '/dashboard/settings',     icon: '⚙️', label: 'الإعدادات' },
 ]
 
 export default function Sidebar({ alertsCount }: { alertsCount: number }) {
@@ -26,7 +27,6 @@ export default function Sidebar({ alertsCount }: { alertsCount: number }) {
 
   return (
     <>
-      {/* ===== DESKTOP SIDEBAR - hidden on mobile ===== */}
       <style>{`
         .desktop-sidebar { display: none; }
         .mobile-nav { display: flex; }
@@ -36,8 +36,10 @@ export default function Sidebar({ alertsCount }: { alertsCount: number }) {
         }
       `}</style>
 
+      {/* ===== DESKTOP SIDEBAR ===== */}
       <aside className="desktop-sidebar w-64 flex-col shrink-0 relative z-10"
         style={{ background: 'var(--bg-secondary)', borderLeft: '1px solid var(--border)' }}>
+
         <div className="flex items-center gap-3 px-5 py-5" style={{ borderBottom: '1px solid var(--border)' }}>
           <div className="w-9 h-9 rounded-xl gradient-blue flex items-center justify-center text-white font-black text-sm glow-blue">ف</div>
           <div>
@@ -45,6 +47,7 @@ export default function Sidebar({ alertsCount }: { alertsCount: number }) {
             <div className="text-xs" style={{ color: 'var(--text-muted)' }}>إدارة مالية ذكية</div>
           </div>
         </div>
+
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.href
@@ -68,12 +71,8 @@ export default function Sidebar({ alertsCount }: { alertsCount: number }) {
             )
           })}
         </nav>
+
         <div className="px-3 pb-4" style={{ borderTop: '1px solid var(--border)', paddingTop: '12px' }}>
-          <Link href="/dashboard/settings"
-            className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium"
-            style={{ color: 'var(--text-secondary)', display: 'flex' }}>
-            <span>⚙️</span><span>الإعدادات</span>
-          </Link>
           <button onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium"
             style={{ color: 'var(--text-muted)', display: 'flex' }}>
@@ -100,17 +99,17 @@ export default function Sidebar({ alertsCount }: { alertsCount: number }) {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '2px',
-                padding: '8px 10px',
+                padding: '6px 8px',
                 borderRadius: '12px',
                 position: 'relative',
-                minWidth: '48px',
+                minWidth: '40px',
                 textDecoration: 'none',
               }}>
-              <span style={{ fontSize: '20px', lineHeight: 1, opacity: isActive ? 1 : 0.4 }}>
+              <span style={{ fontSize: '18px', lineHeight: 1, opacity: isActive ? 1 : 0.4 }}>
                 {item.icon}
               </span>
               <span style={{
-                fontSize: '9px',
+                fontSize: '8px',
                 fontWeight: 600,
                 color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)',
               }}>
@@ -118,19 +117,15 @@ export default function Sidebar({ alertsCount }: { alertsCount: number }) {
               </span>
               {isActive && (
                 <span style={{
-                  position: 'absolute',
-                  top: '-1px',
-                  left: '50%',
+                  position: 'absolute', top: '-1px', left: '50%',
                   transform: 'translateX(-50%)',
-                  width: '20px',
-                  height: '3px',
-                  borderRadius: '2px',
-                  background: 'var(--accent-blue)',
+                  width: '20px', height: '3px',
+                  borderRadius: '2px', background: 'var(--accent-blue)',
                 }} />
               )}
               {item.href === '/dashboard/alerts' && alertsCount > 0 && (
                 <span style={{
-                  position: 'absolute', top: '4px', right: '4px',
+                  position: 'absolute', top: '2px', right: '2px',
                   width: '14px', height: '14px', borderRadius: '50%',
                   background: '#ef4444', color: 'white',
                   fontSize: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700,
