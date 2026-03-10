@@ -117,6 +117,8 @@ export default function SettingsPage() {
 
       <div className="card p-5">
         <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>{t('settings_account')}</h3>
+        <PushToggle />
+
         <button onClick={handleLogout}
           className="w-full py-3.5 rounded-xl font-black text-sm"
           style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', fontFamily: 'inherit' }}>
