@@ -4,16 +4,25 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { PageHeader } from '@/components/ui/page-header'
+import { AddButton } from '@/components/ui/add-button'
+import { StatBar } from '@/components/ui/stat-bar'
+import { Modal } from '@/components/ui/modal'
+import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
+import { EmptyState } from '@/components/ui/empty-state'
+
+const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
+const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','هدية','أخرى']
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'income' | 'expense'>('all')
+  const [filter, setFilter] = useState<'all'|'income'|'expense'>('all')
   const [form, setForm] = useState({ type: 'expense', amount: '', category: '', description: '', transaction_date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string|null>(null)
   const supabase = createClient()
   const { t } = useI18n()
 
@@ -27,16 +36,16 @@ export default function TransactionsPage() {
 
   useEffect(() => { load() }, [load])
 
+  function openAdd() {
+    setEditingId(null)
+    setForm({ type: 'expense', amount: '', category: '', description: '', transaction_date: new Date().toISOString().split('T')[0] })
+    setShowForm(true)
+  }
+
   function startEdit(tx: any) {
     setEditingId(tx.id)
     setForm({ type: tx.type, amount: tx.amount.toString(), category: tx.category ?? '', description: tx.description ?? '', transaction_date: tx.transaction_date })
     setShowForm(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function cancelForm() {
-    setShowForm(false); setEditingId(null)
-    setForm({ type: 'expense', amount: '', category: '', description: '', transaction_date: new Date().toISOString().split('T')[0] })
   }
 
   async function saveTransaction() {
@@ -53,152 +62,156 @@ export default function TransactionsPage() {
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(form.type === 'income' ? t('toast_income_added') : t('toast_expense_added'))
     }
-    cancelForm(); setSaving(false); load()
+    setShowForm(false); setSaving(false); load()
   }
 
   async function deleteTransaction(id: string) {
     setDeletingId(id)
-    const { error } = await supabase.from('transactions').delete().eq('id', id)
-    if (error) { toast.error(t('toast_error_delete')) } else { toast.success(t('toast_deleted')); load() }
+    await supabase.from('transactions').delete().eq('id', id)
+    setTransactions(prev => prev.filter(t => t.id !== id))
+    toast.success(t('toast_deleted'))
     setDeletingId(null)
   }
 
-  const filtered = filter === 'all' ? transactions : transactions.filter(t => t.type === filter)
-  const income   = transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-  const expenses = transactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+  const filtered = transactions.filter(tx => filter === 'all' || tx.type === filter)
+  const totalIncome  = transactions.filter(t => t.type === 'income').reduce((a,t) => a + Number(t.amount), 0)
+  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((a,t) => a + Number(t.amount), 0)
+  const net = totalIncome - totalExpense
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {[0,1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 72, borderRadius: 16 }} />)}
+    </div>
+  )
 
   return (
-    <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('trans_title')}</h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{transactions.length}</p>
-        </div>
-        <button onClick={() => { cancelForm(); setShowForm(true) }}
-          className="px-4 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue" style={{ fontFamily: 'inherit' }}>
-          + {t('trans_add')}
-        </button>
-      </div>
+    <div className="animate-fade-in">
+      <PageHeader
+        title={t('trans_title')}
+        subtitle={`${transactions.length} ${t('trans_count')}`}
+        action={<AddButton label={t('trans_add')} onClick={openAdd} />}
+      />
 
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: t('trans_total_income'),   value: `+${income.toFixed(0)}`,                              color: 'var(--accent-green-light)' },
-          { label: t('trans_total_expenses'), value: `${expenses.toFixed(0)}`,                             color: 'var(--accent-red-light)'   },
-          { label: t('trans_total_net'),      value: `${(income-expenses)>=0?'+':''}${(income-expenses).toFixed(0)}`, color: (income-expenses)>=0?'var(--accent-green-light)':'var(--accent-red-light)' },
-        ].map((s, i) => (
-          <div key={i} className="card p-3 text-center">
-            <div className="text-base font-black font-mono" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
+      <StatBar stats={[
+        { label: t('dash_income'),   value: `${totalIncome.toFixed(0)}+`,  color: 'var(--accent-green-light)' },
+        { label: t('dash_expenses'), value: `${totalExpense.toFixed(0)}`,  color: 'var(--accent-red-light)'   },
+        { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${net.toFixed(0)}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+      ]} />
 
-      <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-        {[
-          { key: 'all',     label: t('trans_all')     },
-          { key: 'income',  label: `💰 ${t('trans_income')}` },
-          { key: 'expense', label: `💸 ${t('trans_expense')}` },
-        ].map(f => (
-          <button key={f.key} onClick={() => setFilter(f.key as any)}
-            className="flex-1 py-2.5 text-xs font-black transition-all"
-            style={{ background: filter === f.key ? 'var(--accent-blue)' : 'var(--bg-secondary)', color: filter === f.key ? 'white' : 'var(--text-muted)', fontFamily: 'inherit' }}>
-            {f.label}
+      {/* Filter Tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        {(['all','income','expense'] as const).map(f => (
+          <button key={f} onClick={() => setFilter(f)} style={{
+            flex: 1, padding: '9px 4px', borderRadius: 12,
+            background: filter === f ? 'var(--accent-blue)' : 'var(--bg-card)',
+            color: filter === f ? 'white' : 'var(--text-muted)',
+            border: `1px solid ${filter === f ? 'transparent' : 'var(--border)'}`,
+            fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            transition: 'all 0.15s',
+          }}>
+            {f === 'all' ? t('trans_all') : f === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
           </button>
         ))}
       </div>
 
-      {showForm && (
-        <div className="card p-4 animate-scale-in" style={{ borderColor: editingId ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.3)' }}>
-          <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>
-            {editingId ? t('trans_edit') : t('trans_new')}
-          </h3>
-          <div className="space-y-3">
-            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-              {['income', 'expense'].map(tp => (
-                <button key={tp} onClick={() => setForm(p => ({ ...p, type: tp }))}
-                  className="flex-1 py-2.5 text-sm font-black transition-all"
-                  style={{ background: form.type === tp ? (tp === 'income' ? '#10b981' : '#ef4444') : 'var(--bg-secondary)', color: form.type === tp ? 'white' : 'var(--text-muted)', fontFamily: 'inherit' }}>
-                  {tp === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
-                </button>
-              ))}
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: `${t('trans_amount')} (JOD)`, key: 'amount', type: 'number', placeholder: '50' },
-                { label: t('trans_category'), key: 'category', type: 'text', placeholder: '' },
-              ].map(f => (
-                <div key={f.key}>
-                  <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
-                  <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                    placeholder={f.placeholder} />
+      {/* List */}
+      {filtered.length === 0 ? (
+        <EmptyState icon="💸" title={t('trans_empty')} action={<AddButton label={t('trans_add')} onClick={openAdd} />} />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {filtered.map(tx => (
+            <div key={tx.id} style={{
+              background: 'var(--bg-card)', border: '1px solid var(--border)',
+              borderRadius: 16, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', gap: 12,
+              transition: 'border-color 0.15s',
+              opacity: deletingId === tx.id ? 0.4 : 1,
+            }}>
+              {/* Icon */}
+              <div style={{
+                width: 44, height: 44, borderRadius: 13, flexShrink: 0,
+                background: tx.type === 'income' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)',
+                border: `1px solid ${tx.type === 'income' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.15)'}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+              }}>
+                {tx.type === 'income' ? '💰' : '💸'}
+              </div>
+
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {tx.description || tx.category}
                 </div>
-              ))}
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                  {tx.category} · {tx.transaction_date}
+                </div>
+              </div>
+
+              {/* Amount */}
+              <div style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)', flexShrink: 0 }}>
+                {tx.type === 'income' ? '+' : '−'}{Number(tx.amount).toFixed(0)}
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                <button onClick={() => startEdit(tx)} style={{
+                  width: 30, height: 30, borderRadius: 8,
+                  background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)',
+                  color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>✎</button>
+                <button onClick={() => deleteTransaction(tx.id)} disabled={deletingId === tx.id} style={{
+                  width: 30, height: 30, borderRadius: 8,
+                  background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)',
+                  color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>✕</button>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{t('trans_description')}</label>
-              <input type="text" value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
-            </div>
-            <div>
-              <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{t('trans_date')}</label>
-              <input type="date" value={form.transaction_date} onChange={e => setForm(p => ({ ...p, transaction_date: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
-            </div>
-            <div className="flex gap-2">
-              <button onClick={saveTransaction} disabled={saving}
-                className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
-                style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
-                {saving ? '...' : editingId ? t('trans_save_edit') : t('trans_save')}
-              </button>
-              <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
-                style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>
-                {t('trans_cancel')}
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
-      <div className="space-y-2">
-        {filtered.map(tx => (
-          <div key={tx.id} className="card p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
-              style={{ background: tx.type === 'income' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)' }}>
-              {tx.type === 'income' ? '💰' : '💸'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>{tx.description || tx.category || '—'}</div>
-              <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{tx.category} · {tx.transaction_date}</div>
-            </div>
-            <div className="font-black font-mono text-sm shrink-0"
-              style={{ color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
-              {tx.type === 'income' ? '+' : '-'}{Number(tx.amount).toFixed(2)}
-            </div>
-            <div className="flex flex-col gap-1 shrink-0">
-              <button onClick={() => startEdit(tx)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
-                style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>✏️</button>
-              <button onClick={() => deleteTransaction(tx.id)} disabled={deletingId === tx.id}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-xs disabled:opacity-40"
-                style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>
-                {deletingId === tx.id ? '⏳' : '🗑️'}
+      {/* Modal */}
+      {showForm && (
+        <Modal title={editingId ? t('trans_edit') : t('trans_add')} onClose={() => setShowForm(false)}>
+          {/* Type Toggle */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            {['expense','income'].map(type => (
+              <button key={type} onClick={() => setForm(f => ({ ...f, type }))} style={{
+                flex: 1, padding: '11px', borderRadius: 12,
+                background: form.type === type
+                  ? (type === 'income' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)')
+                  : 'var(--bg-card)',
+                border: `1px solid ${form.type === type ? (type === 'income' ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)') : 'var(--border)'}`,
+                color: form.type === type ? (type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)') : 'var(--text-muted)',
+                fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+              }}>
+                {type === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
               </button>
-            </div>
+            ))}
           </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="text-center py-16 card">
-            <div className="text-4xl mb-3">📋</div>
-            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>{t('trans_empty')}</div>
-          </div>
-        )}
-      </div>
+
+          <FormField label={t('trans_amount')}>
+            <Input type="number" placeholder="0.00" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
+          </FormField>
+          <FormField label={t('trans_category')}>
+            <Select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
+              <option value="">{t('trans_select_category')}</option>
+              {(form.type === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </Select>
+          </FormField>
+          <FormField label={t('trans_description')}>
+            <Input placeholder={t('trans_description_placeholder')} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+          </FormField>
+          <FormField label={t('trans_date')}>
+            <Input type="date" value={form.transaction_date} onChange={e => setForm(f => ({ ...f, transaction_date: e.target.value }))} />
+          </FormField>
+          <SaveButton label={editingId ? t('trans_save_edit') : t('trans_save_add')} loading={saving} onClick={saveTransaction} />
+        </Modal>
+      )}
     </div>
   )
 }
