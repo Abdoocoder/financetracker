@@ -180,13 +180,17 @@ create policy "Users own savings_goals" on public.savings_goals for all using (a
 
 -- Auto-create profile on signup
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger as $body$
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, new.raw_user_meta_data->>'full_name');
+  insert into public.profiles (id, full_name, monthly_income)
+  values (
+    new.id, 
+    new.raw_user_meta_data->>'full_name',
+    (new.raw_user_meta_data->>'monthly_income')::numeric
+  );
   return new;
 end;
-$$ language plpgsql security definer;
+$body$ language plpgsql security definer;
 
 create trigger on_auth_user_created
   after insert on auth.users
