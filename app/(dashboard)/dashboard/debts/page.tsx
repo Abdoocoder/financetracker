@@ -4,6 +4,20 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { PageHeader } from '@/components/ui/page-header'
+import { AddButton } from '@/components/ui/add-button'
+import { StatBar } from '@/components/ui/stat-bar'
+import { Modal } from '@/components/ui/modal'
+import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
+import { EmptyState } from '@/components/ui/empty-state'
+
+const PRIORITY_CONFIG = [
+  { color: '#EF4444', label: 'عالية جداً' },
+  { color: '#F59E0B', label: 'عالية'      },
+  { color: '#3B7EF6', label: 'متوسطة'    },
+  { color: '#8B9CC8', label: 'منخفضة'    },
+  { color: '#4A5568', label: 'مؤجلة'     },
+]
 
 export default function DebtsPage() {
   const [debts, setDebts] = useState<any[]>([])
@@ -28,16 +42,16 @@ export default function DebtsPage() {
 
   useEffect(() => { load() }, [load])
 
+  function openAdd() {
+    setEditingId(null)
+    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '' })
+    setShowForm(true)
+  }
+
   function startEdit(d: any) {
     setEditingId(d.id)
     setForm({ name: d.name, original_amount: d.original_amount.toString(), remaining_amount: d.remaining_amount.toString(), monthly_payment: d.monthly_payment?.toString() ?? '', due_date: d.due_date ?? '', priority: d.priority.toString(), notes: d.notes ?? '' })
     setShowForm(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  function cancelForm() {
-    setShowForm(false); setEditingId(null)
-    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '' })
   }
 
   async function saveDebt() {
@@ -54,13 +68,13 @@ export default function DebtsPage() {
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_debt_added'))
     }
-    cancelForm(); setSaving(false); load()
+    setShowForm(false); setSaving(false); load()
   }
 
   async function deleteDebt(id: string) {
-    const { error } = await supabase.from('debts').delete().eq('id', id)
-    if (error) { toast.error(t('toast_error_delete')); return }
-    toast.success(t('toast_deleted')); load()
+    await supabase.from('debts').delete().eq('id', id)
+    setDebts(prev => prev.filter(d => d.id !== id))
+    toast.success(t('toast_deleted'))
   }
 
   async function makePayment(debtId: string) {
@@ -79,141 +93,149 @@ export default function DebtsPage() {
     setPaymentDebtId(null); setPaymentAmount(''); setPayingSaving(false); load()
   }
 
-  const totalRemaining = debts.reduce((a, d) => a + d.remaining_amount, 0)
-  const totalOriginal  = debts.reduce((a, d) => a + d.original_amount, 0)
+  const totalRemaining = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
+  const totalOriginal  = debts.reduce((a, d) => a + Number(d.original_amount), 0)
+  const totalMonthly   = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
   const paidPct = totalOriginal > 0 ? ((totalOriginal - totalRemaining) / totalOriginal * 100) : 0
-  const priorityColor = ['', '#ef4444', '#f59e0b', '#3b82f6', '#94a3b8', '#94a3b8']
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {[0,1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 140, borderRadius: 16 }} />)}
+    </div>
+  )
 
   return (
-    <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('debts_title')}</h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{debts.length} {t('debts_active')}</p>
-        </div>
-        <button onClick={() => { cancelForm(); setShowForm(true) }}
-          className="px-4 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue" style={{ fontFamily: 'inherit' }}>
-          + {t('debts_add')}
-        </button>
-      </div>
+    <div className="animate-fade-in">
+      <PageHeader
+        title={t('debts_title')}
+        subtitle={`${debts.length} ${t('debts_active')}`}
+        action={<AddButton label={t('debts_add')} onClick={openAdd} />}
+      />
 
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: t('debts_total'),    value: `${totalRemaining.toFixed(0)}`, color: 'var(--accent-red-light)'   },
-          { label: t('debts_paid_pct'), value: `${paidPct.toFixed(0)}%`,       color: 'var(--accent-green-light)' },
-          { label: t('debts_count'),    value: `${debts.length}`,              color: 'var(--accent-blue-light)'  },
-        ].map((s, i) => (
-          <div key={i} className="card p-3 text-center">
-            <div className="text-lg font-black font-mono" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
+      <StatBar stats={[
+        { label: t('debts_total'),    value: totalRemaining.toFixed(0), color: 'var(--accent-red-light)'   },
+        { label: t('debts_paid_pct'), value: `${paidPct.toFixed(0)}%`, color: 'var(--accent-green-light)' },
+        { label: t('debts_monthly'),  value: totalMonthly.toFixed(0),  color: 'var(--accent-amber-light)'  },
+      ]} />
+
+      {debts.length > 0 && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{t('debts_progress')}</span>
+            <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--accent-green-light)' }}>{paidPct.toFixed(1)}%</span>
           </div>
-        ))}
-      </div>
-
-      <div className="card p-4">
-        <div className="flex justify-between text-xs mb-2">
-          <span style={{ color: 'var(--text-secondary)' }}>{t('debts_progress')}</span>
-          <span className="font-bold" style={{ color: 'var(--accent-green-light)' }}>{paidPct.toFixed(0)}%</span>
-        </div>
-        <div className="progress-track h-3">
-          <div className="progress-fill gradient-green" style={{ width: `${Math.min(paidPct, 100)}%` }} />
-        </div>
-      </div>
-
-      {showForm && (
-        <div className="card p-4 animate-scale-in" style={{ borderColor: editingId ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.3)' }}>
-          <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>
-            {editingId ? t('debts_edit') : t('debts_new')}
-          </h3>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: t('debts_name'),     key: 'name',             type: 'text',   col: 'col-span-2' },
-              { label: t('debts_original'), key: 'original_amount',  type: 'number', col: '' },
-              { label: t('debts_remaining'),key: 'remaining_amount', type: 'number', col: '' },
-              { label: t('debts_monthly'),  key: 'monthly_payment',  type: 'number', col: '' },
-              { label: t('debts_due_date'), key: 'due_date',         type: 'date',   col: '' },
-              { label: t('debts_notes'),    key: 'notes',            type: 'text',   col: 'col-span-2' },
-            ].map(f => (
-              <div key={f.key} className={f.col}>
-                <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
-                <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                  className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
-              </div>
-            ))}
+          <div className="progress-track" style={{ height: 10 }}>
+            <div className="progress-fill gradient-green" style={{ width: `${Math.min(paidPct, 100)}%` }} />
           </div>
-          <div className="flex gap-2 mt-4">
-            <button onClick={saveDebt} disabled={saving}
-              className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
-              style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
-              {saving ? '...' : editingId ? t('debts_save_edit') : t('debts_save')}
-            </button>
-            <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
-              style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>
-              {t('debts_cancel')}
-            </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>مسدد: {(totalOriginal - totalRemaining).toFixed(0)} JOD</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>الأصل: {totalOriginal.toFixed(0)} JOD</span>
           </div>
         </div>
       )}
 
-      <div className="space-y-3">
-        {debts.map(debt => {
-          const pct = (debt.original_amount - debt.remaining_amount) / debt.original_amount * 100
-          return (
-            <div key={debt.id} className="card p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-2.5 h-2.5 rounded-full shrink-0 mt-1" style={{ background: priorityColor[debt.priority] }} />
-                  <div className="min-w-0">
-                    <div className="font-black text-sm truncate" style={{ color: 'var(--text-primary)' }}>{debt.name}</div>
-                    {debt.notes && <div className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{debt.notes}</div>}
+      {debts.length === 0 ? (
+        <EmptyState icon="🎉" title={t('debts_empty')} subtitle="لا ديون نشطة — أحسنت!" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {debts.map(debt => {
+            const pct = Number(debt.original_amount) > 0
+              ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
+              : 0
+            const pri = PRIORITY_CONFIG[(debt.priority ?? 3) - 1] ?? PRIORITY_CONFIG[2]
+            return (
+              <div key={debt.id} style={{
+                background: 'var(--bg-card)', border: '1px solid var(--border)',
+                borderRadius: 18, padding: '16px',
+                borderRight: `3px solid ${pri.color}`,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: `${pri.color}18`, border: `1px solid ${pri.color}30`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: pri.color, boxShadow: `0 0 8px ${pri.color}` }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>{debt.name}</div>
+                    {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{debt.notes}</div>}
+                  </div>
+                  <div style={{ textAlign: 'left', flexShrink: 0 }}>
+                    <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace' }}>
+                      {Number(debt.remaining_amount).toFixed(0)}<span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 2 }}> JOD</span>
+                    </div>
+                    {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}/شهر</div>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                    <button onClick={() => startEdit(debt)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
+                    <button onClick={() => deleteDebt(debt.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0 mr-2">
-                  <div className="text-right ml-2">
-                    <div className="font-black font-mono text-sm" style={{ color: 'var(--accent-red-light)' }}>{debt.remaining_amount.toFixed(0)} JOD</div>
-                    {debt.monthly_payment > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{debt.monthly_payment}{t('debts_per_month')}</div>}
-                  </div>
-                  <button onClick={() => startEdit(debt)} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>✏️</button>
-                  <button onClick={() => deleteDebt(debt.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>🗑️</button>
+
+                <div className="progress-track" style={{ marginBottom: 10 }}>
+                  <div className="progress-fill gradient-green" style={{ width: `${Math.min(pct, 100)}%` }} />
                 </div>
-              </div>
-              <div className="progress-track mb-1.5">
-                <div className="progress-fill gradient-green" style={{ width: `${pct}%` }} />
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{pct.toFixed(0)}% {t('debts_paid')}</span>
-                {paymentDebtId === debt.id ? (
-                  <div className="flex items-center gap-2">
-                    <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)}
-                      className="w-20 px-2 py-1.5 rounded-lg text-xs outline-none text-center"
-                      style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                      placeholder="0" autoFocus onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)} />
-                    <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
-                      className="px-3 py-1.5 rounded-lg gradient-green text-white text-xs font-black disabled:opacity-50">
-                      {payingSaving ? '⏳' : '✓'}
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{pct.toFixed(0)}% مسدد</span>
+                  {paymentDebtId === debt.id ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)}
+                        placeholder="المبلغ" autoFocus onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)}
+                        style={{ width: 90, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }} />
+                      <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
+                        style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
+                        {payingSaving ? '⏳' : '✓ دفع'}
+                      </button>
+                      <button onClick={() => { setPaymentDebtId(null); setPaymentAmount('') }}
+                        style={{ padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => { setPaymentDebtId(debt.id); setPaymentAmount('') }}
+                      style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      + دفعة
                     </button>
-                    <button onClick={() => { setPaymentDebtId(null); setPaymentAmount('') }}
-                      className="px-3 py-1.5 rounded-lg text-xs" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
-                  </div>
-                ) : (
-                  <button onClick={() => setPaymentDebtId(debt.id)} className="text-xs px-3 py-1.5 rounded-lg font-bold badge-green">
-                    {t('debts_payment_add')}
-                  </button>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          )
-        })}
-        {debts.length === 0 && (
-          <div className="text-center py-16 card">
-            <div className="text-4xl mb-3">🎉</div>
-            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>{t('debts_empty')}</div>
+            )
+          })}
+        </div>
+      )}
+
+      {showForm && (
+        <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={() => setShowForm(false)}>
+          <FormField label={t('debts_name')}>
+            <Input placeholder="مثال: بطاقة Visa" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+          </FormField>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <FormField label={t('debts_original')}>
+              <Input type="number" placeholder="0" value={form.original_amount} onChange={e => setForm(f => ({ ...f, original_amount: e.target.value }))} />
+            </FormField>
+            <FormField label={t('debts_remaining')}>
+              <Input type="number" placeholder="0" value={form.remaining_amount} onChange={e => setForm(f => ({ ...f, remaining_amount: e.target.value }))} />
+            </FormField>
+            <FormField label={t('debts_monthly')}>
+              <Input type="number" placeholder="0" value={form.monthly_payment} onChange={e => setForm(f => ({ ...f, monthly_payment: e.target.value }))} />
+            </FormField>
+            <FormField label={t('debts_due_date')}>
+              <Input type="date" value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
+            </FormField>
           </div>
-        )}
-      </div>
+          <FormField label={t('debts_priority')}>
+            <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
+              {PRIORITY_CONFIG.map((p, i) => (
+                <option key={i+1} value={i+1}>{p.label}</option>
+              ))}
+            </Select>
+          </FormField>
+          <FormField label={t('debts_notes')}>
+            <Input placeholder="ملاحظات اختيارية" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+          </FormField>
+          <SaveButton label={editingId ? t('debts_save_edit') : t('debts_save')} loading={saving} onClick={saveDebt} />
+        </Modal>
+      )}
     </div>
   )
 }
