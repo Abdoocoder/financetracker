@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { PushToggle } from '@/components/ui/push-toggle'
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<any>(null)
