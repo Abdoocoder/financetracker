@@ -2,20 +2,24 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/toast'
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<any>(null)
   const [form, setForm] = useState({ full_name: '', monthly_income: '', currency: 'JOD' })
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+  const { success, error } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    if (data) { setProfile(data); setForm({ full_name: data.full_name ?? '', monthly_income: data.monthly_income?.toString() ?? '', currency: data.currency ?? 'JOD' }) }
+    if (data) {
+      setProfile({ ...data, email: user.email })
+      setForm({ full_name: data.full_name ?? '', monthly_income: data.monthly_income?.toString() ?? '', currency: data.currency ?? 'JOD' })
+    }
   }, [supabase])
 
   useEffect(() => { load() }, [load])
@@ -24,9 +28,14 @@ export default function SettingsPage() {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('profiles').update({ full_name: form.full_name, monthly_income: parseFloat(form.monthly_income) || 0, currency: form.currency }).eq('id', user.id)
-    setSaving(false); setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    const { error: err } = await supabase.from('profiles').update({
+      full_name: form.full_name,
+      monthly_income: parseFloat(form.monthly_income) || 0,
+      currency: form.currency
+    }).eq('id', user.id)
+    setSaving(false)
+    if (err) { error('فشل حفظ الإعدادات'); return }
+    success('تم حفظ الإعدادات بنجاح ✅')
   }
 
   async function handleLogout() {
@@ -54,7 +63,7 @@ export default function SettingsPage() {
 
         <div className="space-y-4">
           {[
-            { label: 'الاسم الكامل', key: 'full_name', type: 'text', placeholder: 'عبدالله ابوصغيرة' },
+            { label: 'الاسم الكامل', key: 'full_name', type: 'text', placeholder: 'عبدالله أبوصغيرة' },
             { label: 'الراتب الشهري (JOD)', key: 'monthly_income', type: 'number', placeholder: '495' },
           ].map(f => (
             <div key={f.key}>
@@ -75,11 +84,10 @@ export default function SettingsPage() {
               <option value="SAR">ريال سعودي (SAR)</option>
             </select>
           </div>
-
           <button onClick={saveProfile} disabled={saving}
             className="w-full py-3.5 rounded-xl gradient-blue text-white font-black text-sm disabled:opacity-50 transition-all"
             style={{ fontFamily: 'inherit' }}>
-            {saved ? '✅ تم الحفظ!' : saving ? '⏳ جاري...' : 'حفظ التغييرات'}
+            {saving ? '⏳ جاري الحفظ...' : 'حفظ التغييرات'}
           </button>
         </div>
       </div>
