@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
+import { useI18n } from '@/lib/i18n'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
@@ -14,6 +15,7 @@ export default function GoalsPage() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
+  const { t } = useI18n()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -38,48 +40,38 @@ export default function GoalsPage() {
   }
 
   async function saveGoal() {
-    if (!form.name || !form.target_amount) { toast.warning('يرجى تعبئة اسم الهدف والمبلغ'); return }
+    if (!form.name || !form.target_amount) { toast.warning(t('toast_fill_required')); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     if (editingId) {
-      const { error: err } = await supabase.from('savings_goals').update({
-        name: form.name, target_amount: parseFloat(form.target_amount),
-        current_amount: parseFloat(form.current_amount),
-        target_date: form.target_date || null, icon: form.icon,
-      }).eq('id', editingId)
-      if (err) { toast.error('فشل تعديل الهدف'); setSaving(false); return }
-      toast.success('تم تعديل الهدف بنجاح ✏️')
+      const { error } = await supabase.from('savings_goals').update({ name: form.name, target_amount: parseFloat(form.target_amount), current_amount: parseFloat(form.current_amount), target_date: form.target_date || null, icon: form.icon }).eq('id', editingId)
+      if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
+      toast.success(t('toast_edited'))
     } else {
-      const { error: err } = await supabase.from('savings_goals').insert({
-        user_id: user.id, name: form.name,
-        target_amount: parseFloat(form.target_amount),
-        current_amount: parseFloat(form.current_amount) || 0,
-        target_date: form.target_date || null, icon: form.icon,
-      })
-      if (err) { toast.error('فشل إضافة الهدف'); setSaving(false); return }
-      toast.success('تم إضافة الهدف 🎯')
+      const { error } = await supabase.from('savings_goals').insert({ user_id: user.id, name: form.name, target_amount: parseFloat(form.target_amount), current_amount: parseFloat(form.current_amount) || 0, target_date: form.target_date || null, icon: form.icon })
+      if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
+      toast.success(t('toast_goal_added'))
     }
     cancelForm(); setSaving(false); load()
   }
 
   async function deleteGoal(id: string) {
-    const { error: err } = await supabase.from('savings_goals').delete().eq('id', id)
-    if (err) { toast.error('فشل حذف الهدف'); return }
-    toast.success('تم حذف الهدف')
-    load()
+    const { error } = await supabase.from('savings_goals').delete().eq('id', id)
+    if (error) { toast.error(t('toast_error_delete')); return }
+    toast.success(t('toast_deleted')); load()
   }
 
   async function addSaving(goalId: string) {
     const amount = parseFloat(savingAmount)
-    if (!amount || amount <= 0) { toast.warning('أدخل مبلغاً صحيحاً'); return }
+    if (!amount || amount <= 0) { toast.warning(t('toast_fill_required')); return }
     const goal = goals.find(g => g.id === goalId)
     if (!goal) return
     const newAmount = Math.min(goal.current_amount + amount, goal.target_amount)
-    const { error: err } = await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
-    if (err) { toast.error('فشل تسجيل الادخار'); return }
-    if (newAmount >= goal.target_amount) toast.success(`🎉 تهانينا! تحقق هدف "${goal.name}"`)
-    else toast.success(`تم إضافة ${amount} JOD 💰`)
+    const { error } = await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
+    if (error) { toast.error(t('toast_error_save')); return }
+    if (newAmount >= goal.target_amount) toast.success(`${t('toast_goal_reached')} "${goal.name}"`)
+    else toast.success(`${t('toast_saving_added')} ${amount} JOD`)
     setSavingGoalId(null); setSavingAmount(''); load()
   }
 
@@ -93,12 +85,12 @@ export default function GoalsPage() {
     <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>أهداف الادخار</h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{goals.length} هدف</p>
+          <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('goals_title')}</h1>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{goals.length} {t('goals_count')}</p>
         </div>
         <button onClick={() => { cancelForm(); setShowForm(true) }}
           className="px-4 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue" style={{ fontFamily: 'inherit' }}>
-          + إضافة
+          + {t('goals_add')}
         </button>
       </div>
 
@@ -106,11 +98,11 @@ export default function GoalsPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-green-light)' }}>{totalSaved.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>تم ادخاره JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_saved')} JOD</div>
           </div>
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>{totalTarget.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>المستهدف JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_target_lbl')} JOD</div>
           </div>
         </div>
       )}
@@ -118,10 +110,10 @@ export default function GoalsPage() {
       {showForm && (
         <div className="card p-4 animate-scale-in" style={{ borderColor: editingId ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.3)' }}>
           <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>
-            {editingId ? '✏️ تعديل الهدف' : 'هدف جديد'}
+            {editingId ? t('goals_edit') : t('goals_new')}
           </h3>
           <div className="mb-3">
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>الأيقونة</label>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('goals_icon')}</label>
             <div className="flex flex-wrap gap-2">
               {icons.map(i => (
                 <button key={i} onClick={() => setForm(p => ({ ...p, icon: i }))}
@@ -134,17 +126,16 @@ export default function GoalsPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: 'اسم الهدف', key: 'name', type: 'text', placeholder: 'شراء سيارة', col: 'col-span-2' },
-              { label: 'المبلغ المستهدف (JOD)', key: 'target_amount', type: 'number', placeholder: '5000', col: '' },
-              { label: 'المبلغ الحالي (JOD)', key: 'current_amount', type: 'number', placeholder: '0', col: '' },
-              { label: 'تاريخ الهدف', key: 'target_date', type: 'date', placeholder: '', col: 'col-span-2' },
+              { label: t('goals_name'),    key: 'name',           type: 'text',   col: 'col-span-2' },
+              { label: t('goals_target'),  key: 'target_amount',  type: 'number', col: '' },
+              { label: t('goals_current'), key: 'current_amount', type: 'number', col: '' },
+              { label: t('goals_date'),    key: 'target_date',    type: 'date',   col: 'col-span-2' },
             ].map(f => (
               <div key={f.key} className={f.col}>
                 <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
                 <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                   className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                  placeholder={f.placeholder} />
+                  style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
               </div>
             ))}
           </div>
@@ -152,39 +143,34 @@ export default function GoalsPage() {
             <button onClick={saveGoal} disabled={saving}
               className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
               style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
-              {saving ? '...' : editingId ? 'حفظ التعديل' : 'إضافة'}
+              {saving ? '...' : editingId ? t('goals_save_edit') : t('goals_save')}
             </button>
             <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
-              style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>إلغاء</button>
+              style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>
+              {t('goals_cancel')}
+            </button>
           </div>
         </div>
       )}
 
       <div className="space-y-3">
-        {goals.map((goal) => {
+        {goals.map(goal => {
           const pct = Math.min((goal.current_amount / goal.target_amount) * 100, 100)
           const remaining = goal.target_amount - goal.current_amount
-          const isAddingToThis = savingGoalId === goal.id
           return (
             <div key={goal.id} className="card p-4">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-                  style={{ background: 'var(--bg-secondary)' }}>{goal.icon || '🎯'}</div>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0" style={{ background: 'var(--bg-secondary)' }}>{goal.icon || '🎯'}</div>
                 <div className="flex-1 min-w-0">
                   <div className="font-black" style={{ color: 'var(--text-primary)' }}>{goal.name}</div>
                   {goal.target_date && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>📅 {goal.target_date}</div>}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <div className="font-black font-mono text-sm ml-1"
-                    style={{ color: pct >= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}>
+                  <div className="font-black font-mono text-sm ml-1" style={{ color: pct >= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}>
                     {pct >= 100 ? '✅' : `${pct.toFixed(0)}%`}
                   </div>
-                  <button onClick={() => startEdit(goal)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
-                    style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--accent-yellow-light)' }}>✏️</button>
-                  <button onClick={() => deleteGoal(goal.id)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
-                    style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red-light)' }}>🗑️</button>
+                  <button onClick={() => startEdit(goal)} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>✏️</button>
+                  <button onClick={() => deleteGoal(goal.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>🗑️</button>
                 </div>
               </div>
               <div className="progress-track mb-2">
@@ -192,29 +178,23 @@ export default function GoalsPage() {
               </div>
               <div className="flex justify-between items-center mb-2">
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span>
-                  {' / '}{goal.target_amount.toFixed(0)} JOD
+                  <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span> / {goal.target_amount.toFixed(0)} JOD
                 </div>
-                {remaining > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>متبقي: <span className="font-mono">{remaining.toFixed(0)} JOD</span></div>}
+                {remaining > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('goals_remaining')}: <span className="font-mono">{remaining.toFixed(0)} JOD</span></div>}
               </div>
-              {isAddingToThis ? (
+              {savingGoalId === goal.id ? (
                 <div className="flex gap-2 mt-2">
                   <input type="number" value={savingAmount} onChange={e => setSavingAmount(e.target.value)}
                     className="flex-1 px-3 py-2 rounded-xl text-sm outline-none text-center"
                     style={{ background: 'var(--bg-secondary)', border: '1px solid var(--accent-green)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                    placeholder="المبلغ JOD" autoFocus
-                    onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
-                  <button onClick={() => addSaving(goal.id)}
-                    className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black">✓</button>
-                  <button onClick={() => { setSavingGoalId(null); setSavingAmount('') }}
-                    className="px-3 py-2 rounded-xl text-sm"
-                    style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
+                    placeholder="0 JOD" autoFocus onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
+                  <button onClick={() => addSaving(goal.id)} className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black">✓</button>
+                  <button onClick={() => { setSavingGoalId(null); setSavingAmount('') }} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
                 </div>
               ) : (
                 remaining > 0 && (
-                  <button onClick={() => { setSavingGoalId(goal.id); setSavingAmount('') }}
-                    className="w-full py-2 rounded-xl text-sm font-bold badge-green mt-1">
-                    + إضافة ادخار
+                  <button onClick={() => setSavingGoalId(goal.id)} className="w-full py-2 rounded-xl text-sm font-bold badge-green mt-1">
+                    {t('goals_add_saving')}
                   </button>
                 )
               )}
@@ -224,7 +204,7 @@ export default function GoalsPage() {
         {goals.length === 0 && (
           <div className="text-center py-16 card">
             <div className="text-4xl mb-3">🎯</div>
-            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>لا توجد أهداف بعد</div>
+            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>{t('goals_empty')}</div>
           </div>
         )}
       </div>
