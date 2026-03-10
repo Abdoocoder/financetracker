@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
@@ -14,7 +14,6 @@ export default function GoalsPage() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
-  const { success, error, warning } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -39,7 +38,7 @@ export default function GoalsPage() {
   }
 
   async function saveGoal() {
-    if (!form.name || !form.target_amount) { warning('يرجى تعبئة اسم الهدف والمبلغ'); return }
+    if (!form.name || !form.target_amount) { toast.warning('يرجى تعبئة اسم الهدف والمبلغ'); return }
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -49,8 +48,8 @@ export default function GoalsPage() {
         current_amount: parseFloat(form.current_amount),
         target_date: form.target_date || null, icon: form.icon,
       }).eq('id', editingId)
-      if (err) { error('فشل تعديل الهدف'); setSaving(false); return }
-      success('تم تعديل الهدف بنجاح ✏️')
+      if (err) { toast.error('فشل تعديل الهدف'); setSaving(false); return }
+      toast.success('تم تعديل الهدف بنجاح ✏️')
     } else {
       const { error: err } = await supabase.from('savings_goals').insert({
         user_id: user.id, name: form.name,
@@ -58,29 +57,29 @@ export default function GoalsPage() {
         current_amount: parseFloat(form.current_amount) || 0,
         target_date: form.target_date || null, icon: form.icon,
       })
-      if (err) { error('فشل إضافة الهدف'); setSaving(false); return }
-      success('تم إضافة الهدف 🎯')
+      if (err) { toast.error('فشل إضافة الهدف'); setSaving(false); return }
+      toast.success('تم إضافة الهدف 🎯')
     }
     cancelForm(); setSaving(false); load()
   }
 
   async function deleteGoal(id: string) {
     const { error: err } = await supabase.from('savings_goals').delete().eq('id', id)
-    if (err) { error('فشل حذف الهدف'); return }
-    success('تم حذف الهدف')
+    if (err) { toast.error('فشل حذف الهدف'); return }
+    toast.success('تم حذف الهدف')
     load()
   }
 
   async function addSaving(goalId: string) {
     const amount = parseFloat(savingAmount)
-    if (!amount || amount <= 0) { warning('أدخل مبلغاً صحيحاً'); return }
+    if (!amount || amount <= 0) { toast.warning('أدخل مبلغاً صحيحاً'); return }
     const goal = goals.find(g => g.id === goalId)
     if (!goal) return
     const newAmount = Math.min(goal.current_amount + amount, goal.target_amount)
     const { error: err } = await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
-    if (err) { error('فشل تسجيل الادخار'); return }
-    if (newAmount >= goal.target_amount) success(`🎉 تهانينا! تحقق هدف "${goal.name}"`)
-    else success(`تم إضافة ${amount} JOD 💰`)
+    if (err) { toast.error('فشل تسجيل الادخار'); return }
+    if (newAmount >= goal.target_amount) toast.success(`🎉 تهانينا! تحقق هدف "${goal.name}"`)
+    else toast.success(`تم إضافة ${amount} JOD 💰`)
     setSavingGoalId(null); setSavingAmount(''); load()
   }
 
