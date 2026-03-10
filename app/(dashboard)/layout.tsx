@@ -4,6 +4,8 @@ import { UserProvider } from '@/lib/user-context'
 import { useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
+import { ToastProvider } from '@/lib/toast-context'
+import ToastContainer from '@/components/ui/ToastContainer'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -35,6 +37,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       }}>
         {children}
       </main>
+      <ToastContainer />
     </div>
   )
 }
@@ -42,7 +45,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <UserProvider>
-      <DashboardContent>{children}</DashboardContent>
+      <ToastProvider>
+        <DashboardContent>{children}</DashboardContent>
+      </ToastProvider>
     </UserProvider>
   )
 }
