@@ -1,5 +1,3 @@
-// app/api/alerts/route.ts
-// Called by Vercel Cron daily to generate smart alerts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
@@ -8,7 +6,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Motivational messages
 const MOTIVATIONS = [
   { title: '💪 استمر في المسيرة!', message: 'كل دينار تدخره اليوم هو خطوة نحو الحرية المالية.' },
   { title: '🌟 أنت تسير بالاتجاه الصحيح', message: 'الثبات على الخطة هو السر الحقيقي للنجاح المالي.' },
@@ -24,25 +21,24 @@ const WARNINGS = {
   investmentTime: { title: '📈 حان وقت شراء SPUS', message: 'مرت 3 أشهر — حان وقت إضافة دفعتك الاستثمارية الربعية.' },
 }
 
-export async function GET(request: NextRequest) {
-  // Verify cron secret
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
+async function generateAlerts(userId?: string) {
   const now = new Date()
-  const dayOfWeek = now.getDay() // 0=Sunday
+  const dayOfWeek = now.getDay()
   const dayOfMonth = now.getDate()
+  const month = now.getMonth() + 1
 
-  // Get all users
-  const { data: profiles } = await supabase.from('profiles').select('id, monthly_income')
-  if (!profiles) return NextResponse.json({ ok: true })
+  // جلب المستخدمين — إما مستخدم محدد أو الكل
+  const query = supabase.from('profiles').select('id, monthly_income')
+  const { data: profiles } = userId
+    ? await query.eq('id', userId)
+    : await query
+
+  if (!profiles || profiles.length === 0) return 0
 
   const alertsToInsert: Record<string, unknown>[] = []
 
   for (const profile of profiles) {
-    // Daily motivation (every day)
+    // تحفيز يومي
     const motivation = MOTIVATIONS[dayOfMonth % MOTIVATIONS.length]
     alertsToInsert.push({
       user_id: profile.id,
@@ -54,7 +50,7 @@ export async function GET(request: NextRequest) {
       is_active: true,
     })
 
-    // Weekly: check if no transactions this week (Monday)
+    // أسبوعي: الإثنين — لا معاملات هذا الأسبوع
     if (dayOfWeek === 1) {
       const weekAgo = new Date(now)
       weekAgo.setDate(weekAgo.getDate() - 7)
@@ -77,7 +73,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Monthly: spending check (1st of month)
+    // شهري: أول الشهر
     if (dayOfMonth === 1) {
       const lastMonth = new Date(now)
       lastMonth.setMonth(lastMonth.getMonth() - 1)
@@ -91,21 +87,20 @@ export async function GET(request: NextRequest) {
       if (txns) {
         const income = txns.filter(t => t.type === 'income').reduce((a, t) => a + t.amount, 0) || profile.monthly_income
         const expenses = txns.filter(t => t.type === 'expense').reduce((a, t) => a + t.amount, 0)
-        if (expenses / income > 0.8) {
+        if (income > 0 && expenses / income > 0.8) {
           alertsToInsert.push({
             user_id: profile.id,
             type: 'warning',
             frequency: 'monthly',
             title: WARNINGS.overspending.title,
-            message: `${WARNINGS.overspending.message} (مصاريفك: ${expenses.toFixed(2)} JOD = ${((expenses / income) * 100).toFixed(0)}% من دخلك)`,
+            message: `${WARNINGS.overspending.message} (مصاريفك: ${expenses.toFixed(0)} JOD = ${((expenses / income) * 100).toFixed(0)}% من دخلك)`,
             is_read: false,
             is_active: true,
           })
         }
       }
 
-      // SPUS quarterly reminder (every 3 months: April, July, October, January)
-      const month = now.getMonth() + 1 // 1-12
+      // ربعي: يناير، أبريل، يوليو، أكتوبر
       if ([1, 4, 7, 10].includes(month)) {
         alertsToInsert.push({
           user_id: profile.id,
@@ -119,7 +114,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Debt due reminder (25th of each month)
+    // يوم 25: تذكير دفعات الديون
     if (dayOfMonth === 25) {
       const { data: debts } = await supabase
         .from('debts')
@@ -135,7 +130,7 @@ export async function GET(request: NextRequest) {
           type: 'reminder',
           frequency: 'monthly',
           title: WARNINGS.debtDue.title,
-          message: `${WARNINGS.debtDue.message} إجمالي أقساطك: ${totalMonthly.toFixed(2)} JOD`,
+          message: `${WARNINGS.debtDue.message} إجمالي أقساطك: ${totalMonthly.toFixed(0)} JOD`,
           is_read: false,
           is_active: true,
         })
@@ -143,10 +138,48 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Batch insert
   if (alertsToInsert.length > 0) {
     await supabase.from('alerts').insert(alertsToInsert)
   }
 
-  return NextResponse.json({ ok: true, generated: alertsToInsert.length })
+  return alertsToInsert.length
+}
+
+// ===== GET: Vercel Cron Job =====
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const count = await generateAlerts()
+  return NextResponse.json({ ok: true, generated: count })
+}
+
+// ===== POST: استدعاء يدوي من صفحة التنبيهات =====
+export async function POST(request: NextRequest) {
+  try {
+    // التحقق من المستخدم عبر Supabase Auth
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+
+    // التحقق من الـ token مع Supabase
+    const { data: { user }, error } = await supabase.auth.getUser(token)
+    if (error || !user) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
+    // توليد التنبيهات لهذا المستخدم فقط
+    const count = await generateAlerts(user.id)
+    return NextResponse.json({
+      ok: true,
+      generated: count,
+      message: count > 0 ? `✅ تم توليد ${count} تنبيه` : '✅ لا تنبيهات جديدة الآن'
+    })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
 }
