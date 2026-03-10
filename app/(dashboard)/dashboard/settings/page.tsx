@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
+import { useI18n } from '@/lib/i18n'
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<any>(null)
@@ -11,6 +12,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+  const { t, lang, setLang } = useI18n()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -28,14 +30,14 @@ export default function SettingsPage() {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error: err } = await supabase.from('profiles').update({
+    const { error } = await supabase.from('profiles').update({
       full_name: form.full_name,
       monthly_income: parseFloat(form.monthly_income) || 0,
       currency: form.currency
     }).eq('id', user.id)
     setSaving(false)
-    if (err) { toast.error('فشل حفظ الإعدادات'); return }
-    toast.success('تم حفظ الإعدادات بنجاح ✅')
+    if (error) { toast.error(t('toast_error_save')); return }
+    toast.success(t('toast_settings_saved'))
   }
 
   async function handleLogout() {
@@ -46,8 +48,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-4 animate-fade-in max-w-lg mx-auto">
       <div>
-        <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>الإعدادات</h1>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>بيانات حسابك الشخصي</p>
+        <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('settings_title')}</h1>
+        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('settings_subtitle')}</p>
       </div>
 
       <div className="card p-5">
@@ -56,48 +58,68 @@ export default function SettingsPage() {
             {form.full_name?.charAt(0) || 'م'}
           </div>
           <div>
-            <div className="font-black text-lg" style={{ color: 'var(--text-primary)' }}>{form.full_name || 'اسمك'}</div>
+            <div className="font-black text-lg" style={{ color: 'var(--text-primary)' }}>{form.full_name || t('settings_name')}</div>
             <div className="text-sm" style={{ color: 'var(--text-muted)' }}>{profile?.email}</div>
           </div>
         </div>
 
         <div className="space-y-4">
-          {[
-            { label: 'الاسم الكامل', key: 'full_name', type: 'text', placeholder: 'عبدالله أبوصغيرة' },
-            { label: 'الراتب الشهري (JOD)', key: 'monthly_income', type: 'number', placeholder: '495' },
-          ].map(f => (
-            <div key={f.key}>
-              <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
-              <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                placeholder={f.placeholder} />
-            </div>
-          ))}
           <div>
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>العملة</label>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_name')}</label>
+            <input type="text" value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
+              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_income')} (JOD)</label>
+            <input type="number" value={form.monthly_income} onChange={e => setForm(p => ({ ...p, monthly_income: e.target.value }))}
+              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
+              placeholder="495" />
+          </div>
+          <div>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_currency')}</label>
             <select value={form.currency} onChange={e => setForm(p => ({ ...p, currency: e.target.value }))}
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
               <option value="JOD">دينار أردني (JOD)</option>
-              <option value="USD">دولار أمريكي (USD)</option>
+              <option value="USD">US Dollar (USD)</option>
               <option value="SAR">ريال سعودي (SAR)</option>
             </select>
           </div>
+
+          {/* تبديل اللغة */}
+          <div>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_language')}</label>
+            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+              {(['ar', 'en'] as const).map(l => (
+                <button key={l} onClick={() => setLang(l)}
+                  className="flex-1 py-3 text-sm font-black transition-all"
+                  style={{
+                    background: lang === l ? 'var(--accent-blue)' : 'var(--bg-secondary)',
+                    color: lang === l ? 'white' : 'var(--text-muted)',
+                    fontFamily: 'inherit',
+                  }}>
+                  {l === 'ar' ? '🇯🇴 العربية' : '🇬🇧 English'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button onClick={saveProfile} disabled={saving}
-            className="w-full py-3.5 rounded-xl gradient-blue text-white font-black text-sm disabled:opacity-50 transition-all"
+            className="w-full py-3.5 rounded-xl gradient-blue text-white font-black text-sm disabled:opacity-50"
             style={{ fontFamily: 'inherit' }}>
-            {saving ? '⏳ جاري الحفظ...' : 'حفظ التغييرات'}
+            {saving ? t('settings_saving') : t('settings_save')}
           </button>
         </div>
       </div>
 
       <div className="card p-5">
-        <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>الحساب</h3>
+        <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>{t('settings_account')}</h3>
         <button onClick={handleLogout}
-          className="w-full py-3.5 rounded-xl font-black text-sm transition-all hover:opacity-90"
-          style={{ background: 'rgba(239,68,68,0.12)', color: 'var(--accent-red-light)', border: '1px solid rgba(239,68,68,0.2)', fontFamily: 'inherit' }}>
-          🚪 تسجيل الخروج
+          className="w-full py-3.5 rounded-xl font-black text-sm"
+          style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', fontFamily: 'inherit' }}>
+          🚪 {t('settings_logout')}
         </button>
       </div>
     </div>
