@@ -13,26 +13,23 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return
-    const fetchAlerts = async () => {
-      const { count } = await supabase
-        .from('alerts')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('is_read', false)
-      setAlertsCount(count ?? 0)
-    }
-    fetchAlerts()
+    supabase.from('alerts')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('is_read', false)
+      .then(({ count }) => setAlertsCount(count ?? 0))
   }, [user, supabase])
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: 'rtl' }}>
       <Sidebar alertsCount={alertsCount} />
       <main style={{
         flex: 1,
-        padding: '24px 20px',
-        paddingBottom: '90px',
+        padding: '20px 16px',
+        paddingBottom: '96px',
         maxWidth: '100%',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        minHeight: '100vh',
       }}>
         {children}
       </main>
