@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast'
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<any>(null)
@@ -11,7 +11,6 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const supabase = createClient()
   const router = useRouter()
-  const { success, error } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -35,8 +34,8 @@ export default function SettingsPage() {
       currency: form.currency
     }).eq('id', user.id)
     setSaving(false)
-    if (err) { error('فشل حفظ الإعدادات'); return }
-    success('تم حفظ الإعدادات بنجاح ✅')
+    if (err) { toast.error('فشل حفظ الإعدادات'); return }
+    toast.success('تم حفظ الإعدادات بنجاح ✅')
   }
 
   async function handleLogout() {

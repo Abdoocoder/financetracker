@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 type ToastType = 'success' | 'error' | 'warning' | 'info'
 interface ToastItem { id: string; type: ToastType; message: string }
 
-// Global event system — لا يحتاج Provider
 const listeners: Set<(t: ToastItem) => void> = new Set()
 
 export function toast(message: string, type: ToastType = 'info') {
@@ -16,18 +15,6 @@ toast.error   = (m: string) => toast(m, 'error')
 toast.warning = (m: string) => toast(m, 'warning')
 toast.info    = (m: string) => toast(m, 'info')
 
-// Hook للاستخدام في الصفحات
-export function useToast() {
-  return {
-    toast,
-    success: toast.success,
-    error:   toast.error,
-    warning: toast.warning,
-    info:    toast.info,
-  }
-}
-
-// Provider — فقط لعرض الـ toasts، لا علاقة له بالـ context
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())

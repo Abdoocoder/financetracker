@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useToast } from '@/components/ui/toast'
+import { toast } from '@/components/ui/toast'
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = useState<any[]>([])
@@ -10,7 +10,6 @@ export default function AlertsPage() {
   const [generating, setGenerating] = useState(false)
   const [msg, setMsg] = useState('')
   const supabase = createClient()
-  const { success, error } = useToast()
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -33,7 +32,7 @@ export default function AlertsPage() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) {
-        error('يجب تسجيل الدخول أولاً')
+        toast.error('يجب تسجيل الدخول أولاً')
         setGenerating(false)
         return
       }
@@ -46,13 +45,13 @@ export default function AlertsPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        error(data.error ?? 'حدث خطأ')
+        toast.error(data.error ?? 'حدث خطأ')
       } else {
-        success(data.message ?? '✅ تم توليد التنبيهات')
+        toast.success(data.message ?? '✅ تم توليد التنبيهات')
         await load()
       }
     } catch (err: any) {
-      error(`خطأ في الاتصال`)
+      toast.error(`خطأ في الاتصال`)
     }
     setGenerating(false)
   }
@@ -67,7 +66,7 @@ export default function AlertsPage() {
     if (!user) return
     await supabase.from('alerts').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false)
     setAlerts(prev => prev.map(a => ({ ...a, is_read: true })))
-    success('تم تعيين الكل كمقروء')
+    toast.success('تم تعيين الكل كمقروء')
   }
 
   async function deleteAlert(id: string) {
@@ -80,7 +79,7 @@ export default function AlertsPage() {
     if (!user) return
     await supabase.from('alerts').delete().eq('user_id', user.id)
     setAlerts([])
-    success('تم حذف كل التنبيهات')
+    toast.success('تم حذف كل التنبيهات')
   }
 
   const unread = alerts.filter(a => !a.is_read).length
