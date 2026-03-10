@@ -29,7 +29,7 @@ async function pushAlert(
 ) {
   const exists = await alreadyExists(userId, title, withinHours)
   if (!exists) {
-    list.push({ user_id: userId, type, title, message, is_read: false, is_active: true })
+    list.push({ user_id: userId, type, title, message, frequency: 'daily', is_read: false, is_active: true })
   }
 }
 
@@ -215,7 +215,7 @@ async function generateAlerts(userId?: string) {
     for (const mot of motivations) {
       const exists = await alreadyExists(uid, mot.title, 20)
       if (!exists) {
-        toInsert.push({ user_id: uid, type: 'motivation', title: mot.title, message: mot.message, is_read: false, is_active: true })
+        toInsert.push({ user_id: uid, type: 'motivation', title: mot.title, message: mot.message, frequency: 'daily', is_read: false, is_active: true })
         break
       }
     }
