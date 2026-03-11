@@ -143,7 +143,10 @@ export default function DashboardPage() {
       const catMap: Record<string, number> = {}
       ;(txRes.data ?? [] as any[]).filter((t:any)=>t.type==='expense').forEach((t:any)=>{ catMap[t.category]=(catMap[t.category]??0)+Number(t.amount) })
       const categories = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,5)
-      setData({ income, expenses, months6, categories, net: income - expenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 })
+      const prevMonth = months6[4] ?? { income: 0, expense: 0 }
+      const prevIncome = prevMonth.income
+      const prevExpenses = prevMonth.expense
+      setData({ income, expenses, months6, categories, net: income - expenses, prevIncome, prevExpenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 })
       setRecentTx(recentRes.data ?? [])
       setLoading(false)
     }
@@ -185,6 +188,29 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* مقارنة مع الشهر الماضي */}
+      {(data?.prevIncome > 0 || data?.prevExpenses > 0) && (() => {
+        const incDiff = data.prevIncome > 0 ? ((income - data.prevIncome) / data.prevIncome * 100) : 0
+        const expDiff = data.prevExpenses > 0 ? ((expenses - data.prevExpenses) / data.prevExpenses * 100) : 0
+        return (
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
+            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 12 }}>📊 مقارنة بالشهر الماضي</div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: incDiff >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, marginBottom: 2 }}>{incDiff >= 0 ? '📈' : '📉'}</div>
+                <div style={{ fontSize: 13, fontWeight: 900, color: incDiff >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{incDiff >= 0 ? '+' : ''}{incDiff.toFixed(0)}%</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>الدخل</div>
+              </div>
+              <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: expDiff <= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
+                <div style={{ fontSize: 18, marginBottom: 2 }}>{expDiff <= 0 ? '✅' : '⚠️'}</div>
+                <div style={{ fontSize: 13, fontWeight: 900, color: expDiff <= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{expDiff > 0 ? '+' : ''}{expDiff.toFixed(0)}%</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>المصاريف</div>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {income > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
