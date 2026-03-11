@@ -156,10 +156,10 @@ export default function OnboardingPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoadingProfile(false); return }
       const meta = user.user_metadata
-      const { data } = await supabase.from('profiles').select('full_name,monthly_salary,currency').eq('id', user.id).single()
+      const { data } = await supabase.from('profiles').select('full_name,monthly_income,currency').eq('id', user.id).single()
       setProfile({
         fullName: data?.full_name ?? meta?.full_name ?? '',
-        monthlyIncome: data?.monthly_salary?.toString() ?? meta?.monthly_income?.toString() ?? '',
+        monthlyIncome: data?.monthly_income?.toString() ?? meta?.monthly_income?.toString() ?? '',
         currency: (data?.currency ?? 'JOD') as Profile['currency'],
       })
       setLoadingProfile(false)
@@ -170,7 +170,7 @@ export default function OnboardingPage() {
   async function handleStep1() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    await supabase.from('profiles').upsert({ id:user.id, full_name:profile.fullName, monthly_salary:profile.monthlyIncome?parseFloat(profile.monthlyIncome):null, currency:profile.currency, onboarding_done:false })
+    await supabase.from('profiles').upsert({ id:user.id, full_name:profile.fullName, monthly_income:profile.monthlyIncome?parseFloat(profile.monthlyIncome):null, currency:profile.currency, onboarding_done:false })
     setStep(2)
   }
 
