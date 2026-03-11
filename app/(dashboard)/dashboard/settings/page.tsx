@@ -49,19 +49,11 @@ export default function SettingsPage() {
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <PageHeader title={t('settings_title')} subtitle={t('settings_sub')} />
+      <PageHeader title={t('settings_title')} subtitle="بيانات حسابك الشخصي" />
 
-      {/* Profile Card */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
-        {/* Avatar + Name */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 16, flexShrink: 0,
-            background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20, fontWeight: 900, color: 'white',
-            boxShadow: '0 4px 16px var(--accent-blue-glow)',
-          }}>{initials}</div>
+          <div style={{ width: 56, height: 56, borderRadius: 16, flexShrink: 0, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: 'white', boxShadow: '0 4px 16px var(--accent-blue-glow)' }}>{initials}</div>
           <div>
             <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)' }}>{form.full_name || t('settings_title')}</div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{userEmail}</div>
@@ -69,13 +61,11 @@ export default function SettingsPage() {
         </div>
 
         <FormField label={t('settings_name')}>
-          <Input placeholder={t('settings_name_placeholder')} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
+          <Input placeholder="الاسم الكامل" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
         </FormField>
-
         <FormField label={t('settings_salary')}>
           <Input type="number" placeholder="0" value={form.monthly_salary} onChange={e => setForm(f => ({ ...f, monthly_salary: e.target.value }))} />
         </FormField>
-
         <FormField label={t('settings_currency')}>
           <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
             <option value="JOD">دينار أردني (JOD)</option>
@@ -84,39 +74,23 @@ export default function SettingsPage() {
             <option value="SAR">ريال سعودي (SAR)</option>
           </Select>
         </FormField>
-
         <FormField label={t('settings_lang')}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {(['ar', 'en'] as const).map(l => (
-              <button key={l} onClick={() => setLang(l)} style={{
-                padding: '11px', borderRadius: 10,
-                background: lang === l ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)',
-                border: `1px solid ${lang === l ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
-                color: lang === l ? 'var(--accent-blue-light)' : 'var(--text-muted)',
-                fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
-                transition: 'all 0.15s',
-              }}>
+              <button key={l} onClick={() => setLang(l)} style={{ padding: '11px', borderRadius: 10, background: lang === l ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${lang === l ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: lang === l ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                 {l === 'ar' ? '🇯🇴 العربية' : '🇬🇧 English'}
               </button>
             ))}
           </div>
         </FormField>
-
         <SaveButton label={t('settings_save')} loading={saving} onClick={handleSave} />
       </div>
 
-      {/* Account section */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
         <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>الحساب</div>
         <PushToggle />
         <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
-        <button onClick={handleLogout} disabled={loggingOut} style={{
-          width: '100%', padding: '13px', borderRadius: 12,
-          background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)',
-          color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 800,
-          cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1,
-          transition: 'opacity 0.15s',
-        }}>
+        <button onClick={handleLogout} disabled={loggingOut} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1 }}>
           {loggingOut ? '⏳ ...' : `${t('settings_logout')} ←`}
         </button>
       </div>
