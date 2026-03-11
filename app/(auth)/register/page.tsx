@@ -7,10 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [monthlyIncome, setMonthlyIncome] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,10 +21,6 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: {
-          full_name: fullName,
-          monthly_income: monthlyIncome ? parseFloat(monthlyIncome) : null
-        },
         emailRedirectTo: `${window.location.origin}/dashboard`,
       },
     })
@@ -57,13 +51,6 @@ export default function RegisterPage() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>الاسم الكامل</label>
-            <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-              placeholder="عبدالله أبو صغيرة" />
-          </div>
-          <div>
             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>البريد الإلكتروني</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
@@ -76,15 +63,6 @@ export default function RegisterPage() {
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               placeholder="6 أحرف على الأقل" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
-              الراتب الشهري <span style={{ color: 'var(--text-muted)' }}>(دينار — اختياري)</span>
-            </label>
-            <input type="number" value={monthlyIncome} onChange={e => setMonthlyIncome(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-              placeholder="495" />
           </div>
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
