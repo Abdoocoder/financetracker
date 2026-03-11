@@ -11,39 +11,33 @@ function Bone({ w, h = '14px', r = '8px' }: { w: string; h?: string; r?: string 
 
 function DashSkeleton() {
   return (
-    <div className="space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <Bone w="140px" h="24px" />
-        <Bone w="80px" h="18px" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Bone w="140px" h="24px" /><Bone w="80px" h="18px" />
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[0,1,2].map(i => (
-          <div key={i} className="card-static p-3 flex flex-col items-center gap-2">
-            <Bone w="32px" h="32px" r="10px" />
-            <Bone w="60px" h="20px" r="6px" />
-            <Bone w="50px" h="12px" r="6px" />
+          <div key={i} className="card-static" style={{ padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+            <Bone w="32px" h="32px" r="10px" /><Bone w="60px" h="20px" r="6px" /><Bone w="50px" h="12px" r="6px" />
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-1 gap-3">
-        {[0,1,2].map(i => (
-          <div key={i} className="card-static p-4 flex items-center gap-4">
-            <Bone w="48px" h="48px" r="12px" />
-            <div className="flex-1 space-y-2">
-              <Bone w="80px" h="12px" r="6px" />
-              <Bone w="120px" h="20px" r="6px" />
-            </div>
+      {[0,1,2].map(i => (
+        <div key={i} className="card-static" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Bone w="48px" h="48px" r="14px" />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Bone w="80px" h="12px" r="6px" /><Bone w="120px" h="20px" r="6px" />
           </div>
-        ))}
-      </div>
-      <div className="card-static p-4 space-y-3">
+          <Bone w="20px" h="20px" r="6px" />
+        </div>
+      ))}
+      <div className="card-static" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
         <Bone w="120px" h="16px" r="6px" />
         {[0,1,2,3,4].map(i => (
-          <div key={i} className="flex items-center gap-3">
-            <Bone w="32px" h="32px" r="8px" />
-            <div className="flex-1 space-y-1.5">
-              <Bone w="70%" h="12px" r="6px" />
-              <Bone w="40%" h="10px" r="6px" />
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Bone w="36px" h="36px" r="10px" />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <Bone w="70%" h="12px" r="6px" /><Bone w="40%" h="10px" r="6px" />
             </div>
             <Bone w="50px" h="14px" r="6px" />
           </div>
@@ -64,161 +58,126 @@ export default function DashboardPage() {
   useEffect(() => {
     if (fetched.current) return
     fetched.current = true
-
     async function fetchAll() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
-
       const now = new Date()
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
       const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-
       const [txRes, debtRes, invRes, goalRes, alertRes, recentRes] = await Promise.all([
-        supabase.from('transactions').select('type,amount')
-          .eq('user_id', user.id)
-          .gte('transaction_date', firstDay)
-          .lte('transaction_date', lastDay),
-        supabase.from('debts').select('remaining_amount,monthly_payment')
-          .eq('user_id', user.id).eq('is_paid', false),
-        supabase.from('investments').select('shares,current_price')
-          .eq('user_id', user.id),
-        supabase.from('savings_goals').select('current_amount,target_amount')
-          .eq('user_id', user.id),
-        supabase.from('alerts').select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id).eq('is_read', false),
-        supabase.from('transactions').select('id,type,amount,category,description,transaction_date')
-          .eq('user_id', user.id)
-          .order('transaction_date', { ascending: false })
-          .limit(5),
+        supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
+        supabase.from('debts').select('remaining_amount,monthly_payment').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
+        supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
+        supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
+        supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
       ])
-
       const txs      = txRes.data ?? []
       const income   = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-
-      setData({
-        income, expenses,
-        net:          income - expenses,
-        totalDebt:    (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
-        invValue:     (invRes.data  ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
-        goalsSaved:   (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
-        goalsTarget:  (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
-        unreadAlerts: alertRes.count ?? 0,
-      })
+      setData({ income, expenses, net: income - expenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 })
       setRecentTx(recentRes.data ?? [])
       setLoading(false)
     }
-
     fetchAll()
   }, [supabase])
 
   if (loading) return <DashSkeleton />
 
-  const stats = [
-    { label: t('dash_income'),
-      value: `+${(data?.income ?? 0).toFixed(0)}`,
-      color: 'var(--accent-green-light)', icon: '💰' },
-    { label: t('dash_expenses'),
-      value: `${(data?.expenses ?? 0).toFixed(0)}`,
-      color: 'var(--accent-red-light)', icon: '💸' },
-    { label: t('dash_net'),
-      value: `${(data?.net ?? 0) >= 0 ? '+' : ''}${(data?.net ?? 0).toFixed(0)}`,
-      color: (data?.net ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
-      icon: '📊' },
-  ]
-
-  const cards = [
-    { label: t('dash_debts'),
-      value: `${(data?.totalDebt ?? 0).toFixed(0)} JOD`,
-      color: 'var(--accent-red-light)', icon: '💳', href: '/dashboard/debts' },
-    { label: t('dash_investments'),
-      value: `$${(data?.invValue ?? 0).toFixed(0)}`,
-      color: 'var(--accent-green-light)', icon: '📈', href: '/dashboard/investments' },
-    { label: t('dash_goals'),
-      value: `${(data?.goalsSaved ?? 0).toFixed(0)}/${(data?.goalsTarget ?? 0).toFixed(0)}`,
-      color: 'var(--accent-blue-light)', icon: '🎯', href: '/dashboard/goals' },
-  ]
+  const net = data?.net ?? 0
+  const income = data?.income ?? 0
+  const expenses = data?.expenses ?? 0
+  const spendPct = income > 0 ? Math.min((expenses / income) * 100, 100) : 0
+  const spendColor = spendPct > 90 ? '#EF4444' : spendPct > 70 ? '#F59E0B' : '#10B981'
 
   return (
-    <div className="space-y-4 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('dash_title')}</h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('dash_monthly')}</p>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>{t('dash_title')}</h1>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>{t('dash_monthly')}</p>
         </div>
         {(data?.unreadAlerts ?? 0) > 0 && (
-          <Link href="/dashboard/alerts"
-            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold"
-            style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', textDecoration: 'none' }}>
-            🔔 {data.unreadAlerts} {t('dash_unread_alerts')}
+          <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
+            🔔 {data.unreadAlerts}
           </Link>
         )}
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 stagger">
-        {stats.map((s, i) => (
-          <div key={i} className="card p-3 text-center">
-            <div className="text-lg mb-1">{s.icon}</div>
-            <div className="text-base font-black font-mono" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{s.label}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+        {[
+          { label: t('dash_income'),   value: `+${income.toFixed(0)}`,  color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
+          { label: t('dash_expenses'), value: `${expenses.toFixed(0)}`, color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
+          { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${net.toFixed(0)}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+        ].map((s, i) => (
+          <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
+            <div style={{ fontSize: 12, color: s.color, fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>{s.icon}</div>
+            <div style={{ fontSize: 17, fontWeight: 900, color: s.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{s.value}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 gap-3 stagger">
-        {cards.map((c, i) => (
-          <Link key={i} href={c.href}
-            className="card p-4 flex items-center gap-4 transition-all"
-            style={{ textDecoration: 'none' }}>
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
-              style={{ background: 'var(--bg-secondary)' }}>{c.icon}</div>
-            <div className="flex-1">
-              <div className="text-sm font-bold" style={{ color: 'var(--text-secondary)' }}>{c.label}</div>
-              <div className="text-lg font-black font-mono mt-0.5" style={{ color: c.color }}>{c.value}</div>
-            </div>
-            <span style={{ color: 'var(--text-muted)', fontSize: '18px' }}>‹</span>
-          </Link>
-        ))}
-      </div>
+      {income > 0 && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>الميزانية الشهرية</span>
+            <span style={{ fontSize: 12, fontWeight: 900, color: spendColor, fontFamily: 'monospace' }}>{spendPct.toFixed(0)}% مُنفَق</span>
+          </div>
+          <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-elevated)', overflow: 'hidden' }}>
+            <div style={{ height: '100%', width: `${spendPct}%`, borderRadius: 4, background: spendColor, transition: 'width 0.5s ease' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>الدخل: {income.toFixed(0)} JOD</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>المتبقي: {Math.max(0, net).toFixed(0)} JOD</span>
+          </div>
+        </div>
+      )}
 
-      {/* Recent Transactions */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-black text-sm" style={{ color: 'var(--text-primary)' }}>{t('dash_recent')}</h3>
-          <Link href="/dashboard/transactions"
-            className="text-xs font-bold"
-            style={{ color: 'var(--accent-blue-light)', textDecoration: 'none' }}>
-            {t('dash_view_all')}
-          </Link>
-        </div>
-        <div className="space-y-1">
-          {recentTx.length === 0 ? (
-            <p className="text-sm text-center py-6" style={{ color: 'var(--text-muted)' }}>{t('dash_no_transactions')}</p>
-          ) : recentTx.map(tx => (
-            <div key={tx.id}
-              className="flex items-center gap-3 px-2 py-2.5 rounded-xl transition-all"
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm shrink-0"
-                style={{ background: tx.type === 'income' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.12)' }}>
-                {tx.type === 'income' ? '💰' : '💸'}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs font-bold truncate" style={{ color: 'var(--text-primary)' }}>
-                  {tx.description || tx.category || '—'}
-                </div>
-                <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{tx.transaction_date}</div>
-              </div>
-              <div className="font-black font-mono text-sm shrink-0"
-                style={{ color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
-                {tx.type === 'income' ? '+' : '−'}{Number(tx.amount).toFixed(0)}
-              </div>
+      {[
+        { label: t('dash_debts'),       value: `${(data?.totalDebt ?? 0).toFixed(0)} JOD`, color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',   border: 'rgba(239,68,68,0.15)',  icon: '◈', href: '/dashboard/debts'       },
+        { label: t('dash_investments'), value: `$${(data?.invValue ?? 0).toFixed(0)}`,     color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '◎', href: '/dashboard/investments' },
+        { label: t('dash_goals'),       value: `${(data?.goalsSaved ?? 0).toFixed(0)}/${(data?.goalsTarget ?? 0).toFixed(0)} JOD`, color: 'var(--accent-blue-light)', bg: 'var(--accent-blue-dim)', border: 'rgba(59,126,246,0.15)', icon: '◉', href: '/dashboard/goals' },
+      ].map((c, i) => (
+        <Link key={i} href={c.href} style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14, transition: 'border-color 0.15s' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: c.bg, border: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: c.color }}>{c.icon}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 3 }}>{c.label}</div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: c.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{c.value}</div>
             </div>
-          ))}
+            <span style={{ color: 'var(--text-muted)', fontSize: 20 }}>›</span>
+          </div>
+        </Link>
+      ))}
+
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{t('dash_recent')}</span>
+          <Link href="/dashboard/transactions" style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-blue-light)', textDecoration: 'none' }}>{t('dash_view_all')}</Link>
         </div>
+        {recentTx.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: 13 }}>{t('dash_no_transactions')}</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {recentTx.map(tx => (
+              <div key={tx.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 12, transition: 'background 0.15s' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: tx.type === 'income' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
+                  {tx.type === 'income' ? '💰' : '💸'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.description || tx.category || '—'}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{tx.transaction_date}</div>
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 900, fontFamily: 'monospace', flexShrink: 0, color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+                  {tx.type === 'income' ? '+' : '−'}{Number(tx.amount).toFixed(0)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
