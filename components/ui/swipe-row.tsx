@@ -30,9 +30,10 @@ export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
         paddingLeft: 20,
         opacity: revealed ? 1 : 0,
         transition: 'opacity 0.2s',
+        zIndex: 2,
       }}>
         <button
-          onClick={() => { onDelete(); setRevealed(false) }}
+          onClick={(e) => { e.stopPropagation(); onDelete(); setRevealed(false) }}
           style={{
             width: 44, height: 44, borderRadius: 12,
             background: '#EF4444', border: 'none',
