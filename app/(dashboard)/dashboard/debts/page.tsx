@@ -27,7 +27,7 @@ export default function DebtsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '' })
+  const [form, setForm] = useState({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false })
   const [saving, setSaving] = useState(false)
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null)
   const [paymentAmount, setPaymentAmount] = useState('')
@@ -49,13 +49,13 @@ export default function DebtsPage() {
 
   function openAdd() {
     setEditingId(null)
-    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '' })
+    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false })
     setShowForm(true)
   }
 
   function startEdit(d: any) {
     setEditingId(d.id)
-    setForm({ name: d.name, original_amount: d.original_amount.toString(), remaining_amount: d.remaining_amount.toString(), monthly_payment: d.monthly_payment?.toString() ?? '', due_date: d.due_date ?? '', priority: d.priority.toString(), notes: d.notes ?? '' })
+    setForm({ name: d.name, original_amount: d.original_amount.toString(), remaining_amount: d.remaining_amount.toString(), monthly_payment: d.monthly_payment?.toString() ?? '', due_date: d.due_date ?? '', priority: d.priority.toString(), notes: d.notes ?? '', payment_day: d.payment_day?.toString() ?? '1', auto_deduct: d.auto_deduct ?? false })
     setShowForm(true)
   }
 
@@ -65,11 +65,11 @@ export default function DebtsPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     if (editingId) {
-      const { error } = await supabase.from('debts').update({ name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.remaining_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null }).eq('id', editingId)
+      const { error } = await supabase.from('debts').update({ name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.remaining_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct }).eq('id', editingId)
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_edited'))
     } else {
-      const { error } = await supabase.from('debts').insert({ user_id: user.id, name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.original_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null })
+      const { error } = await supabase.from('debts').insert({ user_id: user.id, name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.original_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct })
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_debt_added'))
     }
@@ -247,6 +247,22 @@ export default function DebtsPage() {
           </FormField>
           <FormField label={t('debts_notes')}>
             <Input placeholder="ملاحظات اختيارية" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+          </FormField>
+          <FormField label="يوم الخصم الشهري (1-28)">
+            <Input type="number" placeholder="1" value={form.payment_day} onChange={e => setForm(f => ({ ...f, payment_day: e.target.value }))} />
+          </FormField>
+          <FormField label="خصم تلقائي شهري">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+              <button
+                onClick={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
+                style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: form.auto_deduct ? 'var(--accent-green)' : 'var(--bg-elevated)', transition: 'background 0.2s', position: 'relative', flexShrink: 0 }}
+              >
+                <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form.auto_deduct ? 3 : 23 }} />
+              </button>
+              <span style={{ fontSize: 13, color: form.auto_deduct ? 'var(--accent-green-light)' : 'var(--text-muted)', fontWeight: 600 }}>
+                {form.auto_deduct ? '✅ سيتم الخصم تلقائياً كل شهر' : 'غير مفعّل — يدوي فقط'}
+              </span>
+            </div>
           </FormField>
           <SaveButton label={editingId ? t('debts_save_edit') : t('debts_save')} loading={saving} onClick={saveDebt} />
         </Modal>
