@@ -10,6 +10,8 @@ import { StatBar } from '@/components/ui/stat-bar'
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PRIORITY_CONFIG = [
@@ -33,6 +35,7 @@ export default function DebtsPage() {
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
   const supabase = createClient()
   const { t } = useI18n()
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -107,7 +110,8 @@ export default function DebtsPage() {
   )
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in" ref={pageRef}>
+      <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
         title={t('debts_title')}
         subtitle={`${debts.length} ${t('debts_active')}`}

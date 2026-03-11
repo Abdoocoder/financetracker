@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
@@ -16,6 +18,7 @@ export default function GoalsPage() {
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
   const { t } = useI18n()
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
