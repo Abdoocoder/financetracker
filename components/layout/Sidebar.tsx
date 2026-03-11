@@ -69,7 +69,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(7,11,20,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '8px 8px 14px', gap: 4 }} className="mobile-nav">
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(7,11,20,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '10px 4px 18px', gap: 4 }} className="mobile-nav">
 
         {/* Main 4 items */}
         {MAIN_NAV.map(item => {
@@ -77,8 +77,8 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
           return (
             <Link key={item.href} href={item.href} style={{ flex: 1, textDecoration: 'none' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 2px', position: 'relative' }}>
-                {isActive && <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 36, height: 32, borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)' }} />}
-                <span style={{ fontSize: 18, lineHeight: 1, position: 'relative', zIndex: 1, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)', transition: 'color 0.15s' }}>
+                {isActive && <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 44, height: 36, borderRadius: 12, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)' }} />}
+                <span style={{ fontSize: 26, lineHeight: 1, position: 'relative', zIndex: 1, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)', transition: 'color 0.15s' }}>
                   {item.icon}
                 </span>
                 <span style={{ fontSize: 9, fontWeight: isActive ? 800 : 500, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)', position: 'relative', zIndex: 1, letterSpacing: '-0.01em' }}>
@@ -92,7 +92,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         {/* More button */}
         <button onClick={() => setShowMore(true)} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 2px', position: 'relative' }}>
-            {isMoreActive && <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 36, height: 32, borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)' }} />}
+            {isMoreActive && <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 44, height: 36, borderRadius: 12, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)' }} />}
             <div style={{ fontSize: 18, lineHeight: 1, position: 'relative', zIndex: 1, color: isMoreActive ? 'var(--accent-blue-light)' : 'var(--text-muted)', display: 'flex', gap: 2 }}>
               {alertsCount > 0 ? (
                 <span style={{ position: 'relative' }}>
