@@ -47,6 +47,62 @@ function DashSkeleton() {
   )
 }
 
+
+function MiniBarChart({ data }: { data: { month: string; income: number; expense: number }[] }) {
+  const maxVal = Math.max(...data.flatMap(d => [d.income, d.expense]), 1)
+  const W = 300, H = 80, barW = 18
+  const gap = (W - data.length * barW * 2) / (data.length + 1)
+  return (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>الإيرادات والمصروفات</span>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <span style={{ fontSize: 10, color: 'var(--accent-green-light)', fontWeight: 700 }}>■ دخل</span>
+          <span style={{ fontSize: 10, color: 'var(--accent-red-light)', fontWeight: 700 }}>■ مصروف</span>
+        </div>
+      </div>
+      <svg width="100%" viewBox={"0 0 " + W + " " + (H+20)} style={{ overflow: 'visible' }}>
+        {data.map((d, i) => {
+          const x = gap + i * (barW * 2 + gap)
+          const ih = (d.income / maxVal) * H
+          const eh = (d.expense / maxVal) * H
+          return (
+            <g key={i}>
+              <rect x={x} y={H-ih} width={barW} height={ih} rx={3} fill="#10B981" opacity="0.8" />
+              <rect x={x+barW+2} y={H-eh} width={barW} height={eh} rx={3} fill="#EF4444" opacity="0.8" />
+              <text x={x+barW} y={H+14} textAnchor="middle" style={{ fontSize: 9, fill: 'var(--text-muted)' }}>{d.month}</text>
+            </g>
+          )
+        })}
+      </svg>
+    </div>
+  )
+}
+
+function CategoryBars({ categories }: { categories: [string, number][] }) {
+  if (!categories.length) return null
+  const max = categories[0][1]
+  const COLORS = ['#3B7EF6','#8B5CF6','#F59E0B','#10B981','#EF4444']
+  return (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: 16 }}>
+      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', display: 'block', marginBottom: 14 }}>توزيع المصاريف</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {categories.map(([cat, amt], i) => (
+          <div key={cat}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{cat}</span>
+              <span style={{ fontSize: 12, fontWeight: 900, color: COLORS[i], fontFamily: 'monospace' }}>{Number(amt).toFixed(0)} JOD</span>
+            </div>
+            <div style={{ height: 6, borderRadius: 3, background: 'var(--bg-elevated)', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: (amt/max*100)+'%', borderRadius: 3, background: COLORS[i], transition: 'width 0.6s ease' }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const { t } = useI18n()
   const supabase = createClient()
@@ -64,18 +120,30 @@ export default function DashboardPage() {
       const now = new Date()
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
       const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-      const [txRes, debtRes, invRes, goalRes, alertRes, recentRes] = await Promise.all([
-        supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
+      const [txRes, debtRes, invRes, goalRes, alertRes, recentRes, chartRes] = await Promise.all([
+        supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
         supabase.from('debts').select('remaining_amount,monthly_payment').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
         supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
+        supabase.from('transactions').select('type,amount,transaction_date,category').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
       ])
       const txs      = txRes.data ?? []
       const income   = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      setData({ income, expenses, net: income - expenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 })
+      const months6 = []
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+        const label = d.toLocaleDateString('ar-EG', { month: 'short' })
+        const mt = (chartRes.data ?? []).filter((t) => t.transaction_date?.startsWith(key))
+        months6.push({ month: label, income: mt.filter(t=>t.type==='income').reduce((a,t)=>a+Number(t.amount),0), expense: mt.filter(t=>t.type==='expense').reduce((a,t)=>a+Number(t.amount),0) })
+      }
+      const catMap: Record<string, number> = {}
+      ;(txRes.data ?? [] as any[]).filter((t:any)=>t.type==='expense').forEach((t:any)=>{ catMap[t.category]=(catMap[t.category]??0)+Number(t.amount) })
+      const categories = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).slice(0,5)
+      setData({ income, expenses, months6, categories, net: income - expenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 })
       setRecentTx(recentRes.data ?? [])
       setLoading(false)
     }
@@ -132,6 +200,13 @@ export default function DashboardPage() {
             <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>المتبقي: {Math.max(0, net).toFixed(0)} JOD</span>
           </div>
         </div>
+      )}
+
+      {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
+        <MiniBarChart data={data.months6} />
+      )}
+      {data?.categories?.length > 0 && (
+        <CategoryBars categories={data.categories} />
       )}
 
       {[
