@@ -10,7 +10,7 @@ import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field
 import { PushToggle } from '@/components/ui/push-toggle'
 
 export default function SettingsPage() {
-  const [form, setForm] = useState({ full_name: '', monthly_salary: '', currency: 'JOD' })
+  const [form, setForm] = useState({ full_name: '', monthly_income: '', currency: 'JOD' })
   const [saving, setSaving] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [userEmail, setUserEmail] = useState('')
@@ -24,7 +24,7 @@ export default function SettingsPage() {
       if (!user) return
       setUserEmail(user.email ?? '')
       const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-      if (data) setForm({ full_name: data.full_name ?? '', monthly_salary: data.monthly_salary?.toString() ?? '', currency: data.currency ?? 'JOD' })
+      if (data) setForm({ full_name: data.full_name ?? '', monthly_income: data.monthly_income?.toString() ?? '', currency: data.currency ?? 'JOD' })
     }
     load()
   }, [supabase])
@@ -33,7 +33,7 @@ export default function SettingsPage() {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('profiles').upsert({ id: user.id, full_name: form.full_name, monthly_salary: parseFloat(form.monthly_salary) || 0, currency: form.currency, updated_at: new Date().toISOString() })
+    const { error } = await supabase.from('profiles').upsert({ id: user.id, full_name: form.full_name, monthly_income: parseFloat(form.monthly_income) || 0, currency: form.currency, updated_at: new Date().toISOString() })
     if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
     toast.success(t('toast_saved'))
     setSaving(false)
@@ -64,7 +64,7 @@ export default function SettingsPage() {
           <Input placeholder="الاسم الكامل" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
         </FormField>
         <FormField label="الراتب الشهري (JOD)">
-          <Input type="number" placeholder="0" value={form.monthly_salary} onChange={e => setForm(f => ({ ...f, monthly_salary: e.target.value }))} />
+          <Input type="number" placeholder="0" value={form.monthly_income} onChange={e => setForm(f => ({ ...f, monthly_income: e.target.value }))} />
         </FormField>
         <FormField label="العملة">
           <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
