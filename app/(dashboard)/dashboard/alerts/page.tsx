@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { PageHeader } from '@/components/ui/page-header'
 
 const ALERT_CONFIG: Record<string, { icon: string; accent: string; bg: string; border: string }> = {
@@ -102,6 +104,7 @@ export default function AlertsPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'warning' | 'achievement'>('all')
   const supabase = createClient()
   const { t } = useI18n()
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
