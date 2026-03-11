@@ -153,7 +153,12 @@ export default function TransactionsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(tx => (
-            <div key={tx.id} style={{ opacity: deletingId === tx.id ? 0.4 : 1 }}>
+            <div key={tx.id} style={{
+              background: 'var(--bg-card)', border: '1px solid var(--border)',
+              borderRadius: 16, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', gap: 12,
+              opacity: deletingId === tx.id ? 0.4 : 1,
+            }}>
               {/* Icon */}
               <div style={{
                 width: 44, height: 44, borderRadius: 13, flexShrink: 0,
