@@ -158,6 +158,7 @@ export default function TransactionsPage() {
               borderRadius: 16, padding: '14px 16px',
               display: 'flex', alignItems: 'center', gap: 12,
               opacity: deletingId === tx.id ? 0.4 : 1,
+              direction: 'rtl',
             }}>
               {/* Icon */}
               <div style={{
