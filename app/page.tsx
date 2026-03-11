@@ -68,13 +68,8 @@ export default function LandingPage() {
         </div>
 
         {/* Social proof */}
-        <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-          <div style={{ display: 'flex' }}>
-            {['🇯🇴','🇸🇦','🇦🇪','🇪🇬','🇲🇦'].map((flag, i) => (
-              <span key={i} style={{ fontSize: 18, marginLeft: -4 }}>{flag}</span>
-            ))}
-          </div>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', marginRight: 8 }}>يستخدمه أشخاص من أكثر من 10 دول</span>
+        <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>🚀 جديد — كن من أوائل المستخدمين وشكّل تجربتك</span>
         </div>
       </section>
 
@@ -155,7 +150,7 @@ export default function LandingPage() {
             },
             {
               icon: '💳', title: 'خطة سداد الديون',
-              desc: 'رتّب ديونك وتتبع الدفعات. الذكاء الاصطناعي يقترح أفضل خطة لتحررك من الديون.',
+              desc: 'رتّب ديونك وتتبع الدفعات. خطة سداد واضحة تريك كم تبقى حتى تتحرر من الديون.',
               color: 'var(--accent-red-light)', bg: 'rgba(239,68,68,0.06)', border: 'rgba(239,68,68,0.15)',
             },
             {
@@ -235,7 +230,7 @@ export default function LandingPage() {
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pro</div>
             <div style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>$4.99</div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>شهرياً</div>
-            {['كل ميزات المجاني', 'رسوم بيانية متقدمة', 'تصدير PDF شهري', 'أسعار أسهم حية', 'دعم أولوية', 'إشعارات Push'].map((f, i) => (
+            {['كل ميزات المجاني', 'إشعارات Push', 'أسعار أسهم حية', 'دعم أولوية', '⏳ تصدير PDF — قادم قريباً', '⏳ تقارير متقدمة — قادم قريباً'].map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <span style={{ color: '#10B981', fontSize: 14 }}>✓</span>
                 <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{f}</span>
@@ -279,7 +274,7 @@ export default function LandingPage() {
             ابدأ رحلتك المالية اليوم
           </h2>
           <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>
-            انضم لآلاف المستخدمين الذين يتحكمون في أموالهم بذكاء
+            ابدأ اليوم وتحكم في أموالك — مجاناً وبدون أي التزامات
           </p>
           <Link href="/register" style={{
             display: 'inline-block', padding: '15px 40px', borderRadius: 14,
