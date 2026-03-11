@@ -8,6 +8,8 @@ import { StatBar } from '@/components/ui/stat-bar'
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 export default function InvestmentsPage() {
   const [investments, setInvestments] = useState<Investment[]>([])
