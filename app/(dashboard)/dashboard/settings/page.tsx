@@ -1,131 +1,125 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { PageHeader } from '@/components/ui/page-header'
+import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { PushToggle } from '@/components/ui/push-toggle'
 
 export default function SettingsPage() {
-  const [profile, setProfile] = useState<any>(null)
-  const [form, setForm] = useState({ full_name: '', monthly_income: '', currency: 'JOD' })
+  const [form, setForm] = useState({ full_name: '', monthly_salary: '', currency: 'JOD' })
   const [saving, setSaving] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const supabase = createClient()
   const router = useRouter()
   const { t, lang, setLang } = useI18n()
 
-  const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    if (data) {
-      setProfile({ ...data, email: user.email })
-      setForm({ full_name: data.full_name ?? '', monthly_income: data.monthly_income?.toString() ?? '', currency: data.currency ?? 'JOD' })
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setUserEmail(user.email ?? '')
+      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      if (data) setForm({ full_name: data.full_name ?? '', monthly_salary: data.monthly_salary?.toString() ?? '', currency: data.currency ?? 'JOD' })
     }
+    load()
   }, [supabase])
 
-  useEffect(() => { load() }, [load])
-
-  async function saveProfile() {
+  async function handleSave() {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { error } = await supabase.from('profiles').update({
-      full_name: form.full_name,
-      monthly_income: parseFloat(form.monthly_income) || 0,
-      currency: form.currency
-    }).eq('id', user.id)
+    const { error } = await supabase.from('profiles').upsert({ id: user.id, full_name: form.full_name, monthly_salary: parseFloat(form.monthly_salary) || 0, currency: form.currency, updated_at: new Date().toISOString() })
+    if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
+    toast.success(t('toast_saved'))
     setSaving(false)
-    if (error) { toast.error(t('toast_error_save')); return }
-    toast.success(t('toast_settings_saved'))
   }
 
   async function handleLogout() {
+    setLoggingOut(true)
     await supabase.auth.signOut()
     router.push('/login')
   }
 
+  const initials = form.full_name ? form.full_name.slice(0, 2) : userEmail.slice(0, 2).toUpperCase()
+
   return (
-    <div className="space-y-4 animate-fade-in max-w-lg mx-auto">
-      <div>
-        <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('settings_title')}</h1>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('settings_subtitle')}</p>
-      </div>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <PageHeader title={t('settings_title')} subtitle={t('settings_sub')} />
 
-      <div className="card p-5">
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-2xl gradient-blue flex items-center justify-center text-white font-black text-2xl glow-blue">
-            {form.full_name?.charAt(0) || 'م'}
-          </div>
+      {/* Profile Card */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
+        {/* Avatar + Name */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+            background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, fontWeight: 900, color: 'white',
+            boxShadow: '0 4px 16px var(--accent-blue-glow)',
+          }}>{initials}</div>
           <div>
-            <div className="font-black text-lg" style={{ color: 'var(--text-primary)' }}>{form.full_name || t('settings_name')}</div>
-            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>{profile?.email}</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)' }}>{form.full_name || t('settings_title')}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{userEmail}</div>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_name')}</label>
-            <input type="text" value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_income')} (JOD)</label>
-            <input type="number" value={form.monthly_income} onChange={e => setForm(p => ({ ...p, monthly_income: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-              placeholder="495" />
-          </div>
-          <div>
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_currency')}</label>
-            <select value={form.currency} onChange={e => setForm(p => ({ ...p, currency: e.target.value }))}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
-              <option value="JOD">دينار أردني (JOD)</option>
-              <option value="USD">US Dollar (USD)</option>
-              <option value="SAR">ريال سعودي (SAR)</option>
-            </select>
-          </div>
+        <FormField label={t('settings_name')}>
+          <Input placeholder={t('settings_name_placeholder')} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
+        </FormField>
 
-          {/* تبديل اللغة */}
-          <div>
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('settings_language')}</label>
-            <div className="flex rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
-              {(['ar', 'en'] as const).map(l => (
-                <button key={l} onClick={() => setLang(l)}
-                  className="flex-1 py-3 text-sm font-black transition-all"
-                  style={{
-                    background: lang === l ? 'var(--accent-blue)' : 'var(--bg-secondary)',
-                    color: lang === l ? 'white' : 'var(--text-muted)',
-                    fontFamily: 'inherit',
-                  }}>
-                  {l === 'ar' ? '🇯🇴 العربية' : '🇬🇧 English'}
-                </button>
-              ))}
-            </div>
-          </div>
+        <FormField label={t('settings_salary')}>
+          <Input type="number" placeholder="0" value={form.monthly_salary} onChange={e => setForm(f => ({ ...f, monthly_salary: e.target.value }))} />
+        </FormField>
 
-          <button onClick={saveProfile} disabled={saving}
-            className="w-full py-3.5 rounded-xl gradient-blue text-white font-black text-sm disabled:opacity-50"
-            style={{ fontFamily: 'inherit' }}>
-            {saving ? t('settings_saving') : t('settings_save')}
-          </button>
-        </div>
+        <FormField label={t('settings_currency')}>
+          <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+            <option value="JOD">دينار أردني (JOD)</option>
+            <option value="USD">دولار (USD)</option>
+            <option value="EUR">يورو (EUR)</option>
+            <option value="SAR">ريال سعودي (SAR)</option>
+          </Select>
+        </FormField>
+
+        <FormField label={t('settings_lang')}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {(['ar', 'en'] as const).map(l => (
+              <button key={l} onClick={() => setLang(l)} style={{
+                padding: '11px', borderRadius: 10,
+                background: lang === l ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)',
+                border: `1px solid ${lang === l ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
+                color: lang === l ? 'var(--accent-blue-light)' : 'var(--text-muted)',
+                fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                transition: 'all 0.15s',
+              }}>
+                {l === 'ar' ? '🇯🇴 العربية' : '🇬🇧 English'}
+              </button>
+            ))}
+          </div>
+        </FormField>
+
+        <SaveButton label={t('settings_save')} loading={saving} onClick={handleSave} />
       </div>
 
-      <div className="card p-5">
-        <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>{t('settings_account')}</h3>
+      {/* Account section */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
+        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>الحساب</div>
         <PushToggle />
-
-        <button onClick={handleLogout}
-          className="w-full py-3.5 rounded-xl font-black text-sm"
-          style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', fontFamily: 'inherit' }}>
-          🚪 {t('settings_logout')}
+        <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
+        <button onClick={handleLogout} disabled={loggingOut} style={{
+          width: '100%', padding: '13px', borderRadius: 12,
+          background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)',
+          color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 800,
+          cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1,
+          transition: 'opacity 0.15s',
+        }}>
+          {loggingOut ? '⏳ ...' : `${t('settings_logout')} ←`}
         </button>
       </div>
     </div>
   )
 }
-// Push section added via script — see PushSection component

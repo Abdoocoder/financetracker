@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { PageHeader } from '@/components/ui/page-header'
 
 const ALERT_CONFIG: Record<string, { icon: string; accent: string; bg: string; border: string }> = {
   warning:     { icon: '⚠️', accent: '#F87171', bg: 'rgba(239,68,68,0.06)',    border: 'rgba(239,68,68,0.2)'   },
