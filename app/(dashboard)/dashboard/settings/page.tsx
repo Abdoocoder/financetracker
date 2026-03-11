@@ -60,13 +60,13 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <FormField label={t('settings_name')}>
+        <FormField label="الاسم الكامل">
           <Input placeholder="الاسم الكامل" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
         </FormField>
-        <FormField label={t('settings_salary')}>
+        <FormField label="الراتب الشهري (JOD)">
           <Input type="number" placeholder="0" value={form.monthly_salary} onChange={e => setForm(f => ({ ...f, monthly_salary: e.target.value }))} />
         </FormField>
-        <FormField label={t('settings_currency')}>
+        <FormField label="العملة">
           <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
             <option value="JOD">دينار أردني (JOD)</option>
             <option value="USD">دولار (USD)</option>
@@ -74,7 +74,7 @@ export default function SettingsPage() {
             <option value="SAR">ريال سعودي (SAR)</option>
           </Select>
         </FormField>
-        <FormField label={t('settings_lang')}>
+        <FormField label="اللغة">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {(['ar', 'en'] as const).map(l => (
               <button key={l} onClick={() => setLang(l)} style={{ padding: '11px', borderRadius: 10, background: lang === l ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${lang === l ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: lang === l ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -83,7 +83,7 @@ export default function SettingsPage() {
             ))}
           </div>
         </FormField>
-        <SaveButton label={t('settings_save')} loading={saving} onClick={handleSave} />
+        <SaveButton label="حفظ التغييرات" loading={saving} onClick={handleSave} />
       </div>
 
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
@@ -91,7 +91,7 @@ export default function SettingsPage() {
         <PushToggle />
         <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
         <button onClick={handleLogout} disabled={loggingOut} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1 }}>
-          {loggingOut ? '⏳ ...' : `${t('settings_logout')} ←`}
+          {loggingOut ? '⏳ ...' : `$"تسجيل الخروج" ←`}
         </button>
       </div>
     </div>
