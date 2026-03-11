@@ -30,6 +30,7 @@ export default function TransactionsPage() {
   const supabase = createClient()
   const { t } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
+  const [errors, setErrors] = useState<Record<string,string>>({})
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -54,7 +55,11 @@ export default function TransactionsPage() {
   }
 
   async function saveTransaction() {
-    if (!form.amount || !form.category) { toast.warning(t('toast_fill_required')); return }
+    const errs: Record<string,string> = {}
+    if (!form.amount) errs.amount = 'المبلغ مطلوب'
+    if (!form.category) errs.category = 'الفئة مطلوبة'
+    if (Object.keys(errs).length) { setErrors(errs); return }
+    setErrors({})
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
