@@ -1,5 +1,6 @@
 'use client'
-import { useRef, useState } from 'react'
+import { useSwipeable } from 'react-swipeable'
+import { useState } from 'react'
 
 interface SwipeRowProps {
   children: React.ReactNode
@@ -8,74 +9,59 @@ interface SwipeRowProps {
 }
 
 export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
-  const startX = useRef(0)
-  const [offset, setOffset] = useState(0)
-  const [swiped, setSwiped] = useState(false)
+  const [revealed, setRevealed] = useState(false)
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX
-  }
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    // RTL: سحب يميناً (diff سالب)
-    const diff = e.touches[0].clientX - startX.current
-    if (diff > 0) setOffset(Math.min(diff, 90))
-  }
-
-  const onTouchEnd = () => {
-    if (offset >= 70) setSwiped(true)
-    else { setOffset(0); setSwiped(false) }
-  }
-
-  const reset = () => { setOffset(0); setSwiped(false) }
-  const finalOffset = swiped ? 80 : offset
+  const handlers = useSwipeable({
+    onSwipedRight: () => setRevealed(true),
+    onSwipedLeft: () => setRevealed(false),
+    trackMouse: false,
+    delta: 50,
+  })
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 16, opacity }}>
-
-      {/* Delete button — يمين */}
+    <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden' }}>
+      {/* خلفية الحذف */}
       <div style={{
-        position: 'absolute', top: 0, right: 0, bottom: 0, width: 80,
-        background: '#EF4444',
+        position: 'absolute', inset: 0,
+        background: 'rgba(239,68,68,0.15)',
+        border: '1px solid rgba(239,68,68,0.3)',
         borderRadius: 16,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: Math.min(finalOffset / 80, 1),
-        zIndex: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
+        paddingRight: 20,
+        opacity: revealed ? 1 : 0,
+        transition: 'opacity 0.2s',
       }}>
-        <span style={{ fontSize: 22 }}>🗑</span>
+        <button
+          onClick={() => { onDelete(); setRevealed(false) }}
+          style={{
+            width: 44, height: 44, borderRadius: 12,
+            background: '#EF4444', border: 'none',
+            cursor: 'pointer', fontSize: 18,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(239,68,68,0.4)',
+          }}
+        >🗑</button>
       </div>
 
-      {/* Row — يتحرك يميناً */}
+      {/* المحتوى */}
       <div
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
+        {...handlers}
         style={{
-          transform: `translateX(${finalOffset}px)`,
-          transition: (offset === 0 || swiped) ? 'transform 0.2s ease' : 'none',
+          transform: revealed ? 'translateX(70px)' : 'translateX(0)',
+          transition: 'transform 0.25s ease',
+          opacity,
           position: 'relative', zIndex: 1,
         }}
       >
         {children}
       </div>
 
-      {/* عند السحب الكامل: زر قابل للضغط */}
-      {swiped && (
-        <>
-          <div onClick={reset} style={{ position: 'fixed', inset: 0, zIndex: 2 }} />
-          <button
-            onClick={() => { onDelete(); reset() }}
-            style={{
-              position: 'absolute', top: '50%', right: 12,
-              transform: 'translateY(-50%)',
-              width: 56, height: 56, borderRadius: 14,
-              background: '#EF4444', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22, zIndex: 3,
-              boxShadow: '0 4px 16px rgba(239,68,68,0.5)',
-            }}
-          >🗑</button>
-        </>
+      {/* إغلاق عند الضغط خارج */}
+      {revealed && (
+        <div
+          onClick={() => setRevealed(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 0 }}
+        />
       )}
     </div>
   )
