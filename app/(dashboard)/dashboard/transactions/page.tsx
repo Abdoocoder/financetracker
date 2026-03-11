@@ -12,6 +12,7 @@ import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field
 import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
+import { SwipeRow } from '@/components/ui/swipe-row'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
@@ -153,11 +154,11 @@ export default function TransactionsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(tx => (
-            <div key={tx.id} style={{
+            <SwipeRow key={tx.id} onDelete={() => setConfirmDelete(tx.id)} opacity={deletingId === tx.id ? 0.4 : 1}>
+            <div style={{
               background: 'var(--bg-card)', border: '1px solid var(--border)',
               borderRadius: 16, padding: '14px 16px',
               display: 'flex', alignItems: 'center', gap: 12,
-              opacity: deletingId === tx.id ? 0.4 : 1,
               direction: 'rtl',
             }}>
               {/* Icon */}
@@ -201,6 +202,7 @@ export default function TransactionsPage() {
                 }}>✕</button>
               </div>
             </div>
+            </SwipeRow>
           ))}
         </div>
       )}
