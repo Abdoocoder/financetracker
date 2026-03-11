@@ -136,7 +136,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                       background: isActive ? 'var(--accent-blue-dim)' : 'var(--bg-card)',
                       border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'var(--border)'}`,
                     }}>
-                      <div style={{ width: 40, height: 40, borderRadius: 12, background: isActive ? 'rgba(59,126,246,0.15)' : 'var(--bg-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>
+                      <div style={{ width: 40, height: 40, borderRadius: 12, position: 'relative', background: isActive ? 'rgba(59,126,246,0.15)' : 'var(--bg-elevated)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>
                         {item.icon}
                         {item.href === '/dashboard/alerts' && alertsCount > 0 && (
                           <span style={{ position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: 8, background: 'var(--accent-red)', color: 'white', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{alertsCount}</span>
