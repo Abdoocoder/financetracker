@@ -8,9 +8,11 @@ const supabase = createClient(
 
 async function addMonthlySalaries() {
   const now = new Date()
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
-  const dayOfMonth = now.getDate()
+  // استخدام توقيت UTC+3 (الأردن/السعودية/الخليج)
+  const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+  const dayOfMonth = localNow.getUTCDate()
+  const year = localNow.getUTCFullYear()
+  const month = localNow.getUTCMonth() + 1
 
   const { data: profiles } = await supabase
     .from('profiles')
