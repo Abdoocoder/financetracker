@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n'
+import { QuickAdd } from '@/components/ui/quick-add'
 
 function Bone({ w, h = '14px', r = '8px' }: { w: string; h?: string; r?: string }) {
   return <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
@@ -188,6 +189,8 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      <QuickAdd onAdded={() => { fetched.current = false; setLoading(true); }} />
 
       {/* مقارنة مع الشهر الماضي */}
       {(data?.prevIncome > 0 || data?.prevExpenses > 0) && (() => {
