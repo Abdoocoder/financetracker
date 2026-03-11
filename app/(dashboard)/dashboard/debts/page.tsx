@@ -10,6 +10,7 @@ import { StatBar } from '@/components/ui/stat-bar'
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', label: 'عالية جداً' },
@@ -29,6 +30,7 @@ export default function DebtsPage() {
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null)
   const [paymentAmount, setPaymentAmount] = useState('')
   const [payingSaving, setPayingSaving] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
   const supabase = createClient()
   const { t } = useI18n()
 
@@ -169,7 +171,7 @@ export default function DebtsPage() {
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
                     <button onClick={() => startEdit(debt)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
-                    <button onClick={() => deleteDebt(debt.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                    <button onClick={() => setConfirmDelete(debt.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
 
@@ -202,6 +204,15 @@ export default function DebtsPage() {
             )
           })}
         </div>
+      )}
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="حذف الدين"
+          message="هل أنت متأكد من حذف هذا الدين؟ لا يمكن التراجع."
+          onConfirm={() => { deleteDebt(confirmDelete); setConfirmDelete(null) }}
+          onCancel={() => setConfirmDelete(null)}
+        />
       )}
 
       {showForm && (

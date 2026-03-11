@@ -10,6 +10,7 @@ import { StatBar } from '@/components/ui/stat-bar'
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
 const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','هدية','أخرى']
@@ -23,6 +24,7 @@ export default function TransactionsPage() {
   const [form, setForm] = useState({ type: 'expense', amount: '', category: '', description: '', transaction_date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string|null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
   const supabase = createClient()
   const { t } = useI18n()
 
@@ -160,7 +162,7 @@ export default function TransactionsPage() {
                   color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>✎</button>
-                <button onClick={() => deleteTransaction(tx.id)} disabled={deletingId === tx.id} style={{
+                <button onClick={() => setConfirmDelete(tx.id)} disabled={deletingId === tx.id} style={{
                   width: 30, height: 30, borderRadius: 8,
                   background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)',
                   color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer',
@@ -173,6 +175,15 @@ export default function TransactionsPage() {
       )}
 
       {/* Modal */}
+      {confirmDelete && (
+        <ConfirmDialog
+          title="حذف المعاملة"
+          message="هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء."
+          onConfirm={() => { deleteTransaction(confirmDelete); setConfirmDelete(null) }}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
+
       {showForm && (
         <Modal title={editingId ? `تعديل معاملة` : `+ إضافة`} onClose={() => setShowForm(false)}>
           {/* Type Toggle */}
