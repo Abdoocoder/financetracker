@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { UserProvider, useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
@@ -9,6 +10,7 @@ import { I18nProvider } from '@/lib/i18n'
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
   const [alertsCount, setAlertsCount] = useState(0)
+  const pathname = usePathname()
   const supabase = createClient()
 
   const fetchCount = async () => {
@@ -33,7 +35,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       }, () => fetchCount())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [user])
+  }, [user, pathname])
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: 'rtl' }}>
