@@ -88,8 +88,8 @@ export default function TransactionsPage() {
     <div className="animate-fade-in">
       <PageHeader
         title={t('trans_title')}
-        subtitle={`${transactions.length} ${t('trans_count')}`}
-        action={<AddButton label={t('trans_add')} onClick={openAdd} />}
+        subtitle={`${transactions.length} ${`معاملة`}`}
+        action={<AddButton label={`+ إضافة`} onClick={openAdd} />}
       />
 
       <StatBar stats={[
@@ -109,14 +109,14 @@ export default function TransactionsPage() {
             fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
             transition: 'all 0.15s',
           }}>
-            {f === 'all' ? t('trans_all') : f === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
+            {f === 'all' ? `الكل` : f === 'income' ? `💰 ${`دخل`}` : `💸 ${`مصروف`}`}
           </button>
         ))}
       </div>
 
       {/* List */}
       {filtered.length === 0 ? (
-        <EmptyState icon="💸" title={t('trans_empty')} action={<AddButton label={t('trans_add')} onClick={openAdd} />} />
+        <EmptyState icon="💸" title={`لا توجد معاملات`} action={<AddButton label={`+ إضافة`} onClick={openAdd} />} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(tx => (
@@ -174,7 +174,7 @@ export default function TransactionsPage() {
 
       {/* Modal */}
       {showForm && (
-        <Modal title={editingId ? t('trans_edit') : t('trans_add')} onClose={() => setShowForm(false)}>
+        <Modal title={editingId ? `تعديل معاملة` : `+ إضافة`} onClose={() => setShowForm(false)}>
           {/* Type Toggle */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
             {['expense','income'].map(type => (
@@ -187,29 +187,29 @@ export default function TransactionsPage() {
                 color: form.type === type ? (type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)') : 'var(--text-muted)',
                 fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
               }}>
-                {type === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
+                {type === 'income' ? `💰 ${`دخل`}` : `💸 ${`مصروف`}`}
               </button>
             ))}
           </div>
 
-          <FormField label={t('trans_amount')}>
+          <FormField label={`المبلغ`}>
             <Input type="number" placeholder="0.00" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
           </FormField>
-          <FormField label={t('trans_category')}>
+          <FormField label={`الفئة`}>
             <Select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}>
-              <option value="">{t('trans_select_category')}</option>
+              <option value="">{`اختر فئة`}</option>
               {(form.type === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </Select>
           </FormField>
-          <FormField label={t('trans_description')}>
-            <Input placeholder={t('trans_description_placeholder')} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+          <FormField label={`الوصف`}>
+            <Input placeholder={`وصف اختياري`} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
           </FormField>
-          <FormField label={t('trans_date')}>
+          <FormField label={`التاريخ`}>
             <Input type="date" value={form.transaction_date} onChange={e => setForm(f => ({ ...f, transaction_date: e.target.value }))} />
           </FormField>
-          <SaveButton label={editingId ? t('trans_save_edit') : t('trans_save_add')} loading={saving} onClick={saveTransaction} />
+          <SaveButton label={editingId ? `حفظ التعديل` : `إضافة`} loading={saving} onClick={saveTransaction} />
         </Modal>
       )}
     </div>
