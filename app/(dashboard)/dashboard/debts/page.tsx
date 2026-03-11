@@ -223,7 +223,7 @@ export default function DebtsPage() {
               <Input type="date" value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
             </FormField>
           </div>
-          <FormField label={t('debts_priority')}>
+          <FormField label="الأولوية">
             <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
               {PRIORITY_CONFIG.map((p, i) => (
                 <option key={i+1} value={i+1}>{p.label}</option>
