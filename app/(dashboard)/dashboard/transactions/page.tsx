@@ -85,6 +85,28 @@ export default function TransactionsPage() {
     setDeletingId(null)
   }
 
+
+  function exportCSV() {
+    const rows = [
+      ['التاريخ', 'النوع', 'الفئة', 'الوصف', 'المبلغ'],
+      ...transactions.map(tx => [
+        tx.transaction_date,
+        tx.type === 'income' ? 'دخل' : 'مصروف',
+        tx.category,
+        tx.description ?? '',
+        tx.amount,
+      ])
+    ]
+    const csv = rows.map(r => r.join(',')).join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `معاملات-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const filtered = transactions.filter(tx => filter === 'all' || tx.type === filter)
   const totalIncome  = transactions.filter(t => t.type === 'income').reduce((a,t) => a + Number(t.amount), 0)
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((a,t) => a + Number(t.amount), 0)

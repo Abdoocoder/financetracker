@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { SwipeRow } from '@/components/ui/swipe-row'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 

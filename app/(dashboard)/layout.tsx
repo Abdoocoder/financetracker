@@ -5,6 +5,7 @@ import { UserProvider, useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
 import { ToastProvider } from '@/components/ui/toast'
+import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { I18nProvider } from '@/lib/i18n'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
@@ -59,7 +60,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <UserProvider>
       <I18nProvider>
         <ToastProvider>
-          <DashboardContent>{children}</DashboardContent>
+          <ErrorBoundary>
+            <DashboardContent>{children}</DashboardContent>
+          </ErrorBoundary>
         </ToastProvider>
       </I18nProvider>
     </UserProvider>
