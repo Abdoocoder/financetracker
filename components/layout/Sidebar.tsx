@@ -69,7 +69,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(7,11,20,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '10px 4px 18px', gap: 4 }} className="mobile-nav">
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(7,11,20,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '10px 2px 18px', gap: 4 }} className="mobile-nav">
 
         {/* Main 4 items */}
         {MAIN_NAV.map(item => {
