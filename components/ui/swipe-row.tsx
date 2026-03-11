@@ -12,8 +12,8 @@ export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
   const [revealed, setRevealed] = useState(false)
 
   const handlers = useSwipeable({
-    onSwipedRight: () => setRevealed(true),
-    onSwipedLeft: () => setRevealed(false),
+    onSwipedLeft: () => setRevealed(true),
+    onSwipedRight: () => setRevealed(false),
     trackMouse: false,
     delta: 50,
   })
@@ -26,8 +26,8 @@ export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
         background: 'rgba(239,68,68,0.15)',
         border: '1px solid rgba(239,68,68,0.3)',
         borderRadius: 16,
-        display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-        paddingRight: 20,
+        display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+        paddingLeft: 20,
         opacity: revealed ? 1 : 0,
         transition: 'opacity 0.2s',
       }}>
@@ -47,7 +47,7 @@ export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
       <div
         {...handlers}
         style={{
-          transform: revealed ? 'translateX(70px)' : 'translateX(0)',
+          transform: revealed ? 'translateX(-70px)' : 'translateX(0)',
           transition: 'transform 0.25s ease',
           opacity,
           position: 'relative', zIndex: 1,
