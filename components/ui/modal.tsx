@@ -19,7 +19,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
         borderRadius: '24px 24px 0 0',
         width: '100%', maxWidth: 480,
         maxHeight: '90vh', overflowY: 'auto',
-        padding: '20px 20px 40px',
+        padding: '20px 20px 100px',
       }}>
         {/* Handle */}
         <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border-light)', margin: '0 auto 16px' }} />
