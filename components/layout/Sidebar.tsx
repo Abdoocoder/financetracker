@@ -143,7 +143,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                         )}
                       </div>
                       <span style={{ fontSize: 15, fontWeight: isActive ? 800 : 600, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-primary)', flex: 1 }}>{item.label}</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>‹</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>←</span>
                     </div>
                   </Link>
                 )
