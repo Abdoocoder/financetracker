@@ -1,5 +1,5 @@
 'use client'
-import { useSwipeToDelete } from '@/lib/use-swipe-delete'
+import { useRef, useState } from 'react'
 
 interface SwipeRowProps {
   children: React.ReactNode
@@ -8,65 +8,74 @@ interface SwipeRowProps {
 }
 
 export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
-  const { offset, swiped, handlers, reset } = useSwipeToDelete(onDelete)
+  const startX = useRef(0)
+  const [offset, setOffset] = useState(0)
+  const [swiped, setSwiped] = useState(false)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    // RTL: سحب يميناً (diff سالب)
+    const diff = e.touches[0].clientX - startX.current
+    if (diff > 0) setOffset(Math.min(diff, 90))
+  }
+
+  const onTouchEnd = () => {
+    if (offset >= 70) setSwiped(true)
+    else { setOffset(0); setSwiped(false) }
+  }
+
+  const reset = () => { setOffset(0); setSwiped(false) }
+  const finalOffset = swiped ? 80 : offset
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 16 }}>
-      {/* Delete background */}
+    <div style={{ position: 'relative', overflow: 'hidden', borderRadius: 16, opacity }}>
+
+      {/* Delete button — يمين */}
       <div style={{
-        position: 'absolute', top: 0, left: 0, bottom: 0,
-        width: 80,
-        background: 'var(--accent-red-dim)',
-        border: '1px solid rgba(239,68,68,0.3)',
+        position: 'absolute', top: 0, right: 0, bottom: 0, width: 80,
+        background: '#EF4444',
         borderRadius: 16,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: Math.min(offset / 80, 1),
-        transition: swiped ? 'none' : 'opacity 0.1s',
+        opacity: Math.min(finalOffset / 80, 1),
+        zIndex: 0,
       }}>
-        <span style={{ fontSize: 18 }}>🗑</span>
+        <span style={{ fontSize: 22 }}>🗑</span>
       </div>
 
-      {/* Row content */}
+      {/* Row — يتحرك يميناً */}
       <div
-        {...handlers}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
         style={{
-          transform: `translateX(${swiped ? -80 : -offset}px)`,
-          transition: swiped ? 'transform 0.2s ease' : 'none',
-          opacity,
-          position: 'relative',
-          zIndex: 1,
+          transform: `translateX(${finalOffset}px)`,
+          transition: (offset === 0 || swiped) ? 'transform 0.2s ease' : 'none',
+          position: 'relative', zIndex: 1,
         }}
       >
         {children}
       </div>
 
-      {/* Swiped state: show delete button */}
+      {/* عند السحب الكامل: زر قابل للضغط */}
       {swiped && (
-        <div style={{
-          position: 'absolute', top: 0, left: 0, bottom: 0, width: 80,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 2,
-        }}>
+        <>
+          <div onClick={reset} style={{ position: 'fixed', inset: 0, zIndex: 2 }} />
           <button
             onClick={() => { onDelete(); reset() }}
             style={{
+              position: 'absolute', top: '50%', right: 12,
+              transform: 'translateY(-50%)',
               width: 56, height: 56, borderRadius: 14,
-              background: 'var(--accent-red)',
-              border: 'none', cursor: 'pointer',
+              background: '#EF4444', border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 20,
-              boxShadow: '0 4px 16px rgba(239,68,68,0.4)',
+              fontSize: 22, zIndex: 3,
+              boxShadow: '0 4px 16px rgba(239,68,68,0.5)',
             }}
           >🗑</button>
-        </div>
-      )}
-
-      {/* Tap anywhere else to reset */}
-      {swiped && (
-        <div
-          onClick={reset}
-          style={{ position: 'fixed', inset: 0, zIndex: 1 }}
-        />
+        </>
       )}
     </div>
   )
