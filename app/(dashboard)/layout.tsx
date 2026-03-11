@@ -11,14 +11,29 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const [alertsCount, setAlertsCount] = useState(0)
   const supabase = createClient()
 
-  useEffect(() => {
+  const fetchCount = async () => {
     if (!user) return
-    supabase.from('alerts')
+    const { count } = await supabase.from('alerts')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('is_read', false)
-      .then(({ count }) => setAlertsCount(count ?? 0))
-  }, [user, supabase])
+    setAlertsCount(count ?? 0)
+  }
+
+  useEffect(() => {
+    if (!user) return
+    fetchCount()
+    const channel = supabase
+      .channel('alerts-count')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'alerts',
+        filter: `user_id=eq.${user.id}`,
+      }, () => fetchCount())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user])
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: 'rtl' }}>
