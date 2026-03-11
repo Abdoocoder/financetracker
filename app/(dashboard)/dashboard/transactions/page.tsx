@@ -11,6 +11,8 @@ import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { useSwipeToDelete } from '@/lib/use-swipe-delete'
+import { SwipeRow } from '@/components/ui/swipe-row'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
@@ -131,13 +133,7 @@ export default function TransactionsPage() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(tx => (
-            <div key={tx.id} style={{
-              background: 'var(--bg-card)', border: '1px solid var(--border)',
-              borderRadius: 16, padding: '14px 16px',
-              display: 'flex', alignItems: 'center', gap: 12,
-              transition: 'border-color 0.15s',
-              opacity: deletingId === tx.id ? 0.4 : 1,
-            }}>
+            <SwipeRow key={tx.id} onDelete={() => setConfirmDelete(tx.id)} opacity={deletingId === tx.id ? 0.4 : 1}>
               {/* Icon */}
               <div style={{
                 width: 44, height: 44, borderRadius: 13, flexShrink: 0,
@@ -178,7 +174,7 @@ export default function TransactionsPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>✕</button>
               </div>
-            </div>
+            </SwipeRow>
           ))}
         </div>
       )}
