@@ -8,6 +8,17 @@ import { useI18n } from '@/lib/i18n'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
+
+// مسح cache المستخدم بعد أي تعديل
+function clearUserCache(userId: string) {
+  try {
+    sessionStorage.removeItem(`dashboard_${userId}`)
+    sessionStorage.removeItem(`tx_${userId}`)
+    sessionStorage.removeItem(`debts_${userId}`)
+    sessionStorage.removeItem(`goals_${userId}`)
+    sessionStorage.removeItem(`inv_${userId}`)
+  } catch {}
+}
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
   const { user: currentUser } = useUser()

@@ -12,6 +12,17 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
+
+// مسح cache المستخدم بعد أي تعديل
+function clearUserCache(userId: string) {
+  try {
+    sessionStorage.removeItem(`dashboard_${userId}`)
+    sessionStorage.removeItem(`tx_${userId}`)
+    sessionStorage.removeItem(`debts_${userId}`)
+    sessionStorage.removeItem(`goals_${userId}`)
+    sessionStorage.removeItem(`inv_${userId}`)
+  } catch {}
+}
 export default function InvestmentsPage() {
   const [investments, setInvestments] = useState<Investment[]>([])
   const { user: currentUser } = useUser()
@@ -36,9 +47,14 @@ export default function InvestmentsPage() {
   const load = useCallback(async () => {
     const user = currentUser
     if (!user) return
+    const cacheKey = `inv_${user.id}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) { try { const { d, ts } = JSON.parse(cached); if (Date.now() - ts < 30000) { setInvestments(d); setLoading(false); return } } catch {} }
     const { data: inv } = await supabase.from('investments').select('*').eq('user_id', user.id).order('created_at')
-    setInvestments(inv ?? [])
+    const result = inv ?? []
+    setInvestments(result)
     setLoading(false)
+    try { sessionStorage.setItem(cacheKey, JSON.stringify({ d: result, ts: Date.now() })) } catch {}
   }, [supabase])
 
   const fetchExchangeRate = useCallback(async () => {
@@ -61,6 +77,7 @@ export default function InvestmentsPage() {
     if (!editingInv) return
     setSaving(true)
     await supabase.from('investments').update({ symbol: editForm.symbol.toUpperCase(), name: editForm.name, type: editForm.type, shares: parseFloat(editForm.shares) || 0, avg_buy_price: parseFloat(editForm.avg_buy_price) || 0, current_price: parseFloat(editForm.current_price) || 0, is_halal: editForm.is_halal, notes: editForm.notes || null }).eq('id', editingInv.id)
+    clearUserCache(currentUser?.id ?? '')
     setEditingInv(null); setSaving(false); load()
   }
 
@@ -131,6 +148,7 @@ export default function InvestmentsPage() {
     const totalShares = inv.shares + shares
     const newAvg = totalShares > 0 ? ((inv.shares * inv.avg_buy_price) + (shares * price)) / totalShares : price
     await supabase.from('investments').update({ shares: totalShares, avg_buy_price: newAvg, current_price: price }).eq('id', investmentId)
+    clearUserCache(currentUser?.id ?? '')
     setShowBuyForm(null)
     setBuyForm({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
     setSaving(false); load()
