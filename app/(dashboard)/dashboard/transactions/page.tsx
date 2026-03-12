@@ -41,6 +41,10 @@ export default function TransactionsPage() {
   const [saving, setSaving] = useState(false)
   const [deletingId, setDeletingId] = useState<string|null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
+  const [page, setPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const PAGE_SIZE = 20
   const supabase = createClient()
   const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
@@ -88,6 +92,19 @@ export default function TransactionsPage() {
       toast.success(form.type === 'income' ? t('toast_income_added') : t('toast_expense_added'))
     }
     setShowForm(false); setSaving(false); load()
+  }
+
+  async function loadMore() {
+    const user = currentUser
+    if (!user || loadingMore || !hasMore) return
+    setLoadingMore(true)
+    const nextPage = page + 1
+    const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('transaction_date', { ascending: false }).range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1)
+    const result = data ?? []
+    setTransactions(prev => [...prev, ...result])
+    setPage(nextPage)
+    setHasMore(result.length === PAGE_SIZE)
+    setLoadingMore(false)
   }
 
   async function deleteTransaction(id: string) {
@@ -222,6 +239,14 @@ export default function TransactionsPage() {
       )}
 
       {/* Modal */}
+      {hasMore && (
+        <div style={{ textAlign: 'center', padding: '16px 0' }}>
+          <button onClick={loadMore} disabled={loadingMore} style={{ padding: '12px 32px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, cursor: loadingMore ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: loadingMore ? 0.6 : 1 }}>
+            {loadingMore ? '⏳ ...' : `${lang === 'en' ? 'Load More' : 'تحميل المزيد'} ↓`}
+          </button>
+        </div>
+      )}
+
       {confirmDelete && (
         <ConfirmDialog
           title={lang === "en" ? "Delete Transaction" : "حذف المعاملة"}
