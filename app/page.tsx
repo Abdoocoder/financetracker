@@ -57,6 +57,29 @@ export default function LandingPage() {
           ))}
         </div>
         <div style={{ marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>🇯🇴🇸🇦🇦🇪🇪🇬🇲🇦 مستخدمون من أكثر من 10 دول</div>
+
+        {/* زر تنزيل APK */}
+        <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>📱 متاح أيضاً كتطبيق أندرويد</div>
+          <a
+            href="https://github.com/Abdoocoder/financetracker/releases/download/v1.0.0/FinanceTracker-v1.0.apk"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '13px 28px', borderRadius: 14,
+              background: 'rgba(16,185,129,0.08)',
+              border: '1px solid rgba(16,185,129,0.25)',
+              color: '#10B981', fontSize: 15, fontWeight: 700,
+              textDecoration: 'none', transition: 'all 0.2s',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C3.4925 10.4609 2 13.0197 2 16h20c0-2.9803-1.4925-5.5391-4.1185-6.6786"/>
+            </svg>
+            تنزيل تطبيق Android
+            <span style={{ fontSize: 11, opacity: 0.7, fontWeight: 600 }}>v1.0.0</span>
+          </a>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>APK مباشر · لا يحتاج Google Play</div>
+        </div>
       </section>
 
       <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
