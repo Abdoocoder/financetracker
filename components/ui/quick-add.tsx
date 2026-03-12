@@ -12,6 +12,14 @@ const QUICK_CATS = [
   { label: 'أخرى', icon: '📝', type: 'expense' },
 ]
 
+
+function clearUserCache(userId: string) {
+  try {
+    ['dashboard','tx','debts','goals','inv'].forEach(k => 
+      sessionStorage.removeItem(`${k}_${userId}`)
+    )
+  } catch {}
+}
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const { user } = useUser()
   const supabase = createClient()
@@ -52,6 +60,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
     setSaving(false)
     setAmount('')
     setSelected(null)
+    clearUserCache(user?.id ?? '')
     setShowSuccess(true)
     setTimeout(() => setShowSuccess(false), 2000)
     onAdded()
@@ -70,6 +79,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       transaction_date: new Date().toISOString().split('T')[0],
     })
     setSaving(false)
+    clearUserCache(user?.id ?? '')
     setShowSuccess(true)
     setTimeout(() => setShowSuccess(false), 2000)
     onAdded()
