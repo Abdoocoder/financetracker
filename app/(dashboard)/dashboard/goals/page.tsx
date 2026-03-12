@@ -25,9 +25,14 @@ export default function GoalsPage() {
   const load = useCallback(async () => {
     const user = currentUser
     if (!user) return
+    const cacheKey = `goals_${user.id}`
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) { try { const { d, ts } = JSON.parse(cached); if (Date.now() - ts < 30000) { setGoals(d); setLoading(false); return } } catch {} }
     const { data } = await supabase.from('savings_goals').select('*').eq('user_id', user.id).order('created_at')
-    setGoals(data ?? [])
+    const result = data ?? []
+    setGoals(result)
     setLoading(false)
+    try { sessionStorage.setItem(`goals_${user.id}`, JSON.stringify({ d: result, ts: Date.now() })) } catch {}
   }, [supabase])
 
   useEffect(() => { load() }, [load])
