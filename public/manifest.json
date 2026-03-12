@@ -1,14 +1,13 @@
 {
-  "name": "FinanceTracker — إدارة شؤونك المالية",
+  "name": "FinanceTracker",
   "short_name": "FinanceTracker",
-  "description": "تتبع دخلك ومصاريفك وديونك واستثماراتك",
+  "description": "منصة إدارة مالية شخصية ذكية",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#070B14",
-  "theme_color": "#3B7EF6",
+  "theme_color": "#070B14",
   "orientation": "portrait",
   "icons": [
-    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" },
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
