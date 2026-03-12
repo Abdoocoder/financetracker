@@ -62,7 +62,7 @@ export default function LandingPage() {
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>📱 متاح أيضاً كتطبيق أندرويد</div>
           <a
-            href="https://github.com/Abdoocoder/financetracker/releases/download/v1.0.0/FinanceTracker-v1.0.apk"
+            href="https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk" download="FinanceTracker.apk"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 10,
               padding: '13px 28px', borderRadius: 14,
