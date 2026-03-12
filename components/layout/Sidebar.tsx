@@ -109,7 +109,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
               )}
             </div>
             <span style={{ fontSize: 10, fontWeight: isMoreActive ? 800 : 500, color: isMoreActive ? 'var(--accent-blue-light)' : 'var(--text-muted)', position: 'relative', zIndex: 1 }}>
-              المزيد
+              {lang === 'en' ? 'More' : 'المزيد'}
             </span>
           </div>
         </button>
