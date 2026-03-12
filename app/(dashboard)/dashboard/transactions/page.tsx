@@ -45,6 +45,9 @@ export default function TransactionsPage() {
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const PAGE_SIZE = 20
+  const now = new Date()
+  const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
+  const [filterYear, setFilterYear] = useState(now.getFullYear())
   const supabase = createClient()
   const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
@@ -99,7 +102,9 @@ export default function TransactionsPage() {
     if (!user || loadingMore || !hasMore) return
     setLoadingMore(true)
     const nextPage = page + 1
-    const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('transaction_date', { ascending: false }).range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1)
+    const firstDay = `${filterYear}-${String(filterMonth).padStart(2,'0')}-01`
+    const lastDay = new Date(filterYear, filterMonth, 0).toISOString().split('T')[0]
+    const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay).order('transaction_date', { ascending: false }).range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1)
     const result = data ?? []
     setTransactions(prev => [...prev, ...result])
     setPage(nextPage)

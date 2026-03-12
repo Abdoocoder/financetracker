@@ -6,7 +6,7 @@ import { useState } from 'react'
 import {
   LayoutDashboard, ArrowUpDown, CreditCard,
   TrendingUp, Target, Bell, Settings, Globe,
-  ChevronLeft, MoreHorizontal
+  ChevronLeft, MoreHorizontal, PieChart
 } from 'lucide-react'
 
 const MAIN_NAV = [
@@ -17,8 +17,9 @@ const MAIN_NAV = [
 ]
 
 const MORE_NAV = [
-  { href: '/dashboard/goals',    Icon: Target,   label: 'الأهداف'   },
-  { href: '/dashboard/alerts',   Icon: Bell,     label: 'التنبيهات' },
+  { href: '/dashboard/goals',    Icon: Target,     label: 'الأهداف'   },
+  { href: '/dashboard/budgets',  Icon: PieChart,  label: 'الميزانية' },
+  { href: '/dashboard/alerts',   Icon: Bell,       label: 'التنبيهات' },
   { href: '/dashboard/settings', Icon: Settings, label: 'الإعدادات' },
 ]
 
