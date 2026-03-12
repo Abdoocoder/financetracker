@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 import { useCachedData } from '@/lib/use-cached-data'
 import { QuickAdd } from '@/components/ui/quick-add'
@@ -108,6 +109,7 @@ function CategoryBars({ categories }: { categories: [string, number][] }) {
 export default function DashboardPage() {
   const { t } = useI18n()
   const supabase = createClient()
+  const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<any>(null)
   const [recentTx, setRecentTx] = useState<any[]>([])

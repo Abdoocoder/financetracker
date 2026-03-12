@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
 import { PageHeader } from '@/components/ui/page-header'
@@ -20,6 +21,7 @@ const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','هدية'
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
+  const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -35,7 +37,7 @@ export default function TransactionsPage() {
 
   // cache key فريد لكل مستخدم
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(100)
     setTransactions(data ?? [])
@@ -63,7 +65,7 @@ export default function TransactionsPage() {
     if (Object.keys(errs).length) { setErrors(errs); return }
     setErrors({})
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     if (editingId) {
       const { error } = await supabase.from('transactions').update({ type: form.type, amount: parseFloat(form.amount), category: form.category, description: form.description, transaction_date: form.transaction_date }).eq('id', editingId)

@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
@@ -9,6 +10,7 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
+  const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -21,7 +23,7 @@ export default function GoalsPage() {
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     const { data } = await supabase.from('savings_goals').select('*').eq('user_id', user.id).order('created_at')
     setGoals(data ?? [])
@@ -45,7 +47,7 @@ export default function GoalsPage() {
   async function saveGoal() {
     if (!form.name || !form.target_amount) { toast.warning(t('toast_fill_required')); return }
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     if (editingId) {
       const { error } = await supabase.from('savings_goals').update({ name: form.name, target_amount: parseFloat(form.target_amount), current_amount: parseFloat(form.current_amount), target_date: form.target_date || null, icon: form.icon }).eq('id', editingId)
