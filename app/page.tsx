@@ -30,7 +30,7 @@ export default function LandingPage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Link href="/login" style={{ padding: '8px 18px', borderRadius: 10, color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>تسجيل الدخول</Link>
-            <Link href="/register" style={{ padding: '9px 20px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 14, fontWeight: 700, textDecoration: 'none', boxShadow: '0 0 16px rgba(59,126,246,0.35)' }}>ابدأ مجاناً ←</Link>
+            <Link href="/register" style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--accent-blue)', color: 'white', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>ابدأ مجاناً ←</Link>
           </div>
         </div>
       </nav>
@@ -47,9 +47,9 @@ export default function LandingPage() {
         <p style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 28px' }}>
           تتبع دخلك ومصاريفك وديونك واستثماراتك في مكان واحد — بدل ما تنقّل بين تطبيقات وأوراق.
         </p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <Link href="/register" style={{ padding: '13px 28px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 'clamp(14px, 4vw, 17px)', fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(59,126,246,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>أنشئ حسابك المجاني ←</Link>
-          <Link href="/login" style={{ padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 600, textDecoration: 'none' }}>لدي حساب</Link>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
+          <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center' as const, boxShadow: '0 0 30px rgba(59,126,246,0.35)' }}>أنشئ حسابك المجاني ←</Link>
+          <Link href="/login" style={{ flex: 1, minWidth: 120, padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none', textAlign: 'center' as const }}>لدي حساب</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
           {['✓ مجاني للأبد', '✓ بدون بطاقة ائتمانية', '✓ تسجيل في 30 ثانية'].map((t, i) => (
