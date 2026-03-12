@@ -86,6 +86,12 @@ function CategoryBars({ categories, lang }: { categories: [string, number][], la
   if (!categories.length) return null
   const max = categories[0][1]
   const COLORS = ['#3B7EF6','#8B5CF6','#F59E0B','#10B981','#EF4444']
+  const CAT_TRANS: Record<string, string> = {
+    'طعام':'Food','مواصلات':'Transport','فواتير':'Bills','صحة':'Health',
+    'ملابس':'Clothes','ترفيه':'Entertainment','تعليم':'Education',
+    'أخرى':'Other','راتب':'Salary','ديون':'Debts','استثمار':'Investment',
+    'هدية':'Gift','عمل حر':'Freelance'
+  }
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: 16 }}>
       <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', display: 'block', marginBottom: 14 }}>{lang === 'en' ? 'Expense Breakdown' : 'توزيع المصاريف'}</span>
