@@ -51,7 +51,7 @@ function DashSkeleton() {
 }
 
 
-function MiniBarChart({ data }: { data: { month: string; income: number; expense: number }[] }) {
+function MiniBarChart({ data, lang }: { data: { month: string; income: number; expense: number }[], lang: string }) {
   const maxVal = Math.max(...data.flatMap(d => [d.income, d.expense]), 1)
   const W = 300, H = 80, barW = 18
   const gap = (W - data.length * barW * 2) / (data.length + 1)
@@ -82,7 +82,7 @@ function MiniBarChart({ data }: { data: { month: string; income: number; expense
   )
 }
 
-function CategoryBars({ categories }: { categories: [string, number][] }) {
+function CategoryBars({ categories, lang }: { categories: [string, number][], lang: string }) {
   if (!categories.length) return null
   const max = categories[0][1]
   const COLORS = ['#3B7EF6','#8B5CF6','#F59E0B','#10B981','#EF4444']
@@ -277,10 +277,10 @@ export default function DashboardPage() {
       )}
 
       {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
-        <MiniBarChart data={data.months6} />
+        <MiniBarChart data={data.months6} lang={lang} />
       )}
       {data?.categories?.length > 0 && (
-        <CategoryBars categories={data.categories} />
+        <CategoryBars categories={data.categories} lang={lang} />
       )}
 
       {[
