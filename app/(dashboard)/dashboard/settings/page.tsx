@@ -100,16 +100,16 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <FormField label="الاسم الكامل">
+        <FormField label={lang === "en" ? "Full Name" : "الاسم الكامل"}>
           <Input placeholder={lang === "en" ? "Full Name" : "الاسم الكامل"} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
         </FormField>
-        <FormField label="الراتب الشهري (JOD)">
+        <FormField label={lang === "en" ? "Monthly Salary (JOD)" : "الراتب الشهري (JOD)"  }>
           <Input type="number" placeholder="0" value={form.monthly_income} onChange={e => setForm(f => ({ ...f, monthly_income: e.target.value }))} />
         </FormField>
-        <FormField label="يوم استلام الراتب (1-28)">
+        <FormField label={lang === "en" ? "Salary Day (1-28)" : "يوم استلام الراتب (1-28)"  }>
           <Input type="number" placeholder="1" min="1" max="28" value={form.salary_day} onChange={e => setForm(f => ({ ...f, salary_day: e.target.value }))} />
         </FormField>
-        <FormField label="العملة">
+        <FormField label={lang === "en" ? "Currency" : "العملة"}>
           <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
             <option value="JOD">{lang === 'en' ? 'Jordanian Dinar (JOD)' : 'دينار أردني (JOD)'}</option>
             <option value="USD">{lang === 'en' ? 'US Dollar (USD)' : 'دولار (USD)'}</option>
@@ -117,7 +117,7 @@ export default function SettingsPage() {
             <option value="SAR">{lang === 'en' ? 'Saudi Riyal (SAR)' : 'ريال سعودي (SAR)'}</option>
           </Select>
         </FormField>
-        <FormField label="اللغة">
+        <FormField label={lang === "en" ? "Language" : "اللغة"}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {(['ar', 'en'] as const).map(l => (
               <button key={l} onClick={() => setLang(l)} style={{ padding: '11px', borderRadius: 10, background: lang === l ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${lang === l ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: lang === l ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -135,7 +135,7 @@ export default function SettingsPage() {
             ))}
           </div>
         </FormField>
-        <SaveButton label="حفظ التغييرات" loading={saving} onClick={handleSave} />
+        <SaveButton label={lang === "en" ? "Save Changes" : "حفظ التغييرات"} loading={saving} onClick={handleSave} />
       </div>
 
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
