@@ -292,7 +292,7 @@ export default function TransactionsPage() {
             </Select>
           </FormField>
           <FormField label={`الوصف`}>
-            <Input placeholder={`وصف اختياري`} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            <Input placeholder={lang === "en" ? "Optional description" : "وصف اختياري"} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
           </FormField>
           <FormField label={`التاريخ`}>
             <Input type="date" value={form.transaction_date} onChange={e => setForm(f => ({ ...f, transaction_date: e.target.value }))} />

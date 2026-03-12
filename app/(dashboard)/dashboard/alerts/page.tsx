@@ -124,18 +124,18 @@ export default function AlertsPage() {
     setGenerating(true)
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.access_token) { toast.error('يجب تسجيل الدخول'); setGenerating(false); return }
+      if (!session?.access_token) { toast.error(lang === 'en' ? 'Please log in' : 'يجب تسجيل الدخول'); setGenerating(false); return }
       const res = await fetch('/api/alerts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` }
       })
       const data = await res.json()
-      if (!res.ok) toast.error(data.error ?? 'حدث خطأ')
+      if (!res.ok) toast.error(data.error ?? (lang === 'en' ? 'An error occurred' : 'حدث خطأ'))
       else {
         toast.success(data.message)
         await load()
       }
-    } catch { toast.error('خطأ في الاتصال') }
+    } catch { toast.error(lang === 'en' ? 'Connection error' : 'خطأ في الاتصال') }
     setGenerating(false)
   }
 

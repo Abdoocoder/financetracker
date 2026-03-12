@@ -130,7 +130,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
             type="number"
             value={amount}
             onChange={e => setAmount(e.target.value)}
-            placeholder="المبلغ..."
+            placeholder={lang === "en" ? "Amount..." : "المبلغ..."}
             autoFocus
             onKeyDown={e => e.key === 'Enter' && save()}
             style={{
