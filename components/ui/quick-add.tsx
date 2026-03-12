@@ -78,7 +78,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       type: lastTx.type,
       amount: lastTx.amount,
       category: lastTx.category,
-      description: 'تكرار',
+      description: lang === 'en' ? 'Repeat' : 'تكرار',
       transaction_date: new Date().toISOString().split('T')[0],
     })
     setSaving(false)
@@ -153,7 +153,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
               transition: 'opacity 0.15s',
             }}
           >
-            {saving ? '⏳' : '+ حفظ'}
+            {saving ? '⏳' : (lang === 'en' ? '+ Save' : '+ حفظ')}
           </button>
         </div>
       )}

@@ -53,8 +53,8 @@ export default function SettingsPage() {
     if (!user) return
     const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('transaction_date', { ascending: false })
     if (!data?.length) { toast.error(t('settings_no_export')); setExportLoading(false); return }
-    const headers = ['التاريخ', 'النوع', 'المبلغ', 'الفئة', 'الوصف']
-    const rows = data.map(t => [t.transaction_date, t.type === 'income' ? 'دخل' : 'مصروف', t.amount, t.category ?? '', t.description ?? ''])
+    const headers = lang === 'en' ? ['Date','Type','Amount','Category','Description'] : ['التاريخ','النوع','المبلغ','الفئة','الوصف']
+    const rows = data.map(t => [t.transaction_date, t.type === 'income' ? (lang === 'en' ? 'Income' : 'دخل') : (lang === 'en' ? 'Expense' : 'مصروف'), t.amount, t.category ?? '', t.description ?? ''])
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
@@ -143,7 +143,7 @@ export default function SettingsPage() {
         <PushToggle />
         <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
         <button onClick={handleLogout} disabled={loggingOut} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1 }}>
-          {loggingOut ? '⏳ ...' : 'تسجيل الخروج ←'}
+          {loggingOut ? '⏳ ...' : (lang === 'en' ? 'Sign Out ←' : 'تسجيل الخروج ←')}
         </button>
       </div>
 
@@ -174,7 +174,7 @@ export default function SettingsPage() {
             />
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleDeleteAccount} disabled={deleteInput !== 'حذف حسابي' || deletingAccount} style={{ flex: 1, padding: '12px', borderRadius: 12, background: '#EF4444', border: 'none', color: 'white', fontSize: 14, fontWeight: 800, cursor: deleteInput !== 'حذف حسابي' ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: deleteInput !== 'حذف حسابي' ? 0.4 : 1 }}>
-                {deletingAccount ? '⏳ جاري الحذف...' : 'تأكيد الحذف'}
+                {deletingAccount ? '⏳ ...' : (lang === 'en' ? 'Confirm Delete' : 'تأكيد الحذف')}
               </button>
               <button onClick={() => { setShowDeleteConfirm(false); setDeleteInput('') }} style={{ flex: 1, padding: '12px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
             </div>
