@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
 
 const QUICK_CATS = [
   { label: 'طعام', icon: '🍔', type: 'expense' },
@@ -12,6 +13,7 @@ const QUICK_CATS = [
 ]
 
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
+  const { user } = useUser()
   const supabase = createClient()
   const [selected, setSelected] = useState<typeof QUICK_CATS[0] | null>(null)
   const [amount, setAmount] = useState('')
@@ -22,7 +24,6 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   // جلب آخر معاملة
   useEffect(() => {
     async function loadLast() {
-      const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       const { data } = await supabase
         .from('transactions')
@@ -39,7 +40,6 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   async function save() {
     if (!selected || !amount) return
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
     await supabase.from('transactions').insert({
       user_id: user.id,
@@ -60,7 +60,6 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   async function repeatLast() {
     if (!lastTx) return
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
     await supabase.from('transactions').insert({
       user_id: user.id,
