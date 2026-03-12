@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
 import type { Investment, InvestmentTransaction } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
 import { StatBar } from '@/components/ui/stat-bar'
@@ -13,6 +14,7 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 export default function InvestmentsPage() {
   const [investments, setInvestments] = useState<Investment[]>([])
+  const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showBuyForm, setShowBuyForm] = useState<string | null>(null)
@@ -32,7 +34,7 @@ export default function InvestmentsPage() {
   const supabase = createClient()
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     const { data: inv } = await supabase.from('investments').select('*').eq('user_id', user.id).order('created_at')
     setInvestments(inv ?? [])
@@ -97,7 +99,7 @@ export default function InvestmentsPage() {
 
   async function addInvestment() {
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     let initialPrice = 0
     try {
@@ -118,7 +120,7 @@ export default function InvestmentsPage() {
 
   async function recordBuy(investmentId: string) {
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     const shares = parseFloat(buyForm.shares)
     const price = parseFloat(buyForm.price)

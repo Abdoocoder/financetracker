@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
 import { PageHeader } from '@/components/ui/page-header'
@@ -24,6 +25,7 @@ const PRIORITY_CONFIG = [
 
 export default function DebtsPage() {
   const [debts, setDebts] = useState<any[]>([])
+  const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -38,7 +40,7 @@ export default function DebtsPage() {
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     const { data } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority')
     setDebts(data ?? [])
@@ -62,7 +64,7 @@ export default function DebtsPage() {
   async function saveDebt() {
     if (!form.name || !form.original_amount) { toast.warning(t('toast_fill_required')); return }
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     if (editingId) {
       const { error } = await supabase.from('debts').update({ name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.remaining_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct }).eq('id', editingId)
@@ -86,7 +88,7 @@ export default function DebtsPage() {
     const amount = parseFloat(paymentAmount)
     if (!amount || amount <= 0) { toast.warning(t('toast_fill_required')); return }
     setPayingSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = currentUser
     if (!user) return
     const debt = debts.find(d => d.id === debtId)
     if (!debt) return

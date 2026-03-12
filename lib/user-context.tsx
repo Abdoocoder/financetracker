@@ -1,44 +1,40 @@
 'use client'
-import { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 
 interface UserContextType {
   user: User | null
   loading: boolean
-  refresh: () => void
 }
 
-const UserContext = createContext<UserContextType>({
-  user: null,
-  loading: true,
-  refresh: () => {}
-})
+const UserContext = createContext<UserContextType>({ user: null, loading: true })
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
+export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  const loadUser = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    setUser(user)
-    setLoading(false)
-  }, [supabase])
-
   useEffect(() => {
-    loadUser()
+    // جلب المستخدم مرة واحدة فقط
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user)
+      setLoading(false)
+    })
+    // الاستماع للتغييرات
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
     return () => subscription.unsubscribe()
-  }, [supabase, loadUser])
+  }, [supabase])
 
   return (
-    <UserContext.Provider value={{ user, loading, refresh: loadUser }}>
+    <UserContext.Provider value={{ user, loading }}>
       {children}
     </UserContext.Provider>
   )
 }
 
-export const useUser = () => useContext(UserContext)
+export function useUser() {
+  return useContext(UserContext)
+}
