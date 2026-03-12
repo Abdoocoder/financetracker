@@ -11,6 +11,15 @@ const cairo = Cairo({
 
 export const metadata: Metadata = {
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'FinanceTracker',
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'theme-color': '#070B14',
+  },
   title: 'FinanceTracker — إدارة شؤونك المالية',
   description: 'تتبع دخلك، مصاريفك، ديونك واستثماراتك في مكان واحد',
   icons: { icon: '/favicon.ico' },
