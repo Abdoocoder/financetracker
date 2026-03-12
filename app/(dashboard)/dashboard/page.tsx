@@ -115,11 +115,33 @@ export default function DashboardPage() {
   const [recentTx, setRecentTx] = useState<any[]>([])
   const fetched = useRef(false)
 
+  // cache key
+  const CACHE_KEY = `dashboard_${currentUser?.id}`
+
   useEffect(() => {
     if (fetched.current) return
     fetched.current = true
-    async function fetchAll() {
-      const { data: { user } } = await supabase.auth.getUser()
+
+    // عرض cache فوراً إن وجد
+    const cached = sessionStorage.getItem(CACHE_KEY)
+    if (cached) {
+      try {
+        const { data, recentTx: rt, ts } = JSON.parse(cached)
+        const age = Date.now() - ts
+        if (age < 60000) { // أقل من دقيقة — عرض فوري
+          setData(data)
+          setRecentTx(rt)
+          setLoading(false)
+          if (age > 20000) { // أقدم من 20 ثانية — حدّث في الخلفية
+            fetchAll(true)
+          }
+          return
+        }
+      } catch {}
+    }
+
+    async function fetchAll(background = false) {
+      const user = currentUser
       if (!user) { setLoading(false); return }
       const now = new Date()
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
@@ -150,12 +172,16 @@ export default function DashboardPage() {
       const prevMonth = months6[4] ?? { income: 0, expense: 0 }
       const prevIncome = prevMonth.income
       const prevExpenses = prevMonth.expense
-      setData({ income, expenses, months6, categories, net: income - expenses, prevIncome, prevExpenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 })
-      setRecentTx(recentRes.data ?? [])
+      const newData = { income, expenses, months6, categories, net: income - expenses, prevIncome, prevExpenses, totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0), invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0), goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0), goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0), unreadAlerts: alertRes.count ?? 0 }
+      const newRecent = recentRes.data ?? []
+      setData(newData)
+      setRecentTx(newRecent)
       setLoading(false)
+      // حفظ في cache
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: newRecent, ts: Date.now() })) } catch {}
     }
     fetchAll()
-  }, [supabase])
+  }, [currentUser, supabase])
 
   if (loading) return <DashSkeleton />
 
