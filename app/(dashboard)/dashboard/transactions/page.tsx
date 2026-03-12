@@ -33,6 +33,7 @@ export default function TransactionsPage() {
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
   const [errors, setErrors] = useState<Record<string,string>>({})
 
+  // cache key فريد لكل مستخدم
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
