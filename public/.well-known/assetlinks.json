@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.financetracker.app",
+    "sha256_cert_fingerprints": [
+      "44:58:4A:8F:75:46:79:76:39:0E:67:70:12:DC:48:65:2F:11:24:B5:09:B2:21:CC:72:73:24:20:C2:1C:A6:10"
+    ]
+  }
+}]
