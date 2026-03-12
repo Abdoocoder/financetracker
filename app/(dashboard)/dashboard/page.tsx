@@ -248,12 +248,12 @@ export default function DashboardPage() {
               <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: incDiff >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
                 <div style={{ fontSize: 18, marginBottom: 2 }}>{incDiff >= 0 ? '📈' : '📉'}</div>
                 <div style={{ fontSize: 13, fontWeight: 900, color: incDiff >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{incDiff >= 0 ? '+' : ''}{incDiff.toFixed(0)}%</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>الدخل</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{lang === 'en' ? 'Income' : 'الدخل'}</div>
               </div>
               <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: expDiff <= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
                 <div style={{ fontSize: 18, marginBottom: 2 }}>{expDiff <= 0 ? '✅' : '⚠️'}</div>
                 <div style={{ fontSize: 13, fontWeight: 900, color: expDiff <= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{expDiff > 0 ? '+' : ''}{expDiff.toFixed(0)}%</div>
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>المصاريف</div>
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{lang === 'en' ? 'Expenses' : 'المصاريف'}</div>
               </div>
             </div>
           </div>
@@ -264,14 +264,14 @@ export default function DashboardPage() {
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{lang === 'en' ? 'Monthly Budget' : 'الميزانية الشهرية'}</span>
-            <span style={{ fontSize: 12, fontWeight: 900, color: spendColor, fontFamily: 'monospace' }}>{spendPct.toFixed(0)}% مُنفَق</span>
+            <span style={{ fontSize: 12, fontWeight: 900, color: spendColor, fontFamily: 'monospace' }}>{spendPct.toFixed(0)}% {lang === 'en' ? 'spent' : 'مُنفَق'}</span>
           </div>
           <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-elevated)', overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${spendPct}%`, borderRadius: 4, background: spendColor, transition: 'width 0.5s ease' }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>الدخل: {income.toFixed(0)} JOD</span>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>المتبقي: {Math.max(0, net).toFixed(0)} JOD</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Income' : 'الدخل'}: {income.toFixed(0)} JOD</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: {Math.max(0, net).toFixed(0)} JOD</span>
           </div>
         </div>
       )}
