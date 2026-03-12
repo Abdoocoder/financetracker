@@ -1,0 +1,46 @@
+=== وصف التطبيق للمتجر (عربي) ===
+
+الاسم: FinanceTracker
+العنوان (30 حرف): FinanceTracker - ادارة مالية
+الوصف القصير (80 حرف): تتبع مصاريفك وديونك واستثماراتك بذكاء في مكان واحد
+
+الوصف الكامل:
+💰 FinanceTracker منصة ادارة مالية شخصية ذكية
+
+هل تريد السيطرة على امولك؟ FinanceTracker يساعدك على تتبع كل ريال بشكل منظم.
+
+المميزات:
+• لوحة تحكم شاملة مع رسوم بيانية
+• تتبع المعاملات اليومية مع Quick Add
+• ميزانية شهرية مع تحذيرات التجاوز
+• ادارة الديون مع خصم تلقائي للاقساط
+• تتبع الاستثمارات باسعار حية (اسهم + عملات رقمية)
+• تنبيهات ذكية بالذكاء الاصطناعي
+• دعم عربي/انجليزي مع RTL كامل
+• وضع داكن وفاتح
+
+الفئة: Finance
+التصنيف العمري: للجميع
+الموقع: https://financetracker-brown.vercel.app
+
+=== English Store Listing ===
+
+Title (30 chars): FinanceTracker - Smart Finance
+Short Description: Track expenses, debts and investments intelligently in one place
+
+Full Description:
+Take control of your money with FinanceTracker.
+
+Features:
+• Comprehensive dashboard with charts
+• Daily transaction tracking with Quick Add
+• Monthly budget with overspending alerts
+• Debt management with automatic deductions
+• Investment portfolio with live prices (stocks + crypto)
+• AI-powered smart alerts
+• Full Arabic/English support with RTL
+• Dark and light mode
+
+Category: Finance
+Content Rating: Everyone
+Website: https://financetracker-brown.vercel.app
