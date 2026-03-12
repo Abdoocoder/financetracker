@@ -1,165 +1,252 @@
-# 💰 FinanceTracker
+<div align="center">
 
-> منصة إدارة مالية شخصية ذكية — Smart Personal Finance Manager
+<img src="https://raw.githubusercontent.com/Abdoocoder/financetracker/main/public/favicon.ico" width="80" height="80" alt="FinanceTracker Logo" />
 
-[
+# FinanceTracker
 
-![Deploy](https://img.shields.io/badge/Live-financetracker--brown.vercel.app-blue)
+**منصة إدارة مالية شخصية ذكية**
+*Smart Personal Finance Manager*
 
-](https://financetracker-brown.vercel.app)
-[
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-financetracker--brown.vercel.app-3B7EF6?style=for-the-badge&logoColor=white)](https://financetracker-brown.vercel.app)
 
-![Next.js](https://img.shields.io/badge/Next.js-15-black)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)](https://vercel.com)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa)](https://financetracker-brown.vercel.app)
 
-](https://nextjs.org)
-[
+---
 
-![Supabase](https://img.shields.io/badge/Supabase-Database-green)
+*تحكّم في أموالك، حقق حريتك المالية*
+*Track your money. Build your freedom.*
 
-](https://supabase.com)
+</div>
+
+---
+
+## ✨ لمحة سريعة / Overview
+
+> FinanceTracker هو تطبيق ويب متكامل لإدارة الشؤون المالية الشخصية، مبني بأحدث التقنيات ومصمم خصيصاً للمستخدم العربي مع دعم كامل للغة الإنجليزية.
+
+```
+💰 تتبع المصاريف  →  💳 سدد الديون  →  📈 استثمر الفائض  →  🎯 حقق أهدافك
+```
+
+---
+
+## 🖥️ Screenshots
+
+<div align="center">
+
+| Dashboard | Transactions | Budget |
+|:---------:|:------------:|:------:|
+| ملخص شهري + رسوم بيانية | بحث + فلترة + Swipe | ملخص تلقائي + فئات |
+
+</div>
 
 ---
 
 ## 🌟 الميزات / Features
 
+<table>
+<tr>
+<td width="50%">
+
 ### 🏠 Dashboard
 - ملخص شهري: الدخل، المصروف، الصافي
-- مقارنة مع الشهر الماضي
+- مقارنة مع الشهر الماضي 📊
 - رسم بياني للإيرادات والمصروفات
-- توزيع المصاريف حسب الفئة
-- إضافة سريعة (Quick Add) مع تكرار آخر معاملة
+- إضافة سريعة مع تكرار آخر معاملة ⚡
 
-### 💸 المعاملات / Transactions
+### 💸 المعاملات
 - إضافة / تعديل / حذف
-- بحث نصي (الوصف، الفئة، المبلغ)
+- **بحث نصي** في الوصف والفئة والمبلغ 🔍
 - فلترة بالنوع والشهر
-- Pagination (20 معاملة)
-- Swipe للحذف
-- تصدير CSV
+- Swipe للحذف على الموبايل
+- تصدير CSV 📥
 
-### 💳 الديون / Debts
-- تتبع مع شريط تقدم
-- خصم تلقائي شهري (CRON)
+### 💳 الديون
+- تتبع مع شريط تقدم مرئي
+- **خصم تلقائي شهري** (CRON) 🤖
 - تحديد يوم الخصم لكل دين
-- سجل الدفعات
+- سجل كامل للدفعات
 
-### 📈 الاستثمارات / Investments
-- أسهم + عملات رقمية (15+)
-- أسعار حية (CoinGecko + Twelve Data + Yahoo)
+</td>
+<td width="50%">
+
+### 📊 الميزانية
+- ملخص تلقائي من بيانات التطبيق
+- حساب المتاح: الدخل − الأقساط − الأهداف
+- حدود إنفاق يدوية لكل فئة
+- تحذير 🔶 عند الاقتراب وتنبيه ⚠️ عند التجاوز
+
+### 📈 الاستثمارات
+- أسهم + عملات رقمية (15+ عملة)
+- أسعار **حية** (CoinGecko + Twelve Data)
 - دعم الاستثمار الحلال ✅
 
-### 🎯 الأهداف / Savings Goals
+### 🎯 الأهداف
 - أهداف ادخار مع شريط تقدم
 - إضافة دفعات يدوية
 
-### 📊 الميزانية / Budget
-- ملخص تلقائي: الدخل، الأقساط، ادخار الأهداف، المتاح
-- حدود إنفاق يدوية لكل فئة
-- تحذير عند تجاوز الحد أو اقترابه
-- فلتر شهري
+### 🔔 التنبيهات الذكية
+- تحليل يومي تلقائي (CRON)
+- إشعارات Push حتى لو التطبيق مغلق
+- تحذيرات الإسراف + تهنئة الادخار
 
-### 🔔 التنبيهات / Alerts
-- تنبيهات ذكية يومية (rule-based engine)
-- إشعارات Push (Web Push API)
-- فلترة: achievements, warnings, unread
-
-### ⚙️ الإعدادات / Settings
-- JOD, USD, SAR, AED
-- تصدير CSV
-- حذف الحساب
-- راتب تلقائي شهري (CRON)
-
----
-
-## 🌍 i18n + 🎨 Theme
-
-- عربي / English — يُحفظ في localStorage
-- داكن / فاتح — يُحفظ في localStorage
-
-## 📱 PWA
-
-- تثبيت على Android و iOS
-- يعمل بدون شريط المتصفح
-- Push Notifications
+</td>
+</tr>
+</table>
 
 ---
 
 ## 🛠️ Tech Stack
 
-| التقنية | الاستخدام |
-|---------|-----------|
-| Next.js 15 | Framework |
-| Supabase | Database + Auth + RLS |
-| Vercel | Hosting + CRON |
-| CoinGecko | أسعار العملات الرقمية |
-| Twelve Data + Yahoo | أسعار الأسهم |
-| Web Push API | الإشعارات |
-| react-swipeable | Swipe to Delete |
+<div align="center">
+
+| التقنية | الاستخدام | الإصدار |
+|:-------:|:---------:|:-------:|
+| ![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs&logoColor=white) | Framework + SSR | 15.x |
+| ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) | Type Safety | 5.x |
+| ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white) | Database + Auth + RLS | Latest |
+| ![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel&logoColor=white) | Hosting + CRON Jobs | Latest |
+| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwind-css&logoColor=white) | Styling | 3.x |
+| ![CoinGecko](https://img.shields.io/badge/CoinGecko-8DC63F?logoColor=white) | أسعار العملات الرقمية | Free API |
+| ![WebPush](https://img.shields.io/badge/Web_Push-5A0FC8?logo=pwa&logoColor=white) | Push Notifications | VAPID |
+
+</div>
 
 ---
 
-## 🗄️ Database Tables
+## 🗄️ Database Schema
 
-| الجدول | الوظيفة |
-|--------|---------|
-| profiles | بيانات المستخدم، الراتب، العملة |
-| transactions | المعاملات المالية |
-| debts | الديون |
-| debt_payments | سجل دفعات الديون |
-| investments | الاستثمارات |
-| investment_transactions | معاملات الاستثمار |
-| budgets | ميزانيات الفئات الشهرية |
-| alerts | التنبيهات الذكية |
-| savings_goals | أهداف الادخار |
-| push_subscriptions | اشتراكات الإشعارات |
+```
+┌─────────────────────────────────────────────────────┐
+│                    Supabase Tables                   │
+├──────────────────────┬──────────────────────────────┤
+│ profiles             │ بيانات المستخدم + الراتب      │
+│ transactions         │ المعاملات المالية              │
+│ debts                │ الديون + الخصم التلقائي        │
+│ debt_payments        │ سجل دفعات الديون               │
+│ investments          │ المحفظة الاستثمارية            │
+│ investment_transactions │ معاملات الاستثمار           │
+│ budgets              │ ميزانيات الفئات الشهرية        │
+│ savings_goals        │ أهداف الادخار                  │
+│ alerts               │ التنبيهات الذكية               │
+│ push_subscriptions   │ اشتراكات الإشعارات             │
+└──────────────────────┴──────────────────────────────┘
+```
 
----
-
-## ⚙️ CRON Jobs
-
-| المسار | الجدول | الوظيفة |
-|--------|--------|---------|
-| /api/alerts | 0 7 * * * | تنبيهات ذكية يومية |
-| /api/auto-salary | 0 8 * * * | إضافة الراتب تلقائياً |
-| /api/auto-debt | 0 9 * * * | خصم أقساط الديون تلقائياً |
+> 🔒 جميع الجداول محمية بـ **Row Level Security (RLS)** — لا يمكن لأي مستخدم الوصول لبيانات غيره.
 
 ---
 
-## 🚀 Local Setup
+## ⚙️ CRON Jobs — الأتمتة اليومية
+
+```
+┌─────────────────────────────────────────────────────┐
+│  ⏰ 7:00 AM  │  /api/alerts      │  تنبيهات ذكية   │
+│  ⏰ 8:00 AM  │  /api/auto-salary │  إضافة الراتب   │
+│  ⏰ 9:00 AM  │  /api/auto-debt   │  خصم الأقساط    │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Quick Start
 
 ```bash
+# 1. Clone
 git clone https://github.com/Abdoocoder/financetracker.git
 cd financetracker
+
+# 2. Install
 npm install
+
+# 3. Environment
+cp .env.example .env.local
+# عدّل متغيرات البيئة
+
+# 4. Run
 npm run dev
-Environment Variables
+```
+
+### Environment Variables
+
+```env
+# Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+
+# Security
 CRON_SECRET=
-NEXT_PUBLIC_EXCHANGE_RATE_KEY=
+
+# APIs
 TWELVE_DATA_KEY=
+NEXT_PUBLIC_EXCHANGE_RATE_KEY=
+
+# Push Notifications (VAPID)
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=
 VAPID_PRIVATE_KEY=
 VAPID_EMAIL=
+
+# App
 NEXT_PUBLIC_APP_URL=
-🗺️ Roadmap
-[x] Landing Page + Privacy + 404
-[x] Onboarding (3 خطوات)
-[x] المعاملات + بحث + فلتر + Pagination
-[x] الديون + خصم تلقائي
-[x] الاستثمارات + أسعار حية
-[x] الأهداف والادخار
-[x] التنبيهات الذكية
-[x] الميزانية الشهرية (تلقائية + يدوية)
-[x] ترجمة كاملة عربي/English
-[x] Dark/Light Mode
-[x] PWA + Push Notifications
-[x] Cron Jobs (راتب + ديون + تنبيهات)
-[x] صفحة 404 مخصصة
-[ ] تقارير PDF شهرية
-[ ] نظام اشتراكات (Paddle/Stripe)
-[ ] OCR للفواتير
-👨‍💻 المطور
-Abdoocoder — GitHub
-بُني بـ ❤️ باستخدام Next.js و Supabase
+```
+
+---
+
+## 🗺️ Roadmap
+
+```
+✅ المرحلة الأولى — MVP
+   ├── [x] Auth + Onboarding
+   ├── [x] المعاملات الكاملة
+   ├── [x] الديون + الخصم التلقائي
+   ├── [x] الاستثمارات + أسعار حية
+   ├── [x] الأهداف والادخار
+   └── [x] Landing Page + PWA
+
+✅ المرحلة الثانية — Smart Features
+   ├── [x] التنبيهات الذكية + Push
+   ├── [x] الميزانية الذكية
+   ├── [x] الراتب التلقائي
+   ├── [x] بحث في المعاملات
+   ├── [x] Dark/Light Mode
+   └── [x] i18n عربي/English
+
+⏳ المرحلة الثالثة — Pro Features
+   ├── [ ] تقارير PDF شهرية
+   ├── [ ] نظام اشتراكات
+   └── [ ] OCR للفواتير
+```
+
+---
+
+## 📱 PWA Support
+
+التطبيق يعمل كـ **Progressive Web App** كامل:
+
+- 📲 قابل للتثبيت على Android و iOS
+- 🔔 إشعارات Push حتى مع إغلاق التطبيق
+- ⚡ أداء سريع مع Service Worker
+
+---
+
+<div align="center">
+
+## 👨‍💻 المطور / Developer
+
+**عبدالله رافع — Abdoocoder**
+
+[![GitHub](https://img.shields.io/badge/GitHub-Abdoocoder-181717?style=for-the-badge&logo=github)](https://github.com/Abdoocoder)
+
+---
+
+*بُني بـ ❤️ باستخدام Next.js و Supabase*
+*Built with ❤️ using Next.js & Supabase*
+
+**© 2026 FinanceTracker — إدارة مالية ذكية للعالم العربي**
+
+</div>
