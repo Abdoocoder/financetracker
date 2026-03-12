@@ -1,4 +1,5 @@
 'use client'
+import { useI18n } from '@/lib/i18n'
 import { usePush } from '@/lib/use-push'
 import { toast } from '@/components/ui/toast'
 
@@ -14,12 +15,12 @@ export function PushToggle() {
   async function handleToggle() {
     if (subscribed) {
       await unsubscribe()
-      toast.success('تم إيقاف الإشعارات')
+      toast.success('Notifications disabled')
     } else {
       const result = await subscribe()
-      if (result?.ok) toast.success('✅ تم تفعيل الإشعارات!')
-      else if (result?.reason === 'permission_denied') toast.error('❌ يجب السماح بالإشعارات من إعدادات المتصفح')
-      else toast.error('حدث خطأ — حاول مرة أخرى')
+      if (result?.ok) toast.success('✅ Notifications enabled!')
+      else if (result?.reason === 'permission_denied') toast.error('❌ Allow notifications in browser settings')
+      else toast.error('Error — please try again')
     }
   }
 

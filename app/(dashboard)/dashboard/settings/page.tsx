@@ -101,7 +101,7 @@ export default function SettingsPage() {
         </div>
 
         <FormField label="الاسم الكامل">
-          <Input placeholder="الاسم الكامل" value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
+          <Input placeholder={lang === "en" ? "Full Name" : "الاسم الكامل"} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
         </FormField>
         <FormField label="الراتب الشهري (JOD)">
           <Input type="number" placeholder="0" value={form.monthly_income} onChange={e => setForm(f => ({ ...f, monthly_income: e.target.value }))} />
@@ -169,7 +169,7 @@ export default function SettingsPage() {
             <input
               value={deleteInput}
               onChange={e => setDeleteInput(e.target.value)}
-              placeholder='حذف حسابي'
+              placeholder={lang === 'en' ? 'delete my account' : 'حذف حسابي'}
               style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit', outline: 'none' }}
             />
             <div style={{ display: 'flex', gap: 8 }}>
