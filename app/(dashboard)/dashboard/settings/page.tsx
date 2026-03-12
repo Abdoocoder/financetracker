@@ -111,10 +111,10 @@ export default function SettingsPage() {
         </FormField>
         <FormField label="العملة">
           <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
-            <option value="JOD">دينار أردني (JOD)</option>
-            <option value="USD">دولار (USD)</option>
-            <option value="EUR">يورو (EUR)</option>
-            <option value="SAR">ريال سعودي (SAR)</option>
+            <option value="JOD">{lang === 'en' ? 'Jordanian Dinar (JOD)' : 'دينار أردني (JOD)'}</option>
+            <option value="USD">{lang === 'en' ? 'US Dollar (USD)' : 'دولار (USD)'}</option>
+            <option value="EUR">{lang === 'en' ? 'Euro (EUR)' : 'يورو (EUR)'}</option>
+            <option value="SAR">{lang === 'en' ? 'Saudi Riyal (SAR)' : 'ريال سعودي (SAR)'}</option>
           </Select>
         </FormField>
         <FormField label="اللغة">
@@ -139,7 +139,7 @@ export default function SettingsPage() {
       </div>
 
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>الحساب</div>
+        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{lang === 'en' ? 'Account' : 'الحساب'}</div>
         <PushToggle />
         <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
         <button onClick={handleLogout} disabled={loggingOut} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1 }}>
@@ -158,7 +158,7 @@ export default function SettingsPage() {
       {/* حذف الحساب */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 20, padding: '20px' }}>
         <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-red-light)', marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{t('settings_danger')}</div>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14, lineHeight: 1.6 }}>حذف الحساب سيمسح جميع بياناتك نهائياً ولا يمكن استرجاعها.</p>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14, lineHeight: 1.6 }}>{lang === 'en' ? 'Deleting your account will permanently erase all your data and cannot be undone.' : 'حذف الحساب سيمسح جميع بياناتك نهائياً ولا يمكن استرجاعها.'}</p>
         {!showDeleteConfirm ? (
           <button onClick={() => setShowDeleteConfirm(true)} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             🗑️ حذف حسابي نهائياً

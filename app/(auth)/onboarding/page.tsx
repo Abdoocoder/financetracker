@@ -1,4 +1,5 @@
 'use client'
+import { useI18n } from '@/lib/i18n'
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
@@ -48,7 +49,7 @@ function StyledSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return <select {...props} style={{ width:'100%', padding:'12px 16px', borderRadius:12, border:'1px solid var(--border)', background:'var(--bg-secondary)', color:'var(--text-primary)', fontSize:15, outline:'none', fontFamily:'inherit', boxSizing:'border-box', cursor:'pointer', ...props.style }} />
 }
 
-function Step1({ profile, setProfile, onNext, loading }: { profile:Profile; setProfile:React.Dispatch<React.SetStateAction<Profile>>; onNext:()=>void; loading:boolean }) {
+function Step1({ profile, setProfile, onNext, loading, lang }: { profile:Profile; setProfile:React.Dispatch<React.SetStateAction<Profile>>; onNext:()=>void; loading:boolean; lang:string }) {
   if (loading) return (
     <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
       {[80,56,56,56].map((h,i) => <div key={i} className="skeleton" style={{ height:h, borderRadius:12 }} />)}
@@ -58,8 +59,8 @@ function Step1({ profile, setProfile, onNext, loading }: { profile:Profile; setP
     <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
       <div style={{ textAlign:'center', marginBottom:8 }}>
         <div style={{ width:64, height:64, borderRadius:20, background:'var(--accent-blue-dim)', border:'1px solid rgba(59,126,246,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, margin:'0 auto 16px' }}>👋</div>
-        <h2 style={{ fontSize:22, fontWeight:900, color:'var(--text-primary)', margin:0 }}>أهلاً وسهلاً!</h2>
-        <p style={{ fontSize:14, color:'var(--text-muted)', marginTop:6 }}>خلنا نكمّل إعداد حسابك</p>
+        <h2 style={{ fontSize:22, fontWeight:900, color:'var(--text-primary)', margin:0 }}>{lang === 'en' ? 'Welcome!' : 'أهلاً وسهلاً!'}</h2>
+        <p style={{ fontSize:14, color:'var(--text-muted)', marginTop:6 }}>{lang === 'en' ? `Let's finish setting up your account` : 'خلنا نكمّل إعداد حسابك'}</p>
       </div>
       <Field label="اسمك الكامل *">
         <StyledInput type="text" value={profile.fullName} onChange={e=>setProfile(p=>({...p,fullName:e.target.value}))} placeholder="اسمك الكامل" />
@@ -82,7 +83,7 @@ function Step1({ profile, setProfile, onNext, loading }: { profile:Profile; setP
   )
 }
 
-function Step2({ tx, setTx, onNext, onBack, saving }: { tx:FirstTransaction; setTx:React.Dispatch<React.SetStateAction<FirstTransaction>>; onNext:()=>void; onBack:()=>void; saving:boolean }) {
+function Step2({ tx, setTx, onNext, onBack, saving, lang }: { tx:FirstTransaction; setTx:React.Dispatch<React.SetStateAction<FirstTransaction>>; onNext:()=>void; onBack:()=>void; saving:boolean; lang:string }) {
   const categories = tx.type==='income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
@@ -117,7 +118,7 @@ function Step2({ tx, setTx, onNext, onBack, saving }: { tx:FirstTransaction; set
   )
 }
 
-function Step3({ onGo }: { onGo:()=>void }) {
+function Step3({ onGo, lang }: { onGo:()=>void; lang:string }) {
   const features = [{ icon:'📊', text:'تتبع دخلك ومصاريفك' },{ icon:'💳', text:'خطة سداد ديونك' },{ icon:'📈', text:'راقب استثماراتك' },{ icon:'🔔', text:'تنبيهات ذكية يومية' }]
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
@@ -144,6 +145,7 @@ function Step3({ onGo }: { onGo:()=>void }) {
 
 export default function OnboardingPage() {
   const router = useRouter()
+  const { t, lang } = useI18n()
   const supabase = createClient()
   const [step, setStep] = useState<Step>(1)
   const [saving, setSaving] = useState(false)
@@ -204,9 +206,9 @@ export default function OnboardingPage() {
         <div style={{ background:'var(--bg-card)', border:'1px solid var(--border)', borderRadius:24, padding:'28px 24px', boxShadow:'0 8px 40px rgba(0,0,0,0.25)' }}>
           <ProgressBar step={step} />
           <StepDots current={step} />
-          {step===1 && <Step1 profile={profile} setProfile={setProfile} onNext={handleStep1} loading={loadingProfile} />}
-          {step===2 && <Step2 tx={tx} setTx={setTx} onNext={handleStep2} onBack={()=>setStep(1)} saving={saving} />}
-          {step===3 && <Step3 onGo={handleDone} />}
+          {step===1 && <Step1 profile={profile} setProfile={setProfile} onNext={handleStep1} loading={loadingProfile} lang={lang} />}
+          {step===2 && <Step2 tx={tx} setTx={setTx} onNext={handleStep2} onBack={()=>setStep(1)} saving={saving} lang={lang} />}
+          {step===3 && <Step3 onGo={handleDone} lang={lang} />}
         </div>
       </div>
       <style>{`
