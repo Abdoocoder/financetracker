@@ -10,17 +10,17 @@ import {
 } from 'lucide-react'
 
 const MAIN_NAV = [
-  { href: '/dashboard',              Icon: LayoutDashboard, label: 'الرئيسية'   },
-  { href: '/dashboard/transactions', Icon: ArrowUpDown,     label: 'المعاملات' },
-  { href: '/dashboard/debts',        Icon: CreditCard,      label: 'الديون'    },
-  { href: '/dashboard/budgets',      Icon: PieChart,        label: 'الميزانية' },
+  { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
+  { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
+  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
+  { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
 ]
 
 const MORE_NAV = [
-  { href: '/dashboard/goals',    Icon: Target,     label: 'الأهداف'   },
-  { href: '/dashboard/investments', Icon: TrendingUp, label: 'الاستثمار' },
-  { href: '/dashboard/alerts',   Icon: Bell,       label: 'التنبيهات' },
-  { href: '/dashboard/settings', Icon: Settings, label: 'الإعدادات' },
+  { href: '/dashboard/goals',       Icon: Target,   ar: 'الأهداف',    en: 'Goals'       },
+  { href: '/dashboard/investments', Icon: TrendingUp, ar: 'الاستثمار', en: 'Investments' },
+  { href: '/dashboard/alerts',      Icon: Bell,     ar: 'التنبيهات',  en: 'Alerts'      },
+  { href: '/dashboard/settings',    Icon: Settings, ar: 'الإعدادات',  en: 'Settings'    },
 ]
 
 const ALL_NAV = [...MAIN_NAV, ...MORE_NAV]
@@ -52,14 +52,14 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         </div>
 
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {ALL_NAV.map(({ href, Icon, label }) => {
+          {ALL_NAV.map(({ href, Icon, ar, en }) => {
             const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
                   {isActive && <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: '0 2px 2px 0', background: 'var(--accent-blue)', boxShadow: '0 0 8px var(--accent-blue)' }} />}
                   <Icon size={18} opacity={isActive ? 1 : 0.5} />
-                  <span style={{ flex: 1 }}>{label}</span>
+                  <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
                   {href === '/dashboard/alerts' && alertsCount > 0 && (
                     <span style={{ minWidth: 18, height: 18, borderRadius: 9, background: 'var(--accent-red)', color: 'white', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{alertsCount}</span>
                   )}
@@ -79,7 +79,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
       {/* ── Mobile Bottom Nav ── */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100, background: 'rgba(7,11,20,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', padding: '8px 4px 18px' }} className="mobile-nav">
 
-        {MAIN_NAV.map(({ href, Icon, label }) => {
+        {MAIN_NAV.map(({ href, Icon, ar, en }) => {
           const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
           return (
             <Link key={href} href={href} style={{ flex: 1, textDecoration: 'none' }}>
@@ -89,7 +89,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                   <Icon size={22} color={isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)'} strokeWidth={isActive ? 2.5 : 1.8} />
                 </div>
                 <span style={{ fontSize: 10, fontWeight: isActive ? 800 : 500, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)', position: 'relative', zIndex: 1 }}>
-                  {label}
+                  {lang === 'en' ? en : ar}
                 </span>
               </div>
             </Link>
@@ -122,7 +122,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
           <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 201, background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', borderRadius: '24px 24px 0 0', padding: '12px 20px 44px' }} className="mobile-nav">
             <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border)', margin: '0 auto 20px' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-              {MORE_NAV.map(({ href, Icon, label }) => {
+              {MORE_NAV.map(({ href, Icon, ar, en }) => {
                 const isActive = pathname.startsWith(href)
                 return (
                   <Link key={href} href={href} onClick={() => setShowMore(false)} style={{ textDecoration: 'none' }}>
@@ -135,7 +135,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                           </span>
                         )}
                       </div>
-                      <span style={{ fontSize: 15, fontWeight: isActive ? 800 : 600, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-primary)', flex: 1 }}>{label}</span>
+                      <span style={{ fontSize: 15, fontWeight: isActive ? 800 : 600, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-primary)', flex: 1 }}>{lang === 'en' ? en : ar}</span>
                       <ChevronLeft size={18} color="var(--text-muted)" />
                     </div>
                   </Link>
