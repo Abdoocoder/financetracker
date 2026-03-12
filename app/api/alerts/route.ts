@@ -33,6 +33,8 @@ async function generateAlerts(userId?: string) {
     const uid = profile.id
     const income = profile.monthly_income ?? 0
     const name = profile.full_name?.split(' ')[0] ?? 'أخي'
+    const n = profile.full_name?.split(' ')[0] ?? 'Friend'
+    const ar = true
     const firstOfMonth = `${now.getFullYear()}-${String(month).padStart(2,'0')}-01`
     const [txRes, debtRes, invRes, goalRes] = await Promise.all([
       supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', uid).gte('transaction_date', firstOfMonth),
