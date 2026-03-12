@@ -46,7 +46,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'white', fontSize: 16, boxShadow: '0 4px 16px var(--accent-blue-glow)' }}>₣</div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>FinanceTracker</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>إدارة مالية ذكية</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Smart Finance Manager' : 'إدارة مالية ذكية'}</div>
             </div>
           </div>
         </div>

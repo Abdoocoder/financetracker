@@ -220,7 +220,7 @@ export default function InvestmentsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{inv.symbol}</span>
-                      {inv.is_halal && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)', fontWeight: 700 }}>حلال</span>}
+                      {inv.is_halal && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)', fontWeight: 700 }}>{lang === 'en' ? 'Halal' : 'حلال'}</span>}
                       {isLive && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-blue-dim)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>LIVE</span>}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.name}</div>
@@ -274,11 +274,11 @@ export default function InvestmentsPage() {
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={() => recordBuy(inv.id)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--accent-green)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>{saving ? '⏳' : (lang === 'en' ? 'Record Buy' : 'تسجيل الشراء')}</button>
-                      <button onClick={() => setShowBuyForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
+                      <button onClick={() => setShowBuyForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => setShowBuyForm(inv.id)} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>+ تسجيل شراء</button>
+                  <button onClick={() => setShowBuyForm(inv.id)} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? '+ Record Buy' : '+ تسجيل شراء'}</button>
                 )}
               </div>
             )
@@ -295,14 +295,14 @@ export default function InvestmentsPage() {
           <FormField label="النوع">
             <Select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
               <option value="etf">ETF</option>
-              <option value="stock">سهم</option>
-              <option value="crypto">عملة رقمية</option>
-              <option value="other">أخرى</option>
+              <option value="stock">{lang === 'en' ? 'Stock' : 'سهم'}</option>
+              <option value="crypto">{lang === 'en' ? 'Crypto' : 'عملة رقمية'}</option>
+              <option value="other">{lang === 'en' ? 'Other' : 'أخرى'}</option>
             </Select>
           </FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
             <input type="checkbox" checked={form.is_halal} onChange={e => setForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ استثمار حلال</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{lang === 'en' ? '✅ Halal Investment' : '✅ استثمار حلال'}</span>
           </div>
           <SaveButton label="إضافة الأصل" loading={saving} onClick={addInvestment} />
         </Modal>
@@ -345,7 +345,7 @@ export default function InvestmentsPage() {
       {showTxHistory && (
         <Modal title={t('inv_tx_history')} onClose={() => { setShowTxHistory(null); setTxHistory([]) }}>
           {txLoading ? (
-            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>⏳ جاري التحميل...</div>
+            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>{lang === 'en' ? '⏳ Loading...' : '⏳ جاري التحميل...'}</div>
           ) : txHistory.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>لا توجد معاملات بعد</div>
           ) : (
@@ -382,7 +382,7 @@ export default function InvestmentsPage() {
             <FormField label="السعر الحالي $"><Input type="number" value={editForm.current_price} onChange={e => setEditForm(f => ({ ...f, current_price: e.target.value }))} /></FormField>
             <FormField label="النوع">
               <Select value={editForm.type} onChange={e => setEditForm(f => ({ ...f, type: e.target.value }))}>
-                <option value="etf">ETF</option><option value="stock">سهم</option><option value="crypto">عملة رقمية</option>
+                <option value="etf">ETF</option><option value="stock">{lang === 'en' ? 'Stock' : 'سهم'}</option><option value="crypto">{lang === 'en' ? 'Crypto' : 'عملة رقمية'}</option>
               </Select>
             </FormField>
           </div>

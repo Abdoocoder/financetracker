@@ -78,8 +78,8 @@ export default function TransactionsPage() {
 
   async function saveTransaction() {
     const errs: Record<string,string> = {}
-    if (!form.amount) errs.amount = 'المبلغ مطلوب'
-    if (!form.category) errs.category = 'الفئة مطلوبة'
+    if (!form.amount) errs.amount = lang === 'en' ? 'Amount required' : 'المبلغ مطلوب'
+    if (!form.category) errs.category = lang === 'en' ? 'Category required' : 'الفئة مطلوبة'
     if (Object.keys(errs).length) { setErrors(errs); return }
     setErrors({})
     setSaving(true)
@@ -123,10 +123,10 @@ export default function TransactionsPage() {
 
   function exportCSV() {
     const rows = [
-      ['التاريخ', 'النوع', 'الفئة', 'الوصف', 'المبلغ'],
+      lang === 'en' ? ['Date','Type','Category','Description','Amount'] : ['التاريخ','النوع','الفئة','الوصف','المبلغ'],
       ...transactions.map(tx => [
         tx.transaction_date,
-        tx.type === 'income' ? 'دخل' : 'مصروف',
+        tx.type === 'income' ? (lang === 'en' ? 'Income' : 'دخل') : (lang === 'en' ? 'Expense' : 'مصروف'),
         tx.category,
         tx.description ?? '',
         tx.amount,

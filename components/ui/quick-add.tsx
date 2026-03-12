@@ -95,7 +95,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{t('quick_add_title')}</span>
         {showSuccess && (
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-green-light)', animation: 'fadeIn 0.2s ease' }}>✅ تم الحفظ!</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-green-light)', animation: 'fadeIn 0.2s ease' }}>{lang === 'en' ? '✅ Saved!' : '✅ تم الحفظ!'}</span>
         )}
       </div>
 
