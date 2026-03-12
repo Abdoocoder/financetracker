@@ -30,7 +30,7 @@ export default function GoalsPage() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
@@ -119,11 +119,11 @@ export default function GoalsPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-green-light)' }}>{totalSaved.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{`المدخر`} JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{lang === "en" ? "Saved" : "المدخر"} JOD</div>
           </div>
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>{totalTarget.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{`الهدف`} JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{lang === "en" ? "Goal" : "الهدف"} JOD</div>
           </div>
         </div>
       )}
@@ -147,10 +147,10 @@ export default function GoalsPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: `اسم الهدف`,    key: 'name',           type: 'text',   col: 'col-span-2' },
+              { label: lang === 'en' ? 'Goal Name' : 'اسم الهدف',    key: 'name',           type: 'text',   col: 'col-span-2' },
               { label: `المبلغ المستهدف`,  key: 'target_amount',  type: 'number', col: '' },
-              { label: `المدخر حالياً`, key: 'current_amount', type: 'number', col: '' },
-              { label: `تاريخ الهدف`,    key: 'target_date',    type: 'date',   col: 'col-span-2' },
+              { label: lang === 'en' ? 'Saved Amount' : 'المدخر حالياً', key: 'current_amount', type: 'number', col: '' },
+              { label: lang === 'en' ? 'Target Date' : 'تاريخ الهدف',    key: 'target_date',    type: 'date',   col: 'col-span-2' },
             ].map(f => (
               <div key={f.key} className={f.col}>
                 <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
@@ -164,7 +164,7 @@ export default function GoalsPage() {
             <button onClick={saveGoal} disabled={saving}
               className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
               style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
-              {saving ? '...' : editingId ? `حفظ التعديل` : `إضافة الهدف`}
+              {saving ? '...' : editingId ? (lang === 'en' ? 'Save' : 'حفظ التعديل') : (lang === 'en' ? 'Add Goal' : 'إضافة الهدف')}
             </button>
             <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
               style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>
@@ -201,7 +201,7 @@ export default function GoalsPage() {
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span> / {goal.target_amount.toFixed(0)} JOD
                 </div>
-                {remaining > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{`المتبقي`}: <span className="font-mono">{remaining.toFixed(0)} JOD</span></div>}
+                {remaining > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: <span className="font-mono">{remaining.toFixed(0)} JOD</span></div>}
               </div>
               {savingGoalId === goal.id ? (
                 <div className="flex gap-2 mt-2">
@@ -215,7 +215,7 @@ export default function GoalsPage() {
               ) : (
                 remaining > 0 && (
                   <button onClick={() => setSavingGoalId(goal.id)} className="w-full py-2 rounded-xl text-sm font-bold badge-green mt-1">
-                    {`إضافة ادخار`}
+                    {lang === 'en' ? 'Add Saving' : 'إضافة ادخار'}
                   </button>
                 )
               )}
