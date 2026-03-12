@@ -60,8 +60,8 @@ function MiniBarChart({ data }: { data: { month: string; income: number; expense
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{lang === 'en' ? 'Income & Expenses' : 'الإيرادات والمصروفات'}</span>
         <div style={{ display: 'flex', gap: 10 }}>
-          <span style={{ fontSize: 10, color: 'var(--accent-green-light)', fontWeight: 700 }}>■ دخل</span>
-          <span style={{ fontSize: 10, color: 'var(--accent-red-light)', fontWeight: 700 }}>■ مصروف</span>
+          <span style={{ fontSize: 10, color: 'var(--accent-green-light)', fontWeight: 700 }}>{`■ ${lang === 'en' ? 'Income' : 'دخل'}`}</span>
+          <span style={{ fontSize: 10, color: 'var(--accent-red-light)', fontWeight: 700 }}>{`■ ${lang === 'en' ? 'Expense' : 'مصروف'}`}</span>
         </div>
       </div>
       <svg width="100%" viewBox={"0 0 " + W + " " + (H+20)} style={{ overflow: 'visible' }}>
