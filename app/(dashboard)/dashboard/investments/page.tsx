@@ -386,7 +386,7 @@ export default function InvestmentsPage() {
               </Select>
             </FormField>
           </div>
-          <FormField label="ملاحظات"><Input placeholder="اختياري" value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
+          <FormField label="ملاحظات"><Input placeholder={lang === "en" ? "Optional" : "اختياري"} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
             <input type="checkbox" checked={editForm.is_halal} onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
             <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ حلال</span>
