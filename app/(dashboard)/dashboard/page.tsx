@@ -193,7 +193,19 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <QuickAdd onAdded={() => { fetched.current = false; setLoading(true); }} />
+      <QuickAdd onAdded={async () => {
+        // تحديث خفيف بدون skeleton
+        const user = currentUser
+        if (!user) return
+        const now = new Date()
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+        const { data: txs } = await supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', start).lte('transaction_date', end)
+        if (!txs) return
+        const income = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+        const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+        setData((prev: any) => prev ? { ...prev, income, expenses, net: income - expenses } : prev)
+      }} />
 
       {/* مقارنة مع الشهر الماضي */}
       {(data?.prevIncome > 0 || data?.prevExpenses > 0) && (() => {
