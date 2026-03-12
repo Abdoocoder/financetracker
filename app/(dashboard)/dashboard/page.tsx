@@ -93,7 +93,7 @@ function CategoryBars({ categories, lang }: { categories: [string, number][], la
         {categories.map(([cat, amt], i) => (
           <div key={cat}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{cat}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{lang === 'en' ? (CAT_TRANS[cat] ?? cat) : cat}</span>
               <span style={{ fontSize: 12, fontWeight: 900, color: COLORS[i], fontFamily: 'monospace' }}>{Number(amt).toFixed(0)} JOD</span>
             </div>
             <div style={{ height: 6, borderRadius: 3, background: 'var(--bg-elevated)', overflow: 'hidden' }}>
