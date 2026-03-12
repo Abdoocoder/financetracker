@@ -16,6 +16,9 @@ export default function InvestmentsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showBuyForm, setShowBuyForm] = useState<string | null>(null)
+  const [showTxHistory, setShowTxHistory] = useState<string | null>(null)
+  const [txHistory, setTxHistory] = useState<InvestmentTransaction[]>([])
+  const [txLoading, setTxLoading] = useState(false)
   const [editingInv, setEditingInv] = useState<Investment | null>(null)
   const [form, setForm] = useState({ symbol: '', name: '', type: 'etf', currency: 'USD', is_halal: true })
   const [editForm, setEditForm] = useState({ symbol: '', name: '', type: 'etf', shares: '', avg_buy_price: '', current_price: '', is_halal: true, notes: '' })
@@ -64,6 +67,14 @@ export default function InvestmentsPage() {
     setInvestments(prev => prev.filter(i => i.id !== id))
   }
 
+  async function loadTxHistory(invId: string) {
+    setTxLoading(true)
+    setShowTxHistory(invId)
+    const { data } = await supabase.from('investment_transactions').select('*').eq('investment_id', invId).order('transaction_date', { ascending: false })
+    setTxHistory(data ?? [])
+    setTxLoading(false)
+  }
+
   async function refreshPrices() {
     setRefreshing(true); setRefreshMsg('')
     const newStatus: Record<string, 'live' | 'manual'> = {}
@@ -71,18 +82,10 @@ export default function InvestmentsPage() {
     try {
       for (const inv of investments) {
         try {
-          if (inv.symbol === 'BTC') {
-            const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd')
-            const data = await res.json()
-            const price = data?.bitcoin?.usd
-            if (price) { await supabase.from('investments').update({ current_price: price }).eq('id', inv.id); newStatus[inv.id] = 'live'; updated++ }
-            else { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
-          } else {
-            const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
-            const data = await res.json()
-            if (data.price) { await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id); newStatus[inv.id] = 'live'; updated++ }
-            else { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
-          }
+          const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
+          const data = await res.json()
+          if (data.price) { await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id); newStatus[inv.id] = 'live'; updated++ }
+          else { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
         } catch { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
       }
       await fetchExchangeRate(); await load(); setPriceStatus(newStatus)
@@ -224,6 +227,13 @@ export default function InvestmentsPage() {
                   ))}
                 </div>
 
+                <button
+                  onClick={() => loadTxHistory(inv.id)}
+                  style={{ width: '100%', padding: '9px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8 }}
+                >
+                  📋 سجل المعاملات
+                </button>
+
                 {showBuyForm === inv.id ? (
                   <div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
@@ -273,6 +283,70 @@ export default function InvestmentsPage() {
             <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ استثمار حلال</span>
           </div>
           <SaveButton label="إضافة الأصل" loading={saving} onClick={addInvestment} />
+        </Modal>
+      )}
+
+      {/* رسم بياني */}
+      {investments.length > 0 && (() => {
+        const total = investments.reduce((a,i) => a + i.shares * i.current_price, 0)
+        const colors = ['#3B7EF6','#10B981','#F59E0B','#8B5CF6','#EF4444','#EC4899']
+        return total > 0 ? (
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 14 }}>📊 توزيع المحفظة</div>
+            <div style={{ display: 'flex', height: 10, borderRadius: 8, overflow: 'hidden', gap: 2, marginBottom: 14 }}>
+              {investments.map((inv, i) => {
+                const pct = total > 0 ? (inv.shares * inv.current_price / total) * 100 : 0
+                return pct > 0 ? <div key={inv.id} style={{ height: '100%', width: `${pct}%`, background: colors[i % colors.length], borderRadius: 4 }} /> : null
+              })}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {investments.map((inv, i) => {
+                const val = inv.shares * inv.current_price
+                const pct = total > 0 ? (val / total * 100).toFixed(1) : '0'
+                const pnl = val - (inv.shares * inv.avg_buy_price)
+                return (
+                  <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: 3, background: colors[i % colors.length], flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', flex: 1 }}>{inv.symbol}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{pct}%</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: pnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{pnl >= 0 ? '+' : ''}${pnl.toFixed(0)}</span>
+                    <span style={{ fontSize: 12, fontWeight: 900, fontFamily: 'monospace', color: 'var(--text-secondary)', minWidth: 55, textAlign: 'left' }}>${val.toFixed(0)}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ) : null
+      })()}
+
+      {/* Modal تاريخ المعاملات */}
+      {showTxHistory && (
+        <Modal title="سجل المعاملات" onClose={() => { setShowTxHistory(null); setTxHistory([]) }}>
+          {txLoading ? (
+            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>⏳ جاري التحميل...</div>
+          ) : txHistory.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>لا توجد معاملات بعد</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {txHistory.map(tx => (
+                <div key={tx.id} style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: tx.type === 'buy' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                    {tx.type === 'buy' ? '📈' : '📉'}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? 'شراء' : 'بيع'} {Number(tx.shares).toFixed(4)} وحدة</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{tx.transaction_date} · سعر ${Number(tx.price).toFixed(2)}</div>
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: tx.type === 'buy' ? 'var(--accent-red-light)' : 'var(--accent-green-light)' }}>
+                      {tx.type === 'buy' ? '-' : '+'}${(Number(tx.shares) * Number(tx.price)).toFixed(0)}
+                    </div>
+                    {Number(tx.commission) > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>عمولة ${Number(tx.commission).toFixed(2)}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Modal>
       )}
 
