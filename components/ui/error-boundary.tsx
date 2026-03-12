@@ -1,44 +1,31 @@
 'use client'
 import { Component, ReactNode } from 'react'
 
-interface Props { children: ReactNode; fallback?: ReactNode }
-interface State { hasError: boolean; error?: Error }
+interface Props { children: ReactNode }
+interface State { hasError: boolean; message: string }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    this.state = { hasError: false }
+    this.state = { hasError: false, message: '' }
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, message: error.message }
   }
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback ?? (
-        <div style={{
-          padding: '32px 20px', textAlign: 'center',
-          background: 'var(--bg-card)', border: '1px solid rgba(239,68,68,0.2)',
-          borderRadius: 20, margin: '20px 0',
-        }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>⚠️</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 6 }}>
-            حدث خطأ غير متوقع
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>
-            {this.state.error?.message}
-          </div>
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, padding: 24, textAlign: 'center' }}>
+          <div style={{ fontSize: 48 }}>⚠️</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>حدث خطأ غير متوقع</div>
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 300 }}>{this.state.message}</div>
           <button
-            onClick={() => this.setState({ hasError: false })}
-            style={{
-              padding: '10px 24px', borderRadius: 12,
-              background: 'var(--accent-blue)', color: 'white',
-              border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-              fontSize: 13, fontWeight: 700,
-            }}
+            onClick={() => { this.setState({ hasError: false, message: '' }); window.location.reload() }}
+            style={{ padding: '12px 28px', borderRadius: 12, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
           >
-            إعادة المحاولة
+            🔄 إعادة المحاولة
           </button>
         </div>
       )
