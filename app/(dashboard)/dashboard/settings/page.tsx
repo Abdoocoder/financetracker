@@ -6,6 +6,7 @@ import { useUser } from '@/lib/user-context'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { useTheme } from '@/lib/theme-context'
 import { PageHeader } from '@/components/ui/page-header'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { PushToggle } from '@/components/ui/push-toggle'
@@ -23,6 +24,7 @@ export default function SettingsPage() {
   const supabase = createClient()
   const router = useRouter()
   const { t, lang, setLang } = useI18n()
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     async function load() {
@@ -50,7 +52,7 @@ export default function SettingsPage() {
     const user = currentUser
     if (!user) return
     const { data } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('transaction_date', { ascending: false })
-    if (!data?.length) { toast.error('لا توجد معاملات للتصدير'); setExportLoading(false); return }
+    if (!data?.length) { toast.error(t('settings_no_export')); setExportLoading(false); return }
     const headers = ['التاريخ', 'النوع', 'المبلغ', 'الفئة', 'الوصف']
     const rows = data.map(t => [t.transaction_date, t.type === 'income' ? 'دخل' : 'مصروف', t.amount, t.category ?? '', t.description ?? ''])
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
@@ -59,7 +61,7 @@ export default function SettingsPage() {
     const a = document.createElement('a')
     a.href = url; a.download = `financetracker-${new Date().toISOString().split('T')[0]}.csv`
     a.click(); URL.revokeObjectURL(url)
-    toast.success('تم تصدير البيانات بنجاح ✅')
+    toast.success(t('settings_export_ok'))
     setExportLoading(false)
   }
 
@@ -124,6 +126,15 @@ export default function SettingsPage() {
             ))}
           </div>
         </FormField>
+        <FormField label={t('settings_theme')}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            {(['dark', 'light'] as const).map(themeOpt => (
+              <button key={themeOpt} onClick={() => themeOpt !== theme && toggleTheme()} style={{ padding: '11px', borderRadius: 10, background: theme === themeOpt ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${theme === themeOpt ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: theme === themeOpt ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+                {themeOpt === 'dark' ? t('settings_dark') : t('settings_light')}
+              </button>
+            ))}
+          </div>
+        </FormField>
         <SaveButton label="حفظ التغييرات" loading={saving} onClick={handleSave} />
       </div>
 
@@ -138,15 +149,15 @@ export default function SettingsPage() {
 
       {/* تصدير البيانات */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>البيانات</div>
+        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{t('settings_data')}</div>
         <button onClick={handleExportCSV} disabled={exportLoading} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          {exportLoading ? '⏳ جاري التصدير...' : '📥 تصدير المعاملات CSV'}
+          {exportLoading ? t('settings_exporting') : t('settings_export')}
         </button>
       </div>
 
       {/* حذف الحساب */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 20, padding: '20px' }}>
-        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-red-light)', marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>⚠️ منطقة الخطر</div>
+        <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-red-light)', marginBottom: 8, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{t('settings_danger')}</div>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14, lineHeight: 1.6 }}>حذف الحساب سيمسح جميع بياناتك نهائياً ولا يمكن استرجاعها.</p>
         {!showDeleteConfirm ? (
           <button onClick={() => setShowDeleteConfirm(true)} style={{ width: '100%', padding: '13px', borderRadius: 12, background: 'transparent', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>

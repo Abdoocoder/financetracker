@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { useI18n } from '@/lib/i18n'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 
@@ -42,6 +43,7 @@ export default function InvestmentsPage() {
   const [usdToJod, setUsdToJod] = useState<number | null>(null)
   const [showJod, setShowJod] = useState(false)
   const [priceStatus, setPriceStatus] = useState<Record<string, 'live' | 'manual'>>({})
+  const { t } = useI18n()
   const supabase = createClient()
 
   const load = useCallback(async () => {
@@ -251,7 +253,7 @@ export default function InvestmentsPage() {
                   onClick={() => loadTxHistory(inv.id)}
                   style={{ width: '100%', padding: '9px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8 }}
                 >
-                  📋 سجل المعاملات
+                  {t('inv_tx_history')}
                 </button>
 
                 {showBuyForm === inv.id ? (
@@ -312,7 +314,7 @@ export default function InvestmentsPage() {
         const colors = ['#3B7EF6','#10B981','#F59E0B','#8B5CF6','#EF4444','#EC4899']
         return total > 0 ? (
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 14 }}>📊 توزيع المحفظة</div>
+            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 14 }}>{t('inv_portfolio_chart')}</div>
             <div style={{ display: 'flex', height: 10, borderRadius: 8, overflow: 'hidden', gap: 2, marginBottom: 14 }}>
               {investments.map((inv, i) => {
                 const pct = total > 0 ? (inv.shares * inv.current_price / total) * 100 : 0
@@ -341,7 +343,7 @@ export default function InvestmentsPage() {
 
       {/* Modal تاريخ المعاملات */}
       {showTxHistory && (
-        <Modal title="سجل المعاملات" onClose={() => { setShowTxHistory(null); setTxHistory([]) }}>
+        <Modal title={t('inv_tx_history')} onClose={() => { setShowTxHistory(null); setTxHistory([]) }}>
           {txLoading ? (
             <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>⏳ جاري التحميل...</div>
           ) : txHistory.length === 0 ? (
