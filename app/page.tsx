@@ -35,21 +35,21 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: '100px 24px 80px', textAlign: 'center' }}>
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: 'clamp(60px, 10vw, 100px) 20px clamp(40px, 8vw, 80px)', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(59,126,246,0.08)', border: '1px solid rgba(59,126,246,0.2)', marginBottom: 28 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-blue)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>متاح لجميع دول العالم</span>
         </div>
-        <h1 style={{ fontSize: 'clamp(36px, 7vw, 64px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 20px', letterSpacing: '-0.03em' }}>
+        <h1 style={{ fontSize: 'clamp(28px, 6vw, 64px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 20px', letterSpacing: '-0.03em' }}>
           وين راح<br />
           <span style={{ background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>راتبك هذا الشهر؟</span>
         </h1>
-        <p style={{ fontSize: 18, color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 40px' }}>
+        <p style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 28px' }}>
           تتبع دخلك ومصاريفك وديونك واستثماراتك في مكان واحد — بدل ما تنقّل بين تطبيقات وأوراق.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <Link href="/register" style={{ padding: '16px 40px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 17, fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(59,126,246,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>أنشئ حسابك المجاني ←</Link>
-          <Link href="/login" style={{ padding: '16px 24px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none' }}>لدي حساب</Link>
+          <Link href="/register" style={{ padding: '13px 28px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 'clamp(14px, 4vw, 17px)', fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(59,126,246,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>أنشئ حسابك المجاني ←</Link>
+          <Link href="/login" style={{ padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 600, textDecoration: 'none' }}>لدي حساب</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
           {['✓ مجاني للأبد', '✓ بدون بطاقة ائتمانية', '✓ تسجيل في 30 ثانية'].map((t, i) => (
