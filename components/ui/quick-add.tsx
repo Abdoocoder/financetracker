@@ -102,7 +102,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
               fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
               transition: 'all 0.15s',
-              border: selected?.label === cat.label ? 'none' : '1px solid var(--border)',
+              outline: selected?.label === cat.label ? 'none' : '1px solid var(--border)',
             }}
           >
             <span style={{ fontSize: 18 }}>{cat.icon}</span>
