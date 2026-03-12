@@ -23,6 +23,17 @@ const PRIORITY_CONFIG = [
   { color: '#4A5568', label: 'مؤجلة'     },
 ]
 
+
+// مسح cache المستخدم بعد أي تعديل
+function clearUserCache(userId: string) {
+  try {
+    sessionStorage.removeItem(`dashboard_${userId}`)
+    sessionStorage.removeItem(`tx_${userId}`)
+    sessionStorage.removeItem(`debts_${userId}`)
+    sessionStorage.removeItem(`goals_${userId}`)
+    sessionStorage.removeItem(`inv_${userId}`)
+  } catch {}
+}
 export default function DebtsPage() {
   const [debts, setDebts] = useState<any[]>([])
   const { user: currentUser } = useUser()
