@@ -54,33 +54,33 @@ async function generateAlerts(userId?: string) {
     const effectiveIncome = monthIncome || income
     if (effectiveIncome > 0) {
       const ratio = monthExpenses / effectiveIncome
-      if (ratio > 0.9) await pushAlert(toInsert, uid, 'warning', '🚨 تجاوزت 90% من دخلك!', `مصاريفك ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% من دخلك.`)
-      else if (ratio > 0.75) await pushAlert(toInsert, uid, 'warning', '⚠️ مصاريفك تجاوزت 75% من دخلك', `أنفقت ${monthExpenses.toFixed(0)} JOD من أصل ${effectiveIncome.toFixed(0)} JOD.`)
-      else if (ratio < 0.5 && monthExpenses > 0) await pushAlert(toInsert, uid, 'achievement', '🏆 ادخرت أكثر من 50% من دخلك!', `رائع يا ${name}! مصاريفك فقط ${(ratio*100).toFixed(0)}% من دخلك. استثمر الفائض!`)
+      if (ratio > 0.9) await pushAlert(toInsert, uid, 'warning', ar ? '🚨 تجاوزت 90% من دخلك!' : '🚨 You exceeded 90% of income!', ar ? `مصاريفك ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% من دخلك.` : `Expenses ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% of income.`)
+      else if (ratio > 0.75) await pushAlert(toInsert, uid, 'warning', ar ? '⚠️ مصاريفك تجاوزت 75% من دخلك' : '⚠️ Expenses exceeded 75% of income', ar ? `أنفقت ${monthExpenses.toFixed(0)} JOD من أصل ${effectiveIncome.toFixed(0)} JOD.` : `Spent ${monthExpenses.toFixed(0)} JOD of ${effectiveIncome.toFixed(0)} JOD.`)
+      else if (ratio < 0.5 && monthExpenses > 0) await pushAlert(toInsert, uid, 'achievement', ar ? '🏆 ادخرت أكثر من 50% من دخلك!' : '🏆 Saved over 50% of income!', ar ? `رائع يا ${name}! مصاريفك فقط ${(ratio*100).toFixed(0)}% من دخلك. استثمر الفائض!` : `Great ${n}! Expenses only ${(ratio*100).toFixed(0)}% of income. Invest the rest!`)
     }
     if (debts.length > 0) {
-      if (dayOfMonth >= 23 && dayOfMonth <= 25) await pushAlert(toInsert, uid, 'reminder', '📅 تذكير: أقساط الشهر القادم', `إجمالي أقساطك ${totalMonthly.toFixed(0)} JOD.`, 48)
+      if (dayOfMonth >= 23 && dayOfMonth <= 25) await pushAlert(toInsert, uid, 'reminder', ar ? '📅 تذكير: أقساط الشهر القادم' : '📅 Reminder: Next month installments', ar ? `إجمالي أقساطك ${totalMonthly.toFixed(0)} JOD.` : `Total installments: ${totalMonthly.toFixed(0)} JOD.`, 48)
       const nearlyPaid = debts.find(d => { const pct = (Number(d.original_amount) - Number(d.remaining_amount)) / Number(d.original_amount); return pct >= 0.8 && pct < 1 })
-      if (nearlyPaid) await pushAlert(toInsert, uid, 'achievement', `🎯 اقتربت من سداد "${nearlyPaid.name}"!`, `تبقى فقط ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD!`, 168)
-      if (effectiveIncome > 0 && totalDebt > effectiveIncome * 6) await pushAlert(toInsert, uid, 'warning', '💳 ديونك تجاوزت 6 أضعاف دخلك', `إجمالي ديونك ${totalDebt.toFixed(0)} JOD.`, 168)
+      if (nearlyPaid) await pushAlert(toInsert, uid, 'achievement', ar ? `🎯 اقتربت من سداد "${nearlyPaid.name}"!` : `🎯 Almost paid off "${nearlyPaid.name}"!`, ar ? `تبقى فقط ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD!` : `Only ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD left!`, 168)
+      if (effectiveIncome > 0 && totalDebt > effectiveIncome * 6) await pushAlert(toInsert, uid, 'warning', ar ? '💳 ديونك تجاوزت 6 أضعاف دخلك' : '💳 Debts exceed 6x your income', ar ? `إجمالي ديونك ${totalDebt.toFixed(0)} JOD.` : `Total debts: ${totalDebt.toFixed(0)} JOD.`, 168)
     }
     if (invs.length > 0) {
-      if (invPnl > 0) await pushAlert(toInsert, uid, 'achievement', `📈 محفظتك في المنطقة الخضراء +${(invPnl/invCost*100).toFixed(1)}%`, `قيمة محفظتك $${invValue.toFixed(0)} مقابل تكلفة $${invCost.toFixed(0)}.`, 168)
-      else if (invPnl < -invCost * 0.1) await pushAlert(toInsert, uid, 'reminder', '📉 انخفاض مؤقت في محفظتك', 'لا تتسرع في البيع — الاستثمار طويل الأمد مصمم لتحمل التذبذبات.', 168)
-      if (dayOfMonth <= 3 && [1,4,7,10].includes(month)) await pushAlert(toInsert, uid, 'reminder', '🗓️ وقت الشراء الربعي لـ SPUS', 'أضف دفعتك الاستثمارية الربعية للاستفادة من متوسط التكلفة.', 168)
+      if (invPnl > 0) await pushAlert(toInsert, uid, 'achievement', ar ? `📈 محفظتك في المنطقة الخضراء +${(invPnl/invCost*100).toFixed(1)}%` : `📈 Portfolio in the green +${(invPnl/invCost*100).toFixed(1)}%`, ar ? `قيمة محفظتك $${invValue.toFixed(0)} مقابل تكلفة $${invCost.toFixed(0)}.` : `Portfolio value $${invValue.toFixed(0)} vs cost $${invCost.toFixed(0)}.`, 168)
+      else if (invPnl < -invCost * 0.1) await pushAlert(toInsert, uid, 'reminder', ar ? '📉 انخفاض مؤقت في محفظتك' : '📉 Temporary portfolio dip', ar ? 'لا تتسرع في البيع — الاستثمار طويل الأمد مصمم لتحمل التذبذبات.' : "Don't rush to sell — long-term investing is designed to weather volatility.", 168)
+      if (dayOfMonth <= 3 && [1,4,7,10].includes(month)) await pushAlert(toInsert, uid, 'reminder', ar ? '🗓️ وقت الشراء الربعي لـ SPUS' : '🗓️ Quarterly buy time for SPUS', ar ? 'أضف دفعتك الاستثمارية الربعية للاستفادة من متوسط التكلفة.' : 'Add your quarterly investment to benefit from dollar-cost averaging.', 168)
     }
     if (goals.length > 0) {
       const almostGoal = goals.find(g => { const pct = Number(g.current_amount) / Number(g.target_amount); return pct >= 0.9 && pct < 1 })
-      if (almostGoal) await pushAlert(toInsert, uid, 'achievement', `🎯 كدت تحقق هدف "${almostGoal.name}"!`, `تبقى ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD فقط!`, 168)
+      if (almostGoal) await pushAlert(toInsert, uid, 'achievement', ar ? `🎯 كدت تحقق هدف "${almostGoal.name}"!` : `🎯 Almost reached goal "${almostGoal.name}"!`, ar ? `تبقى ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD فقط!` : `Only ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD left!`, 168)
       const stagnant = goals.find(g => Number(g.current_amount) === 0)
-      if (stagnant) await pushAlert(toInsert, uid, 'reminder', `⏰ هدف "${stagnant.name}" ينتظرك`, `حتى ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD شهرياً يصنع فارقاً.`, 168)
+      if (stagnant) await pushAlert(toInsert, uid, 'reminder', ar ? `⏰ هدف "${stagnant.name}" ينتظرك` : `⏰ Goal "${stagnant.name}" is waiting`, ar ? `حتى ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD شهرياً يصنع فارقاً.` : `Even ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD/month makes a difference.`, 168)
     }
     if (dayOfWeek === 0) {
       const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
       const { count } = await supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', uid).gte('transaction_date', weekAgo.toISOString().split('T')[0])
-      if ((count ?? 0) === 0) await pushAlert(toInsert, uid, 'reminder', '⏰ لم تسجل أي معاملات هذا الأسبوع', 'سجّل مصاريفك بانتظام — التتبع اليومي هو أقوى أداة للوعي المالي.', 168)
+      if ((count ?? 0) === 0) await pushAlert(toInsert, uid, 'reminder', ar ? '⏰ لم تسجل أي معاملات هذا الأسبوع' : '⏰ No transactions recorded this week', ar ? 'سجّل مصاريفك بانتظام — التتبع اليومي هو أقوى أداة للوعي المالي.' : 'Track your expenses regularly — daily tracking is the most powerful financial awareness tool.', 168)
     }
-    const motivations = [
+    const motivations = ar ? [
       { title: '💪 خطوة صغيرة تصنع فارقاً كبيراً', message: `يا ${name}، كل دينار تدخره اليوم هو استثمار في حريتك المالية غداً.` },
       { title: '🌟 الانضباط المالي عادة لا موهبة', message: 'الأثرياء بنوا عادات يومية صغيرة جعلتهم يختلفون.' },
       { title: '📊 راجع ميزانيتك الأسبوع القادم', message: 'خصص 10 دقائق أسبوعياً لمراجعة المصاريف.' },
@@ -88,6 +88,14 @@ async function generateAlerts(userId?: string) {
       { title: `⚡ أنت على الطريق الصحيح يا ${name}`, message: 'سداد الديون → صندوق طوارئ → استثمار منتظم. استمر!' },
       { title: '🎯 هدف واحد كل شهر يغير حياتك', message: 'التركيز على هدف واحد أقوى من عشرة أهداف متوازية.' },
       { title: '💡 المعرفة المالية هي أفضل استثمار', message: 'كل دقيقة في تتبع مالك تساوي أضعافها على المدى البعيد.' },
+    ] : [
+      { title: '💪 Small steps make a big difference', message: `Hey ${n}, every dollar you save today is an investment in tomorrow's financial freedom.` },
+      { title: '🌟 Financial discipline is a habit, not a talent', message: 'Wealthy people built small daily habits that set them apart.' },
+      { title: '📊 Review your budget next week', message: 'Set aside 10 minutes weekly to review your expenses.' },
+      { title: '🏦 Save first, spend later', message: 'Save the first 20% of your income before any spending.' },
+      { title: `⚡ You are on the right track ${n}`, message: 'Pay debts → Emergency fund → Regular investment. Keep going!' },
+      { title: '🎯 One goal a month changes your life', message: 'Focusing on one goal is more powerful than ten parallel goals.' },
+      { title: '💡 Financial knowledge is the best investment', message: 'Every minute tracking your money is worth many times over in the long run.' },
     ]
     for (const mot of motivations) {
       const exists = await alreadyExists(uid, mot.title, 20)
