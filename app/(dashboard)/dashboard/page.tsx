@@ -119,7 +119,10 @@ export default function DashboardPage() {
   const CACHE_KEY = `dashboard_${currentUser?.id}`
 
   useEffect(() => {
-    if (!currentUser) return // انتظر حتى يكون المستخدم جاهز
+    if (!currentUser) {
+      fetched.current = false // إعادة ضبط عند تسجيل الخروج
+      return
+    }
     if (fetched.current) return
     fetched.current = true
 
