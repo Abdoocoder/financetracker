@@ -24,6 +24,210 @@ function clearUserCache(userId: string) {
     sessionStorage.removeItem(`inv_${userId}`)
   } catch {}
 }
+
+function WealthSimulator({ lang }: { lang: string }) {
+  const ar = lang === 'ar'
+  const [monthly, setMonthly] = useState(50)
+  const [years, setYears] = useState(10)
+  const [rate, setRate] = useState(7)
+  const [showDetails, setShowDetails] = useState(false)
+
+  // حساب القيمة المستقبلية مع الفائدة المركبة
+  function calc(m: number, y: number, r: number) {
+    const monthlyRate = r / 100 / 12
+    const months = y * 12
+    if (monthlyRate === 0) return m * months
+    return m * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate)
+  }
+
+  const future = calc(monthly, years, rate)
+  const invested = monthly * years * 12
+  const profit = future - invested
+  const multiplier = future / invested
+
+  // جدول تفصيلي
+  const milestones = [1, 3, 5, 10, 15, 20].filter(y => y <= years + 5)
+
+  return (
+    <div style={{ margin: '20px 0', background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: '1px solid rgba(59,126,246,0.2)' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>
+            📈 {ar ? 'محاكي الثروة' : 'Wealth Simulator'}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+            {ar ? 'شاهد كيف ينمو استثمارك مع الزمن' : 'See how your investment grows over time'}
+          </div>
+        </div>
+        <div style={{
+          padding: '6px 14px', borderRadius: 20,
+          background: 'linear-gradient(135deg, var(--accent-blue-dim), rgba(16,185,129,0.1))',
+          border: '1px solid rgba(59,126,246,0.2)',
+          fontSize: 11, fontWeight: 800, color: 'var(--accent-blue-light)',
+        }}>
+          {ar ? `${multiplier.toFixed(1)}x` : `${multiplier.toFixed(1)}x return`}
+        </div>
+      </div>
+
+      {/* Sliders */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+
+        {/* الاستثمار الشهري */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
+              {ar ? 'الاستثمار الشهري' : 'Monthly Investment'}
+            </span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
+              ${monthly}
+            </span>
+          </div>
+          <input type="range" min={10} max={1000} step={10} value={monthly}
+            onChange={e => setMonthly(Number(e.target.value))}
+            style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+            <span>$10</span><span>$1,000</span>
+          </div>
+        </div>
+
+        {/* عدد السنوات */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
+              {ar ? 'المدة' : 'Duration'}
+            </span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
+              {years} {ar ? 'سنة' : 'yrs'}
+            </span>
+          </div>
+          <input type="range" min={1} max={30} step={1} value={years}
+            onChange={e => setYears(Number(e.target.value))}
+            style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+            <span>1 {ar ? 'سنة' : 'yr'}</span><span>30 {ar ? 'سنة' : 'yrs'}</span>
+          </div>
+        </div>
+
+        {/* معدل العائد */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
+              {ar ? 'معدل العائد السنوي' : 'Annual Return'}
+            </span>
+            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
+              {rate}%
+            </span>
+          </div>
+          <input type="range" min={1} max={20} step={0.5} value={rate}
+            onChange={e => setRate(Number(e.target.value))}
+            style={{ width: '100%', accentColor: 'var(--accent-green)' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+            <span>1%</span>
+            <span style={{ color: '#F59E0B' }}>7% S&P500</span>
+            <span>20%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* النتيجة الرئيسية */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(59,126,246,0.1), rgba(16,185,129,0.08))',
+        border: '1px solid rgba(59,126,246,0.2)',
+        borderRadius: 16, padding: 20, marginBottom: 16, textAlign: 'center',
+      }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>
+          {ar ? `بعد ${years} سنة ستمتلك` : `After ${years} years you'll have`}
+        </div>
+        <div style={{
+          fontSize: 36, fontWeight: 900, fontFamily: 'monospace',
+          background: 'linear-gradient(135deg, var(--accent-blue-light), var(--accent-green-light))',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+        }}>
+          ${future >= 1000000
+            ? (future / 1000000).toFixed(2) + 'M'
+            : future >= 1000
+            ? (future / 1000).toFixed(1) + 'K'
+            : future.toFixed(0)
+          }
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12 }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'ما دفعته' : 'You invested'}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
+              ${(invested/1000).toFixed(1)}K
+            </div>
+          </div>
+          <div style={{ width: 1, background: 'var(--border)' }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'الربح' : 'Profit'}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
+              +${profit >= 1000 ? (profit/1000).toFixed(1) + 'K' : profit.toFixed(0)}
+            </div>
+          </div>
+          <div style={{ width: 1, background: 'var(--border)' }} />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'المضاعف' : 'Multiplier'}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
+              {multiplier.toFixed(1)}x
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* جدول المعالم */}
+      <button onClick={() => setShowDetails(!showDetails)} style={{
+        width: '100%', padding: '10px', borderRadius: 12,
+        background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+        color: 'var(--text-muted)', fontSize: 12, fontWeight: 700,
+        cursor: 'pointer', fontFamily: 'inherit',
+      }}>
+        {showDetails
+          ? (ar ? '▲ إخفاء التفاصيل' : '▲ Hide details')
+          : (ar ? '▼ عرض التفاصيل سنة بسنة' : '▼ Show year by year')}
+      </button>
+
+      {showDetails && (
+        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {milestones.map(y => {
+            const val = calc(monthly, y, rate)
+            const inv = monthly * y * 12
+            const pct = ((val - inv) / inv * 100)
+            return (
+              <div key={y} style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                padding: '10px 14px', borderRadius: 10,
+                background: y === years ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)',
+                border: `1px solid ${y === years ? 'rgba(59,126,246,0.2)' : 'var(--border)'}`,
+              }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: y === years ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>
+                  {ar ? `بعد ${y} سنة` : `${y} years`}
+                </span>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: y === years ? 'var(--accent-blue-light)' : 'var(--text-primary)' }}>
+                    ${val >= 1000 ? (val/1000).toFixed(1) + 'K' : val.toFixed(0)}
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--accent-green-light)' }}>+{pct.toFixed(0)}%</div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* تلميح */}
+      <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6 }}>
+        💡 {ar
+          ? 'هذا الحساب يعتمد على الفائدة المركبة. العوائد الفعلية قد تختلف.'
+          : 'Based on compound interest. Actual returns may vary.'}
+      </div>
+    </div>
+  )
+}
+
 export default function InvestmentsPage() {
   const [investments, setInvestments] = useState<Investment[]>([])
   const { user: currentUser } = useUser()
@@ -372,6 +576,9 @@ export default function InvestmentsPage() {
         </Modal>
       )}
 
+
+      {/* ── محاكي الثروة ── */}
+      <WealthSimulator lang={lang} />
       {editingInv && (
         <Modal title={`تعديل ${editingInv.symbol}`} onClose={() => setEditingInv(null)}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

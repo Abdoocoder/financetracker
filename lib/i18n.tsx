@@ -399,7 +399,19 @@ const translations = {
     settings_export_ok:  'Data exported successfully ✅',
     settings_danger:     '⚠️ Danger Zone',
     settings_data:       'Data',
+    wealthSimulator: 'Wealth Simulator',
+    wealthSimulatorDesc: 'See how your investment grows over time',
+    monthlyInvestment: 'Monthly Investment',
+    duration: 'Duration',
+    annualReturn: 'Annual Return',
+    youInvested: 'You invested',
+    profit: 'Profit',
+    multiplier: 'Multiplier',
+    showYearByYear: 'Show year by year',
+    hideDetails: 'Hide details',
+    compoundNote: 'Based on compound interest. Actual returns may vary.',
   }
+
 } as const
 
 export type TranslationKey = keyof typeof translations.ar
