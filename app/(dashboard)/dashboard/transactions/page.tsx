@@ -42,7 +42,7 @@ export default function TransactionsPage() {
   const [deletingId, setDeletingId] = useState<string|null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
   const supabase = createClient()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
   const [errors, setErrors] = useState<Record<string,string>>({})
 
@@ -136,7 +136,7 @@ export default function TransactionsPage() {
       <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
         title={t('trans_title')}
-        subtitle={`${transactions.length} ${`معاملة`}`}
+        subtitle={`${transactions.length} ${lang === "en" ? "transactions" : "معاملة"}`}
         action={<AddButton label={`+ إضافة`} onClick={openAdd} />}
       />
 
@@ -164,7 +164,7 @@ export default function TransactionsPage() {
 
       {/* List */}
       {filtered.length === 0 ? (
-        <EmptyState icon="💸" title={`لا توجد معاملات`} action={<AddButton label={`+ إضافة`} onClick={openAdd} />} />
+        <EmptyState icon="💸" title={t("trans_empty")} action={<AddButton label={`+ ${t("trans_add")}`} onClick={openAdd} />} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {filtered.map(tx => (
@@ -224,7 +224,7 @@ export default function TransactionsPage() {
       {/* Modal */}
       {confirmDelete && (
         <ConfirmDialog
-          title="حذف المعاملة"
+          title={lang === "en" ? "Delete Transaction" : "حذف المعاملة"}
           message="هل أنت متأكد؟ لا يمكن التراجع عن هذا الإجراء."
           onConfirm={() => { deleteTransaction(confirmDelete); setConfirmDelete(null) }}
           onCancel={() => setConfirmDelete(null)}
@@ -232,7 +232,7 @@ export default function TransactionsPage() {
       )}
 
       {showForm && (
-        <Modal title={editingId ? `تعديل معاملة` : `+ إضافة`} onClose={() => setShowForm(false)}>
+        <Modal title={editingId ? t("trans_edit") : `+ ${t("trans_add")}`} onClose={() => setShowForm(false)}>
           {/* Type Toggle */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
             {['expense','income'].map(type => (
