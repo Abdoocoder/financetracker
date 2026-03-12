@@ -261,10 +261,10 @@ export default function DebtsPage() {
           <FormField label={t('debts_notes')}>
             <Input placeholder="ملاحظات اختيارية" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
           </FormField>
-          <FormField label="يوم الخصم الشهري (1-28)">
+          <FormField label={t('debts_payment_day')}>
             <Input type="number" placeholder="1" value={form.payment_day} onChange={e => setForm(f => ({ ...f, payment_day: e.target.value }))} />
           </FormField>
-          <FormField label="خصم تلقائي شهري">
+          <FormField label={t('debts_auto_deduct')}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
               <button
                 onClick={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
@@ -273,7 +273,7 @@ export default function DebtsPage() {
                 <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form.auto_deduct ? 3 : 23 }} />
               </button>
               <span style={{ fontSize: 13, color: form.auto_deduct ? 'var(--accent-green-light)' : 'var(--text-muted)', fontWeight: 600 }}>
-                {form.auto_deduct ? '✅ سيتم الخصم تلقائياً كل شهر' : 'غير مفعّل — يدوي فقط'}
+                {form.auto_deduct ? t('debts_auto_on') : t('debts_auto_off')}
               </span>
             </div>
           </FormField>
