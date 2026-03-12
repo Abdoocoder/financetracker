@@ -58,7 +58,7 @@ function MiniBarChart({ data }: { data: { month: string; income: number; expense
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>الإيرادات والمصروفات</span>
+        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{lang === 'en' ? 'Income & Expenses' : 'الإيرادات والمصروفات'}</span>
         <div style={{ display: 'flex', gap: 10 }}>
           <span style={{ fontSize: 10, color: 'var(--accent-green-light)', fontWeight: 700 }}>■ دخل</span>
           <span style={{ fontSize: 10, color: 'var(--accent-red-light)', fontWeight: 700 }}>■ مصروف</span>
@@ -88,7 +88,7 @@ function CategoryBars({ categories }: { categories: [string, number][] }) {
   const COLORS = ['#3B7EF6','#8B5CF6','#F59E0B','#10B981','#EF4444']
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: 16 }}>
-      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', display: 'block', marginBottom: 14 }}>توزيع المصاريف</span>
+      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', display: 'block', marginBottom: 14 }}>{lang === 'en' ? 'Expense Breakdown' : 'توزيع المصاريف'}</span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {categories.map(([cat, amt], i) => (
           <div key={cat}>
@@ -107,7 +107,7 @@ function CategoryBars({ categories }: { categories: [string, number][] }) {
 }
 
 export default function DashboardPage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const supabase = createClient()
   const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
@@ -263,7 +263,7 @@ export default function DashboardPage() {
       {income > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>الميزانية الشهرية</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{lang === 'en' ? 'Monthly Budget' : 'الميزانية الشهرية'}</span>
             <span style={{ fontSize: 12, fontWeight: 900, color: spendColor, fontFamily: 'monospace' }}>{spendPct.toFixed(0)}% مُنفَق</span>
           </div>
           <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-elevated)', overflow: 'hidden' }}>

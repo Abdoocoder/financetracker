@@ -56,7 +56,7 @@ export default function BudgetsPage() {
 
   useEffect(() => { load() }, [load])
 
-  function openAdd() { setForm({ category: 'food', monthly_limit: '' }); setEditingId(null); setShowForm(true) }
+  function openAdd() { setForm({ category: 'طعام', monthly_limit: '' }); setEditingId(null); setShowForm(true) }
   function openEdit(b: any) { setForm({ category: b.category, monthly_limit: String(b.monthly_limit) }); setEditingId(b.id); setShowForm(true) }
 
   async function handleSave() {
