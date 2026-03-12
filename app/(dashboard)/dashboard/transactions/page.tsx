@@ -48,6 +48,7 @@ export default function TransactionsPage() {
   const now = new Date()
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
   const [filterYear, setFilterYear] = useState(now.getFullYear())
+  const [search, setSearch] = useState('')
   const supabase = createClient()
   const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
@@ -142,7 +143,14 @@ export default function TransactionsPage() {
     URL.revokeObjectURL(url)
   }
 
-  const filtered = transactions.filter(tx => filter === 'all' || tx.type === filter)
+  const searched = search.trim()
+    ? transactions.filter(t =>
+        t.description?.toLowerCase().includes(search.toLowerCase()) ||
+        t.category?.toLowerCase().includes(search.toLowerCase()) ||
+        String(t.amount).includes(search)
+      )
+    : transactions
+  const filtered = searched.filter(tx => filter === 'all' || tx.type === filter)
   const totalIncome  = transactions.filter(t => t.type === 'income').reduce((a,t) => a + Number(t.amount), 0)
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((a,t) => a + Number(t.amount), 0)
   const net = totalIncome - totalExpense
@@ -169,6 +177,30 @@ export default function TransactionsPage() {
       ]} />
 
       {/* Filter Tabs */}
+
+      {/* حقل البحث */}
+      <div style={{ padding: '0 0 12px', position: 'relative' }}>
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder={lang === 'ar' ? '🔍 ابحث عن معاملة...' : '🔍 Search transactions...'}
+          style={{
+            width: '100%', padding: '11px 14px', borderRadius: 12,
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit',
+            outline: 'none', boxSizing: 'border-box',
+          }}
+        />
+        {search && (
+          <button onClick={() => setSearch('')} style={{
+            position: 'absolute', top: '50%', left: 14, transform: 'translateY(-50%)',
+            background: 'none', border: 'none', color: 'var(--text-muted)',
+            fontSize: 16, cursor: 'pointer', padding: 0, lineHeight: 1,
+          }}>✕</button>
+        )}
+      </div>
+
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {(['all','income','expense'] as const).map(f => (
           <button key={f} onClick={() => setFilter(f)} style={{
