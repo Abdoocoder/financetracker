@@ -4,13 +4,13 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 
-const QUICK_CATS = [
-  { label: 'طعام', icon: '🍔', type: 'expense' },
-  { label: 'مواصلات', icon: '🚗', type: 'expense' },
-  { label: 'فواتير', icon: '💡', type: 'expense' },
-  { label: 'صحة', icon: '💊', type: 'expense' },
-  { label: 'راتب', icon: '💰', type: 'income' },
-  { label: 'أخرى', icon: '📝', type: 'expense' },
+const CATEGORIES_AR = [
+  { key: 'food', label: 'طعام', labelEn: 'Food', icon: '🍔', type: 'expense' },
+  { key: 'transport', label: 'مواصلات', labelEn: 'Transport', icon: '🚗', type: 'expense' },
+  { key: 'bills', label: 'فواتير', labelEn: 'Bills', icon: '💡', type: 'expense' },
+  { key: 'health', label: 'صحة', labelEn: 'Health', icon: '💊', type: 'expense' },
+  { key: 'salary', label: 'راتب', labelEn: 'Salary', icon: '💰', type: 'income' },
+  { key: 'other', label: 'أخرى', labelEn: 'Other', icon: '📝', type: 'expense' },
 ]
 
 
@@ -23,9 +23,10 @@ function clearUserCache(userId: string) {
 }
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const { user } = useUser()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
+  const CATEGORIES = CATEGORIES_AR.map(c => ({ ...c, label: lang === 'en' ? c.labelEn : c.label }))
   const supabase = createClient()
-  const [selected, setSelected] = useState<typeof QUICK_CATS[0] | null>(null)
+  const [selected, setSelected] = useState<typeof CATEGORIES_AR[0] | null>(null)
   const [amount, setAmount] = useState('')
   const [saving, setSaving] = useState(false)
   const [lastTx, setLastTx] = useState<{ category: string; amount: number; type: string } | null>(null)
@@ -100,20 +101,20 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
 
       {/* Category buttons */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-        {QUICK_CATS.map((cat) => (
+        {CATEGORIES.map((cat) => (
           <button
-            key={cat.label}
-            onClick={() => setSelected(selected?.label === cat.label ? null : cat)}
+            key={cat.key}
+            onClick={() => setSelected(selected?.key === cat.key ? null : cat)}
             style={{
               padding: '10px 6px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: selected?.label === cat.label
+              background: selected?.key === cat.key
                 ? cat.type === 'income' ? 'var(--accent-green)' : 'var(--accent-blue)'
                 : 'var(--bg-secondary)',
-              color: selected?.label === cat.label ? 'white' : 'var(--text-secondary)',
+              color: selected?.key === cat.key ? 'white' : 'var(--text-secondary)',
               fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
               transition: 'all 0.15s',
-              outline: selected?.label === cat.label ? 'none' : '1px solid var(--border)',
+              outline: selected?.key === cat.key ? 'none' : '1px solid var(--border)',
             }}
           >
             <span style={{ fontSize: 18 }}>{cat.icon}</span>

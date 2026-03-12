@@ -89,7 +89,7 @@ export default function SettingsPage() {
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <PageHeader title={t('settings_title')} subtitle="بيانات حسابك الشخصي" />
+      <PageHeader title={t('settings_title')} subtitle={t('settings_subtitle')} />
 
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
