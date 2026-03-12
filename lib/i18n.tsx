@@ -181,6 +181,26 @@ const translations = {
     toast_alerts_done:  'تم توليد التنبيهات ✅',
     toast_marked_read:  'تم تعيين الكل كمقروء',
     toast_all_deleted:  'تم حذف كل التنبيهات',
+
+    // New features
+    quick_add_title:     '⚡ إضافة سريعة',
+    quick_add_repeat:    'تكرار آخر معاملة',
+    dash_compare:        '📊 مقارنة بالشهر الماضي',
+    debts_payment_day:   'يوم الخصم الشهري (1-28)',
+    debts_auto_deduct:   'خصم تلقائي شهري',
+    debts_auto_on:       '✅ سيتم الخصم تلقائياً كل شهر',
+    debts_auto_off:      'غير مفعّل — يدوي فقط',
+    inv_tx_history:      '📋 سجل المعاملات',
+    inv_portfolio_chart: '📊 توزيع المحفظة',
+    settings_theme:      'المظهر',
+    settings_dark:       '🌙 داكن',
+    settings_light:      '☀️ فاتح',
+    settings_export:     '📥 تصدير المعاملات CSV',
+    settings_exporting:  '⏳ جاري التصدير...',
+    settings_no_export:  'لا توجد معاملات للتصدير',
+    settings_export_ok:  'تم تصدير البيانات بنجاح ✅',
+    settings_danger:     '⚠️ منطقة الخطر',
+    settings_data:       'البيانات',
   },
   en: {
     // Nav
@@ -359,6 +379,26 @@ const translations = {
     toast_alerts_done:  'Alerts generated ✅',
     toast_marked_read:  'All marked as read',
     toast_all_deleted:  'All alerts deleted',
+
+    // New features
+    quick_add_title:     '⚡ Quick Add',
+    quick_add_repeat:    'Repeat last transaction',
+    dash_compare:        '📊 vs Last Month',
+    debts_payment_day:   'Monthly payment day (1-28)',
+    debts_auto_deduct:   'Auto monthly deduction',
+    debts_auto_on:       '✅ Will auto-deduct every month',
+    debts_auto_off:      'Disabled — manual only',
+    inv_tx_history:      '📋 Transaction History',
+    inv_portfolio_chart: '📊 Portfolio Breakdown',
+    settings_theme:      'Theme',
+    settings_dark:       '🌙 Dark',
+    settings_light:      '☀️ Light',
+    settings_export:     '📥 Export Transactions CSV',
+    settings_exporting:  '⏳ Exporting...',
+    settings_no_export:  'No transactions to export',
+    settings_export_ok:  'Data exported successfully ✅',
+    settings_danger:     '⚠️ Danger Zone',
+    settings_data:       'Data',
   }
 } as const
 

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { UserProvider, useUser } from '@/lib/user-context'
+import { ThemeProvider } from '@/lib/theme-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
 import { ToastProvider } from '@/components/ui/toast'
@@ -57,6 +58,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
+    <ThemeProvider>
     <UserProvider>
       <I18nProvider>
         <ToastProvider>
@@ -66,5 +68,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </ToastProvider>
       </I18nProvider>
     </UserProvider>
+    </ThemeProvider>
   )
 }
