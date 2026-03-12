@@ -179,7 +179,7 @@ export default function TransactionsPage() {
             fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
             transition: 'all 0.15s',
           }}>
-            {f === 'all' ? `الكل` : f === 'income' ? `💰 ${`دخل`}` : `💸 ${`مصروف`}`}
+            {f === 'all' ? (lang === 'en' ? 'All' : 'الكل') : f === 'income' ? `💰 ${lang === 'en' ? 'Income' : 'دخل'}` : `💸 ${lang === 'en' ? 'Expense' : 'مصروف'}`}
           </button>
         ))}
       </div>
