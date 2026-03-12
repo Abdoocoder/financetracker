@@ -27,6 +27,11 @@ export async function middleware(request: NextRequest) {
   if ((pathname === '/login' || pathname === '/register') && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
+  // تمرير user id في header لتجنب استدعاء getUser() في كل صفحة
+  if (user) {
+    supabaseResponse.headers.set('x-user-id', user.id)
+    supabaseResponse.headers.set('x-user-email', user.email ?? '')
+  }
   return supabaseResponse
 }
 
