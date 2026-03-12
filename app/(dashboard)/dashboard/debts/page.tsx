@@ -201,7 +201,7 @@ export default function DebtsPage() {
                   {paymentDebtId === debt.id ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)}
-                        placeholder="المبلغ" autoFocus onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)}
+                        placeholder={lang === "en" ? "Amount" : "المبلغ"} autoFocus onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)}
                         style={{ width: 90, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }} />
                       <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
                         style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
@@ -235,7 +235,7 @@ export default function DebtsPage() {
       {showForm && (
         <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={() => setShowForm(false)}>
           <FormField label={t('debts_name')}>
-            <Input placeholder="مثال: بطاقة Visa" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            <Input placeholder={lang === "en" ? "e.g. Visa Card" : "مثال: بطاقة Visa"} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('debts_original')}>
@@ -259,7 +259,7 @@ export default function DebtsPage() {
             </Select>
           </FormField>
           <FormField label={t('debts_notes')}>
-            <Input placeholder="ملاحظات اختيارية" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            <Input placeholder={lang === "en" ? "Optional notes" : "ملاحظات اختيارية"} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
           </FormField>
           <FormField label={t('debts_payment_day')}>
             <Input type="number" placeholder="1" value={form.payment_day} onChange={e => setForm(f => ({ ...f, payment_day: e.target.value }))} />

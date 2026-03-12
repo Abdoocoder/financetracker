@@ -62,10 +62,10 @@ function Step1({ profile, setProfile, onNext, loading, lang }: { profile:Profile
         <h2 style={{ fontSize:22, fontWeight:900, color:'var(--text-primary)', margin:0 }}>{lang === 'en' ? 'Welcome!' : 'أهلاً وسهلاً!'}</h2>
         <p style={{ fontSize:14, color:'var(--text-muted)', marginTop:6 }}>{lang === 'en' ? `Let's finish setting up your account` : 'خلنا نكمّل إعداد حسابك'}</p>
       </div>
-      <Field label="اسمك الكامل *">
-        <StyledInput type="text" value={profile.fullName} onChange={e=>setProfile(p=>({...p,fullName:e.target.value}))} placeholder="اسمك الكامل" />
+      <Field label={lang === "en" ? "Full Name *" : "اسمك الكامل *"}>
+        <StyledInput type="text" value={profile.fullName} onChange={e=>setProfile(p=>({...p,fullName:e.target.value}))} placeholder={lang === "en" ? "Full Name" : "اسمك الكامل"} />
       </Field>
-      <Field label="راتبك الشهري (اختياري)">
+      <Field label={lang === "en" ? "Monthly Income (optional)" : "راتبك الشهري (اختياري)"  }>
         <StyledInput type="number" value={profile.monthlyIncome} onChange={e=>setProfile(p=>({...p,monthlyIncome:e.target.value}))} placeholder="0" />
       </Field>
       <Field label="العملة">
@@ -99,14 +99,14 @@ function Step2({ tx, setTx, onNext, onBack, saving, lang }: { tx:FirstTransactio
           </button>
         ))}
       </div>
-      <Field label="المبلغ *"><StyledInput type="number" value={tx.amount} onChange={e=>setTx(t=>({...t,amount:e.target.value}))} placeholder="0.00" /></Field>
+      <Field label={lang === "en" ? "Amount *" : "المبلغ *"}><StyledInput type="number" value={tx.amount} onChange={e=>setTx(t=>({...t,amount:e.target.value}))} placeholder="0.00" /></Field>
       <Field label="الفئة *">
         <StyledSelect value={tx.category} onChange={e=>setTx(t=>({...t,category:e.target.value}))}>
           <option value="">اختر فئة...</option>
           {categories.map(c=><option key={c} value={c}>{c}</option>)}
         </StyledSelect>
       </Field>
-      <Field label="وصف (اختياري)"><StyledInput type="text" value={tx.description} onChange={e=>setTx(t=>({...t,description:e.target.value}))} placeholder={tx.type==='income'?'مثال: راتب شهر مارس':'مثال: فاتورة الكهرباء'} /></Field>
+      <Field label={lang === "en" ? "Description (optional)" : "وصف (اختياري)"  }><StyledInput type="text" value={tx.description} onChange={e=>setTx(t=>({...t,description:e.target.value}))} placeholder={lang === 'en' ? (tx.type==='income' ? 'e.g. March salary' : 'e.g. Electricity bill') : (tx.type==='income' ? 'مثال: راتب شهر مارس' : 'مثال: فاتورة الكهرباء')} /></Field>
       <div style={{ display:'flex', gap:10, marginTop:8 }}>
         <button onClick={onBack} style={{ padding:'14px 20px', borderRadius:14, border:'1px solid var(--border)', background:'transparent', color:'var(--text-secondary)', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit' }}>← رجوع</button>
         <button onClick={onNext} disabled={saving || tx.amount.length === 0 || tx.category.length === 0} style={{ flex:1, padding:'14px', borderRadius:14, border:'none', background:tx.type==='income'?'var(--accent-green)':'var(--accent-blue)', color:'white', fontSize:15, fontWeight:700, cursor:saving||!tx.amount||!tx.category?'not-allowed':'pointer', fontFamily:'inherit', opacity:saving||!tx.amount||!tx.category?0.5:1, transition:'opacity 0.15s' }}>
