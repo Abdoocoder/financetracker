@@ -8,14 +8,14 @@ import { Modal } from '@/components/ui/modal'
 import { toast } from '@/components/ui/toast'
 
 const CATEGORIES = [
-  { key: 'food', ar: 'طعام', en: 'Food', icon: '🍔' },
-  { key: 'transport', ar: 'مواصلات', en: 'Transport', icon: '🚗' },
-  { key: 'bills', ar: 'فواتير', en: 'Bills', icon: '💡' },
-  { key: 'health', ar: 'صحة', en: 'Health', icon: '💊' },
-  { key: 'clothes', ar: 'ملابس', en: 'Clothes', icon: '👕' },
-  { key: 'entertainment', ar: 'ترفيه', en: 'Entertainment', icon: '🎮' },
-  { key: 'education', ar: 'تعليم', en: 'Education', icon: '📚' },
-  { key: 'other', ar: 'أخرى', en: 'Other', icon: '📝' },
+  { key: 'طعام', ar: 'طعام', en: 'Food', icon: '🍔' },
+  { key: 'مواصلات', ar: 'مواصلات', en: 'Transport', icon: '🚗' },
+  { key: 'فواتير', ar: 'فواتير', en: 'Bills', icon: '💡' },
+  { key: 'صحة', ar: 'صحة', en: 'Health', icon: '💊' },
+  { key: 'ملابس', ar: 'ملابس', en: 'Clothes', icon: '👕' },
+  { key: 'ترفيه', ar: 'ترفيه', en: 'Entertainment', icon: '🎮' },
+  { key: 'تعليم', ar: 'تعليم', en: 'Education', icon: '📚' },
+  { key: 'أخرى', ar: 'أخرى', en: 'Other', icon: '📝' },
 ]
 
 function clearUserCache(userId: string) {
@@ -35,7 +35,7 @@ export default function BudgetsPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ category: 'food', monthly_limit: '' })
+  const [form, setForm] = useState({ category: 'طعام', monthly_limit: '' })
 
   const load = useCallback(async () => {
     const user = currentUser
