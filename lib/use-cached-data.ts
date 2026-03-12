@@ -1,58 +1,71 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
-const cache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_TTL = 30000 // 30 ثانية
+interface CacheEntry<T> {
+  data: T
+  timestamp: number
+}
+
+const memoryCache = new Map<string, CacheEntry<any>>()
+const CACHE_TTL = 30_000 // 30 ثانية
 
 export function useCachedData<T>(
   key: string,
   fetcher: () => Promise<T>,
-  deps: any[] = []
+  ttl = CACHE_TTL
 ) {
-  const [data, setData] = useState<T | null>(() => {
-    const cached = cache.get(key)
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data
-    return null
-  })
-  const [loading, setLoading] = useState(!cache.has(key))
-  const [error, setError] = useState<string | null>(null)
-  const fetcherRef = useRef(fetcher)
-  fetcherRef.current = fetcher
+  const cached = memoryCache.get(key)
+  const [data, setData] = useState<T | null>(cached?.data ?? null)
+  const [loading, setLoading] = useState(!cached)
+  const [refreshing, setRefreshing] = useState(false)
+  const fetchedRef = useRef(false)
 
-  const load = useCallback(async (force = false) => {
-    const cached = cache.get(key)
-    if (!force && cached && Date.now() - cached.timestamp < CACHE_TTL) {
+  const load = useCallback(async (forceRefresh = false) => {
+    const now = Date.now()
+    const cached = memoryCache.get(key)
+    
+    // إذا في cache حديث وما في force refresh — اعرض فوراً
+    if (cached && now - cached.timestamp < ttl && !forceRefresh) {
       setData(cached.data)
       setLoading(false)
       return
     }
-    setLoading(true)
-    setError(null)
+
+    // إذا في cache قديم — اعرضه أولاً ثم حدّث في الخلفية (stale-while-revalidate)
+    if (cached && !forceRefresh) {
+      setData(cached.data)
+      setLoading(false)
+      setRefreshing(true)
+    }
+
     try {
-      const result = await fetcherRef.current()
-      cache.set(key, { data: result, timestamp: Date.now() })
-      setData(result)
-    } catch (e: any) {
-      setError(e.message)
+      const fresh = await fetcher()
+      memoryCache.set(key, { data: fresh, timestamp: now })
+      setData(fresh)
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
-  }, [key])
+  }, [key, fetcher, ttl])
 
-  useEffect(() => { load() }, [load, ...deps])
+  useEffect(() => {
+    if (!fetchedRef.current) {
+      fetchedRef.current = true
+      load()
+    }
+  }, [load])
 
-  const refresh = useCallback(() => {
-    cache.delete(key)
+  const refresh = useCallback(() => load(true), [load])
+  const invalidate = useCallback(() => {
+    memoryCache.delete(key)
+    fetchedRef.current = false
     load(true)
   }, [key, load])
 
-  return { data, loading, error, refresh }
+  return { data, loading, refreshing, refresh, invalidate }
 }
 
-export function invalidateCache(...keys: string[]) {
-  keys.forEach(k => cache.delete(k))
-}
-
-export function invalidateAllCache() {
-  cache.clear()
+// مسح كل الـ cache عند logout
+export function clearAllCache() {
+  memoryCache.clear()
 }
