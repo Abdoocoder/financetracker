@@ -58,7 +58,7 @@
 - إشعارات Push (Web Push API)
 
 ### ⚙️ الإعدادات / Settings
-- JOD, USD, EUR, SAR
+- JOD, USD, SAR, AED
 - تصدير CSV + حذف الحساب
 - راتب تلقائي شهري
 
@@ -66,8 +66,8 @@
 
 ## 🌍 i18n + 🎨 Theme
 
-- عربي / English — Auto-detect حسب الجهاز
-- داكن / فاتح — Auto-detect حسب الجهاز
+- عربي / English — يُحفظ في localStorage
+- داكن / فاتح — يُحفظ في localStorage
 
 ## 📱 PWA
 
@@ -85,7 +85,7 @@
 | Vercel | Hosting + CRON |
 | CoinGecko + Twelve Data | Prices |
 | Web Push API | Notifications |
-| Claude API | AI Alerts |
+| Rule-based Engine | Smart Alerts |
 
 ---
 
@@ -117,8 +117,7 @@ profiles, transactions, debts, debt_payments, investments, investment_transactio
     NEXT_PUBLIC_SUPABASE_ANON_KEY=
     SUPABASE_SERVICE_ROLE_KEY=
     CRON_SECRET=
-    ANTHROPIC_API_KEY=
-    TWELVE_DATA_API_KEY=
+    TWELVE_DATA_KEY=
     NEXT_PUBLIC_VAPID_PUBLIC_KEY=
     VAPID_PRIVATE_KEY=
 
