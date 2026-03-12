@@ -98,7 +98,7 @@ export default function BudgetsPage() {
       />
 
       {/* فلتر الشهر */}
-      <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflowX: 'auto', flexDirection: 'row' }}>
         {months.map((m, i) => (
           <button key={i} onClick={() => setMonth(i + 1)} style={{ padding: '8px 14px', borderRadius: 20, background: month === i + 1 ? 'var(--accent-blue)' : 'var(--bg-secondary)', border: '1px solid', borderColor: month === i + 1 ? 'transparent' : 'var(--border)', color: month === i + 1 ? 'white' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
             {m}

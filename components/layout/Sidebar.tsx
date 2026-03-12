@@ -13,12 +13,12 @@ const MAIN_NAV = [
   { href: '/dashboard',              Icon: LayoutDashboard, label: 'الرئيسية'   },
   { href: '/dashboard/transactions', Icon: ArrowUpDown,     label: 'المعاملات' },
   { href: '/dashboard/debts',        Icon: CreditCard,      label: 'الديون'    },
-  { href: '/dashboard/investments',  Icon: TrendingUp,      label: 'الاستثمار' },
+  { href: '/dashboard/budgets',      Icon: PieChart,        label: 'الميزانية' },
 ]
 
 const MORE_NAV = [
   { href: '/dashboard/goals',    Icon: Target,     label: 'الأهداف'   },
-  { href: '/dashboard/budgets',  Icon: PieChart,  label: 'الميزانية' },
+  { href: '/dashboard/investments', Icon: TrendingUp, label: 'الاستثمار' },
   { href: '/dashboard/alerts',   Icon: Bell,       label: 'التنبيهات' },
   { href: '/dashboard/settings', Icon: Settings, label: 'الإعدادات' },
 ]
