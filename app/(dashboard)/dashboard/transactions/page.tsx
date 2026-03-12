@@ -19,6 +19,17 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
 const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','هدية','أخرى']
 
+
+// مسح cache المستخدم بعد أي تعديل
+function clearUserCache(userId: string) {
+  try {
+    sessionStorage.removeItem(`dashboard_${userId}`)
+    sessionStorage.removeItem(`tx_${userId}`)
+    sessionStorage.removeItem(`debts_${userId}`)
+    sessionStorage.removeItem(`goals_${userId}`)
+    sessionStorage.removeItem(`inv_${userId}`)
+  } catch {}
+}
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<any[]>([])
   const { user: currentUser } = useUser()
