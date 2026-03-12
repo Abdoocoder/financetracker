@@ -103,7 +103,7 @@ export default function AlertsPage() {
   const [generating, setGenerating] = useState(false)
   const [filter, setFilter] = useState<'all' | 'unread' | 'warning' | 'achievement'>('all')
   const supabase = createClient()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
@@ -174,10 +174,10 @@ export default function AlertsPage() {
   })
 
   const filterTabs = [
-    { key: 'all',         label: `الكل (${alerts.length})` },
-    { key: 'unread',      label: `غير مقروء (${unreadCount})` },
-    { key: 'warning',     label: '⚠️ تحذيرات' },
-    { key: 'achievement', label: '🏆 إنجازات' },
+    { key: 'all',         label: lang === 'en' ? `All (${alerts.length})` : `الكل (${alerts.length})` },
+    { key: 'unread',      label: lang === 'en' ? `Unread (${unreadCount})` : `غير مقروء (${unreadCount})` },
+    { key: 'warning',     label: lang === 'en' ? '⚠️ Warnings' : '⚠️ تحذيرات' },
+    { key: 'achievement', label: lang === 'en' ? '🏆 Achievements' : '🏆 إنجازات' },
   ]
 
   if (loading) return (
@@ -237,7 +237,7 @@ export default function AlertsPage() {
         <button onClick={generateNow} disabled={generating}
           className="w-full py-3 rounded-xl text-white font-black text-sm disabled:opacity-50 transition-all"
           style={{ background: generating ? 'var(--bg-elevated)' : 'linear-gradient(135deg, #3B7EF6 0%, #8B5CF6 100%)', fontFamily: 'inherit', boxShadow: generating ? 'none' : '0 4px 20px rgba(59,126,246,0.35)' }}>
-          {generating ? '⏳ جاري التحليل...' : `✨ ${t('alerts_generate')}`}
+          {generating ? (lang === 'en' ? '⏳ Analyzing...' : '⏳ جاري التحليل...') : `✨ ${t('alerts_generate')}`}
         </button>
         <p className="text-xs text-center mt-2" style={{ color: 'var(--text-muted)' }}>{t('alerts_auto')}</p>
       </div>

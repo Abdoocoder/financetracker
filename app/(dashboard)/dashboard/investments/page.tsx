@@ -43,7 +43,7 @@ export default function InvestmentsPage() {
   const [usdToJod, setUsdToJod] = useState<number | null>(null)
   const [showJod, setShowJod] = useState(false)
   const [priceStatus, setPriceStatus] = useState<Record<string, 'live' | 'manual'>>({})
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const supabase = createClient()
 
   const load = useCallback(async () => {
@@ -110,8 +110,8 @@ export default function InvestmentsPage() {
         } catch { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
       }
       await fetchExchangeRate(); await load(); setPriceStatus(newStatus)
-      setRefreshMsg(updated === investments.length ? '✅ تم تحديث جميع الأسعار' : updated > 0 ? `⚠️ تم ${updated} — تعذّر: ${failed.join(', ')}` : '❌ تعذّر التحديث')
-    } catch { setRefreshMsg('❌ خطأ') }
+      setRefreshMsg(updated === investments.length ? (lang === 'en' ? '✅ All prices updated' : '✅ تم تحديث جميع الأسعار') : updated > 0 ? (lang === 'en' ? `⚠️ Updated ${updated} — Failed: ${failed.join(', ')}` : `⚠️ تم ${updated} — تعذّر: ${failed.join(', ')}`) : (lang === 'en' ? '❌ Update failed' : '❌ تعذّر التحديث'))
+    } catch { setRefreshMsg(lang === 'en' ? '❌ Error' : '❌ خطأ') }
     setRefreshing(false)
     setTimeout(() => setRefreshMsg(''), 5000)
   }
@@ -176,7 +176,7 @@ export default function InvestmentsPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             {usdToJod && (
               <button onClick={() => setShowJod(!showJod)} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                {showJod ? '$ USD' : 'JOD د.أ'}
+                {showJod ? '$ USD' : (lang === 'en' ? 'JOD' : 'JOD د.أ')}
               </button>
             )}
             <button onClick={refreshPrices} disabled={refreshing} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 16, cursor: refreshing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: refreshing ? 0.5 : 1 }}>
@@ -192,9 +192,9 @@ export default function InvestmentsPage() {
       )}
 
       <StatBar stats={[
-        { label: 'القيمة', value: showJod && usdToJod ? `${(totalValueUSD * usdToJod).toFixed(0)} JD` : `$${totalValueUSD.toFixed(0)}`, color: 'var(--accent-blue-light)' },
-        { label: 'الربح',  value: showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)} JD` : `${totalPnL >= 0 ? '+$' : '-$'}${Math.abs(totalPnL).toFixed(0)}`, color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
-        { label: 'العائد', value: `${parseFloat(pnlPct) >= 0 ? '+' : ''}${pnlPct}%`, color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+        { label: lang === 'en' ? 'Value' : 'القيمة', value: showJod && usdToJod ? `${(totalValueUSD * usdToJod).toFixed(0)} JD` : `$${totalValueUSD.toFixed(0)}`, color: 'var(--accent-blue-light)' },
+        { label: lang === 'en' ? 'Profit' : 'الربح',  value: showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)} JD` : `${totalPnL >= 0 ? '+$' : '-$'}${Math.abs(totalPnL).toFixed(0)}`, color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+        { label: lang === 'en' ? 'Return' : 'العائد', value: `${parseFloat(pnlPct) >= 0 ? '+' : ''}${pnlPct}%`, color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
       ]} />
 
       {investments.length === 0 ? (
@@ -238,9 +238,9 @@ export default function InvestmentsPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
                   {[
-                    { label: 'الوحدات', value: inv.shares.toFixed(5) },
-                    { label: 'متوسط الشراء', value: `$${inv.avg_buy_price.toFixed(2)}` },
-                    { label: 'السعر الحالي', value: `$${inv.current_price.toFixed(2)}` },
+                    { label: lang === 'en' ? 'Units' : 'الوحدات', value: inv.shares.toFixed(5) },
+                    { label: lang === 'en' ? 'Avg Buy' : 'متوسط الشراء', value: `$${inv.avg_buy_price.toFixed(2)}` },
+                    { label: lang === 'en' ? 'Current Price' : 'السعر الحالي', value: `$${inv.current_price.toFixed(2)}` },
                   ].map((s, i) => (
                     <div key={i} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
                       <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.value}</div>
@@ -260,7 +260,7 @@ export default function InvestmentsPage() {
                   <div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
                       {[
-                        { label: 'الوحدات', key: 'shares', placeholder: '0.5', type: 'number' },
+                        { label: lang === 'en' ? 'Units' : 'الوحدات', key: 'shares', placeholder: '0.5', type: 'number' },
                         { label: 'السعر $', key: 'price', placeholder: '50', type: 'number' },
                         { label: 'العمولة $', key: 'commission', placeholder: '0.5', type: 'number' },
                         { label: 'التاريخ', key: 'date', placeholder: '', type: 'date' },
@@ -273,7 +273,7 @@ export default function InvestmentsPage() {
                       ))}
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => recordBuy(inv.id)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--accent-green)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>{saving ? '⏳' : 'تسجيل الشراء'}</button>
+                      <button onClick={() => recordBuy(inv.id)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--accent-green)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>{saving ? '⏳' : (lang === 'en' ? 'Record Buy' : 'تسجيل الشراء')}</button>
                       <button onClick={() => setShowBuyForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>إلغاء</button>
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export default function InvestmentsPage() {
                     {tx.type === 'buy' ? '📈' : '📉'}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? 'شراء' : 'بيع'} {Number(tx.shares).toFixed(4)} وحدة</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? (lang === 'en' ? 'Buy' : 'شراء') : (lang === 'en' ? 'Sell' : 'بيع')} {Number(tx.shares).toFixed(4)} {lang === 'en' ? 'units' : 'وحدة'}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{tx.transaction_date} · سعر ${Number(tx.price).toFixed(2)}</div>
                   </div>
                   <div style={{ textAlign: 'left' }}>
@@ -395,7 +395,7 @@ export default function InvestmentsPage() {
             ⚠️ تعديل الوحدات والأسعار يؤثر على حسابات الربح والخسارة
           </div>
           <SaveButton label="حفظ التعديلات" loading={saving} onClick={saveEditInv} />
-          <button onClick={() => { if (confirm('حذف هذا الاستثمار؟')) { deleteInv(editingInv.id); setEditingInv(null) } }} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button onClick={() => { if (confirm(lang === 'en' ? 'Delete this investment?' : 'حذف هذا الاستثمار؟')) { deleteInv(editingInv.id); setEditingInv(null) } }} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             🗑️ حذف الاستثمار
           </button>
         </Modal>

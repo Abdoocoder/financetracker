@@ -16,11 +16,11 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PRIORITY_CONFIG = [
-  { color: '#EF4444', label: 'عالية جداً' },
-  { color: '#F59E0B', label: 'عالية'      },
-  { color: '#3B7EF6', label: 'متوسطة'    },
-  { color: '#8B9CC8', label: 'منخفضة'    },
-  { color: '#4A5568', label: 'مؤجلة'     },
+  { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
+  { color: '#F59E0B', ar: 'عالية',      en: 'High'      },
+  { color: '#3B7EF6', ar: 'متوسطة',    en: 'Medium'    },
+  { color: '#8B9CC8', ar: 'منخفضة',    en: 'Low'       },
+  { color: '#4A5568', ar: 'مؤجلة',     en: 'Deferred'  },
 ]
 
 
@@ -47,7 +47,7 @@ export default function DebtsPage() {
   const [payingSaving, setPayingSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
   const supabase = createClient()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
@@ -205,7 +205,7 @@ export default function DebtsPage() {
                         style={{ width: 90, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }} />
                       <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
                         style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
-                        {payingSaving ? '⏳' : '✓ دفع'}
+                        {payingSaving ? '⏳' : (lang === 'en' ? '✓ Pay' : '✓ دفع')}
                       </button>
                       <button onClick={() => { setPaymentDebtId(null); setPaymentAmount('') }}
                         style={{ padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
@@ -254,7 +254,7 @@ export default function DebtsPage() {
           <FormField label="الأولوية">
             <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
               {PRIORITY_CONFIG.map((p, i) => (
-                <option key={i+1} value={i+1}>{p.label}</option>
+                <option key={i+1} value={i+1}>{lang === 'en' ? p.en : p.ar}</option>
               ))}
             </Select>
           </FormField>
