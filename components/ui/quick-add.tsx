@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
+import { useI18n } from '@/lib/i18n'
 
 const QUICK_CATS = [
   { label: 'طعام', icon: '🍔', type: 'expense' },
@@ -22,6 +23,7 @@ function clearUserCache(userId: string) {
 }
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const { user } = useUser()
+  const { t } = useI18n()
   const supabase = createClient()
   const [selected, setSelected] = useState<typeof QUICK_CATS[0] | null>(null)
   const [amount, setAmount] = useState('')
@@ -90,7 +92,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>⚡ إضافة سريعة</span>
+        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{t('quick_add_title')}</span>
         {showSuccess && (
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-green-light)', animation: 'fadeIn 0.2s ease' }}>✅ تم الحفظ!</span>
         )}
@@ -173,7 +175,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
         >
           <span>🔁</span>
-          <span>تكرار آخر معاملة: {lastTx.category} — {Number(lastTx.amount).toFixed(0)} JOD</span>
+          <span>{t('quick_add_repeat')}: {lastTx.category} — {Number(lastTx.amount).toFixed(0)} JOD</span>
         </button>
       )}
 

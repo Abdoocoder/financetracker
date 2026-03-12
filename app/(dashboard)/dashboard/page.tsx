@@ -240,7 +240,7 @@ export default function DashboardPage() {
         const expDiff = data.prevExpenses > 0 ? ((expenses - data.prevExpenses) / data.prevExpenses * 100) : 0
         return (
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
-            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 12 }}>📊 مقارنة بالشهر الماضي</div>
+            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 12 }}>{t('dash_compare')}</div>
             <div style={{ display: 'flex', gap: 10 }}>
               <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: incDiff >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
                 <div style={{ fontSize: 18, marginBottom: 2 }}>{incDiff >= 0 ? '📈' : '📉'}</div>
