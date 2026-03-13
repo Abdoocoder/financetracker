@@ -23,8 +23,7 @@ export function ConfirmDialog({ title, message, confirmLabel = 'حذف', cancelL
         background: 'var(--bg-secondary)',
         borderRadius: '24px 24px 0 0',
         border: '1px solid var(--border)',
-        padding: '24px 20px',
-        paddingBottom: 'max(44px, env(safe-area-inset-bottom, 44px))',
+        padding: '24px 20px 100px',
         animation: 'slideUp 0.25s ease',
       }}>
         {/* Handle */}
