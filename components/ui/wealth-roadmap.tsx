@@ -17,6 +17,8 @@ interface RoadmapData {
   monthlyIncome: number
   totalDebt: number
   monthlyDebtPayment: number
+  totalPersonalAssets: number
+  netWorth: number
   smallestDebt: { name: string; amount: number; monthly: number } | null
 }
 
@@ -44,7 +46,7 @@ export function WealthRoadmap() {
 
     // جلب البيانات
     const [profileRes, txRes, debtsRes, goalsRes, invRes] = await Promise.all([
-      supabase.from('profiles').select('monthly_income, salary_day').eq('id', user.id).single(),
+      supabase.from('profiles').select('monthly_income, salary_day, asset_real_estate, asset_vehicles, asset_jewelry, asset_other').eq('id', user.id).single(),
       supabase.from('transactions').select('amount, type, category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', today),
       supabase.from('debts').select('name, remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
       supabase.from('savings_goals').select('target_amount, current_amount').eq('user_id', user.id),
@@ -52,6 +54,7 @@ export function WealthRoadmap() {
     ])
 
     const income = profileRes.data?.monthly_income ?? 0
+    const totalPersonalAssets = (profileRes.data?.asset_real_estate ?? 0) + (profileRes.data?.asset_vehicles ?? 0) + (profileRes.data?.asset_jewelry ?? 0) + (profileRes.data?.asset_other ?? 0)
     const txList = txRes.data ?? []
     const debts = debtsRes.data ?? []
     const goals = goalsRes.data ?? []
@@ -78,6 +81,7 @@ export function WealthRoadmap() {
     if (isInvesting) score += 25
     if (income > 0) score += 10
 
+    if (totalPersonalAssets > income * 6) score += 10
     score = Math.min(100, score)
 
     // ── تحديد المرحلة ──
@@ -141,6 +145,8 @@ export function WealthRoadmap() {
       nextStep, nextStepDetail,
       debtRatio, hasEmergencyFund, isInvesting,
       monthlyIncome: income, totalDebt, monthlyDebtPayment,
+      totalPersonalAssets,
+      netWorth: totalPersonalAssets + totalInvested + totalSavings - totalDebt,
       smallestDebt: smallestDebt ? {
         name: smallestDebt.name,
         amount: Number(smallestDebt.remaining_amount),
@@ -187,6 +193,23 @@ export function WealthRoadmap() {
           <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700 }}>/100</div>
         </div>
       </div>
+
+      {/* صافي الثروة */}
+      {(data.netWorth !== 0 || data.totalPersonalAssets > 0) && (
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid var(--border)', background: data.netWorth >= 0 ? 'rgba(16,185,129,0.04)' : 'rgba(239,68,68,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 2 }}>
+              {ar ? '💎 صافي ثروتك الحقيقية' : '💎 Your True Net Worth'}
+            </div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+              {ar ? 'أصول + استثمارات + ادخار − ديون' : 'Assets + Investments + Savings − Debts'}
+            </div>
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 900, fontFamily: 'monospace', color: data.netWorth >= 0 ? '#10B981' : '#EF4444' }}>
+            {data.netWorth >= 0 ? '+' : ''}{data.netWorth.toLocaleString()} JOD
+          </div>
+        </div>
+      )}
 
       {/* شريط المراحل */}
       <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
