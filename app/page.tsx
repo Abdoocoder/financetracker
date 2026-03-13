@@ -1,9 +1,15 @@
 'use client'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { createClient } from '@supabase/supabase-js'
 
 export default function LandingPage() {
   const [showSticky, setShowSticky] = useState(false)
+  const [testimonials, setTestimonials] = useState([
+    { name: 'أحمد الشمري', country: '🇸🇦', role: 'موظف حكومي', stars: 5, text: 'أخيراً عرفت وين يروح راتبي! الديون خصمت تلقائياً وصحيت على تقرير صباحي كل يوم.' },
+    { name: 'سارة المنصوري', country: '🇦🇪', role: 'رائدة أعمال', stars: 5, text: 'خارطة الثراء غيرت تفكيري كلياً. عرفت إني في مرحلة سداد الديون وش الخطوة الجاية.' },
+    { name: 'محمد أبو علي', country: '🇯🇴', role: 'مهندس', stars: 5, text: 'جربت YNAB و Mint بس ما دعموا الدينار الأردني. هذا التطبيق فهمني من أول يوم.' },
+  ])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -11,6 +17,16 @@ export default function LandingPage() {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    supabase.from('testimonials').select('*').eq('is_visible', true).order('created_at').then(({ data }) => {
+      if (data && data.length > 0) setTestimonials(data)
+    })
   }, [])
 
   return (
@@ -228,11 +244,7 @@ export default function LandingPage() {
           <p style={{ fontSize: 15, color: 'var(--text-muted)' }}>آراء حقيقية من مستخدمين في العالم العربي</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-          {[
-            { name: 'أحمد الشمري', country: '🇸🇦', role: 'موظف حكومي', stars: 5, text: 'أخيراً عرفت وين يروح راتبي! الديون خصمت تلقائياً وصحيت على تقرير صباحي كل يوم. ما توقعت يكون بالعربي بهالجودة.' },
-            { name: 'سارة المنصوري', country: '🇦🇪', role: 'رائدة أعمال', stars: 5, text: 'خارطة الثراء غيرت تفكيري كلياً. عرفت إني في مرحلة سداد الديون وش الخطوة الجاية. بسيط وذكي.' },
-            { name: 'محمد أبو علي', country: '🇯🇴', role: 'مهندس', stars: 5, text: 'جربت YNAB و Mint بس ما دعموا الدينار الأردني. هذا التطبيق فهمني من أول يوم. التنبيه المسائي يذكرني أسجل مصاريفي.' },
-          ].map((t, i) => (
+          {testimonials.map((t, i) => (
             <div key={i} style={{ padding: 24, borderRadius: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', gap: 2 }}>
                 {Array(t.stars).fill(0).map((_, s) => (
