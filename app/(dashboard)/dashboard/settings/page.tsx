@@ -515,6 +515,75 @@ function DangerZone({
 // ══════════════════════════════════════════════════════
 // MAIN PAGE
 // ══════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════
+// ACCORDION CARD
+// ══════════════════════════════════════════════════════
+function AccordionCard({
+  title, icon, defaultOpen = false, badge, children
+}: {
+  title: string
+  icon: string
+  defaultOpen?: boolean
+  badge?: string
+  children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border)',
+      borderRadius: 20,
+      overflow: 'hidden',
+      boxShadow: 'var(--shadow-card)',
+      transition: 'border-color 0.2s',
+    }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%',
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: open ? 'rgba(59,126,246,0.04)' : 'transparent',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: 'inherit',
+          borderBottom: open ? '1px solid var(--border)' : 'none',
+          transition: 'background 0.2s',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 20 }}>{icon}</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{title}</span>
+          {badge && (
+            <span style={{
+              fontSize: 10, fontWeight: 700,
+              color: 'var(--accent-blue-light)',
+              background: 'var(--accent-blue-dim)',
+              border: '1px solid rgba(59,126,246,0.2)',
+              padding: '2px 8px', borderRadius: 100,
+            }}>{badge}</span>
+          )}
+        </div>
+        <span style={{
+          fontSize: 12,
+          color: 'var(--text-muted)',
+          transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          transition: 'transform 0.25s ease',
+          display: 'inline-block',
+        }}>▼</span>
+      </button>
+      {open && (
+        <div style={{ padding: '20px' }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function SettingsPage() {
   const { user: currentUser } = useUser()
   const supabase = useRef(createClient()).current
