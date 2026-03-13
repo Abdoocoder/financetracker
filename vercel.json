@@ -15,6 +15,14 @@
     {
       "path": "/api/daily-reminder",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/evening-reminder",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/weekly-report",
+      "schedule": "0 8 * * 5"
     }
   ]
 }

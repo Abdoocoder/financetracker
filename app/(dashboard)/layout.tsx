@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
 import { ToastProvider } from '@/components/ui/toast'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
-import { I18nProvider } from '@/lib/i18n'
+import { I18nProvider, useI18n } from '@/lib/i18n'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -50,10 +50,41 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         overflowX: 'hidden',
         minHeight: '100vh',
       }}>
-        {children}
+        <NotificationReminder />
+      {children}
       </main>
     </div>
   )
+}
+
+function NotificationReminder() {
+  const { lang } = useI18n()
+  useEffect(() => {
+    if (!('Notification' in window)) return
+    if (Notification.permission !== 'default') return
+    // مرة واحدة يومياً فقط
+    const key = 'notif_reminder_' + new Date().toDateString()
+    if (sessionStorage.getItem(key)) return
+    sessionStorage.setItem(key, '1')
+    // تأخير 3 ثواني بعد فتح التطبيق
+    const timer = setTimeout(() => {
+      const msg = lang === 'en'
+        ? '🔔 Enable notifications to get daily financial tips and alerts'
+        : '🔔 فعّل الإشعارات للحصول على تنبيهات مالية يومية تساعدك في توفير المال'
+      if (confirm(msg)) {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            new Notification('FinanceTracker 🎉', {
+              body: lang === 'en' ? 'Notifications enabled!' : 'تم تفعيل الإشعارات ✅',
+              icon: '/icon-192.png'
+            })
+          }
+        })
+      }
+    }, 3000)
+    return () => clearTimeout(timer)
+  }, [lang])
+  return null
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -63,7 +94,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <I18nProvider>
         <ToastProvider>
           <ErrorBoundary>
-            <DashboardContent>{children}</DashboardContent>
+            <DashboardContent><NotificationReminder />
+      {children}</DashboardContent>
           </ErrorBoundary>
         </ToastProvider>
       </I18nProvider>
