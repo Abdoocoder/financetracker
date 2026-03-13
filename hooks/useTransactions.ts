@@ -1,4 +1,5 @@
 'use client'
+import { useFinancialSummary } from '@/hooks/useFinancialSummary'
 import { useState, useCallback, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
@@ -196,7 +197,7 @@ export function useTransactions() {
   const filtered = searched.filter(tx => filter === 'all' || tx.type === filter)
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-  const net = totalIncome - totalExpense
+  const { debtPayments, net } = useFinancialSummary(currentUser?.id)
 
   return {
     transactions, filtered, loading, saving, deletingId,
