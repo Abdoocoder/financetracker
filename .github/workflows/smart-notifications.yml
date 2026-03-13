@@ -2,8 +2,11 @@ name: Smart Notifications CRON
 
 on:
   schedule:
-    - cron: '0 * * * *'  # كل ساعة
-  workflow_dispatch:       # تشغيل يدوي للاختبار
+    - cron: '0 3 * * *'   # 6 ص (UTC+3)
+    - cron: '0 5 * * *'   # 8 ص (UTC+3)
+    - cron: '0 6 * * *'   # 9 ص (UTC+3)
+    - cron: '0 15 * * *'  # 6 م (UTC+3)
+  workflow_dispatch:
 
 jobs:
   notify:
