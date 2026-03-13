@@ -189,6 +189,8 @@ export default function LandingPage() {
             { icon: '🔔', title: 'تنبيهات ذكية', desc: 'تحليل يومي تلقائي، تقرير أسبوعي، وتذكير مسائي — مع سياسة ذكية تمنع الإشعارات المزعجة.', badge: 'محدّث', badgeColor: '#10B981' },
             { icon: '💰', title: 'راتب تلقائي', desc: 'حدد يوم استلام راتبك وسيُضاف تلقائياً كل شهر بدون أي جهد منك.' },
             { icon: '🌐', title: 'عربي + English', desc: 'واجهة كاملة باللغتين العربية والإنجليزية مع دعم RTL احترافي.' },
+            { icon: '💎', title: 'الأصول الشخصية', desc: 'سجّل عقاراتك ومركباتك وذهبك واعرف صافي ثروتك الحقيقية مباشرة في خارطة الثراء.', badge: 'جديد', badgeColor: '#8B5CF6' },
+            { icon: '🏆', title: 'تحديات الادخار', desc: 'تحديات أسبوعية وشهرية تتبعها تلقائياً من معاملاتك — بدون أي إدخال يدوي.', badge: 'جديد', badgeColor: '#F59E0B' },
           ].map((f, i) => (
             <div key={i} style={{ padding: 24, borderRadius: 16, background: 'var(--bg-card)', border: '1px solid var(--border)', position: 'relative' }}>
               {f.badge && (
@@ -245,7 +247,7 @@ export default function LandingPage() {
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>مجاني</div>
             <div style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>$0</div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>للأبد</div>
-            {['المعاملات الأساسية', 'تتبع الديون', 'أهداف الادخار', 'خارطة الثراء 🗺️', 'تنبيهات يومية', 'راتب تلقائي'].map((f, i) => (
+            {['المعاملات الأساسية', 'تتبع الديون', 'أهداف الادخار', 'خارطة الثراء 🗺️', 'الأصول الشخصية 💎', 'تحديات الادخار 🏆', 'تنبيهات يومية', 'راتب تلقائي'].map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <span style={{ color: '#10B981', fontSize: 14 }}>✓</span>
                 <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{f}</span>
