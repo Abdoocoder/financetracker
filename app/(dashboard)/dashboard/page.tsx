@@ -81,7 +81,7 @@ function useDashboardData() {
       const txs      = txRes.data ?? []
       const income   = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      const debtPayments = (debtRes.data ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0)
+
       const months6  = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -95,8 +95,7 @@ function useDashboardData() {
       const prevMonth    = months6[4] ?? { income: 0, expense: 0 }
       const newData = {
         income, expenses, months6, categories,
-        net: income - expenses - debtPayments,
-        debtPayments,
+        net: income - expenses,
         prevIncome:   prevMonth.income,
         prevExpenses: prevMonth.expense,
         totalDebt:    (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
