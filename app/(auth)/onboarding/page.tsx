@@ -136,8 +136,28 @@ function Step3({ onGo, lang }: { onGo:()=>void; lang:string }) {
           </div>
         ))}
       </div>
+      {/* طلب إذن الإشعارات */}
+      <div style={{ padding:'16px', borderRadius:14, background:'rgba(59,126,246,0.06)', border:'1px solid rgba(59,126,246,0.15)', display:'flex', alignItems:'center', gap:14 }}>
+        <span style={{ fontSize:28 }}>🔔</span>
+        <div style={{ flex:1 }}>
+          <div style={{ fontSize:13, fontWeight:800, color:'var(--text-primary)', marginBottom:2 }}>
+            {lang === 'en' ? 'Enable notifications' : 'فعّل الإشعارات'}
+          </div>
+          <div style={{ fontSize:11, color:'var(--text-muted)', lineHeight:1.5 }}>
+            {lang === 'en' ? 'Get daily tips and spending alerts' : 'تنبيهات يومية ذكية لمساعدتك'}
+          </div>
+        </div>
+        <button onClick={async () => {
+          try {
+            if ('Notification' in window) await Notification.requestPermission()
+          } catch {}
+        }} style={{ padding:'8px 14px', borderRadius:10, border:'none', background:'var(--accent-blue)', color:'white', fontSize:12, fontWeight:700, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap' }}>
+          {lang === 'en' ? 'Allow' : 'السماح'}
+        </button>
+      </div>
+
       <button onClick={onGo} style={{ width:'100%', padding:'15px', marginTop:8, borderRadius:14, border:'none', background:'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', color:'white', fontSize:16, fontWeight:900, cursor:'pointer', fontFamily:'inherit', transition:'transform 0.15s' }} onMouseEnter={e=>{e.currentTarget.style.transform='scale(1.02)'}} onMouseLeave={e=>{e.currentTarget.style.transform='scale(1)'}}>
-        ادخل لوحة التحكم 🚀
+        {lang === 'en' ? 'Go to Dashboard 🚀' : 'ادخل لوحة التحكم 🚀'}
       </button>
     </div>
   )
@@ -191,6 +211,12 @@ export default function OnboardingPage() {
   async function handleDone() {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) await supabase.from('profiles').upsert({ id:user.id, onboarding_done:true })
+    // طلب إذن الإشعارات
+    try {
+      if ('Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission()
+      }
+    } catch {}
     router.push('/dashboard')
     router.refresh()
   }
