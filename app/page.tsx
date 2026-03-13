@@ -49,7 +49,7 @@ export default function LandingPage() {
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
           <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center' as const, boxShadow: '0 0 30px rgba(59,126,246,0.35)' }}>ابدأ مجاناً ←</Link>
-          <Link href="/login" style={{ flex: 1, minWidth: 120, padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none', textAlign: 'center' as const }}>لدي حساب</Link>
+          <Link href="/login" style={{ flex: 1, minWidth: 120, padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none', textAlign: 'center' as const }}>شاهد كيف يعمل ↓</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
           {['✓ مجاني للأبد', '✓ بدون بطاقة ائتمانية', '✓ تسجيل في 30 ثانية'].map((t, i) => (
@@ -277,9 +277,9 @@ export default function LandingPage() {
       {/* CTA */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: 700, margin: '0 auto 80px', padding: '0 24px', textAlign: 'center' }}>
         <div style={{ padding: '56px 40px', borderRadius: 28, background: 'linear-gradient(135deg, rgba(59,126,246,0.1), rgba(16,185,129,0.07))', border: '1px solid rgba(59,126,246,0.2)' }}>
-          <h2 style={{ fontSize: 'clamp(26px, 5vw, 38px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>ابدأ اليوم بدون أي التزام</h2>
-          <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>انضم لمن يتحكمون في أموالهم بذكاء</p>
-          <Link href="/register" style={{ display: 'inline-block', padding: '16px 44px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 17, fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(59,126,246,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>ابدأ مجاناً ←</Link>
+          <h2 style={{ fontSize: 'clamp(26px, 5vw, 38px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>وضعك المالي يستحق أكثر من Excel 💡</h2>
+          <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>ابدأ مجاناً الآن وشوف أين يذهب راتبك خلال دقيقتين</p>
+          <Link href="/register" style={{ display: 'inline-block', padding: '16px 44px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 17, fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(59,126,246,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>جرّب مجاناً — لا بطاقة مطلوبة ✓</Link>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
             {['✓ مجاني للأبد', '✓ بدون بطاقة', '✓ 30 ثانية للتسجيل'].map((t, i) => (
               <span key={i} style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}>{t}</span>
