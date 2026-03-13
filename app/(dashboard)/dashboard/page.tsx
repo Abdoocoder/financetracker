@@ -114,6 +114,28 @@ function useDashboardData() {
   return { data, setData, recentTx, loading, supabase }
 }
 
+
+function CollapsibleSection({ title, icon, defaultOpen = false, children }: {
+  title: string; icon: string; defaultOpen?: boolean; children: React.ReactNode
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--bg-card)' }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', background: 'transparent', border: 'none',
+        cursor: 'pointer', fontFamily: 'inherit',
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          {icon} {title}
+        </span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)', transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.25s', display: 'inline-block' }}>▼</span>
+      </button>
+      {open && <div style={{ padding: '0 0 4px' }}>{children}</div>}
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const { t, lang } = useI18n()
   const { user: currentUser } = useUser()
@@ -126,8 +148,9 @@ export default function DashboardPage() {
   const expenses = data?.expenses ?? 0
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <WealthRoadmap />
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>{t('dash_title')}</h1>
@@ -139,6 +162,8 @@ export default function DashboardPage() {
           </Link>
         )}
       </div>
+
+      {/* أرقام الشهر — مفتوح دائماً */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
           { label: t('dash_income'),   value: `+${income.toFixed(0)}`,  color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
@@ -152,6 +177,8 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* إضافة سريعة — مفتوح دائماً */}
       <QuickAdd onAdded={async () => {
         const user = currentUser
         if (!user) return
@@ -164,14 +191,46 @@ export default function DashboardPage() {
         const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
         setData((prev: any) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
       }} />
-      <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
-      <BudgetProgressCard income={income} expenses={expenses} net={net} />
-      {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
-      {data?.categories?.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
+
+      {/* روابط سريعة — مفتوح دائماً */}
       <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
-      <WealthSimulatorCard net={net} lang={lang} />
-      <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
+
+      {/* آخر المعاملات — مفتوح دائماً */}
       <RecentTransactionsCard transactions={recentTx} lang={lang} />
+
+      {/* خارطة الثراء — مطوية */}
+      <CollapsibleSection icon="🗺️" title={lang === 'en' ? 'Wealth Roadmap' : 'خارطة الثراء'}>
+        <div style={{ padding: '0 4px 4px' }}><WealthRoadmap /></div>
+      </CollapsibleSection>
+
+      {/* الميزانية والمقارنة — مطوية */}
+      <CollapsibleSection icon="📊" title={lang === 'en' ? 'Budget & Comparison' : 'الميزانية والمقارنة'}>
+        <div style={{ padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
+          <BudgetProgressCard income={income} expenses={expenses} net={net} />
+        </div>
+      </CollapsibleSection>
+
+      {/* الرسوم البيانية — مطوية */}
+      {(data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) || (data?.categories?.length > 0)) && (
+        <CollapsibleSection icon="📈" title={lang === 'en' ? 'Charts & Analytics' : 'الرسوم البيانية والتحليل'}>
+          <div style={{ padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
+            {data?.categories?.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
+          </div>
+        </CollapsibleSection>
+      )}
+
+      {/* محاكي الثروة — مطوي */}
+      <CollapsibleSection icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
+        <div style={{ padding: '8px 12px 12px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
+      </CollapsibleSection>
+
+      {/* تحديات الادخار — مطوية */}
+      <CollapsibleSection icon="🏆" title={lang === 'en' ? 'Savings Challenges' : 'تحديات الادخار'}>
+        <div style={{ padding: '8px 12px 12px' }}><ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} /></div>
+      </CollapsibleSection>
+
     </div>
   )
 }
