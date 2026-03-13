@@ -71,7 +71,7 @@ function useDashboardData() {
       const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
       const [txRes, debtRes, invRes, goalRes, alertRes, recentRes, chartRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
@@ -81,6 +81,7 @@ function useDashboardData() {
       const txs      = txRes.data ?? []
       const income   = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+      const debtPayments = (debtRes.data ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0)
       const months6  = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -94,7 +95,8 @@ function useDashboardData() {
       const prevMonth    = months6[4] ?? { income: 0, expense: 0 }
       const newData = {
         income, expenses, months6, categories,
-        net: income - expenses,
+        net: income - expenses - debtPayments,
+        debtPayments,
         prevIncome:   prevMonth.income,
         prevExpenses: prevMonth.expense,
         totalDebt:    (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
