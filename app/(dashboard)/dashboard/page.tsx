@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { WealthRoadmap } from '@/components/ui/wealth-roadmap'
 import { useCachedData } from '@/lib/use-cached-data'
 import { QuickAdd } from '@/components/ui/quick-add'
 
@@ -229,6 +230,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      <WealthRoadmap />
       <QuickAdd onAdded={async () => {
         // تحديث خفيف بدون skeleton
         const user = currentUser
