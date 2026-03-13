@@ -20,7 +20,7 @@ export default function Header({ profile }: { profile: Profile | null }) {
         <div className="text-right">
           <div className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>الراتب الشهري</div>
           <div className="text-sm font-bold" style={{ color: 'var(--accent-green)' }}>
-            {profile?.monthly_income?.toFixed(2) ?? '0.00'} {profile?.currency ?? 'JOD'}
+            {profile?.monthly_income?.toFixed(0) ?? '0.00'} {profile?.currency ?? 'JOD'}
           </div>
         </div>
         <div className="w-9 h-9 rounded-xl gradient-blue flex items-center justify-center text-white font-bold text-sm">

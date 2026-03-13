@@ -206,7 +206,7 @@ export function WealthRoadmap() {
             </div>
           </div>
           <div style={{ fontSize: 22, fontWeight: 900, fontFamily: 'monospace', color: data.netWorth >= 0 ? '#10B981' : '#EF4444' }}>
-            {data.netWorth >= 0 ? '+' : ''}{data.netWorth.toLocaleString()} JOD
+            {data.netWorth >= 0 ? '+' : ''}{data.netWorth.toLocaleString(undefined, {maximumFractionDigits: 0})} JOD
           </div>
         </div>
       )}
