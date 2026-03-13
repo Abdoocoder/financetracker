@@ -171,15 +171,38 @@ export async function GET(request: NextRequest) {
 
   const hour = getLocalHour()
   const day = getLocalDay()
-
   const tasks: string[] = []
 
-  if (hour === 6)  { await dailyMorningReminder(); tasks.push('morning') }
-  if (hour === 7)  { await smartAlerts();           tasks.push('alerts') }
-  if (hour === 8 && day !== 5) { await autoSalary(); tasks.push('salary') }
-  if (hour === 9)  { await autoDebt();              tasks.push('debt') }
-  if (hour === 18) { await eveningReminder();        tasks.push('evening') }
-  if (hour === 8 && day === 5) { await weeklyReport(); tasks.push('weekly') }
+  // 6 ص — صباحي + تنبيهات ذكية معاً (تنبيه واحد فقط)
+  if (hour === 6) {
+    await dailyMorningReminder()
+    await smartAlerts()
+    tasks.push('morning+alerts')
+  }
+
+  // 8 ص — راتب صامت (بدون إشعار)
+  if (hour === 8) {
+    await autoSalary()
+    tasks.push('salary-silent')
+  }
+
+  // 9 ص — ديون صامتة (بدون إشعار)
+  if (hour === 9) {
+    await autoDebt()
+    tasks.push('debt-silent')
+  }
+
+  // 6 م — مسائي فقط إذا لم يسجل المستخدم اليوم
+  if (hour === 18) {
+    await eveningReminder()
+    tasks.push('evening-if-needed')
+  }
+
+  // الجمعة 8 ص — تقرير أسبوعي (مرة واحدة فقط)
+  if (hour === 8 && day === 5) {
+    await weeklyReport()
+    tasks.push('weekly')
+  }
 
   return NextResponse.json({ ok: true, hour, day, tasks })
 }
