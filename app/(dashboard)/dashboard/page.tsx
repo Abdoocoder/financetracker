@@ -230,7 +230,6 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <WealthRoadmap />
       <QuickAdd onAdded={async () => {
         // تحديث خفيف بدون skeleton
         const user = currentUser
