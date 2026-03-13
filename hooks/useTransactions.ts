@@ -16,6 +16,8 @@ export interface TransactionForm {
   category: string
   description: string
   transaction_date: string
+  is_recurring: boolean
+  recurring_day: number
 }
 
 const DEFAULT_FORM: TransactionForm = {
@@ -24,6 +26,8 @@ const DEFAULT_FORM: TransactionForm = {
   category: '',
   description: '',
   transaction_date: new Date().toISOString().split('T')[0],
+  is_recurring: false,
+  recurring_day: new Date().getDate(),
 }
 
 function clearUserCache(userId: string) {
@@ -88,6 +92,8 @@ export function useTransactions() {
       category: tx.category ?? '',
       description: tx.description ?? '',
       transaction_date: tx.transaction_date,
+      is_recurring: tx.is_recurring ?? false,
+      recurring_day: tx.recurring_day ?? new Date().getDate(),
     })
     setShowForm(true)
   }

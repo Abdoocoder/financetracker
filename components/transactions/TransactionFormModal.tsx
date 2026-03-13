@@ -44,6 +44,59 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
       <FormField label={lang === 'en' ? 'Date' : 'التاريخ'}>
         <Input type="date" value={form.transaction_date} onChange={e => onChange({ transaction_date: e.target.value })} />
       </FormField>
+      {/* تكرار شهري */}
+      <div style={{ background: 'var(--bg-secondary)', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: form.is_recurring ? 12 : 0 }}>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+              🔁 {lang === 'ar' ? 'معاملة متكررة' : 'Recurring'}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+              {lang === 'ar' ? 'تنفيذ تلقائي كل شهر' : 'Auto-execute monthly'}
+            </div>
+          </div>
+          <button
+            onClick={() => onChange({ is_recurring: !form.is_recurring })}
+            style={{
+              width: 48, height: 28, borderRadius: 14,
+              background: form.is_recurring ? 'var(--accent-green-light)' : 'var(--bg-elevated)',
+              border: '1px solid var(--border)',
+              cursor: 'pointer', position: 'relative', transition: 'background 0.2s',
+              flexShrink: 0
+            }}
+          >
+            <div style={{
+              width: 22, height: 22, borderRadius: '50%', background: 'white',
+              position: 'absolute', top: 3,
+              left: form.is_recurring ? 23 : 3,
+              transition: 'left 0.2s',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.2)'
+            }} />
+          </button>
+        </div>
+        {form.is_recurring && (
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
+              {lang === 'ar' ? 'يوم التكرار كل شهر' : 'Repeat day each month'}
+            </div>
+            <input
+              type="number" min="1" max="31"
+              value={form.recurring_day}
+              onChange={e => onChange({ recurring_day: Number(e.target.value) })}
+              style={{
+                width: '100%', padding: '10px 14px', borderRadius: 10,
+                background: 'var(--bg-card)', border: '1px solid var(--border)',
+                color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit',
+                boxSizing: 'border-box'
+              }}
+            />
+            <div style={{ fontSize: 11, color: 'var(--accent-green-light)', marginTop: 8, fontWeight: 700 }}>
+              ✅ {lang === 'ar' ? 'سيتم التنفيذ تلقائياً كل شهر' : 'Will auto-execute every month'}
+            </div>
+          </div>
+        )}
+      </div>
+
       <SaveButton label={editingId ? (lang === 'en' ? 'Save Changes' : 'حفظ التعديل') : (lang === 'en' ? 'Add' : 'إضافة')} loading={saving} onClick={onSave} />
     </Modal>
   )
