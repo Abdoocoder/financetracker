@@ -64,7 +64,7 @@ export function WealthRoadmap() {
     const monthlyDebtPayment = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
     const totalDebt = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
     const totalSavings = goals.reduce((a, g) => a + Number(g.current_amount), 0)
-    const totalInvested = investments.reduce((a, i) => a + (Number(i.shares) * Number(i.avg_buy_price)), 0)
+    const totalInvested = investments.reduce((a, i) => a + (Number(i.shares) * Number(i.current_price)), 0)
     const emergencyTarget = monthlyExpenses * 3
 
     const debtRatio = income > 0 ? (monthlyDebtPayment / income) * 100 : 0
