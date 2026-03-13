@@ -483,6 +483,12 @@ const translations = {
     afterPayoff: 'بعد سدادها ستوفر {amount} JOD شهرياً للأبد',
     yourRoadmap: 'خارطة طريقك للثراء',
     yourRoadmapEn: 'Your Wealth Roadmap',
+    recurringTx: 'معاملة متكررة',
+    recurringTxEn: 'Recurring Transaction',
+    recurringDay: 'يوم التكرار كل شهر',
+    recurringDayEn: 'Repeat day each month',
+    recurringNote: '✅ سيتم التنفيذ تلقائياً كل شهر',
+    recurringNoteEn: '✅ Will auto-execute every month',
   }
 
 } as const
