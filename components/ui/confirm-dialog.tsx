@@ -23,11 +23,12 @@ export function ConfirmDialog({ title, message, confirmLabel = 'حذف', cancelL
         background: 'var(--bg-secondary)',
         borderRadius: '24px 24px 0 0',
         border: '1px solid var(--border)',
-        padding: '24px 20px 44px',
+        padding: '24px 20px',
+        paddingBottom: 'max(44px, env(safe-area-inset-bottom, 44px))',
         animation: 'slideUp 0.25s ease',
       }}>
         {/* Handle */}
-        <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border)', margin: '0 auto 24px' }} />
+        <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--border)', margin: '0 auto 16px' }} />
 
         {/* Icon */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
@@ -43,7 +44,7 @@ export function ConfirmDialog({ title, message, confirmLabel = 'حذف', cancelL
 
         {/* Text */}
         <h3 style={{ textAlign: 'center', fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 8px' }}>{title}</h3>
-        <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: '0 0 28px' }}>{message}</p>
+        <p style={{ textAlign: 'center', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: '0 0 20px' }}>{message}</p>
 
         {/* Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

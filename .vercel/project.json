@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_uh9Tkj9oUMwo4zA2tuinX4dVyvC0",
+  "orgId": "team_Ka0BFl088pd0KY5XhIZoRVNe",
+  "projectName": "financetracker",
+  "settings": {
+    "createdAt": 1773014801063,
+    "framework": "nextjs",
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}
