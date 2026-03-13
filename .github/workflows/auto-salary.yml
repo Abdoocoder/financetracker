@@ -1,0 +1,18 @@
+name: Auto Salary CRON
+
+on:
+  schedule:
+    - cron: '0 5 * * *'  # كل يوم 8 ص (UTC+3)
+  workflow_dispatch:
+
+jobs:
+  salary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Auto Salary
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://financetracker-brown.vercel.app/api/auto-salary)
+          echo "Response: $response"
+          echo "✅ Done"

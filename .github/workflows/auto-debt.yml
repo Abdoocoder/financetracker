@@ -1,0 +1,18 @@
+name: Auto Debt CRON
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # كل يوم 9 ص (UTC+3)
+  workflow_dispatch:
+
+jobs:
+  debt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Auto Debt
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://financetracker-brown.vercel.app/api/auto-debt)
+          echo "Response: $response"
+          echo "✅ Done"

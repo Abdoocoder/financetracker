@@ -1,0 +1,22 @@
+name: Smart Notifications CRON
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # كل ساعة
+  workflow_dispatch:       # تشغيل يدوي للاختبار
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Smart Notifications
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://financetracker-brown.vercel.app/api/smart-notifications)
+          echo "Response: $response"
+          if [ "$response" != "200" ]; then
+            echo "❌ Failed with status $response"
+            exit 1
+          fi
+          echo "✅ Success"
