@@ -220,6 +220,37 @@ export default function LandingPage() {
         </div>
       </section>
 
+      
+      {/* شهادات المستخدمين */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <h2 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>ماذا يقول المستخدمون؟</h2>
+          <p style={{ fontSize: 15, color: 'var(--text-muted)' }}>آراء حقيقية من مستخدمين في العالم العربي</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+          {[
+            { name: 'أحمد الشمري', country: '🇸🇦', role: 'موظف حكومي', stars: 5, text: 'أخيراً عرفت وين يروح راتبي! الديون خصمت تلقائياً وصحيت على تقرير صباحي كل يوم. ما توقعت يكون بالعربي بهالجودة.' },
+            { name: 'سارة المنصوري', country: '🇦🇪', role: 'رائدة أعمال', stars: 5, text: 'خارطة الثراء غيرت تفكيري كلياً. عرفت إني في مرحلة سداد الديون وش الخطوة الجاية. بسيط وذكي.' },
+            { name: 'محمد أبو علي', country: '🇯🇴', role: 'مهندس', stars: 5, text: 'جربت YNAB و Mint بس ما دعموا الدينار الأردني. هذا التطبيق فهمني من أول يوم. التنبيه المسائي يذكرني أسجل مصاريفي.' },
+          ].map((t, i) => (
+            <div key={i} style={{ padding: 24, borderRadius: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', gap: 2 }}>
+                {Array(t.stars).fill(0).map((_, s) => (
+                  <span key={s} style={{ color: '#F59E0B', fontSize: 14 }}>★</span>
+                ))}
+              </div>
+              <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0, flex: 1 }}>{t.text}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 900, color: 'white' }}>{t.name[0]}</div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{t.name} {t.country}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* الأسعار */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto 100px', padding: '0 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
