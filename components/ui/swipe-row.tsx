@@ -47,11 +47,12 @@ export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
       {/* المحتوى */}
       <div
         {...handlers}
+        onClick={(e) => { if (revealed) { setRevealed(false); e.stopPropagation() } }}
         style={{
           transform: revealed ? 'translateX(-70px)' : 'translateX(0)',
           transition: 'transform 0.25s ease',
           opacity,
-          position: 'relative', zIndex: 1,
+          position: 'relative', zIndex: 3,
         }}
       >
         {children}
@@ -61,7 +62,7 @@ export function SwipeRow({ children, onDelete, opacity = 1 }: SwipeRowProps) {
       {revealed && (
         <div
           onClick={() => setRevealed(false)}
-          style={{ position: 'fixed', inset: 0, zIndex: 0 }}
+          style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: revealed ? 'auto' : 'none' }}
         />
       )}
     </div>
