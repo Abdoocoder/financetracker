@@ -11,6 +11,7 @@ import { useTheme } from "@/lib/theme-context"
 import { PageHeader } from "@/components/ui/page-header"
 import { FormField, Input, Select, SaveButton } from "@/components/ui/form-field"
 import { PushToggle } from "@/components/ui/push-toggle"
+import { TestimonialSection } from "@/components/ui/testimonial-section"
 
 interface ProfileFormData {
   full_name: string
@@ -655,6 +656,8 @@ export default function SettingsPage() {
       <AccountSection onLogout={handleLogout} loggingOut={loadingStates.logout} />
 
       <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
+
+      <TestimonialSection userId={currentUser?.id ?? ''} />
 
       <DangerZone
         showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm}
