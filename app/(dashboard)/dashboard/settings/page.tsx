@@ -13,7 +13,10 @@ import { PushToggle } from '@/components/ui/push-toggle'
 
 export default function SettingsPage() {
   const [form, setForm] = useState({ full_name: '', monthly_income: '', currency: 'JOD', salary_day: '1' })
+  const [assets, setAssets] = useState({ real_estate: '', vehicles: '', jewelry: '', other_assets: '' })
+  const [assetsUpdatedAt, setAssetsUpdatedAt] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [savingAssets, setSavingAssets] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
   const [deletingAccount, setDeletingAccount] = useState(false)
@@ -32,7 +35,16 @@ export default function SettingsPage() {
       if (!user) return
       setUserEmail(user.email ?? '')
       const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-      if (data) setForm({ full_name: data.full_name ?? '', monthly_income: data.monthly_income?.toString() ?? '', currency: data.currency ?? 'JOD', salary_day: data.salary_day?.toString() ?? '1' })
+      if (data) {
+        setForm({ full_name: data.full_name ?? '', monthly_income: data.monthly_income?.toString() ?? '', currency: data.currency ?? 'JOD', salary_day: data.salary_day?.toString() ?? '1' })
+        setAssets({
+          real_estate: data.asset_real_estate?.toString() ?? '',
+          vehicles: data.asset_vehicles?.toString() ?? '',
+          jewelry: data.asset_jewelry?.toString() ?? '',
+          other_assets: data.asset_other?.toString() ?? '',
+        })
+        setAssetsUpdatedAt(data.assets_updated_at ?? null)
+      }
     }
     load()
   }, [supabase])
@@ -45,6 +57,25 @@ export default function SettingsPage() {
     if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
     toast.success(t('toast_saved'))
     setSaving(false)
+  }
+
+  async function handleSaveAssets() {
+    setSavingAssets(true)
+    const user = currentUser
+    if (!user) return
+    const now = new Date().toISOString()
+    const { error } = await supabase.from('profiles').upsert({
+      id: user.id,
+      asset_real_estate: parseFloat(assets.real_estate) || 0,
+      asset_vehicles: parseFloat(assets.vehicles) || 0,
+      asset_jewelry: parseFloat(assets.jewelry) || 0,
+      asset_other: parseFloat(assets.other_assets) || 0,
+      assets_updated_at: now,
+    })
+    if (error) { toast.error(t('toast_error_save')); setSavingAssets(false); return }
+    setAssetsUpdatedAt(now)
+    toast.success(t('toast_saved'))
+    setSavingAssets(false)
   }
 
   async function handleExportCSV() {
@@ -69,7 +100,6 @@ export default function SettingsPage() {
     const user = currentUser
     if (!user || deleteInput !== 'حذف حسابي') return
     setDeletingAccount(true)
-    // حذف كل البيانات
     await supabase.from('transactions').delete().eq('user_id', user.id)
     await supabase.from('debts').delete().eq('user_id', user.id)
     await supabase.from('investments').delete().eq('user_id', user.id)
@@ -85,12 +115,16 @@ export default function SettingsPage() {
     router.push('/login')
   }
 
+  const totalAssets = (parseFloat(assets.real_estate) || 0) + (parseFloat(assets.vehicles) || 0) + (parseFloat(assets.jewelry) || 0) + (parseFloat(assets.other_assets) || 0)
   const initials = form.full_name ? form.full_name.slice(0, 2) : userEmail.slice(0, 2).toUpperCase()
+
+  const assetsAge = assetsUpdatedAt ? Math.floor((Date.now() - new Date(assetsUpdatedAt).getTime()) / (1000 * 60 * 60 * 24 * 30)) : null
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <PageHeader title={t('settings_title')} subtitle={t('settings_subtitle')} />
 
+      {/* الملف الشخصي */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
           <div style={{ width: 56, height: 56, borderRadius: 16, flexShrink: 0, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 900, color: 'white', boxShadow: '0 4px 16px var(--accent-blue-glow)' }}>{initials}</div>
@@ -99,14 +133,13 @@ export default function SettingsPage() {
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{userEmail}</div>
           </div>
         </div>
-
         <FormField label={lang === "en" ? "Full Name" : "الاسم الكامل"}>
           <Input placeholder={lang === "en" ? "Full Name" : "الاسم الكامل"} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
         </FormField>
-        <FormField label={lang === "en" ? "Monthly Salary (JOD)" : "الراتب الشهري (JOD)"  }>
+        <FormField label={lang === "en" ? "Monthly Salary (JOD)" : "الراتب الشهري (JOD)"}>
           <Input type="number" placeholder="0" value={form.monthly_income} onChange={e => setForm(f => ({ ...f, monthly_income: e.target.value }))} />
         </FormField>
-        <FormField label={lang === "en" ? "Salary Day (1-28)" : "يوم استلام الراتب (1-28)"  }>
+        <FormField label={lang === "en" ? "Salary Day (1-28)" : "يوم استلام الراتب (1-28)"}>
           <Input type="number" placeholder="1" min="1" max="28" value={form.salary_day} onChange={e => setForm(f => ({ ...f, salary_day: e.target.value }))} />
         </FormField>
         <FormField label={lang === "en" ? "Currency" : "العملة"}>
@@ -138,6 +171,46 @@ export default function SettingsPage() {
         <SaveButton label={lang === "en" ? "Save Changes" : "حفظ التغييرات"} loading={saving} onClick={handleSave} />
       </div>
 
+      {/* الأصول الشخصية */}
+      <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(59,126,246,0.2)', borderRadius: 20, padding: '20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+            {t('settings_assets_title')}
+          </div>
+          {assetsAge !== null && (
+            <div style={{ fontSize: 11, color: assetsAge >= 3 ? '#F59E0B' : 'var(--text-muted)', fontWeight: 600 }}>
+              {assetsAge >= 3 ? '⚠️ ' : '✓ '}{lang === 'en' ? `Updated ${assetsAge}mo ago` : `آخر تحديث منذ ${assetsAge} أشهر`}
+            </div>
+          )}
+        </div>
+        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16, lineHeight: 1.6 }}>
+          {t('settings_assets_desc')}
+        </p>
+
+        {/* إجمالي الأصول */}
+        {totalAssets > 0 && (
+          <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))', border: '1px solid rgba(59,126,246,0.15)', borderRadius: 14, padding: '14px 16px', marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>💼 {t('settings_assets_total')}</span>
+            <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>{totalAssets.toLocaleString()} {form.currency}</span>
+          </div>
+        )}
+
+        <FormField label={`🏠 ${t('settings_assets_realestate')}`}>
+          <Input type="number" placeholder="0" value={assets.real_estate} onChange={e => setAssets(a => ({ ...a, real_estate: e.target.value }))} />
+        </FormField>
+        <FormField label={`🚗 ${t('settings_assets_vehicles')}`}>
+          <Input type="number" placeholder="0" value={assets.vehicles} onChange={e => setAssets(a => ({ ...a, vehicles: e.target.value }))} />
+        </FormField>
+        <FormField label={`👑 ${t('settings_assets_jewelry')}`}>
+          <Input type="number" placeholder="0" value={assets.jewelry} onChange={e => setAssets(a => ({ ...a, jewelry: e.target.value }))} />
+        </FormField>
+        <FormField label={`📦 ${t('settings_assets_other')}`}>
+          <Input type="number" placeholder="0" value={assets.other_assets} onChange={e => setAssets(a => ({ ...a, other_assets: e.target.value }))} />
+        </FormField>
+        <SaveButton label={lang === "en" ? "Save Assets" : "حفظ الأصول"} loading={savingAssets} onClick={handleSaveAssets} />
+      </div>
+
+      {/* الحساب */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '20px' }}>
         <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 14, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{lang === 'en' ? 'Account' : 'الحساب'}</div>
         <PushToggle />
