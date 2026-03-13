@@ -1,0 +1,18 @@
+name: Wealth Guidance CRON
+
+on:
+  schedule:
+    - cron: '0 16 * * *'  # 7 م (UTC+3)
+  workflow_dispatch:
+
+jobs:
+  wealth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Wealth Guidance
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://financetracker-brown.vercel.app/api/smart-notifications)
+          echo "Response: $response"
+          echo "✅ Wealth guidance sent"
