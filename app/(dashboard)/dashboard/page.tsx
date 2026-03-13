@@ -113,6 +113,80 @@ function CategoryBars({ categories, lang }: { categories: [string, number][], la
   )
 }
 
+
+function ChallengesCard({ lang, data, net, income, expenses }: { lang: string, data: any, net: number, income: number, expenses: number }) {
+  const { t } = useI18n()
+  const challenges = [
+    { id: 1, icon: '🍔', title: lang === 'en' ? 'No Restaurants Week' : 'أسبوع بدون مطاعم', days: 7 },
+    { id: 2, icon: '💰', title: lang === 'en' ? 'Save 10% of Income' : 'وفّر 10% من دخلك', days: 30 },
+    { id: 3, icon: '📉', title: lang === 'en' ? 'Spend Less Than Last Month' : 'أنفق أقل من الشهر الماضي', days: 30 },
+    { id: 4, icon: '🎯', title: lang === 'en' ? 'Zero Extra Spending' : 'صفر مصاريف غير ضرورية', days: 14 },
+  ]
+  const [activeChallenge, setActiveChallenge] = useState<number|null>(null)
+  const active = challenges.find(c => c.id === activeChallenge)
+
+  const getProgress = (id: number) => {
+    if (!data) return 0
+    if (id === 1) {
+      const foodSpend = (data.categories ?? []).find(([cat]: [string,number]) => cat === 'طعام')?.[1] ?? 0
+      return foodSpend === 0 ? 100 : Math.max(0, 100 - (foodSpend / 50 * 100))
+    }
+    if (id === 2) { const t = income * 0.1; return t > 0 ? Math.min(100, (net / t) * 100) : 0 }
+    if (id === 3) { const t = data?.prevExpenses ?? 0; return t > 0 ? Math.min(100, ((t - expenses) / t) * 100) : 0 }
+    if (id === 4) {
+      const entSpend = (data.categories ?? []).find(([cat]: [string,number]) => cat === 'ترفيه')?.[1] ?? 0
+      return entSpend === 0 ? 100 : 0
+    }
+    return 0
+  }
+
+  return (
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>🏆 {t('dash_challenges')}</span>
+        {active && <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-blue-light)', background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.2)', padding: '3px 10px', borderRadius: 100 }}>{t('dash_challenge_active')}</span>}
+      </div>
+      {active ? (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span style={{ fontSize: 28 }}>{active.icon}</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{active.title}</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{active.days} {t('dash_challenge_days_left')}</div>
+            </div>
+          </div>
+          <div style={{ marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('dash_challenge_progress')}</span>
+              <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--accent-green-light)' }}>{getProgress(active.id).toFixed(0)}%</span>
+            </div>
+            <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-elevated)' }}>
+              <div style={{ height: '100%', width: `${getProgress(active.id)}%`, borderRadius: 4, background: getProgress(active.id) >= 100 ? '#10B981' : 'var(--accent-blue)', transition: 'width 0.5s ease' }} />
+            </div>
+          </div>
+          {getProgress(active.id) >= 100 && <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#10B981' }}>{t('dash_challenge_done')}</div>}
+          <button onClick={() => setActiveChallenge(null)} style={{ marginTop: 10, width: '100%', padding: '8px', borderRadius: 10, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+            {lang === 'en' ? 'Change Challenge' : 'تغيير التحدي'}
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {challenges.map(c => (
+            <button key={c.id} onClick={() => setActiveChallenge(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', cursor: 'pointer', textAlign: 'right' as const, width: '100%' }}>
+              <span style={{ fontSize: 22, flexShrink: 0 }}>{c.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{c.title}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.days} {lang === 'en' ? 'days' : 'يوم'}</div>
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-blue-light)', background: 'rgba(59,126,246,0.1)', padding: '4px 10px', borderRadius: 8, flexShrink: 0 }}>{t('dash_challenge_join')}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const { t, lang } = useI18n()
   const supabase = createClient()
@@ -342,78 +416,9 @@ export default function DashboardPage() {
 
 
       {/* تحديات الادخار */}
-      {(() => {
-        const challenges = [
-          { id: 1, icon: '🍔', title: lang === 'en' ? 'No Restaurants Week' : 'أسبوع بدون مطاعم', category: 'طعام', days: 7, target: 0 },
-          { id: 2, icon: '💰', title: lang === 'en' ? 'Save 10% of Income' : 'وفّر 10% من دخلك', category: null, days: 30, target: income * 0.1 },
-          { id: 3, icon: '📉', title: lang === 'en' ? 'Spend Less Than Last Month' : 'أنفق أقل من الشهر الماضي', category: null, days: 30, target: data?.prevExpenses ?? 0 },
-          { id: 4, icon: '🎯', title: lang === 'en' ? 'Zero Extra Spending' : 'صفر مصاريف غير ضرورية', category: 'ترفيه', days: 14, target: 0 },
-        ]
-        const [activeChallenge, setActiveChallenge] = useState<number|null>(null)
-        const active = challenges.find(c => c.id === activeChallenge)
+      <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
 
-        // حساب التقدم
-        const getProgress = (c: typeof challenges[0]) => {
-          if (!data) return 0
-          if (c.id === 1) {
-            const foodSpend = (data.categories ?? []).find(([cat]: [string,number]) => cat === 'طعام')?.[1] ?? 0
-            return foodSpend === 0 ? 100 : Math.max(0, 100 - (foodSpend / 50 * 100))
-          }
-          if (c.id === 2) return c.target > 0 ? Math.min(100, (net / c.target) * 100) : 0
-          if (c.id === 3) return c.target > 0 ? Math.min(100, ((c.target - expenses) / c.target) * 100) : 0
-          if (c.id === 4) {
-            const entSpend = (data.categories ?? []).find(([cat]: [string,number]) => cat === 'ترفيه')?.[1] ?? 0
-            return entSpend === 0 ? 100 : 0
-          }
-          return 0
-        }
-
-        return (
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>🏆 {t('dash_challenges')}</span>
-              {active && <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-blue-light)', background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.2)', padding: '3px 10px', borderRadius: 100 }}>{t('dash_challenge_active')}</span>}
-            </div>
-            {active ? (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <span style={{ fontSize: 28 }}>{active.icon}</span>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{active.title}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{active.days} {t('dash_challenge_days_left')}</div>
-                  </div>
-                </div>
-                <div style={{ marginBottom: 8 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('dash_challenge_progress')}</span>
-                    <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--accent-green-light)' }}>{getProgress(active).toFixed(0)}%</span>
-                  </div>
-                  <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-elevated)' }}>
-                    <div style={{ height: '100%', width: `${getProgress(active)}%`, borderRadius: 4, background: getProgress(active) >= 100 ? '#10B981' : 'var(--accent-blue)', transition: 'width 0.5s ease' }} />
-                  </div>
-                </div>
-                {getProgress(active) >= 100 && <div style={{ textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#10B981' }}>{t('dash_challenge_done')}</div>}
-                <button onClick={() => setActiveChallenge(null)} style={{ marginTop: 10, width: '100%', padding: '8px', borderRadius: 10, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                  {lang === 'en' ? 'Change Challenge' : 'تغيير التحدي'}
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {challenges.map(c => (
-                  <button key={c.id} onClick={() => setActiveChallenge(c.id)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', cursor: 'pointer', textAlign: 'right' as const, width: '100%' }}>
-                    <span style={{ fontSize: 22, flexShrink: 0 }}>{c.icon}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{c.title}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.days} {lang === 'en' ? 'days' : 'يوم'}</div>
-                    </div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-blue-light)', background: 'rgba(59,126,246,0.1)', padding: '4px 10px', borderRadius: 8, flexShrink: 0 }}>{t('dash_challenge_join')}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )
-      })()}
+      
 
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
