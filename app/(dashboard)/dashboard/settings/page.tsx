@@ -705,34 +705,48 @@ export default function SettingsPage() {
     router.push('/login')
   }
 
+  const { lang } = useI18n()
+
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <PageHeader title={t('settings_title')} subtitle={t('settings_subtitle')} />
 
-      <ProfileSection
-        profileForm={profileForm} setProfileForm={setProfileForm}
-        userEmail={userEmail} initials={initials} memberSince={memberSince}
-        saving={loadingStates.profile} onSave={handleSaveProfile}
-      />
+      <AccordionCard icon="👤" title={lang === 'en' ? 'Personal Profile' : 'الملف الشخصي'} defaultOpen={true}>
+        <ProfileSection
+          profileForm={profileForm} setProfileForm={setProfileForm}
+          userEmail={userEmail} initials={initials} memberSince={memberSince}
+          saving={loadingStates.profile} onSave={handleSaveProfile}
+        />
+      </AccordionCard>
 
-      <AssetsSection
-        assetsForm={assetsForm} setAssetsForm={setAssetsForm}
-        totalAssets={totalAssets} assetsAge={assetsAge}
-        currency={profileForm.currency} saving={loadingStates.assets}
-        onSave={handleSaveAssets}
-      />
+      <AccordionCard icon="💎" title={lang === 'en' ? 'Personal Assets' : 'أصولي الشخصية'} badge={lang === 'en' ? 'Net Worth' : 'صافي الثروة'}>
+        <AssetsSection
+          assetsForm={assetsForm} setAssetsForm={setAssetsForm}
+          totalAssets={totalAssets} assetsAge={assetsAge}
+          currency={profileForm.currency} saving={loadingStates.assets}
+          onSave={handleSaveAssets}
+        />
+      </AccordionCard>
 
-      <AccountSection onLogout={handleLogout} loggingOut={loadingStates.logout} />
+      <AccordionCard icon="🔔" title={lang === 'en' ? 'Account & Notifications' : 'الحساب والإشعارات'}>
+        <AccountSection onLogout={handleLogout} loggingOut={loadingStates.logout} />
+      </AccordionCard>
 
-      <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
+      <AccordionCard icon="📥" title={lang === 'en' ? 'Export Data' : 'تصدير البيانات'}>
+        <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
+      </AccordionCard>
 
-      <TestimonialSection userId={currentUser?.id ?? ''} />
+      <AccordionCard icon="⭐" title={lang === 'en' ? 'Share Your Experience' : 'شارك تجربتك'} badge={lang === 'en' ? 'New' : 'جديد'}>
+        <TestimonialSection userId={currentUser?.id ?? ''} />
+      </AccordionCard>
 
-      <DangerZone
-        showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm}
-        deleteInput={deleteInput} setDeleteInput={setDeleteInput}
-        onDelete={handleDeleteAccount} deleting={loadingStates.delete}
-      />
+      <AccordionCard icon="⚠️" title={lang === 'en' ? 'Danger Zone' : 'منطقة الخطر'}>
+        <DangerZone
+          showDeleteConfirm={showDeleteConfirm} setShowDeleteConfirm={setShowDeleteConfirm}
+          deleteInput={deleteInput} setDeleteInput={setDeleteInput}
+          onDelete={handleDeleteAccount} deleting={loadingStates.delete}
+        />
+      </AccordionCard>
     </div>
   )
 }
