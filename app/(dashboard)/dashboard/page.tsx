@@ -308,6 +308,38 @@ export default function DashboardPage() {
         </Link>
       ))}
 
+
+      {/* محاكي الثروة - بطاقة سريعة */}
+      <Link href="/dashboard/investments" style={{ textDecoration: 'none' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))', border: '1px solid rgba(59,126,246,0.2)', borderRadius: 16, padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>📈 {lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-blue-light)', background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.2)', padding: '3px 10px', borderRadius: 100 }}>{lang === 'en' ? 'View' : 'افتح ←'}</span>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>{lang === 'en' ? 'If you invest your monthly surplus:' : 'لو استثمرت فائضك الشهري:'}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+            {(() => {
+              const surplus = Math.max(0, Math.round(net))
+              const invest = Math.max(surplus, 10)
+              const future10 = invest * ((Math.pow(1 + 0.07/12, 120) - 1) / (0.07/12))
+              const future20 = invest * ((Math.pow(1 + 0.07/12, 240) - 1) / (0.07/12))
+              const fmt = (n: number) => n >= 1000 ? `$${(n/1000).toFixed(1)}K` : `$${n.toFixed(0)}`
+              return [
+                { label: lang === 'en' ? 'Monthly' : 'شهرياً', value: `$${invest}`, color: 'var(--accent-blue-light)' },
+                { label: lang === 'en' ? '10 years' : 'بعد 10 سنوات', value: fmt(future10), color: 'var(--accent-green-light)' },
+                { label: lang === 'en' ? '20 years' : 'بعد 20 سنة', value: fmt(future20), color: '#F59E0B' },
+              ].map((s, i) => (
+                <div key={i} style={{ textAlign: 'center', padding: '10px 6px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: s.color, fontFamily: 'monospace' }}>{s.value}</div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
+                </div>
+              ))
+            })()}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, textAlign: 'center' }}>💡 {lang === 'en' ? 'Based on 7% annual return (S&P500 avg)' : 'بناءً على عائد 7% سنوياً (متوسط S&P500)'}</div>
+        </div>
+      </Link>
+
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{t('dash_recent')}</span>
