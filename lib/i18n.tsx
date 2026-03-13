@@ -410,6 +410,20 @@ const translations = {
     showYearByYear: 'Show year by year',
     hideDetails: 'Hide details',
     compoundNote: 'Based on compound interest. Actual returns may vary.',
+    eveningReminderTitle: 'لم تسجل اليوم بعد 🤔',
+    eveningReminderBody: 'هل كان يوماً بدون إنفاق؟ سجّل الآن قبل أن تنسى',
+    eveningReminderTitleDone: 'أحسنت اليوم! 💪',
+    eveningReminderBodyDone: 'سجّلت {n} معاملة اليوم. استمر على هذا النهج',
+    weeklyReportTitle: 'تقرير أسبوعك 📊',
+    weeklyReportBetter: 'أسبوع أفضل! وفّرت {n} مقارنة بالأسبوع الماضي ✅',
+    weeklyReportWorse: 'أنفقت {n} أكثر من الأسبوع الماضي — راجع مصاريفك',
+    weeklyReportSame: 'إنفاقك مستقر هذا الأسبوع',
+    investmentNudgeTitle: 'فرصة استثمار 📈',
+    investmentNudgeBody: 'وفّرت {n} هذا الشهر — لو استثمرتها ستصبح {future} بعد 10 سنوات',
+    monthEndTitle: 'آخر {n} أيام في الشهر ⚠️',
+    monthEndBody: 'تبقى لك {amount} — أنفق بحكمة حتى نهاية الشهر',
+    categoryWarningTitle: 'تنبيه إنفاق 🔶',
+    categoryWarningBody: 'أنفقت {amount} على {category} هذا الشهر — {pct}% من ميزانيتك',
   }
 
 } as const
