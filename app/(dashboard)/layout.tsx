@@ -63,9 +63,9 @@ function NotificationReminder() {
     if (!('Notification' in window)) return
     if (Notification.permission !== 'default') return
     // مرة واحدة يومياً فقط
-    const key = 'notif_reminder_' + new Date().toDateString()
-    if (sessionStorage.getItem(key)) return
-    sessionStorage.setItem(key, '1')
+    const key = 'notif_asked'
+    if (localStorage.getItem(key)) return
+    localStorage.setItem(key, '1')
     // تأخير 3 ثواني بعد فتح التطبيق
     const timer = setTimeout(() => {
       const msg = lang === 'en'
