@@ -69,7 +69,7 @@ export function PushPrompt() {
           {lang === 'en' ? 'Enable Notifications?' : 'تفعيل الإشعارات؟'}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-          {lang === 'en' ? 'Get daily financial insights & alerts' : 'تنبيهات مالية يومية حتى لو التطبيق مغلق'}
+          {lang === 'en' ? 'Get daily alerts — enable sound in app settings for best experience' : 'تنبيهات يومية — فعّل صوت الإشعارات من إعدادات التطبيق للحصول على أفضل تجربة'}
         </div>
       </div>
 
