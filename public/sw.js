@@ -3,12 +3,13 @@ self.addEventListener('push', function(event) {
   const data = event.data.json();
   const options = {
     body: data.message,
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
+    icon: '/icon-192.png',
+    badge: '/icon-96.png',
     tag: data.tag || 'finance-alert',
     renotify: true,
     requireInteraction: false,
-    vibrate: [200, 100, 200],
+    silent: false,
+    vibrate: [200, 100, 200, 100, 200],
     data: { url: data.url || '/dashboard/alerts' },
     actions: [
       { action: 'open', title: '📊 فتح التطبيق' },
