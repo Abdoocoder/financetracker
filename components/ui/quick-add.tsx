@@ -49,7 +49,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
     await supabase.from('transactions').insert({
       user_id: user.id,
       type: selected.type,
-      amount: parseFloat(amount),
+      amount: parseFloat(amount.replace(",", ".")),
       category: selected.label,
       description: null,
       transaction_date: new Date().toISOString().split('T')[0],
