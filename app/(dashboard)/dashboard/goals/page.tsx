@@ -9,8 +9,6 @@ import { useI18n } from '@/lib/i18n'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
-
-// مسح cache المستخدم بعد أي تعديل
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
   const { user: currentUser } = useUser()
@@ -36,7 +34,7 @@ export default function GoalsPage() {
     setGoals(result)
     setLoading(false)
     try { sessionStorage.setItem(`goals_${user.id}`, JSON.stringify({ d: result, ts: Date.now() })) } catch {}
-  }, [supabase])
+  }, [supabase, currentUser])
 
   useEffect(() => { load() }, [load])
 
@@ -95,15 +93,17 @@ export default function GoalsPage() {
   if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
 
   return (
-    <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto">
+    <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto" ref={pageRef}>
+      <PullToRefreshIndicator refreshing={refreshing} />
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-black" style={{ color: 'var(--text-primary)' }}>{t('goals_title')}</h1>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{goals.length} {`هدف`}</p>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{goals.length} {t('goals_count')}</p>
         </div>
         <button onClick={() => { cancelForm(); setShowForm(true) }}
           className="px-4 py-2.5 rounded-xl gradient-blue text-white text-sm font-black glow-blue" style={{ fontFamily: 'inherit' }}>
-          + {`+ إضافة`}
+          + {t('goals_add')}
         </button>
       </div>
 
@@ -111,11 +111,11 @@ export default function GoalsPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-green-light)' }}>{totalSaved.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{lang === "en" ? "Saved" : "المدخر"} JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_saved')} JOD</div>
           </div>
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>{totalTarget.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{lang === "en" ? "Goal" : "الهدف"} JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_target_lbl')} JOD</div>
           </div>
         </div>
       )}
@@ -123,10 +123,10 @@ export default function GoalsPage() {
       {showForm && (
         <div className="card p-4 animate-scale-in" style={{ borderColor: editingId ? 'rgba(245,158,11,0.4)' : 'rgba(59,130,246,0.3)' }}>
           <h3 className="font-black mb-4 text-sm" style={{ color: 'var(--text-primary)' }}>
-            {editingId ? `تعديل هدف` : `هدف جديد`}
+            {editingId ? t('goals_edit') : t('goals_new')}
           </h3>
           <div className="mb-3">
-            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{`الأيقونة`}</label>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'var(--text-muted)' }}>{t('goals_icon')}</label>
             <div className="flex flex-wrap gap-2">
               {icons.map(i => (
                 <button key={i} onClick={() => setForm(p => ({ ...p, icon: i }))}
@@ -139,10 +139,10 @@ export default function GoalsPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: lang === 'en' ? 'Goal Name' : 'اسم الهدف',    key: 'name',           type: 'text',   col: 'col-span-2' },
-              { label: `المبلغ المستهدف`,  key: 'target_amount',  type: 'number', col: '' },
-              { label: lang === 'en' ? 'Saved Amount' : 'المدخر حالياً', key: 'current_amount', type: 'number', col: '' },
-              { label: lang === 'en' ? 'Target Date' : 'تاريخ الهدف',    key: 'target_date',    type: 'date',   col: 'col-span-2' },
+              { label: t('goals_name'),    key: 'name',           type: 'text',   col: 'col-span-2' },
+              { label: t('goals_target'),  key: 'target_amount',  type: 'number', col: '' },
+              { label: t('goals_current'), key: 'current_amount', type: 'number', col: '' },
+              { label: t('goals_date'),    key: 'target_date',    type: 'date',   col: 'col-span-2' },
             ].map(f => (
               <div key={f.key} className={f.col}>
                 <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
@@ -156,7 +156,7 @@ export default function GoalsPage() {
             <button onClick={saveGoal} disabled={saving}
               className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
               style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
-              {saving ? '...' : editingId ? (lang === 'en' ? 'Save' : 'حفظ التعديل') : (lang === 'en' ? 'Add Goal' : 'إضافة الهدف')}
+              {saving ? '...' : editingId ? t('goals_save_edit') : t('goals_save')}
             </button>
             <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
               style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>
@@ -193,7 +193,11 @@ export default function GoalsPage() {
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span> / {goal.target_amount.toFixed(0)} JOD
                 </div>
-                {remaining > 0 && <div className="text-xs" style={{ color: 'var(--text-muted)' }}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: <span className="font-mono">{remaining.toFixed(0)} JOD</span></div>}
+                {remaining > 0 && (
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                    {t('goals_remaining')}: <span className="font-mono">{remaining.toFixed(0)} JOD</span>
+                  </div>
+                )}
               </div>
               {savingGoalId === goal.id ? (
                 <div className="flex gap-2 mt-2">
@@ -207,7 +211,7 @@ export default function GoalsPage() {
               ) : (
                 remaining > 0 && (
                   <button onClick={() => setSavingGoalId(goal.id)} className="w-full py-2 rounded-xl text-sm font-bold badge-green mt-1">
-                    {lang === 'en' ? 'Add Saving' : 'إضافة ادخار'}
+                    {t('goals_add_saving')}
                   </button>
                 )
               )}
@@ -217,7 +221,7 @@ export default function GoalsPage() {
         {goals.length === 0 && (
           <div className="text-center py-16 card">
             <div className="text-4xl mb-3">🎯</div>
-            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>{`لا توجد أهداف`}</div>
+            <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>{t('goals_empty')}</div>
           </div>
         )}
       </div>
