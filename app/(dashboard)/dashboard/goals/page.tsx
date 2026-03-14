@@ -56,11 +56,11 @@ export default function GoalsPage() {
     const user = currentUser
     if (!user) return
     if (editingId) {
-      const { error } = await supabase.from('savings_goals').update({ name: form.name, target_amount: parseFloat(form.target_amount), current_amount: parseFloat(form.current_amount), target_date: form.target_date || null, icon: form.icon }).eq('id', editingId)
+      const { error } = await supabase.from('savings_goals').update({ name: form.name, target_amount: parseFloat(form.target_amount.replace(",", ".")), current_amount: parseFloat(form.current_amount.replace(",", ".")), target_date: form.target_date || null, icon: form.icon }).eq('id', editingId)
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_edited'))
     } else {
-      const { error } = await supabase.from('savings_goals').insert({ user_id: user.id, name: form.name, target_amount: parseFloat(form.target_amount), current_amount: parseFloat(form.current_amount) || 0, target_date: form.target_date || null, icon: form.icon })
+      const { error } = await supabase.from('savings_goals').insert({ user_id: user.id, name: form.name, target_amount: parseFloat(form.target_amount.replace(",", ".")), current_amount: parseFloat(form.current_amount.replace(",", ".")) || 0, target_date: form.target_date || null, icon: form.icon })
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_goal_added'))
     }
