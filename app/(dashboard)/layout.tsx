@@ -12,6 +12,7 @@ import { PushPrompt } from '@/components/ui/push-prompt'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
+  const { lang } = useI18n()
   const [alertsCount, setAlertsCount] = useState(0)
   const pathname = usePathname()
   const supabase = createClient()
@@ -41,7 +42,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }, [user, pathname])
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: 'rtl' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
       <Sidebar alertsCount={alertsCount} />
       <main style={{
         flex: 1,
