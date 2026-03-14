@@ -10,6 +10,7 @@ import { WealthRoadmap }              from '@/components/ui/wealth-roadmap'
 import { QuickAdd }                   from '@/components/ui/quick-add'
 import { MiniBarChart, CategoryBars } from '@/components/dashboard/Charts'
 import { ChallengesCard }             from '@/components/dashboard/ChallengesCard'
+import { GamificationCard }           from '@/components/dashboard/GamificationCard'
 import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
@@ -194,6 +195,9 @@ export default function DashboardPage() {
 
       {/* روابط سريعة — مفتوح دائماً */}
       <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
+
+      {/* رحلة الثروة — مفتوح دائماً */}
+      <GamificationCard />
 
       {/* آخر المعاملات — مفتوح دائماً */}
       <RecentTransactionsCard transactions={recentTx} lang={lang} />
