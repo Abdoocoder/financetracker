@@ -279,18 +279,31 @@ export default function LandingPage() {
             ))}
             <Link href="/register" style={{ display: 'block', textAlign: 'center', marginTop: 24, padding: '12px', borderRadius: 12, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>ابدأ مجاناً</Link>
           </div>
-          <div style={{ padding: 28, borderRadius: 20, background: 'linear-gradient(135deg, rgba(59,126,246,0.12), rgba(16,185,129,0.08))', border: '1px solid rgba(59,126,246,0.3)', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: 16, left: 16, padding: '4px 10px', borderRadius: 100, background: 'var(--accent-blue)', color: 'white', fontSize: 11, fontWeight: 800 }}>الأكثر شيوعاً</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pro</div>
-            <div style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>$4.99</div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>شهرياً</div>
-            {['كل ميزات المجاني', 'إشعارات Push', 'أسعار أسهم حية', 'تقارير أسبوعية متقدمة', 'دعم أولوية', '⏳ تصدير PDF — قادم', '⏳ OCR للفواتير — قادم'].map((f, i) => (
+          <div style={{ padding: 28, borderRadius: 20, background: 'linear-gradient(135deg, rgba(59,126,246,0.06), rgba(139,92,246,0.06))', border: '1px solid rgba(59,126,246,0.2)', position: 'relative', overflow: 'hidden', opacity: 0.85 }}>
+            <div style={{ position: 'absolute', top: 16, left: 16, padding: '4px 10px', borderRadius: 100, background: 'rgba(139,92,246,0.15)', color: '#A78BFA', border: '1px solid rgba(139,92,246,0.3)', fontSize: 11, fontWeight: 800 }}>قريباً</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#A78BFA', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pro</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>قريباً</div>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>نعمل عليها الآن</div>
+            {[
+              '📄 تصدير تقارير PDF شهرية',
+              '🤖 مستشار مالي بالذكاء الاصطناعي',
+              '📸 OCR — مسح الفواتير تلقائياً',
+              '📊 تقارير متقدمة ورسوم تفصيلية',
+              '🔔 إشعارات Push مخصصة',
+              '⭐ دعم أولوية',
+            ].map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <span style={{ color: '#10B981', fontSize: 14 }}>✓</span>
-                <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{f}</span>
+                <span style={{ color: '#A78BFA', fontSize: 14 }}>◇</span>
+                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{f}</span>
               </div>
             ))}
-            <Link href="/register" style={{ display: 'block', textAlign: 'center', marginTop: 24, padding: '12px', borderRadius: 12, background: 'var(--accent-blue)', color: 'white', fontSize: 14, fontWeight: 700, textDecoration: 'none', boxShadow: '0 4px 20px rgba(59,126,246,0.3)' }}>جرّب Pro مجاناً 14 يوم</Link>
+            <div style={{ marginTop: 24, padding: '14px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', textAlign: 'center' }}>
+              <div style={{ fontSize: 13, color: '#A78BFA', fontWeight: 900, marginBottom: 6 }}>🎁 عرض خاص لأول 100 مشترك</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, lineHeight: 1.5 }}>خصم 50% مدى الحياة — فقط لمن يسجّل مبكراً</div>
+              <Link href="/register" style={{ display: 'block', padding: '10px', borderRadius: 10, background: 'linear-gradient(135deg, #8B5CF6, #6366F1)', color: 'white', fontSize: 13, fontWeight: 800, textDecoration: 'none', boxShadow: '0 4px 16px rgba(139,92,246,0.3)' }}>
+                سجّل الآن واحجز مكانك ←
+              </Link>
+            </div>
           </div>
         </div>
       </section>
