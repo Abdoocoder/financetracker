@@ -1,6 +1,5 @@
 'use client'
 export const dynamic = 'force-dynamic'
-
 import { useState, useEffect } from 'react'
 import Link                           from 'next/link'
 import { createClient }               from '@/lib/supabase/client'
@@ -12,16 +11,14 @@ import {
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
 
-// ── Lazy loaded — تُحمَّل فقط عند الحاجة ──────────────
 import nextDynamic from 'next/dynamic'
 
-const WealthRoadmap   = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
-const MiniBarChart    = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
-const CategoryBars    = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
-const ChallengesCard  = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
+const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
+const MiniBarChart     = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
+const CategoryBars     = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
+const ChallengesCard   = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
 const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
 
-// ── Skeleton ─────────────────────────────────────────────────────
 function Bone({ w, h = '14px', r = '8px' }: { w: string; h?: string; r?: string }) {
   return <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
 }
@@ -52,57 +49,88 @@ function DashSkeleton() {
   )
 }
 
-// ── useDashboardData ──────────────────────────────────────────────
+// ── useDashboardData — مرحلتان للتحميل ───────────────────────────
 function useDashboardData() {
   const [data, setData] = useState<any>(null)
   const [recentTx, setRecentTx] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)  // skeleton للأرقام الرئيسية فقط
   const { user: currentUser } = useUser()
   const supabase = createClient()
   const CACHE_TTL = 2 * 60 * 1000
 
   useEffect(() => {
-    const CACHE_KEY = `dashboard_${currentUser?.id}`
+    if (!currentUser) return
+    const CACHE_KEY = `dashboard_${currentUser.id}`
+
+    // ── عرض الـ cache فوراً إن وجد ──
     try {
       const cached = sessionStorage.getItem(CACHE_KEY)
       if (cached) {
         const { data: cd, recentTx: cr, ts } = JSON.parse(cached)
-        if (Date.now() - ts < CACHE_TTL) { setData(cd); setRecentTx(cr); setLoading(false); return }
+        if (Date.now() - ts < CACHE_TTL) {
+          setData(cd); setRecentTx(cr); setLoading(false)
+          return
+        }
       }
     } catch {}
 
-    async function fetchAll() {
-      const user = currentUser
-      if (!user) { setLoading(false); return }
-      const now = new Date()
-      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-      const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-      const [txRes, debtRes, invRes, goalRes, alertRes, recentRes, chartRes, profileRes] = await Promise.all([
+    const user = currentUser
+    const now = new Date()
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+    const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+
+    // ── المرحلة 1: الأرقام الرئيسية فقط (أسرع) ──
+    async function fetchPhase1() {
+      const [txRes, profileRes, alertRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
-        supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
-        supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
-        supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-        supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
-        supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
         supabase.from('profiles').select('monthly_income').eq('id', user.id).single(),
+        supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
       ])
-      const txs      = txRes.data ?? []
+
+      const txs = txRes.data ?? []
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const profileIncome = Number((profileRes as any)?.data?.monthly_income ?? 0)
       const income = txIncome > 0 ? txIncome : profileIncome
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      const months6  = Array.from({ length: 6 }, (_, i) => {
+      const catMap: Record<string, number> = {}
+      txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
+      const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
+
+      // عرض الأرقام الأساسية فوراً — إزالة الـ skeleton
+      setData({
+        income, expenses, categories,
+        net: income - expenses,
+        prevIncome: 0, prevExpenses: 0,
+        months6: [], totalDebt: 0,
+        invValue: 0, goalsSaved: 0, goalsTarget: 0,
+        unreadAlerts: alertRes.count ?? 0,
+      })
+      setLoading(false)
+
+      // ── المرحلة 2: باقي البيانات في الخلفية ──
+      fetchPhase2(income, expenses, categories, alertRes.count ?? 0)
+    }
+
+    // ── المرحلة 2: بيانات ثانوية في الخلفية ──
+    async function fetchPhase2(income: number, expenses: number, categories: [string, number][], unreadAlerts: number) {
+      const [debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
+        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
+        supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
+        supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
+        supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
+      ])
+
+      const months6 = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
         const label = d.toLocaleDateString('ar-EG', { month: 'short' })
         const mt = (chartRes.data ?? []).filter(t => t.transaction_date?.startsWith(key))
         return { month: label, income: mt.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), expense: mt.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0) }
       })
-      const catMap: Record<string, number> = {}
-      txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
-      const categories   = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
-      const prevMonth    = months6[4] ?? { income: 0, expense: 0 }
+
+      const prevMonth = months6[4] ?? { income: 0, expense: 0 }
+
       const newData = {
         income, expenses, months6, categories,
         net: income - expenses,
@@ -112,13 +140,17 @@ function useDashboardData() {
         invValue:     (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
         goalsSaved:   (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
         goalsTarget:  (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
-        unreadAlerts: alertRes.count ?? 0,
+        unreadAlerts,
       }
       const newRecent = recentRes.data ?? []
-      setData(newData); setRecentTx(newRecent); setLoading(false)
+
+      setData(newData)
+      setRecentTx(newRecent)
+
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: newRecent, ts: Date.now() })) } catch {}
     }
-    fetchAll()
+
+    fetchPhase1()
   }, [currentUser])
 
   return { data, setData, recentTx, loading, supabase }
@@ -156,9 +188,9 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
-          { label: t('dash_income'),   value: `+${income.toFixed(0)}`,  color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
-          { label: t('dash_expenses'), value: `${expenses.toFixed(0)}`, color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
-          { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${net.toFixed(0)}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+          { label: t('dash_income'),   value: `+${income % 1 === 0 ? income.toFixed(0) : income.toFixed(2)}`,    color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
+          { label: t('dash_expenses'), value: `${expenses % 1 === 0 ? expenses.toFixed(0) : expenses.toFixed(2)}`, color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
+          { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${net % 1 === 0 ? net.toFixed(0) : net.toFixed(2)}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
         ].map((s, i) => (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
             <div style={{ fontSize: 12, color: s.color, fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>{s.icon}</div>
@@ -178,6 +210,8 @@ export default function DashboardPage() {
         if (!txs) return
         const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
         const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+        // مسح الـ cache لضمان تحديث حقيقي في الزيارة القادمة
+        try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch {}
         setData((prev: any) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
       }} />
 
