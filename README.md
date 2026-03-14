@@ -244,15 +244,25 @@ UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
 
 ## ⚙️ CRON Jobs — الأتمتة اليومية
 
+تعمل عبر **GitHub Actions** (UTC+3):
+
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  ⏰ 7:00 AM  │  /api/smart-notifications  │  تنبيهات ذكية   │
-│  ⏰ 8:00 AM  │  /api/auto-salary          │  إضافة الراتب   │
-│  ⏰ 9:00 AM  │  /api/auto-debt            │  خصم الأقساط    │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│  ⏰ 6:00 ص   │  smart-notifications.yml  │  تنبيهات صباحية + ذكية      │
+│  ⏰ 8:00 ص   │  auto-salary.yml          │  إضافة الراتب التلقائي       │
+│  ⏰ 9:00 ص   │  auto-debt.yml            │  خصم الأقساط التلقائي        │
+│  ⏰ 6:00 م   │  smart-notifications.yml  │  تذكير مسائي                 │
+│  ⏰ 7:00 م   │  wealth-guidance.yml      │  توجيه بناء الثروة            │
+│  ⏰ 8:00 ص ج │  smart-notifications.yml  │  تقرير أسبوعي (الجمعة فقط)   │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-> ملاحظة: جميع الـ CRONs موحّدة في endpoint واحد ذكي لتوافق Vercel Hobby plan.
+**GitHub Secrets المطلوبة:**
+```
+CRON_SECRET=financetracker2026
+```
+
+> جميع الـ workflows تستدعي `/api/smart-notifications` الذي يحدد المهمة تلقائياً بناءً على الساعة الحالية.
 
 ---
 
