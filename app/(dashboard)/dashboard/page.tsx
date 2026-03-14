@@ -1,21 +1,27 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect }       from 'react'
+import { useState, useEffect } from 'react'
 import Link                           from 'next/link'
 import { createClient }               from '@/lib/supabase/client'
 import { useUser }                    from '@/lib/user-context'
 import { useI18n }                    from '@/lib/i18n'
-import { WealthRoadmap }              from '@/components/ui/wealth-roadmap'
 import { QuickAdd }                   from '@/components/ui/quick-add'
-import { MiniBarChart, CategoryBars } from '@/components/dashboard/Charts'
-import { ChallengesCard }             from '@/components/dashboard/ChallengesCard'
-import { GamificationCard }           from '@/components/dashboard/GamificationCard'
 import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
 
+// ── Lazy loaded — تُحمَّل فقط عند الحاجة ──────────────
+import nextDynamic from 'next/dynamic'
+
+const WealthRoadmap   = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
+const MiniBarChart    = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
+const CategoryBars    = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
+const ChallengesCard  = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
+const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
+
+// ── Skeleton ─────────────────────────────────────────────────────
 function Bone({ w, h = '14px', r = '8px' }: { w: string; h?: string; r?: string }) {
   return <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
 }
@@ -46,6 +52,7 @@ function DashSkeleton() {
   )
 }
 
+// ── useDashboardData ──────────────────────────────────────────────
 function useDashboardData() {
   const [data, setData] = useState<any>(null)
   const [recentTx, setRecentTx] = useState<any[]>([])
@@ -72,7 +79,7 @@ function useDashboardData() {
       const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
       const [txRes, debtRes, invRes, goalRes, alertRes, recentRes, chartRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-        supabase.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
@@ -82,7 +89,6 @@ function useDashboardData() {
       const txs      = txRes.data ?? []
       const income   = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-
       const months6  = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -115,28 +121,7 @@ function useDashboardData() {
   return { data, setData, recentTx, loading, supabase }
 }
 
-
-function CollapsibleSection({ title, icon, defaultOpen = false, children }: {
-  title: string; icon: string; defaultOpen?: boolean; children: React.ReactNode
-}) {
-  const [open, setOpen] = useState(defaultOpen)
-  return (
-    <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--bg-card)' }}>
-      <button onClick={() => setOpen(o => !o)} style={{
-        width: '100%', padding: '12px 16px', display: 'flex', alignItems: 'center',
-        justifyContent: 'space-between', background: 'transparent', border: 'none',
-        cursor: 'pointer', fontFamily: 'inherit',
-      }}>
-        <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-          {icon} {title}
-        </span>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', transform: open ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.25s', display: 'inline-block' }}>▼</span>
-      </button>
-      {open && <div style={{ padding: '0 0 4px' }}>{children}</div>}
-    </div>
-  )
-}
-
+// ── Page ──────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const { t, lang } = useI18n()
   const { user: currentUser } = useUser()
@@ -149,7 +134,8 @@ export default function DashboardPage() {
   const expenses = data?.expenses ?? 0
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <WealthRoadmap />
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -164,7 +150,7 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* أرقام الشهر — مفتوح دائماً */}
+      {/* Stats Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
           { label: t('dash_income'),   value: `+${income.toFixed(0)}`,  color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
@@ -179,7 +165,6 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* إضافة سريعة — مفتوح دائماً */}
       <QuickAdd onAdded={async () => {
         const user = currentUser
         if (!user) return
@@ -193,48 +178,21 @@ export default function DashboardPage() {
         setData((prev: any) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
       }} />
 
-      {/* روابط سريعة — مفتوح دائماً */}
-      <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
-
-      {/* رحلة الثروة — مفتوح دائماً */}
       <GamificationCard />
+      <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
+      <BudgetProgressCard income={income} expenses={expenses} net={net} />
 
-      {/* آخر المعاملات — مفتوح دائماً */}
-      <RecentTransactionsCard transactions={recentTx} lang={lang} />
-
-      {/* خارطة الثراء — مطوية */}
-      <CollapsibleSection icon="🗺️" title={lang === 'en' ? 'Wealth Roadmap' : 'خارطة الثراء'}>
-        <div style={{ padding: '0 4px 4px' }}><WealthRoadmap /></div>
-      </CollapsibleSection>
-
-      {/* الميزانية والمقارنة — مطوية */}
-      <CollapsibleSection icon="📊" title={lang === 'en' ? 'Budget & Comparison' : 'الميزانية والمقارنة'}>
-        <div style={{ padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
-          <BudgetProgressCard income={income} expenses={expenses} net={net} />
-        </div>
-      </CollapsibleSection>
-
-      {/* الرسوم البيانية — مطوية */}
-      {(data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) || (data?.categories?.length > 0)) && (
-        <CollapsibleSection icon="📈" title={lang === 'en' ? 'Charts & Analytics' : 'الرسوم البيانية والتحليل'}>
-          <div style={{ padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
-            {data?.categories?.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
-          </div>
-        </CollapsibleSection>
+      {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
+        <MiniBarChart data={data.months6} lang={lang} />
+      )}
+      {data?.categories?.length > 0 && (
+        <CategoryBars categories={data.categories} lang={lang} />
       )}
 
-      {/* محاكي الثروة — مطوي */}
-      <CollapsibleSection icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
-        <div style={{ padding: '8px 12px 12px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
-      </CollapsibleSection>
-
-      {/* تحديات الادخار — مطوية */}
-      <CollapsibleSection icon="🏆" title={lang === 'en' ? 'Savings Challenges' : 'تحديات الادخار'}>
-        <div style={{ padding: '8px 12px 12px' }}><ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} /></div>
-      </CollapsibleSection>
-
+      <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
+      <WealthSimulatorCard net={net} lang={lang} />
+      <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
+      <RecentTransactionsCard transactions={recentTx} lang={lang} />
     </div>
   )
 }
