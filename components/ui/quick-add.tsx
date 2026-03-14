@@ -170,10 +170,10 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
         >
           <span>🔁</span>
-          <span>
+          <span style={{ direction: lang === 'ar' ? 'rtl' : 'ltr', display: 'inline-block' }}>
             {lang === 'ar'
-              ? <span><span style={{ direction: 'rtl' }}>{t('quick_add_repeat')}</span>{': '}<span style={{ direction: 'rtl' }}>{lastTx.category}</span>{' — '}{Number(lastTx.amount).toFixed(0)}{' JOD'}</span>
-              : <span>{t('quick_add_repeat')}: {lastTx.category} — {Number(lastTx.amount).toFixed(0)} JOD</span>
+              ? `${t('quick_add_repeat')}: ${lastTx.category} — ${Number(lastTx.amount).toFixed(0)} JOD`
+              : `${t('quick_add_repeat')}: ${lastTx.category} — ${Number(lastTx.amount).toFixed(0)} JOD`
             }
           </span>
         </button>
