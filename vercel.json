@@ -1,8 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/smart-notifications",
-      "schedule": "0 7 * * *"
-    }
-  ]
-}
+{}
