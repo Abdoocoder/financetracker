@@ -10,10 +10,10 @@ import {
 } from 'lucide-react'
 
 const MAIN_NAV = [
-  { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
-  { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
-  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
   { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
+  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
+  { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
+  { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
 ]
 
 const MORE_NAV = [
