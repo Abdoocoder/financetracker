@@ -24,10 +24,74 @@ const PRIORITY_CONFIG = [
   { color: '#4A5568', ar: 'مؤجلة',     en: 'Deferred'  },
 ]
 
+// ── Confetti Component ──
+function Confetti({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 3000)
+    return () => clearTimeout(timer)
+  }, [onDone])
 
-// مسح cache المستخدم بعد أي تعديل
+  const pieces = Array.from({ length: 30 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 1.5,
+    color: ['#10B981', '#3B7EF6', '#F59E0B', '#8B5CF6', '#EF4444'][Math.floor(Math.random() * 5)],
+    size: Math.random() * 8 + 6,
+  }))
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 999, pointerEvents: 'none', overflow: 'hidden' }}>
+      {pieces.map(p => (
+        <div key={p.id} style={{
+          position: 'absolute',
+          left: `${p.left}%`,
+          top: '-20px',
+          width: p.size,
+          height: p.size,
+          borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+          background: p.color,
+          animation: `confettiFall 3s ${p.delay}s ease-in forwards`,
+        }} />
+      ))}
+      <style>{`
+        @keyframes confettiFall {
+          0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ── Celebration Modal ──
+function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 4000)
+    return () => clearTimeout(timer)
+  }, [onClose])
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
+      onClick={onClose}>
+      <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 24, padding: '40px 32px', textAlign: 'center', maxWidth: 320, margin: 16, boxShadow: '0 0 60px rgba(16,185,129,0.3)' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>أحرار من الدين!</div>
+        <div style={{ fontSize: 15, color: 'var(--accent-green-light)', fontWeight: 700, marginBottom: 12 }}>"{debtName}"</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>تهانيّ! لقد سددت هذا الدين بالكامل. خطوة عظيمة نحو حريتك المالية 💪</div>
+        <button onClick={onClose} style={{ marginTop: 24, padding: '10px 28px', borderRadius: 12, background: 'var(--accent-green)', color: 'white', border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+          شكراً 🙌
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function DebtsPage() {
   const [debts, setDebts] = useState<any[]>([])
+  const [paidDebts, setPaidDebts] = useState<any[]>([])
+  const [showPaid, setShowPaid] = useState(false)
+  const [totalPaidAmount, setTotalPaidAmount] = useState(0)
   const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -38,6 +102,8 @@ export default function DebtsPage() {
   const [paymentAmount, setPaymentAmount] = useState('')
   const [payingSaving, setPayingSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
+  const [celebration, setCelebration] = useState<string | null>(null)
+  const [showConfetti, setShowConfetti] = useState(false)
   const supabase = createClient()
   const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
@@ -45,10 +111,17 @@ export default function DebtsPage() {
   const load = useCallback(async () => {
     const user = currentUser
     if (!user) return
-    const { data } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority')
-    setDebts(data ?? [])
+    // الديون النشطة
+    const { data: active } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority')
+    setDebts(active ?? [])
+    // الديون المسددة
+    const { data: paid } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', true).order('updated_at', { ascending: false })
+    setPaidDebts(paid ?? [])
+    // إجمالي المبالغ المسددة
+    const total = (paid ?? []).reduce((a, d) => a + Number(d.original_amount), 0)
+    setTotalPaidAmount(total)
     setLoading(false)
-  }, [supabase])
+  }, [supabase, currentUser])
 
   useEffect(() => { load() }, [load])
 
@@ -98,8 +171,14 @@ export default function DebtsPage() {
     const newRemaining = Math.max(0, debt.remaining_amount - amount)
     await supabase.from('debt_payments').insert({ debt_id: debtId, user_id: user.id, amount, payment_date: new Date().toISOString().split('T')[0] })
     await supabase.from('debts').update({ remaining_amount: newRemaining, is_paid: newRemaining === 0 }).eq('id', debtId)
-    if (newRemaining === 0) toast.success(t('toast_debt_paid'))
-    else toast.success(`${t('toast_payment_done')} ${amount} JOD`)
+    if (newRemaining === 0) {
+      // ── احتفال ──
+      setCelebration(debt.name)
+      setShowConfetti(true)
+      clearUserCache(user.id)
+    } else {
+      toast.success(`${t('toast_payment_done')} ${amount} JOD`)
+    }
     setPaymentDebtId(null); setPaymentAmount(''); setPayingSaving(false); load()
   }
 
@@ -117,6 +196,15 @@ export default function DebtsPage() {
   return (
     <div className="animate-fade-in" ref={pageRef}>
       <PullToRefreshIndicator refreshing={refreshing} />
+
+      {/* ── Confetti ── */}
+      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
+
+      {/* ── Celebration Modal ── */}
+      {celebration && (
+        <CelebrationModal debtName={celebration} onClose={() => setCelebration(null)} />
+      )}
+
       <PageHeader
         title={t('debts_title')}
         subtitle={`${debts.length} ${t('debts_active')}`}
@@ -128,6 +216,21 @@ export default function DebtsPage() {
         { label: t('debts_paid_pct'), value: `${paidPct.toFixed(0)}%`, color: 'var(--accent-green-light)' },
         { label: t('debts_monthly'),  value: totalMonthly.toFixed(0),  color: 'var(--accent-amber-light)'  },
       ]} />
+
+      {/* ── إحصائية المبالغ المسددة ── */}
+      {totalPaidAmount > 0 && (
+        <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 16, padding: '14px 16px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontSize: 28 }}>💪</div>
+          <div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 2 }}>إجمالي ما سددته</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>{totalPaidAmount.toFixed(0)} JOD</div>
+          </div>
+          <div style={{ marginRight: 'auto' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>ديون مسددة</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-green-light)' }}>{paidDebts.length} 🎯</div>
+          </div>
+        </div>
+      )}
 
       {debts.length > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px', marginBottom: 16 }}>
@@ -161,11 +264,7 @@ export default function DebtsPage() {
                 borderRight: `3px solid ${pri.color}`,
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: `${pri.color}18`, border: `1px solid ${pri.color}30`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `${pri.color}18`, border: `1px solid ${pri.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div style={{ width: 10, height: 10, borderRadius: '50%', background: pri.color, boxShadow: `0 0 8px ${pri.color}` }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -183,11 +282,9 @@ export default function DebtsPage() {
                     <button onClick={() => setConfirmDelete(debt.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 </div>
-
                 <div className="progress-track" style={{ marginBottom: 10 }}>
                   <div className="progress-fill gradient-green" style={{ width: `${Math.min(pct, 100)}%` }} />
                 </div>
-
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{pct.toFixed(0)}% مسدد</span>
                   {paymentDebtId === debt.id ? (
@@ -212,6 +309,37 @@ export default function DebtsPage() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* ── تبويب الديون المسددة ── */}
+      {paidDebts.length > 0 && (
+        <div style={{ marginTop: 24 }}>
+          <button
+            onClick={() => setShowPaid(p => !p)}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>✅ الديون المسددة ({paidDebts.length})</span>
+            <span style={{ fontSize: 16 }}>{showPaid ? '▲' : '▼'}</span>
+          </button>
+
+          {showPaid && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              {paidDebts.map(debt => (
+                <div key={debt.id} style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ fontSize: 24 }}>✅</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{debt.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                      {debt.updated_at ? new Date(debt.updated_at).toLocaleDateString('ar-EG') : ''}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
+                    {Number(debt.original_amount).toFixed(0)} JOD
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -260,8 +388,7 @@ export default function DebtsPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
               <button
                 onClick={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
-                style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: form.auto_deduct ? 'var(--accent-green)' : 'var(--bg-elevated)', transition: 'background 0.2s', position: 'relative', flexShrink: 0 }}
-              >
+                style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: form.auto_deduct ? 'var(--accent-green)' : 'var(--bg-elevated)', transition: 'background 0.2s', position: 'relative', flexShrink: 0 }}>
                 <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form.auto_deduct ? 3 : 23 }} />
               </button>
               <span style={{ fontSize: 13, color: form.auto_deduct ? 'var(--accent-green-light)' : 'var(--text-muted)', fontWeight: 600 }}>
