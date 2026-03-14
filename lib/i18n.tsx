@@ -614,7 +614,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem('lang') as Lang
-    if (saved === 'ar' || saved === 'en') setLangState(saved)
+    if (saved === 'ar' || saved === 'en') { setLangState(saved); return }
+    const browserLang = navigator.language || navigator.languages?.[0] || 'ar'
+    const detected: Lang = browserLang.startsWith('ar') ? 'ar' : 'en'
+    setLangState(detected)
   }, [])
 
   const setLang = useCallback((l: Lang) => {
