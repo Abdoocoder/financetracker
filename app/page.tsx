@@ -5,11 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export default function LandingPage() {
   const [showSticky, setShowSticky] = useState(false)
-  const [testimonials, setTestimonials] = useState([
-    { name: 'أحمد الشمري', country: '🇸🇦', role: 'موظف حكومي', stars: 5, text: 'أخيراً عرفت وين يروح راتبي! الديون خصمت تلقائياً وصحيت على تقرير صباحي كل يوم.' },
-    { name: 'سارة المنصوري', country: '🇦🇪', role: 'رائدة أعمال', stars: 5, text: 'خارطة الثراء غيرت تفكيري كلياً. عرفت إني في مرحلة سداد الديون وش الخطوة الجاية.' },
-    { name: 'محمد أبو علي', country: '🇯🇴', role: 'مهندس', stars: 5, text: 'جربت YNAB و Mint بس ما دعموا الدينار الأردني. هذا التطبيق فهمني من أول يوم.' },
-  ])
+  const [testimonials, setTestimonials] = useState<any[]>([])
 
   useEffect(() => {
     const handleScroll = () => {
