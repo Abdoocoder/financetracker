@@ -89,7 +89,7 @@ function useDashboardData() {
       ])
       const txs      = txRes.data ?? []
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-      const profileIncome = Number(profileRes?.data?.monthly_income ?? 0)
+      const profileIncome = Number((profileRes as any)?.data?.monthly_income ?? 0)
       const income = txIncome > 0 ? txIncome : profileIncome
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
       const months6  = Array.from({ length: 6 }, (_, i) => {
