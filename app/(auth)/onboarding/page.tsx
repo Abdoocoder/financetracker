@@ -322,7 +322,7 @@ export default function OnboardingPage() {
   async function handleDone() {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-      await supabase.from('profiles').upsert({ id: user.id, onboarding_done: true })
+      await supabase.from('profiles').update({ onboarding_done: true }).eq('id', user.id)
       // تهيئة الـ gamification
       try {
         await fetch('/api/gamification', {
