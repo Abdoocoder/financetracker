@@ -303,7 +303,6 @@ export default function OnboardingPage() {
     const { data: { user }, error: authErr } = await supabase.auth.getUser()
     if (authErr) { alert('Auth error: ' + authErr.message); return }
     if (!user) { alert('No user found!'); return }
-    alert('User found: ' + user.id + ' name: ' + profile.fullName + ' income: ' + profile.monthlyIncome)
     await supabase.from('profiles').upsert({ id: user.id, full_name: profile.fullName, monthly_income: profile.monthlyIncome ? parseFloat(profile.monthlyIncome) : null, currency: profile.currency, onboarding_done: false })
     setStep(2)
   }
