@@ -10,7 +10,6 @@ import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
-
 import nextDynamic from 'next/dynamic'
 
 const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
@@ -19,6 +18,60 @@ const CategoryBars     = nextDynamic(() => import('@/components/dashboard/Charts
 const ChallengesCard   = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
 const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
 
+// ── Collapsible Section ──────────────────────────────────────────
+function Section({ id, title, icon, defaultOpen = false, children }: {
+  id: string
+  title: string
+  icon: string
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
+  const STORAGE_KEY = `dash_section_${id}`
+  const [open, setOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      return saved !== null ? saved === 'true' : defaultOpen
+    } catch { return defaultOpen }
+  })
+
+  function toggle() {
+    const next = !open
+    setOpen(next)
+    try { localStorage.setItem(STORAGE_KEY, String(next)) } catch {}
+  }
+
+  return (
+    <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)' }}>
+      <button
+        onClick={toggle}
+        style={{
+          width: '100%', padding: '12px 16px',
+          background: open ? 'var(--bg-elevated)' : 'var(--bg-card)',
+          border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          transition: 'background 0.2s',
+        }}
+      >
+        <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span>{icon}</span>
+          <span>{title}</span>
+        </span>
+        <span style={{
+          fontSize: 12, color: 'var(--text-muted)', fontWeight: 700,
+          transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+          transition: 'transform 0.25s ease', display: 'inline-block',
+        }}>▼</span>
+      </button>
+      {open && (
+        <div style={{ padding: '0 0 4px 0', background: 'var(--bg-primary)' }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Skeleton ─────────────────────────────────────────────────────
 function Bone({ w, h = '14px', r = '8px' }: { w: string; h?: string; r?: string }) {
   return <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
 }
@@ -49,11 +102,11 @@ function DashSkeleton() {
   )
 }
 
-// ── useDashboardData — مرحلتان للتحميل ───────────────────────────
+// ── useDashboardData ──────────────────────────────────────────────
 function useDashboardData() {
   const [data, setData] = useState<any>(null)
   const [recentTx, setRecentTx] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)  // skeleton للأرقام الرئيسية فقط
+  const [loading, setLoading] = useState(true)
   const { user: currentUser } = useUser()
   const supabase = createClient()
   const CACHE_TTL = 2 * 60 * 1000
@@ -62,31 +115,24 @@ function useDashboardData() {
     if (!currentUser) return
     const CACHE_KEY = `dashboard_${currentUser.id}`
 
-    // ── عرض الـ cache فوراً إن وجد ──
     try {
       const cached = sessionStorage.getItem(CACHE_KEY)
       if (cached) {
         const { data: cd, recentTx: cr, ts } = JSON.parse(cached)
-        if (Date.now() - ts < CACHE_TTL) {
-          setData(cd); setRecentTx(cr); setLoading(false)
-          return
-        }
+        if (Date.now() - ts < CACHE_TTL) { setData(cd); setRecentTx(cr); setLoading(false); return }
       }
     } catch {}
 
     const user = currentUser
     const now = new Date()
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-    const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
 
-    // ── المرحلة 1: الأرقام الرئيسية فقط (أسرع) ──
     async function fetchPhase1() {
       const [txRes, profileRes, alertRes] = await Promise.all([
-        supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
+        supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
         supabase.from('profiles').select('monthly_income').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
       ])
-
       const txs = txRes.data ?? []
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const profileIncome = Number((profileRes as any)?.data?.monthly_income ?? 0)
@@ -96,22 +142,11 @@ function useDashboardData() {
       txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
       const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
 
-      // عرض الأرقام الأساسية فوراً — إزالة الـ skeleton
-      setData({
-        income, expenses, categories,
-        net: income - expenses,
-        prevIncome: 0, prevExpenses: 0,
-        months6: [], totalDebt: 0,
-        invValue: 0, goalsSaved: 0, goalsTarget: 0,
-        unreadAlerts: alertRes.count ?? 0,
-      })
+      setData({ income, expenses, categories, net: income - expenses, prevIncome: 0, prevExpenses: 0, months6: [], totalDebt: 0, invValue: 0, goalsSaved: 0, goalsTarget: 0, unreadAlerts: alertRes.count ?? 0 })
       setLoading(false)
-
-      // ── المرحلة 2: باقي البيانات في الخلفية ──
       fetchPhase2(income, expenses, categories, alertRes.count ?? 0)
     }
 
-    // ── المرحلة 2: بيانات ثانوية في الخلفية ──
     async function fetchPhase2(income: number, expenses: number, categories: [string, number][], unreadAlerts: number) {
       const [debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
         supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
@@ -120,7 +155,6 @@ function useDashboardData() {
         supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
         supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
       ])
-
       const months6 = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -128,26 +162,18 @@ function useDashboardData() {
         const mt = (chartRes.data ?? []).filter(t => t.transaction_date?.startsWith(key))
         return { month: label, income: mt.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), expense: mt.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0) }
       })
-
       const prevMonth = months6[4] ?? { income: 0, expense: 0 }
-
       const newData = {
-        income, expenses, months6, categories,
-        net: income - expenses,
-        prevIncome:   prevMonth.income,
-        prevExpenses: prevMonth.expense,
-        totalDebt:    (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
-        invValue:     (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
-        goalsSaved:   (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
-        goalsTarget:  (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
+        income, expenses, months6, categories, net: income - expenses,
+        prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
+        totalDebt:   (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
+        invValue:    (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
+        goalsSaved:  (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
+        goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts,
       }
-      const newRecent = recentRes.data ?? []
-
-      setData(newData)
-      setRecentTx(newRecent)
-
-      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: newRecent, ts: Date.now() })) } catch {}
+      setData(newData); setRecentTx(recentRes.data ?? [])
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch {}
     }
 
     fetchPhase1()
@@ -167,10 +193,10 @@ export default function DashboardPage() {
   const net      = data?.net ?? 0
   const income   = data?.income ?? 0
   const expenses = data?.expenses ?? 0
+  const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <WealthRoadmap />
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -185,12 +211,12 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats — دائماً ظاهرة */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
-          { label: t('dash_income'),   value: `+${income % 1 === 0 ? income.toFixed(0) : income.toFixed(2)}`,    color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
-          { label: t('dash_expenses'), value: `${expenses % 1 === 0 ? expenses.toFixed(0) : expenses.toFixed(2)}`, color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
-          { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${net % 1 === 0 ? net.toFixed(0) : net.toFixed(2)}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+          { label: t('dash_income'),   value: `+${fmt(income)}`,                          color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
+          { label: t('dash_expenses'), value: fmt(expenses),                               color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
+          { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${fmt(net)}`,        color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
         ].map((s, i) => (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
             <div style={{ fontSize: 12, color: s.color, fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>{s.icon}</div>
@@ -200,36 +226,67 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {/* إضافة سريعة — دائماً ظاهرة */}
       <QuickAdd onAdded={async () => {
         const user = currentUser
         if (!user) return
         const now = new Date()
         const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-        const end   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-        const { data: txs } = await supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', start).lte('transaction_date', end)
+        const { data: txs } = await supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', start)
         if (!txs) return
         const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
         const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-        // مسح الـ cache لضمان تحديث حقيقي في الزيارة القادمة
         try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch {}
         setData((prev: any) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
       }} />
 
-      <GamificationCard />
-      <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
+      {/* الميزانية الشهرية — دائماً ظاهرة */}
       <BudgetProgressCard income={income} expenses={expenses} net={net} />
 
-      {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
-        <MiniBarChart data={data.months6} lang={lang} />
-      )}
-      {data?.categories?.length > 0 && (
-        <CategoryBars categories={data.categories} lang={lang} />
-      )}
-
+      {/* روابط سريعة — دائماً ظاهرة */}
       <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
-      <WealthSimulatorCard net={net} lang={lang} />
-      <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
+
+      {/* ── قابلة للطي — مطوية افتراضياً ── */}
+
+      <Section id="wealth" icon="🗺️" title="خارطة الثراء ورحلة الثروة">
+        <div style={{ padding: '12px 0 8px' }}>
+          <WealthRoadmap />
+        </div>
+      </Section>
+
+      <Section id="gamification" icon="🏆" title="نظام الإنجازات">
+        <div style={{ padding: '12px 0 8px' }}>
+          <GamificationCard />
+        </div>
+      </Section>
+
+      <Section id="charts" icon="📊" title="الرسوم البيانية وتوزيع المصاريف">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
+          <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
+          {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
+            <MiniBarChart data={data.months6} lang={lang} />
+          )}
+          {data?.categories?.length > 0 && (
+            <CategoryBars categories={data.categories} lang={lang} />
+          )}
+        </div>
+      </Section>
+
+      <Section id="simulator" icon="💰" title="محاكي الثروة">
+        <div style={{ padding: '12px 0 8px' }}>
+          <WealthSimulatorCard net={net} lang={lang} />
+        </div>
+      </Section>
+
+      <Section id="challenges" icon="🎯" title="تحديات الادخار">
+        <div style={{ padding: '12px 0 8px' }}>
+          <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
+        </div>
+      </Section>
+
+      {/* آخر المعاملات — دائماً ظاهرة */}
       <RecentTransactionsCard transactions={recentTx} lang={lang} />
+
     </div>
   )
 }
