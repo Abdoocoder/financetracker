@@ -50,25 +50,25 @@ export default function LandingPage() {
       <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: 'clamp(60px, 10vw, 100px) 20px clamp(40px, 8vw, 80px)', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(59,126,246,0.08)', border: '1px solid rgba(59,126,246,0.2)', marginBottom: 28 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-blue)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>متاح لجميع دول العالم</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>أول أداة مالية عربية ذكية 🇯🇴🇸🇦🇦🇪</span>
         </div>
         <h1 style={{ fontSize: 'clamp(28px, 6vw, 64px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 20px', letterSpacing: '-0.03em' }}>
           وين راح<br />
           <span style={{ background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>راتبك هذا الشهر؟</span>
         </h1>
         <p style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 28px' }}>
-          تتبع دخلك ومصاريفك وديونك واستثماراتك في مكان واحد — بدل ما تنقّل بين تطبيقات وأوراق.
+          أداة مالية تفهمك — بلغتك وعملتك وثقافتك. تعرف أين يذهب راتبك، تسدد ديونك، وتبني ثروتك خطوة بخطوة.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
           <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center' as const, boxShadow: '0 0 30px rgba(59,126,246,0.35)' }}>ابدأ مجاناً ←</Link>
           <a href="#features" style={{ flex: 1, minWidth: 120, padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none', textAlign: 'center' as const }}>شاهد كيف يعمل ↓</a>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
-          {['✓ مجاني للأبد', '✓ بدون بطاقة ائتمانية', '✓ تسجيل في 30 ثانية'].map((t, i) => (
+          {['✓ مجاني للأبد', '✓ بدون بطاقة ائتمانية', '✓ يدعم الاستثمار الحلال'].map((t, i) => (
             <span key={i} style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}>{t}</span>
           ))}
         </div>
-        <div style={{ marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>🇯🇴🇸🇦🇦🇪🇪🇬🇲🇦 مستخدمون من أكثر من 10 دول</div>
+        <div style={{ marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>🇯🇴🇸🇦🇦🇪🇪🇬🇲🇦🇰🇼🇶🇦🇧🇭 مصمم للعالم العربي</div>
 
         {/* زر تنزيل Android */}
         <div style={{ marginTop: 28 }}>
