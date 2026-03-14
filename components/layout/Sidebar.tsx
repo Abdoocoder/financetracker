@@ -10,10 +10,10 @@ import {
 } from 'lucide-react'
 
 const MAIN_NAV = [
-  { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
-  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
-  { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
   { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
+  { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
+  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
+  { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
 ]
 
 const MORE_NAV = [
@@ -80,7 +80,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center',
+        display: 'flex', alignItems: 'center', flexDirection: lang === 'ar' ? 'row-reverse' : 'row',
         padding: '10px 8px',
         paddingBottom: 'max(18px, env(safe-area-inset-bottom))',
       }} className="mobile-nav">
