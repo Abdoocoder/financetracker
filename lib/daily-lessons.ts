@@ -1,194 +1,350 @@
 /**
- * بنك الدروس اليومية الذكية — مقسّمة حسب المرحلة المالية
- * كل مستخدم يستلم الدرس المناسب لوضعه الحقيقي
+ * بنك الدروس اليومية الذكية
+ * مبنية على أبحاث علم السلوك المالي
+ * ثنائية اللغة — عربي وإنجليزي
  */
 
 export interface DailyLesson {
-  title: string    // عنوان الإشعار
-  body: string     // نص الإشعار
-  url: string      // الصفحة التي يفتحها
+  title: string
+  body: string
+  url: string
 }
 
 export type FinancialStage =
-  | 'awareness'    // مبتدئ — أقل من 5 معاملات
-  | 'debt'         // مرحلة الديون — نسبة دين > 35%
-  | 'emergency'    // بناء صندوق الطوارئ
-  | 'investing'    // مرحلة الاستثمار
-  | 'wealth'       // تعظيم الثروة
+  | 'awareness'
+  | 'debt'
+  | 'emergency'
+  | 'investing'
+  | 'wealth'
 
-// ── دروس مرحلة الوعي المالي ─────────────────────────
-const AWARENESS_LESSONS: DailyLesson[] = [
+type BilingualLesson = { ar: DailyLesson; en: DailyLesson }
+
+// ── مرحلة الوعي المالي ──────────────────────────────
+const AWARENESS: BilingualLesson[] = [
   {
-    title: '🌱 رحلة الثروة تبدأ بخطوة واحدة',
-    body: 'الأثرياء لم يولدوا أثرياء — بدأوا بتسجيل أول معاملة. سجّل مصاريف اليوم الآن.',
-    url: '/dashboard/transactions',
+    ar: {
+      title: '🌱 رحلة الثروة تبدأ بتسجيل أول معاملة',
+      body: 'تشير أبحاث السلوك المالي إلى أن تتبع المصاريف يقلل الإنفاق غير الواعي بنسبة تصل لـ 20%. سجّل مصاريف اليوم الآن.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '🌱 Your wealth journey starts with one transaction',
+      body: 'Financial behavior research shows that expense tracking reduces unconscious spending by up to 20%. Log today\'s expenses now.',
+      url: '/dashboard/transactions',
+    },
   },
   {
-    title: '💡 ما لا يُقاس لا يُحسَّن',
-    body: 'المستخدمون الذين يسجلون مصاريفهم يوفرون 20% أكثر. ابدأ عادتك اليوم.',
-    url: '/dashboard/transactions',
+    ar: {
+      title: '💡 ما لا يُقاس لا يُحسَّن',
+      body: 'الوعي المالي هو أول خطوات الثروة — قبل أن تبني، تعرّف على وضعك الحقيقي. أضف دخلك ومصاريفك هذا الشهر.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '💡 What gets measured gets managed',
+      body: 'Financial awareness is the first step to wealth. Before you build, understand your real situation. Add this month\'s income and expenses.',
+      url: '/dashboard/transactions',
+    },
   },
   {
-    title: '🧠 الوعي المالي هو أول درجات الثروة',
-    body: 'قبل أن تبني ثروة، تعرّف على وضعك الحقيقي. أضف دخلك ومصاريفك الشهر الماضي.',
-    url: '/dashboard/transactions',
+    ar: {
+      title: '🎯 هدف مكتوب يرفع احتمال التحقق 42%',
+      body: 'دراسات جامعة دومينيكان تُثبت أن كتابة الأهداف المالية ترفع احتمال تحقيقها. ما هدفك المالي لهذا العام؟',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🎯 Written goals are 42% more likely to be achieved',
+      body: 'Dominican University studies prove that writing financial goals significantly increases achievement. What\'s your financial goal this year?',
+      url: '/dashboard/goals',
+    },
   },
   {
-    title: '📊 راتبك قصة — كيف تكتبها؟',
-    body: '"لا تدخر ما تبقى بعد الإنفاق، بل أنفق ما تبقى بعد الادخار" — وارن بافيت',
-    url: '/dashboard',
+    ar: {
+      title: '🧠 الادخار التلقائي أقوى من الإرادة',
+      body: 'يُثبت اقتصاديو السلوك — بمن فيهم ريتشارد ثالر (نوبل 2017) — أن الادخار التلقائي أفعل بكثير من الادخار الإرادي.',
+      url: '/dashboard/settings',
+    },
+    en: {
+      title: '🧠 Automatic saving beats willpower every time',
+      body: 'Behavioral economists — including Nobel laureate Richard Thaler — prove that automatic saving is far more effective than manual saving.',
+      url: '/dashboard/settings',
+    },
   },
   {
-    title: '🎯 هدف واحد يغير كل شيء',
-    body: 'الأثرياء لديهم أهداف مالية مكتوبة. ما هدفك المالي لهذا العام؟ أضفه الآن.',
-    url: '/dashboard/goals',
+    ar: {
+      title: '📊 راتبك قصة — كيف تكتبها؟',
+      body: 'الفرق بين من يبني ثروة ومن لا يبنيها ليس في المبلغ — بل في الوعي بأين يذهب كل دينار. ابدأ وعيك اليوم.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '📊 Your salary tells a story — how do you write it?',
+      body: 'The difference between wealth builders and others isn\'t the amount — it\'s awareness of where every dollar goes. Start your awareness today.',
+      url: '/dashboard',
+    },
   },
 ]
 
-// ── دروس مرحلة سداد الديون ─────────────────────────
-const DEBT_LESSONS: DailyLesson[] = [
+// ── مرحلة سداد الديون ───────────────────────────────
+const DEBT: BilingualLesson[] = [
   {
-    title: '⚔️ الديون تسرق حريتك المستقبلية',
-    body: 'كل دين تسدده يحرر جزءاً من حياتك. ركّز على أصغر دين أولاً — الانتصار السريع يبني الزخم.',
-    url: '/dashboard/debts',
+    ar: {
+      title: '⚔️ كل دين تسدده يحرر جزءاً من مستقبلك',
+      body: 'تُظهر أبحاث علم النفس المالي أن سداد أصغر دين أولاً يبني الزخم النفسي اللازم لسداد الباقي — ما يُعرف بـ "تأثير كرة الثلج".',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '⚔️ Every debt you pay frees part of your future',
+      body: 'Financial psychology research shows that paying the smallest debt first builds the psychological momentum needed for the rest — known as the "snowball effect".',
+      url: '/dashboard/debts',
+    },
   },
   {
-    title: '🔑 سرّ طريقة كرة الثلج',
-    body: 'سدّد أصغر دين أولاً، ثم وجّه قسطه لأكبر دين. هذا ما يجعل الأثرياء يتحررون من الديون بسرعة.',
-    url: '/dashboard/debts',
+    ar: {
+      title: '🔑 الأقساط المسددة = استثمارات مستقبلية',
+      body: 'كل قسط تسدده اليوم سيتحول لاستثمار عندما تتحرر من الدين. أنت لا تسدد ديوناً — أنت تشتري حريتك المالية.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🔑 Paid installments = future investments',
+      body: 'Every payment you make today will become an investment when you\'re debt-free. You\'re not paying off debt — you\'re buying your financial freedom.',
+      url: '/dashboard/debts',
+    },
   },
   {
-    title: '💪 كل دفعة إضافية تختصر أشهراً',
-    body: '"المقترض عبد للمُقرض" — كل دينار إضافي على الدين اليوم يشتري حريتك غداً.',
-    url: '/dashboard/debts',
+    ar: {
+      title: '💪 نسبة الدين من الدخل — المقياس الحقيقي',
+      body: 'تنصح المعايير المالية المعتمدة بألا تتجاوز نسبة الأقساط 35% من الدخل. كلما خفضت هذه النسبة، زادت مرونتك المالية.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '💪 Debt-to-income ratio — the real measure',
+      body: 'Established financial standards recommend keeping debt payments below 35% of income. The lower this ratio, the greater your financial flexibility.',
+      url: '/dashboard/debts',
+    },
   },
   {
-    title: '🧮 احسب ثمن حريتك',
-    body: 'مجموع أقساطك الشهرية = المبلغ الذي سيتحرر لك عند سداد كل ديونك. كم هو؟',
-    url: '/dashboard/debts',
+    ar: {
+      title: '🧮 دفعة إضافية صغيرة = أشهر أقل',
+      body: 'إضافة 10% فقط على قسطك الشهري يمكن أن تختصر سنوات من الدين. حساب بسيط يغير معادلة حريتك.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🧮 A small extra payment = fewer months',
+      body: 'Adding just 10% to your monthly payment can cut years off your debt. A simple calculation that changes your freedom equation.',
+      url: '/dashboard/debts',
+    },
   },
   {
-    title: '🚀 الأقساط المسددة = استثمارات مستقبلية',
-    body: 'تخيّل: كل قسط تسدده اليوم سيتحول لاستثمار عندما تتحرر. أنت تبني مستقبلك الآن.',
-    url: '/dashboard/debts',
-  },
-  {
-    title: '📉 نسبة دينك من دخلك — المفتاح الخفي',
-    body: 'الأثرياء يحافظون على نسبة ديون أقل من 15% من دخلهم. أنت في الطريق الصحيح.',
-    url: '/dashboard/debts',
-  },
-]
-
-// ── دروس مرحلة صندوق الطوارئ ────────────────────────
-const EMERGENCY_LESSONS: DailyLesson[] = [
-  {
-    title: '🛡️ صندوق الطوارئ = نوم هادئ',
-    body: '78% من الناس يعيشون راتباً لراتب. صندوق الطوارئ يجعلك من الـ 22% الآمنين.',
-    url: '/dashboard/goals',
-  },
-  {
-    title: '🏗️ الأساس قبل البناء',
-    body: 'لا تبدأ الاستثمار قبل أن يكون عندك 3 أشهر من المصاريف محفوظة. هذا هو ترتيب الأثرياء.',
-    url: '/dashboard/goals',
-  },
-  {
-    title: '⚡ الطوارئ لا تستأذن',
-    body: '"الإعداد للأسوأ يجعلك تعيش الأفضل" — ادخر اليوم حتى لو مبلغ صغير.',
-    url: '/dashboard/goals',
-  },
-  {
-    title: '💰 10 JOD يومياً = 300 JOD شهرياً',
-    body: 'الأمن المالي لا يحتاج مبالغ كبيرة — يحتاج انتظاماً. ابدأ بما تستطيع الآن.',
-    url: '/dashboard/goals',
-  },
-  {
-    title: '🎯 هدف واضح = تقدم حقيقي',
-    body: 'صندوق طوارئك يجب أن يساوي مصاريفك × 3. ما المبلغ المتبقي للوصول؟',
-    url: '/dashboard/goals',
-  },
-]
-
-// ── دروس مرحلة الاستثمار ────────────────────────────
-const INVESTING_LESSONS: DailyLesson[] = [
-  {
-    title: '📈 فلوسك تنتظر أن تعمل',
-    body: '"الفائدة المركّبة هي العجب الثامن في الدنيا" — أينشتاين. كل شهر تؤخر فيه تكلفك آلاف.',
-    url: '/dashboard/investments',
-  },
-  {
-    title: '⏰ الوقت أهم من المبلغ',
-    body: '100 JOD شهرياً بعائد 7% = 121,997 JOD بعد 30 سنة. ابدأ اليوم لا غداً.',
-    url: '/dashboard/investments',
-  },
-  {
-    title: '🌍 SPUS — الاستثمار الحلال المتنوع',
-    body: 'تملك بسهم واحد أسهماً في أكبر 500 شركة حلال في العالم. هذا ما يفعله الأذكياء.',
-    url: '/dashboard/investments',
-  },
-  {
-    title: '📊 لا تراقب الأسعار يومياً',
-    body: '"السوق ينقل الثروة من غير الصبورين إلى الصبورين" — وارن بافيت. استثمر وانسَ.',
-    url: '/dashboard/investments',
-  },
-  {
-    title: '🔄 الانتظام أقوى من التوقيت',
-    body: 'لا أحد يستطيع توقيت السوق. لكن الجميع يستطيع الاستثمار المنتظم كل شهر.',
-    url: '/dashboard/investments',
-  },
-  {
-    title: '💎 نوّع مصادر دخلك',
-    body: 'الأثرياء لديهم 7 مصادر دخل في المتوسط. استثماراتك هي مصدرك الثاني.',
-    url: '/dashboard/investments',
+    ar: {
+      title: '🚀 التحرر من الدين ليس حلماً — له جدول زمني',
+      body: 'مع كل دفعة منتظمة، تاريخ تحررك يقترب. تتبع تقدمك في التطبيق يُثبت علمياً أنه يعزز الالتزام بالخطة.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🚀 Debt freedom isn\'t a dream — it has a timeline',
+      body: 'With every regular payment, your freedom date gets closer. Research proves that tracking your progress significantly improves plan adherence.',
+      url: '/dashboard/debts',
+    },
   },
 ]
 
-// ── دروس مرحلة تعظيم الثروة ─────────────────────────
-const WEALTH_LESSONS: DailyLesson[] = [
+// ── مرحلة صندوق الطوارئ ─────────────────────────────
+const EMERGENCY: BilingualLesson[] = [
   {
-    title: '👑 أنت في مرحلة بناء الثروة الحقيقية',
-    body: 'أقل من 10% من الناس يصلون لهذه المرحلة. استمر وزد نسبة استثمارك 1% كل سنة.',
-    url: '/dashboard/investments',
+    ar: {
+      title: '🛡️ صندوق الطوارئ = قرارات أهدأ في الأزمات',
+      body: 'تُثبت أبحاث الاحتياطي الفيدرالي أن من لديهم صندوق طوارئ يتخذون قرارات مالية أفضل في الأزمات لأنهم لا يتصرفون من خوف.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🛡️ Emergency fund = calmer decisions in crises',
+      body: 'Federal Reserve research proves that people with emergency funds make better financial decisions during crises because they don\'t act out of fear.',
+      url: '/dashboard/goals',
+    },
   },
   {
-    title: '🚀 زيادة 5% في الاستثمار تُغير المعادلة',
-    body: 'زيادة استثمارك بـ 5% من دخلك الآن = مئات الآلاف فرقاً بعد 20 سنة.',
-    url: '/dashboard/investments',
+    ar: {
+      title: '🏗️ الأساس قبل البناء',
+      body: 'المعايير المالية المعتمدة توصي بتأسيس 3 أشهر من المصاريف قبل الاستثمار. هذا ليس تحفظاً — هذا هو الترتيب الصحيح لبناء الثروة.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🏗️ Foundation before construction',
+      body: 'Established financial standards recommend building 3 months of expenses before investing. This isn\'t conservative — it\'s the correct order for wealth building.',
+      url: '/dashboard/goals',
+    },
   },
   {
-    title: '🏠 الأصول الحقيقية تنمو وأنت نائم',
-    body: '"لا تعمل من أجل المال، اجعل المال يعمل من أجلك" — روبرت كيوساكي',
-    url: '/dashboard/investments',
+    ar: {
+      title: '💰 الانتظام أقوى من المبلغ',
+      body: 'دراسات الادخار السلوكي تُظهر أن الانتظام في مبلغ صغير أفعل بكثير من ادخار مبالغ كبيرة بشكل غير منتظم. ابدأ بما تستطيع اليوم.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '💰 Consistency beats amount',
+      body: 'Behavioral savings studies show that consistent small amounts are far more effective than irregular large savings. Start with what you can today.',
+      url: '/dashboard/goals',
+    },
   },
   {
-    title: '📚 الاستثمار في نفسك أعلى عائد',
-    body: '88% من الأثرياء يقرؤون 30 دقيقة يومياً. ما الكتاب المالي الذي ستقرؤه هذا الشهر؟',
-    url: '/dashboard',
+    ar: {
+      title: '🎯 هدف واضح = تقدم حقيقي',
+      body: 'صندوق طوارئك المثالي = مصاريفك الشهرية × 3. عندما يكون الهدف محدداً برقم واضح، يزداد الالتزام به وفق أبحاث تحديد الأهداف.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🎯 Clear goal = real progress',
+      body: 'Your ideal emergency fund = monthly expenses × 3. When a goal has a specific number, commitment increases according to goal-setting research.',
+      url: '/dashboard/goals',
+    },
+  },
+]
+
+// ── مرحلة الاستثمار ─────────────────────────────────
+const INVESTING: BilingualLesson[] = [
+  {
+    ar: {
+      title: '📈 الفائدة المركّبة — الرياضيات التي تبني الثروة',
+      body: 'هذه ليست نصيحة — هذه رياضيات: 100 JOD شهرياً بعائد 7% = أكثر من 120,000 JOD بعد 30 سنة. الوقت هو المتغير الأهم.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '📈 Compound interest — the math that builds wealth',
+      body: 'This isn\'t advice — it\'s mathematics: 100 JOD monthly at 7% return = over 120,000 JOD after 30 years. Time is the most important variable.',
+      url: '/dashboard/investments',
+    },
   },
   {
-    title: '🌱 الثروة تُبنى في الهدوء لا في الإثارة',
-    body: 'تجنب قرارات الاستثمار العاطفية. الثبات والانتظام هما سر الأثرياء الحقيقيين.',
-    url: '/dashboard/investments',
+    ar: {
+      title: '⏰ البدء المبكر يتفوق على المبلغ الكبير',
+      body: 'الدراسات الرياضية تُثبت: من يبدأ بـ 50 JOD شهرياً في عمر 25 يتفوق على من يبدأ بـ 200 JOD في عمر 35. ابدأ اليوم.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '⏰ Starting early beats investing more',
+      body: 'Mathematical studies prove: someone who starts with 50 JOD/month at age 25 outperforms someone who starts with 200 JOD/month at age 35. Start today.',
+      url: '/dashboard/investments',
+    },
   },
   {
-    title: '🎯 الحرية المالية قريبة — استمر',
-    body: 'الحرية المالية = دخل سلبي يغطي مصاريفك. أنت تبني هذا كل يوم.',
-    url: '/dashboard',
+    ar: {
+      title: '🌍 التنويع — الوقاية من مخاطر السوق',
+      body: 'نظرية المحفظة الحديثة (ماركويتز، نوبل 1990) تُثبت أن التنويع يقلل المخاطر دون التضحية بالعائد. صناديق المؤشرات تُطبق هذا تلقائياً.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🌍 Diversification — protection from market risk',
+      body: 'Modern Portfolio Theory (Markowitz, Nobel 1990) proves diversification reduces risk without sacrificing returns. Index funds apply this automatically.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '📊 الانتظام يتفوق على توقيت السوق',
+      body: 'أبحاث Vanguard تُظهر أن المستثمرين المنتظمين يتفوقون على من يحاولون توقيت السوق في 90% من الحالات على المدى البعيد.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '📊 Consistency beats market timing',
+      body: 'Vanguard research shows that consistent investors outperform market-timers in 90% of cases over the long term.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '💎 مصدر دخل ثانٍ يحمي من الصدمات',
+      body: 'تشير الدراسات الاقتصادية إلى أن تنويع مصادر الدخل يقلل التأثر بالصدمات الاقتصادية. استثماراتك هي مصدرك الثاني.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '💎 A second income source protects from shocks',
+      body: 'Economic studies indicate that diversifying income sources reduces vulnerability to economic shocks. Your investments are your second source.',
+      url: '/dashboard/investments',
+    },
+  },
+]
+
+// ── مرحلة تعظيم الثروة ──────────────────────────────
+const WEALTH: BilingualLesson[] = [
+  {
+    ar: {
+      title: '👑 أنت في مرحلة يصلها أقل من 10% من الناس',
+      body: 'الاستمرارية هي السر الأكبر. أبحاث الثروة طويلة المدى تُثبت أن زيادة نسبة الاستثمار 1% سنوياً تُحدث فرقاً هائلاً بعد 20 عاماً.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '👑 You\'ve reached a stage fewer than 10% achieve',
+      body: 'Consistency is the biggest secret. Long-term wealth research proves that increasing your investment rate by 1% annually makes a massive difference after 20 years.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '🚀 الثروة الحقيقية = الأصول التي تعمل نيابةً عنك',
+      body: 'نظرية رأس المال تُعرّف الثروة الحقيقية بأنها الأصول المنتجة. كل استثمار تضيفه يعمل 24 ساعة يومياً بدون أن تطلب منه.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🚀 Real wealth = assets working for you',
+      body: 'Capital theory defines real wealth as productive assets. Every investment you add works 24 hours a day without you asking it to.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '📚 الاستثمار في المعرفة — العائد الأعلى',
+      body: 'دراسات رأس المال البشري تُثبت أن الاستثمار في المهارات والمعرفة يُعطي من أعلى العوائد على المدى البعيد. ما الكتاب المالي الذي ستقرؤه هذا الشهر؟',
+      url: '/dashboard',
+    },
+    en: {
+      title: '📚 Investing in knowledge — the highest return',
+      body: 'Human capital studies prove that investing in skills and knowledge yields among the highest long-term returns. What financial book will you read this month?',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🌱 الثبات في السوق يتفوق على التحرك المتكرر',
+      body: 'أبحاث سلوك المستثمرين تُظهر أن المستثمرين الذين يتدخلون أقل في محافظهم يحققون عوائد أفضل على المدى البعيد.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🌱 Staying invested beats frequent trading',
+      body: 'Investor behavior research shows that those who intervene less in their portfolios achieve better long-term returns.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '🎯 الحرية المالية رقم — احسبها الآن',
+      body: 'الحرية المالية = مصاريفك السنوية × 25 (قاعدة الـ 4%). هذا الرقم هو هدفك النهائي. كم تبقى لك؟',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🎯 Financial freedom is a number — calculate it now',
+      body: 'Financial freedom = annual expenses × 25 (the 4% rule). This number is your ultimate goal. How much remains?',
+      url: '/dashboard',
+    },
   },
 ]
 
 /**
- * يختار الدرس المناسب حسب المرحلة المالية ورقم اليوم
+ * يختار الدرس حسب المرحلة واللغة ورقم اليوم
  */
-export function getLessonForStage(stage: FinancialStage, dayOfMonth: number): DailyLesson {
-  const map: Record<FinancialStage, DailyLesson[]> = {
-    awareness:  AWARENESS_LESSONS,
-    debt:       DEBT_LESSONS,
-    emergency:  EMERGENCY_LESSONS,
-    investing:  INVESTING_LESSONS,
-    wealth:     WEALTH_LESSONS,
+export function getLessonForStage(
+  stage: FinancialStage,
+  dayOfMonth: number,
+  lang: 'ar' | 'en' = 'ar'
+): DailyLesson {
+  const map: Record<FinancialStage, BilingualLesson[]> = {
+    awareness: AWARENESS,
+    debt:      DEBT,
+    emergency: EMERGENCY,
+    investing: INVESTING,
+    wealth:    WEALTH,
   }
   const lessons = map[stage]
-  return lessons[(dayOfMonth - 1) % lessons.length]
+  const lesson = lessons[(dayOfMonth - 1) % lessons.length]
+  return lesson[lang]
 }
 
 /**

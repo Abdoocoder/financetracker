@@ -35,13 +35,14 @@ async function dailyMorningReminder() {
   const daysLeft = new Date(year, month, 0).getDate() - day + 1
 
   const { data: profiles } = await supabase
-    .from('profiles').select('id, full_name, monthly_income')
+    .from('profiles').select('id, full_name, monthly_income, lang')
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 
   for (const p of profiles) {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = p.monthly_income ?? 0
+    const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
 
     const { data: txData } = await supabase.from('transactions')
       .select('amount, type').eq('user_id', p.id)
@@ -171,13 +172,14 @@ async function wealthGuidanceAlert() {
   const todayStr = today()
 
   const { data: profiles } = await supabase
-    .from('profiles').select('id, full_name, monthly_income')
+    .from('profiles').select('id, full_name, monthly_income, lang')
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 
   for (const p of profiles) {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = Number(p.monthly_income ?? 0)
+    const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
 
     const [txRes, debtRes, invRes, goalRes] = await Promise.all([
       supabase.from('transactions').select('amount,type').eq('user_id', p.id)
@@ -261,7 +263,7 @@ async function wealthGuidanceAlert() {
       isInvesting,
     })
     const dayOfMonth = now.getUTCDate()
-    const lesson = getLessonForStage(stage, dayOfMonth)
+    const lesson = getLessonForStage(stage, dayOfMonth, userLang)
     await sendPushToUser(p.id, lesson.title, lesson.body, lesson.url, 'lesson')
   }
 }
