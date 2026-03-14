@@ -303,7 +303,14 @@ export default function OnboardingPage() {
     const { data: { user }, error: authErr } = await supabase.auth.getUser()
     if (authErr) { alert('Auth error: ' + authErr.message); return }
     if (!user) { alert('No user found!'); return }
-    await supabase.from('profiles').upsert({ id: user.id, full_name: profile.fullName, monthly_income: profile.monthlyIncome ? parseFloat(profile.monthlyIncome) : null, currency: profile.currency, onboarding_done: false })
+    const { error: upsertErr } = await supabase.from('profiles').upsert({ 
+      id: user.id, 
+      full_name: profile.fullName, 
+      monthly_income: profile.monthlyIncome ? parseFloat(profile.monthlyIncome) : null, 
+      currency: profile.currency, 
+      onboarding_done: false 
+    })
+    if (upsertErr) { alert('خطأ في حفظ البيانات: ' + upsertErr.message); return }
     setStep(2)
   }
 
