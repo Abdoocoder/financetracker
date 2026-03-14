@@ -53,11 +53,11 @@ export default function LandingPage() {
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>أول أداة مالية عربية ذكية 🇯🇴🇸🇦🇦🇪</span>
         </div>
         <h1 style={{ fontSize: 'clamp(28px, 6vw, 64px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 20px', letterSpacing: '-0.03em' }}>
-          وين راح<br />
-          <span style={{ background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>راتبك هذا الشهر؟</span>
+          كلنا نحلم بالثراء<br />
+          <span style={{ background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>هنا تبدأ الرحلة</span>
         </h1>
         <p style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 28px' }}>
-          أداة مالية تفهمك — بلغتك وعملتك وثقافتك. تعرف أين يذهب راتبك، تسدد ديونك، وتبني ثروتك خطوة بخطوة.
+          أول أداة مالية عربية تمشي معك خطوة بخطوة — من أول دينار تسجّله حتى تحقق حريتك المالية.
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
           <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center' as const, boxShadow: '0 0 30px rgba(59,126,246,0.35)' }}>ابدأ مجاناً ←</Link>
