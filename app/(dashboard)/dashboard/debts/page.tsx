@@ -143,11 +143,11 @@ export default function DebtsPage() {
     const user = currentUser
     if (!user) return
     if (editingId) {
-      const { error } = await supabase.from('debts').update({ name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.remaining_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct }).eq('id', editingId)
+      const { error } = await supabase.from('debts').update({ name: form.name, original_amount: parseFloat(form.original_amount.replace(",", ".")), remaining_amount: parseFloat(form.remaining_amount.replace(",", ".")), monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct }).eq('id', editingId)
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_edited'))
     } else {
-      const { error } = await supabase.from('debts').insert({ user_id: user.id, name: form.name, original_amount: parseFloat(form.original_amount), remaining_amount: parseFloat(form.original_amount), monthly_payment: parseFloat(form.monthly_payment) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct })
+      const { error } = await supabase.from('debts').insert({ user_id: user.id, name: form.name, original_amount: parseFloat(form.original_amount.replace(",", ".")), remaining_amount: parseFloat(form.original_amount.replace(",", ".")), monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct })
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_debt_added'))
     }
