@@ -222,7 +222,7 @@ function WealthSimulator({ lang }: { lang: string }) {
       <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6 }}>
         💡 {ar
           ? 'هذا الحساب يعتمد على الفائدة المركبة. العوائد الفعلية قد تختلف.'
-          : 'Based on compound interest. Actual returns may vary.'}
+          : 'This calculation is based on compound interest. Actual returns may vary.'}
       </div>
     </div>
   )
@@ -465,9 +465,9 @@ export default function InvestmentsPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
                       {[
                         { label: lang === 'en' ? 'Units' : 'الوحدات', key: 'shares', placeholder: '0.5', type: 'number' },
-                        { label: 'السعر $', key: 'price', placeholder: '50', type: 'number' },
-                        { label: 'العمولة $', key: 'commission', placeholder: '0.5', type: 'number' },
-                        { label: 'التاريخ', key: 'date', placeholder: '', type: 'date' },
+                        { label: lang === 'en' ? 'Price $' : 'السعر $', key: 'price', placeholder: '50', type: 'number' },
+                        { label: lang === 'en' ? 'Commission $' : 'العمولة $', key: 'commission', placeholder: '0.5', type: 'number' },
+                        { label: lang === 'en' ? 'Date' : 'التاريخ', key: 'date', placeholder: '', type: 'date' },
                       ].map(f => (
                         <div key={f.key}>
                           <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>{f.label}</label>
