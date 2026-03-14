@@ -13,6 +13,7 @@ import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field
 import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
+import { clearUserCache } from '@/lib/cache'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PRIORITY_CONFIG = [
@@ -25,15 +26,6 @@ const PRIORITY_CONFIG = [
 
 
 // مسح cache المستخدم بعد أي تعديل
-function clearUserCache(userId: string) {
-  try {
-    sessionStorage.removeItem(`dashboard_${userId}`)
-    sessionStorage.removeItem(`tx_${userId}`)
-    sessionStorage.removeItem(`debts_${userId}`)
-    sessionStorage.removeItem(`goals_${userId}`)
-    sessionStorage.removeItem(`inv_${userId}`)
-  } catch {}
-}
 export default function DebtsPage() {
   const [debts, setDebts] = useState<any[]>([])
   const { user: currentUser } = useUser()

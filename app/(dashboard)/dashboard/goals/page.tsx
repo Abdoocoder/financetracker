@@ -1,5 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
+import { clearUserCache } from '@/lib/cache'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
@@ -10,15 +11,6 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 
 // مسح cache المستخدم بعد أي تعديل
-function clearUserCache(userId: string) {
-  try {
-    sessionStorage.removeItem(`dashboard_${userId}`)
-    sessionStorage.removeItem(`tx_${userId}`)
-    sessionStorage.removeItem(`debts_${userId}`)
-    sessionStorage.removeItem(`goals_${userId}`)
-    sessionStorage.removeItem(`inv_${userId}`)
-  } catch {}
-}
 export default function GoalsPage() {
   const [goals, setGoals] = useState<any[]>([])
   const { user: currentUser } = useUser()
