@@ -625,6 +625,14 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('lang', l)
     document.documentElement.lang = l
     document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'
+    // حفظ اللغة في profiles عشان يستخدمها نظام الإشعارات
+    try {
+      const { createClient } = require('@/lib/supabase/client')
+      const supabase = createClient()
+      supabase.auth.getUser().then(({ data }: any) => {
+        if (data?.user) supabase.from('profiles').update({ lang: l }).eq('id', data.user.id)
+      })
+    } catch {}
   }, [])
 
   useEffect(() => {
