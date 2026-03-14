@@ -77,7 +77,7 @@ function useDashboardData() {
       const now = new Date()
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
       const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-      const [txRes, debtRes, invRes, goalRes, alertRes, recentRes, chartRes] = await Promise.all([
+      const [txRes, debtRes, invRes, goalRes, alertRes, recentRes, chartRes, profileRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
         supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
@@ -85,9 +85,12 @@ function useDashboardData() {
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
         supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
         supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
+        supabase.from('profiles').select('monthly_income').eq('id', user.id).single(),
       ])
       const txs      = txRes.data ?? []
-      const income   = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+      const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+      const profileIncome = Number(profileRes?.data?.monthly_income ?? 0)
+      const income = txIncome > 0 ? txIncome : profileIncome
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
       const months6  = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
