@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendPushToUser } from '@/lib/push-send'
+import { getLessonForStage, determineStage } from '@/lib/daily-lessons'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -249,6 +250,19 @@ async function wealthGuidanceAlert() {
     if (title && body) {
       await sendPushToUser(p.id, title, body, url, 'wealth')
     }
+
+    // ── درس يومي ذكي حسب المرحلة ──
+    const txCount = (await supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', p.id)).count ?? 0
+    const stage = determineStage({
+      txCount,
+      debtRatio,
+      totalSavings,
+      emergencyTarget,
+      isInvesting,
+    })
+    const dayOfMonth = now.getUTCDate()
+    const lesson = getLessonForStage(stage, dayOfMonth)
+    await sendPushToUser(p.id, lesson.title, lesson.body, lesson.url, 'lesson')
   }
 }
 
