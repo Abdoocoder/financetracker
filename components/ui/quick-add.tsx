@@ -1,4 +1,5 @@
 'use client'
+import { clearUserCache } from '@/lib/cache'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
@@ -14,13 +15,6 @@ const CATEGORIES_AR = [
 ]
 
 
-function clearUserCache(userId: string) {
-  try {
-    ['dashboard','tx','debts','goals','inv'].forEach(k => 
-      sessionStorage.removeItem(`${k}_${userId}`)
-    )
-  } catch {}
-}
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const { user } = useUser()
   const { t, lang } = useI18n()

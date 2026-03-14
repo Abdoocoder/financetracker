@@ -1,4 +1,5 @@
 'use client'
+import { clearUserCache } from '@/lib/cache'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
@@ -18,9 +19,6 @@ const CATEGORIES = [
   { key: 'أخرى',    ar: 'أخرى',    en: 'Other',          icon: '📝' },
 ]
 
-function clearUserCache(userId: string) {
-  try { ['dashboard','tx','debts','goals','inv'].forEach(k => sessionStorage.removeItem(`${k}_${userId}`)) } catch {}
-}
 
 // ── المستشار المالي الذكي ─────────────────────────────
 function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted, totalSpent, ar }: {

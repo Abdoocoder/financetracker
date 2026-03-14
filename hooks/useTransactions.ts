@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { clearUserCache } from '@/lib/cache'
 import type { Transaction } from '@/types'
 
 const PAGE_SIZE = 20
@@ -30,15 +31,6 @@ const DEFAULT_FORM: TransactionForm = {
   recurring_day: new Date().getDate(),
 }
 
-function clearUserCache(userId: string) {
-  try {
-    sessionStorage.removeItem(`dashboard_${userId}`)
-    sessionStorage.removeItem(`tx_${userId}`)
-    sessionStorage.removeItem(`debts_${userId}`)
-    sessionStorage.removeItem(`goals_${userId}`)
-    sessionStorage.removeItem(`inv_${userId}`)
-  } catch {}
-}
 
 export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
