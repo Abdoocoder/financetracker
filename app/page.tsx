@@ -342,6 +342,38 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── قسم الرؤية ── */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto 100px', padding: '0 24px', textAlign: 'center' }}>
+        <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.06), rgba(16,185,129,0.04))', border: '1px solid rgba(59,126,246,0.15)', borderRadius: 24, padding: 'clamp(32px, 6vw, 56px)' }}>
+          <div style={{ fontSize: 36, marginBottom: 16 }}>🌅</div>
+          <h2 style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 900, color: 'var(--text-primary)', marginBottom: 20, letterSpacing: '-0.02em' }}>
+            لماذا بنينا هذا التطبيق؟
+          </h2>
+          <p style={{ fontSize: 'clamp(15px, 3vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.9, marginBottom: 28, maxWidth: 600, margin: '0 auto 28px' }}>
+            رؤيتنا أن يكون كل إنسان على دراية كاملة بوضعه المالي، ويملك خطة واضحة للتحسين — بغض النظر عن دخله أو مستواه — حتى ينجح في تحقيق حريته المالية.
+          </p>
+          <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 20 }}>
+            {[
+              { icon: '🕌', title: 'مستلهم من الإسلام', desc: 'السعي والعمل والقناعة' },
+              { icon: '🎓', title: 'يُعلّم لا يتتبع فقط', desc: 'درس يومي يغير تفكيرك' },
+              { icon: '🔒', title: 'بياناتك لك وحدك', desc: 'أمان كامل بدون استثناء' },
+              { icon: '🆓', title: 'مجاني للأبد', desc: 'الوعي المالي حق للجميع' },
+            ].map((v, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>{v.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>{v.title}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{v.desc}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+            "كل رحلة ثراء تبدأ بخطوة" — بُني بـ ❤️ من الأردن للعالم العربي
+          </p>
+        </div>
+      </section>
+
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--border)', padding: '32px 24px', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 13 }}>ف</div>
