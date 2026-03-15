@@ -300,12 +300,12 @@ UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  ⏰ 6:00 ص   │  smart-notifications.yml  │  تنبيهات صباحية + ذكية      │
-│  ⏰ 8:00 ص   │  auto-salary.yml          │  إضافة الراتب التلقائي       │
-│  ⏰ 9:00 ص   │  auto-debt.yml            │  خصم الأقساط التلقائي        │
-│  ⏰ 6:00 م   │  smart-notifications.yml  │  تذكير مسائي                 │
-│  ⏰ 7:00 م   │  wealth-guidance.yml      │  توجيه بناء الثروة            │
-│  ⏰ 8:00 ص ج │  smart-notifications.yml  │  تقرير أسبوعي (الجمعة فقط)   │
+│  ⏰ 6:00 ص   │  smart-notifications.yml  │  تنبيهات صباحية + ذكية     │
+│  ⏰ 8:00 ص   │  auto-salary.yml          │  إضافة الراتب التلقائي     │
+│  ⏰ 9:00 ص   │  auto-debt.yml            │  خصم الأقساط التلقائي       │
+│  ⏰ 6:00 م   │  smart-notifications.yml  │  تذكير مسائي               │
+│  ⏰ 7:00 م   │  wealth-guidance.yml      │  توجيه بناء الثروة         │
+│  ⏰ 8:00 ص ج │  smart-notifications.yml  │  تقرير أسبوعي (الجمعة فقط) │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -337,25 +337,44 @@ npm run dev
 ### Environment Variables
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+# =================================================
+# APP CONFIG
+# =================================================
+NEXT_PUBLIC_APP_URL=https://fajrak.com
 
-# Security
-CRON_SECRET=
 
-# APIs
-TWELVE_DATA_KEY=
-NEXT_PUBLIC_EXCHANGE_RATE_KEY=
+# =================================================
+# SUPABASE CONFIG
+# =================================================
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
-# Push Notifications (VAPID)
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=
-VAPID_PRIVATE_KEY=
-VAPID_EMAIL=
 
-# App
-NEXT_PUBLIC_APP_URL=
+# =================================================
+# MARKET DATA API
+# =================================================
+TWELVE_DATA_KEY=your_twelve_data_key
+
+
+# =================================================
+# CURRENCY EXCHANGE API
+# =================================================
+NEXT_PUBLIC_EXCHANGE_RATE_KEY=your_exchange_rate_key
+
+
+# =================================================
+# PUSH NOTIFICATIONS (VAPID)
+# =================================================
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=your_vapid_public_key
+VAPID_PRIVATE_KEY=your_vapid_private_key
+VAPID_EMAIL=mailto:your@email.com
+
+
+# =================================================
+# CRON JOB SECURITY
+# =================================================
+CRON_SECRET=your_cron_secret
 ```
 
 ---
