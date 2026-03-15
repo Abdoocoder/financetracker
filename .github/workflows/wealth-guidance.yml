@@ -13,6 +13,6 @@ jobs:
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            https://financetracker-brown.vercel.app/api/smart-notifications)
+            https://fajrak.com/api/smart-notifications)
           echo "Response: $response"
           echo "✅ Wealth guidance sent"

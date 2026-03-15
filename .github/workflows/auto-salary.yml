@@ -13,6 +13,6 @@ jobs:
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            https://financetracker-brown.vercel.app/api/auto-salary)
+            https://fajrak.com/api/auto-salary)
           echo "Response: $response"
           echo "✅ Done"
