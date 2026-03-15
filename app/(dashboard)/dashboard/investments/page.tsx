@@ -393,6 +393,7 @@ export default function InvestmentsPage() {
       <PageHeader
         title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
         subtitle={usdToJod ? `1 USD = ${usdToJod.toFixed(3)} JOD` : undefined}
+        subtitleDir="ltr"
         action={
           <div style={{ display: 'flex', gap: 8 }}>
             {usdToJod && (
@@ -446,7 +447,7 @@ export default function InvestmentsPage() {
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.name}</div>
                   </div>
-                  <div style={{ textAlign: 'left', flexShrink: 0 }}>
+                  <div style={{ textAlign: lang === 'ar' ? 'right' : 'left', flexShrink: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
                       {showJod && valueJOD ? `${valueJOD.toFixed(0)} JD` : `$${valueUSD.toFixed(2)}`}
                     </div>
@@ -553,7 +554,7 @@ export default function InvestmentsPage() {
                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', flex: 1 }}>{inv.symbol}</span>
                     <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{pct}%</span>
                     <span style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: pnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{pnl >= 0 ? '+' : ''}${pnl.toFixed(0)}</span>
-                    <span style={{ fontSize: 12, fontWeight: 900, fontFamily: 'monospace', color: 'var(--text-secondary)', minWidth: 55, textAlign: 'left' }}>${val.toFixed(0)}</span>
+                    <span style={{ fontSize: 12, fontWeight: 900, fontFamily: 'monospace', color: 'var(--text-secondary)', minWidth: 55, textAlign: lang === 'ar' ? 'right' : 'left' }}>${val.toFixed(0)}</span>
                   </div>
                 )
               })}
