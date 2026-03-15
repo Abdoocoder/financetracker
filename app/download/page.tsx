@@ -8,7 +8,7 @@ export default function DownloadPage() {
   const handleDownload = () => {
     setDownloading(true)
     setTimeout(() => setDownloading(false), 3000)
-    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak.apk'
+    window.location.href = 'https://github.com/Abdoocoder/financetracker/releases/download/v1.6.0/Fajrak.apk'
   }
 
   return (
