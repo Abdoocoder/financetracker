@@ -198,7 +198,7 @@ function WealthSimulator({ lang }: { lang: string }) {
                 <span style={{ fontSize: 12, fontWeight: 700, color: y === years ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>
                   {ar ? `بعد ${y} سنة` : `${y} years`}
                 </span>
-                <div style={{ textAlign: 'left' }}>
+                <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
                   <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: y === years ? 'var(--accent-blue-light)' : 'var(--text-primary)' }}>
                     ${val >= 1000 ? (val/1000).toFixed(1) + 'K' : val.toFixed(0)}
                   </div>
@@ -394,9 +394,10 @@ export default function InvestmentsPage() {
         title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
         subtitle={usdToJod ? `1 USD = ${usdToJod.toFixed(3)} JOD` : undefined}
         subtitleDir="ltr"
+        subtitleDir="ltr"
         action={
           <div style={{ display: 'flex', gap: 8 }}>
-            {usdToJod && (
+            {usdToJod !== null && (
               <button onClick={() => setShowJod(!showJod)} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
                 {showJod ? '$ USD' : (lang === 'en' ? 'JOD' : 'JOD د.أ')}
               </button>
@@ -581,7 +582,7 @@ export default function InvestmentsPage() {
                     <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? (lang === 'en' ? 'Buy' : 'شراء') : (lang === 'en' ? 'Sell' : 'بيع')} {Number(tx.shares).toFixed(4)} {lang === 'en' ? 'units' : 'وحدة'}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{tx.transaction_date} · سعر ${Number(tx.price).toFixed(2)}</div>
                   </div>
-                  <div style={{ textAlign: 'left' }}>
+                  <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
                     <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: tx.type === 'buy' ? 'var(--accent-red-light)' : 'var(--accent-green-light)' }}>
                       {tx.type === 'buy' ? '-' : '+'}${(Number(tx.shares) * Number(tx.price)).toFixed(0)}
                     </div>
