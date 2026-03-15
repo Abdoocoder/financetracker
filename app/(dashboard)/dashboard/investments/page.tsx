@@ -247,7 +247,7 @@ export default function InvestmentsPage() {
     if (!user) return
     const cacheKey = `inv_${user.id}`
     const cached = sessionStorage.getItem(cacheKey)
-    if (cached) { try { const { d, ts } = JSON.parse(cached); if (Date.now() - ts < 30000) { setInvestments(d); setLoading(false); return } } catch {} }
+    if (cached) { try { const { d, ts } = JSON.parse(cached); if (Date.now() - ts < 300000) { setInvestments(d); setLoading(false); return } } catch {} }
     const { data: inv } = await supabase.from('investments').select('*').eq('user_id', user.id).order('created_at')
     const result = inv ?? []
     setInvestments(result)
@@ -267,18 +267,25 @@ export default function InvestmentsPage() {
   useEffect(() => {
     load()
     fetchExchangeRate()
-    // تحديث تلقائي للأسعار عند الدخول (بدون إظهار loading)
+    // تحديث تلقائي للأسعار في الخلفية بعد عرض البيانات المحفوظة
     const autoRefresh = async () => {
       if (!currentUser) return
-      const { data: invs } = await supabase.from('investments').select('id,symbol,type').eq('user_id', currentUser.id)
+      // نأخر التحديث 2 ثانية عشان يظهر المحتوى أولاً
+      await new Promise(r => setTimeout(r, 2000))
+      const { data: invs } = await supabase.from('investments').select('id,symbol').eq('user_id', currentUser.id)
       if (!invs?.length) return
-      for (const inv of invs) {
-        try {
-          const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
-          const data = await res.json()
-          if (data.price) await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id)
-        } catch {}
-      }
+      // Parallel calls — كل الأسهم معاً بدل واحد واحد
+      await Promise.allSettled(
+        invs.map(async (inv) => {
+          try {
+            const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
+            const data = await res.json()
+            if (data.price) await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id)
+          } catch {}
+        })
+      )
+      // نمسح الـ cache عشان يجلب البيانات الجديدة
+      try { sessionStorage.removeItem(`inv_${currentUser.id}`) } catch {}
       load()
     }
     autoRefresh()
