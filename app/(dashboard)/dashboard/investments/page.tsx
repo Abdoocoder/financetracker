@@ -393,8 +393,6 @@ export default function InvestmentsPage() {
       <PageHeader
         title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
         subtitle={usdToJod ? `1 USD = ${usdToJod.toFixed(3)} JOD` : undefined}
-        subtitleDir="ltr"
-        subtitleDir="ltr"
         action={
           <div style={{ display: 'flex', gap: 8 }}>
             {usdToJod !== null && (
