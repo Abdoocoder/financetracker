@@ -34,7 +34,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 16 }}>ف</div>
-            <span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>FinanceTracker</span>
+            <span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>فجرك</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Link href="/login" style={{ padding: '8px 18px', borderRadius: 10, color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>تسجيل الدخول</Link>
@@ -83,7 +83,7 @@ export default function LandingPage() {
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#F59E0B' }} />
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981' }} />
             <div style={{ flex: 1, height: 24, borderRadius: 6, background: 'var(--bg-elevated)', maxWidth: 300, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>financetracker.app/dashboard</span>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>fajrak.com/dashboard</span>
             </div>
           </div>
           <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -374,9 +374,9 @@ export default function LandingPage() {
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--border)', padding: '32px 24px', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 13 }}>ف</div>
-          <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>FinanceTracker</span>
+          <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>فجرك</span>
         </div>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} FinanceTracker — إدارة مالية ذكية للعالم العربي</p>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} فجرك — إدارة مالية ذكية للعالم العربي</p>
       </footer>
 
       {/* Sticky CTA */}

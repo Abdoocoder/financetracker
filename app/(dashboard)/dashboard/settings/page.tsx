@@ -411,7 +411,7 @@ function ExportSection({ exporting, userId }: { exporting: boolean; userId: stri
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `financetracker-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `fajrak-${new Date().toISOString().split('T')[0]}.csv`
     a.click()
     URL.revokeObjectURL(url)
     toast.success(t('settings_export_ok'))

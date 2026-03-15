@@ -14,7 +14,7 @@ const translations = {
     nav_alerts:      'التنبيهات',
     nav_settings:    'الإعدادات',
     nav_logout:      'تسجيل الخروج',
-    app_name:        'FinanceTracker',
+    app_name:        'فجرك',
     app_subtitle:    'إدارة مالية ذكية',
 
     // Dashboard
@@ -311,7 +311,7 @@ const translations = {
     nav_alerts:      'Alerts',
     nav_settings:    'Settings',
     nav_logout:      'Logout',
-    app_name:        'FinanceTracker',
+    app_name:        'Fajrak',
     app_subtitle:    'Smart Finance',
 
     // Dashboard

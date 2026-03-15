@@ -14,13 +14,13 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'FinanceTracker',
+    title: 'فجرك',
   },
   other: {
     'mobile-web-app-capable': 'yes',
     'theme-color': '#070B14',
   },
-  title: 'FinanceTracker — إدارة شؤونك المالية',
+  title: 'فجرك — إدارة شؤونك المالية',
   description: 'تتبع دخلك، مصاريفك، ديونك واستثماراتك في مكان واحد',
   icons: { icon: '/favicon.ico' },
 }

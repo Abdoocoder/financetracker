@@ -7,7 +7,7 @@
 **منصة إدارة مالية شخصية ذكية**
 *Smart Personal Finance Manager*
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-financetracker--brown.vercel.app-3B7EF6?style=for-the-badge&logoColor=white)](https://financetracker-brown.vercel.app)
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
 [![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
@@ -15,7 +15,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)](https://vercel.com)
 [![Recharts](https://img.shields.io/badge/Recharts-Charts-22B5BF?style=flat-square)](https://recharts.org)
-[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa)](https://financetracker-brown.vercel.app)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa)](https://fajrak.com/)
 
 ---
 

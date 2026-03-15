@@ -141,7 +141,7 @@ export function TestimonialSection({ userId }: { userId: string }) {
             <textarea
               value={form.text}
               onChange={e => setForm(f => ({ ...f, text: e.target.value }))}
-              placeholder={lang === 'en' ? 'What do you like most about FinanceTracker?' : 'ما الذي أعجبك في التطبيق؟'}
+              placeholder={lang === 'en' ? 'What do you like most about Fajrak?' : 'ما الذي أعجبك في التطبيق؟'}
               rows={4}
               style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.7 }}
             />
