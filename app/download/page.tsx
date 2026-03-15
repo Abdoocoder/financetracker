@@ -7,16 +7,8 @@ export default function DownloadPage() {
 
   const handleDownload = () => {
     setDownloading(true)
-    
-    // Create a temporary link element to trigger a clean download
-    const link = document.createElement('a')
-    link.href = 'https://github.com/Abdoocoder/financetracker/releases/download/v1.1.0/Fajrak.apk'
-    link.download = 'Fajrak.apk'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-
     setTimeout(() => setDownloading(false), 3000)
+    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v1.1.apk'
   }
 
   return (
@@ -58,7 +50,7 @@ export default function DownloadPage() {
           boxShadow: '0 0 40px rgba(16,185,129,0.15)',
         }}>
           <svg width="40" height="40" viewBox="0 0 24 24" fill="#10B981">
-            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C3.4925 10.4609 2 13.0197 2 16h20c0-2.9803-1.4925-5.5391-4.1185-6.6786" />
+            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C3.4925 10.4609 2 13.0197 2 16h20c0-2.9803-1.4925-5.5391-4.1185-6.6786"/>
           </svg>
         </div>
 
@@ -105,7 +97,7 @@ export default function DownloadPage() {
           ) : (
             <>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
               </svg>
               تنزيل APK — مجاني
             </>
@@ -113,7 +105,7 @@ export default function DownloadPage() {
         </button>
 
         <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-muted)' }}>
-          Fajrak-v1.0.apk · ~15 MB · Android 8.0+
+          Fajrak-v1.1.apk · ~15 MB · Android 8.0+
         </div>
       </section>
 
