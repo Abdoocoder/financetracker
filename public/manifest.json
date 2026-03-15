@@ -5,6 +5,7 @@
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
   "background_color": "#070B14",
   "theme_color": "#070B14",
   "orientation": "portrait-primary",
@@ -36,10 +37,18 @@
   ],
   "screenshots": [
     {
+      "src": "/feature-graphic.png",
+      "sizes": "1024x500",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Fajrak Dashboard - Home"
+    },
+    {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Fajrak Mobile View"
     }
   ],
   "categories": [
@@ -48,5 +57,8 @@
   ],
   "lang": "ar",
   "dir": "rtl",
-  "id": "com.fajrak.app"
+  "id": "com.fajrak.app",
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "e578c73c-662C-703E-97E7-460703B38D89"
 }
