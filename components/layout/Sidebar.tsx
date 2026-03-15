@@ -67,7 +67,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
           })}
         </nav>
         <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} style={{ width: '100%', padding: '8px 12px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setTimeout(() => window.location.reload(), 100) }} style={{ width: '100%', padding: '8px 12px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <Globe size={14} /> {lang === 'ar' ? 'English' : 'العربية'}
           </button>
         </div>
@@ -222,7 +222,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                 )
               })}
             </div>
-            <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setShowMore(false) }} style={{ width: '100%', padding: '13px', borderRadius: 14, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setShowMore(false); setTimeout(() => window.location.reload(), 100) }} style={{ width: '100%', padding: '13px', borderRadius: 14, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <Globe size={16} /> {lang === 'ar' ? 'English' : 'العربية'}
             </button>
           </div>
