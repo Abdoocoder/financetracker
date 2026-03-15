@@ -15,12 +15,23 @@ export function PushPrompt() {
     // نعرضه فقط إذا:
     // 1. المتصفح يدعم الإشعارات
     // 2. لم يشترك بعد
-    // 3. لم يرفض أو يقبل سابقاً
     if (!supported || subscribed) return
+
     try {
       const shown = localStorage.getItem(PROMPT_KEY)
-      if (shown) return
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone
+
+      // إذا كان في الـ APK (standalone) ولم يشترك، نعطيه فرصة ثانية حتى لو رفض سابقاً في المتصفح
+      // لكن لا نزعجه إذا رفض التنبيه "الآن" في نفس الجلسة
+      if (shown === 'true') return
+      
+      if (shown === 'dismissed') {
+        // إذا رفض سابقاً، ننتظر 3 أيام قبل سؤاله مرة أخرى في الوضع العادي
+        // أما في الـ APK (standalone)، نسأله مرة واحدة عند التحميل الأول
+        if (!isStandalone) return
+      }
     } catch {}
+
     // نأخر الظهور 3 ثوان عشان يتحمل الداشبورد أولاً
     const timer = setTimeout(() => setShow(true), 3000)
     return () => clearTimeout(timer)
