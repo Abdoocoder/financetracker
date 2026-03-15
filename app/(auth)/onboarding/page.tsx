@@ -311,6 +311,17 @@ export default function OnboardingPage() {
       onboarding_done: false 
     })
     if (upsertErr) { alert('خطأ في حفظ البيانات: ' + upsertErr.message); return }
+    // إضافة الراتب كمعاملة دخل تلقائياً
+    if (profile.monthlyIncome && parseFloat(profile.monthlyIncome) > 0) {
+      await supabase.from('transactions').insert({
+        user_id: user.id,
+        type: 'income',
+        amount: parseFloat(profile.monthlyIncome),
+        category: 'راتب',
+        description: profile.fullName ? `راتب ${profile.fullName}` : 'الراتب الشهري',
+        transaction_date: new Date().toISOString().split('T')[0]
+      })
+    }
     setStep(2)
   }
 
