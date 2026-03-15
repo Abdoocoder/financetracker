@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LandingPage() {
   const [showSticky, setShowSticky] = useState(false)
@@ -16,10 +16,7 @@ export default function LandingPage() {
   }, [])
 
   useEffect(() => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const supabase = createClient()
     supabase.from('testimonials').select('*').eq('is_visible', true).order('created_at').then(({ data }) => {
       if (data && data.length > 0) setTestimonials(data)
     })
