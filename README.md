@@ -1,14 +1,14 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/Abdoocoder/financetracker/main/public/favicon.ico" width="80" height="80" alt="FinanceTracker Logo" />
+<img src="https://raw.githubusercontent.com/Abdoocoder/financetracker/main/public/favicon.ico" width="80" height="80" alt="Fajrak Logo" />
 
-# FinanceTracker
+# Fajrak
 
 **منصة إدارة مالية شخصية ذكية**
 *Smart Personal Finance Manager*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v1.0.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -28,7 +28,7 @@
 
 ## ✨ لمحة سريعة / Overview
 
-> FinanceTracker هو أول أداة مالية عربية ذكية تمشي مع المستخدم خطوة بخطوة — من أول دينار يسجّله حتى يحقق حريته المالية.
+> فجرك هو أول أداة مالية عربية ذكية تمشي مع المستخدم خطوة بخطوة — من أول دينار يسجّله حتى يحقق حريته المالية.
 >
 > **رؤيتنا:** أن يكون كل إنسان على دراية كاملة بوضعه المالي، ويملك خطة واضحة للتحسين — بغض النظر عن دخله أو مستواه — حتى ينجح في تحقيق حريته المالية.
 >
@@ -321,7 +321,7 @@ CRON_SECRET=your_secret_here
 ```bash
 # 1. Clone
 git clone https://github.com/Abdoocoder/financetracker.git
-cd financetracker
+cd fajrak
 
 # 2. Install
 npm install
@@ -415,7 +415,7 @@ NEXT_PUBLIC_APP_URL=
 - 📲 قابل للتثبيت على Android و iOS
 - 🔔 إشعارات Push حتى مع إغلاق التطبيق
 - ⚡ أداء سريع مع Service Worker
-- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk)
+- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v1.0.apk)
 
 ---
 
@@ -434,6 +434,6 @@ NEXT_PUBLIC_APP_URL=
 
 *"كل رحلة ثراء تبدأ بخطوة"*
 
-**© 2026 FinanceTracker — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
+**© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
 
 </div>
