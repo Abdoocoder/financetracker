@@ -8,7 +8,7 @@
 *Smart Personal Finance Manager*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v1.0.apk)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -415,7 +415,7 @@ NEXT_PUBLIC_APP_URL=
 - 📲 قابل للتثبيت على Android و iOS
 - 🔔 إشعارات Push حتى مع إغلاق التطبيق
 - ⚡ أداء سريع مع Service Worker
-- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v1.0.apk)
+- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk)
 
 ---
 

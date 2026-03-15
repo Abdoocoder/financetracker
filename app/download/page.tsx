@@ -8,7 +8,7 @@ export default function DownloadPage() {
   const handleDownload = () => {
     setDownloading(true)
     setTimeout(() => setDownloading(false), 3000)
-    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v1.0.apk'
+    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/FinanceTracker-v1.0.apk'
   }
 
   return (
@@ -105,7 +105,7 @@ export default function DownloadPage() {
         </button>
 
         <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-muted)' }}>
-          Fajrak-v1.0.apk · ~15 MB · Android 8.0+
+          FinanceTracker-v1.0.apk · ~15 MB · Android 8.0+
         </div>
       </section>
 
