@@ -248,19 +248,19 @@ export default function DashboardPage() {
 
       {/* ── قابلة للطي — مطوية افتراضياً ── */}
 
-      <Section id="wealth" icon="🗺️" title="خارطة الثراء ورحلة الثروة">
+      <Section id="wealth" icon="🗺️" title={lang === 'en' ? 'Wealth Roadmap & Journey' : 'خارطة الثراء ورحلة الثروة'}>
         <div style={{ padding: '12px 0 8px' }}>
           <WealthRoadmap />
         </div>
       </Section>
 
-      <Section id="gamification" icon="🏆" title="نظام الإنجازات">
+      <Section id="gamification" icon="🏆" title={lang === 'en' ? 'Achievements' : 'نظام الإنجازات'}>
         <div style={{ padding: '12px 0 8px' }}>
           <GamificationCard />
         </div>
       </Section>
 
-      <Section id="charts" icon="📊" title="الرسوم البيانية وتوزيع المصاريف">
+      <Section id="charts" icon="📊" title={lang === 'en' ? 'Charts & Expense Breakdown' : 'الرسوم البيانية وتوزيع المصاريف'}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
           <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
           {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
@@ -272,13 +272,13 @@ export default function DashboardPage() {
         </div>
       </Section>
 
-      <Section id="simulator" icon="💰" title="محاكي الثروة">
+      <Section id="simulator" icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
         <div style={{ padding: '12px 0 8px' }}>
           <WealthSimulatorCard net={net} lang={lang} />
         </div>
       </Section>
 
-      <Section id="challenges" icon="🎯" title="تحديات الادخار">
+      <Section id="challenges" icon="🎯" title={lang === 'en' ? 'Saving Challenges' : 'تحديات الادخار'}>
         <div style={{ padding: '12px 0 8px' }}>
           <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
         </div>
