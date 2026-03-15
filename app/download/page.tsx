@@ -7,8 +7,16 @@ export default function DownloadPage() {
 
   const handleDownload = () => {
     setDownloading(true)
+    
+    // Create a temporary link element to trigger a clean download
+    const link = document.createElement('a')
+    link.href = 'https://github.com/Abdoocoder/financetracker/releases/download/v1.1.0/Fajrak.apk'
+    link.download = 'Fajrak.apk'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
     setTimeout(() => setDownloading(false), 3000)
-    window.location.href = 'https://github.com/Abdoocoder/financetracker/releases/download/v1.1.0/Fajrak.apk'
   }
 
   return (
