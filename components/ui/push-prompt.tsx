@@ -17,40 +17,31 @@ export function PushPrompt() {
 
   useEffect(() => {
     if (!supported || subscribed) return
-
     async function checkAndShow() {
       try {
         const shown = localStorage.getItem(PROMPT_KEY)
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone
-
-        // إذا سبق وفعّل — لا نسأله مجدداً
         if (shown === 'true') return
-
-        // إذا كان عنده اشتراك سابق في قاعدة البيانات
-        // (يعني أعاد تثبيت التطبيق) — نعرض الـ prompt فوراً بدون انتظار
         if (user?.id) {
           const { count } = await supabase
             .from('push_subscriptions')
             .select('id', { count: 'exact', head: true })
             .eq('user_id', user.id)
-
           if (count && count > 0) {
-            // عنده اشتراك سابق لكن الجهاز الحالي غير مشترك — اعرض فوراً
+            if (Notification.permission === 'granted') {
+              subscribe()
+              try { localStorage.setItem(PROMPT_KEY, 'true') } catch {}
+              return
+            }
             setShow(true)
             return
           }
         }
-
-        // مستخدم جديد بدون اشتراك سابق
         if (shown === 'dismissed' && !isStandalone) return
-
-        // أخّر الظهور 3 ثواني
         const timer = setTimeout(() => setShow(true), 3000)
         return () => clearTimeout(timer)
-
       } catch {}
     }
-
     checkAndShow()
   }, [supported, subscribed, user])
 
@@ -72,51 +63,21 @@ export function PushPrompt() {
   }
 
   return (
-    <div style={{
-      position: 'fixed', bottom: 80, left: 16, right: 16, zIndex: 999,
-      background: 'var(--bg-card)',
-      border: '1px solid rgba(59,126,246,0.3)',
-      borderRadius: 20,
-      padding: '16px 18px',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-      animation: 'slideUp 0.3s ease',
-      display: 'flex', alignItems: 'center', gap: 14,
-    }}>
-      <div style={{
-        width: 48, height: 48, borderRadius: 14, flexShrink: 0,
-        background: 'rgba(59,126,246,0.12)',
-        border: '1px solid rgba(59,126,246,0.2)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 24,
-      }}>🔔</div>
-
+    <div style={{ position: 'fixed', bottom: 80, left: 16, right: 16, zIndex: 999, background: 'var(--bg-card)', border: '1px solid rgba(59,126,246,0.3)', borderRadius: 20, padding: '16px 18px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', animation: 'slideUp 0.3s ease', display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: 'rgba(59,126,246,0.12)', border: '1px solid rgba(59,126,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🔔</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 3 }}>
           {lang === 'en' ? 'Enable Notifications?' : 'تفعيل الإشعارات؟'}
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.4 }}>
-          {lang === 'en'
-            ? 'Get daily alerts — enable sound in app settings for best experience'
-            : 'تنبيهات يومية — فعّل صوت الإشعارات من إعدادات التطبيق للحصول على أفضل تجربة'}
+          {lang === 'en' ? 'Get daily alerts — enable sound in app settings for best experience' : 'تنبيهات يومية — فعّل صوت الإشعارات من إعدادات التطبيق للحصول على أفضل تجربة'}
         </div>
       </div>
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-        <button onClick={handleAllow} disabled={loading} style={{
-          padding: '7px 14px', borderRadius: 10,
-          background: 'var(--accent-blue)', border: 'none',
-          color: 'white', fontSize: 12, fontWeight: 800,
-          cursor: 'pointer', fontFamily: 'inherit',
-          opacity: loading ? 0.7 : 1,
-        }}>
+        <button onClick={handleAllow} disabled={loading} style={{ padding: '7px 14px', borderRadius: 10, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 12, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: loading ? 0.7 : 1 }}>
           {loading ? '...' : (lang === 'en' ? 'Allow' : 'السماح')}
         </button>
-        <button onClick={handleDismiss} style={{
-          padding: '7px 14px', borderRadius: 10,
-          background: 'transparent', border: '1px solid var(--border)',
-          color: 'var(--text-muted)', fontSize: 12, fontWeight: 700,
-          cursor: 'pointer', fontFamily: 'inherit',
-        }}>
+        <button onClick={handleDismiss} style={{ padding: '7px 14px', borderRadius: 10, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
           {lang === 'en' ? 'Later' : 'لاحقاً'}
         </button>
       </div>
