@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - FinanceTracker",
+  title: "Privacy Policy - Fajrak",
 }
 
 export default function PrivacyPage() {
@@ -14,10 +14,10 @@ export default function PrivacyPage() {
       <section style={{ marginBottom: 32 }}>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>1. Data We Collect / البيانات التي نجمعها</h3>
         <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
-          FinanceTracker collects only the data you provide: financial transactions, debts, investments, and savings goals.
+          Fajrak collects only the data you provide: financial transactions, debts, investments, and savings goals.
           All data is stored securely in Supabase and is only accessible by you.
           <br/><br/>
-          يجمع FinanceTracker فقط البيانات التي تقدمها: المعاملات المالية والديون والاستثمارات وأهداف الادخار.
+          يجمع فجرك فقط البيانات التي تقدمها: المعاملات المالية والديون والاستثمارات وأهداف الادخار.
           تُخزَّن جميع البيانات بشكل آمن ولا يمكن الوصول إليها إلا من قِبلك.
         </p>
       </section>
@@ -52,12 +52,12 @@ export default function PrivacyPage() {
       <section style={{ marginBottom: 32 }}>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>5. Contact / التواصل</h3>
         <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
-          For any privacy concerns, contact us at: <a href="mailto:support@financetracker.app" style={{ color: "#3B7EF6" }}>support@financetracker.app</a>
+          For any privacy concerns, contact us at: <a href="mailto:support@fajrak.com" style={{ color: "#3B7EF6" }}>support@fajrak.com</a>
         </p>
       </section>
 
       <div style={{ borderTop: "1px solid #1e293b", paddingTop: 24, color: "#475569", fontSize: 13 }}>
-        <a href="/" style={{ color: "#3B7EF6", textDecoration: "none" }}>← Back to FinanceTracker</a>
+        <a href="/" style={{ color: "#3B7EF6", textDecoration: "none" }}>← Back to Fajrak</a>
       </div>
     </div>
   )

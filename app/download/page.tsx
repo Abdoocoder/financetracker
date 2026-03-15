@@ -31,7 +31,7 @@ export default function DownloadPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 16 }}>ف</div>
-            <span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>FinanceTracker</span>
+            <span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>فجرك</span>
           </Link>
           <Link href="/register" style={{ padding: '8px 18px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>ابدأ مجاناً ←</Link>
         </div>
@@ -60,7 +60,7 @@ export default function DownloadPage() {
         </div>
 
         <h1 style={{ fontSize: 'clamp(26px, 5vw, 48px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 16px', letterSpacing: '-0.03em' }}>
-          FinanceTracker
+          فجرك
           <br />
           <span style={{ background: 'linear-gradient(135deg, #10B981, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             لأجهزة Android
@@ -105,7 +105,7 @@ export default function DownloadPage() {
         </button>
 
         <div style={{ marginTop: 14, fontSize: 12, color: 'var(--text-muted)' }}>
-          FinanceTracker-v1.0.apk · ~15 MB · Android 8.0+
+          Fajrak-v1.0.apk · ~15 MB · Android 8.0+
         </div>
       </section>
 
@@ -207,9 +207,9 @@ export default function DownloadPage() {
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--border)', padding: '32px 24px', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 13 }}>ف</div>
-          <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>FinanceTracker</span>
+          <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>فجرك</span>
         </div>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} FinanceTracker — إدارة مالية ذكية للعالم العربي</p>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} فجرك — إدارة مالية ذكية للعالم العربي</p>
       </footer>
     </div>
   )
