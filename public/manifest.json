@@ -1,17 +1,52 @@
 {
-  "name": "فجرك",
-  "short_name": "Finance",
-  "description": "منصة إدارة مالية شخصية ذكية",
+  "name": "Fajrak — فجرك",
+  "short_name": "Fajrak",
+  "description": "أول أداة مالية عربية ذكية — كلنا نحلم بالثراء، هنا تبدأ الرحلة",
   "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#070B14",
   "theme_color": "#070B14",
   "orientation": "portrait-primary",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ],
-  "categories": ["finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": [
+    "finance",
+    "productivity"
+  ],
   "lang": "ar",
-  "dir": "rtl"
+  "dir": "rtl",
+  "id": "com.fajrak.app"
 }
