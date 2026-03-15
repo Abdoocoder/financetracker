@@ -85,7 +85,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         paddingBottom: 'max(18px, env(safe-area-inset-bottom))',
       }} className="mobile-nav">
 
-        {MAIN_NAV.map(({ href, Icon, ar, en }) => {
+        {(lang === 'ar' ? [...MAIN_NAV].reverse() : MAIN_NAV).map(({ href, Icon, ar, en }) => {
           const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
           return (
             <Link key={href} href={href} style={{ flex: 1, textDecoration: 'none' }}>
