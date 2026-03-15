@@ -362,6 +362,14 @@ export default function OnboardingPage() {
   }
 
   async function handleStep2() {
+
+// تحقق من تكرار الراتب
+    if (tx.category === 'راتب' && tx.type === 'income' && profile.monthlyIncome && parseFloat(tx.amount) === parseFloat(profile.monthlyIncome)) {
+      const confirmed = window.confirm(`أضفنا راتبك ${profile.monthlyIncome} بالفعل. هل تريد إضافة راتب آخر؟`)
+      if (!confirmed) { setStep(3); return }
+    }
+
+
     if (tx.amount && tx.category) {
       setSaving(true)
       const { data: { user } } = await supabase.auth.getUser()
