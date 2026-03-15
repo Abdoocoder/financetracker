@@ -56,6 +56,35 @@ function StyledSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   )
 }
 
+function BudgetPreview({ income, lang }: { income: number; lang: string }) {
+  const ar = lang === 'ar'
+  if (income <= 0) return null
+  const needs = Math.round(income * 0.5)
+  const wants = Math.round(income * 0.3)
+  const savings = Math.round(income * 0.2)
+  return (
+    <div style={{ marginTop: 12, padding: 12, background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)', animation: 'fadeSlideIn 0.3s ease' }}>
+      <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, textAlign: 'center' }}>
+        {ar ? '⚖️ التوزيع المقترح (50/30/20)' : '⚖️ Suggested Budget (50/30/20)'}
+      </div>
+      <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ flex: 1, textAlign: 'center', padding: 6, background: 'var(--accent-blue-dim)', borderRadius: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>{needs}</div>
+          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>{ar ? 'أساسيات' : 'Needs'}</div>
+        </div>
+        <div style={{ flex: 1, textAlign: 'center', padding: 6, background: 'var(--accent-purple-dim)', borderRadius: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-purple-light)', fontFamily: 'monospace' }}>{wants}</div>
+          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>{ar ? 'رغبات' : 'Wants'}</div>
+        </div>
+        <div style={{ flex: 1, textAlign: 'center', padding: 6, background: 'var(--accent-green-dim)', borderRadius: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>{savings}</div>
+          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>{ar ? 'ادخار' : 'Savings'}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Step 1: الملف الشخصي ─────────────────────────────
 function Step1({ profile, setProfile, onNext, loading, lang }: {
   profile: Profile
@@ -98,6 +127,7 @@ function Step1({ profile, setProfile, onNext, loading, lang }: {
           onChange={e => setProfile(p => ({ ...p, monthlyIncome: e.target.value }))}
           placeholder="0"
         />
+        <BudgetPreview income={parseFloat(profile.monthlyIncome) || 0} lang={lang} />
       </Field>
 
       <Field label={ar ? 'العملة' : 'Currency'}>
@@ -313,6 +343,12 @@ export default function OnboardingPage() {
     if (upsertErr) { alert('خطأ في حفظ البيانات: ' + upsertErr.message); return }
     // إضافة الراتب كمعاملة دخل تلقائياً
     if (profile.monthlyIncome && parseFloat(profile.monthlyIncome) > 0) {
+      // حذف الراتب القديم لهذا المستخدم لمنع التكرار في حال دخل الصفحة مرتين
+      await supabase.from('transactions')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('category', 'راتب')
+
       await supabase.from('transactions').insert({
         user_id: user.id,
         type: 'income',
