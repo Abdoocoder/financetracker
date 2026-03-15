@@ -12,11 +12,11 @@ import {
 const MAIN_NAV = [
   { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
   { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
-  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
-  { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
 ]
 
 const MORE_NAV = [
+  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
+  { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
   { href: '/dashboard/goals',       Icon: Target,     ar: 'الأهداف',    en: 'Goals'       },
   { href: '/dashboard/investments', Icon: TrendingUp, ar: 'الاستثمار',  en: 'Investments' },
   { href: '/dashboard/alerts',      Icon: Bell,       ar: 'التنبيهات',  en: 'Alerts'      },
