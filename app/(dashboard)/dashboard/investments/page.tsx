@@ -264,7 +264,25 @@ export default function InvestmentsPage() {
     } catch {}
   }, [])
 
-  useEffect(() => { load(); fetchExchangeRate() }, [load, fetchExchangeRate])
+  useEffect(() => {
+    load()
+    fetchExchangeRate()
+    // تحديث تلقائي للأسعار عند الدخول (بدون إظهار loading)
+    const autoRefresh = async () => {
+      if (!currentUser) return
+      const { data: invs } = await supabase.from('investments').select('id,symbol,type').eq('user_id', currentUser.id)
+      if (!invs?.length) return
+      for (const inv of invs) {
+        try {
+          const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
+          const data = await res.json()
+          if (data.price) await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id)
+        } catch {}
+      }
+      load()
+    }
+    autoRefresh()
+  }, [load, fetchExchangeRate, currentUser])
 
   function startEditInv(inv: Investment) {
     setEditingInv(inv)
@@ -366,7 +384,7 @@ export default function InvestmentsPage() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="المحفظة"
+        title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
         subtitle={usdToJod ? `1 USD = ${usdToJod.toFixed(3)} JOD` : undefined}
         action={
           <div style={{ display: 'flex', gap: 8 }}>
@@ -483,7 +501,7 @@ export default function InvestmentsPage() {
       )}
 
       {showForm && (
-        <Modal title="إضافة أصل جديد" onClose={() => setShowForm(false)}>
+        <Modal title={lang === 'en' ? 'Add New Asset' : 'إضافة أصل جديد'} onClose={() => setShowForm(false)}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label="الرمز"><Input placeholder="SPUS" value={form.symbol} onChange={e => setForm(f => ({ ...f, symbol: e.target.value.toUpperCase() }))} /></FormField>
             <FormField label="الاسم"><Input placeholder="SP Funds ETF" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></FormField>
@@ -500,7 +518,7 @@ export default function InvestmentsPage() {
             <input type="checkbox" checked={form.is_halal} onChange={e => setForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
             <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{lang === 'en' ? '✅ Halal Investment' : '✅ استثمار حلال'}</span>
           </div>
-          <SaveButton label="إضافة الأصل" loading={saving} onClick={addInvestment} />
+          <SaveButton label={lang === 'en' ? 'Add Asset' : 'إضافة الأصل'} loading={saving} onClick={addInvestment} />
         </Modal>
       )}
 
@@ -585,17 +603,17 @@ export default function InvestmentsPage() {
               </Select>
             </FormField>
           </div>
-          <FormField label="ملاحظات"><Input placeholder={lang === "en" ? "Optional" : "اختياري"} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
+          <FormField label={lang === 'en' ? 'Notes' : 'ملاحظات'}><Input placeholder={lang === "en" ? "Optional" : "اختياري"} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
             <input type="checkbox" checked={editForm.is_halal} onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ حلال</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ {lang === 'en' ? 'Halal' : 'حلال'}</span>
           </div>
           <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B', fontSize: 12, marginBottom: 14 }}>
-            ⚠️ تعديل الوحدات والأسعار يؤثر على حسابات الربح والخسارة
+            ⚠️ {lang === 'en' ? 'Editing units and prices affects P&L calculations' : 'تعديل الوحدات والأسعار يؤثر على حسابات الربح والخسارة'}
           </div>
-          <SaveButton label="حفظ التعديلات" loading={saving} onClick={saveEditInv} />
+          <SaveButton label={lang === 'en' ? 'Save Changes' : 'حفظ التعديلات'} loading={saving} onClick={saveEditInv} />
           <button onClick={() => { if (confirm(lang === 'en' ? 'Delete this investment?' : 'حذف هذا الاستثمار؟')) { deleteInv(editingInv.id); setEditingInv(null) } }} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-            🗑️ حذف الاستثمار
+            🗑️ {lang === 'en' ? 'Delete Investment' : 'حذف الاستثمار'}
           </button>
         </Modal>
       )}
