@@ -18,8 +18,8 @@ self.addEventListener('push', function(event) {
   };
   event.waitUntil(
     self.registration.showNotification(data.title, options).then(() => {
-      if ('setAppBadge' in navigator) {
-        navigator.setAppBadge(data.badgeCount || 1).catch(() => {})
+      if ('setAppBadge' in self) {
+        self.setAppBadge(data.badgeCount || 1).catch(() => {})
       }
     })
   );
@@ -27,7 +27,7 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
-  if ('clearAppBadge' in navigator) navigator.clearAppBadge().catch(() => {})
+  if ('clearAppBadge' in self) self.clearAppBadge().catch(() => {})
   if (event.action === 'close') return;
   const url = event.notification.data?.url || 'https://fajrak.com/dashboard/alerts';
   event.waitUntil(
