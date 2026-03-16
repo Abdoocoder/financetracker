@@ -50,8 +50,8 @@ export async function sendPushToUser(
         user_id: userId,
         title,
         message,
-        type: tag,
-        url,
+        type: ['warning','motivation','reminder','achievement'].includes(tag) ? tag : 'reminder',
+        frequency: 'once',
         is_read: false,
       })
     } catch {}
