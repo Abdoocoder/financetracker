@@ -42,5 +42,20 @@ export async function sendPushToUser(
       }
     }
   }
+
+  // حفظ في صفحة التنبيهات إذا تم الإرسال
+  if (sent > 0) {
+    try {
+      await supabase.from('alerts').insert({
+        user_id: userId,
+        title,
+        message,
+        type: tag,
+        url,
+        is_read: false,
+      })
+    } catch {}
+  }
+
   return sent
 }
