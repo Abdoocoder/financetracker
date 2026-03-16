@@ -25,28 +25,49 @@ export function usePush() {
   async function subscribe() {
     setLoading(true)
     try {
-      // تسجيل Service Worker
-      const reg = await navigator.serviceWorker.register('/sw.js')
-      await navigator.serviceWorker.ready
-
-      // طلب الإذن
       const permission = await Notification.requestPermission()
       if (permission !== 'granted') {
         setLoading(false)
         return { ok: false, reason: 'permission_denied' }
       }
 
-      // الاشتراك
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { setLoading(false); return { ok: false } }
+
+      // Android — استخدم FCM
+      const isAndroid = /android/i.test(navigator.userAgent)
+      if (isAndroid) {
+        try {
+          const { getFCMToken } = await import('@/lib/firebase')
+          const fcmToken = await getFCMToken()
+          if (fcmToken) {
+            await fetch('/api/push-subscribe', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`
+              },
+              body: JSON.stringify({ fcmToken, type: 'fcm' })
+            })
+            setSubscribed(true)
+            setLoading(false)
+            return { ok: true }
+          }
+        } catch (err) {
+          console.error('FCM error:', err)
+        }
+      }
+
+      // iOS وباقي الأجهزة — استخدم Web Push
+      const reg = await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.ready
+
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(
           process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
         )
       })
-
-      // حفظ في Supabase
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { setLoading(false); return { ok: false } }
 
       const subJson = sub.toJSON()
       await fetch('/api/push-subscribe', {

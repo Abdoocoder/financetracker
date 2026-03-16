@@ -12,6 +12,11 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!
 )
 
+async function sendFCM(fcmToken: string, title: string, message: string, url: string) {
+  const { sendFCMNotification } = await import('./firebase-admin')
+  return sendFCMNotification(fcmToken, title, message, `https://fajrak.com${url}`)
+}
+
 export async function sendPushToUser(
   userId: string,
   title: string,
@@ -26,7 +31,6 @@ export async function sendPushToUser(
 
   if (!subs?.length) return 0
 
-  // جلب عدد التنبيهات غير المقروءة
   const { count: unread } = await supabase
     .from('alerts')
     .select('id', { count: 'exact', head: true })
@@ -37,6 +41,15 @@ export async function sendPushToUser(
   let sent = 0
 
   for (const sub of subs) {
+    // FCM token
+    if (sub.endpoint?.startsWith('fcm:')) {
+      const fcmToken = sub.endpoint.replace('fcm:', '')
+      const ok = await sendFCM(fcmToken, title, message, `https://fajrak.com${url}`)
+      if (ok) sent++
+      continue
+    }
+
+    // Web Push
     try {
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
@@ -50,7 +63,6 @@ export async function sendPushToUser(
     }
   }
 
-  // حفظ في صفحة التنبيهات إذا تم الإرسال
   if (sent > 0) {
     try {
       await supabase.from('alerts').insert({
