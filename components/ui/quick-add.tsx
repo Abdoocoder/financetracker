@@ -10,7 +10,7 @@ const CATEGORIES_AR = [
   { key: 'transport', label: 'مواصلات', labelEn: 'Transport', icon: '🚗', type: 'expense' },
   { key: 'bills', label: 'فواتير', labelEn: 'Bills', icon: '💡', type: 'expense' },
   { key: 'health', label: 'صحة', labelEn: 'Health', icon: '💊', type: 'expense' },
-  { key: 'salary', label: 'راتب', labelEn: 'Salary', icon: '💰', type: 'income' },
+  { key: 'freelance', label: 'عمل حر', labelEn: 'Freelance', icon: '💼', type: 'income' },
   { key: 'other', label: 'أخرى', labelEn: 'Other', icon: '📝', type: 'expense' },
 ]
 
