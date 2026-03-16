@@ -26,7 +26,14 @@ export async function sendPushToUser(
 
   if (!subs?.length) return 0
 
-  const payload = JSON.stringify({ title, message, url, tag })
+  // جلب عدد التنبيهات غير المقروءة
+  const { count: unread } = await supabase
+    .from('alerts')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_read', false)
+
+  const payload = JSON.stringify({ title, message, url, tag, badgeCount: (unread ?? 0) + 1 })
   let sent = 0
 
   for (const sub of subs) {
