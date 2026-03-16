@@ -63,6 +63,7 @@ export function useTransactions() {
       .select('*')
       .eq('user_id', user.id)
       .order('transaction_date', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(100)
     setTransactions((data as Transaction[]) ?? [])
     setLoading(false)
@@ -139,6 +140,7 @@ export function useTransactions() {
       .eq('user_id', user.id)
       .gte('transaction_date', firstDay).lte('transaction_date', lastDay)
       .order('transaction_date', { ascending: false })
+      .order('created_at', { ascending: false })
       .range(nextPage * PAGE_SIZE, (nextPage + 1) * PAGE_SIZE - 1)
     const result = (data as Transaction[]) ?? []
     setTransactions(prev => [...prev, ...result])
