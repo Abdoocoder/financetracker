@@ -1,8 +1,14 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.fajrak.app",
-        "sha256_cert_fingerprints": ["69:E8:0B:F2:BD:72:66:D0:EE:97:02:BC:AF:17:91:62:D4:57:92:0B:E2:33:EB:09:35:85:F9:BA:95:35:1C:49"]
-      }
-    }]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.financetracker.app",
+      "sha256_cert_fingerprints": [
+        "0B:F7:B6:F3:78:89:F8:92:74:81:33:53:80:B7:07:01:C5:7A:CB:1E:10:31:82:ED:F4:6B:F4:3A:64:09:30:12"
+      ]
+    }
+  }
+]
