@@ -23,7 +23,7 @@ export function TransactionItem({ tx, deletingId, onEdit, onDelete }: Props) {
           <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{tx.category} · {tx.transaction_date}</div>
         </div>
         <div style={{ fontSize: 15, fontWeight: 900, fontFamily: 'monospace', flexShrink: 0, color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
-          {tx.type === 'income' ? '+' : '−'}{Number(tx.amount).toFixed(0)}
+          {tx.type === 'income' ? '+' : '−'}{Number(tx.amount) % 1 === 0 ? Number(tx.amount).toFixed(0) : Number(tx.amount).toFixed(2)}
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <button onClick={() => onEdit(tx)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
