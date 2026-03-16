@@ -335,6 +335,12 @@ export function getLessonForStage(
   dayOfMonth: number,
   lang: 'ar' | 'en' = 'ar'
 ): DailyLesson {
+  // كل 7 أيام — درس إسلامي
+  if (dayOfMonth % 7 === 0) {
+    const allIslamic = [...ISLAMIC_LESSONS, ...ISLAMIC_LESSONS_EXTENDED]
+    const idx = (Math.floor(dayOfMonth / 7) - 1) % allIslamic.length
+    return allIslamic[idx][lang]
+  }
   const map: Record<FinancialStage, BilingualLesson[]> = {
     awareness: AWARENESS,
     debt:      DEBT,
@@ -364,3 +370,235 @@ export function determineStage(params: {
   if (!isInvesting) return 'investing'
   return 'wealth'
 }
+
+// ── الدروس الإسلامية ─────────────────────────────────
+export const ISLAMIC_LESSONS = [
+  {
+    ar: {
+      title: '💚 الصلاة على النبي ﷺ تكفي الهم',
+      body: 'عن أُبَيِّ بن كعب رضي الله عنه قال: قلت يا رسول الله أجعل لك صلاتي كلها؟ قال: "إذًا تُكْفَى هَمَّكَ وَيُغْفَرُ لَكَ ذَنْبُكَ". رواه الترمذي وأحمد. أكثر من الصلاة على النبي ﷺ — فهي تكفي همك المالي وغيره.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '💚 Salawat upon the Prophet ﷺ relieves worries',
+      body: "Ubayy ibn Ka'b said: I said: O Messenger of Allah, shall I devote all my prayers to you? He said: Then your worries will be relieved and your sins forgiven. (Tirmidhi & Ahmad)",
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🌧️ الاستغفار يفتح أبواب الرزق',
+      body: '"فَقُلْتُ اسْتَغْفِرُوا رَبَّكُمْ إِنَّهُ كَانَ غَفَّارًا • يُرْسِلِ السَّمَاءَ عَلَيْكُم مِّدْرَارًا • وَيُمْدِدْكُم بِأَمْوَالٍ وَبَنِينَ وَيَجْعَل لَّكُمْ جَنَّاتٍ وَيَجْعَل لَّكُمْ أَنْهَارًا" (نوح: 10-12). الاستغفار سبب مباشر للرزق.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🌧️ Istighfar opens the gates of provision',
+      body: '"Ask forgiveness of your Lord. He will send rain upon you in continuing showers. And give you increase in wealth and children." (Nuh: 10-12). Seeking forgiveness is a direct cause of provision.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '💰 "مَا نَقَصَ مَالٌ مِن صَدَقَةٍ"',
+      body: 'قال ﷺ: "ما نقص مال من صدقة، وما زاد الله عبداً بعفو إلا عزاً". الصدقة تبارك المال ولا تنقصه. خصص نسبة من دخلك اليوم للصدقة وتوكل على الله.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '💰 Wealth is not diminished by charity',
+      body: 'The Prophet ﷺ said: "Wealth is not diminished by charity, and Allah only increases a servant in honor by pardoning." Charity blesses wealth rather than diminishing it.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🌅 اليد العليا خير من اليد السفلى',
+      body: 'قال ﷺ: "اليد العليا خير من اليد السفلى، واليد العليا هي المنفقة، واليد السفلى هي السائلة". هدفك من بناء ثروتك أن تكون دائماً صاحب اليد العليا.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🌅 The upper hand is better than the lower hand',
+      body: 'The Prophet ﷺ said: "The upper hand is better than the lower hand. The upper hand is the one that gives, and the lower hand is the one that takes." Build wealth to always be the giver.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🛡️ حكمة يوسف عليه السلام في الادخار',
+      body: '"تَزْرَعُونَ سَبْعَ سِنِينَ دَأَبًا فَمَا حَصَدتُّمْ فَذَرُوهُ فِي سُنبُلِهِ" (يوسف:47). نبي الله يوسف علّمنا الادخار في سنوات الخير استعداداً للعسر.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🛡️ Prophet Yusuf wisdom in saving',
+      body: '"You will plant for seven years consecutively; and what you harvest leave in its spikes" (12:47). Prophet Yusuf taught us to save in years of plenty for years of hardship.',
+      url: '/dashboard/goals',
+    },
+  },
+  {
+    ar: {
+      title: '🤲 دعاء الكفاية — احفظه',
+      body: '"اللهم اكفني بحلالك عن حرامك، وأغنني بفضلك عمن سواك". رددها صباحاً ومساءً — جامعة لطلب الغنى الحلال والاستغناء عن الخلق.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🤲 The prayer of sufficiency',
+      body: '"O Allah, suffice me with Your lawful against Your unlawful, and enrich me with Your grace over all others." Repeat morning and evening.',
+      url: '/dashboard',
+    },
+  },
+]
+
+// ── الدروس الإسلامية الموسّعة ────────────────────────
+// مصادر: القرآن الكريم + السنة النبوية الصحيحة
+// المحور: العمل، التجارة، التقوى، الاستغفار، الصدقة، الدعاء، الاستغناء
+
+export const ISLAMIC_LESSONS_EXTENDED = [
+  // ── العمل والسعي ──
+  {
+    ar: {
+      title: '🌍 انتشروا في الأرض وابتغوا من فضل الله',
+      body: '"فَإِذَا قُضِيَتِ الصَّلَاةُ فَانتَشِرُوا فِي الْأَرْضِ وَابْتَغُوا مِن فَضْلِ اللَّهِ" (الجمعة:10). العمل بعد الصلاة أمر إلهي — ابتغاء الرزق عبادة.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🌍 Disperse through the land and seek the bounty of Allah',
+      body: '"When the prayer has been concluded, disperse within the land and seek from the bounty of Allah" (62:10). Working after prayer is a divine command — seeking provision is worship.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🚶 امشوا في مناكبها وكلوا من رزقه',
+      body: '"هُوَ الَّذِي جَعَلَ لَكُمُ الْأَرْضَ ذَلُولًا فَامْشُوا فِي مَنَاكِبِهَا وَكُلُوا مِن رِّزْقِهِ" (الملك:15). الأرض مسخّرة لك — السعي فيها شكر لله.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🚶 Walk in its paths and eat of His provision',
+      body: '"It is He who made the earth tame for you — so walk among its slopes and eat of His provision" (67:15). The earth is made easy for you — striving in it is gratitude to Allah.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🪵 العمل بيدك خير من سؤال الناس',
+      body: 'قال ﷺ: "لأن يأخذ أحدكم حبله فيأتي بحزمة حطب على ظهره فيبيعها خير له من أن يسأل الناس". رواه البخاري. الاعتماد على النفس كرامة — ابدأ بما تملك.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🪵 Working with your hands is better than asking people',
+      body: 'The Prophet ﷺ said: "For one of you to take his rope, bring a bundle of wood on his back and sell it, is better than asking people." (Bukhari). Self-reliance is dignity.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🍞 خير الطعام ما كان من عمل يدك',
+      body: 'قال ﷺ: "ما أكل أحد طعاماً قط خيراً من أن يأكل من عمل يده". رواه البخاري. مالك الذي تكسبه بعملك هو أطيب مال — تابعه وبارك فيه.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '🍞 The best food is what comes from your own work',
+      body: 'The Prophet ﷺ said: "No one has ever eaten food better than what he earned with his own hands." (Bukhari). The money you earn through your work is the purest.',
+      url: '/dashboard/transactions',
+    },
+  },
+  // ── التجارة الحلال ──
+  {
+    ar: {
+      title: '🤝 التاجر الصدوق مع النبيين والشهداء',
+      body: 'قال ﷺ: "التاجر الصدوق الأمين مع النبيين والصديقين والشهداء". رواه الترمذي. تجارتك الحلال تضعك في أعلى درجات الآخرة — الصدق في المال عبادة.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🤝 The honest merchant is with the prophets and martyrs',
+      body: 'The Prophet ﷺ said: "The honest, trustworthy merchant is with the prophets, the truthful, and the martyrs." (Tirmidhi). Your lawful trade places you among the highest ranks.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '📈 وَأَحَلَّ اللَّهُ الْبَيْعَ وَحَرَّمَ الرِّبَا',
+      body: '"وَأَحَلَّ اللَّهُ الْبَيْعَ وَحَرَّمَ الرِّبَا" (البقرة:275). التجارة الحلال مباركة — ابتعد عن الربا وتبارك في مالك. تتبع مصادر دخلك وتأكد من حلّها.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '📈 Allah has permitted trade and forbidden usury',
+      body: '"Allah has permitted trade and forbidden usury" (2:275). Lawful trade is blessed — avoid usury and your wealth will be pure. Track your income sources and ensure their lawfulness.',
+      url: '/dashboard/transactions',
+    },
+  },
+  // ── التقوى ──
+  {
+    ar: {
+      title: '🌟 وَمَن يَتَّقِ اللَّهَ يَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ',
+      body: '"وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ" (الطلاق:2-3). التقوى تفتح أبواباً لا تخطر على البال — كن مستقيماً وتوكل.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🌟 Whoever fears Allah — He will provide from where he does not expect',
+      body: '"Whoever fears Allah — He will make for him a way out and will provide for him from where he does not expect" (65:2-3). Taqwa opens doors beyond imagination.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🌧️ لو آمنوا واتقوا لفُتحت بركات السماء والأرض',
+      body: '"وَلَوْ أَنَّ أَهْلَ الْقُرَى آمَنُوا وَاتَّقَوْا لَفَتَحْنَا عَلَيْهِم بَرَكَاتٍ مِّنَ السَّمَاءِ وَالْأَرْضِ" (الأعراف:96). الاستقامة مفتاح البركة في الرزق.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🌧️ If they had believed and feared Allah, blessings would have opened',
+      body: '"If the people of the towns had believed and feared Allah, We would have opened upon them blessings from the heaven and the earth" (7:96). Righteousness is the key to blessed provision.',
+      url: '/dashboard',
+    },
+  },
+  // ── الصدقة ──
+  {
+    ar: {
+      title: '🌾 حبة أنبتت سبع سنابل — مثل الصدقة',
+      body: '"مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ" (البقرة:261). كل دينار تتصدق به يعود إليك بسبعمائة — خصص نسبة للصدقة اليوم.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🌾 One grain that grows seven spikes — the parable of charity',
+      body: '"The example of those who spend their wealth in the way of Allah is like a seed of grain which grows seven spikes" (2:261). Every dinar you give returns seven hundred — allocate a portion for charity today.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '💫 وَمَا أَنفَقْتُم مِّن شَيْءٍ فَهُوَ يُخْلِفُهُ',
+      body: '"وَمَا أَنفَقْتُم مِّن شَيْءٍ فَهُوَ يُخْلِفُهُ وَهُوَ خَيْرُ الرَّازِقِينَ" (سبأ:39). الله يخلف ما أنفقت — أنفق بيقين وتوكل على الرازق.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '💫 Whatever you spend — He will replace it',
+      body: '"Whatever you spend of good — He will compensate it; and He is the best of providers" (34:39). Allah replaces what you spend — give with certainty and trust the Provider.',
+      url: '/dashboard',
+    },
+  },
+  // ── الدعاء والاستغناء ──
+  {
+    ar: {
+      title: '🤲 النبي ﷺ كان يسأل الله الغنى',
+      body: 'قال ﷺ: "اللهم إني أسألك الهدى والتقى والعفاف والغنى". رواه مسلم. طلب الغنى من الله عبادة — ادعُ بهذا الدعاء اليوم.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🤲 The Prophet ﷺ used to ask Allah for wealth',
+      body: 'The Prophet ﷺ said: "O Allah, I ask You for guidance, piety, chastity, and wealth." (Muslim). Asking Allah for wealth is worship — make this supplication today.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '💎 ومن يستغن يغنه الله',
+      body: 'قال ﷺ: "ومن يستعفف يعفه الله، ومن يستغن يغنه الله". رواه البخاري ومسلم. الاستغناء عن الناس بداية الغنى الحقيقي — اعتمد على الله ثم على عملك.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '💎 Whoever seeks self-sufficiency, Allah will enrich him',
+      body: 'The Prophet ﷺ said: "Whoever seeks chastity, Allah will make him chaste. Whoever seeks self-sufficiency, Allah will enrich him." (Bukhari & Muslim). Self-reliance is the beginning of true wealth.',
+      url: '/dashboard',
+    },
+  },
+]
