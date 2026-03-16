@@ -18,7 +18,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const { endpoint, keys } = await request.json()
+    const body = await request.json()
+
+    // FCM token من Android
+    if (body.fcmToken && body.type === 'fcm') {
+      await supabase.from('push_subscriptions').upsert({
+        user_id: user.id,
+        endpoint: `fcm:${body.fcmToken}`,
+        p256dh: 'fcm',
+        auth: 'fcm',
+      }, { onConflict: 'user_id,endpoint' })
+      return NextResponse.json({ ok: true, type: 'fcm' })
+    }
+
+    // Web Push من iOS وباقي الأجهزة
+    const { endpoint, keys } = body
     if (!endpoint || !keys?.p256dh || !keys?.auth) {
       return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 })
     }
@@ -30,7 +44,7 @@ export async function POST(request: NextRequest) {
       auth: keys.auth,
     }, { onConflict: 'user_id,endpoint' })
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, type: 'webpush' })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
