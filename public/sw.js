@@ -19,7 +19,7 @@ self.addEventListener('push', function(event) {
   event.waitUntil(
     self.registration.showNotification(data.title, options).then(() => {
       if ('setAppBadge' in navigator) {
-        navigator.setAppBadge().catch(() => {})
+        navigator.setAppBadge(data.badgeCount || 1).catch(() => {})
       }
     })
   );
