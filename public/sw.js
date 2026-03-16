@@ -10,7 +10,7 @@ self.addEventListener('push', function(event) {
     requireInteraction: false,
     silent: false,
     vibrate: [200, 100, 200, 100, 200],
-    data: { url: data.url || '/dashboard/alerts' },
+    data: { url: data.url || 'https://fajrak.com/dashboard/alerts' },
     actions: [
       { action: 'open', title: '📊 فتح التطبيق' },
       { action: 'close', title: 'إغلاق' }
@@ -24,7 +24,7 @@ self.addEventListener('push', function(event) {
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   if (event.action === 'close') return;
-  const url = event.notification.data?.url || '/dashboard/alerts';
+  const url = event.notification.data?.url || 'https://fajrak.com/dashboard/alerts';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
       for (const client of list) {
