@@ -17,12 +17,17 @@ self.addEventListener('push', function(event) {
     ]
   };
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(data.title, options).then(() => {
+      if ('setAppBadge' in navigator) {
+        navigator.setAppBadge().catch(() => {})
+      }
+    })
   );
 });
 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
+  if ('clearAppBadge' in navigator) navigator.clearAppBadge().catch(() => {})
   if (event.action === 'close') return;
   const url = event.notification.data?.url || 'https://fajrak.com/dashboard/alerts';
   event.waitUntil(
