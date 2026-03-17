@@ -1,8 +1,4 @@
 @tailwind base;
-
-html, body {
-  overscroll-behavior-y: contain;
-}
 @tailwind components;
 @tailwind utilities;
 
