@@ -55,7 +55,10 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>كلمة المرور</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label className="block text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>كلمة المرور</label>
+              <a href="/forgot-password" style={{ fontSize: 12, color: 'var(--accent-blue-light)', textDecoration: 'none', fontWeight: 600 }}>نسيت كلمة المرور؟</a>
+            </div>
             <input
               type="password" value={password} onChange={e => setPassword(e.target.value)} required
               className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
