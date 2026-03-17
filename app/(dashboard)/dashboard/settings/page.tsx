@@ -741,10 +741,10 @@ export default function SettingsPage() {
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🌅</div>
           <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>
-            {lang === 'ar' ? 'ساعد أصدقاءك يبدأوا رحلتهم' : 'Help your friends start their journey'}
+            {t('share_subtitle')}
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.6 }}>
-            {lang === 'ar' ? 'كل شخص تدعوه لفجرك قد يغير حياته المالية للأبد 💪' : 'Every person you invite may change their financial life forever 💪'}
+            {t('share_body')}
           </div>
           <button
             onClick={() => {
@@ -755,7 +755,7 @@ export default function SettingsPage() {
                 navigator.share({ title: 'فجرك', text, url: 'https://fajrak.com' })
               } else {
                 navigator.clipboard.writeText('https://fajrak.com')
-                alert(lang === 'ar' ? '✅ تم نسخ الرابط!' : '✅ Link copied!')
+                alert(t('share_copied'))
               }
             }}
             style={{
@@ -766,7 +766,7 @@ export default function SettingsPage() {
               boxShadow: '0 4px 20px rgba(59,126,246,0.3)',
             }}
           >
-            🔗 {lang === 'ar' ? 'شارك فجرك' : 'Share Fajrak'}
+            {t('share_btn')}
           </button>
         </div>
       </AccordionCard>
