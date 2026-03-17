@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { haptic } from '@/lib/haptic'
 import { getLessonForStage, determineStage, type FinancialStage, type DailyLesson } from '@/lib/daily-lessons'
 import { PageHeader } from '@/components/ui/page-header'
 
@@ -88,6 +89,7 @@ export default function LearnPage() {
     localStorage.setItem(`lesson_completed_${today}`, 'true')
     setCompleted(true)
     setStreak(s => s + 1)
+    haptic(100)
   }
 
   const info = stageInfo[stage]

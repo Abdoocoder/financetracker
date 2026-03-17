@@ -1,5 +1,6 @@
 'use client'
 import { clearUserCache } from '@/lib/cache'
+import { haptic } from '@/lib/haptic'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
@@ -58,6 +59,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
     setAmount('')
     setSelected(null)
     clearUserCache(user?.id ?? '')
+    haptic(50)
     setShowSuccess(true)
     setTimeout(() => setShowSuccess(false), 2000)
     onAdded()
@@ -77,6 +79,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
     })
     setSaving(false)
     clearUserCache(user?.id ?? '')
+    haptic(50)
     setShowSuccess(true)
     setTimeout(() => setShowSuccess(false), 2000)
     onAdded()
