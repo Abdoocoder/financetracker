@@ -12,11 +12,22 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    const code = new URLSearchParams(window.location.search).get('code')
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(() => setReady(true))
+    // Supabase يرسل tokens في الـ hash
+    const hashParams = new URLSearchParams(window.location.hash.slice(1))
+    const accessToken = hashParams.get('access_token')
+    const refreshToken = hashParams.get('refresh_token')
+    
+    if (accessToken && refreshToken) {
+      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(() => setReady(true))
     } else {
-      setReady(true)
+      // جرب code في query string
+      const code = new URLSearchParams(window.location.search).get('code')
+      if (code) {
+        supabase.auth.exchangeCodeForSession(code).then(() => setReady(true))
+      } else {
+        setReady(true)
+      }
     }
   }, [])
   const [confirm, setConfirm] = useState('')
