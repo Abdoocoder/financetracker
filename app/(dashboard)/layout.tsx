@@ -9,6 +9,7 @@ import { ToastProvider } from '@/components/ui/toast'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { I18nProvider, useI18n } from '@/lib/i18n'
 import { PushPrompt } from '@/components/ui/push-prompt'
+import { syncSessionToNative } from '@/lib/capacitor-bridge'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -29,6 +30,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!user) return
     fetchCount()
+    // sync session to native Android
+    createClient().auth.getSession().then(({ data }) => {
+      if (data.session) syncSessionToNative(data.session.access_token, user.id)
+    })
     const channel = supabase
       .channel('alerts-count')
       .on('postgres_changes', {
