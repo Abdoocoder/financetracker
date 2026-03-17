@@ -6,7 +6,7 @@ import { useState } from 'react'
 import {
   LayoutDashboard, ArrowUpDown, CreditCard,
   TrendingUp, Target, Bell, Settings, Globe,
-  ChevronLeft, MoreHorizontal, PieChart, BookOpen
+  ChevronLeft, MoreHorizontal, PieChart, BookOpen, HelpCircle
 } from 'lucide-react'
 
 const MAIN_NAV = [
@@ -22,6 +22,7 @@ const MORE_NAV = [
   { href: '/dashboard/learn',        Icon: BookOpen,   ar: 'تعلّم',       en: 'Learn'       },
   { href: '/dashboard/alerts',      Icon: Bell,       ar: 'التنبيهات',  en: 'Alerts'      },
   { href: '/dashboard/settings',    Icon: Settings,   ar: 'الإعدادات',  en: 'Settings'    },
+  { href: '/dashboard/help',          Icon: HelpCircle, ar: 'المساعدة',   en: 'Help'        },
 ]
 
 const ALL_NAV = [...MAIN_NAV, ...MORE_NAV]
