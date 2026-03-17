@@ -166,6 +166,57 @@ export default function LandingPage() {
         </div>
       </section>
 
+
+      {/* رحلة الحرية المالية */}
+      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: '#F59E0B', textTransform: 'uppercase', marginBottom: 12 }}>رحلتك</div>
+          <h2 style={{ fontSize: 'clamp(26px, 5vw, 42px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 16px', letterSpacing: '-0.02em' }}>
+            أين أنت الآن؟<br />
+            <span style={{ background: 'linear-gradient(135deg, #F59E0B, #10B981)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>وإلى أين تريد أن تصل؟</span>
+          </h2>
+          <p style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 500, margin: '0 auto' }}>
+            فجرك يحدد مرحلتك المالية الحقيقية ويمشي معك خطوة بخطوة حتى تصل لليد العليا
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {[
+            { num: '01', icon: '🌱', stage: 'الوعي المالي', desc: 'تعرف أين يذهب راتبك. تسجل مصاريفك. تفهم وضعك الحقيقي.', quote: '"ما لا يُقاس لا يُحسَّن"', color: '#8B5CF6', active: false },
+            { num: '02', icon: '💳', stage: 'سداد الديون', desc: 'خطة سداد واضحة. خصم تلقائي شهري. احتفال عند كل دين تسدده.', quote: '"اقضِ دينك وارتح"', color: '#EF4444', active: false },
+            { num: '03', icon: '🛡️', stage: 'صندوق الطوارئ', desc: 'ثلاثة أشهر من الأمان. درع ضد المفاجآت. نوم هادئ كل ليلة.', quote: '"تَصَدَّقُوا وَلَوْ بِشِقِّ تَمْرَةٍ"', color: '#F59E0B', active: false },
+            { num: '04', icon: '📈', stage: 'الاستثمار', desc: 'أسهم حلال. عملات رقمية. محفظة تنمو وأنت نائم.', quote: '"وَمَا أَنفَقْتُم مِّن شَيْءٍ فَهُوَ يُخْلِفُهُ"', color: '#10B981', active: false },
+            { num: '05', icon: '👑', stage: 'الحرية المالية', desc: 'اليد العليا. تعطي ولا تحتاج. تساعد عائلتك وتتصدق بيسر.', quote: '"اليد العليا خير من اليد السفلى"', color: '#3B7EF6', active: true },
+          ].map((step, i) => (
+            <div key={i} style={{
+              display: 'flex', gap: 16, padding: '20px 24px', borderRadius: 16,
+              background: step.active ? 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))' : 'var(--bg-card)',
+              border: `1px solid ${step.active ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
+              alignItems: 'flex-start',
+            }}>
+              <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: `${step.color}15`, border: `1px solid ${step.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+                {step.icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                  <span style={{ fontSize: 10, fontWeight: 900, color: step.color, background: `${step.color}15`, padding: '2px 8px', borderRadius: 100 }}>{step.num}</span>
+                  <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)' }}>{step.stage}</span>
+                  {step.active && <span style={{ fontSize: 10, fontWeight: 700, color: '#3B7EF6', background: 'rgba(59,126,246,0.1)', padding: '2px 8px', borderRadius: 100 }}>🎯 الهدف النهائي</span>}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 8 }}>{step.desc}</div>
+                <div style={{ fontSize: 11, color: step.color, fontStyle: 'italic', opacity: 0.8 }}>{step.quote}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 32 }}>
+          <a href="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', boxShadow: '0 4px 24px rgba(59,126,246,0.35)' }}>
+            ابدأ رحلتك اليوم ←
+          </a>
+        </div>
+      </section>
+
       {/* الميزات - محدّث */}
       <section id="features" style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
