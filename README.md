@@ -8,7 +8,7 @@
 *Smart Personal Finance Manager*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v2.2.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
+[![Download APK](https://img.shields.io/badge/📱_Android-قريباً-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -146,7 +146,12 @@
 - 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
 - 🔔 App Badge عند وصول إشعار جديد
 
-### v2.2.0 — 2026-03-17 *(الإصدار الحالي)*
+### v2.3.0 — 2026-03-17 *(الإصدار الحالي)*
+- 🧹 **تنظيف المشروع** — حذف Capacitor والعودة لـ PWA فقط
+- 📱 **صفحة Android Coming Soon** — مع خانة تسجيل الاهتمام
+- 🔔 **إصلاح dedup التنبيهات** — نافذة 24 ساعة بدل 20
+
+### v2.2.0 — 2026-03-17
 - 📱 **Native Android App** — Capacitor + Firebase FCM حقيقي
 - 🔔 **إشعارات Native** — تصل حتى لو التطبيق مغلق كلياً
 - 🔐 **FCM Bridge** — Java ↔ JavaScript لتسجيل Token تلقائياً
