@@ -269,6 +269,38 @@ async function wealthGuidanceAlert() {
 }
 
 // ── Main handler ──────────────────────────────────────
+
+// ── Smart Nudge: مستخدمين غير نشطين 3 أيام ─────────
+async function smartNudge() {
+  const { data: profiles } = await supabase
+    .from('profiles').select('id, full_name, lang')
+
+  if (!profiles?.length) return
+
+  for (const p of profiles) {
+    const name = p.full_name?.split(' ')[0] ?? 'أخي'
+    const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
+
+    // تحقق إذا سجل معاملة في آخر 3 أيام
+    const { count } = await supabase
+      .from('transactions')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', p.id)
+      .gte('transaction_date', daysAgo(3))
+
+    if ((count ?? 0) === 0) {
+      const title = userLang === 'ar'
+        ? `${name}، كيف مصاريفك اليوم؟ 💭`
+        : `${name}, how are your expenses today? 💭`
+      const body = userLang === 'ar'
+        ? 'ما سجلت أي معاملة منذ 3 أيام — دقيقة واحدة تفرق في وعيك المالي ⚡'
+        : 'No transactions logged in 3 days — one minute makes a difference in your financial awareness ⚡'
+
+      await sendPushToUser(p.id, title, body, '/dashboard?quick=1', 'nudge')
+    }
+  }
+}
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   const isVercelCron = request.headers.get('x-vercel-cron') === '1'
@@ -286,6 +318,7 @@ export async function GET(request: NextRequest) {
     await dailyMorningReminder()
     await smartAlerts()
     tasks.push('morning+alerts')
+    tasks.push('nudge')
   }
 
   // 8 ص — راتب صامت (بدون إشعار)
