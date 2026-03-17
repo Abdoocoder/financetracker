@@ -736,6 +736,41 @@ export default function SettingsPage() {
         <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
       </AccordionCard>
 
+
+      <AccordionCard icon="🔗" title={lang === 'en' ? 'Share Fajrak' : 'شارك فجرك مع أصدقائك'}>
+        <div style={{ textAlign: 'center', padding: '20px 0' }}>
+          <div style={{ fontSize: 40, marginBottom: 12 }}>🌅</div>
+          <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>
+            {lang === 'ar' ? 'ساعد أصدقاءك يبدأوا رحلتهم' : 'Help your friends start their journey'}
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.6 }}>
+            {lang === 'ar' ? 'كل شخص تدعوه لفجرك قد يغير حياته المالية للأبد 💪' : 'Every person you invite may change their financial life forever 💪'}
+          </div>
+          <button
+            onClick={() => {
+              const text = lang === 'ar'
+                ? 'جربت فجرك؟ تطبيق مالي عربي مجاني يساعدك تتحكم في مصاريفك وتبني ثروتك 🌅\n\nhttps://fajrak.com'
+                : 'Tried Fajrak? A free Arabic financial app to control your expenses and build wealth 🌅\n\nhttps://fajrak.com'
+              if (navigator.share) {
+                navigator.share({ title: 'فجرك', text, url: 'https://fajrak.com' })
+              } else {
+                navigator.clipboard.writeText('https://fajrak.com')
+                alert(lang === 'ar' ? '✅ تم نسخ الرابط!' : '✅ Link copied!')
+              }
+            }}
+            style={{
+              padding: '14px 32px', borderRadius: 14,
+              background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)',
+              border: 'none', color: 'white', fontSize: 15, fontWeight: 900,
+              cursor: 'pointer', fontFamily: 'inherit',
+              boxShadow: '0 4px 20px rgba(59,126,246,0.3)',
+            }}
+          >
+            🔗 {lang === 'ar' ? 'شارك فجرك' : 'Share Fajrak'}
+          </button>
+        </div>
+      </AccordionCard>
+
       <AccordionCard icon="⭐" title={lang === 'en' ? 'Share Your Experience' : 'شارك تجربتك'} badge={lang === 'en' ? 'New' : 'جديد'}>
         <TestimonialSection userId={currentUser?.id ?? ''} />
       </AccordionCard>
