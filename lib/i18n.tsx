@@ -5,6 +5,14 @@ export type Lang = 'ar' | 'en'
 
 const translations = {
   ar: {
+    // Share
+    share_title:         'شارك فجرك مع أصدقائك',
+    share_subtitle:      'ساعد أصدقاءك يبدأوا رحلتهم',
+    share_body:          'كل شخص تدعوه لفجرك قد يغير حياته المالية للأبد 💪',
+    share_btn:           '🔗 شارك فجرك',
+    share_msg:           'جربت فجرك؟ تطبيق مالي عربي مجاني يساعدك تتحكم في مصاريفك وتبني ثروتك 🌅',
+    share_copied:        '✅ تم نسخ الرابط!',
+
     // Install Prompt
     install_title:       'أضف فجرك لهاتفك 📱',
     install_body:        'ثبّت التطبيق للحصول على تجربة أفضل وإشعارات أسرع 🚀',
@@ -350,6 +358,14 @@ const translations = {
     recurringNoteEn:   '✅ Will auto-execute every month',
   },
   en: {
+    // Share
+    share_title:         'Share Fajrak with your friends',
+    share_subtitle:      'Help your friends start their journey',
+    share_body:          'Every person you invite may change their financial life forever 💪',
+    share_btn:           '🔗 Share Fajrak',
+    share_msg:           'Tried Fajrak? A free Arabic financial app to control your expenses and build wealth 🌅',
+    share_copied:        '✅ Link copied!',
+
     // Install Prompt
     install_title:       'Add Fajrak to your phone 📱',
     install_body:        'Install for a better experience and faster notifications 🚀',
