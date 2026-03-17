@@ -206,7 +206,7 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
-            {data?.name ? (lang === 'ar' ? `👋 أهلاً ${data.name.split(' ')[0]}` : `👋 Hey ${data.name.split(' ')[0]}`) : t('dash_title')}
+            {(() => { const name = data?.name || currentUser?.user_metadata?.full_name || ''; const first = name.split(' ')[0]; return first ? (lang === 'ar' ? `👋 أهلاً ${first}` : `👋 Hey ${first}`) : t('dash_title') })()}
           </h1>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
             {lang === 'ar' ? 'فجرك المالي يبدأ اليوم 🌅' : 'Your financial dawn starts today 🌅'}
