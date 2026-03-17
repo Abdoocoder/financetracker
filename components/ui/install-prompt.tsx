@@ -93,8 +93,7 @@ export function InstallPrompt() {
         </div>
         {isIOS ? (
           <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            {lang === 'ar'
-              t('install_ios')}
+            {t('install_ios')}
           </div>
         ) : (
           <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
