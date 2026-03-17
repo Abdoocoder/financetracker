@@ -13,6 +13,7 @@ import {
 import { FinancialHealthScore } from '@/components/ui/financial-health-score'
 import { DashboardEmptyState } from '@/components/ui/empty-state'
 import { PullToRefresh } from '@/components/ui/pull-to-refresh'
+import { useCountUp } from '@/lib/use-count-up'
 import nextDynamic from 'next/dynamic'
 
 const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
@@ -203,6 +204,9 @@ export default function DashboardPage() {
   const income   = data?.income ?? 0
   const expenses = data?.expenses ?? 0
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
+  const animIncome   = useCountUp(income)
+  const animExpenses = useCountUp(expenses)
+  const animNet      = useCountUp(Math.abs(net))
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
@@ -229,9 +233,9 @@ export default function DashboardPage() {
       {/* Stats — دائماً ظاهرة */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
-          { label: t('dash_income'),   value: `+${fmt(income)}`,                          color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
-          { label: t('dash_expenses'), value: fmt(expenses),                               color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
-          { label: t('dash_net'),      value: `${net >= 0 ? '+' : ''}${fmt(net)}`,        color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+          { label: t('dash_income'),   value: `+${fmt(animIncome)}`,                          color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
+          { label: t('dash_expenses'), value: fmt(animExpenses),                               color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
+          { label: t('dash_net'),      value: `${net >= 0 ? '+' : '-'}${fmt(animNet)}`,        color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
         ].map((s, i) => (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
             <div style={{ fontSize: 12, color: s.color, fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>{s.icon}</div>
