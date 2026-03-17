@@ -10,6 +10,7 @@ import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
+import { FinancialHealthScore } from '@/components/ui/financial-health-score'
 import nextDynamic from 'next/dynamic'
 
 const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
@@ -171,6 +172,7 @@ function useDashboardData() {
         goalsSaved:  (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts,
+        txCount: (chartRes.data ?? []).length,
       }
       setData(newData); setRecentTx(recentRes.data ?? [])
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch {}
@@ -242,6 +244,17 @@ export default function DashboardPage() {
 
       {/* الميزانية الشهرية — دائماً ظاهرة */}
       <BudgetProgressCard income={income} expenses={expenses} net={net} />
+
+      {/* نقاط الصحة المالية */}
+      <FinancialHealthScore
+        income={income}
+        expenses={expenses}
+        totalDebt={data?.totalDebt ?? 0}
+        invValue={data?.invValue ?? 0}
+        goalsSaved={data?.goalsSaved ?? 0}
+        goalsTarget={data?.goalsTarget ?? 0}
+        txCount={data?.txCount ?? 0}
+      />
 
       {/* روابط سريعة — دائماً ظاهرة */}
       <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
