@@ -8,9 +8,11 @@ const WELCOME_KEY = 'fajrak_welcome_shown'
 export function WelcomeModal() {
   const { lang } = useI18n()
   const { user } = useUser()
+  const [mounted, setMounted] = useState(false)
   const [show, setShow] = useState(false)
   const [name, setName] = useState('')
 
+  useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
     if (!user) return
     const shown = localStorage.getItem(WELCOME_KEY)
@@ -26,7 +28,7 @@ export function WelcomeModal() {
     setShow(false)
   }
 
-  if (!show) return null
+  if (!mounted || !show) return null
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, backdropFilter: 'blur(4px)' }}>

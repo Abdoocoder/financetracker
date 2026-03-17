@@ -121,8 +121,10 @@ export function OnboardingTour() {
   const { lang } = useI18n()
   const pathname = usePathname()
   const [step, setStep] = useState(0)
+  const [mounted, setMounted] = useState(false)
   const [show, setShow] = useState(false)
 
+  useEffect(() => { setMounted(true) }, [])
   useEffect(() => {
     const key = TOUR_KEYS[pathname]
     if (!key) return
