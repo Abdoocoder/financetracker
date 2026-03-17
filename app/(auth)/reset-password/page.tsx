@@ -12,7 +12,7 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [ready, setReady] = useState(false)
+  const [ready, setReady] = useState(true)
 
   useEffect(() => {
     const supabase = createClient()
@@ -54,9 +54,6 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleSubmit} className="p-8 rounded-2xl border space-y-5" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
           {success && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>{t('reset_success')}</div>}
           {error && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>{error}</div>}
-          {!ready && !success && (
-            <div className="text-center text-sm" style={{ color: 'var(--text-muted)' }}>⏳ جاري التحقق...</div>
-          )}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('reset_new')}</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
@@ -69,8 +66,8 @@ export default function ResetPasswordPage() {
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
-          <button type="submit" disabled={loading || !ready} className="w-full py-3 rounded-xl font-bold text-white"
-            style={{ background: 'var(--accent-blue)', opacity: (loading || !ready) ? 0.7 : 1 }}>
+          <button type="submit" disabled={loading} className="w-full py-3 rounded-xl font-bold text-white"
+            style={{ background: 'var(--accent-blue)', opacity: loading ? 0.7 : 1 }}>
             {loading ? t('reset_saving') : t('reset_btn')}
           </button>
         </form>
