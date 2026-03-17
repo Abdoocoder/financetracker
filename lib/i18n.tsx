@@ -5,6 +5,26 @@ export type Lang = 'ar' | 'en'
 
 const translations = {
   ar: {
+    // Onboarding
+    onboard_welcome:     'مرحباً بك في فجرك 👋',
+    onboard_subtitle:    'رفيقك في رحلة الحرية المالية',
+    onboard_skip:        'تخطي',
+    onboard_next:        'التالي',
+    onboard_start:       '🚀 ابدأ الجولة التعريفية',
+    onboard_skip_tour:   'تخطي — أنا أعرف كيف أستخدمه',
+    onboard_finish:      '🎉 ابدأ رحلتك!',
+
+    // Learn
+    learn_title:         'درس اليوم',
+    learn_subtitle:      'تعلم خطوة كل يوم نحو حريتك المالية',
+    learn_stage:         'مرحلتك',
+    learn_streak:        'السلسلة',
+    learn_journey:       'رحلتك المالية',
+    learn_apply:         '← طبّق الدرس',
+    learn_done:          'أتممت الدرس',
+    learn_completed:     'مكتمل',
+    learn_did_you_know:  'هل تعلم؟',
+
     // Nav
     nav_home:        'الرئيسية',
     nav_transactions:'المعاملات',
@@ -302,6 +322,26 @@ const translations = {
     recurringNoteEn:   '✅ Will auto-execute every month',
   },
   en: {
+    // Onboarding
+    onboard_welcome:     'Welcome to Fajrak 👋',
+    onboard_subtitle:    'Your companion on the journey to financial freedom',
+    onboard_skip:        'Skip',
+    onboard_next:        'Next',
+    onboard_start:       '🚀 Start the Tour',
+    onboard_skip_tour:   "Skip — I know how to use it",
+    onboard_finish:      '🎉 Start your journey!',
+
+    // Learn
+    learn_title:         "Today's Lesson",
+    learn_subtitle:      'One step every day toward financial freedom',
+    learn_stage:         'Your Stage',
+    learn_streak:        'Streak',
+    learn_journey:       'Your Financial Journey',
+    learn_apply:         'Apply Lesson →',
+    learn_done:          'Done',
+    learn_completed:     'Completed',
+    learn_did_you_know:  'Did you know?',
+
     // Nav
     nav_home:        'Home',
     nav_transactions:'Transactions',
