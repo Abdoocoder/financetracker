@@ -5,6 +5,29 @@ export type Lang = 'ar' | 'en'
 
 const translations = {
   ar: {
+    // Forgot Password
+    forgot_title:        'نسيت كلمة المرور؟',
+    forgot_subtitle:     'أدخل بريدك وسنرسل لك رابط الاسترجاع',
+    forgot_email:        'البريد الإلكتروني',
+    forgot_btn:          'إرسال رابط الاسترجاع',
+    forgot_sending:      'جاري الإرسال...',
+    forgot_sent_title:   'تم الإرسال!',
+    forgot_sent_body:    'تحقق من بريدك الإلكتروني واضغط على الرابط لإعادة تعيين كلمة المرور.',
+    forgot_back:         '← العودة لتسجيل الدخول',
+    forgot_error:        'حدث خطأ — تأكد من البريد الإلكتروني',
+
+    // Reset Password
+    reset_title:         'إعادة تعيين كلمة المرور',
+    reset_subtitle:      'أدخل كلمة المرور الجديدة',
+    reset_new:           'كلمة المرور الجديدة',
+    reset_confirm:       'تأكيد كلمة المرور',
+    reset_btn:           'تعيين كلمة المرور',
+    reset_saving:        'جاري الحفظ...',
+    reset_success:       '✅ تم تغيير كلمة المرور! جاري التحويل...',
+    reset_mismatch:      'كلمتا المرور غير متطابقتين',
+    reset_error:         'حدث خطأ — حاول مرة أخرى',
+
+    // Forgot Password
     // Share
     share_title:         'شارك فجرك مع أصدقائك',
     share_subtitle:      'ساعد أصدقاءك يبدأوا رحلتهم',
@@ -358,6 +381,28 @@ const translations = {
     recurringNoteEn:   '✅ Will auto-execute every month',
   },
   en: {
+    // Forgot Password
+    forgot_title:        'Forgot your password?',
+    forgot_subtitle:     'Enter your email and we will send you a reset link',
+    forgot_email:        'Email',
+    forgot_btn:          'Send Reset Link',
+    forgot_sending:      'Sending...',
+    forgot_sent_title:   'Sent!',
+    forgot_sent_body:    'Check your email and click the link to reset your password.',
+    forgot_back:         '← Back to login',
+    forgot_error:        'An error occurred — check your email address',
+
+    // Reset Password
+    reset_title:         'Reset Password',
+    reset_subtitle:      'Enter your new password',
+    reset_new:           'New Password',
+    reset_confirm:       'Confirm Password',
+    reset_btn:           'Set Password',
+    reset_saving:        'Saving...',
+    reset_success:       '✅ Password changed! Redirecting...',
+    reset_mismatch:      'Passwords do not match',
+    reset_error:         'An error occurred — please try again',
+
     // Share
     share_title:         'Share Fajrak with your friends',
     share_subtitle:      'Help your friends start their journey',
