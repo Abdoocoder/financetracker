@@ -8,7 +8,7 @@
 *Smart Personal Finance Manager*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.6.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/download/v1.6.0/Fajrak.apk)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v2.1.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -146,7 +146,13 @@
 - 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
 - 🔔 App Badge عند وصول إشعار جديد
 
-### v2.0.1 — 2026-03-17 *(الإصدار الحالي)*
+### v2.1.0 — 2026-03-17 *(الإصدار الحالي)*
+- 📱 **Native Android APK** — بناء تلقائي عبر GitHub Actions
+- 🔔 **إشعارات Native حقيقية** — تصل حتى لو التطبيق مغلق كلياً
+- ⚡ **تنبيه Battery Optimization** — يوجه المستخدم لإعدادات Chrome
+- 🔗 **رابط تنزيل ديناميكي** — يشير لأحدث إصدار تلقائياً
+
+### v2.0.1 — 2026-03-17
 - 🔧 إصلاح Push Notifications على Android — استبدال `navigator` بـ `self` في Service Worker
 - ⚡ تنبيه تلقائي لمستخدمي Android لتفعيل إعدادات البطارية
 - 🗑️ حذف FCM tokens المنتهية الصلاحية تلقائياً
@@ -470,7 +476,7 @@ CRON_SECRET=your_cron_secret
 - 📲 قابل للتثبيت على Android و iOS
 - 🔔 إشعارات Push حتى مع إغلاق التطبيق
 - ⚡ أداء سريع مع Service Worker
-- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/releases/download/v1.6.0/Fajrak.apk)
+- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
 
 ---
 
