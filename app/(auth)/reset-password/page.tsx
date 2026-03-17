@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
     setLoading(true); setError('')
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({ password })
-    if (error) { setError(t('reset_error')); setLoading(false); return }
+    if (error) { setError(error.message); setLoading(false); return }
     setSuccess(true)
     setTimeout(() => router.push('/dashboard'), 2000)
   }
