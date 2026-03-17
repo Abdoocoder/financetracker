@@ -752,7 +752,7 @@ export default function SettingsPage() {
                 ? 'جربت فجرك؟ تطبيق مالي عربي مجاني يساعدك تتحكم في مصاريفك وتبني ثروتك 🌅\n\nhttps://fajrak.com'
                 : 'Tried Fajrak? A free Arabic financial app to control your expenses and build wealth 🌅\n\nhttps://fajrak.com'
               if (navigator.share) {
-                navigator.share({ title: 'فجرك', text, url: 'https://fajrak.com' })
+                navigator.share({ title: 'فجرك', text: text + '\n\nhttps://fajrak.com' })
               } else {
                 navigator.clipboard.writeText('https://fajrak.com')
                 alert(t('share_copied'))
