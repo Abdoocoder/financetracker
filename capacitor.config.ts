@@ -7,6 +7,8 @@ const config: CapacitorConfig = {
   server: {
     url: 'https://fajrak.com',
     cleartext: false,
+    androidScheme: 'https',
+    hostname: 'fajrak.com',
   },
   plugins: {
     PushNotifications: {
