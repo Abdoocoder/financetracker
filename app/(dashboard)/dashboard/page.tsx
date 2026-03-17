@@ -12,7 +12,6 @@ import {
 } from '@/components/dashboard/Cards'
 import { FinancialHealthScore } from '@/components/ui/financial-health-score'
 import { DashboardEmptyState } from '@/components/ui/empty-state'
-import { PullToRefresh } from '@/components/ui/pull-to-refresh'
 import nextDynamic from 'next/dynamic'
 
 const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
@@ -194,18 +193,12 @@ export default function DashboardPage() {
 
   if (loading) return <DashSkeleton />
 
-  async function handleRefresh() {
-    try { sessionStorage.removeItem('dashboard_' + (currentUser?.id ?? '')) } catch {}
-    window.location.reload()
-  }
-
   const net      = data?.net ?? 0
   const income   = data?.income ?? 0
   const expenses = data?.expenses ?? 0
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
       {/* Header */}
@@ -318,6 +311,5 @@ export default function DashboardPage() {
       </Section>
 
     </div>
-    </PullToRefresh>
   )
 }
