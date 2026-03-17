@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Fajrak',
   webDir: 'out',
   server: {
-    url: 'https://fajrak.com',
+    url: 'https://fajrak.com/dashboard',
     cleartext: false,
     androidScheme: 'https',
     hostname: 'fajrak.com',
@@ -24,6 +24,7 @@ const config: CapacitorConfig = {
     allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false,
+    appendUserAgent: 'FajrakApp',
   },
 };
 
