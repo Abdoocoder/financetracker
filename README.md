@@ -153,7 +153,14 @@
 - 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
 - 🔔 App Badge عند وصول إشعار جديد
 
-### v2.8.0 — 2026-03-17 *(الإصدار الحالي)*
+### v2.9.0 — 2026-03-17 *(الإصدار الحالي)*
+- 📱 **Install Prompt** — طلب تثبيت PWA تلقائي مع تكرار أسبوعي
+- 🌐 **i18n كامل** — مفاتيح ترجمة للـ Install Prompt وHelp وLearn وOnboarding
+- 🔄 **إصلاح Pull to Refresh** — يعمل بشكل صحيح في كل الصفحات
+- 🏦 **إصلاح صفحة الاستثمار** — لا اختفاء للبيانات عند السحب
+- 🐛 **إصلاح Hydration Error** — Welcome Modal وOnboarding Tour
+
+### v2.8.0 — 2026-03-17
 - 🐛 **إصلاح Hydration Error** — خطأ React #310 في Dashboard
 - 🔧 **إصلاح Welcome Modal** — mounted state لتجنب SSR mismatch
 - 🔧 **إصلاح Onboarding Tour** — نفس الإصلاح
