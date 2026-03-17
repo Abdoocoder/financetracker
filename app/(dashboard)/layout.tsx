@@ -9,6 +9,8 @@ import { ToastProvider } from '@/components/ui/toast'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { I18nProvider, useI18n } from '@/lib/i18n'
 import { PushPrompt } from '@/components/ui/push-prompt'
+import { WelcomeModal } from '@/components/ui/welcome-modal'
+import { OnboardingTour } from '@/components/ui/onboarding-tour'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -54,6 +56,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       }}>
         
       <PushPrompt />
+      <WelcomeModal />
+      <OnboardingTour />
       {children}
       </main>
     </div>
