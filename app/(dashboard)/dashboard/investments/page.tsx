@@ -240,7 +240,7 @@ export default function InvestmentsPage() {
   const [showJod, setShowJod] = useState(false)
   const [priceStatus, setPriceStatus] = useState<Record<string, 'live' | 'manual'>>({})
   const { t, lang } = useI18n()
-  const { el: pageRef } = usePullToRefresh(async () => { await refreshPrices() })
+  const { el: pageRef } = usePullToRefresh(async () => { if (!refreshing) await refreshPrices() })
   const supabase = createClient()
 
   const load = useCallback(async () => {
