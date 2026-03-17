@@ -40,6 +40,8 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets
           npx cap sync android
+          # تأكد من appendUserAgent
+          cat android/app/src/main/assets/capacitor.config.json
 
       - name: Build APK
         run: |
