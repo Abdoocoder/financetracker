@@ -23,9 +23,6 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
   // تجاوز الحماية للتطبيق Native
-  const userAgent = request.headers.get('user-agent') || ''
-  const isNativeApp = userAgent.includes('FajrakApp') || userAgent.includes('Android')
-  if (isNativeApp) return supabaseResponse
   if (pathname.startsWith('/dashboard') && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
