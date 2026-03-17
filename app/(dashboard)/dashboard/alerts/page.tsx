@@ -104,7 +104,7 @@ export default function AlertsPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'warning' | 'achievement'>('all')
   const supabase = createClient()
   const { t, lang } = useI18n()
-  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load(true) })
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
