@@ -11,6 +11,7 @@ import {
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
 import { FinancialHealthScore } from '@/components/ui/financial-health-score'
+import { DashboardEmptyState } from '@/components/ui/empty-state'
 import nextDynamic from 'next/dynamic'
 
 const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
@@ -212,6 +213,11 @@ export default function DashboardPage() {
           </Link>
         )}
       </div>
+
+      {/* Empty State للمستخدم الجديد */}
+      {income === 0 && expenses === 0 && (recentTx?.length ?? 0) === 0 && (
+        <DashboardEmptyState />
+      )}
 
       {/* Stats — دائماً ظاهرة */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
