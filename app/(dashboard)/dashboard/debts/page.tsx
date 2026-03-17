@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { clearUserCache } from '@/lib/cache'
+import { haptic } from '@/lib/haptic'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const PRIORITY_CONFIG = [
@@ -175,6 +176,7 @@ export default function DebtsPage() {
       // ── احتفال ──
       setCelebration(debt.name)
       setShowConfetti(true)
+      haptic(200)
       clearUserCache(user.id)
     } else {
       toast.success(`${t('toast_payment_done')} ${amount} JOD`)
