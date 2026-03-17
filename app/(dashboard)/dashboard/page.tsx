@@ -132,19 +132,20 @@ function useDashboardData() {
     async function fetchPhase1() {
       const [txRes, profileRes, alertRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
-        supabase.from('profiles').select('monthly_income').eq('id', user.id).single(),
+        supabase.from('profiles').select('monthly_income, full_name').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
       ])
       const txs = txRes.data ?? []
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const profileIncome = Number((profileRes as any)?.data?.monthly_income ?? 0)
+      const profileName = (profileRes as any)?.data?.full_name ?? ''
       const income = txIncome > 0 ? txIncome : profileIncome
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
       const catMap: Record<string, number> = {}
       txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
       const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
 
-      setData({ income, expenses, categories, net: income - expenses, prevIncome: 0, prevExpenses: 0, months6: [], totalDebt: 0, invValue: 0, goalsSaved: 0, goalsTarget: 0, unreadAlerts: alertRes.count ?? 0 })
+      setData({ income, expenses, categories, net: income - expenses, prevIncome: 0, prevExpenses: 0, months6: [], totalDebt: 0, invValue: 0, goalsSaved: 0, goalsTarget: 0, unreadAlerts: alertRes.count ?? 0, name: profileName })
       setLoading(false)
       fetchPhase2(income, expenses, categories, alertRes.count ?? 0)
     }
@@ -204,8 +205,12 @@ export default function DashboardPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>{t('dash_title')}</h1>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>{t('dash_monthly')}</p>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
+            {data?.name ? (lang === 'ar' ? `👋 أهلاً ${data.name.split(' ')[0]}` : `👋 Hey ${data.name.split(' ')[0]}`) : t('dash_title')}
+          </h1>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
+            {lang === 'ar' ? 'فجرك المالي يبدأ اليوم 🌅' : 'Your financial dawn starts today 🌅'}
+          </p>
         </div>
         {(data?.unreadAlerts ?? 0) > 0 && (
           <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
