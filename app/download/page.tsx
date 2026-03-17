@@ -8,7 +8,7 @@ export default function DownloadPage() {
   const handleDownload = () => {
     setDownloading(true)
     setTimeout(() => setDownloading(false), 3000)
-    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/latest/download/app-debug.apk'
+    window.location.href = 'https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk'
   }
 
   return (
