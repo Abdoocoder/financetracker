@@ -70,7 +70,7 @@ export default function LandingPage() {
         {/* زر تنزيل Android */}
         <div style={{ marginTop: 28 }}>
           <Link href="/download" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
-            📱 تطبيق Android متاح — تنزيل
+            📱 تطبيق Android — قريباً
           </Link>
         </div>
       </section>
