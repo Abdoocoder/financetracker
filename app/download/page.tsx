@@ -8,7 +8,7 @@ export default function DownloadPage() {
   const handleDownload = () => {
     setDownloading(true)
     setTimeout(() => setDownloading(false), 3000)
-    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/Fajrak-v2.0.apk'
+    window.location.href = 'https://github.com/Abdoocoder/financetracker/raw/main/releases/download/v2.1.0-android/app-debug.apk'
   }
 
   return (
@@ -56,7 +56,7 @@ export default function DownloadPage() {
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 100, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', marginBottom: 20 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#10B981' }}>الإصدار v1.6.0 — متاح الآن</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#10B981' }}>الإصدار v2.1.0 — متاح الآن</span>
         </div>
 
         <h1 style={{ fontSize: 'clamp(26px, 5vw, 48px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 16px', letterSpacing: '-0.03em' }}>
