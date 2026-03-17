@@ -10,7 +10,7 @@ const translations = {
     share_subtitle:      'ساعد أصدقاءك يبدأوا رحلتهم',
     share_body:          'كل شخص تدعوه لفجرك قد يغير حياته المالية للأبد 💪',
     share_btn:           '🔗 شارك فجرك',
-    share_msg:           'جربت فجرك؟ تطبيق مالي عربي مجاني يساعدك تتحكم في مصاريفك وتبني ثروتك 🌅',
+    share_msg:           'فجرك 🌅\n\nراتبك يختفي كل شهر وما تعرف وين؟\nفجرك يجاوبك — ويمشي معك خطوة بخطوة نحو حريتك المالية.\n\nمجاني للأبد ✓ يعلم الاستثمار الحلال ✓',
     share_copied:        '✅ تم نسخ الرابط!',
 
     // Install Prompt
@@ -363,7 +363,7 @@ const translations = {
     share_subtitle:      'Help your friends start their journey',
     share_body:          'Every person you invite may change their financial life forever 💪',
     share_btn:           '🔗 Share Fajrak',
-    share_msg:           'Tried Fajrak? A free Arabic financial app to control your expenses and build wealth 🌅',
+    share_msg:           'Fajrak 🌅\n\nDoes your salary disappear every month without knowing where?\nFajrak answers you — and walks with you step by step toward financial freedom.\n\nFree forever ✓ Teaches halal investing ✓',
     share_copied:        '✅ Link copied!',
 
     // Install Prompt
