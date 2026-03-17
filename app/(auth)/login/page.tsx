@@ -22,8 +22,9 @@ export default function LoginPage() {
       setError('البريد الإلكتروني أو كلمة المرور غير صحيحة')
       setLoading(false)
     } else {
-      router.push('/dashboard')
       router.refresh()
+      await new Promise(r => setTimeout(r, 100))
+      router.push('/dashboard')
     }
   }
 
