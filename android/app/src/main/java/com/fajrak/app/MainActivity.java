@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import com.getcapacitor.BridgeActivity;
+import android.webkit.WebView;
 import com.google.firebase.messaging.FirebaseMessaging;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -21,12 +22,19 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         requestNotificationPermission();
         registerFCMToken();
+        setUserAgent();
     }
 
     private static final String SUPABASE_URL = "https://ujwcvtpwsaidljecqbaa.supabase.co";
     private static final String SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd2N2dHB3c2FpZGxqZWNxYmFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTUxNTQsImV4cCI6MjA4ODU3MTE1NH0.AgwLNG0i3srUCixr_b47of6ur7RlCZuUio7DivPzlCw";
 
 
+
+    private void setUserAgent() {
+        WebView webView = getBridge().getWebView();
+        String currentUA = webView.getSettings().getUserAgentString();
+        webView.getSettings().setUserAgentString(currentUA + " FajrakApp");
+    }
 
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
