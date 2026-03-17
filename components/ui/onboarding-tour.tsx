@@ -3,50 +3,119 @@ import { useState, useEffect } from 'react'
 import { useI18n } from '@/lib/i18n'
 import { usePathname } from 'next/navigation'
 
-const TOUR_KEY = 'fajrak_tour_completed'
+const TOUR_KEYS: Record<string, string> = {
+  '/dashboard':              'tour_dashboard',
+  '/dashboard/transactions': 'tour_transactions',
+  '/dashboard/debts':        'tour_debts',
+  '/dashboard/budgets':      'tour_budgets',
+  '/dashboard/goals':        'tour_goals',
+  '/dashboard/investments':  'tour_investments',
+  '/dashboard/learn':        'tour_learn',
+  '/dashboard/alerts':       'tour_alerts',
+}
 
-const steps = [
-  {
-    target: 'nav-home',
-    ar: { title: '🏠 لوحة التحكم', desc: 'ملخص كامل لوضعك المالي — دخلك، مصاريفك، ديونك، واستثماراتك في مكان واحد.' },
-    en: { title: '🏠 Dashboard', desc: 'Complete overview of your finances — income, expenses, debts, and investments in one place.' },
-  },
-  {
-    target: 'nav-transactions',
-    ar: { title: '💸 المعاملات', desc: 'سجّل كل دخل ومصروف. التتبع اليومي هو أقوى أداة للوعي المالي.' },
-    en: { title: '💸 Transactions', desc: 'Log every income and expense. Daily tracking is the most powerful financial awareness tool.' },
-  },
-  {
-    target: 'nav-debts',
-    ar: { title: '💳 الديون', desc: 'تتبع ديونك مع خطة سداد واضحة وشريط تقدم مرئي.' },
-    en: { title: '💳 Debts', desc: 'Track your debts with a clear repayment plan and visual progress bar.' },
-  },
-  {
-    target: 'nav-budgets',
-    ar: { title: '📊 الميزانية', desc: 'خطط إنفاقك الشهري واحصل على تحليل ذكي وتوصيات فورية.' },
-    en: { title: '📊 Budget', desc: 'Plan your monthly spending and get smart analysis and instant recommendations.' },
-  },
-  {
-    target: 'nav-goals',
-    ar: { title: '🎯 الأهداف', desc: 'حدد أهداف ادخار واتبع تقدمك. كل هدف مكتوب يرفع احتمال تحقيقه 42%.' },
-    en: { title: '🎯 Goals', desc: 'Set savings goals and track your progress. Written goals are 42% more likely to be achieved.' },
-  },
-  {
-    target: 'nav-investments',
-    ar: { title: '📈 الاستثمار', desc: 'تتبع محفظتك الاستثمارية مع أسعار حية وحساب الربح والخسارة.' },
-    en: { title: '📈 Investments', desc: 'Track your portfolio with live prices and profit/loss calculations.' },
-  },
-  {
-    target: 'nav-learn',
-    ar: { title: '📚 تعلّم', desc: 'درس مالي يومي مخصص لمرحلتك — مبني على أبحاث علم السلوك المالي وتعاليم الإسلام.' },
-    en: { title: '📚 Learn', desc: 'Daily financial lesson tailored to your stage — based on behavioral finance research and Islamic teachings.' },
-  },
-  {
-    target: 'nav-alerts',
-    ar: { title: '🔔 التنبيهات', desc: 'تنبيهات ذكية تصلك يومياً — تحذيرات، إنجازات، ونصائح مالية مخصصة لك.' },
-    en: { title: '🔔 Alerts', desc: 'Smart daily alerts — warnings, achievements, and personalized financial tips.' },
-  },
-]
+const TOURS: Record<string, { ar: { title: string; desc: string }; en: { title: string; desc: string } }[]> = {
+  '/dashboard': [
+    {
+      ar: { title: '👋 مرحباً في لوحة التحكم', desc: 'هنا ملخص كامل لوضعك المالي — دخلك، مصاريفك، وصافيك هذا الشهر.' },
+      en: { title: '👋 Welcome to Dashboard', desc: 'Here\'s a complete summary of your finances — income, expenses, and net this month.' },
+    },
+    {
+      ar: { title: '⚡ الإضافة السريعة', desc: 'أضف دخلاً أو مصروفاً بضغطة واحدة. التتبع اليومي يغير حياتك المالية.' },
+      en: { title: '⚡ Quick Add', desc: 'Add income or expense in one tap. Daily tracking transforms your financial life.' },
+    },
+    {
+      ar: { title: '💊 نقاط الصحة المالية', desc: 'رقم من 0-100 يقيس صحتك المالية. كلما ارتفع كلما كنت أقرب للحرية المالية.' },
+      en: { title: '💊 Financial Health Score', desc: 'A score from 0-100 measuring your financial health. The higher, the closer to financial freedom.' },
+    },
+    {
+      ar: { title: '🗺️ خارطة الثراء', desc: 'تتبع رحلتك من الوعي المالي حتى الحرية المالية عبر 5 مراحل.' },
+      en: { title: '🗺️ Wealth Roadmap', desc: 'Track your journey from financial awareness to financial freedom through 5 stages.' },
+    },
+  ],
+  '/dashboard/transactions': [
+    {
+      ar: { title: '💸 صفحة المعاملات', desc: 'سجّل كل دخل ومصروف هنا. كلما سجلت أكثر كلما فهمت وضعك المالي بشكل أدق.' },
+      en: { title: '💸 Transactions', desc: 'Log every income and expense here. The more you track, the better you understand your finances.' },
+    },
+    {
+      ar: { title: '🔍 البحث والفلترة', desc: 'ابحث عن أي معاملة أو فلتر حسب النوع أو الشهر بسهولة.' },
+      en: { title: '🔍 Search & Filter', desc: 'Search any transaction or filter by type or month easily.' },
+    },
+    {
+      ar: { title: '📥 تصدير CSV', desc: 'صدّر معاملاتك كملف Excel لمراجعتها خارج التطبيق.' },
+      en: { title: '📥 Export CSV', desc: 'Export your transactions as an Excel file for external review.' },
+    },
+  ],
+  '/dashboard/debts': [
+    {
+      ar: { title: '💳 إدارة الديون', desc: 'تتبع كل ديونك مع شريط تقدم مرئي. الشفافية مع نفسك أول خطوة للسداد.' },
+      en: { title: '💳 Debt Management', desc: 'Track all your debts with a visual progress bar. Being honest with yourself is the first step to repayment.' },
+    },
+    {
+      ar: { title: '📅 خصم تلقائي', desc: 'حدد يوم الخصم لكل دين وسيخصم تلقائياً كل شهر.' },
+      en: { title: '📅 Auto Deduction', desc: 'Set a deduction day for each debt and it will automatically deduct every month.' },
+    },
+    {
+      ar: { title: '🎉 احتفال السداد', desc: 'عند سداد دين كامل — احتفال وألعاب نارية! 🎊 كل دين مسدد انتصار.' },
+      en: { title: '🎉 Payoff Celebration', desc: 'When you fully pay off a debt — celebration and confetti! 🎊 Every paid debt is a victory.' },
+    },
+  ],
+  '/dashboard/budgets': [
+    {
+      ar: { title: '📊 الميزانية الذكية', desc: 'خطط إنفاقك الشهري واحصل على تحليل فوري ومستشار مالي ذكي.' },
+      en: { title: '📊 Smart Budget', desc: 'Plan your monthly spending and get instant analysis and a smart financial advisor.' },
+    },
+    {
+      ar: { title: '📐 قاعدة 50/30/20', desc: '50% للضروريات، 30% للرغبات، 20% للادخار — توزيع مثالي مقترح تلقائياً.' },
+      en: { title: '📐 50/30/20 Rule', desc: '50% for needs, 30% for wants, 20% for savings — automatically suggested optimal distribution.' },
+    },
+  ],
+  '/dashboard/goals': [
+    {
+      ar: { title: '🎯 أهداف الادخار', desc: 'حدد هدفاً مالياً وتابع تقدمك. الأهداف المكتوبة أكثر احتمالاً للتحقق بنسبة 42%.' },
+      en: { title: '🎯 Savings Goals', desc: 'Set a financial goal and track your progress. Written goals are 42% more likely to be achieved.' },
+    },
+    {
+      ar: { title: '💰 إضافة دفعات', desc: 'أضف مبلغاً لهدفك في أي وقت وشاهد شريط التقدم يرتفع.' },
+      en: { title: '💰 Add Contributions', desc: 'Add an amount to your goal anytime and watch the progress bar rise.' },
+    },
+  ],
+  '/dashboard/investments': [
+    {
+      ar: { title: '📈 محفظتك الاستثمارية', desc: 'تتبع أسهمك وعملاتك الرقمية مع أسعار حية وحساب الربح والخسارة.' },
+      en: { title: '📈 Your Portfolio', desc: 'Track your stocks and crypto with live prices and profit/loss calculations.' },
+    },
+    {
+      ar: { title: '✅ استثمار حلال', desc: 'ندعم الأسهم الحلال مثل SPUS وغيرها — استثمر بطمأنينة.' },
+      en: { title: '✅ Halal Investing', desc: 'We support halal stocks like SPUS and others — invest with peace of mind.' },
+    },
+  ],
+  '/dashboard/learn': [
+    {
+      ar: { title: '📚 درس اليوم', desc: 'درس مالي يومي مخصص لمرحلتك — مبني على أبحاث علم السلوك المالي.' },
+      en: { title: '📚 Today\'s Lesson', desc: 'Daily financial lesson tailored to your stage — based on behavioral finance research.' },
+    },
+    {
+      ar: { title: '🔥 السلسلة اليومية', desc: 'حافظ على سلسلتك بإتمام درس كل يوم. الاستمرارية هي سر النجاح.' },
+      en: { title: '🔥 Daily Streak', desc: 'Maintain your streak by completing a lesson every day. Consistency is the secret to success.' },
+    },
+    {
+      ar: { title: '🕌 دروس إسلامية', desc: 'كل 7 أيام درس من القرآن والسنة مرتبط بالرزق والثروة.' },
+      en: { title: '🕌 Islamic Lessons', desc: 'Every 7 days a lesson from the Quran and Sunnah related to provision and wealth.' },
+    },
+  ],
+  '/dashboard/alerts': [
+    {
+      ar: { title: '🔔 التنبيهات الذكية', desc: 'تنبيهات يومية تحللها الذكاء الاصطناعي بناءً على بياناتك الحقيقية.' },
+      en: { title: '🔔 Smart Alerts', desc: 'Daily alerts analyzed by AI based on your real data.' },
+    },
+    {
+      ar: { title: '⚠️ أنواع التنبيهات', desc: 'تحذيرات عند تجاوز الميزانية، إنجازات عند الادخار، وتذكيرات للأقساط.' },
+      en: { title: '⚠️ Alert Types', desc: 'Warnings when budget is exceeded, achievements when saving, and reminders for installments.' },
+    },
+  ],
+}
 
 export function OnboardingTour() {
   const { lang } = useI18n()
@@ -55,11 +124,13 @@ export function OnboardingTour() {
   const [show, setShow] = useState(false)
 
   useEffect(() => {
-    if (pathname === '/dashboard') {
-      const done = localStorage.getItem(TOUR_KEY)
-      if (!done) setTimeout(() => setShow(true), 1000)
-    }
+    const key = TOUR_KEYS[pathname]
+    if (!key) return
+    const done = localStorage.getItem(key)
+    if (!done) setTimeout(() => { setStep(0); setShow(true) }, 1500)
   }, [pathname])
+
+  const steps = TOURS[pathname] ?? []
 
   function next() {
     if (step < steps.length - 1) setStep(s => s + 1)
@@ -67,21 +138,19 @@ export function OnboardingTour() {
   }
 
   function complete() {
-    localStorage.setItem(TOUR_KEY, 'true')
+    const key = TOUR_KEYS[pathname]
+    if (key) localStorage.setItem(key, 'true')
     setShow(false)
   }
 
-  if (!show) return null
+  if (!show || steps.length === 0) return null
 
   const current = steps[step]
   const info = current[lang as 'ar' | 'en']
 
   return (
     <>
-      {/* Overlay */}
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9998, backdropFilter: 'blur(2px)' }} onClick={complete} />
-
-      {/* Tooltip Card */}
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 9998, backdropFilter: 'blur(2px)' }} onClick={complete} />
       <div style={{
         position: 'fixed', bottom: 100, left: '50%', transform: 'translateX(-50%)',
         width: 'min(340px, calc(100vw - 32px))',
@@ -101,31 +170,17 @@ export function OnboardingTour() {
           ))}
         </div>
 
-        {/* Content */}
-        <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>
-          {info.title}
-        </div>
-        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20 }}>
-          {info.desc}
-        </div>
+        <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>{info.title}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20 }}>{info.desc}</div>
 
-        {/* Buttons */}
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button onClick={complete} style={{
-            padding: '9px 16px', borderRadius: 10,
-            background: 'transparent', border: '1px solid var(--border)',
-            color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer',
-          }}>
+          <button onClick={complete} style={{ padding: '9px 16px', borderRadius: 10, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
             {lang === 'ar' ? 'تخطي' : 'Skip'}
           </button>
-          <button onClick={next} style={{
-            flex: 1, padding: '10px', borderRadius: 10,
-            background: 'var(--accent-blue)', border: 'none',
-            color: 'white', fontSize: 14, fontWeight: 800, cursor: 'pointer',
-          }}>
+          <button onClick={next} style={{ flex: 1, padding: '10px', borderRadius: 10, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
             {step < steps.length - 1
               ? (lang === 'ar' ? `التالي ← (${step + 1}/${steps.length})` : `Next → (${step + 1}/${steps.length})`)
-              : (lang === 'ar' ? '🎉 ابدأ رحلتك!' : '🎉 Start your journey!')}
+              : (lang === 'ar' ? '✅ فهمت!' : '✅ Got it!')}
           </button>
         </div>
       </div>
