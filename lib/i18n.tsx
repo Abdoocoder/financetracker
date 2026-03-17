@@ -5,6 +5,19 @@ export type Lang = 'ar' | 'en'
 
 const translations = {
   ar: {
+    // Financial Health Score
+    health_score:        'نقاط الصحة المالية',
+    health_excellent:    'ممتاز 🌟',
+    health_good:         'جيد 💪',
+    health_fair:         'متوسط ⚡',
+    health_poor:         'يحتاج تحسين 🔴',
+    health_savings:      'الادخار',
+    health_debt:         'الديون',
+    health_emergency:    'الطوارئ',
+    health_investing:    'الاستثمار',
+    health_tracking:     'التتبع',
+    health_tip:          'نصيحة للتحسين',
+
     // Onboarding
     onboard_welcome:     'مرحباً بك في فجرك 👋',
     onboard_subtitle:    'رفيقك في رحلة الحرية المالية',
@@ -322,6 +335,21 @@ const translations = {
     recurringNoteEn:   '✅ Will auto-execute every month',
   },
   en: {
+    // Financial Health Score
+
+    // Financial Health Score
+    health_score:        'Financial Health Score',
+    health_excellent:    'Excellent 🌟',
+    health_good:         'Good 💪',
+    health_fair:         'Fair ⚡',
+    health_poor:         'Needs Improvement 🔴',
+    health_savings:      'Savings',
+    health_debt:         'Debt',
+    health_emergency:    'Emergency',
+    health_investing:    'Investing',
+    health_tracking:     'Tracking',
+    health_tip:          'Improvement Tip',
+
     // Onboarding
     onboard_welcome:     'Welcome to Fajrak 👋',
     onboard_subtitle:    'Your companion on the journey to financial freedom',
