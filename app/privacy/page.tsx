@@ -11,6 +11,23 @@ export default function PrivacyPage() {
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 32, color: "#94a3b8" }}>سياسة الخصوصية</h2>
       <p style={{ color: "#64748b", marginBottom: 32 }}>Last updated: March 2026</p>
 
+
+      <section style={{ marginBottom: 32, padding: '24px', borderRadius: 16, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.2)' }}>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#10B981", marginBottom: 12 }}>🔐 من يرى بياناتك؟ / Who Can See Your Data?</h3>
+        <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
+          <strong style={{ color: '#10B981' }}>أنت فقط.</strong> بياناتك محمية بـ Row Level Security — حتى المطور لا يستطيع الوصول لبياناتك إلا في حالات الدعم الفني بإذنك الصريح.
+          <br/><br/>
+          <strong style={{ color: '#10B981' }}>You only.</strong> Your data is protected by Row Level Security — even the developer cannot access your data except in support cases with your explicit permission.
+        </p>
+        <ul style={{ lineHeight: 2, color: "#94a3b8", paddingRight: 20, marginTop: 12 }}>
+          <li>✅ لا أحد يرى معاملاتك / Nobody sees your transactions</li>
+          <li>✅ لا أحد يرى ديونك / Nobody sees your debts</li>
+          <li>✅ لا أحد يرى استثماراتك / Nobody sees your investments</li>
+          <li>✅ لا إعلانات ولا بيع بيانات / No ads, no data selling</li>
+          <li>✅ يمكنك حذف كل بياناتك في أي وقت / Delete all your data anytime</li>
+        </ul>
+      </section>
+
       <section style={{ marginBottom: 32 }}>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>1. Data We Collect / البيانات التي نجمعها</h3>
         <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
