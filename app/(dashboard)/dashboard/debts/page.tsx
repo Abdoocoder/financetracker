@@ -107,11 +107,12 @@ export default function DebtsPage() {
   const [showConfetti, setShowConfetti] = useState(false)
   const supabase = createClient()
   const { t, lang } = useI18n()
-  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load(true) })
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     const user = currentUser
     if (!user) return
+    if (!silent) setLoading(true)
     // الديون النشطة
     const { data: active } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority')
     setDebts(active ?? [])
