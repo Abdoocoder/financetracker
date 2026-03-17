@@ -7,6 +7,9 @@ export function usePullToRefresh(onRefresh: () => Promise<void>) {
   const el = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const container = el.current
+    if (!container) return
+
     const onTouchStart = (e: TouchEvent) => {
       if (window.scrollY === 0) startY.current = e.touches[0].clientY
     }
@@ -21,11 +24,11 @@ export function usePullToRefresh(onRefresh: () => Promise<void>) {
       startY.current = 0
     }
 
-    window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchend', onTouchEnd, { passive: true })
+    container.addEventListener('touchstart', onTouchStart, { passive: true })
+    container.addEventListener('touchend', onTouchEnd, { passive: true })
     return () => {
-      window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchend', onTouchEnd)
+      container.removeEventListener('touchstart', onTouchStart)
+      container.removeEventListener('touchend', onTouchEnd)
     }
   }, [onRefresh, refreshing])
 
