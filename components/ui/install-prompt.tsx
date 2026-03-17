@@ -6,7 +6,7 @@ const INSTALL_KEY = 'fajrak_install_dismissed'
 const INSTALL_DATE_KEY = 'fajrak_install_dismissed_date'
 
 export function InstallPrompt() {
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
   const [show, setShow] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [isIOS, setIsIOS] = useState(false)
@@ -94,8 +94,7 @@ export function InstallPrompt() {
         {isIOS ? (
           <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
             {lang === 'ar'
-              ? 'اضغط على زر المشاركة ⬆️ ثم "إضافة إلى الشاشة الرئيسية"'
-              : 'Tap the share button ⬆️ then "Add to Home Screen"'}
+              t('install_ios')}
           </div>
         ) : (
           <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
@@ -114,7 +113,7 @@ export function InstallPrompt() {
             color: 'white', fontSize: 12, fontWeight: 800,
             cursor: 'pointer', fontFamily: 'inherit',
           }}>
-            {lang === 'ar' ? 'تثبيت' : 'Install'}
+            {t('install_btn')}
           </button>
         )}
         <button onClick={handleDismiss} style={{
@@ -123,7 +122,7 @@ export function InstallPrompt() {
           color: 'var(--text-muted)', fontSize: 12, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
         }}>
-          {lang === 'ar' ? 'لاحقاً' : 'Later'}
+          {t('install_later')}
         </button>
       </div>
     </div>

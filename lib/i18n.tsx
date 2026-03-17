@@ -5,6 +5,21 @@ export type Lang = 'ar' | 'en'
 
 const translations = {
   ar: {
+    // Install Prompt
+    install_title:       'أضف فجرك لهاتفك 📱',
+    install_body:        'ثبّت التطبيق للحصول على تجربة أفضل وإشعارات أسرع 🚀',
+    install_ios:         'اضغط على زر المشاركة ⬆️ ثم "إضافة إلى الشاشة الرئيسية"',
+    install_btn:         'تثبيت',
+    install_later:       'لاحقاً',
+
+    // Help
+    help_title:          'مركز المساعدة',
+    help_subtitle:       'كل ما تحتاج معرفته عن فجرك',
+    help_search:         '🔍 ابحث عن سؤال...',
+    help_contact:        'لم تجد إجابتك؟',
+    help_contact_sub:    'تواصل معنا مباشرة وسنساعدك',
+    help_contact_btn:    'راسلنا',
+
     // Financial Health Score
     health_score:        'نقاط الصحة المالية',
     health_excellent:    'ممتاز 🌟',
@@ -335,7 +350,20 @@ const translations = {
     recurringNoteEn:   '✅ Will auto-execute every month',
   },
   en: {
-    // Financial Health Score
+    // Install Prompt
+    install_title:       'Add Fajrak to your phone 📱',
+    install_body:        'Install for a better experience and faster notifications 🚀',
+    install_ios:         'Tap the share button ⬆️ then "Add to Home Screen"',
+    install_btn:         'Install',
+    install_later:       'Later',
+
+    // Help
+    help_title:          'Help Center',
+    help_subtitle:       'Everything you need to know about Fajrak',
+    help_search:         '🔍 Search a question...',
+    help_contact:        "Didn't find your answer?",
+    help_contact_sub:    "Contact us directly and we'll help you",
+    help_contact_btn:    'Contact Us',
 
     // Financial Health Score
     health_score:        'Financial Health Score',
