@@ -8,7 +8,7 @@
 *Smart Personal Finance Manager*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v2.1.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v2.2.0-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -146,7 +146,16 @@
 - 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
 - 🔔 App Badge عند وصول إشعار جديد
 
-### v2.1.0 — 2026-03-17 *(الإصدار الحالي)*
+### v2.2.0 — 2026-03-17 *(الإصدار الحالي)*
+- 📱 **Native Android App** — Capacitor + Firebase FCM حقيقي
+- 🔔 **إشعارات Native** — تصل حتى لو التطبيق مغلق كلياً
+- 🔐 **FCM Bridge** — Java ↔ JavaScript لتسجيل Token تلقائياً
+- 💾 **Session Persistence** — لا تسجيل دخول عند كل فتح
+- 🚀 **GitHub Actions** — بناء APK تلقائي عند كل push
+- 🔗 **رابط تنزيل ديناميكي** — يشير لأحدث إصدار دائماً
+- 🛡️ **Middleware fix** — تجاوز SSR للتطبيق Native
+
+### v2.1.0 — 2026-03-17
 - 📱 **Native Android APK** — بناء تلقائي عبر GitHub Actions
 - 🔔 **إشعارات Native حقيقية** — تصل حتى لو التطبيق مغلق كلياً
 - ⚡ **تنبيه Battery Optimization** — يوجه المستخدم لإعدادات Chrome
