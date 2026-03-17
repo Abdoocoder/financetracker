@@ -18,6 +18,10 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Set user agent before WebView loads
+        android.webkit.WebView.setWebContentsDebuggingEnabled(false);
+        String defaultUA = new android.webkit.WebView(this).getSettings().getUserAgentString();
+        System.setProperty("http.agent", defaultUA + " FajrakApp");
         registerPlugin(FajrakPlugin.class);
         super.onCreate(savedInstanceState);
         requestNotificationPermission();
