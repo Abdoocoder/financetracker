@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-async function alreadyExists(userId: string, title: string, withinHours = 20): Promise<boolean> {
+async function alreadyExists(userId: string, title: string, withinHours = 24): Promise<boolean> {
   const since = new Date(Date.now() - withinHours * 60 * 60 * 1000).toISOString()
   const { count } = await supabase
     .from('alerts').select('id', { count: 'exact', head: true })
