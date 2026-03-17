@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useI18n } from '@/lib/i18n'
 
 const INSTALL_KEY = 'fajrak_install_dismissed'
+const INSTALL_DATE_KEY = 'fajrak_install_dismissed_date'
 
 export function InstallPrompt() {
   const { lang } = useI18n()
@@ -14,7 +15,16 @@ export function InstallPrompt() {
   useEffect(() => {
     setMounted(true)
     const dismissed = localStorage.getItem(INSTALL_KEY)
-    if (dismissed) return
+    const dismissedDate = localStorage.getItem(INSTALL_DATE_KEY)
+    
+    // إذا ثبّت — لا تظهر أبداً
+    if (dismissed === 'true') return
+    
+    // إذا ضغط "لاحقاً" — تحقق هل مر أسبوع
+    if (dismissed === 'dismissed' && dismissedDate) {
+      const daysPassed = (Date.now() - parseInt(dismissedDate)) / (1000 * 60 * 60 * 24)
+      if (daysPassed < 7) return
+    }
 
     // iOS detection
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
@@ -52,6 +62,7 @@ export function InstallPrompt() {
 
   function handleDismiss() {
     localStorage.setItem(INSTALL_KEY, 'dismissed')
+    localStorage.setItem(INSTALL_DATE_KEY, Date.now().toString())
     setShow(false)
   }
 
