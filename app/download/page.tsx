@@ -7,7 +7,7 @@ export default function DownloadPage() {
 
   const handleDownload = () => {
     setDownloading(true)
-    window.open('https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk', '_blank')
+    window.open('https://github.com/Abdoocoder/financetracker/releases/latest/download/Fajrak.apk', '_blank')
     setTimeout(() => setDownloading(false), 3000)
   }
 
