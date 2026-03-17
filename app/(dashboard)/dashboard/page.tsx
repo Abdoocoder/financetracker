@@ -245,16 +245,19 @@ export default function DashboardPage() {
       {/* الميزانية الشهرية — دائماً ظاهرة */}
       <BudgetProgressCard income={income} expenses={expenses} net={net} />
 
-      {/* نقاط الصحة المالية */}
-      <FinancialHealthScore
-        income={income}
-        expenses={expenses}
-        totalDebt={data?.totalDebt ?? 0}
-        invValue={data?.invValue ?? 0}
-        goalsSaved={data?.goalsSaved ?? 0}
-        goalsTarget={data?.goalsTarget ?? 0}
-        txCount={data?.txCount ?? 0}
-      />
+      <Section id="health" icon="💊" title={lang === 'en' ? `Financial Health Score — ${Math.min(100, Math.round(((income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) + (data?.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data?.totalDebt / Math.max(income * 12, 1)) * 25))) + Math.min(20, Math.round(((data?.goalsSaved ?? 0) / Math.max(income * 3, 1)) * 20)) + ((data?.invValue ?? 0) > 0 ? 15 : 0) + Math.min(10, data?.txCount ?? 0))))}%` : `نقاط الصحة المالية — ${Math.min(100, Math.round(((income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) + (data?.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data?.totalDebt / Math.max(income * 12, 1)) * 25))) + Math.min(20, Math.round(((data?.goalsSaved ?? 0) / Math.max(income * 3, 1)) * 20)) + ((data?.invValue ?? 0) > 0 ? 15 : 0) + Math.min(10, data?.txCount ?? 0))))}%`}>
+        <div style={{ padding: '12px 0 8px' }}>
+          <FinancialHealthScore
+            income={income}
+            expenses={expenses}
+            totalDebt={data?.totalDebt ?? 0}
+            invValue={data?.invValue ?? 0}
+            goalsSaved={data?.goalsSaved ?? 0}
+            goalsTarget={data?.goalsTarget ?? 0}
+            txCount={data?.txCount ?? 0}
+          />
+        </div>
+      </Section>
 
       {/* روابط سريعة — دائماً ظاهرة */}
       <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
