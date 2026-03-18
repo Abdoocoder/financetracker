@@ -94,6 +94,14 @@ async function autoDebt() {
   })
 }
 
+// ── 9 ص: معاملات متكررة تلقائية ──────────────────────
+async function autoRecurring() {
+  const url = `${process.env.NEXT_PUBLIC_APP_URL}/api/auto-recurring`
+  await fetch(url, {
+    headers: { authorization: `Bearer ${process.env.CRON_SECRET}` }
+  })
+}
+
 // ── 6 م: تذكير مسائي ─────────────────────────────────
 async function eveningReminder() {
   const todayStr = today()
