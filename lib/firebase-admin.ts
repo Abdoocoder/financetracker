@@ -31,6 +31,16 @@ export async function sendFCMNotification(
         fcmOptions: { link: url },
       },
       data: { url: String(url), title: String(title), message: String(body) },
+      android: {
+        priority: 'high',
+        notification: {
+          title,
+          body,
+          icon: 'ic_notification',
+          clickAction: url,
+          channelId: 'fajrak_notifications',
+        },
+      },
     })
     return true
   } catch (err: any) {
