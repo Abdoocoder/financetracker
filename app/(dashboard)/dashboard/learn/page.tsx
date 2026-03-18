@@ -71,7 +71,7 @@ export default function LearnPage() {
         debtRatio,
         savingsRate,
         txCount: txRes.count ?? 0,
-        streak: s,
+        streak: streak,
         hasInvestments: (invRes.count ?? 0) > 0,
       }))
 
