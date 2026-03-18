@@ -7,12 +7,36 @@ interface Props {
   onSearchChange: (v: string) => void
   filter: TransactionFilter
   onFilterChange: (f: TransactionFilter) => void
+  filterMonth: number
+  filterYear: number
+  onMonthChange: (m: number) => void
+  onYearChange: (y: number) => void
 }
 
-export function TransactionFilters({ search, onSearchChange, filter, onFilterChange }: Props) {
+export function TransactionFilters({ search, onSearchChange, filter, onFilterChange, filterMonth, filterYear, onMonthChange, onYearChange }: Props) {
   const { lang } = useI18n()
+  const months = lang === 'ar'
+    ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']
+    : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const currentYear = new Date().getFullYear()
+  const years = [currentYear - 1, currentYear, currentYear + 1]
   return (
     <>
+      {/* فلتر الشهر والسنة */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <select value={filterMonth} onChange={e => onMonthChange(Number(e.target.value))}
+          style={{ flex: 2, padding: '9px 12px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', cursor: 'pointer' }}>
+          {months.map((m, i) => (
+            <option key={i+1} value={i+1}>{m}</option>
+          ))}
+        </select>
+        <select value={filterYear} onChange={e => onYearChange(Number(e.target.value))}
+          style={{ flex: 1, padding: '9px 12px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', cursor: 'pointer' }}>
+          {years.map(y => (
+            <option key={y} value={y}>{y}</option>
+          ))}
+        </select>
+      </div>
       <div style={{ padding: '0 0 12px', position: 'relative' }}>
         <input type="text" value={search} onChange={e => onSearchChange(e.target.value)}
           placeholder={lang === 'ar' ? '🔍 ابحث عن معاملة...' : '🔍 Search transactions...'}
