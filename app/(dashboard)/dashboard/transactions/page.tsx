@@ -57,6 +57,10 @@ export default function TransactionsPage() {
         onSearchChange={tx.setSearch}
         filter={tx.filter}
         onFilterChange={tx.setFilter}
+        filterMonth={tx.filterMonth}
+        filterYear={tx.filterYear}
+        onMonthChange={tx.setFilterMonth}
+        onYearChange={tx.setFilterYear}
       />
 
       {tx.filtered.length === 0 ? (
