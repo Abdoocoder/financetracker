@@ -93,6 +93,43 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
             <div style={{ fontSize: 11, color: 'var(--accent-green-light)', marginTop: 8, fontWeight: 700 }}>
               ✅ {lang === 'ar' ? 'سيتم التنفيذ تلقائياً كل شهر' : 'Will auto-execute every month'}
             </div>
+
+            {/* نوع التكرار */}
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 700 }}>
+                {lang === 'ar' ? 'نوع الدفع' : 'Payment Type'}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={() => onChange({ recurring_auto: true })}
+                  style={{
+                    flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
+                    border: '1px solid ' + (form.recurring_auto !== false ? 'var(--accent-blue)' : 'var(--border)'),
+                    background: form.recurring_auto !== false ? 'var(--accent-blue-dim)' : 'var(--bg-card)',
+                    color: form.recurring_auto !== false ? 'var(--accent-blue-light)' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
+                  }}>
+                  🏦 {lang === 'ar' ? 'تلقائي من البنك' : 'Auto from Bank'}
+                </button>
+                <button
+                  onClick={() => onChange({ recurring_auto: false })}
+                  style={{
+                    flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
+                    border: '1px solid ' + (form.recurring_auto === false ? 'var(--accent-amber)' : 'var(--border)'),
+                    background: form.recurring_auto === false ? 'rgba(245,158,11,0.1)' : 'var(--bg-card)',
+                    color: form.recurring_auto === false ? '#F59E0B' : 'var(--text-muted)',
+                    fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
+                  }}>
+                  💬 {lang === 'ar' ? 'يحتاج تأكيد' : 'Needs Confirmation'}
+                </button>
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
+                {form.recurring_auto !== false
+                  ? (lang === 'ar' ? 'يُضاف تلقائياً بدون تدخل منك' : 'Added automatically without your input')
+                  : (lang === 'ar' ? 'ستصلك رسالة تذكير لتسجيله يدوياً' : 'You will receive a reminder to record it manually')
+                }
+              </div>
+            </div>
           </div>
         )}
       </div>
