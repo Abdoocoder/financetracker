@@ -110,6 +110,17 @@ async function processAutoDebts() {
       transaction_date: dateStr,
     })
 
+    // إشعار Push
+    await sendPushToUser(
+      debt.user_id,
+      isPaid ? `🎉 تم سداد ${debt.name} بالكامل!` : `💳 تم خصم قسط ${debt.name}`,
+      isPaid
+        ? `مبروك! أنهيت سداد دين "${debt.name}" بالكامل. إنجاز رائع! 🏆`
+        : `تم خصم ${payment.toFixed(0)} JOD تلقائياً. المتبقي: ${newRemaining.toFixed(0)} JOD`,
+      '/dashboard/debts',
+      isPaid ? 'debt-paid' : 'debt-auto'
+    )
+
     // تنبيه للمستخدم
     await supabase.from('alerts').insert({
       user_id: debt.user_id,
