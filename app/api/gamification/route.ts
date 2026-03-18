@@ -25,6 +25,11 @@ const BADGES = [
   // شارات الاستثمار
   { id: 'investor',      icon: '📈', ar: 'مستثمر مبتدئ',       en: 'New Investor',      points: 100, check: (s: any) => s.is_investing },
   { id: 'inv_profit',    icon: '🚀', ar: 'استثمار رابح',        en: 'Profitable Investor', points: 150, check: (s: any) => s.investment_profit > 0 },
+  // شارات الدروس
+  { id: 'lesson_3',   icon: '📖', ar: '3 دروس متواصلة',  en: '3 Lessons Streak',  points: 15,  check: (s: any) => s.lesson_streak >= 3 },
+  { id: 'lesson_7',   icon: '🎓', ar: 'أسبوع تعلم',       en: 'Learning Week',     points: 40,  check: (s: any) => s.lesson_streak >= 7 },
+  { id: 'lesson_30',  icon: '🧠', ar: 'شهر من التعلم',    en: 'Month of Learning', points: 150, check: (s: any) => s.lesson_streak >= 30 },
+
   // شارات الثروة
   { id: 'emergency',     icon: '🛡️', ar: 'صندوق الطوارئ',      en: 'Emergency Fund',    points: 200, check: (s: any) => s.has_emergency_fund },
   { id: 'net_positive',  icon: '✨', ar: 'صافي إيجابي',         en: 'Net Positive',      points: 50,  check: (s: any) => s.net_worth > 0 },
@@ -97,9 +102,13 @@ export async function POST(req: NextRequest) {
       else break
     }
 
+    // جلب lesson_streak من profiles
+    const lessonStreak = Number(profileRes.data?.lesson_streak ?? 0)
+
     const stats = {
       total_transactions: txs.length,
       streak_days: streak,
+      lesson_streak: lessonStreak,
       savings_rate: savingsRate,
       debts_paid: debtsPaid,
       total_debt: totalDebt,
