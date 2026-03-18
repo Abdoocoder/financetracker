@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { sendPushToUser } from '@/lib/push-send'
+import { sendPushToUser } from '@/lib/push-send'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,6 +26,78 @@ async function processAutoDebts() {
     .gt('remaining_amount', 0)
 
   if (!debts?.length) return 0
+
+  // الديون اليدوية (auto_deduct = false)
+  const { data: manualDebts } = await supabase
+    .from('debts')
+    .select('id, user_id, name, monthly_payment, remaining_amount, payment_day')
+    .eq('auto_deduct', false)
+    .eq('is_paid', false)
+    .eq('payment_day', dayOfMonth)
+    .gt('remaining_amount', 0)
+
+  if (manualDebts?.length) {
+    for (const debt of manualDebts) {
+      const { count: existing } = await supabase
+        .from('debt_payments')
+        .select('id', { count: 'exact', head: true })
+        .eq('debt_id', debt.id)
+        .gte('payment_date', `${year}-${String(month).padStart(2,'0')}-01`)
+
+      if ((existing ?? 0) > 0) continue
+
+      await sendPushToUser(
+        debt.user_id,
+        `💳 قسط ${debt.name} يستحق اليوم`,
+        `المبلغ: ${Number(debt.monthly_payment).toFixed(0)} JOD — هل قمت بالدفع؟ سجّله في التطبيق.`,
+        '/dashboard/debts',
+        'warning'
+      )
+    }
+  }
+
+  // ── الديون اليدوية (auto_deduct = false) ──
+  const { data: manualDebts } = await supabase
+    .from('debts')
+    .select('id, user_id, name, monthly_payment, remaining_amount, payment_day')
+    .eq('auto_deduct', false)
+    .eq('is_paid', false)
+    .eq('payment_day', dayOfMonth)
+    .gt('remaining_amount', 0)
+
+  if (manualDebts?.length) {
+    for (const debt of manualDebts) {
+      // تحقق إن ما في دفعة لهذا الشهر
+      const { count: existing } = await supabase
+        .from('debt_payments')
+        .select('id', { count: 'exact', head: true })
+        .eq('debt_id', debt.id)
+        .gte('payment_date', `${year}-${String(month).padStart(2,'0')}-01`)
+
+      // إذا دفع بالفعل → لا ترسل إشعار
+      if ((existing ?? 0) > 0) continue
+
+      // أرسل إشعار تذكير
+      await sendPushToUser(
+        debt.user_id,
+        `💳 قسط ${debt.name} يستحق اليوم`,
+        `المبلغ: ${debt.monthly_payment.toFixed(0)} JOD — هل قمت بالدفع؟ افتح التطبيق لتسجيله.`,
+        '/dashboard/debts',
+        'debt-reminder'
+      )
+
+      // إضافة تنبيه داخل التطبيق
+      await supabase.from('alerts').insert({
+        user_id: debt.user_id,
+        type: 'warning',
+        title: `💳 تذكير: قسط ${debt.name}`,
+        message: `قسط ${debt.name} (${debt.monthly_payment.toFixed(0)} JOD) يستحق اليوم — يرجى الدفع وتسجيله في التطبيق.`,
+        frequency: 'once',
+        is_read: false,
+        is_active: true,
+      })
+    }
+  }
 
   let count = 0
   for (const debt of debts) {
