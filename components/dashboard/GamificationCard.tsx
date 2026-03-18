@@ -19,6 +19,9 @@ const BADGE_INFO: Record<string, { icon: string; ar: string; en: string }> = {
   inv_profit:  { icon: '🚀', ar: 'استثمار رابح',      en: 'Profitable Investor' },
   emergency:   { icon: '🛡️', ar: 'صندوق الطوارئ',    en: 'Emergency Fund' },
   net_positive:{ icon: '✨', ar: 'صافي إيجابي',       en: 'Net Positive' },
+  lesson_3:   { icon: '📖', ar: '3 دروس متواصلة',  en: '3 Lessons Streak' },
+  lesson_7:   { icon: '🎓', ar: 'أسبوع تعلم',       en: 'Learning Week' },
+  lesson_30:  { icon: '🧠', ar: 'شهر من التعلم',    en: 'Month of Learning' },
 }
 
 const LEVEL_COLORS = ['', '#6B7280', '#F59E0B', '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B']
