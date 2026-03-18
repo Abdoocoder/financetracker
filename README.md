@@ -223,6 +223,14 @@ npm run dev
 
 ## Changelog
 
+### v3.2.0 — 2026-03-18 *(Latest)*
+- 🏦 **Recurring payment type selector** — auto from bank or manual reminder
+- 🔔 **Push for auto-recurring** — instant notification on auto transactions
+- 🔄 **Improved recurring check** — precise duplicate detection
+- 🔐 **Session persistence** — autoRefreshToken + persistSession enabled
+- 💳 **Push for auto debt** — instant notification on every deduction
+
+
 ### v3.1.0 — 2026-03-18 *(Latest)*
 - 🔄 Auto-recurring transactions
 - 💳 Enhanced debt system
