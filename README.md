@@ -223,6 +223,14 @@ npm run dev
 
 ## Changelog
 
+### v3.4.0 — 2026-03-19 *(Latest)*
+- 📚 **Smart Lesson Selection** — lessons chosen based on user data (debt ratio, savings, streak, investments)
+- 🧠 **25 New Scientific Lessons** — behavioral finance, neuroscience, proven strategies per stage
+- 🕌 **Islamic Haram Money Lessons** — 8 hadiths on avoiding haram wealth linked to investing stage
+- 📊 **Enhanced Weekly Report** — includes stage, next step, streak, top spending category
+- 📋 **Weekly Alert** — detailed internal alert added every Friday with full financial summary
+
+
 ### v3.3.0 — 2026-03-19 *(Latest)*
 - 📖 **Islamic Lessons Bank** — haram money warnings + debt lessons linked to financial stages
 - 🎓 **Lesson Streak in Supabase** — streak saved permanently, synced across devices
