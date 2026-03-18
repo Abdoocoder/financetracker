@@ -6,3 +6,4 @@ node_modules/
 .env.local
 .vercel
 android/app/google-services.json
+.env*.local
