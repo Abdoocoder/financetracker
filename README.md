@@ -544,7 +544,7 @@ CRON_SECRET=your_cron_secret
 
 ## 📱 PWA + Android
 
-- 🔔 Web Push للـ iOS + Firebase FCM للأندرويد
+- 🔔 Web Push للـ iOS + Firebase FCM للأندرويد ✅ مختبر ويعمل
 - 📦 APK مباشر عبر TWA
 - 🔗 [صفحة التنزيل](https://fajrak.com/download)
 
