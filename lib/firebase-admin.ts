@@ -30,7 +30,7 @@ export async function sendFCMNotification(
         },
         fcmOptions: { link: url },
       },
-      data: { url, title, message: body },
+      data: { url: String(url), title: String(title), message: String(body) },
     })
     return true
   } catch (err: any) {
