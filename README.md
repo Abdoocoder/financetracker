@@ -2,135 +2,144 @@
 
 <img src="https://raw.githubusercontent.com/Abdoocoder/financetracker/main/public/favicon.ico" width="80" height="80" alt="Fajrak Logo" />
 
-# Fajrak
+# Fajrak — فجرك
 
-**منصة إدارة مالية شخصية ذكية**
-*Smart Personal Finance Manager*
+**Smart Personal Finance Manager**
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android-Native_Flutter-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-release.apk)
+[
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)](https://vercel.com)
-[![Recharts](https://img.shields.io/badge/Recharts-Charts-22B5BF?style=flat-square)](https://recharts.org)
-[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa)](https://fajrak.com/)
+![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)
+
+](https://fajrak.com/)
+[
+
+![Download APK](https://img.shields.io/badge/📱_Android-Flutter_App-3ECF8E?style=for-the-badge&logoColor=white)
+
+](https://fajrak.com/download)
+[
+
+![Next.js](https://img.shields.io/badge/Next.js-15.5.12-000000?style=flat-square&logo=nextdotjs)
+
+](https://nextjs.org)
+[
+
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+
+](https://typescriptlang.org)
+[
+
+![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+
+](https://supabase.com)
+[
+
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)
+
+](https://vercel.com)
+[
+
+![Flutter](https://img.shields.io/badge/Flutter-Native_Android-02569B?style=flat-square&logo=flutter)
+
+](https://flutter.dev)
+[
+
+![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa)
+
+](https://fajrak.com/)
 
 ---
 
-*كلنا نحلم بالثراء — هنا تبدأ الرحلة*
 *We all dream of wealth — here the journey begins*
 
-</div>
-
----
-
-## ✨ لمحة سريعة / Overview
-
-> فجرك هو أول أداة مالية عربية ذكية تمشي مع المستخدم خطوة بخطوة — من أول دينار يسجّله حتى يحقق حريته المالية.
->
-> **رؤيتنا:** أن يكون كل إنسان على دراية كاملة بوضعه المالي، ويملك خطة واضحة للتحسين — بغض النظر عن دخله أو مستواه — حتى ينجح في تحقيق حريته المالية.
->
-> مستلهم من قيم الإسلام في السعي والعمل والقناعة 🕌
-
-```
-🌅 وعي مالي  →  💳 سداد الديون  →  🛡️ صندوق طوارئ  →  📈 استثمار  →  👑 حرية مالية
-```
-
----
-
-## 🖥️ Screenshots
-
-<div align="center">
-
-| Dashboard | Transactions | Budget |
-|:---------:|:------------:|:------:|
-| ملخص شهري + خارطة الثراء + محاكي الثروة + رسوم بيانية | بحث + فلترة + Swipe | ملخص تلقائي + فئات |
+[🇸🇦 العربية](./README.ar.md) | 🇬🇧 English
 
 </div>
 
 ---
 
-## 🌟 الميزات / Features
+## ✨ Overview
+
+> Fajrak is the first smart Arabic personal finance tool that walks with the user step by step — from the first transaction they log until they achieve financial freedom.
+>
+> **Our Vision:** Every person should have full awareness of their financial situation and a clear plan for improvement — regardless of their income or level — until they achieve financial freedom.
+>
+> Inspired by Islamic values of effort, work, and contentment 🕌
+🌅 Awareness → 💳 Debt Repayment → 🛡️ Emergency Fund → 📈 Investment → 👑 Financial Freedom
+---
+
+## 🌟 Features
 
 <table>
 <tr>
 <td width="50%">
 
 ### 🏠 Dashboard
-- ملخص شهري: الدخل، المصروف، الصافي
-- **رحلة الثروة** — نقاط، مستويات، سلسلة يومية، شارات 🎮
-- **خارطة الثراء** مع نقاط الصحة المالية 🗺️
-- **بطاقة محاكي الثروة** — يحسب فائضك ويعرض نموه 📈
-- **تحديات الادخار** — 4 تحديات تتبعها تلقائياً 🏆
-- **رسوم بيانية تفاعلية** بـ Recharts مع Tooltips *(جديد)* 📊
-- مقارنة مع الشهر الماضي
-- توزيع المصاريف مع النسب المئوية *(محسّن)*
-- إضافة سريعة مع تكرار آخر معاملة ⚡
-- **Lazy Loading** للمكونات الثقيلة — تحسين الأداء بـ 94% *(جديد)*
+- Monthly summary: Income, Expenses, Net
+- **💊🗺️ Financial Health + Wealth Roadmap** — unified component with two tabs
+  - Health tab: full circle score 0-100 + detailed bars
+  - Roadmap tab: 5 stages + next step + net worth
+- **Wealth Simulator Card** — calculates monthly surplus growth 📈
+- **Saving Challenges** — 4 auto-tracked challenges 🏆
+- **Interactive Charts** with Recharts + Tooltips 📊
+- Month-over-month comparison
+- Expense breakdown with percentages
+- Quick Add with last transaction repeat ⚡
+- **Lazy Loading** for heavy components — 94% performance boost
 
-### 💸 المعاملات
-- إضافة / تعديل / حذف
-- **فئة صلة الرحم** مضافة *(جديد)*
-- بحث نصي في الوصف والفئة والمبلغ 🔍
-- فلترة بالنوع والشهر
-- Swipe للحذف على الموبايل
-- تصدير CSV 📥
+### 💸 Transactions
+- Add / Edit / Delete
+- **Recurring transactions** — monthly auto-execute 🔁
+- Full-text search by description, category, amount 🔍
+- Filter by type and month
+- Swipe to delete on mobile
+- CSV export 📥
 
-### 💳 الديون
-- تتبع مع شريط تقدم مرئي
-- خصم تلقائي شهري (CRON) 🤖
-- تحديد يوم الخصم لكل دين
-- سجل كامل للدفعات
-- تاريخ الديون المسددة مع إحصائية إجمالي ما سددته 💪
-- احتفال + Confetti عند سداد دين كامل 🎉
+### 💳 Debts
+- Track with visual progress bar
+- **Auto monthly deduction** (CRON) 🤖
+- Set payment day per debt
+- Full payment history
+- ✅ Auto-deducted every month
 
 </td>
 <td width="50%">
 
-### 📊 الميزانية
-- ملخص تلقائي من بيانات التطبيق
-- حساب المتاح: الدخل − الأقساط − الأهداف
-- مستشار مالي ذكي — تحليل وتوصيات فورية 🤖
-- قاعدة 50/30/20 — توزيع تلقائي مقترح
-- حدود إنفاق يدوية لكل فئة
-- تحذير 🔶 عند الاقتراب وتنبيه ⚠️ عند التجاوز
+### 📊 Budget
+- Auto summary from app data
+- Available = Income − Installments − Goals
+- Manual spending limits per category
+- Warning 🔶 when approaching, alert ⚠️ when exceeded
 
-### 📈 الاستثمارات
-- أسهم + عملات رقمية (15+ عملة)
-- أسعار **حية** (CoinGecko + Twelve Data)
-- دعم الاستثمار الحلال ✅
-- **صافي الثروة يستخدم السعر الحالي** وليس سعر الشراء *(إصلاح)*
-- محاكي الثروة الكامل مع sliders تفاعلية
+### 📈 Investments
+- Stocks + 15+ cryptocurrencies
+- **Live prices** (CoinGecko + Twelve Data)
+- Halal investment support ✅
+- **Full Wealth Simulator** with interactive sliders + yearly table
 
-### 🎯 الأهداف
-- أهداف ادخار مع شريط تقدم
-- إضافة دفعات يدوية
+### 🎯 Goals
+- Savings goals with progress bar
+- Manual payment additions
 
-### 🔔 التنبيهات الذكية
-- تحليل يومي تلقائي (cron-job.org) *(محدّث)*
-- **Push Prompt UI أنيق** بدل confirm() المزعج *(جديد)*
-- إشعارات Push تعمل على Android APK *(إصلاح)*
-- تقرير أسبوعي + تذكير مسائي
-- توجيه بناء الثروة — نصيحة شخصية يومية 7م 💡
-- طلب إذن الإشعارات مرة واحدة فقط
+### 🔔 Smart Notifications
+- **6 notification types** throughout the day
+- Morning: daily budget + smart alerts
+- Evening: only if user hasn't logged today 🤔
+- Weekly: this week vs last week comparison 📊
+- Salary and debts work **silently** in background
+- Push notifications + in-app alerts for all users
+- Smart policy: one useful daily notification > ten annoying ones
 
-### 📚 التعلم
-- درس يومي مخصص لمرحلتك المالية
-- سلسلة يومية لتتبع الالتزام 🔥
-- خارطة رحلة من الوعي للثروة
-- دروس إسلامية كل 7 أيام
-- ثنائي اللغة عربي/إنجليزي
+### ⚙️ Settings
+- **Personal Assets** — real estate, vehicles, gold 💎
+- **True Net Worth** shown in wealth roadmap
+- **Share button** — share app with friends 🔗
+- **Forgot password** — reset via email 🔑
+- CSV export 📥
 
-### ⚙️ الإعدادات
-- ملف شخصي محسّن — وظيفة، هاتف، تاريخ ميلاد 👤
-- أصولي الشخصية — عقارات، مركبات، ذهب، أصول أخرى 💎
-- صافي الثروة الحقيقية يظهر في خارطة الثراء تلقائياً
-- شارك تجربتك — تقييم يظهر في Landing Page ⭐
-- Dark Mode / Light Mode *(Light Mode محسّن)*
-- أقسام Accordion قابلة للطي
-- تصدير المعاملات CSV 📥
+### 📖 Islamic Lessons
+- Quran verses on provision and gratitude
+- Hadiths on financial ethics
+- Daily supplications 🕌
 
 </td>
 </tr>
@@ -138,449 +147,185 @@
 
 ---
 
-## 📋 Changelog
+## 💊🗺️ Financial Health & Wealth Roadmap
 
-### v1.5.2 — 2026-03-16
-- 🕌 إضافة بنك دروس إسلامي كامل — آيات، أحاديث، أدعية مأثورة مرتبطة بالرزق والثراء
-- 📖 17 درس إسلامي يظهر كل 7 أيام موزعة على كل مراحل الرحلة المالية
-- 🌅 Fajrak الآن يجمع بين العلم المالي الحديث والتراث الإسلامي
+A unified component that analyzes your financial situation:
 
-### v1.5.1 — 2026-03-16
-- 💾 حفظ الإشعارات في صفحة التنبيهات تلقائياً
-- 🔗 إصلاح رابط الإشعار — يفتح الصفحة الصحيحة
-- ⏳ تقسيم المعاملات — قادمة ومنجزة
-- 🔢 إصلاح عرض الأرقام الكسرية في المعاملات
-- 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
-- 🔔 App Badge عند وصول إشعار جديد
-
-### v3.1.0 — 2026-03-18 *(الإصدار الجديد)*
-- 📱 **Native Flutter App** — دمج مشروع Flutter رسمي بدلاً من Capacitor
-- 🔐 **تأمين البيانات** — استخدام `--dart-define` للقيم الحساسة في الموبايل
-- 🔧 **تحديث بنية الأندرويد** — الانتقال إلى v2 Embedding و Kotlin DSL
-- 🕌 **خط Cairo** — دعم كامل للخط العربي في تطبيق الموبايل
-- 🐛 **إصلاحات شاملة** — حل جميع مشاكل البناء والتوافق مع Flutter SDK الحديث
-
-### v3.0.0 — 2026-03-18
-- 🔐 **استرجاع كلمة المرور** — صفحة forgot-password + reset-password
-- 🔗 **زر المشاركة** — في الإعدادات مع رسالة تسويقية احترافية
-- 🛡️ **تحسين Privacy Policy** — قسم من يرى بياناتك؟
-- 🌅 **قسم رحلة الحرية المالية** — في Landing Page مع اقتباسات إسلامية
-- 👋 **تحية شخصية** — باسم المستخدم في Dashboard
-- 🌐 **i18n كامل** — مفاتيح ترجمة لكل الميزات الجديدة
-- 🐛 **إصلاح Auth Layout** — I18nProvider لصفحات المصادقة
-
-### v2.9.0 — 2026-03-17
-- 📱 **Install Prompt** — طلب تثبيت PWA تلقائي مع تكرار أسبوعي
-- 🌐 **i18n كامل** — مفاتيح ترجمة للـ Install Prompt وHelp وLearn وOnboarding
-- 🔄 **إصلاح Pull to Refresh** — يعمل بشكل صحيح في كل الصفحات
-- 🏦 **إصلاح صفحة الاستثمار** — لا اختفاء للبيانات عند السحب
-- 🐛 **إصلاح Hydration Error** — Welcome Modal وOnboarding Tour
-
-### v2.8.0 — 2026-03-17
-- 🐛 **إصلاح Hydration Error** — خطأ React #310 في Dashboard
-- 🔧 **إصلاح Welcome Modal** — mounted state لتجنب SSR mismatch
-- 🔧 **إصلاح Onboarding Tour** — نفس الإصلاح
-
-### v2.7.0 — 2026-03-17
-- 🌅 **Empty State** — رسالة تحفيزية للمستخدم الجديد
-- 🔄 **Pull to Refresh** — سحب لأسفل للتحديث
-- 🔢 **Micro-animations** — الأرقام تعدّ من 0 للقيمة
-- 📳 **Haptic Feedback** — اهتزاز عند الإجراءات المهمة
-- 🔔 **Smart Nudges** — إشعار ذكي للمستخدمين غير النشطين
-
-### v2.6.0 — 2026-03-17
-- 💬 **مركز المساعدة** — صفحة `/help` مع 20+ سؤال وجواب وبحث
-- 🎓 **جولة تعريفية لكل صفحة** — شرح مخصص عند أول زيارة
-- 💊 **Financial Health Score** — نقاط الصحة المالية 0-100
-- 🎓 **Onboarding Tour** محسّن — 8 صفحات كل منها جولة مستقلة
-
-### v2.5.0 — 2026-03-17
-- 🎓 **Onboarding Tour** — جولة تعريفية 8 خطوات لكل مستخدم جديد
-- 👋 **Welcome Modal** — نافذة ترحيبية تشرح التطبيق
-- 🌐 **ترجمة كاملة** — مفاتيح i18n للـ Onboarding والدروس
-
-### v2.4.0 — 2026-03-17
-- 📚 **صفحة الدروس اليومية** — درس مخصص لمرحلتك المالية
-- 🔥 **سلسلة يومية** — تتبع التزامك بالتعلم
-- 🗺️ **خارطة الرحلة** — شاهد تقدمك من الوعي للثروة
-- 🕌 **دروس إسلامية** — كل 7 أيام درس مرتبط بالرزق
-- 📖 **ثنائي اللغة** — عربي وإنجليزي
-
-### v2.3.0 — 2026-03-17
-- 🧹 **تنظيف المشروع** — حذف Capacitor والعودة لـ PWA فقط
-- 📱 **صفحة Android Coming Soon** — مع خانة تسجيل الاهتمام
-- 🔔 **إصلاح dedup التنبيهات** — نافذة 24 ساعة بدل 20
-
-### v2.2.0 — 2026-03-17
-- 📱 **Native Android App** — Capacitor + Firebase FCM حقيقي
-- 🔔 **إشعارات Native** — تصل حتى لو التطبيق مغلق كلياً
-- 🔐 **FCM Bridge** — Java ↔ JavaScript لتسجيل Token تلقائياً
-- 💾 **Session Persistence** — لا تسجيل دخول عند كل فتح
-- 🚀 **GitHub Actions** — بناء APK تلقائي عند كل push
-- 🔗 **رابط تنزيل ديناميكي** — يشير لأحدث إصدار دائماً
-- 🛡️ **Middleware fix** — تجاوز SSR للتطبيق Native
-
-### v2.1.0 — 2026-03-17
-- 📱 **Native Android APK** — بناء تلقائي عبر GitHub Actions
-- 🔔 **إشعارات Native حقيقية** — تصل حتى لو التطبيق مغلق كلياً
-- ⚡ **تنبيه Battery Optimization** — يوجه المستخدم لإعدادات Chrome
-- 🔗 **رابط تنزيل ديناميكي** — يشير لأحدث إصدار تلقائياً
-
-### v2.0.1 — 2026-03-17
-- 🔧 إصلاح Push Notifications على Android — استبدال `navigator` بـ `self` في Service Worker
-- ⚡ تنبيه تلقائي لمستخدمي Android لتفعيل إعدادات البطارية
-- 🗑️ حذف FCM tokens المنتهية الصلاحية تلقائياً
-
-### v2.0.0 — 2026-03
-- 📱 **Fajrak v2.0 APK** — موقع بـ PWABuilder مع keystore جديد
-- 🕌 **دروس إسلامية** — آيات قرآنية وأحاديث وأدعية الرزق يومياً
-- 🔔 **Firebase FCM** — إشعارات تعمل في الخلفية على Android
-- 🔴 **App Badge** — عداد الإشعارات غير المقروءة على أيقونة التطبيق
-- 💳 **تقسيم المعاملات** — upcoming و completed بشكل منفصل
-- 🔢 **إصلاح الأرقام** — عرض الكسور العشرية بشكل صحيح
-- 🔄 **ترتيب المعاملات** — حسب التاريخ ثم وقت الإنشاء
-- 💼 **تحرير الفئات** — استبدال راتب بـ freelance في Quick Add
-- 📄 **وثيقة هوية Fajrak** — الرؤية والرسالة والقيم موثقة
-
-### v1.6.0 — 2026-03
-- 🌅 **هوية المشروع** — Tagline جديد، رؤية ورسالة واضحة، مستلهمة من الإسلام
-- 📄 **Landing Page** — قسم "لماذا بنينا هذا التطبيق"، Pro → قريباً مع عرض أول 100 مشترك
-- 🧭 **Bottom Nav** — 3 عناصر فقط (الرئيسية | المعاملات | المزيد)
-- 🔄 **RTL/LTR كامل** — كل الصفحات تتبع لغة المستخدم
-- ⚡ **أداء صفحة الاستثمارات** — Cache 5 دقائق + Parallel API calls
-- 🔄 **تحديث تلقائي للأسعار** عند الدخول للصفحة في الخلفية
-- 🌍 **ترجمة كاملة** للـ Dashboard sections
-- 🔢 **إصلاح اتجاه الأرقام** — `1 USD = 0.709 JOD` صحيح في العربي
-- ✅ **تقييمات حقيقية فقط** من قاعدة البيانات
-- 🔃 **إعادة تحميل عند تغيير اللغة** لضمان RTL/LTR صحيح
-
-### v1.5.0 — 2026-03
-- 🧠 **دروس يومية ذكية** — مخصصة لكل مستخدم حسب مرحلته المالية
-- 📚 **مبنية على أبحاث أكاديمية** — علم السلوك المالي، نوبل الاقتصاد، Vanguard
-- 🌐 **ثنائية اللغة** — الدرس يصل بلغة المستخدم (عربي/إنجليزي)
-- 🎯 **5 مسارات تعليمية** — وعي → ديون → طوارئ → استثمار → ثروة
-- 🌓 **كشف ثيم الجهاز تلقائياً** عند أول دخول
-- 🌍 **كشف لغة المتصفح تلقائياً** عند أول دخول
-- 🔗 **إصلاح زر "شاهد كيف يعمل"** — يتنقل لقسم الميزات
-- ✅ **تقييمات حقيقية فقط** — حذف التقييمات الوهمية
-- 🗄️ إضافة عمود `lang` في `profiles` لتخصيص الإشعارات
-
-### v1.4.0 — 2026-03
-- 📊 ترقية الرسوم البيانية إلى **Recharts** مع Tooltips تفاعلية
-- ⚡ **Lazy Loading** للمكونات الثقيلة — Dashboard من 120kB إلى 7.5kB (تحسين 94%)
-- 🏗️ **Refactoring** شامل — تقسيم الملفات الكبيرة إلى 9 مكونات منظمة
-- 🔧 `clearUserCache` في ملف مركزي `lib/cache.ts` — إزالة 6 نسخ مكررة
-- 🌐 **مزامنة الترجمة** — 266 مفتاح متطابق عربي/إنجليزي
-- 📱 **Bottom Nav RTL** — الرئيسية على اليمين *(إصلاح)*
-- 🔔 **Push Prompt UI** — إصلاح الإشعارات على Android APK
-- ☀️ **Light Mode محسّن** — عمق وظلال وألوان أفضل
-- 💰 **إصلاح صافي الثروة** — استخدام السعر الحالي بدل سعر الشراء
-- 🔢 **إصلاح الأرقام العشرية** — عرض أرقام نظيفة بدون .075
-- 🗑️ إزالة Vercel Cron المكرر — GitHub Actions فقط
-- ➕ إضافة فئة **صلة الرحم** في المعاملات
-
-### v1.4.0 — 2026-03-15
-- 🔔 إصلاح الإشعارات على Android — auto-subscribe للمستخدم القديم عند إعادة التثبيت
-- 🔔 اشتراك تلقائي إذا الإذن ممنوح مسبقاً بدون popup
-- 🚫 منع تكرار الراتب في الـ onboarding
-- 🌐 نقل الدومين من vercel.app إلى fajrak.com
-- 📱 APK v1.6.0 مع GitHub Release رسمي
-
-### v1.3.0 — 2026-03
-- 🎉 احتفال + Confetti عند سداد دين كامل
-- 📜 تاريخ الديون المسددة مع إحصائية إجمالي المسدد
-- 🌙 Dark Mode افتراضي لكل المستخدمين الجدد
-- 🔔 طلب إذن الإشعارات مرة واحدة فقط للأبد
-- 🌍 إصلاح جميع النصوص لاستخدام i18n
-- 🚀 Landing Page محسّنة — Headline جديد، Trust Signals، Sticky CTA Bar
-- 💪 إحصائية "إجمالي ما سددته" في صفحة الديون
-
-### v1.2.0 — 2026-02
-- 🗺️ خارطة الثراء + نقاط الصحة المالية
-- 🎮 نظام Gamification — نقاط، مستويات، شارات، سلسلة يومية
-- 💎 الأصول الشخصية + صافي الثروة الحقيقية
-- 🏆 تحديات الادخار التلقائية
-- 📱 APK للأندرويد
-
-### v1.1.0 — 2026-01
-- 🌐 i18n عربي/English كامل (266 مفتاح)
-- 🤖 مستشار مالي ذكي + قاعدة 50/30/20
-- 📊 محاكي الثروة التفاعلي
-- 🔔 Push Notifications + تقرير أسبوعي
-- 🔍 بحث في المعاملات + تصدير CSV
-
-### v1.0.0 — 2025-12
-- 🚀 الإطلاق الأول
-- Auth + Onboarding + Dashboard
-- المعاملات، الديون، الاستثمارات، الأهداف
-- PWA + Vercel Deployment
+- 🎯 Full circle score 0-100 with animated progress
+- 📊 Detailed bars: Savings, Debt, Emergency, Investing, Tracking
+- 🗺️ Current financial stage (1 of 5)
+- 👣 Recommended next step with practical details
+- 💎 **True Net Worth** = Personal Assets + Investments + Savings − Debts
 
 ---
 
-## 🗺️ خارطة الثراء / Wealth Roadmap
+## 💎 Personal Assets
 
-ميزة حصرية تحلّل وضعك المالي وتعطيك **نقاط الصحة المالية** مع خطة واضحة للتحسين:
-
-- 🎯 تحديد المرحلة المالية الحالية (طوارئ → ديون → استثمار → ثروة)
-- 💪 نقاط القوة والنقاط التي تحتاج تحسين
-- 👣 الخطوة التالية الموصى بها مع تفاصيل عملية
-- 📐 نسبة الدين من الدخل + مؤشرات أخرى
-- 💎 **صافي الثروة الحقيقية** = أصول شخصية + استثمارات (بالسعر الحالي) + ادخار − ديون
+A section in Settings to enter asset values and calculate **true net worth**:
+- 🏠 Real estate
+- 🚗 Vehicles
+- 👑 Jewelry and gold
+- 📦 Other assets
 
 ---
 
-## 🎮 نظام الإنجازات / Gamification System
+## 📱 PWA + Android
 
-نظام متكامل يحوّل إدارة المال إلى رحلة ممتعة ومحفّزة:
-
-**النقاط والمستويات:**
-```
-🌱 مبتدئ     (0-49 نقطة)
-🔥 متتبع     (50-149 نقطة)
-💪 مدخر      (150-349 نقطة)
-📈 مستثمر    (350-699 نقطة)
-💎 ثري مبتدئ (700-1199 نقطة)
-👑 حر مالياً  (1200+ نقطة)
-```
-
-**الشارات (15 شارة):** تتبع، ادخار، ديون، استثمار، ثروة
-
-**السلسلة اليومية 🔥** — كل يوم يسجّل فيه المستخدم معاملة يكسب نقطة ويحافظ على سلسلته
-
----
-
-## ⭐ نظام التقييمات / Testimonials
-
-نظام متكامل يتيح للمستخدمين مشاركة تجربتهم مباشرة من التطبيق:
-
-- المستخدم يكتب تقييمه من صفحة **الإعدادات** (اسم، دولة، وظيفة، نجوم، نص)
-- التقييم يُحفظ في Supabase بحالة `is_visible = false` بانتظار الموافقة
-- بعد موافقة المشرف يظهر تلقائياً في **Landing Page**
-- المستخدم يستطيع تحديث تقييمه في أي وقت
-
-**موافقة على تقييم** (Supabase SQL Editor):
-```sql
-UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
-```
-
----
-
-## 🛠️ التقنيات / Tech Stack
-
-<div align="center">
-
-| التقنية | الاستخدام | الإصدار |
-|:-------:|:---------:|:-------:|
-| ![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs&logoColor=white) | Framework + SSR | 15.5.12 |
-| ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) | Type Safety | 5.x |
-| ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white) | Database + Auth + RLS | Latest |
-| ![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel&logoColor=white) | Hosting | Latest |
-| ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?logoColor=white) | رسوم بيانية تفاعلية | Latest |
-| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwind-css&logoColor=white) | Styling | 3.x |
-| ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) | CRON Jobs | Latest |
-| ![CoinGecko](https://img.shields.io/badge/CoinGecko-8DC63F?logoColor=white) | أسعار العملات الرقمية | Free API |
-| ![WebPush](https://img.shields.io/badge/Web_Push-5A0FC8?logo=pwa&logoColor=white) | Push Notifications | VAPID |
-| ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white) | Native Mobile App | 3.x |
-
-</div>
+- 🔔 Web Push for iOS + Firebase FCM for Android ✅
+- 📦 Direct APK via TWA (Trusted Web Activity)
+- ⚡ Fast performance with Service Worker
+- 🔗 [Download Page](https://fajrak.com/download)
+- 📱 **Native Flutter App** — full Android app with background notifications
 
 ---
 
 ## 🗄️ Database Schema
-
-```
 ┌─────────────────────────────────────────────────────┐
 │                    Supabase Tables                   │
 ├──────────────────────┬──────────────────────────────┤
-│ profiles             │ بيانات المستخدم + الراتب + اللغة │
-│ transactions         │ المعاملات المالية              │
-│ debts                │ الديون + الخصم التلقائي        │
-│ debt_payments        │ سجل دفعات الديون               │
-│ investments          │ المحفظة الاستثمارية            │
-│ investment_transactions │ معاملات الاستثمار           │
-│ budgets              │ ميزانيات الفئات الشهرية        │
-│ savings_goals        │ أهداف الادخار                  │
-│ alerts               │ التنبيهات الذكية               │
-│ push_subscriptions   │ اشتراكات الإشعارات             │
-│ user_stats           │ نقاط + مستويات + شارات         │
-│ testimonials         │ تقييمات المستخدمين             │
+│ profiles             │ User data + salary            │
+│ transactions         │ Financial transactions        │
+│ debts                │ Debts + auto deduction        │
+│ debt_payments        │ Debt payment history          │
+│ investments          │ Investment portfolio          │
+│ investment_transactions │ Investment transactions   │
+│ budgets              │ Monthly category budgets      │
+│ savings_goals        │ Savings goals                 │
+│ alerts               │ Smart notifications           │
+│ push_subscriptions   │ Notification subscriptions    │
+│ testimonials         │ User reviews                  │
 └──────────────────────┴──────────────────────────────┘
-```
-
-> 🔒 جميع الجداول محمية بـ **Row Level Security (RLS)** — لا يمكن لأي مستخدم الوصول لبيانات غيره.
+> 🔒 All tables protected with **Row Level Security (RLS)**
 
 ---
 
-## ⚙️ CRON Jobs — الأتمتة اليومية
+## ⚙️ CRON Jobs — Daily Automation
+┌───────────────────────────────────────────────────────────────────────┐
+│  ⏰ 6:00 AM  │  smart-notifications  │  Morning + daily budget         │
+│  ⏰ 8:00 AM  │  smart-notifications  │  Auto salary (silent)           │
+│  ⏰ 6:00 PM  │  smart-notifications  │  Evening reminder (if needed)   │
+│  ⏰ Friday   │  smart-notifications  │  Weekly comparison report       │
+└───────────────────────────────────────────────────────────────────────┘
+> CRONs run via **cron-job.org** (free) — calls `/api/smart-notifications` at set times in Amman timezone.
 
-تعمل عبر **GitHub Actions** (UTC+3):
+---
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  ⏰ 6:00 ص   │  smart-notifications.yml  │  تنبيهات صباحية + ذكية     │
-│  ⏰ 8:00 ص   │  auto-salary.yml          │  إضافة الراتب التلقائي     │
-│  ⏰ 9:00 ص   │  auto-debt.yml            │  خصم الأقساط التلقائي       │
-│  ⏰ 6:00 م   │  smart-notifications.yml  │  تذكير مسائي               │
-│  ⏰ 7:00 م   │  wealth-guidance.yml      │  توجيه بناء الثروة         │
-│  ⏰ 8:00 ص ج │  smart-notifications.yml  │  تقرير أسبوعي (الجمعة فقط) │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+## 🛠️ Tech Stack
 
-**GitHub Secrets المطلوبة:**
-```
-CRON_SECRET=your_secret_here
-```
+<div align="center">
+
+| Technology | Usage | Version |
+|:----------:|:-----:|:-------:|
+| 
+
+![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs&logoColor=white)
+
+ | Framework + SSR | 15.5.12 |
+| 
+
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+
+ | Type Safety | 5.x |
+| 
+
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)
+
+ | Database + Auth + RLS | Latest |
+| 
+
+![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel&logoColor=white)
+
+ | Hosting | Latest |
+| 
+
+![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)
+
+ | Native Android App | 3.x |
+| 
+
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black)
+
+ | Push Notifications FCM | Latest |
+| 
+
+![Recharts](https://img.shields.io/badge/Recharts-22B5BF)
+
+ | Interactive Charts | Latest |
+| 
+
+![cron-job.org](https://img.shields.io/badge/cron--job.org-FF6B35)
+
+ | CRON Jobs (free) | Latest |
+
+</div>
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# 1. Clone
 git clone https://github.com/Abdoocoder/financetracker.git
-cd fajrak
-
-# 2. Install
+cd financetracker
 npm install
-
-# 3. Environment
 cp .env.local.example .env.local
-# عدّل متغيرات البيئة
-
-# 4. Run
 npm run dev
-```
-
-### Environment Variables
-
-```env
-# =================================================
-# APP CONFIG
-# =================================================
-NEXT_PUBLIC_APP_URL=https://fajrak.com
-
-
-# =================================================
-# SUPABASE CONFIG
-# =================================================
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-
-# =================================================
-# MARKET DATA API
-# =================================================
-TWELVE_DATA_KEY=your_twelve_data_key
-
-
-# =================================================
-# CURRENCY EXCHANGE API
-# =================================================
-NEXT_PUBLIC_EXCHANGE_RATE_KEY=your_exchange_rate_key
-
-
-# =================================================
-# PUSH NOTIFICATIONS (VAPID)
-# =================================================
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=your_vapid_public_key
-VAPID_PRIVATE_KEY=your_vapid_private_key
-VAPID_EMAIL=mailto:your@email.com
-
-
-# =================================================
-# CRON JOB SECURITY
-# =================================================
-CRON_SECRET=your_cron_secret
-```
-
----
-
-## 🗺️ Roadmap
-
-```
-✅ المرحلة الأولى — MVP
+Environment Variables
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+CRON_SECRET=
+TWELVE_DATA_KEY=
+NEXT_PUBLIC_EXCHANGE_RATE_KEY=
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+VAPID_EMAIL=
+NEXT_PUBLIC_APP_URL=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=
+🗺️ Roadmap
+✅ Phase 1 — MVP
    ├── [x] Auth + Onboarding
-   ├── [x] المعاملات الكاملة
-   ├── [x] الديون + الخصم التلقائي
-   ├── [x] الاستثمارات + أسعار حية
-   ├── [x] الأهداف والادخار
+   ├── [x] Full Transactions
+   ├── [x] Debts + Auto Deduction
+   ├── [x] Investments + Live Prices
+   ├── [x] Goals & Savings
    └── [x] Landing Page + PWA
 
-✅ المرحلة الثانية — Smart Features
-   ├── [x] التنبيهات الذكية + Push
-   ├── [x] الميزانية الذكية + مستشار مالي + قاعدة 50/30/20
-   ├── [x] الراتب التلقائي
-   ├── [x] بحث في المعاملات
-   ├── [x] Dark / Light Mode
-   ├── [x] i18n عربي/English كامل (266 مفتاح)
-   ├── [x] خارطة الثراء + نقاط الصحة المالية
-   ├── [x] Recharts — رسوم بيانية تفاعلية
-   ├── [x] تحديات الادخار التلقائية
-   ├── [x] الأصول الشخصية + صافي الثروة الحقيقية
-   ├── [x] نظام Gamification — نقاط، مستويات، شارات
-   ├── [x] CRONs عبر cron-job.org *(محدّث)*
-   ├── [x] نسيت كلمة المرور + إعادة التعيين
-   ├── [x] زر المشاركة
-   ├── [x] Firebase FCM للأندرويد
-   ├── [x] الدروس الإسلامية
-   ├── [x] تقسيم المعاملات قادمة/مكتملة
-   ├── [x] لوغو SVG
-   ├── [x] Push Notifications على Android APK
-   ├── [x] RTL كامل + Bottom Nav صحيح
-   ├── [x] Lazy Loading — أداء أفضل بـ 94%
-   ├── [x] Refactoring — كود نظيف ومنظم
-   ├── [x] نظام شهادات المستخدمين
-   ├── [x] دروس يومية ذكية مخصصة بالمرحلة المالية
-   ├── [x] مبنية على أبحاث أكاديمية موثوقة
-   ├── [x] ثنائية اللغة — عربي وإنجليزي
-   ├── [x] كشف لغة وثيم الجهاز تلقائياً
-   ├── [x] هوية المشروع — Fajrak، Tagline، رؤية إسلامية
-   ├── [x] Landing Page — قسم الرؤية + عرض أول 100 مشترك
-   ├── [x] Bottom Nav — 3 عناصر فقط
-   ├── [x] RTL/LTR كامل في كل الصفحات
-   ├── [x] تحديث تلقائي للأسعار في الخلفية
-   └── [x] ترجمة كاملة لكل النصوص
+✅ Phase 2 — Smart Features
+   ├── [x] Smart Alerts + Push Notifications
+   ├── [x] Smart Budget
+   ├── [x] Auto Salary
+   ├── [x] Transaction Search
+   ├── [x] Dark/Light Mode
+   ├── [x] i18n Arabic/English
+   ├── [x] Unified Financial Health + Wealth Roadmap
+   ├── [x] Wealth Simulator Card
+   ├── [x] Auto Saving Challenges
+   ├── [x] Personal Assets + True Net Worth
+   ├── [x] Weekly Report + Evening Reminder
+   ├── [x] Smart Notification Policy
+   ├── [x] Recurring Transactions
+   ├── [x] Forgot Password + Reset
+   ├── [x] Share Button
+   ├── [x] CRONs via cron-job.org
+   ├── [x] Firebase FCM for Android
+   ├── [x] Islamic Lessons
+   ├── [x] Split Transactions: upcoming/completed
+   ├── [x] SVG Logo
+   ├── [x] Native Flutter Android App
+   └── [x] Updated Privacy Policy
 
-⏳ المرحلة الثالثة — Pro Features
-   ├── [ ] تقارير PDF شهرية
-   ├── [ ] نظام اشتراكات (Stripe)
-   └── [ ] OCR للفواتير
-```
-
----
-
-## 📱 PWA + Android
-
-- 🔔 Web Push للـ iOS + Firebase FCM للأندرويد ✅ مختبر ويعمل
-- 📦 APK مباشر عبر TWA
-- 🔗 [صفحة التنزيل](https://fajrak.com/download)
-
-
-التطبيق يعمل كـ **Progressive Web App** كامل:
-
-- 📲 قابل للتثبيت على Android و iOS
-- 🔔 إشعارات Push حتى مع إغلاق التطبيق
-- ⚡ أداء سريع مع Service Worker
-- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
-
----
-
-<div align="center">
-
-## 👨‍💻 المطور / Developer
-
-**عبدالله رافع — Abdoocoder**
-
-[![GitHub](https://img.shields.io/badge/GitHub-Abdoocoder-181717?style=for-the-badge&logo=github)](https://github.com/Abdoocoder)
-
----
-
-*بُني بـ ❤️ من الأردن للعالم العربي*
-*Built with ❤️ from Jordan for the Arab world*
-
-*"كل رحلة ثراء تبدأ بخطوة"*
-
-**© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
-
-</div>
+⏳ Phase 3 — Pro Features
+   ├── [ ] Monthly PDF Reports
+   ├── [ ] Subscription System (Paddle)
+   ├── [ ] Invoice OCR
+   └── [ ] Google Play Publishing
+👨‍💻 Developer
+Abdullah Rafi — Abdoocoder
+[
+�
+Load image
+](https://github.com/Abdoocoder)
+Built with ❤️ using Next.js, Supabase & Flutter
+© 2026 Fajrak — Smart Financial Management
+�
