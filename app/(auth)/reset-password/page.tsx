@@ -12,19 +12,27 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [ready, setReady] = useState(true)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const verified = params.get('verified')
     const supabase = createClient()
 
-    // استمع لتغيير الـ session عند الدخول من رابط الإيميل
+    if (verified === '1') {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) setReady(true)
+        else setReady(false)
+      })
+      return
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY' || session) {
         setReady(true)
       }
     })
 
-    // تحقق من session موجود
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true)
     })
