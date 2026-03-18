@@ -220,3 +220,11 @@ npm run dev
 **© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
 
 </div>
+
+## Changelog
+
+### v3.1.0 — 2026-03-18 *(Latest)*
+- 🔄 Auto-recurring transactions
+- 💳 Enhanced debt system
+- 🔔 Push notifications for auto deduction
+- 🔐 Password Reset fix
