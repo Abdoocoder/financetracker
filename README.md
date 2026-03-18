@@ -223,6 +223,17 @@ npm run dev
 
 ## Changelog
 
+### v3.3.0 — 2026-03-19 *(Latest)*
+- 📖 **Islamic Lessons Bank** — haram money warnings + debt lessons linked to financial stages
+- 🎓 **Lesson Streak in Supabase** — streak saved permanently, synced across devices
+- 🏆 **Lesson Badges** — lesson_3, lesson_7, lesson_30 badges in gamification system
+- 🔔 **Alert Navigation** — tapping an alert redirects to the relevant page
+- 🔄 **Auto-recurring in Cron** — recurring transactions run daily at 9am
+- 💳 **Recurring Payment Type UI** — auto from bank or manual reminder selector
+- 🔐 **Session Persistence** — autoRefreshToken + persistSession for stable sessions
+- 🏦 **Auto Debt Push** — instant push notification on every auto deduction
+
+
 ### v3.2.0 — 2026-03-18 *(Latest)*
 - 🏦 **Recurring payment type selector** — auto from bank or manual reminder
 - 🔔 **Push for auto-recurring** — instant notification on auto transactions
