@@ -447,6 +447,83 @@ export const ISLAMIC_LESSONS = [
   },
 ]
 
+
+// ── الدروس الإسلامية لمرحلة الديون ────────────────────
+export const ISLAMIC_DEBT_LESSONS = [
+  {
+    ar: {
+      title: '🤲 دعاء قضاء الدين — احفظه',
+      body: '"اللهم اكفني بحلالك عن حرامك، وأغنني بفضلك عمن سواك". رواه الترمذي. رددها صباحاً ومساءً — جامعة لطلب الغنى الحلال وقضاء الدين.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🤲 Prayer for paying off debt',
+      body: '"O Allah, suffice me with Your lawful against Your unlawful, and enrich me with Your grace over all others." (Tirmidhi). Repeat morning and evening.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '⚖️ نفس المؤمن معلقة بدينه',
+      body: 'قال ﷺ: "نفس المؤمن معلقة بدينه حتى يُقضى عنه". هذا الحديث يُبين خطورة الدين — لكنه أيضاً بشارة: من يسعى لسداد دينه بنية صادقة يُعينه الله.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '⚖️ The believer's soul is held by his debt',
+      body: 'The Prophet ﷺ said: "The believer's soul is held by his debt until it is paid." This shows the seriousness of debt — but also a glad tiding: whoever sincerely seeks to repay will be aided by Allah.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '💚 من أراد الأداء أدى الله عنه',
+      body: 'قال ﷺ: "من أخذ أموال الناس يريد أداءها أدى الله عنه، ومن أخذها يريد إتلافها أتلفه الله". النية الصادقة في السداد تستجلب عون الله.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '💚 Allah repays on behalf of those who intend to repay',
+      body: 'The Prophet ﷺ said: "Whoever takes people's wealth intending to repay it, Allah will repay it on his behalf." Sincere intention to repay brings Allah's help.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '🛡️ دعاء الهم والدين — من السنة',
+      body: '"اللهم إني أعوذ بك من الهم والحَزَن، والعجز والكسل، والجبن والبخل، وغلبة الدين وقهر الرجال". رواه البخاري. اجعله ورداً يومياً حتى تُقضى ديونك.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🛡️ Protection from debt and anxiety — from the Sunnah',
+      body: '"O Allah, I seek refuge in You from worry and grief, from helplessness and laziness, from cowardice and miserliness, and from the burden of debt and the oppression of men." (Bukhari). Make it a daily supplication.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '✍️ كتابة الديون فريضة قرآنية',
+      body: '"يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا تَدَايَنتُم بِدَيْنٍ إِلَىٰ أَجَلٍ مُّسَمًّى فَاكْتُبُوهُ" (البقرة:282). القرآن يأمر بتوثيق الديون — فجرك يساعدك على ذلك.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '✍️ Writing debts is a Quranic obligation',
+      body: '"O you who believe! When you contract a debt for a specified term, write it down." (2:282). The Quran commands documenting debts — Fajrak helps you do that.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '🌟 مطل الغني ظلم',
+      body: 'قال ﷺ: "مطل الغني ظلم". التأخير في سداد الدين مع القدرة ظلم. اجعل سداد ديونك أولوية — وابدأ بأصغر دين اليوم.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🌟 Delay in repayment by the wealthy is injustice',
+      body: 'The Prophet ﷺ said: "Delay in repayment by the wealthy is injustice." Prioritize paying your debts — start with the smallest one today.',
+      url: '/dashboard/debts',
+    },
+  },
+]
+
 // ── الدروس الإسلامية الموسّعة ────────────────────────
 // مصادر: القرآن الكريم + السنة النبوية الصحيحة
 // المحور: العمل، التجارة، التقوى، الاستغفار، الصدقة، الدعاء، الاستغناء
