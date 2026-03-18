@@ -54,6 +54,14 @@ const faqs = [
         ar: { q: 'ماذا يحدث عند سداد الدين كاملاً؟', a: '🎉 احتفال! ستظهر ألعاب نارية وتهنئة. الدين ينتقل لقائمة "الديون المسددة" كإنجاز دائم.' },
         en: { q: 'What happens when I fully pay off a debt?', a: '🎉 Celebration! Confetti and congratulations appear. The debt moves to "Paid Debts" list as a permanent achievement.' },
       },
+      {
+        ar: { q: 'ما الفرق بين الخصم التلقائي والخصم اليدوي؟', a: 'الخصم التلقائي: التطبيق يخصم القسط تلقائياً كل شهر ويسجل معاملة مصروف بدون تدخل منك. الخصم اليدوي: يرسل لك تذكير فقط في يوم القسط لتسجيله بنفسك.' },
+        en: { q: 'What is the difference between auto and manual deduction?', a: 'Auto deduction: the app deducts the installment automatically every month and logs an expense without your intervention. Manual: sends you a reminder on payment day to log it yourself.' },
+      },
+      {
+        ar: { q: 'كيف أفعّل الخصم التلقائي لدين؟', a: 'عند إضافة أو تعديل الدين، فعّل خيار "خصم تلقائي" وحدد يوم الخصم من الشهر. سيتم الخصم تلقائياً كل شهر مع إشعار فوري.' },
+        en: { q: 'How do I enable auto deduction for a debt?', a: 'When adding or editing a debt, enable the "Auto Deduct" option and set the deduction day. It will automatically deduct every month with an instant notification.' },
+      },
     ],
   },
   {

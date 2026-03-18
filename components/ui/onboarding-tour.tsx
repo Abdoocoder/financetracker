@@ -60,6 +60,10 @@ const TOURS: Record<string, { ar: { title: string; desc: string }; en: { title: 
       ar: { title: '🎉 احتفال السداد', desc: 'عند سداد دين كامل — احتفال وألعاب نارية! 🎊 كل دين مسدد انتصار.' },
       en: { title: '🎉 Payoff Celebration', desc: 'When you fully pay off a debt — celebration and confetti! 🎊 Every paid debt is a victory.' },
     },
+    {
+      ar: { title: '🏦 الخصم التلقائي', desc: 'فعّل "تلقائي من البنك" ليخصم القسط تلقائياً كل شهر دون تدخل منك — أو اختر "يدوي" لتسجيله بنفسك مع تذكير.' },
+      en: { title: '🏦 Auto Deduction', desc: 'Enable "Auto from Bank" to automatically deduct the installment every month — or choose "Manual" to log it yourself with a reminder.' },
+    },
   ],
   '/dashboard/budgets': [
     {
