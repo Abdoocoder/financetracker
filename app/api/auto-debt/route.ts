@@ -26,34 +26,6 @@ async function processAutoDebts() {
 
   if (!debts?.length) return 0
 
-  // الديون اليدوية (auto_deduct = false)
-  const { data: manualDebts } = await supabase
-    .from('debts')
-    .select('id, user_id, name, monthly_payment, remaining_amount, payment_day')
-    .eq('auto_deduct', false)
-    .eq('is_paid', false)
-    .eq('payment_day', dayOfMonth)
-    .gt('remaining_amount', 0)
-
-  if (manualDebts?.length) {
-    for (const debt of manualDebts) {
-      const { count: existing } = await supabase
-        .from('debt_payments')
-        .select('id', { count: 'exact', head: true })
-        .eq('debt_id', debt.id)
-        .gte('payment_date', `${year}-${String(month).padStart(2,'0')}-01`)
-
-      if ((existing ?? 0) > 0) continue
-
-      await sendPushToUser(
-        debt.user_id,
-        `💳 قسط ${debt.name} يستحق اليوم`,
-        `المبلغ: ${Number(debt.monthly_payment).toFixed(0)} JOD — هل قمت بالدفع؟ سجّله في التطبيق.`,
-        '/dashboard/debts',
-        'warning'
-      )
-    }
-  }
 
   // ── الديون اليدوية (auto_deduct = false) ──
   const { data: manualDebts } = await supabase
