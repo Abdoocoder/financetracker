@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
       }
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+    console.log('callback error:', error, 'code:', code?.slice(0,20))
     if (!error) {
       const redirectUrl = new URL(next, request.url)
       if (next === '/reset-password') {
