@@ -19,8 +19,328 @@ export type FinancialStage =
 
 type BilingualLesson = { ar: DailyLesson; en: DailyLesson }
 
+// ── دروس علمية وعملية حديثة — مرحلة الوعي ──────────────
+const AWARENESS_NEW: BilingualLesson[] = [
+  {
+    ar: {
+      title: '🧠 تأثير اللاتة — كيف تسرق القهوة مستقبلك؟',
+      body: 'قاعدة "تأثير اللاتة" لديفيد باخ: إنفاق 5 دنانير يومياً على قهوة = 1,825 دينار سنوياً. لو استثمرتها بعائد 7% سنوياً، ستصبح 180,000 دينار خلال 30 سنة. المصاريف الصغيرة المتكررة هي أكبر عدو للثروة.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '🧠 The Latte Factor — How Coffee Steals Your Future',
+      body: 'David Bach\'s "Latte Factor": spending $5 daily on coffee = $1,825/year. Invested at 7% annual return, it becomes $180,000 in 30 years. Small recurring expenses are wealth\'s biggest enemy.',
+      url: '/dashboard/transactions',
+    },
+  },
+  {
+    ar: {
+      title: '📊 قاعدة 50/30/20 — التوزيع المثالي للراتب',
+      body: 'طورتها السيناتورة إليزابيث وارن في كتابها "All Your Worth": 50% للضروريات (إيجار، طعام، فواتير)، 30% للرغبات (ترفيه، تسوق)، 20% للادخار والاستثمار. هذه النسب أثبتت نجاحها علمياً لبناء الثروة.',
+      url: '/dashboard/budgets',
+    },
+    en: {
+      title: '📊 The 50/30/20 Rule — Perfect Salary Distribution',
+      body: 'Developed by Senator Elizabeth Warren in "All Your Worth": 50% for needs (rent, food, bills), 30% for wants (entertainment, shopping), 20% for savings and investment. These ratios are scientifically proven for wealth building.',
+      url: '/dashboard/budgets',
+    },
+  },
+  {
+    ar: {
+      title: '🔬 علم الأعصاب والمال: لماذا نُنفق أكثر مما نخطط؟',
+      body: 'أثبتت دراسات MIT أن الدفع بالبطاقة يُنشّط مناطق مختلفة في الدماغ عن الدفع النقدي — نشعر بألم أقل، فننفق أكثر. الحل: تتبع كل مصروف فوراً في فجرك لتنشيط الوعي الفوري.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '🔬 Neuroscience & Money: Why We Overspend',
+      body: 'MIT studies show card payments activate different brain regions than cash — we feel less pain, so we spend more. Solution: track every expense immediately in Fajrak to activate instant awareness.',
+      url: '/dashboard/transactions',
+    },
+  },
+  {
+    ar: {
+      title: '💡 التلقائية المالية — سر ثروة المليونيرات',
+      body: 'درس ماكنزي: 70% من المليونيرات يؤتمتون مدخراتهم — المبلغ يُخصم قبل أن يروه. "ادفع لنفسك أولاً" (Pay Yourself First) هو المبدأ الذهبي. فعّل الخصم التلقائي في فجرك اليوم.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '💡 Financial Automation — The Secret of Millionaires',
+      body: 'McKinsey study: 70% of millionaires automate their savings — the amount is deducted before they see it. "Pay Yourself First" is the golden principle. Enable auto-deduction in Fajrak today.',
+      url: '/dashboard/goals',
+    },
+  },
+  {
+    ar: {
+      title: '📱 تأثير الإشعارات على الإنفاق',
+      body: 'دراسة جامعة شيكاغو: المستخدمون الذين يتلقون إشعارات مالية فورية ينفقون 23% أقل من غيرهم. فجرك يرسل لك تنبيهات ذكية يومية — لا تتجاهلها، فهي توفر لك أموالاً حقيقية.',
+      url: '/dashboard/alerts',
+    },
+    en: {
+      title: '📱 Notification Effect on Spending',
+      body: 'University of Chicago study: Users who receive instant financial notifications spend 23% less than others. Fajrak sends you smart daily alerts — don\'t ignore them, they save you real money.',
+      url: '/dashboard/alerts',
+    },
+  },
+]
+
+// ── دروس علمية وعملية حديثة — مرحلة الديون ─────────────
+const DEBT_NEW: BilingualLesson[] = [
+  {
+    ar: {
+      title: '🎯 استراتيجية كرة الثلج vs الavalanche',
+      body: 'طريقتان علميتان لسداد الديون: كرة الثلج (Snowball) — ابدأ بأصغر دين لتحصل على دافع نفسي فوري (تُنصح بها دراسات هارفارد للتحفيز). الانهيار الجليدي (Avalanche) — ابدأ بأعلى فائدة لتوفر أموالاً أكثر. اختر ما يناسبك.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🎯 Snowball vs Avalanche Debt Strategy',
+      body: 'Two scientific debt repayment methods: Snowball — start with smallest debt for instant psychological motivation (recommended by Harvard studies). Avalanche — start with highest interest to save more money. Choose what suits you.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '🧪 تجربة ستانفورد — الانضباط المالي',
+      body: 'تجربة المارشميلو الشهيرة أثبتت: الأطفال القادرون على الانتظار حققوا نجاحاً مالياً أكبر في الحياة. الانضباط في سداد الديون يبني نفس العضلة — كل دفعة تقوّي إرادتك المالية.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🧪 Stanford Experiment — Financial Discipline',
+      body: 'The famous Marshmallow Test proved: children who could wait achieved greater financial success in life. Discipline in debt repayment builds the same muscle — every payment strengthens your financial willpower.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '💰 تكلفة الدين الخفية — الفائدة المركبة معكوسة',
+      body: 'دين 10,000 دينار بفائدة 20% سنوياً: إذا دفعت الحد الأدنى فقط، ستدفع 23,000 دينار إجمالاً وتستغرق 22 سنة! الفائدة المركبة سلاح ذو حدين — استخدمها لصالحك في الاستثمار، وتجنبها في الديون.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '💰 Hidden Cost of Debt — Compound Interest Reversed',
+      body: '10,000 JOD debt at 20% annual interest: paying minimum only means paying 23,000 JOD total over 22 years! Compound interest is a double-edged sword — use it for investing, avoid it in debt.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '🔄 إعادة هيكلة الديون — خيار لا يعرفه الكثيرون',
+      body: 'دراسة Consumer Financial Protection Bureau: 40% من المدينين لا يعلمون أن بإمكانهم طلب تخفيض الفائدة من البنك. الحل: اتصل ببنكك واطلب إعادة الجدولة — 60% من المكالمات تنتهي بتخفيض ناجح.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🔄 Debt Restructuring — An Option Many Don\'t Know',
+      body: 'Consumer Financial Protection Bureau study: 40% of debtors don\'t know they can ask their bank to reduce interest. Solution: call your bank and request rescheduling — 60% of calls end with successful reduction.',
+      url: '/dashboard/debts',
+    },
+  },
+  {
+    ar: {
+      title: '🧠 التحيز النفسي نحو الدين — لماذا نتجنب التفكير فيه',
+      body: 'بحث برنستون: الدين يشغل "بيانات وورم" ذهنية تستنزف طاقتك الإدراكية — تماماً كالبرامج التي تعمل في الخلفية. تتبع ديونك في فجرك يحرر عقلك من هذا العبء المخفي.',
+      url: '/dashboard/debts',
+    },
+    en: {
+      title: '🧠 Psychological Bias About Debt — Why We Avoid Thinking About It',
+      body: 'Princeton research: debt occupies mental "bandwidth" that drains your cognitive energy — just like background programs. Tracking your debts in Fajrak frees your mind from this hidden burden.',
+      url: '/dashboard/debts',
+    },
+  },
+]
+
+// ── دروس علمية وعملية حديثة — مرحلة الطوارئ ────────────
+const EMERGENCY_NEW: BilingualLesson[] = [
+  {
+    ar: {
+      title: '📉 إحصائية صادمة — 65% لا يملكون 500 دولار',
+      body: 'استطلاع Bankrate 2024: 65% من الأمريكيين لا يستطيعون تغطية حادث طارئ بـ500 دولار. في العالم العربي الرقم أعلى. صندوق الطوارئ ليس رفاهية — هو الفارق بين أزمة وكارثة.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '📉 Shocking Statistic — 65% Can\'t Cover $500 Emergency',
+      body: 'Bankrate 2024 survey: 65% of Americans can\'t cover a $500 emergency expense. The number is higher in the Arab world. Emergency fund isn\'t a luxury — it\'s the difference between a crisis and a catastrophe.',
+      url: '/dashboard/goals',
+    },
+  },
+  {
+    ar: {
+      title: '🏦 حساب الطوارئ — أين تحتفظ به؟',
+      body: 'توصية المخططين الماليين المعتمدين (CFP): احتفظ بصندوق طوارئك في حساب توفير منفصل عن حسابك الجاري — يجعل السحب يحتاج خطوة إضافية، مما يقلل إنفاقه عفواً بنسبة 47%.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🏦 Emergency Fund — Where to Keep It?',
+      body: 'Certified Financial Planner (CFP) recommendation: Keep your emergency fund in a separate savings account — the extra step to withdraw reduces impulsive spending by 47%.',
+      url: '/dashboard/goals',
+    },
+  },
+  {
+    ar: {
+      title: '🎯 3-6 أشهر — كيف تحسب رقمك الحقيقي؟',
+      body: 'المعيار العلمي: اجمع مصاريفك الضرورية الشهرية فقط (إيجار + طعام + فواتير + أقساط) × 3 إذا كنت موظفاً، × 6 إذا كنت حراً أو عملك غير مستقر. هذا هو هدفك الحقيقي.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '🎯 3-6 Months — How to Calculate Your Real Number?',
+      body: 'Scientific standard: sum your essential monthly expenses only (rent + food + bills + installments) × 3 if employed, × 6 if freelance or unstable job. This is your real target.',
+      url: '/dashboard/goals',
+    },
+  },
+  {
+    ar: {
+      title: '💡 استراتيجية الـ 1% — ابدأ بما تستطيع',
+      body: 'بحث جامعة كورنيل: البدء بادخار 1% من الراتب ورفعها 1% كل شهر أكثر فاعلية من البدء بـ10% مباشرة. النفس البشرية تقبل التغيير التدريجي أكثر من الصدمة. ابدأ بـ1% اليوم.',
+      url: '/dashboard/goals',
+    },
+    en: {
+      title: '💡 The 1% Strategy — Start With What You Can',
+      body: 'Cornell University research: starting with saving 1% of salary and raising it 1% each month is more effective than starting with 10% directly. Human psychology accepts gradual change more than shock. Start with 1% today.',
+      url: '/dashboard/goals',
+    },
+  },
+  {
+    ar: {
+      title: '🔬 علم الضغط المالي — كيف يؤثر على قراراتك',
+      body: 'دراسة Science 2013 (Mullainathan & Shafir): الضغط المالي يقلل الذكاء الوظيفي بما يعادل 13 نقطة IQ. الأمان المالي لا يمنحك فقط راحة البال — بل يجعلك أذكى حرفياً في قراراتك.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🔬 Financial Stress Science — How It Affects Your Decisions',
+      body: 'Science 2013 study (Mullainathan & Shafir): financial stress reduces functional intelligence by the equivalent of 13 IQ points. Financial security doesn\'t just give peace of mind — it literally makes you smarter in decisions.',
+      url: '/dashboard',
+    },
+  },
+]
+
+// ── دروس علمية وعملية حديثة — مرحلة الاستثمار ──────────
+const INVESTING_NEW: BilingualLesson[] = [
+  {
+    ar: {
+      title: '📈 قاعدة 72 — احسب مضاعفة أموالك',
+      body: 'قاعدة بسيطة: 72 ÷ معدل العائد = سنوات المضاعفة. عائد 8%: أموالك تتضاعف كل 9 سنوات. عائد 12%: كل 6 سنوات. هذا هو سر الاستثمار المبكر — الزمن هو أقوى عامل في الثروة.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '📈 Rule of 72 — Calculate When Your Money Doubles',
+      body: 'Simple rule: 72 ÷ return rate = years to double. 8% return: money doubles every 9 years. 12% return: every 6 years. This is the secret of early investing — time is the most powerful factor in wealth.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '🌍 التنويع — الوجبة الغداء المجانية الوحيدة في الاستثمار',
+      body: 'قال هاري ماركويتز (نوبل اقتصاد): "التنويع هو الوجبة المجانية الوحيدة في الاستثمار". توزيع أموالك بين أصول مختلفة يقلل المخاطر دون تقليل العوائد. لا تضع بيضك في سلة واحدة.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🌍 Diversification — The Only Free Lunch in Investing',
+      body: 'Harry Markowitz (Nobel Economics) said: "Diversification is the only free lunch in investing." Spreading money across different assets reduces risk without reducing returns. Don\'t put all eggs in one basket.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '🤖 الاستثمار السلبي — لماذا يتفوق على الخبراء',
+      body: 'دراسة S&P SPIVA: 92% من مديري الصناديق النشطة يخسرون أمام مؤشرات السوق على مدى 15 سنة. وارن بافيت أوصى عائلته بـ Verizon S&P 500 Index بعد وفاته. الاستثمار السلبي في المؤشرات أثبت تفوقه.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🤖 Passive Investing — Why It Beats Experts',
+      body: 'S&P SPIVA study: 92% of active fund managers underperform market indices over 15 years. Warren Buffett instructed his family to invest in S&P 500 Index after his death. Passive index investing is proven superior.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '📅 Dollar Cost Averaging — استثمر في أي وقت',
+      body: 'استراتيجية DCA: استثمر مبلغاً ثابتاً كل شهر بغض النظر عن السعر. دراسة Vanguard: هذه الاستراتيجية تتفوق على محاولة توقيت السوق في 68% من الحالات. الاستمرارية تتفوق على الذكاء.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '📅 Dollar Cost Averaging — Invest Anytime',
+      body: 'DCA strategy: invest a fixed amount monthly regardless of price. Vanguard study: this strategy outperforms market timing in 68% of cases. Consistency beats intelligence.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '🕌 الاستثمار الحلال — فرصة لا قيد',
+      body: 'مؤشر DJIM الإسلامي تفوق على S&P 500 التقليدي في 7 من آخر 10 سنوات. تجنب الربا والقطاعات المحرمة ليس عائقاً — بل صافٍ طبيعي يُبعد المخاطر الأخلاقية والمالية معاً. SPUS وغيره خيارات ممتازة.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🕌 Halal Investing — Opportunity Not Restriction',
+      body: 'The DJIM Islamic Index outperformed the conventional S&P 500 in 7 of the last 10 years. Avoiding interest and prohibited sectors isn\'t a barrier — it\'s a natural filter that removes both ethical and financial risks. SPUS and others are excellent options.',
+      url: '/dashboard/investments',
+    },
+  },
+]
+
+// ── دروس علمية وعملية حديثة — مرحلة الثروة ─────────────
+const WEALTH_NEW: BilingualLesson[] = [
+  {
+    ar: {
+      title: '👑 الثروة الحقيقية — الحرية لا الأرقام',
+      body: 'كتاب "The Psychology of Money" لمورغان هاوسل: "الثروة الحقيقية هي القدرة على الاستيقاظ صباح الاثنين وأن تقرر أنت ماذا تفعل". المال أداة للحرية — ليس هدفاً في حد ذاته.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '👑 True Wealth — Freedom Not Numbers',
+      body: 'Morgan Housel\'s "The Psychology of Money": "True wealth is the ability to wake up on Monday morning and decide for yourself what to do." Money is a tool for freedom — not an end in itself.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🏗️ بناء مصادر دخل متعددة',
+      body: 'دراسة IRS على المليونيرين الأمريكيين: متوسطهم 7 مصادر دخل. ابدأ بمصدر ثانٍ بسيط: تأجير، استثمار، مهارة جانبية. كل مصدر دخل إضافي يقربك خطوة من الاستقلال المالي الكامل.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🏗️ Building Multiple Income Sources',
+      body: 'IRS study of American millionaires: they average 7 income sources. Start with a simple second source: rental, investment, side skill. Each additional income source brings you closer to full financial independence.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '🎓 رأس المال البشري — أعلى عوائد الاستثمار',
+      body: 'بحث جورجتاون: استثمار 1,000 دولار في مهارة مهنية يعود بمتوسط 10x خلال المسيرة المهنية — يتفوق على أي سهم أو عقار. استثمارك في نفسك هو الاستثمار الأضمن والأعلى عائداً.',
+      url: '/dashboard/learn',
+    },
+    en: {
+      title: '🎓 Human Capital — Highest Investment Returns',
+      body: 'Georgetown research: investing $1,000 in a professional skill returns an average 10x over a career — outperforming any stock or real estate. Investing in yourself is the safest and highest-return investment.',
+      url: '/dashboard/learn',
+    },
+  },
+  {
+    ar: {
+      title: '🤝 الصدقة والزكاة — العلم يؤكد البركة',
+      body: 'دراسة هارفارد: المتصدقون يشعرون بسعادة أكبر من الذين ينفقون على أنفسهم — بصرف النظر عن الدخل. الزكاة 2.5% تُطهر المال وتجلب البركة. "خير الصدقة ما كان عن ظهر غنى".',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🤝 Charity & Zakat — Science Confirms the Blessing',
+      body: 'Harvard study: donors feel greater happiness than those who spend on themselves — regardless of income. Zakat 2.5% purifies wealth and brings blessing. "The best charity is what comes from abundance."',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '📋 التخطيط للإرث — مسؤولية الثروة',
+      body: 'دراسة Williams Group: 70% من الثروات تضيع في الجيل الثاني، 90% في الثالث. السبب: غياب التثقيف المالي للأبناء. أعظم إرث تتركه ليس المال — بل القيم والمعرفة المالية.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '📋 Legacy Planning — Wealth Responsibility',
+      body: 'Williams Group study: 70% of wealth is lost by the second generation, 90% by the third. Reason: lack of financial education for children. The greatest legacy you leave isn\'t money — it\'s values and financial knowledge.',
+      url: '/dashboard',
+    },
+  },
+]
+
 // ── مرحلة الوعي المالي ──────────────────────────────
-const AWARENESS: BilingualLesson[] = [
+const AWARENESS: BilingualLesson[] = [...AWARENESS_NEW,
   {
     ar: {
       title: '🌱 رحلة الثروة تبدأ بتسجيل أول معاملة',
@@ -84,7 +404,7 @@ const AWARENESS: BilingualLesson[] = [
 ]
 
 // ── مرحلة سداد الديون ───────────────────────────────
-const DEBT: BilingualLesson[] = [
+const DEBT: BilingualLesson[] = [...DEBT_NEW,
   {
     ar: {
       title: '⚔️ كل دين تسدده يحرر جزءاً من مستقبلك',
@@ -148,7 +468,7 @@ const DEBT: BilingualLesson[] = [
 ]
 
 // ── مرحلة صندوق الطوارئ ─────────────────────────────
-const EMERGENCY: BilingualLesson[] = [
+const EMERGENCY: BilingualLesson[] = [...EMERGENCY_NEW,
   {
     ar: {
       title: '🛡️ صندوق الطوارئ = قرارات أهدأ في الأزمات',
@@ -200,7 +520,7 @@ const EMERGENCY: BilingualLesson[] = [
 ]
 
 // ── مرحلة الاستثمار ─────────────────────────────────
-const INVESTING: BilingualLesson[] = [
+const INVESTING: BilingualLesson[] = [...INVESTING_NEW,
   {
     ar: {
       title: '📈 الفائدة المركّبة — الرياضيات التي تبني الثروة',
@@ -264,7 +584,7 @@ const INVESTING: BilingualLesson[] = [
 ]
 
 // ── مرحلة تعظيم الثروة ──────────────────────────────
-const WEALTH: BilingualLesson[] = [
+const WEALTH: BilingualLesson[] = [...WEALTH_NEW,
   {
     ar: {
       title: '👑 أنت في مرحلة يصلها أقل من 10% من الناس',
@@ -333,11 +653,60 @@ const WEALTH: BilingualLesson[] = [
 export function getLessonForStage(
   stage: FinancialStage,
   dayOfMonth: number,
-  lang: 'ar' | 'en' = 'ar'
+  lang: 'ar' | 'en' = 'ar',
+  context?: {
+    debtRatio?: number      // نسبة الديون من الدخل
+    savingsRate?: number    // نسبة الادخار
+    txCount?: number        // عدد المعاملات
+    streak?: number         // السلسلة اليومية
+    hasInvestments?: boolean
+  }
 ): DailyLesson {
+
+  const debt = context?.debtRatio ?? 0
+  const savings = context?.savingsRate ?? 0
+  const tx = context?.txCount ?? 0
+  const streak = context?.streak ?? 0
+
+  // ── اختيار ذكي بناءً على البيانات ──────────────────
+
+  // المستخدم عنده ديون عالية جداً → درس إسلامي للديون فوراً
+  if (stage === 'debt' && debt > 50 && dayOfMonth % 3 === 0) {
+    const idx = dayOfMonth % ISLAMIC_DEBT_LESSONS.length
+    return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
+  }
+
+  // المستخدم ما سجّل معاملات كثيرة → دروس تتبع وسلوك
+  if (tx < 10 && dayOfMonth % 4 === 0) {
+    const awareness = AWARENESS
+    const idx = dayOfMonth % awareness.length
+    return awareness[idx][lang]
+  }
+
+  // المستخدم ادخاره منخفض → دروس ادخار عملية
+  if (savings < 10 && stage !== 'debt' && dayOfMonth % 5 === 0) {
+    const emergency = EMERGENCY
+    const idx = dayOfMonth % emergency.length
+    return emergency[idx][lang]
+  }
+
+  // المستخدم ما عنده استثمارات → دروس تحفيزية للاستثمار
+  if (!context?.hasInvestments && stage === 'investing' && dayOfMonth % 4 === 0) {
+    const investing = INVESTING
+    const idx = dayOfMonth % investing.length
+    return investing[idx][lang]
+  }
+
+  // المستخدم سلسلته قوية (7+ أيام) → دروس متقدمة
+  if (streak >= 7 && dayOfMonth % 6 === 0) {
+    const advanced = stage === 'wealth' ? WEALTH :
+                     stage === 'investing' ? INVESTING : EMERGENCY
+    const idx = dayOfMonth % advanced.length
+    return advanced[idx][lang]
+  }
+
   // كل 7 أيام — درس إسلامي مرتبط بالمرحلة
   if (dayOfMonth % 7 === 0) {
-    // درس إسلامي خاص بالمرحلة
     if (stage === 'debt') {
       const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_DEBT_LESSONS.length
       return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
@@ -350,6 +719,8 @@ export function getLessonForStage(
     const idx = (Math.floor(dayOfMonth / 7) - 1) % allIslamic.length
     return allIslamic[idx][lang]
   }
+
+  // الدرس الافتراضي حسب المرحلة
   const map: Record<FinancialStage, BilingualLesson[]> = {
     awareness: AWARENESS,
     debt:      DEBT,
@@ -789,3 +1160,4 @@ export const ISLAMIC_LESSONS_EXTENDED = [
     },
   },
 ]
+
