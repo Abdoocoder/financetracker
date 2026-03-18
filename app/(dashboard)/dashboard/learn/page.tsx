@@ -64,7 +64,16 @@ export default function LearnPage() {
       })
 
       setStage(userStage)
-      setLesson(getLessonForStage(userStage, dayOfMonth, lang as 'ar' | 'en'))
+
+      const savingsRate = income > 0 ? ((income - debts.reduce((a,d) => a + Number(d.monthly_payment), 0)) / income) * 100 : 0
+
+      setLesson(getLessonForStage(userStage, dayOfMonth, lang as 'ar' | 'en', {
+        debtRatio,
+        savingsRate,
+        txCount: txRes.count ?? 0,
+        streak: s,
+        hasInvestments: (invRes.count ?? 0) > 0,
+      }))
 
       // جلب streak من Supabase
       const { data: profileData } = await supabase
