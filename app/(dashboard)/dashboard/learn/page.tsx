@@ -66,30 +66,50 @@ export default function LearnPage() {
       setStage(userStage)
       setLesson(getLessonForStage(userStage, dayOfMonth, lang as 'ar' | 'en'))
 
-      // تحقق من إتمام درس اليوم
-      const today = now.toISOString().split('T')[0]
-      const completedKey = `lesson_completed_${today}`
-      setCompleted(localStorage.getItem(completedKey) === 'true')
+      // جلب streak من Supabase
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('lesson_streak, last_lesson_date')
+        .eq('id', user!.id)
+        .single()
 
-      // حساب السلسلة
-      let s = 0
-      for (let i = 1; i <= 30; i++) {
-        const d = new Date(now.getTime() - i * 86400000).toISOString().split('T')[0]
-        if (localStorage.getItem(`lesson_completed_${d}`) === 'true') s++
-        else break
+      const today = now.toISOString().split('T')[0]
+      const lastLesson = profileData?.last_lesson_date
+      setCompleted(lastLesson === today)
+      setStreak(profileData?.lesson_streak ?? 0)
+
+      // sync localStorage للتوافق
+      if (lastLesson === today) {
+        localStorage.setItem(`lesson_completed_${today}`, 'true')
       }
-      setStreak(s)
     } finally {
       setLoading(false)
     }
   }
 
-  function markComplete() {
+  async function markComplete() {
     const today = new Date().toISOString().split('T')[0]
     localStorage.setItem(`lesson_completed_${today}`, 'true')
     setCompleted(true)
-    setStreak(s => s + 1)
     haptic(100)
+
+    // احفظ في Supabase
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('lesson_streak, last_lesson_date')
+      .eq('id', user!.id)
+      .single()
+
+    const lastLesson = profileData?.last_lesson_date
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+    const newStreak = lastLesson === yesterday ? (profileData?.lesson_streak ?? 0) + 1 : 1
+
+    await supabase.from('profiles').update({
+      lesson_streak: newStreak,
+      last_lesson_date: today,
+    }).eq('id', user!.id)
+
+    setStreak(newStreak)
   }
 
   const info = stageInfo[stage]
