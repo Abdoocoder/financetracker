@@ -1,6 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
@@ -15,7 +16,7 @@ const ALERT_CONFIG: Record<string, { icon: string; accent: string; bg: string; b
   achievement: { icon: '🏆', accent: '#34D399', bg: 'rgba(16,185,129,0.06)',   border: 'rgba(16,185,129,0.2)'  },
 }
 
-function AlertCard({ alert, onRead, onDelete }: { alert: any; onRead: (id: string) => void; onDelete: (id: string) => void }) {
+function AlertCard({ alert, onRead, onDelete, onNavigate }: { alert: any; onRead: (id: string) => void; onDelete: (id: string) => void; onNavigate: (alert: any) => void }) {
   const cfg = ALERT_CONFIG[alert.type] ?? { icon: '🔔', accent: '#8B9CC8', bg: 'rgba(139,156,200,0.06)', border: 'rgba(139,156,200,0.2)' }
   const [deleting, setDeleting] = useState(false)
 
@@ -25,13 +26,13 @@ function AlertCard({ alert, onRead, onDelete }: { alert: any; onRead: (id: strin
 
   return (
     <div
-      onClick={() => !alert.is_read && onRead(alert.id)}
+      onClick={() => { if (!alert.is_read) onRead(alert.id); onNavigate(alert) }}
       style={{
         background: alert.is_read ? 'var(--bg-card)' : cfg.bg,
         border: `1px solid ${alert.is_read ? 'var(--border)' : cfg.border}`,
         borderRadius: 16,
         padding: '16px',
-        cursor: !alert.is_read ? 'pointer' : 'default',
+        cursor: 'pointer',
         transition: 'all 0.2s',
         position: 'relative',
         overflow: 'hidden',
@@ -104,6 +105,7 @@ export default function AlertsPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'warning' | 'achievement'>('all')
   const supabase = createClient()
   const { t, lang } = useI18n()
+  const router = useRouter()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
@@ -119,6 +121,18 @@ export default function AlertsPage() {
   }, [supabase])
 
   useEffect(() => { load() }, [load])
+
+  function getAlertLink(alert: any): string {
+    const title = alert.title?.toLowerCase() ?? ''
+    const msg = alert.message?.toLowerCase() ?? ''
+    if (title.includes('دين') || title.includes('debt') || title.includes('قسط') || msg.includes('دين')) return '/dashboard/debts'
+    if (title.includes('ميزانية') || title.includes('budget') || msg.includes('ميزانية')) return '/dashboard/budgets'
+    if (title.includes('هدف') || title.includes('goal') || msg.includes('هدف')) return '/dashboard/goals'
+    if (title.includes('استثمار') || title.includes('invest') || msg.includes('استثمار')) return '/dashboard/investments'
+    if (title.includes('معاملة') || title.includes('transaction') || msg.includes('مصاريف')) return '/dashboard/transactions'
+    if (title.includes('درس') || title.includes('learn') || msg.includes('تعلم')) return '/dashboard/learn'
+    return '/dashboard'
+  }
 
   async function generateNow() {
     setGenerating(true)
@@ -264,7 +278,7 @@ export default function AlertsPage() {
       {/* Alerts List */}
       <div className="space-y-2">
         {filtered.map(alert => (
-          <AlertCard key={alert.id} alert={alert} onRead={markRead} onDelete={deleteAlert} />
+          <AlertCard key={alert.id} alert={alert} onRead={markRead} onDelete={deleteAlert} onNavigate={(a) => { markRead(a.id); router.push(getAlertLink(a)) }} />
         ))}
         {filtered.length === 0 && (
           <div className="text-center py-16 card">
