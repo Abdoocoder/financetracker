@@ -335,8 +335,17 @@ export function getLessonForStage(
   dayOfMonth: number,
   lang: 'ar' | 'en' = 'ar'
 ): DailyLesson {
-  // كل 7 أيام — درس إسلامي
+  // كل 7 أيام — درس إسلامي مرتبط بالمرحلة
   if (dayOfMonth % 7 === 0) {
+    // درس إسلامي خاص بالمرحلة
+    if (stage === 'debt') {
+      const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_DEBT_LESSONS.length
+      return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
+    }
+    if (stage === 'investing' || stage === 'wealth') {
+      const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_HARAM_MONEY_LESSONS.length
+      return lang === 'ar' ? ISLAMIC_HARAM_MONEY_LESSONS[idx].ar : ISLAMIC_HARAM_MONEY_LESSONS[idx].en
+    }
     const allIslamic = [...ISLAMIC_LESSONS, ...ISLAMIC_LESSONS_EXTENDED]
     const idx = (Math.floor(dayOfMonth / 7) - 1) % allIslamic.length
     return allIslamic[idx][lang]
@@ -447,6 +456,107 @@ export const ISLAMIC_LESSONS = [
   },
 ]
 
+
+
+// ── الدروس الإسلامية — التحذير من المال الحرام ──────────
+export const ISLAMIC_HARAM_MONEY_LESSONS = [
+  {
+    ar: {
+      title: '🚫 إن الله طيب لا يقبل إلا طيباً',
+      body: 'قال ﷺ: "إن الله طيب لا يقبل إلا طيباً". المال الحرام لا تُقبل معه صدقة ولا دعاء. احرص أن يكون مصدر دخلك حلالاً طيباً — فالبركة في الحلال لا في الكثرة.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🚫 Allah is pure and accepts only what is pure',
+      body: 'The Prophet ﷺ said: "Allah is pure and accepts only what is pure." Charity and supplications from haram wealth are not accepted. Ensure your income is halal — blessing comes from lawfulness, not quantity.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '⚠️ لا يبالي المرء بما أخذ المال',
+      body: 'قال ﷺ: "ليأتيَنَّ على الناس زمان لا يبالي المرء بما أخذ المال أمن حلال أم من حرام". نحن نعيش هذا الزمان — فكن ممن يُميّز ويختار الحلال.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '⚠️ A time will come when people care not how they earn',
+      body: 'The Prophet ﷺ said: "A time will come when people will not care whether what they earn is halal or haram." We live in that time — be among those who choose halal.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🍽️ مطعمه حرام فأنّى يُستجاب له',
+      body: 'قال ﷺ عن رجل يمد يديه للسماء: "مطعمه حرام ومشربه حرام وملبسه حرام وغُذِّي بالحرام فأنّى يُستجاب لذلك؟" (مسلم). المال الحرام يحجب إجابة الدعاء.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🍽️ His food is haram — how can his prayer be answered?',
+      body: 'The Prophet ﷺ said about a man raising his hands in prayer: "His food is haram, his drink is haram, his clothing is haram — how can his prayer be answered?" (Muslim). Haram wealth blocks answered prayers.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🌱 كلوا مما في الأرض حلالاً طيباً',
+      body: '﴿يَا أَيُّهَا النَّاسُ كُلُوا مِمَّا فِي الْأَرْضِ حَلَالًا طَيِّبًا وَلَا تَتَّبِعُوا خُطُوَاتِ الشَّيْطَانِ﴾ (البقرة:168). الحلال الطيب هو المكتسب بغير غصب ولا ربا ولا غش ولا رشوة.',
+      url: '/dashboard/investments',
+    },
+    en: {
+      title: '🌱 Eat what is lawful and good from the earth',
+      body: '"O mankind, eat from whatever is on earth that is lawful and good and do not follow the footsteps of Satan." (2:168). Halal means earned without usurpation, usury, deception, or bribery.',
+      url: '/dashboard/investments',
+    },
+  },
+  {
+    ar: {
+      title: '💸 من غشنا فليس منا',
+      body: 'مرّ النبي ﷺ على صاحب طعام فأدخل يده فيها فوجد بللاً فقال: "من غشنا فليس منا" (مسلم). الغش في المعاملات من كبائر الذنوب — تحقق أن تعاملاتك شفافة وأمينة.',
+      url: '/dashboard/transactions',
+    },
+    en: {
+      title: '💸 Whoever deceives us is not one of us',
+      body: 'The Prophet ﷺ found wet food hidden beneath dry food and said: "Whoever deceives us is not one of us." (Muslim). Deception in transactions is a major sin — ensure your dealings are transparent and honest.',
+      url: '/dashboard/transactions',
+    },
+  },
+  {
+    ar: {
+      title: '🔥 لا يدخل الجنة لحم نبت من سحت',
+      body: 'قال ﷺ: "لا يدخل الجنة لحم نبت من سحت، النار أولى به". المال الحرام لا بركة فيه ولو كثر. اسعَ للحلال وإن قلّ — فالقليل الحلال خير من الكثير الحرام.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🔥 No flesh nourished by haram will enter Paradise',
+      body: 'The Prophet ﷺ said: "No flesh nourished by what is unlawful will enter Paradise — the Fire is more worthy of it." Haram wealth has no blessing even if abundant. Seek the halal even if little — little halal is better than much haram.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '📊 إن لكل أمة فتنة وفتنة أمتي المال',
+      body: 'قال ﷺ: "إن لكل أمة فتنة وإن فتنة أمتي المال" (الترمذي). المال اختبار — كيف تكسبه؟ وكيف تنفقه؟ فجرك يساعدك تجتاز هذا الاختبار بتتبع الحلال وتجنب الحرام.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '📊 Every nation has a trial — this nation's trial is wealth',
+      body: 'The Prophet ﷺ said: "Every nation has a trial, and the trial of my nation is wealth." (Tirmidhi). Wealth is a test — how do you earn it? How do you spend it? Fajrak helps you pass this test by tracking halal and avoiding haram.',
+      url: '/dashboard',
+    },
+  },
+  {
+    ar: {
+      title: '🤲 كنا ندع تسعة أعشار الحلال مخافة الحرام',
+      body: 'قال عمر بن الخطاب رضي الله عنه: "كنا ندع تسعة أعشار الحلال مخافة الوقوع في الحرام". هذا هو الورع الحقيقي — احرص على طهارة مصادر دخلك.',
+      url: '/dashboard',
+    },
+    en: {
+      title: '🤲 We used to leave 9/10 of the halal fearing the haram',
+      body: 'Umar ibn al-Khattab said: "We used to leave nine-tenths of the halal for fear of falling into the haram." This is true piety — be mindful of the purity of your income sources.',
+      url: '/dashboard',
+    },
+  },
+]
 
 // ── الدروس الإسلامية لمرحلة الديون ────────────────────
 export const ISLAMIC_DEBT_LESSONS = [
