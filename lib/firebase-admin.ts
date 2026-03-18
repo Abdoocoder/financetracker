@@ -33,8 +33,8 @@ export async function sendFCMNotification(
       data: { url, title, message: body },
     })
     return true
-  } catch (err) {
-    console.error('FCM send error:', err)
+  } catch (err: any) {
+    console.error('FCM send error:', JSON.stringify(err?.message || err))
     return false
   }
 }
