@@ -539,7 +539,7 @@ export const ISLAMIC_HARAM_MONEY_LESSONS = [
       url: '/dashboard',
     },
     en: {
-      title: '📊 Every nation has a trial — this nation's trial is wealth',
+      title: '📊 Every nation has a trial — this nation\'s trial is wealth',
       body: 'The Prophet ﷺ said: "Every nation has a trial, and the trial of my nation is wealth." (Tirmidhi). Wealth is a test — how do you earn it? How do you spend it? Fajrak helps you pass this test by tracking halal and avoiding haram.',
       url: '/dashboard',
     },
@@ -579,8 +579,8 @@ export const ISLAMIC_DEBT_LESSONS = [
       url: '/dashboard/debts',
     },
     en: {
-      title: '⚖️ The believer's soul is held by his debt',
-      body: 'The Prophet ﷺ said: "The believer's soul is held by his debt until it is paid." This shows the seriousness of debt — but also a glad tiding: whoever sincerely seeks to repay will be aided by Allah.',
+      title: '⚖️ The believer\'s soul is held by his debt',
+      body: 'The Prophet ﷺ said: "The believer\'s soul is held by his debt until it is paid." This shows the seriousness of debt — but also a glad tiding: whoever sincerely seeks to repay will be aided by Allah.',
       url: '/dashboard/debts',
     },
   },
@@ -592,7 +592,7 @@ export const ISLAMIC_DEBT_LESSONS = [
     },
     en: {
       title: '💚 Allah repays on behalf of those who intend to repay',
-      body: 'The Prophet ﷺ said: "Whoever takes people's wealth intending to repay it, Allah will repay it on his behalf." Sincere intention to repay brings Allah's help.',
+      body: 'The Prophet ﷺ said: "Whoever takes people\'s wealth intending to repay it, Allah will repay it on his behalf." Sincere intention to repay brings Allah\'s help.',
       url: '/dashboard/debts',
     },
   },
