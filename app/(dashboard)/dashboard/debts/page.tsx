@@ -172,6 +172,16 @@ export default function DebtsPage() {
     if (!debt) return
     const newRemaining = Math.max(0, debt.remaining_amount - amount)
     await supabase.from('debt_payments').insert({ debt_id: debtId, user_id: user.id, amount, payment_date: new Date().toISOString().split('T')[0] })
+
+    // تعليم تنبيه الدين كمقروء تلقائياً
+    const debt = debts.find(d => d.id === debtId)
+    if (debt) {
+      await supabase.from('alerts')
+        .update({ is_read: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false)
+        .ilike('title', `%${debt.name}%`)
+    }
     await supabase.from('debts').update({ remaining_amount: newRemaining, is_paid: newRemaining === 0 }).eq('id', debtId)
     if (newRemaining === 0) {
       // ── احتفال ──
