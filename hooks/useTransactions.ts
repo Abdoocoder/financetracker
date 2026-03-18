@@ -19,6 +19,7 @@ export interface TransactionForm {
   transaction_date: string
   is_recurring: boolean
   recurring_day: number
+  recurring_auto: boolean
 }
 
 const DEFAULT_FORM: TransactionForm = {
@@ -29,6 +30,7 @@ const DEFAULT_FORM: TransactionForm = {
   transaction_date: new Date().toISOString().split('T')[0],
   is_recurring: false,
   recurring_day: new Date().getDate(),
+  recurring_auto: true,
 }
 
 
@@ -87,6 +89,7 @@ export function useTransactions() {
       transaction_date: tx.transaction_date,
       is_recurring: tx.is_recurring ?? false,
       recurring_day: tx.recurring_day ?? new Date().getDate(),
+      recurring_auto: tx.recurring_auto ?? true,
     })
     setShowForm(true)
   }
