@@ -130,43 +130,89 @@ async function eveningReminder() {
 // ── الجمعة 8 ص: تقرير أسبوعي ────────────────────────
 async function weeklyReport() {
   const { data: profiles } = await supabase
-    .from('profiles').select('id, full_name')
+    .from('profiles').select('id, full_name, monthly_income, lesson_streak')
   if (!profiles?.length) return
 
   for (const p of profiles) {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
+    const income = Number(p.monthly_income ?? 0)
 
+    // معاملات الأسبوع
     const { data: thisWeek } = await supabase.from('transactions')
-      .select('amount, category').eq('user_id', p.id).eq('type', 'expense')
+      .select('amount, type, category').eq('user_id', p.id)
       .gte('transaction_date', daysAgo(7)).lte('transaction_date', today())
 
     const { data: lastWeek } = await supabase.from('transactions')
       .select('amount').eq('user_id', p.id).eq('type', 'expense')
       .gte('transaction_date', daysAgo(14)).lt('transaction_date', daysAgo(7))
 
-    const thisTotal = (thisWeek ?? []).reduce((a, t) => a + Number(t.amount), 0)
+    const thisExpenses = (thisWeek ?? []).filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+    const thisSavings = (thisWeek ?? []).filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0) - thisExpenses
     const lastTotal = (lastWeek ?? []).reduce((a, t) => a + Number(t.amount), 0)
-    const diff = Math.abs(thisTotal - lastTotal).toFixed(0)
+    const txCount = (thisWeek ?? []).length
+    const diff = Math.abs(thisExpenses - lastTotal).toFixed(0)
 
     // أكبر فئة إنفاق
     const catMap: Record<string, number> = {}
-    for (const t of thisWeek ?? []) {
+    for (const t of (thisWeek ?? []).filter(t => t.type === 'expense')) {
       catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount)
     }
     const topCat = Object.entries(catMap).sort((a, b) => b[1] - a[1])[0]
 
-    const title = `تقرير أسبوعك ${name} 📊`
-    let body = lastTotal === 0
-      ? `أنفقت هذا الأسبوع: ${thisTotal.toFixed(0)} JOD`
-      : thisTotal < lastTotal
-        ? `أسبوع أفضل! وفّرت ${diff} JOD مقارنة بالأسبوع الماضي ✅`
-        : thisTotal > lastTotal
-          ? `أنفقت ${diff} JOD أكثر من الأسبوع الماضي — راجع مصاريفك`
-          : `إنفاقك مستقر: ${thisTotal.toFixed(0)} JOD`
+    // الديون والمرحلة
+    const { data: debts } = await supabase.from('debts')
+      .select('remaining_amount, monthly_payment').eq('user_id', p.id).eq('is_paid', false)
+    const totalDebt = (debts ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
+    const totalMonthly = (debts ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0)
+    const debtRatio = income > 0 ? (totalMonthly / income) * 100 : 0
+
+    // تحديد المرحلة
+    const stage = totalDebt > 0 ? 'سداد الديون' :
+                  thisSavings < income * 0.1 ? 'بناء صندوق الطوارئ' :
+                  'الاستثمار والثروة'
+
+    // الخطوة التالية
+    const nextStep = totalDebt > 0
+      ? `سدّد ${Math.min(totalMonthly, totalDebt).toFixed(0)} JOD من ديونك هذا الشهر`
+      : thisSavings < 0
+        ? `راجع مصاريفك — أنفقت أكثر مما كسبت هذا الأسبوع`
+        : `استمر في الادخار — أنت على الطريق الصحيح`
+
+    const streak = Number(p.lesson_streak ?? 0)
+
+    // بناء الرسالة
+    const title = `تقريرك الأسبوعي ${name} 🌅`
+    let body = `سجّلت ${txCount} معاملة`
+
+    if (lastTotal === 0) {
+      body += ` | إنفاقك: ${thisExpenses.toFixed(0)} JOD`
+    } else if (thisExpenses < lastTotal) {
+      body += ` | وفّرت ${diff} JOD مقارنة بالأسبوع الماضي ✅`
+    } else if (thisExpenses > lastTotal) {
+      body += ` | أنفقت ${diff} JOD أكثر من الأسبوع الماضي ⚠️`
+    }
 
     if (topCat) body += ` | أكثر إنفاق: ${topCat[0]}`
+    body += ` | مرحلتك: ${stage}`
+    if (streak > 0) body += ` | سلسلة الدروس: ${streak} يوم 🔥`
+    body += ` | ${nextStep}`
 
     await sendPushToUser(p.id, title, body, '/dashboard', 'weekly')
+
+    // أضف تنبيه داخلي مفصّل
+    await supabase.from('alerts').insert({
+      user_id: p.id,
+      type: thisExpenses < lastTotal ? 'achievement' : 'info',
+      title: `تقريرك الأسبوعي 📊`,
+      message: `سجّلت ${txCount} معاملة هذا الأسبوع.
+💸 الإنفاق: ${thisExpenses.toFixed(0)} JOD${topCat ? ` (أكثر فئة: ${topCat[0]})` : ''}
+📍 مرحلتك: ${stage}
+🎯 الخطوة التالية: ${nextStep}${streak > 0 ? `
+🔥 سلسلة الدروس: ${streak} يوم` : ''}`,
+      frequency: 'weekly',
+      is_read: false,
+      is_active: true,
+    })
   }
 }
 
