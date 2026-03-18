@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
       .eq('is_recurring', false)
       .eq('category', tx.category)
       .eq('amount', tx.amount)
+      .eq('description', (tx.description ? `${tx.description} (تلقائي)` : 'معاملة تلقائية'))
       .gte('transaction_date', firstDay)
 
     if ((existing ?? 0) > 0) continue
@@ -53,6 +54,13 @@ export async function GET(request: NextRequest) {
         transaction_date: dateStr,
         is_recurring: false,
       })
+      await sendPushToUser(
+        tx.user_id,
+        `✅ تم تسجيل ${tx.category} تلقائياً`,
+        `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — تم التسجيل تلقائياً 🔄`,
+        '/dashboard/transactions',
+        'info'
+      )
       autoCount++
     } else {
       const emoji = tx.type === 'income' ? 'دخل' : 'مصروف'
