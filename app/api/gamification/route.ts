@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       supabase.from('investments').select('shares,avg_buy_price,current_price').eq('user_id', user_id),
       supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user_id),
       supabase.from('user_stats').select('*').eq('id', user_id).single(),
-      supabase.from('profiles').select('monthly_income,asset_real_estate,asset_vehicles,asset_jewelry,asset_other').eq('id', user_id).single(),
+      supabase.from('profiles').select('monthly_income,asset_real_estate,asset_vehicles,asset_jewelry,asset_other,lesson_streak').eq('id', user_id).single(),
     ])
 
     const txs = txRes.data ?? []
