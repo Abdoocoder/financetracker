@@ -335,10 +335,12 @@ export async function GET(request: NextRequest) {
     tasks.push('salary-silent')
   }
 
-  // 9 ص — ديون صامتة (بدون إشعار)
+  // 9 ص — ديون ومعاملات متكررة
   if (hour === 9) {
     await autoDebt()
+    await autoRecurring()
     tasks.push('debt-silent')
+    tasks.push('auto-recurring')
   }
 
   // 6 م — مسائي فقط إذا لم يسجل المستخدم اليوم
