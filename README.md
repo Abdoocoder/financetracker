@@ -8,7 +8,7 @@
 *Smart Personal Finance Manager*
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android-قريباً-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
+[![Download APK](https://img.shields.io/badge/📱_Android-Native_Flutter-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-release.apk)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -153,7 +153,14 @@
 - 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
 - 🔔 App Badge عند وصول إشعار جديد
 
-### v3.0.0 — 2026-03-18 *(الإصدار الحالي)*
+### v3.1.0 — 2026-03-18 *(الإصدار الجديد)*
+- 📱 **Native Flutter App** — دمج مشروع Flutter رسمي بدلاً من Capacitor
+- 🔐 **تأمين البيانات** — استخدام `--dart-define` للقيم الحساسة في الموبايل
+- 🔧 **تحديث بنية الأندرويد** — الانتقال إلى v2 Embedding و Kotlin DSL
+- 🕌 **خط Cairo** — دعم كامل للخط العربي في تطبيق الموبايل
+- 🐛 **إصلاحات شاملة** — حل جميع مشاكل البناء والتوافق مع Flutter SDK الحديث
+
+### v3.0.0 — 2026-03-18
 - 🔐 **استرجاع كلمة المرور** — صفحة forgot-password + reset-password
 - 🔗 **زر المشاركة** — في الإعدادات مع رسالة تسويقية احترافية
 - 🛡️ **تحسين Privacy Policy** — قسم من يرى بياناتك؟
@@ -373,6 +380,7 @@ UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
 | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) | CRON Jobs | Latest |
 | ![CoinGecko](https://img.shields.io/badge/CoinGecko-8DC63F?logoColor=white) | أسعار العملات الرقمية | Free API |
 | ![WebPush](https://img.shields.io/badge/Web_Push-5A0FC8?logo=pwa&logoColor=white) | Push Notifications | VAPID |
+| ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white) | Native Mobile App | 3.x |
 
 </div>
 

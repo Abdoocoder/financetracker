@@ -7,3 +7,16 @@ node_modules/
 .vercel
 android/app/google-services.json
 .env*.local
+
+# Flutter (mobile/)
+mobile/.dart_tool/
+mobile/build/
+mobile/**/.flutter-plugins
+mobile/**/.flutter-plugins-dependencies
+mobile/**/*.g.dart
+mobile/**/google-services.json
+mobile/**/*.jks
+mobile/**/*.keystore
+mobile/**/.idea/
+mobile/**/local.properties
+
