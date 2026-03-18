@@ -24,6 +24,7 @@ export async function middleware(request: NextRequest) {
   
   // تجاوز الحماية للتطبيق Native
   if (pathname === '/reset-password') return supabaseResponse
+  if (pathname.startsWith('/api/auth/callback')) return supabaseResponse
   if (pathname.startsWith('/dashboard') && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
