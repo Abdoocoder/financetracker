@@ -10,11 +10,10 @@ import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
-import { FinancialHealthScore } from '@/components/ui/financial-health-score'
+import { FinancialHealthCombined } from '@/components/ui/financial-health-combined'
 import { DashboardEmptyState } from '@/components/ui/empty-state'
 import nextDynamic from 'next/dynamic'
 
-const WealthRoadmap    = nextDynamic(() => import('@/components/ui/wealth-roadmap').then(m => ({ default: m.WealthRoadmap })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 200, borderRadius: 20 }} /> })
 const MiniBarChart     = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
 const CategoryBars     = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
 const ChallengesCard   = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
@@ -240,7 +239,7 @@ export default function DashboardPage() {
       </div>
       <Section id="health" icon="💊" title={lang === 'en' ? `Financial Health Score — ${Math.min(100, Math.round(((income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) + (data?.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data?.totalDebt / Math.max(income * 12, 1)) * 25))) + Math.min(20, Math.round(((data?.goalsSaved ?? 0) / Math.max(income * 3, 1)) * 20)) + ((data?.invValue ?? 0) > 0 ? 15 : 0) + Math.min(10, data?.txCount ?? 0))))}%` : `نقاط الصحة المالية — ${Math.min(100, Math.round(((income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) + (data?.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data?.totalDebt / Math.max(income * 12, 1)) * 25))) + Math.min(20, Math.round(((data?.goalsSaved ?? 0) / Math.max(income * 3, 1)) * 20)) + ((data?.invValue ?? 0) > 0 ? 15 : 0) + Math.min(10, data?.txCount ?? 0))))}%`}>
         <div style={{ padding: '12px 0 8px' }}>
-          <FinancialHealthScore
+          <FinancialHealthCombined
             income={income}
             expenses={expenses}
             totalDebt={data?.totalDebt ?? 0}
@@ -275,11 +274,6 @@ export default function DashboardPage() {
 
       {/* ── قابلة للطي — مطوية افتراضياً ── */}
 
-      <Section id="wealth" icon="🗺️" title={lang === 'en' ? 'Wealth Roadmap & Journey' : 'خارطة الثراء ورحلة الثروة'}>
-        <div style={{ padding: '12px 0 8px' }}>
-          <WealthRoadmap />
-        </div>
-      </Section>
 
       <Section id="gamification" icon="🏆" title={lang === 'en' ? 'Achievements' : 'نظام الإنجازات'}>
         <div style={{ padding: '12px 0 8px' }}>
