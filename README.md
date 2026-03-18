@@ -109,7 +109,7 @@
 - إضافة دفعات يدوية
 
 ### 🔔 التنبيهات الذكية
-- تحليل يومي تلقائي (GitHub Actions CRON)
+- تحليل يومي تلقائي (cron-job.org) *(محدّث)*
 - **Push Prompt UI أنيق** بدل confirm() المزعج *(جديد)*
 - إشعارات Push تعمل على Android APK *(إصلاح)*
 - تقرير أسبوعي + تذكير مسائي
@@ -511,7 +511,13 @@ CRON_SECRET=your_cron_secret
    ├── [x] تحديات الادخار التلقائية
    ├── [x] الأصول الشخصية + صافي الثروة الحقيقية
    ├── [x] نظام Gamification — نقاط، مستويات، شارات
-   ├── [x] GitHub Actions CRON
+   ├── [x] CRONs عبر cron-job.org *(محدّث)*
+   ├── [x] نسيت كلمة المرور + إعادة التعيين
+   ├── [x] زر المشاركة
+   ├── [x] Firebase FCM للأندرويد
+   ├── [x] الدروس الإسلامية
+   ├── [x] تقسيم المعاملات قادمة/مكتملة
+   ├── [x] لوغو SVG
    ├── [x] Push Notifications على Android APK
    ├── [x] RTL كامل + Bottom Nav صحيح
    ├── [x] Lazy Loading — أداء أفضل بـ 94%
@@ -537,6 +543,11 @@ CRON_SECRET=your_cron_secret
 ---
 
 ## 📱 PWA + Android
+
+- 🔔 Web Push للـ iOS + Firebase FCM للأندرويد
+- 📦 APK مباشر عبر TWA
+- 🔗 [صفحة التنزيل](https://fajrak.com/download)
+
 
 التطبيق يعمل كـ **Progressive Web App** كامل:
 
