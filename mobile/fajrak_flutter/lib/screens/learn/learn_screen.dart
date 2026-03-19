@@ -73,7 +73,7 @@ class _LearnScreenState extends State<LearnScreen> {
     final now = DateTime.now();
     final today = now.toIso8601String().split('T')[0];
 
-    final results = await Future.wait([
+    final results = await Future.wait<dynamic>([
       Supabase.instance.client.from('profiles').select('lesson_streak, last_lesson_date, monthly_income').eq('id', user.id).single(),
       Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
       Supabase.instance.client.from('investments').select('id').eq('user_id', user.id).count(),

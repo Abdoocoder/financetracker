@@ -7,6 +7,7 @@ plugins {
 }
 
 android {
+    ndkVersion = "27.0.12077973"
     namespace = "com.fajrak.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion

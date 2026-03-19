@@ -43,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final now = DateTime.now();
     final firstDay = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
 
-    final results = await Future.wait([
+    final results = await Future.wait<dynamic>([
       Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
       Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
       Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
