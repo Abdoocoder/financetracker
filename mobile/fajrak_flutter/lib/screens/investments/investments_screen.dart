@@ -235,7 +235,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(color: const Color(0xFF8B5CF6).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3))),
                           child: Column(children: [
-                            const Text('بعد ${_years} سنة', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 12)),
+                            Text('بعد ${_years} سنة', style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 12)),
                             Text('\$${fv.toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF8B5CF6), fontWeight: FontWeight.w900, fontSize: 28, fontFamily: 'Cairo')),
                             Text('استثمرت: \$${totalInvested.toStringAsFixed(0)} | ربح: \$${(fv - totalInvested).toStringAsFixed(0)}',
                               style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
