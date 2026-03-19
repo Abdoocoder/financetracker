@@ -42,6 +42,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF070B14),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
