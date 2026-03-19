@@ -13,12 +13,12 @@ dependencies:
     sdk: flutter
 
   # Supabase
-  supabase_flutter: ^2.3.0
+  supabase_flutter: ^2.8.4
 
   # Firebase
-  firebase_core: ^2.24.2
-  firebase_messaging: ^14.7.9
-  flutter_local_notifications: ^16.3.0
+  firebase_core: ^2.27.0
+  firebase_messaging: ^14.7.19
+  flutter_local_notifications: ^16.3.3
 
   # UI
   fl_chart: ^0.66.2
