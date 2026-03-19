@@ -10,6 +10,8 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
 import 'screens/main_screen.dart';
+import 'screens/learn/learn_screen.dart';
+import 'screens/achievements/achievements_screen.dart';
 import 'services/notification_service.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
