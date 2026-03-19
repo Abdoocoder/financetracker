@@ -223,6 +223,18 @@ npm run dev
 
 ## Changelog
 
+### v3.5.0 — 2026-03-20 *(Latest)*
+- 💳 **Debt Received as Income** — checkbox to add received loan as income transaction automatically
+- 💎 **Complete Net Worth** — cash balance + savings + investments + assets - debts
+- 📱 **Flutter Complete Review** — dark theme, AppBar styling for all screens
+- 🔑 **Forgot Password Screen** — Flutter forgot password flow
+- 🏆 **Learn & Achievements Screens** — Flutter daily lessons + badges
+- 📊 **Enhanced Dashboard Flutter** — health score, quick add, financial stage
+- 🎨 **Fajrak Custom Icon** — replaced Flutter default icon with Fajrak branded icon
+- ✅ **Flutter Build Fixed** — resolved all dependency conflicts (NDK, app_links, desugaring)
+- 🏪 **Google Play Account** — SamaCode developer account created
+
+
 ### v3.4.0 — 2026-03-19 *(Latest)*
 - 📚 **Smart Lesson Selection** — lessons chosen based on user data (debt ratio, savings, streak, investments)
 - 🧠 **25 New Scientific Lessons** — behavioral finance, neuroscience, proven strategies per stage
