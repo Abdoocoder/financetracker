@@ -13,12 +13,11 @@ dependencies:
     sdk: flutter
 
   # Supabase
-  supabase_flutter: ^2.9.0
+  supabase_flutter: ^2.3.4
 
-  # Firebase
-  firebase_core: ^2.27.0
-  firebase_messaging: ^14.7.19
-  flutter_local_notifications: ^18.0.0
+  # Firebase - إصدارات متوافقة مع بعض
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
 
   # UI
   fl_chart: ^0.66.2
@@ -29,7 +28,7 @@ dependencies:
   intl: ^0.19.0
   shared_preferences: ^2.2.2
   url_launcher: ^6.2.4
-  package_info_plus: ^9.0.0
+  package_info_plus: ^5.0.1
 
 dev_dependencies:
   flutter_test:
