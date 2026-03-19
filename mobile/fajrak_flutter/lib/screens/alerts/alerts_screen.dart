@@ -47,6 +47,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(title: const Text('التنبيهات')),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
