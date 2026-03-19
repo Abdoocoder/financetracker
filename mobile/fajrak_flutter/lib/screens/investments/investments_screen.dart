@@ -34,6 +34,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     final gainPct = _totalCost > 0 ? (gain / _totalCost * 100) : 0.0;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(title: const Text('الاستثمارات')),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))

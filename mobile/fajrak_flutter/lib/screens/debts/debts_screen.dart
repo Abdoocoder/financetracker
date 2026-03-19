@@ -97,6 +97,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
     final totalMonthly = _debts.fold(0.0, (a, d) => a + (d['monthly_payment'] as num).toDouble());
 
     return Scaffold(
+      backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         title: const Text('الديون'),
         actions: [IconButton(icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)), onPressed: () => _showAddDialog())],
