@@ -161,6 +161,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final expenses = filtered.where((t) => t['type'] == 'expense').fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
 
     return Scaffold(
+      backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         title: Column(children: [
           const Text('المعاملات', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),

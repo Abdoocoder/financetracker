@@ -46,6 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF070B14),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
