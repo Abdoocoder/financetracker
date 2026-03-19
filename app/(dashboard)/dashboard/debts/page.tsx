@@ -97,7 +97,7 @@ export default function DebtsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false })
+  const [form, setForm] = useState({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false, received_amount: false })
   const [saving, setSaving] = useState(false)
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null)
   const [paymentAmount, setPaymentAmount] = useState('')
@@ -129,13 +129,13 @@ export default function DebtsPage() {
 
   function openAdd() {
     setEditingId(null)
-    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false })
+    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false, received_amount: false })
     setShowForm(true)
   }
 
   function startEdit(d: any) {
     setEditingId(d.id)
-    setForm({ name: d.name, original_amount: d.original_amount.toString(), remaining_amount: d.remaining_amount.toString(), monthly_payment: d.monthly_payment?.toString() ?? '', due_date: d.due_date ?? '', priority: d.priority.toString(), notes: d.notes ?? '', payment_day: d.payment_day?.toString() ?? '1', auto_deduct: d.auto_deduct ?? false })
+    setForm({ name: d.name, original_amount: d.original_amount.toString(), remaining_amount: d.remaining_amount.toString(), monthly_payment: d.monthly_payment?.toString() ?? '', due_date: d.due_date ?? '', priority: d.priority.toString(), notes: d.notes ?? '', payment_day: d.payment_day?.toString() ?? '1', auto_deduct: d.auto_deduct ?? false, received_amount: false })
     setShowForm(true)
   }
 
@@ -150,6 +150,17 @@ export default function DebtsPage() {
       toast.success(t('toast_edited'))
     } else {
       const { error } = await supabase.from('debts').insert({ user_id: user.id, name: form.name, original_amount: parseFloat(form.original_amount.replace(",", ".")), remaining_amount: parseFloat(form.original_amount.replace(",", ".")), monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct })
+      // إضافة معاملة دخل إذا استلم المبلغ
+      if (!error && form.received_amount) {
+        await supabase.from('transactions').insert({
+          user_id: user.id,
+          type: 'income',
+          amount: parseFloat(form.original_amount.replace(",", ".")),
+          category: lang === 'ar' ? 'قرض مستلم' : 'Loan Received',
+          description: lang === 'ar' ? `قرض مستلم: ${form.name}` : `Loan Received: ${form.name}`,
+          transaction_date: new Date().toISOString().split('T')[0],
+        })
+      }
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_debt_added'))
     }
@@ -391,6 +402,38 @@ export default function DebtsPage() {
               ))}
             </Select>
           </FormField>
+          {!editingId && (
+            <FormField label={lang === 'ar' ? '💳 استلمت هذا المبلغ' : '💳 I received this amount'}>
+              <div
+                onClick={() => setForm(f => ({ ...f, received_amount: !f.received_amount }))}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+                  borderRadius: 10, cursor: 'pointer',
+                  background: form.received_amount ? 'rgba(16,185,129,0.1)' : 'var(--bg-elevated)',
+                  border: `1px solid ${form.received_amount ? 'rgba(16,185,129,0.4)' : 'var(--border)'}`,
+                  transition: 'all 0.2s',
+                }}
+              >
+                <div style={{
+                  width: 20, height: 20, borderRadius: 6,
+                  background: form.received_amount ? '#10B981' : 'transparent',
+                  border: `2px solid ${form.received_amount ? '#10B981' : 'var(--border)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  {form.received_amount && <span style={{ color: 'white', fontSize: 12 }}>✓</span>}
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: form.received_amount ? '#10B981' : 'var(--text-secondary)' }}>
+                    {lang === 'ar' ? 'نعم، استلمت هذا المبلغ اليوم' : 'Yes, I received this amount today'}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                    {lang === 'ar' ? 'سيُضاف تلقائياً كدخل في معاملاتك' : 'Will be added automatically as income in your transactions'}
+                  </div>
+                </div>
+              </div>
+            </FormField>
+          )}
           <FormField label={t('debts_notes')}>
             <Input placeholder={lang === "en" ? "Optional notes" : "ملاحظات اختيارية"} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
           </FormField>
