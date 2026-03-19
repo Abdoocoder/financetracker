@@ -66,7 +66,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     final remaining = _income - _expenses;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('الميزانية')),
+      appBar: AppBar(backgroundColor: const Color(0xFF070B14), title: const Text('الميزانية', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: Colors.white)), iconTheme: const IconThemeData(color: Colors.white)),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
           : RefreshIndicator(

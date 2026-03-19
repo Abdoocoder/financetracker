@@ -35,7 +35,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF070B14),
-      appBar: AppBar(title: const Text('الاستثمارات')),
+      appBar: AppBar(backgroundColor: const Color(0xFF070B14), title: const Text('الاستثمارات', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: Colors.white)), iconTheme: const IconThemeData(color: Colors.white)),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
           : RefreshIndicator(
