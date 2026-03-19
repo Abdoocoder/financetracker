@@ -28,7 +28,7 @@ class _MoreScreenState extends State<MoreScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
-    final results = await Future.wait([
+    final results = await Future.wait<dynamic>([
       Supabase.instance.client.from('alerts').select('id').eq('user_id', user.id).eq('is_read', false).count(),
       Supabase.instance.client.from('profiles').select('lesson_streak').eq('id', user.id).single(),
       Supabase.instance.client.from('user_stats').select('points').eq('id', user.id).maybeSingle(),
