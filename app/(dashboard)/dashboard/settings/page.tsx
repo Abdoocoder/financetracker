@@ -642,6 +642,39 @@ export default function SettingsPage() {
     safeParseFloat(assetsForm.jewelry) + safeParseFloat(assetsForm.other_assets)
   ), [assetsForm])
 
+  // صافي الثروة الكامل
+  const [netWorthData, setNetWorthData] = useState<{
+    cashBalance: number
+    savings: number
+    investments: number
+    totalDebt: number
+  }>({ cashBalance: 0, savings: 0, investments: 0, totalDebt: 0 })
+
+  useEffect(() => {
+    if (!currentUser) return
+    async function loadNetWorth() {
+      const [txRes, goalsRes, invRes, debtsRes] = await Promise.all([
+        supabase.from('transactions').select('type, amount').eq('user_id', currentUser!.id),
+        supabase.from('savings_goals').select('current_amount').eq('user_id', currentUser!.id),
+        supabase.from('investments').select('shares, current_price').eq('user_id', currentUser!.id),
+        supabase.from('debts').select('remaining_amount').eq('user_id', currentUser!.id).eq('is_paid', false),
+      ])
+      const txs = txRes.data ?? []
+      const income = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+      const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+      const cashBalance = income - expenses
+      const savings = (goalsRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
+      const investments = (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
+      const totalDebt = (debtsRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
+      setNetWorthData({ cashBalance, savings, investments, totalDebt })
+    }
+    loadNetWorth()
+  }, [currentUser, supabase])
+
+  const netWorth = useMemo(() => (
+    netWorthData.cashBalance + netWorthData.savings + netWorthData.investments + totalAssets - netWorthData.totalDebt
+  ), [netWorthData, totalAssets])
+
   const initials = useMemo(() => (
     profileForm.full_name ? profileForm.full_name.slice(0, 2).toUpperCase() : userEmail.slice(0, 2).toUpperCase()
   ), [profileForm.full_name, userEmail])
