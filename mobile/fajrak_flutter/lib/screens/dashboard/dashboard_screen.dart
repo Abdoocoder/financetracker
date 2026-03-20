@@ -253,7 +253,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         setState(() {
           _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
-          _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
+          _currency = profile['currency'] as String? ?? 'JOD';
           _income = income;
           _expenses = txExpenses;
           _net = income - txExpenses;
@@ -410,13 +410,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(_name.isNotEmpty ? '👋 ${'dash_title'.tr()} $_name' : 'dash_title'.tr(),
+          Text(_name.isNotEmpty ? '👋 ${'الرئيسية'} $_name' : 'الرئيسية',
               style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                   fontFamily: 'Cairo')),
-          Text('gamif_start'.tr().substring(0, 15), // Fallback or a localized welcome message
+          Text('فجرك المالي 🌅', // Fallback or a localized welcome message
               style: const TextStyle(
                   fontSize: 12, color: Color(0xFF64748B), fontFamily: 'Cairo')),
         ]),
@@ -507,15 +507,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildStatCards() {
     return Row(children: [
       Expanded(
-          child: _statCard('dash_income'.tr(), _income, const Color(0xFF10B981), '↑')),
+          child: _statCard('الدخل', _income, const Color(0xFF10B981), '↑')),
       const SizedBox(width: 8),
       Expanded(
           child:
-              _statCard('dash_expenses'.tr(), _expenses, const Color(0xFFEF4444), '↓')),
+              _statCard('المصاريف', _expenses, const Color(0xFFEF4444), '↓')),
       const SizedBox(width: 8),
       Expanded(
           child: _statCard(
-              'dash_net'.tr(),
+              'الصافي',
               _net,
               _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
               '=')),
@@ -556,12 +556,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? const Color(0xFFF59E0B)
                 : const Color(0xFFEF4444);
     final label = _healthScore >= 80
-        ? 'health_excellent'.tr()
+        ? 'ممتاز 🌟'
         : _healthScore >= 60
-            ? 'health_good'.tr()
+            ? 'جيد 💪'
             : _healthScore >= 40
-                ? 'health_fair'.tr()
-                : 'health_poor'.tr();
+                ? 'متوسط ⚡'
+                : 'يحتاج تحسين';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -592,7 +592,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('💊 ${'health_score'.tr()}',
+          Text('💊 ${'نقاط الصحة المالية'}',
               style: const TextStyle(
                   color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
           const SizedBox(height: 4),
@@ -654,7 +654,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: const Color(0xFF1E293B)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('quick_add_title'.tr(),
+        Text('إضافة سريعة',
             style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
@@ -678,7 +678,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           : const Color(0xFF1E293B)),
                 ),
                 child: Center(
-                    child: Text('trans_income'.tr(),
+                    child: Text('دخل',
                         style: const TextStyle(
                             color: Color(0xFF10B981),
                             fontFamily: 'Cairo',
@@ -703,7 +703,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           : const Color(0xFF1E293B)),
                 ),
                 child: Center(
-                    child: Text('trans_expense'.tr(),
+                    child: Text('مصروف',
                         style: const TextStyle(
                             color: Color(0xFFEF4444),
                             fontFamily: 'Cairo',
@@ -758,7 +758,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               textAlign: TextAlign.right,
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
               decoration: InputDecoration(
-                hintText: 'trans_amount'.tr(),
+                hintText: 'المبلغ',
                 hintStyle: const TextStyle(
                     color: Color(0xFF64748B), fontFamily: 'Cairo'),
                 filled: true,
@@ -789,7 +789,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: 20,
                       child: CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2))
-                  : Text('add'.tr(),
+                  : Text('إضافة',
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
