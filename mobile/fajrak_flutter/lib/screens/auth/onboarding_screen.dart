@@ -20,13 +20,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     setState(() => _loading = true);
     try {
       final user = Supabase.instance.client.auth.currentUser!;
+      final income = double.tryParse(_incomeController.text) ?? 0;
+      
       await Supabase.instance.client.from('profiles').upsert({
         'id': user.id,
-        'monthly_income': double.tryParse(_incomeController.text) ?? 0,
+        'monthly_income': income,
         'salary_day': _salaryDay,
         'currency': _currency,
         'onboarding_done': true,
       });
+
+      if (income > 0) {
+        await Supabase.instance.client.from('transactions').insert({
+          'user_id': user.id,
+          'type': 'income',
+          'amount': income,
+          'category': 'راتب',
+          'description': 'الراتب الشهري (تلقائي)',
+          'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+        });
+      }
+
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
     } catch (e) {
       if (mounted) {
@@ -105,13 +119,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _loading ? null : _save,
-                child: _loading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text('ابدأ الآن →'),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : _save,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B7EF6),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 8,
+                    shadowColor: const Color(0xFF3B7EF6).withOpacity(0.4),
+                  ),
+                  child: _loading
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Text('ابدأ رحلتك المالية 🚀', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
+                ),
               ),
-            ],
+              const SizedBox(height: 20),
+              const Center(child: Text('يمكنك دائماً تعديل هذه الإعدادات لاحقاً', style: TextStyle(color: Color(0xFF475569), fontSize: 12, fontFamily: 'Cairo'))),
           ),
         ),
       ),
