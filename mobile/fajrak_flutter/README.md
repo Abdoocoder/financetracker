@@ -107,3 +107,5 @@ lib/
 - ✅ **Debts & Goals**: تواريخ الاستحقاق الدقيقة، مكتبة أيقونات (Emoji Picker)، وتأثيرات الاحتفال (Confetti) عند الوصول للهدف.
 - ✅ **Settings & Learn**: تطبيق كامل للإعدادات (اللغة/الثيم الداخلي) وخارطة طريق التعليم المالي (Financial Roadmap).
 - ✅ **Budgets & Alerts**: تحليل آلي لنسب الادخار وتقديم توصيات مضافة (AI Advisor).
+- ✅ **Core Systems**: نظام معالجة أخطاء شامل (ErrorHandler) ونظام تحليلات متكامل (AnalyticsService) متزامن مع Supabase.
+- ✅ **Onboarding**: تجربة مستخدم محسنة بـ 4 خطوات تفاعلية (Step-by-step PageView).

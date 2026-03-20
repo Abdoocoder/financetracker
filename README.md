@@ -188,11 +188,13 @@ npm run dev
 - [x] Smart Notifications (iOS + Android FCM)
 - [x] Budget + Financial Health + Wealth Roadmap
 - [x] Gamification + Islamic Lessons
-- [x] Native Flutter Android App
+- [x] Native Flutter Android App (54.5 MB Release APK ✅)
 - [x] fajrak.com custom domain
+- [x] Global Error Handling + Analytics Service
+- [x] Improved Onboarding Experience (Multi-step PageView)
 - [ ] Monthly PDF Reports
 - [ ] Subscription System (Paddle)
-- [ ] Google Play Store Publishing
+- [ ] Google Play Store Publishing 🔄
 
 ---
 
@@ -223,7 +225,16 @@ npm run dev
 
 ## Changelog
 
-### v3.7.0 — 2026-03-20 *(Latest)*
+### v3.8.0 — 2026-03-20 *(Latest)*
+- 🛡️ **Global Error Handling** — `ErrorHandler` utility catches all errors app-wide, logs to Supabase Analytics, shows user-friendly Snackbars
+- 📊 **Analytics Service** — `AnalyticsService` logs screen views + custom events to `app_events` Supabase table
+- 🎯 **Improved Onboarding** — Multi-step `PageView` flow: Welcome → Income/Currency → Payday → Confirmation
+- 🔧 **Build Fixes** — Resolved all Dart syntax errors across Investments, Goals, Dashboard, Transactions screens
+- 🔐 **StackTrace Support** — `ErrorHandler.handle()` now accepts optional `StackTrace` for detailed logging
+- ⚡ **Release APK** — Successful `flutter build apk --release` → `app-release.apk` (54.5 MB)
+
+
+### v3.7.0 — 2026-03-20
 - 🌟 **100% Flutter-Web Parity** — Successfully achieved 100% feature and visual parity between the native Flutter app and the Next.js React web app.
 - 🛠️ **Dashboard Enhancements** — Added Gamification BadgesGrid and MonthCompareCard natively.
 - 💸 **CSV Export** — Full native support for generating and sharing UTC-8 CSV transaction reports via `share_plus`.
