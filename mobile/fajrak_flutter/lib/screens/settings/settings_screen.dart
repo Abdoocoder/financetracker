@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import '../../main.dart';
 
@@ -18,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _incomeCtrl = TextEditingController();
   final _jobTitleCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
   String _birthDate = '';
   String _salaryDay = '1';
 
@@ -81,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           .single();
       _nameCtrl.text = profile['full_name'] as String? ?? '';
       _incomeCtrl.text = profile['monthly_income']?.toString() ?? '';
-      _currency = profile['currency'] as String? ?? 'JOD';
+      _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
       _birthDate = profile['birth_date'] as String? ?? '';
       _jobTitleCtrl.text = profile['job_title'] as String? ?? '';
       _phoneCtrl.text = profile['phone'] as String? ?? '';
@@ -195,10 +196,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         .order('transaction_date', ascending: false);
     final data = txRes as List;
     if (data.isEmpty) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('لا توجد معاملات لتصديرها',
                 style: TextStyle(fontFamily: 'Cairo'))));
+      }
       setState(() => _loading = false);
       return;
     }
@@ -206,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final buffer = StringBuffer();
     buffer.writeln('التاريخ,النوع,المبلغ,الفئة,الوصف');
     for (final tx in data) {
-      final type = tx['type'] == 'income' ? 'دخل' : 'مصروف';
+      final type = tx['type'] == 'income' ? 'trans_income'.tr() : 'trans_expense'.tr();
       buffer.writeln(
           '${tx['transaction_date']},$type,${tx['amount']},${tx['category'] ?? ''},${tx['description'] ?? ''}');
     }
@@ -253,8 +255,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
-        title: const Text('الإعدادات',
-            style: TextStyle(
+        title: Text('settings_title'.tr(),
+            style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: Colors.white)),
@@ -271,7 +273,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Profile section (Accordion)
                     _accordionCard(
                       icon: '👤',
-                      title: 'الملف الشخصي',
+                      title: 'settings_profile_info'.tr(),
                       initiallyExpanded: true,
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -351,14 +353,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ]),
                             ),
                             const SizedBox(height: 20),
-                            _inputField(_nameCtrl, 'الاسم الكامل',
+                            _inputField(_nameCtrl, 'settings_name'.tr(),
                                 Icons.person_outline),
                             const SizedBox(height: 10),
-                            _inputField(_jobTitleCtrl, 'المهنة / الوظيفة',
+                            _inputField(_jobTitleCtrl, 'settings_job_title'.tr(),
                                 Icons.work_outline),
                             const SizedBox(height: 10),
                             _inputField(
-                                _phoneCtrl, 'رقم الهاتف', Icons.phone_outlined,
+                                _phoneCtrl, 'settings_phone'.tr(), Icons.phone_outlined,
                                 type: TextInputType.phone),
                             const SizedBox(height: 10),
                             GestureDetector(
@@ -373,9 +375,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     lastDate: DateTime.now(),
                                     builder: (ctx, child) => Theme(
                                         data: ThemeData.dark(), child: child!));
-                                if (date != null)
+                                if (date != null) {
                                   setState(() => _birthDate =
                                       date.toIso8601String().split('T')[0]);
+                                }
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
@@ -390,7 +393,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Text(
                                       _birthDate.isNotEmpty
                                           ? _birthDate
-                                          : 'تاريخ الميلاد',
+                                          : 'settings_birth_date'.tr(),
                                       style: TextStyle(
                                           color: _birthDate.isNotEmpty
                                               ? Colors.white
@@ -401,19 +404,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 20),
                             _sectionTitle('💰 الإعدادات المالية'),
-                            _inputField(_incomeCtrl, 'الراتب الشهري',
+                            _inputField(_incomeCtrl, 'settings_income'.tr(),
                                 Icons.account_balance_wallet_outlined,
                                 type: const TextInputType.numberWithOptions(
                                     decimal: true)),
                             const SizedBox(height: 12),
-                            const Text('العملة',
-                                style: TextStyle(
+                            Text('settings_currency'.tr(),
+                                style: const TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontFamily: 'Cairo',
                                     fontSize: 13)),
                             const SizedBox(height: 8),
                             Row(
-                                children: ['JOD', 'USD', 'SAR', 'AED', 'KWD']
+                                children: ['inv_jod'.tr(), 'inv_usd'.tr(), 'SAR', 'AED', 'KWD']
                                     .map((c) => Expanded(
                                             child: Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -473,8 +476,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               color: Colors.white))
-                                      : const Text('حفظ التغييرات',
-                                          style: TextStyle(
+                                      : Text('settings_save'.tr(),
+                                          style: const TextStyle(
                                               fontFamily: 'Cairo',
                                               fontWeight: FontWeight.w900,
                                               fontSize: 15)),
@@ -486,12 +489,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Preferences (Language + Theme)
                     _accordionCard(
                       icon: '⚙️',
-                      title: 'التفضيلات',
+                      title: 'settings_preferences'.tr(),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('اللغة',
-                                style: TextStyle(
+                            Text('settings_language'.tr(),
+                                style: const TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontSize: 13,
                                     fontFamily: 'Cairo',
@@ -505,15 +508,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   final p =
                                       await SharedPreferences.getInstance();
                                   await p.setString('lang', 'ar');
-                                  if (mounted)
+                                  context.setLocale(const Locale('ar'));
+                                  if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content: Text(
-                                                'تم تغيير اللغة إلى العربية ✅ (أعد تشغيل التطبيق)',
-                                                style: TextStyle(
+                                                'toast_settings_saved'.tr(),
+                                                style: const TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
-                                                Color(0xFF10B981)));
+                                                const Color(0xFF10B981)));
+                                  }
                                 },
                                 child: Container(
                                   padding:
@@ -542,15 +547,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   final p =
                                       await SharedPreferences.getInstance();
                                   await p.setString('lang', 'en');
-                                  if (mounted)
+                                  context.setLocale(const Locale('en'));
+                                  if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content: Text(
-                                                'Language changed to English ✅ (Restart app)',
-                                                style: TextStyle(
+                                                'toast_settings_saved'.tr(),
+                                                style: const TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
-                                                Color(0xFF10B981)));
+                                                const Color(0xFF10B981)));
+                                  }
                                 },
                                 child: Container(
                                   padding:
@@ -615,7 +622,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         width: 1.5),
                                   ),
                                   child: Center(
-                                      child: Text('🌙 داكن',
+                                      child: Text('settings_dark'.tr(),
                                           style: TextStyle(
                                               color: _isDarkMode
                                                   ? Colors.white
@@ -659,7 +666,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         width: 1.5),
                                   ),
                                   child: Center(
-                                      child: Text('☀️ فاتح',
+                                      child: Text('settings_light'.tr(),
                                           style: TextStyle(
                                               color: !_isDarkMode
                                                   ? const Color(0xFF1E293B)
@@ -676,7 +683,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Assets section (Accordion)
                     _accordionCard(
                       icon: '💎',
-                      title: 'أصولي الشخصية',
+                      title: 'settings_assets_title'.tr(),
                       badge: 'صافي الثروة',
                       child: Column(children: [
                         Container(
@@ -809,7 +816,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Share App (Accordion)
                     _accordionCard(
                       icon: '🔗',
-                      title: 'شارك فجرك مع أصدقائك',
+                      title: 'share_title'.tr(),
                       child: Column(children: [
                         const Text('🌅', style: TextStyle(fontSize: 40)),
                         const SizedBox(height: 10),
@@ -863,9 +870,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       setState(() => _loggingOut = true);
                                       await Supabase.instance.client.auth
                                           .signOut();
-                                      if (mounted)
+                                      if (mounted) {
                                         Navigator.pushReplacementNamed(
                                             context, '/login');
+                                      }
                                     },
                               style: OutlinedButton.styleFrom(
                                   foregroundColor: const Color(0xFFEF4444),
@@ -974,8 +982,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10))),
-                              child: const Text('إلغاء',
-                                  style: TextStyle(fontFamily: 'Cairo')),
+                              child: Text('trans_cancel'.tr(),
+                                  style: const TextStyle(fontFamily: 'Cairo')),
                             )),
                           ]),
                         ],

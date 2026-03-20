@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,7 +22,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   List<Map<String, dynamic>> _paidDebts = [];
   bool _loading = true;
   bool _showPaid = false;
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
   String? _paymentDebtId;
   final _paymentCtrl = TextEditingController();
   bool _payingSaving = false;
@@ -48,7 +49,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           .select('currency')
           .eq('id', user.id)
           .single();
-      _currency = profile['currency'] as String? ?? 'JOD';
+      _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
       final active = await Supabase.instance.client
           .from('debts')
           .select('*')
@@ -192,11 +193,11 @@ class _DebtsScreenState extends State<DebtsScreen> {
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child:
-                  const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
+                  Text('trans_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('حذف',
-                  style: TextStyle(
+              child: Text('delete'.tr(),
+                  style: const TextStyle(
                       color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
         ],
       ),
@@ -245,7 +246,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     color: const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text(existing != null ? 'تعديل الدين' : 'دين جديد',
+            Text(existing != null ? 'debts_edit'.tr() : 'دين جديد',
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -256,7 +257,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             const SizedBox(height: 10),
             Row(children: [
               Expanded(
-                  child: _field(originalCtrl, 'المبلغ الأصلي',
+                  child: _field(originalCtrl, 'debts_original'.tr(),
                       const TextInputType.numberWithOptions(decimal: true))),
               const SizedBox(width: 10),
               Expanded(
@@ -266,7 +267,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             const SizedBox(height: 10),
             Row(children: [
               Expanded(
-                  child: _field(monthlyCtrl, 'القسط الشهري',
+                  child: _field(monthlyCtrl, 'debts_monthly'.tr(),
                       const TextInputType.numberWithOptions(decimal: true))),
               const SizedBox(width: 10),
               Expanded(
@@ -288,8 +289,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   builder: (c, child) =>
                       Theme(data: ThemeData.dark(), child: child!),
                 );
-                if (picked != null)
+                if (picked != null) {
                   setS(() => dueDate = picked.toIso8601String().split('T')[0]);
+                }
               },
               child: Container(
                 padding:
@@ -380,7 +382,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           : const Color(0xFF64748B),
                       size: 24),
                   const SizedBox(width: 10),
-                  Text('خصم تلقائي شهري',
+                  Text('debts_auto_deduct'.tr(),
                       style: TextStyle(
                           color: autoDeduct
                               ? const Color(0xFF10B981)
@@ -446,8 +448,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (nameCtrl.text.isEmpty || originalCtrl.text.isEmpty)
+                    if (nameCtrl.text.isEmpty || originalCtrl.text.isEmpty) {
                       return;
+                    }
                     final user = Supabase.instance.client.auth.currentUser!;
                     final payDay = int.tryParse(paymentDayCtrl.text);
                     final data = {
@@ -506,7 +509,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'حفظ التعديل' : 'إضافة',
+                  child: Text(existing != null ? 'trans_save_edit'.tr() : 'trans_add'.tr(),
                       style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w900,
@@ -555,8 +558,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
-        title: const Text('الديون',
-            style: TextStyle(
+        title: Text('health_debt'.tr(),
+            style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: Colors.white)),
@@ -587,7 +590,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                         child: _statCard(
-                            'مسدد',
+                            'debts_paid'.tr(),
                             '${paidPct.toStringAsFixed(0)}%',
                             const Color(0xFF10B981))),
                     const SizedBox(width: 8),
@@ -985,7 +988,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   color: Colors.white, fontSize: 13, fontFamily: 'Cairo'),
               textAlign: TextAlign.center,
               decoration: InputDecoration(
-                  hintText: 'المبلغ',
+                  hintText: 'trans_amount'.tr(),
                   hintStyle: const TextStyle(color: Color(0xFF64748B)),
                   filled: true,
                   fillColor: const Color(0xFF1E293B),

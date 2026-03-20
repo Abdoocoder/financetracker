@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,7 +12,7 @@ class GoalsScreen extends StatefulWidget {
 class _GoalsScreenState extends State<GoalsScreen> {
   List<Map<String, dynamic>> _goals = [];
   bool _loading = true;
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
 
   static const _goalIcons = [
     '🎯',
@@ -69,7 +70,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     ]);
     if (mounted) {
       setState(() {
-        _currency = (results[0] as Map)['currency'] as String? ?? 'JOD';
+        _currency = (results[0] as Map)['currency'] as String? ?? 'inv_jod'.tr();
         _goals = List<Map<String, dynamic>>.from(results[1] as List);
         _loading = false;
       });
@@ -107,7 +108,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     color: const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text(existing != null ? 'تعديل الهدف' : 'هدف ادخار جديد',
+            Text(existing != null ? 'goals_edit'.tr() : 'هدف ادخار جديد',
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -159,7 +160,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             _field(nameCtrl, 'اسم الهدف (مثال: سيارة، حج، طوارئ)',
                 TextInputType.text),
             const SizedBox(height: 10),
-            _field(targetCtrl, 'المبلغ المستهدف',
+            _field(targetCtrl, 'goals_target'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
             _field(currentCtrl, 'المبلغ المدخر حالياً',
@@ -179,9 +180,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   builder: (c, child) =>
                       Theme(data: ThemeData.dark(), child: child!),
                 );
-                if (picked != null)
+                if (picked != null) {
                   setS(() =>
                       deadlineDate = picked.toIso8601String().split('T')[0]);
+                }
               },
               child: Container(
                 padding:
@@ -241,7 +243,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'حفظ التعديل' : 'إضافة الهدف',
+                  child: Text(existing != null ? 'trans_save_edit'.tr() : 'إضافة الهدف',
                       style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w900,
@@ -307,8 +309,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12))),
-                child: const Text('إضافة',
-                    style: TextStyle(
+                child: Text('trans_add'.tr(),
+                    style: const TextStyle(
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.w900,
                         fontSize: 15)),
@@ -332,11 +334,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child:
-                  const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
+                  Text('trans_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('حذف',
-                  style: TextStyle(
+              child: Text('delete'.tr(),
+                  style: const TextStyle(
                       color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
         ],
       ),
@@ -415,7 +417,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             const Color(0xFF3B7EF6))),
                     const SizedBox(width: 8),
                     Expanded(
-                        child: _statCard('✅', '$completed', 'مكتمل',
+                        child: _statCard('✅', '$completed', 'learn_completed'.tr(),
                             const Color(0xFF10B981))),
                     const SizedBox(width: 8),
                     Expanded(

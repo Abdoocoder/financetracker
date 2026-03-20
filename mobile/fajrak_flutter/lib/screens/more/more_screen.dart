@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../debts/debts_screen.dart';
 import '../budgets/budgets_screen.dart';
@@ -43,7 +44,7 @@ class MoreScreen extends StatelessWidget {
                 _menuItem(
                     context,
                     Icons.credit_card_outlined,
-                    'الديون',
+                    'health_debt'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -59,7 +60,7 @@ class MoreScreen extends StatelessWidget {
                 _menuItem(
                     context,
                     Icons.track_changes,
-                    'الأهداف',
+                    'nav_goals'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -91,7 +92,7 @@ class MoreScreen extends StatelessWidget {
                 _menuItem(
                     context,
                     Icons.settings_outlined,
-                    'الإعدادات',
+                    'nav_settings'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -124,7 +125,7 @@ class MoreScreen extends StatelessWidget {
                         Icon(Icons.language,
                             color: Color(0xFF3B7EF6), size: 20),
                         SizedBox(width: 8),
-                        Text('English',
+                        Text('settings_lang_en'.tr(),
                             style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w700,

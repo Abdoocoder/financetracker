@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 
@@ -46,7 +47,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             children: [
               Text('💰', style: TextStyle(fontSize: 18)),
               SizedBox(width: 8),
-              Text('محاكي الثروة',
+              Text('wealthSimulator'.tr(),
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
@@ -73,7 +74,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                     fontFamily: 'Cairo')),
           ),
           const SizedBox(height: 24),
-          _buildSlider('الاستثمار الشهري', _monthlyContribution, 0, 5000,
+          _buildSlider('monthlyInvestment'.tr(), _monthlyContribution, 0, 5000,
               _monthlyContribution.toStringAsFixed(0), (val) {
             setState(() => _monthlyContribution = val);
           }),

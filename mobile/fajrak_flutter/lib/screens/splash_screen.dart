@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -91,9 +92,8 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'فجرك',
-                  style: TextStyle(
+                Text('app_name'.tr(),
+                  style: const TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,

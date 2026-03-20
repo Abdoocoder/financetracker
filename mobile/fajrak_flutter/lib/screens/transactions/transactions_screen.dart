@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -21,7 +22,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   String _filter = 'all';
   String _search = '';
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
   int? _filterMonth;
   int? _filterYear;
 
@@ -33,11 +34,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   Future<void> _load({bool reset = true}) async {
     if (reset) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _limit = 20;
           _loading = true;
         });
+      }
     } else {
       if (mounted) setState(() => _loadingMore = true);
     }
@@ -50,7 +52,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         .select('currency')
         .eq('id', user.id)
         .single();
-    if (mounted) _currency = profile['currency'] as String? ?? 'JOD';
+    if (mounted) _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
 
     final baseQ = Supabase.instance.client
         .from('transactions')
@@ -116,7 +118,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       final buffer = StringBuffer();
       buffer.writeln('التاريخ,النوع,المبلغ ($_currency),الفئة,الوصف');
       for (final tx in list) {
-        final type = tx['type'] == 'income' ? 'دخل' : 'مصروف';
+        final type = tx['type'] == 'income' ? 'trans_income'.tr() : 'trans_expense'.tr();
         final amount = (tx['amount'] as num? ?? 0).toStringAsFixed(2);
         final cat = (tx['category'] ?? '').toString().replaceAll(',', '،');
         final desc = (tx['description'] ?? '')
@@ -300,13 +302,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: const InputDecoration(labelText: 'المبلغ'),
+              decoration: const InputDecoration(labelText: 'trans_amount'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: catController,
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: const InputDecoration(labelText: 'الفئة'),
+              decoration: const InputDecoration(labelText: 'trans_category'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
@@ -349,7 +351,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10))),
-                child: Text(existing != null ? 'حفظ التعديل' : 'إضافة',
+                child: Text(existing != null ? 'trans_save_edit'.tr() : 'trans_add'.tr(),
                     style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Cairo',
@@ -484,8 +486,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('المعاملات',
-              style: TextStyle(
+          Text('nav_transactions'.tr(),
+              style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
@@ -533,15 +535,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           Row(children: [
                             Expanded(
                                 child: _statCard(
-                                    'الدخل', income, const Color(0xFF10B981))),
+                                    'dash_income'.tr(), income, const Color(0xFF10B981))),
                             const SizedBox(width: 8),
                             Expanded(
-                                child: _statCard('المصاريف', expenses,
+                                child: _statCard('dash_expenses'.tr(), expenses,
                                     const Color(0xFFEF4444))),
                             const SizedBox(width: 8),
                             Expanded(
                                 child: _statCard(
-                                    'الصافي',
+                                    'dash_net'.tr(),
                                     income - expenses,
                                     income - expenses >= 0
                                         ? const Color(0xFF10B981)
@@ -604,7 +606,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: [
-                                _filterBtn('all', 'الكل'),
+                                _filterBtn('all', 'trans_all'.tr()),
                                 const SizedBox(width: 8),
                                 _filterBtn('income', '💰 دخل'),
                                 const SizedBox(width: 8),
@@ -838,13 +840,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(c, false),
-                      child: const Text('إلغاء',
-                          style: TextStyle(
+                      child: Text('trans_cancel'.tr(),
+                          style: const TextStyle(
                               color: Color(0xFF94A3B8), fontFamily: 'Cairo'))),
                   TextButton(
                       onPressed: () => Navigator.pop(c, true),
-                      child: const Text('حذف',
-                          style: TextStyle(
+                      child: Text('delete'.tr(),
+                          style: const TextStyle(
                               color: Color(0xFFEF4444),
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900))),

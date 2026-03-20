@@ -8,6 +8,7 @@ import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/badges_grid.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../alerts/alerts_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   double _income = 0, _expenses = 0, _net = 0;
   int _healthScore = 0;
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
   String _name = '';
   int _unreadAlerts = 0;
   List<Map<String, dynamic>> _recentTx = [];
@@ -245,7 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (mounted) {
       setState(() {
         _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
-        _currency = profile['currency'] as String? ?? 'JOD';
+        _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
         _income = income;
         _expenses = txExpenses;
         _net = income - txExpenses;
@@ -301,11 +302,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading)
+    if (_loading) {
       return const Scaffold(
           backgroundColor: Color(0xFF070B14),
           body: Center(
               child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFF070B14),
@@ -394,14 +396,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(_name.isNotEmpty ? '👋 أهلاً $_name' : 'لوحة التحكم',
+          Text(_name.isNotEmpty ? '👋 ${'dash_title'.tr()} $_name' : 'dash_title'.tr(),
               style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                   fontFamily: 'Cairo')),
-          const Text('فجرك المالي يبدأ اليوم 🌅',
-              style: TextStyle(
+          Text('gamif_start'.tr().substring(0, 15), // Fallback or a localized welcome message
+              style: const TextStyle(
                   fontSize: 12, color: Color(0xFF64748B), fontFamily: 'Cairo')),
         ]),
         if (_unreadAlerts > 0)
@@ -471,17 +473,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const Center(child: Text('👋', style: TextStyle(fontSize: 40))),
           ),
           const SizedBox(height: 20),
-          const Text('مرحباً بك في فجرك!',
-              style: TextStyle(
+          Text('onboard_welcome'.tr(),
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'Cairo')),
           const SizedBox(height: 8),
-          const Text(
-              'رحلتك المالية تبدأ الآن. أضف أول معاملة لك أو قم ببناء ميزانيتك لتبدأ.',
+          Text(
+              'gamif_start'.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo')),
         ],
       ),
@@ -491,15 +493,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildStatCards() {
     return Row(children: [
       Expanded(
-          child: _statCard('الدخل', _income, const Color(0xFF10B981), '↑')),
+          child: _statCard('dash_income'.tr(), _income, const Color(0xFF10B981), '↑')),
       const SizedBox(width: 8),
       Expanded(
           child:
-              _statCard('المصاريف', _expenses, const Color(0xFFEF4444), '↓')),
+              _statCard('dash_expenses'.tr(), _expenses, const Color(0xFFEF4444), '↓')),
       const SizedBox(width: 8),
       Expanded(
           child: _statCard(
-              'الصافي',
+              'dash_net'.tr(),
               _net,
               _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
               '=')),
@@ -540,12 +542,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? const Color(0xFFF59E0B)
                 : const Color(0xFFEF4444);
     final label = _healthScore >= 80
-        ? 'ممتاز 🌟'
+        ? 'health_excellent'.tr()
         : _healthScore >= 60
-            ? 'جيد 💪'
+            ? 'health_good'.tr()
             : _healthScore >= 40
-                ? 'متوسط ⚡'
-                : 'يحتاج تحسين';
+                ? 'health_fair'.tr()
+                : 'health_poor'.tr();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -576,8 +578,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Expanded(
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('💊 نقاط الصحة المالية',
-              style: TextStyle(
+          Text('💊 ${'health_score'.tr()}',
+              style: const TextStyle(
                   color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
           const SizedBox(height: 4),
           Text(label,
@@ -586,9 +588,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
                   fontFamily: 'Cairo')),
-          const Text('/100 نقطة',
-              style: TextStyle(
-                  color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
         ])),
       ]),
     );
@@ -641,8 +640,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: const Color(0xFF1E293B)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('⚡ إضافة سريعة',
-            style: TextStyle(
+        Text('quick_add_title'.tr(),
+            style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
@@ -664,9 +663,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ? const Color(0xFF10B981)
                           : const Color(0xFF1E293B)),
                 ),
-                child: const Center(
-                    child: Text('دخل',
-                        style: TextStyle(
+                child: Center(
+                    child: Text('trans_income'.tr(),
+                        style: const TextStyle(
                             color: Color(0xFF10B981),
                             fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700))),
@@ -689,9 +688,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ? const Color(0xFFEF4444)
                           : const Color(0xFF1E293B)),
                 ),
-                child: const Center(
-                    child: Text('مصروف',
-                        style: TextStyle(
+                child: Center(
+                    child: Text('trans_expense'.tr(),
+                        style: const TextStyle(
                             color: Color(0xFFEF4444),
                             fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700))),
@@ -745,7 +744,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               textAlign: TextAlign.right,
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
               decoration: InputDecoration(
-                hintText: 'المبلغ',
+                hintText: 'trans_amount'.tr(),
                 hintStyle: const TextStyle(
                     color: Color(0xFF64748B), fontFamily: 'Cairo'),
                 filled: true,
@@ -776,8 +775,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: 20,
                       child: CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2))
-                  : const Text('إضافة',
-                      style: TextStyle(
+                  : Text('add'.tr(),
+                      style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'Cairo')),

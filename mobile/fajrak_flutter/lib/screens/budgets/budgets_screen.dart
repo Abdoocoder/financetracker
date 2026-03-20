@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -37,7 +38,7 @@ class BudgetsScreen extends StatefulWidget {
 class _BudgetsScreenState extends State<BudgetsScreen> {
   bool _loading = true;
   double _income = 0, _totalDebtPayments = 0;
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
   Map<String, double> _spending = {};
   List<Map<String, dynamic>> _budgets = [];
   List<Map<String, dynamic>> _goals = [];
@@ -108,7 +109,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
       if (mounted) {
         setState(() {
-          _currency = profile['currency'] as String? ?? 'JOD';
+          _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
           _income = income > 0
               ? income
               : (profile['monthly_income'] as num?)?.toDouble() ?? 0;
@@ -163,11 +164,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       }
     }
     await _load();
-    if (mounted)
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('تم تطبيق التوزيع المقترح ✨',
               style: TextStyle(fontFamily: 'Cairo')),
           backgroundColor: Color(0xFF10B981)));
+    }
   }
 
   void _showAddDialog({Map<String, dynamic>? existing}) {
@@ -207,7 +209,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
             if (existing == null) ...[
               const Align(
                   alignment: Alignment.centerRight,
-                  child: Text('الفئة',
+                  child: Text('trans_category'.tr(),
                       style: TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 12,
@@ -315,7 +317,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'حفظ' : 'إضافة',
+                  child: Text(existing != null ? 'save'.tr() : 'trans_add'.tr(),
                       style: const TextStyle(
                           fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
                 )),
@@ -367,26 +369,29 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
           'text': 'ممتاز! أنفقت ${ratio.toStringAsFixed(0)}% فقط من دخلك'
         });
     }
-    if (_budgets.isEmpty)
+    if (_budgets.isEmpty) {
       insights.add({
         'icon': '💡',
         'type': 'info',
         'text': 'أضف ميزانية لكل فئة لتتبع إنفاقك بدقة'
       });
-    if (available > _income * 0.2 && _income > 0)
+    }
+    if (available > _income * 0.2 && _income > 0) {
       insights.add({
         'icon': '💰',
         'type': 'success',
         'text':
             'فائض ${available.toStringAsFixed(0)} $_currency — فكر في الاستثمار!'
       });
-    if (totalBudgeted > available && available > 0)
+    }
+    if (totalBudgeted > available && available > 0) {
       insights.add({
         'icon': '⚠️',
         'type': 'warning',
         'text':
             'ميزانيتك تتجاوز المتاح بـ ${(totalBudgeted - available).toStringAsFixed(0)} $_currency'
       });
+    }
 
     // Savings Insights
     for (final g in _goals) {
@@ -692,8 +697,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                                     onPressed: () =>
                                                         Navigator.pop(
                                                             context, false),
-                                                    child: const Text('إلغاء',
-                                                        style: TextStyle(
+                                                    child: Text('trans_cancel'.tr(),
+                                                        style: const TextStyle(
                                                             fontFamily:
                                                                 'Cairo'))),
                                                 TextButton(

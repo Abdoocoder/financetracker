@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,10 +12,10 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _incomeController = TextEditingController();
   int _salaryDay = 25;
-  String _currency = 'JOD';
+  String _currency = 'inv_jod'.tr();
   bool _loading = false;
 
-  final List<String> _currencies = ['JOD', 'USD', 'SAR', 'AED'];
+  final List<String> _currencies = ['inv_jod'.tr(), 'inv_usd'.tr(), 'SAR', 'AED'];
 
   Future<void> _save() async {
     setState(() => _loading = true);
@@ -78,7 +79,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       fontFamily: 'Cairo')),
               const SizedBox(height: 40),
               _buildCard(
-                title: 'الراتب الشهري',
+                title: 'settings_income'.tr(),
                 icon: Icons.account_balance_wallet_outlined,
                 child: TextFormField(
                   controller: _incomeController,
@@ -114,7 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               const SizedBox(height: 16),
               _buildCard(
-                title: 'العملة',
+                title: 'settings_currency'.tr(),
                 icon: Icons.currency_exchange,
                 child: Row(
                   children: _currencies

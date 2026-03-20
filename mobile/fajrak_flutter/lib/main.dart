@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -44,8 +44,16 @@ void main() async {
   );
 
   await NotificationService.initialize();
+  await EasyLocalization.ensureInitialized();
 
-  runApp(const FajrakApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/i18n',
+      fallbackLocale: const Locale('ar'),
+      child: const FajrakApp(),
+    ),
+  );
 }
 
 class FajrakApp extends StatefulWidget {
@@ -87,16 +95,12 @@ class _FajrakAppState extends State<FajrakApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'فجرك',
+      title: 'app_name'.tr(),
       debugShowCheckedModeBanner: false,
       theme: _isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),

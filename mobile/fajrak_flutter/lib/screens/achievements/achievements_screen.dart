@@ -105,11 +105,12 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading)
+    if (_loading) {
       return const Scaffold(
           backgroundColor: Color(0xFF070B14),
           body: Center(
               child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+    }
 
     final progress = _nextLevel < 9999 ? _points / _nextLevel : 1.0;
 
