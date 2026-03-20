@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,6 +20,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Alerts');
     _load();
   }
 
@@ -69,17 +72,25 @@ class _AlertsScreenState extends State<AlertsScreen> {
   Future<void> _deleteAll() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    await Supabase.instance.client
-        .from('alerts')
-        .delete()
-        .eq('user_id', user.id);
-    if (mounted) setState(() => _alerts.clear());
+    try {
+      await Supabase.instance.client
+          .from('alerts')
+          .delete()
+          .eq('user_id', user.id);
+      if (mounted) setState(() => _alerts.clear());
+    } catch (e, st) {
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Delete All Alerts');
+    }
   }
 
   Future<void> _deleteAlert(String id) async {
-    await Supabase.instance.client.from('alerts').delete().eq('id', id);
-    if (mounted) {
-      setState(() => _alerts.removeWhere((a) => a['id'].toString() == id));
+    try {
+      await Supabase.instance.client.from('alerts').delete().eq('id', id);
+      if (mounted) {
+        setState(() => _alerts.removeWhere((a) => a['id'].toString() == id));
+      }
+    } catch (e, st) {
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Delete Single Alert');
     }
   }
 

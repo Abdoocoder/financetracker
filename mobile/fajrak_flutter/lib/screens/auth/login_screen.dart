@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,6 +18,12 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscure = true;
   String? _error;
 
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('Login');
+  }
+
   Future<void> _login() async {
     setState(() {
       _loading = true;
@@ -27,10 +35,13 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text,
       );
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
-    } on AuthException catch (e) {
-      setState(() {
-        _error = e.message;
-      });
+    } catch (e) {
+      if (mounted) {
+        ErrorHandler.handle(e, context: context, developerMessage: 'Login Action');
+        setState(() {
+          _error = e.toString(); // Display a generic error message or parse 'e' if it's an AuthException
+        });
+      }
     } finally {
       if (mounted) {
         setState(() {

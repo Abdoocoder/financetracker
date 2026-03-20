@@ -4,6 +4,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'dart:io';
 import '../../main.dart';
 import '../../widgets/settings/testimonial_card.dart';
@@ -51,6 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Settings');
     _load();
   }
 
@@ -137,8 +140,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _totalDebt = (debtsRes as List)
           .fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
 
-      if (mounted) setState(() => _loading = false);
     } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Settings Load');
+    } finally {
       if (mounted) setState(() => _loading = false);
     }
   }

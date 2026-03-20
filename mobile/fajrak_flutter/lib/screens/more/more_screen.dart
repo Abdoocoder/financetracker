@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import '../debts/debts_screen.dart';
 import '../budgets/budgets_screen.dart';
@@ -9,8 +11,36 @@ import '../alerts/alerts_screen.dart';
 import '../settings/settings_screen.dart';
 import '../help/help_screen.dart';
 
-class MoreScreen extends StatelessWidget {
+class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
+
+  @override
+  State<MoreScreen> createState() => _MoreScreenState();
+}
+
+class _MoreScreenState extends State<MoreScreen> {
+  bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('More');
+    _load();
+  }
+
+  void _load() async {
+    if (!mounted) return;
+    setState(() => _loading = true);
+    try {
+      // No explicit Supabase calls in this screen's initial load based on the provided context,
+      // but if there were, they would be wrapped here.
+      // Example: await Supabase.instance.client.from('table').select();
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'More Load');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
