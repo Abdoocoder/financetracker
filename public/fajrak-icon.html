@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 40px; font-family: 'Cairo', sans-serif; }
+
+.icon-512 {
+  width: 512px;
+  height: 512px;
+  border-radius: 115px;
+  background: linear-gradient(145deg, #0A0F1E 0%, #0D1426 50%, #0A0F1E 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 80px rgba(59, 126, 246, 0.3);
+}
+
+.glow-bg {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,126,246,0.15) 0%, rgba(139,92,246,0.08) 50%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.horizon {
+  position: absolute;
+  bottom: 130px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59,126,246,0.4), rgba(251,191,36,0.6), rgba(59,126,246,0.4), transparent);
+}
+
+.sun-rays {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 120px;
+  overflow: hidden;
+}
+
+.ray {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(to top, rgba(251,191,36,0.5), transparent);
+  transform-origin: bottom center;
+}
+
+.letter-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.letter-fa {
+  font-size: 240px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #3B7EF6 0%, #8B5CF6 40%, #F59E0B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  filter: drop-shadow(0 0 30px rgba(59,126,246,0.5));
+  font-family: 'Cairo', 'Arial', sans-serif;
+}
+
+.stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+/* Feature Graphic */
+.feature-graphic {
+  width: 1024px;
+  height: 500px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #070B14 0%, #0D1426 40%, #070B14 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 80px rgba(59, 126, 246, 0.2);
+}
+
+.fg-bg-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,126,246,0.1) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+}
+
+.fg-bg-glow2 {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
+  bottom: -100px;
+  left: 100px;
+}
+
+.fg-left {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fg-logo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.fg-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3B7EF6, #8B5CF6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  font-weight: 900;
+  color: white;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 0 30px rgba(59,126,246,0.4);
+}
+
+.fg-title {
+  font-size: 64px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffffff, #94A3B8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Cairo', sans-serif;
+  line-height: 1;
+}
+
+.fg-subtitle {
+  font-size: 22px;
+  color: #64748B;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 400;
+}
+
+.fg-tagline {
+  font-size: 18px;
+  color: #3B7EF6;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.fg-right {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.fg-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(59,126,246,0.1);
+  border: 1px solid rgba(59,126,246,0.2);
+  border-radius: 12px;
+  padding: 12px 20px;
+  width: 280px;
+}
+
+.fg-badge-icon { font-size: 24px; }
+.fg-badge-text {
+  color: white;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fg-horizon {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #3B7EF6, #8B5CF6, #F59E0B, transparent);
+}
+
+.label {
+  color: #64748B;
+  font-size: 14px;
+  font-family: sans-serif;
+  margin-top: 8px;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- أيقونة 512x512 -->
+<div>
+<div class="icon-512" id="icon512">
+  <div class="stars">
+    <div class="star" style="width:3px;height:3px;top:60px;left:80px;animation-delay:0.5s"></div>
+    <div class="star" style="width:2px;height:2px;top:40px;left:200px;animation-delay:1s"></div>
+    <div class="star" style="width:3px;height:3px;top:80px;right:100px;animation-delay:0.3s"></div>
+    <div class="star" style="width:2px;height:2px;top:120px;right:60px;animation-delay:1.5s"></div>
+    <div class="star" style="width:2px;height:2px;top:50px;left:350px;animation-delay:0.8s"></div>
+    <div class="star" style="width:3px;height:3px;top:160px;left:60px;animation-delay:0.2s"></div>
+  </div>
+  <div class="glow-bg"></div>
+  <div class="horizon"></div>
+  <div class="letter-container">
+    <div class="letter-fa">ف</div>
+  </div>
+</div>
+<div class="label" style="text-align:center">أيقونة التطبيق 512×512</div>
+</div>
+
+<!-- Feature Graphic 1024x500 -->
+<div>
+<div class="feature-graphic" id="featureGraphic">
+  <div class="fg-bg-glow"></div>
+  <div class="fg-bg-glow2"></div>
+  <div class="fg-left">
+    <div class="fg-logo">
+      <div class="fg-icon">ف</div>
+      <div class="fg-title">فجرك</div>
+    </div>
+    <div class="fg-subtitle">إدارة مالية ذكية للعالم العربي</div>
+    <div class="fg-tagline">🌅 فجرك المالي يبدأ اليوم</div>
+  </div>
+  <div class="fg-right">
+    <div class="fg-badge">
+      <span class="fg-badge-icon">📊</span>
+      <span class="fg-badge-text">تتبع المصاريف والدخل</span>
+    </div>
+    <div class="fg-badge" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.2)">
+      <span class="fg-badge-icon">🎯</span>
+      <span class="fg-badge-text">خطة سداد الديون</span>
+    </div>
+    <div class="fg-badge" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.2)">
+      <span class="fg-badge-icon">📈</span>
+      <span class="fg-badge-text">استثمار حلال</span>
+    </div>
+    <div class="fg-badge" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.2)">
+      <span class="fg-badge-icon">📚</span>
+      <span class="fg-badge-text">دروس مالية يومية</span>
+    </div>
+  </div>
+  <div class="fg-horizon"></div>
+</div>
+<div class="label" style="text-align:center">Feature Graphic 1024×500</div>
+</div>
+
+</body>
+</html>
