@@ -223,6 +223,14 @@ npm run dev
 
 ## Changelog
 
+### v3.5.1 — 2026-03-20 *(Latest)*
+- 📈 **Complete Investments Screen** — portfolio summary, wealth simulator, halal badge, add investment form
+- 📊 **Complete Budgets Screen** — 50/30/20 rule, budget limits per category, spending breakdown
+- 🎯 **Complete Goals Screen** — add amount button, progress tracking, deadline, total progress bar
+- 🎨 **Fajrak Custom Icon** — branded icon for all Android densities (mdpi to xxxhdpi)
+- 🔧 **Flutter Build Fixed** — const expression error in investments screen
+
+
 ### v3.5.0 — 2026-03-20 *(Latest)*
 - 💳 **Debt Received as Income** — checkbox to add received loan as income transaction automatically
 - 💎 **Complete Net Worth** — cash balance + savings + investments + assets - debts
