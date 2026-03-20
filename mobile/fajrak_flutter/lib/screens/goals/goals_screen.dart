@@ -73,7 +73,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     ]);
     if (mounted) {
       setState(() {
-        _currency = (results[0] as Map)['currency'] as String? ?? 'inv_jod'.tr();
+        _currency = (results[0] as Map)['currency'] as String? ?? 'JOD';
         _goals = List<Map<String, dynamic>>.from(results[1] as List);
         _loading = false;
       });
@@ -111,7 +111,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     color: const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text(existing != null ? 'goals_edit'.tr() : 'هدف ادخار جديد',
+            Text(existing != null ? 'تعديل الهدف' : 'هدف ادخار جديد',
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -163,7 +163,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             _field(nameCtrl, 'اسم الهدف (مثال: سيارة، حج، طوارئ)',
                 TextInputType.text),
             const SizedBox(height: 10),
-            _field(targetCtrl, 'goals_target'.tr(),
+            _field(targetCtrl, 'المبلغ المستهدف',
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
             _field(currentCtrl, 'المبلغ المدخر حالياً',
@@ -250,7 +250,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'trans_save_edit'.tr() : 'إضافة الهدف',
+                  child: Text(existing != null ? 'حفظ التعديل' : 'إضافة الهدف',
                       style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w900,
@@ -316,7 +316,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12))),
-                child: Text('trans_add'.tr(),
+                child: Text('إضافة معاملة',
                     style: const TextStyle(
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.w900,
@@ -341,10 +341,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child:
-                  Text('trans_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+                  Text('إلغاء', style: const TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('delete'.tr(),
+              child: Text('حذف',
                   style: const TextStyle(
                       color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
         ],
@@ -424,7 +424,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             const Color(0xFF3B7EF6))),
                     const SizedBox(width: 8),
                     Expanded(
-                        child: _statCard('✅', '$completed', 'learn_completed'.tr(),
+                        child: _statCard('✅', '$completed', 'مكتمل',
                             const Color(0xFF10B981))),
                     const SizedBox(width: 8),
                     Expanded(

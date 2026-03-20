@@ -141,7 +141,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'reset_new'.tr(),
+                  labelText: 'كلمة المرور الجديدة',
                   prefixIcon:
                       const Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
                   suffixIcon: IconButton(
@@ -161,7 +161,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'reset_confirm'.tr(),
+                  labelText: 'تأكيد كلمة المرور',
                   prefixIcon:
                       const Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
                 ),

@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'settings_password'.tr(),
+                    labelText: 'البريد الإلكتروني',
                     prefixIcon:
                         const Icon(Icons.lock_outline, color: Color(0xFF94A3B8))),
               ),

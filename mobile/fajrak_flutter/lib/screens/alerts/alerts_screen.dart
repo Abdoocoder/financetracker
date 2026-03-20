@@ -117,7 +117,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       Navigator.pushNamed(context, '/debts');
     } else if (title.contains('ميزانية') || msg.contains('ميزانية'))
       Navigator.pushNamed(context, '/budgets');
-    else if (title.contains('goals_count'.tr()) || msg.contains('goals_count'.tr()))
+    else if (title.contains('عدد الأهداف') || msg.contains('عدد الأهداف'))
       Navigator.pushNamed(context, '/goals');
     else if (title.contains('استثمار') || msg.contains('استثمار'))
       Navigator.pushNamed(context, '/investments');
@@ -170,7 +170,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
           backgroundColor: const Color(0xFF070B14),
-          title: Text('nav_alerts'.tr(),
+          title: Text('التنبيهات',
               style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,

@@ -112,7 +112,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
       if (mounted) {
         setState(() {
-          _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
+          _currency = profile['currency'] as String? ?? 'JOD';
           _income = income > 0
               ? income
               : (profile['monthly_income'] as num?)?.toDouble() ?? 0;
@@ -213,7 +213,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
             if (existing == null) ...[
               Align(
                   alignment: Alignment.centerRight,
-                  child: Text('trans_category'.tr(),
+                  child: Text('الفئة',
                       style: const TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 12,
@@ -321,7 +321,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'save'.tr() : 'trans_add'.tr(),
+                  child: Text(existing != null ? 'حفظ' : 'إضافة معاملة',
                       style: const TextStyle(
                           fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
                 )),
@@ -701,7 +701,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                                     onPressed: () =>
                                                         Navigator.pop(
                                                             context, false),
-                                                    child: Text('trans_cancel'.tr(),
+                                                    child: Text('إلغاء',
                                                         style: const TextStyle(
                                                             fontFamily:
                                                                 'Cairo'))),

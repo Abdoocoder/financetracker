@@ -13,9 +13,9 @@ class FinancialRoadmap extends StatelessWidget {
   Widget build(BuildContext context) {
     final stages = [
       {'id': 'awareness', 'icon': '🌱', 'title': 'الوعي'},
-      {'id': 'debt', 'icon': '💳', 'title': 'health_debt'.tr()},
-      {'id': 'emergency', 'icon': '🛡️', 'title': 'health_emergency'.tr()},
-      {'id': 'investing', 'icon': '📈', 'title': 'health_investing'.tr()},
+      {'id': 'debt', 'icon': '💳', 'title': 'ديون'},
+      {'id': 'emergency', 'icon': '🛡️', 'title': 'طوارئ'},
+      {'id': 'investing', 'icon': '📈', 'title': 'استثمار'},
       {'id': 'wealth', 'icon': '👑', 'title': 'الثروة'},
     ];
 

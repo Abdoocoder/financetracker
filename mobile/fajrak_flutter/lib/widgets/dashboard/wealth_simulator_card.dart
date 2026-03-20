@@ -47,7 +47,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             children: [
               const Text('💰', style: TextStyle(fontSize: 18)),
               const SizedBox(width: 8),
-              Text('wealthSimulator'.tr(),
+              Text('محاكي الثروة',
                   style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
@@ -74,7 +74,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                     fontFamily: 'Cairo')),
           ),
           const SizedBox(height: 24),
-          _buildSlider('monthlyInvestment'.tr(), _monthlyContribution, 0, 5000,
+          _buildSlider('الاستثمار الشهري', _monthlyContribution, 0, 5000,
               _monthlyContribution.toStringAsFixed(0), (val) {
             setState(() => _monthlyContribution = val);
           }),

@@ -83,7 +83,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
               if (_activeChallenge != null)
                 GestureDetector(
                   onTap: () => setState(() => _activeChallenge = null),
-                  child: Text('trans_all'.tr(),
+                  child: Text('الكل',
                       style: const TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 12,

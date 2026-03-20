@@ -159,7 +159,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  hintText: 'help_search'.tr(),
+                  hintText: 'بحث في المساعدة',
                   prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
                   hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
                   contentPadding:

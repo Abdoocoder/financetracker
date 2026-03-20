@@ -63,11 +63,11 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _navItem(0, Icons.more_horiz, 'nav_settings'.tr()),
-                _navItem(1, Icons.pie_chart_outline, 'dashboard_monthly'.tr()), // Fallback since no nav_budgets
-                _navItem(2, Icons.credit_card_outlined, 'nav_debts'.tr()),
-                _navItem(3, Icons.swap_vert, 'nav_transactions'.tr()),
-                _navItem(4, Icons.dashboard_outlined, 'nav_home'.tr(),
+                _navItem(0, Icons.more_horiz, 'الإعدادات'),
+                _navItem(1, Icons.pie_chart_outline, 'الميزانية الشهرية'), // Fallback since no nav_budgets
+                _navItem(2, Icons.credit_card_outlined, 'الديون'),
+                _navItem(3, Icons.swap_vert, 'المعاملات'),
+                _navItem(4, Icons.dashboard_outlined, 'الرئيسية',
                     badge: _unreadAlerts),
               ],
             ),

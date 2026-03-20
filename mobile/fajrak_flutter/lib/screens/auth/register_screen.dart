@@ -123,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'settings_name'.tr(),
+                    labelText: 'الاسم الكامل',
                     prefixIcon:
                         const Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
               ),
@@ -135,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'forgot_email'.tr(),
+                    labelText: 'البريد الإلكتروني',
                     prefixIcon:
                         const Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
               ),
