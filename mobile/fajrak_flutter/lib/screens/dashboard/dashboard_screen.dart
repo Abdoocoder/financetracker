@@ -8,7 +8,6 @@ import '../../widgets/dashboard/quick_links_card.dart';
 import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
-import 'screens/splash_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -29,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _invValue = 0;
   double _goalsSaved = 0;
   double _goalsTarget = 0;
+  double _prevExpenses = 0;
   String _stage = 'awareness';
 
   // Quick Add
@@ -74,7 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final investments = results[4] as List;
     final goals = results[5] as List;
 
-    double txIncome = 0, txExpenses = 0;
+    double txIncome = 0, txExpenses = 0, prevExpenses = 0;
     Map<String, double> catMap = {};
     
     // Group tx into months and categories
@@ -107,6 +107,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           txExpenses += amount;
           final cat = tx['category'] as String? ?? 'أخرى';
           catMap[cat] = (catMap[cat] ?? 0) + amount;
+        }
+      } else if (txDate.isAfter(DateTime(now.year, now.month - 1, 1).subtract(const Duration(days: 1))) && 
+                 txDate.isBefore(firstDayCurrentMonth)) {
+        if (!isIncome) {
+          prevExpenses += amount;
         }
       }
     }
@@ -162,6 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _invValue = invValue;
       _goalsSaved = goalsSaved;
       _goalsTarget = goalsTarget;
+      _prevExpenses = prevExpenses;
       _healthScore = score.clamp(0, 100);
       _stage = stage;
       _loading = false;
@@ -229,7 +235,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 16),
                 WealthSimulatorCard(currency: _currency),
                 const SizedBox(height: 16),
-                ChallengesCard(currency: _currency),
+                ChallengesCard(
+                  expensesFood: _categoryData.firstWhere((c) => c['category'] == 'طعام', orElse: () => {'amount': 0.0})['amount'] as double,
+                  income: _income,
+                  net: _net,
+                  prevExpenses: _prevExpenses,
+                  currentExpenses: _expenses,
+                  expensesEntertainment: _categoryData.firstWhere((c) => c['category'] == 'ترفيه', orElse: () => {'amount': 0.0})['amount'] as double,
+                  currency: _currency,
+                ),
                 const SizedBox(height: 16),
                 _buildRecentTransactions(),
               ],
