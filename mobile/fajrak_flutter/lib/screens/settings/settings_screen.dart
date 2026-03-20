@@ -440,7 +440,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 20),
                     SizedBox(width: double.infinity, child: ElevatedButton(
                       onPressed: _shareApp,
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), boxShadow: [BoxShadow(color: const Color(0xFF3B7EF6).withOpacity(0.3), blurRadius: 12)]),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       child: const Text('💡 شارك التطبيق الآن', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
                     )),
                   ]),
