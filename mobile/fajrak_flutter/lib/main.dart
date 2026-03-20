@@ -9,6 +9,7 @@ import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
+import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
 import 'services/notification_service.dart';
 
@@ -71,6 +72,7 @@ class FajrakApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingScreen(),
         '/main': (context) => const MainScreen(),
         '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/reset-password': (context) => const ResetPasswordScreen(),
       },
     );
   }

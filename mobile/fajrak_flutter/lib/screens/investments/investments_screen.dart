@@ -27,6 +27,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   bool _isHalal = true;
   bool _saving = false;
 
+  // Record Buy inline form
+  String? _showBuyFormId;
+  final _buySharesCtrl = TextEditingController();
+  final _buyPriceCtrl = TextEditingController();
+  final _buyCommCtrl = TextEditingController(text: '0.5');
+  bool _savingBuy = false;
+
   @override
   void initState() { super.initState(); _load(); }
 
@@ -35,6 +42,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     _symbolCtrl.dispose(); _nameCtrl.dispose();
     _sharesCtrl.dispose(); _avgPriceCtrl.dispose();
     _currentPriceCtrl.dispose();
+    _buySharesCtrl.dispose(); _buyPriceCtrl.dispose(); _buyCommCtrl.dispose();
     super.dispose();
   }
 
@@ -106,6 +114,103 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     if (confirm == true) {
       await Supabase.instance.client.from('investments').delete().eq('id', id);
       await _load();
+    }
+  }
+
+  Future<void> _recordBuy(Map<String, dynamic> inv) async {
+    final shares = double.tryParse(_buySharesCtrl.text);
+    final price = double.tryParse(_buyPriceCtrl.text);
+    final commission = double.tryParse(_buyCommCtrl.text) ?? 0.0;
+    if (shares == null || shares <= 0 || price == null || price <= 0) return;
+
+    setState(() => _savingBuy = true);
+    final user = Supabase.instance.client.auth.currentUser!;
+    
+    await Supabase.instance.client.from('investment_transactions').insert({
+      'investment_id': inv['id'],
+      'user_id': user.id,
+      'type': 'buy',
+      'shares': shares,
+      'price': price,
+      'commission': commission,
+      'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+    });
+
+    final oldShares = (inv['shares'] as num).toDouble();
+    final oldAvg = (inv['avg_buy_price'] as num).toDouble();
+    final totalShares = oldShares + shares;
+    final newAvg = totalShares > 0 ? ((oldShares * oldAvg) + (shares * price)) / totalShares : price;
+
+    await Supabase.instance.client.from('investments').update({
+      'shares': totalShares,
+      'avg_buy_price': newAvg,
+      'current_price': price,
+    }).eq('id', inv['id']);
+
+    _buySharesCtrl.clear(); _buyPriceCtrl.clear(); _buyCommCtrl.text = '0.5';
+    setState(() { _showBuyFormId = null; _savingBuy = false; });
+    await _load();
+  }
+
+  Future<void> _showTxHistory(String invId, String symbol) async {
+    showDialog(context: context, builder: (_) => const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+    final data = await Supabase.instance.client.from('investment_transactions').select('*').eq('investment_id', invId).order('transaction_date', ascending: false);
+    if (mounted) Navigator.pop(context); // close loading
+    
+    final txHistory = List<Map<String, dynamic>>.from(data);
+    
+    if (mounted) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: const Color(0xFF0F1629),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+        builder: (ctx) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 20, right: 20, top: 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            Text('سجل معاملات $symbol', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')),
+            const SizedBox(height: 20),
+            if (txHistory.isEmpty)
+              const Center(child: Padding(padding: EdgeInsets.all(20), child: Text('لا توجد معاملات بعد', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo'))))
+            else
+              SizedBox(
+                height: 300,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: txHistory.length,
+                  itemBuilder: (ctx, i) {
+                    final tx = txHistory[i];
+                    final isBuy = tx['type'] == 'buy';
+                    final color = isBuy ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+                    final shares = (tx['shares'] as num).toDouble();
+                    final price = (tx['price'] as num).toDouble();
+                    final comm = (tx['commission'] as num?)?.toDouble() ?? 0;
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(12)),
+                      child: Row(children: [
+                        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: Center(child: Text(isBuy ? '📈' : '📉', style: const TextStyle(fontSize: 16)))),
+                        const SizedBox(width: 12),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('${isBuy ? "شراء" : "بيع"} ${shares.toStringAsFixed(4)} وحدة', style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13)),
+                          Text('${tx['transaction_date']} • سعر \$${price.toStringAsFixed(2)}', style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 11)),
+                        ])),
+                        Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                          Text('${isBuy ? "-" : "+"}\$${(shares * price).toStringAsFixed(0)}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'monospace', fontSize: 13)),
+                          if (comm > 0) Text('عمولة \$${comm.toStringAsFixed(2)}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 10, fontFamily: 'Cairo')),
+                        ]),
+                      ]),
+                    );
+                  },
+                ),
+              ),
+            const SizedBox(height: 16),
+          ])
+        ),
+      );
     }
   }
 
@@ -244,7 +349,46 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       ]),
                     ]),
                   ),
-                  const SizedBox(height: 16),
+                  // Portfolio Chart
+                  if (_investments.isNotEmpty && _totalValue > 0) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: const Color(0xFF0F1629), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF1E293B))),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        const Text('توزيع المحفظة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 14)),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Row(children: _investments.map((inv) {
+                            final val = (inv['shares'] as num).toDouble() * (inv['current_price'] as num).toDouble();
+                            final pct = val / _totalValue * 100;
+                            final colors = [const Color(0xFF3B7EF6), const Color(0xFF10B981), const Color(0xFFF59E0B), const Color(0xFF8B5CF6), const Color(0xFFEF4444)];
+                            final color = colors[_investments.indexOf(inv) % colors.length];
+                            return Expanded(flex: pct.round() == 0 ? 1 : pct.round(), child: Container(height: 10, decoration: BoxDecoration(color: color, border: const Border(right: BorderSide(color: Color(0xFF0F1629), width: 2)))));
+                          }).toList()),
+                        ),
+                        const SizedBox(height: 12),
+                        ..._investments.map((inv) {
+                          final val = (inv['shares'] as num).toDouble() * (inv['current_price'] as num).toDouble();
+                          final pct = _totalValue > 0 ? (val / _totalValue * 100) : 0.0;
+                          final colors = [const Color(0xFF3B7EF6), const Color(0xFF10B981), const Color(0xFFF59E0B), const Color(0xFF8B5CF6), const Color(0xFFEF4444)];
+                          final color = colors[_investments.indexOf(inv) % colors.length];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(children: [
+                              Container(width: 10, height: 10, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3))),
+                              const SizedBox(width: 8),
+                              Expanded(child: Text(inv['symbol'] ?? '', style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
+                              Text('${pct.toStringAsFixed(1)}%', style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 12)),
+                              const SizedBox(width: 8),
+                              Text('\$${val.toStringAsFixed(0)}', style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 13)),
+                            ]),
+                          );
+                        }),
+                      ]),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // Wealth Simulator
                   GestureDetector(
@@ -391,7 +535,54 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             minHeight: 4,
           ),
         ),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(child: OutlinedButton(
+            onPressed: () => _showTxHistory(inv['id'].toString(), inv['symbol']),
+            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF94A3B8), side: const BorderSide(color: Color(0xFF1E293B)), padding: const EdgeInsets.symmetric(vertical: 8), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+            child: const Text('سجل المعاملات', style: TextStyle(fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w700)),
+          )),
+          const SizedBox(width: 8),
+          Expanded(child: OutlinedButton(
+            onPressed: () => setState(() => _showBuyFormId = _showBuyFormId == inv['id'].toString() ? null : inv['id'].toString()),
+            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF10B981), side: BorderSide(color: const Color(0xFF10B981).withOpacity(0.3)), padding: const EdgeInsets.symmetric(vertical: 8), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+            child: const Text('+ تسجيل شراء', style: TextStyle(fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w700)),
+          )),
+        ]),
+        if (_showBuyFormId == inv['id'].toString()) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
+            child: Column(children: [
+              Row(children: [
+                Expanded(child: _miniField(_buySharesCtrl, 'الوحدات', const TextInputType.numberWithOptions(decimal: true))),
+                const SizedBox(width: 8),
+                Expanded(child: _miniField(_buyPriceCtrl, 'السعر \$', const TextInputType.numberWithOptions(decimal: true))),
+                const SizedBox(width: 8),
+                Expanded(child: _miniField(_buyCommCtrl, 'العمولة \$', const TextInputType.numberWithOptions(decimal: true))),
+              ]),
+              const SizedBox(height: 10),
+              SizedBox(width: double.infinity, child: ElevatedButton(
+                onPressed: _savingBuy ? null : () => _recordBuy(inv),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+                child: _savingBuy ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('تسجيل', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 12)),
+              )),
+            ]),
+          ),
+        ],
       ]),
     );
   }
+
+  TextField _miniField(TextEditingController ctrl, String hint, TextInputType type) => TextField(
+    controller: ctrl, keyboardType: type, textAlign: TextAlign.center,
+    style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontSize: 12),
+    decoration: InputDecoration(
+      hintText: hint, hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 10),
+      filled: true, fillColor: const Color(0xFF0F1629),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+    ),
+  );
 }

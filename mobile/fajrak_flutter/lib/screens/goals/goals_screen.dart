@@ -119,6 +119,25 @@ class _GoalsScreenState extends State<GoalsScreen> {
     );
   }
 
+  Future<void> _deleteGoal(String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF0F1629),
+        title: const Text('حذف الهدف', style: TextStyle(color: Colors.white, fontFamily: 'Cairo')),
+        content: const Text('هل أنت متأكد؟ لا يمكن التراجع.', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('حذف', style: TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      await Supabase.instance.client.from('savings_goals').delete().eq('id', id);
+      await _load();
+    }
+  }
+
   TextField _field(TextEditingController ctrl, String hint, TextInputType type) => TextField(
     controller: ctrl, keyboardType: type, textAlign: TextAlign.right,
     style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
@@ -222,7 +241,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             Expanded(child: Text(goal['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 15))),
                             if (isDone) const Text('✅', style: TextStyle(fontSize: 18)),
                             const SizedBox(width: 8),
-                            GestureDetector(onTap: () => _showAddDialog(existing: goal), child: const Icon(Icons.edit_outlined, color: Color(0xFF64748B), size: 18)),
+                            GestureDetector(onTap: () => _showAddDialog(existing: goal), child: Container(width: 28, height: 28, decoration: BoxDecoration(color: const Color(0xFF3B7EF6).withOpacity(0.1), borderRadius: BorderRadius.circular(7), border: Border.all(color: const Color(0xFF3B7EF6).withOpacity(0.2))), child: const Icon(Icons.edit, color: Color(0xFF3B7EF6), size: 14))),
+                            const SizedBox(width: 6),
+                            GestureDetector(onTap: () => _deleteGoal(goal['id'].toString()), child: Container(width: 28, height: 28, decoration: BoxDecoration(color: const Color(0xFFEF4444).withOpacity(0.1), borderRadius: BorderRadius.circular(7), border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.2))), child: const Icon(Icons.close, color: Color(0xFFEF4444), size: 14))),
                           ]),
                           const SizedBox(height: 12),
                           ClipRRect(borderRadius: BorderRadius.circular(6), child: LinearProgressIndicator(
