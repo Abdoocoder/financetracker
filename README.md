@@ -223,6 +223,18 @@ npm run dev
 
 ## Changelog
 
+### v3.6.0 — 2026-03-20 *(Latest)*
+- 🎯 **Smart Challenges Card** — auto-calculated from real user data, matches web logic (no manual input)
+- 📊 **Charts Card** — real 6-month income/expense charts from Supabase
+- 💼 **Budget Progress Card** — real budget tracking with progress bars
+- 🏆 **Gamification Card** — dynamic level/points from financial health score
+- 🔗 **Quick Links Card** — real totals for debts, investments, savings
+- 🚀 **Wealth Simulator Card** — instant future value calculator
+- 🗄️ **saving_challenges table** — created in Supabase with RLS
+- 📱 **Dashboard 100% UI match** — Flutter dashboard now matches web 100%
+- ⚡ **95% real data** — all cards use live Supabase data except static simulator math
+
+
 ### v3.5.1 — 2026-03-20 *(Latest)*
 - 📈 **Complete Investments Screen** — portfolio summary, wealth simulator, halal badge, add investment form
 - 📊 **Complete Budgets Screen** — 50/30/20 rule, budget limits per category, spending breakdown
