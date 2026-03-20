@@ -17,6 +17,7 @@ class TransactionsScreen extends StatefulWidget {
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Map<String, dynamic>> _transactions = [];
+  List<Map<String, dynamic>> _allTransactions = [];
   bool _loading = true;
   bool _loadingMore = false;
   int _limit = 20;
