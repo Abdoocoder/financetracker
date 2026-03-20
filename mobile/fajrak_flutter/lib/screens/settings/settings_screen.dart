@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../app_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'dart:io';
@@ -513,7 +514,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   final p =
                                       await SharedPreferences.getInstance();
                                   await p.setString('lang', 'ar');
-                                  context.setLocale(const Locale('ar'));
+                                  context.read<AppState>().setLocale(const Locale('ar'));
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
@@ -552,7 +553,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   final p =
                                       await SharedPreferences.getInstance();
                                   await p.setString('lang', 'en');
-                                  context.setLocale(const Locale('en'));
+                                  context.read<AppState>().setLocale(const Locale('en'));
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
@@ -601,7 +602,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       await SharedPreferences.getInstance();
                                   await p.setBool('darkMode', true);
                                   if (mounted) {
-                                    FajrakApp.updateAppState(context, isDarkMode: true);
+                                    context.read<AppState>().setTheme(true);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(
@@ -645,7 +646,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       await SharedPreferences.getInstance();
                                   await p.setBool('darkMode', false);
                                   if (mounted) {
-                                    FajrakApp.updateAppState(context, isDarkMode: false);
+                                    context.read<AppState>().setTheme(false);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(

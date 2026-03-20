@@ -4,10 +4,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'utils/error_handler.dart';
 import 'services/analytics_service.dart';
+import 'package:provider/provider.dart';
+import 'app_state.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -60,62 +61,33 @@ void main() async {
     return true;
   };
 
+  final appState = AppState();
+
   runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      path: 'assets/i18n',
-      fallbackLocale: const Locale('ar'),
-      child: FajrakApp(key: FajrakApp.appKey),
+    ChangeNotifierProvider.value(
+      value: appState,
+      child: const FajrakApp(),
     ),
   );
 }
 
-class FajrakApp extends StatefulWidget {
+class FajrakApp extends StatelessWidget {
   const FajrakApp({super.key});
-
-  static final GlobalKey<_FajrakAppState> appKey = GlobalKey<_FajrakAppState>();
-
-  static void updateAppState(BuildContext context, {bool? isDarkMode}) {
-    if (isDarkMode != null) {
-      appKey.currentState?.setTheme(isDarkMode);
-    }
-  }
-
-  @override
-  State<FajrakApp> createState() => _FajrakAppState();
-}
-
-class _FajrakAppState extends State<FajrakApp> {
-  bool _isDarkMode = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPrefs();
-  }
-
-  Future<void> _loadPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _isDarkMode = prefs.getBool('darkMode') ?? true;
-    });
-  }
-
-  void setTheme(bool isDark) {
-    setState(() {
-      _isDarkMode = isDark;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    final appState = context.watch<AppState>();
     return MaterialApp(
       title: 'فجرك',
       debugShowCheckedModeBanner: false,
-      theme: _isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
+      theme: appState.isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
+      locale: appState.locale,
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
