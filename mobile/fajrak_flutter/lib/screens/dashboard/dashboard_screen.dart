@@ -289,9 +289,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (user == null) return;
     setState(() => _saving = true);
     HapticFeedback.mediumImpact();
-            backgroundColor: Color(0xFF10B981),
-            duration: Duration(seconds: 2)),
-      );
+    try {
+      await Supabase.instance.client.from('transactions').insert({
+        'user_id': user.id,
+        'type': _txType,
+        'amount': amount,
+        'category': _selectedCategory,
+        'description': _selectedCategory,
+        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+      });
+      _amountController.clear();
+      await _loadAll();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content:
+                  Text('تم الإضافة ✅', style: TextStyle(fontFamily: 'Cairo')),
+              backgroundColor: Color(0xFF10B981),
+              duration: Duration(seconds: 2)),
+        );
+      }
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Dashboard QuickAdd');
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 

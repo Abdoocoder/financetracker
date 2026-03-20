@@ -236,44 +236,64 @@ class _LearnScreenState extends State<LearnScreen> {
         .toIso8601String()
         .split('T')[0];
 
-    final profile = await Supabase.instance.client
-        .from('profiles')
-        .select('lesson_streak, last_lesson_date')
-        .eq('id', user.id)
-        .single();
-    final lastLesson = profile['last_lesson_date'] as String?;
-    final currentStreak = (profile['lesson_streak'] as num?)?.toInt() ?? 0;
-    final newStreak = lastLesson == yesterday ? currentStreak + 1 : 1;
+    try {
+      final profile = await Supabase.instance.client
+          .from('profiles')
+          .select('lesson_streak, last_lesson_date')
+          .eq('id', user.id)
+          .single();
+      final lastLesson = profile['last_lesson_date'] as String?;
+      final currentStreak = (profile['lesson_streak'] as num?)?.toInt() ?? 0;
+      final newStreak = lastLesson == yesterday ? currentStreak + 1 : 1;
 
-    await Supabase.instance.client.from('profiles').update({
-                content: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Text('🔥', style: TextStyle(fontSize: 56)),
-                  const SizedBox(height: 12),
-                  Text('$newStreak يوم متواصل!',
-                      style: const TextStyle(
-                          color: Color(0xFFF59E0B),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 22,
-                          fontFamily: 'Cairo')),
-                  const SizedBox(height: 8),
-                  const Text('مبروك! الاستمرارية هي سر النجاح 💪',
-                      style: TextStyle(
-                          color: Color(0xFF94A3B8), fontFamily: 'Cairo'),
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFF59E0B),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12))),
-                    child: const Text('🎯 واصل!',
+      await Supabase.instance.client.from('profiles').update({
+        'lesson_streak': newStreak,
+        'last_lesson_date': today,
+      }).eq('id', user.id);
+
+      setState(() {
+        _completed = true;
+        _streak = newStreak;
+      });
+
+      if (mounted && newStreak % 7 == 0) {
+        showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+                  backgroundColor: const Color(0xFF0F1629),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                  content: Column(mainAxisSize: MainAxisSize.min, children: [
+                    const Text('🔥', style: TextStyle(fontSize: 56)),
+                    const SizedBox(height: 12),
+                    Text('$newStreak يوم متواصل!',
+                        style: const TextStyle(
+                            color: Color(0xFFF59E0B),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 22,
+                            fontFamily: 'Cairo')),
+                    const SizedBox(height: 8),
+                    const Text('مبروك! الاستمرارية هي سر النجاح 💪',
                         style: TextStyle(
-                            fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
-                  ),
-                ]),
-              ));
+                            color: Color(0xFF94A3B8), fontFamily: 'Cairo'),
+                        textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFF59E0B),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12))),
+                      child: const Text('🎯 واصل!',
+                          style: TextStyle(
+                              fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                    ),
+                  ]),
+                ));
+      }
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Learn MarkComplete');
     }
   }
 
