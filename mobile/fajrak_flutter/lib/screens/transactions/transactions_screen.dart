@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -62,9 +66,52 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Future<void> _exportCSV() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('جارِ تصدير CSV... (تحت التطوير)', style: TextStyle(fontFamily: 'Cairo'))),
+      const SnackBar(content: Text('جارِ تجهيز ملف CSV…', style: TextStyle(fontFamily: 'Cairo')), duration: Duration(seconds: 2)),
     );
+
+    try {
+      final data = await Supabase.instance.client
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('transaction_date', ascending: false);
+
+      final list = data as List;
+      if (list.isEmpty) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('لا توجد معاملات لتصديرها', style: TextStyle(fontFamily: 'Cairo'))),
+        );
+        return;
+      }
+
+      final buffer = StringBuffer();
+      buffer.writeln('التاريخ,النوع,المبلغ ($_currency),الفئة,الوصف');
+      for (final tx in list) {
+        final type = tx['type'] == 'income' ? 'دخل' : 'مصروف';
+        final amount = (tx['amount'] as num? ?? 0).toStringAsFixed(2);
+        final cat = (tx['category'] ?? '').toString().replaceAll(',', '،');
+        final desc = (tx['description'] ?? '').toString().replaceAll(',', '،').replaceAll('\n', ' ');
+        buffer.writeln('${tx['transaction_date']},$type,$amount,$cat,$desc');
+      }
+
+      final dir = await getTemporaryDirectory();
+      final ts = DateTime.now().millisecondsSinceEpoch;
+      final file = File('${dir.path}/fajrak_transactions_$ts.csv');
+      await file.writeAsString('﻿${buffer.toString()}', encoding: const Utf8Codec());
+
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'text/csv')],
+        text: 'معاملات فجرك 🌅',
+      );
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('خطأ في التصدير: $e', style: const TextStyle(fontFamily: 'Cairo'))),
+      );
+    }
   }
 
   List<Map<String, dynamic>> get _filtered {

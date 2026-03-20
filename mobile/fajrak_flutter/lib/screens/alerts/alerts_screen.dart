@@ -101,6 +101,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       if (_filter == 'unread') return a['is_read'] == false;
       if (_filter == 'warning') return a['type'] == 'warning';
       if (_filter == 'achievement') return a['type'] == 'achievement';
+      if (_filter == 'motivation') return a['type'] == 'motivation';
       return true;
     }).toList();
 
@@ -167,13 +168,21 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       _filterTab('unread', 'غير مقروء ($unreadCount)'),
                       _filterTab('warning', '⚠️ تحذيرات'),
                       _filterTab('achievement', '🏆 إنجازات'),
+                      _filterTab('motivation', '💡 نصائح'),
                     ]),
                   ),
                   const SizedBox(height: 16),
 
                   // Alerts List
                   if (filtered.isEmpty)
-                    const Center(child: Padding(padding: EdgeInsets.symmetric(vertical: 40), child: Text('لا توجد تنبيهات', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 16))))
+                    Center(child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: Column(children: [
+                        Text(_filter == 'all' ? '🔔' : _filter == 'warning' ? '⚠️' : _filter == 'achievement' ? '🏆' : '💡', style: const TextStyle(fontSize: 40)),
+                        const SizedBox(height: 12),
+                        const Text('لا توجد تنبيهات في هذه الفئة', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 14)),
+                      ]),
+                    ))
                   else
                     ListView.builder(
                       shrinkWrap: true,

@@ -12,6 +12,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   List<Map<String, dynamic>> _investments = [];
   bool _loading = true;
   bool _showSimulator = false;
+  bool _showInUsd = true; // USD by default for investments
+  static const _jodRate = 0.709; // 1 USD = 0.709 JOD
 
   // Wealth Simulator
   double _monthly = 100;
@@ -310,7 +312,37 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         backgroundColor: const Color(0xFF070B14),
         title: const Text('الاستثمارات', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [IconButton(icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)), onPressed: _showAddDialog)],
+        actions: [
+          // Currency toggle
+          GestureDetector(
+            onTap: () => setState(() => _showInUsd = !_showInUsd),
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFF334155)),
+              ),
+              child: Text(
+                _showInUsd ? '💵 USD' : '🇯🇴 JOD',
+                style: const TextStyle(color: Colors.white, fontSize: 11, fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Color(0xFF3B7EF6)),
+            tooltip: 'تحديث الأسعار',
+            onPressed: () async {
+              setState(() => _loading = true);
+              await _load();
+              if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم تحديث بيانات المحفظة ✅', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFF10B981), duration: Duration(seconds: 2)),
+              );
+            },
+          ),
+          IconButton(icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)), onPressed: _showAddDialog),
+        ],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
@@ -333,7 +365,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     child: Column(children: [
                       const Text('قيمة المحفظة', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 13)),
                       const SizedBox(height: 8),
-                      Text('\$${_totalValue.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                      Text(
+                        _showInUsd
+                            ? '\$${_totalValue.toStringAsFixed(2)}'
+                            : '${(_totalValue * _jodRate).toStringAsFixed(2)} JOD',
+                        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+                      ),
                       const SizedBox(height: 8),
                       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Icon(gain >= 0 ? Icons.trending_up : Icons.trending_down, color: gain >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), size: 18),

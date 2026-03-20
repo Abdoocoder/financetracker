@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -33,6 +35,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _showDeleteConfirm = false;
   final _deleteInputCtrl = TextEditingController();
   bool _deleting = false;
+
+  // Preferences
+  String _appLang = 'ar';
+  bool _isDarkMode = true;
 
   String _userEmail = '';
   String _memberSince = '';
@@ -73,6 +79,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _jewelryCtrl.text = profile['asset_jewelry']?.toString() ?? '';
         _otherAssetsCtrl.text = profile['asset_other']?.toString() ?? '';
       }
+
+      // Load preferences
+      final prefs = await SharedPreferences.getInstance();
+      _appLang = prefs.getString('lang') ?? 'ar';
+      _isDarkMode = prefs.getBool('darkMode') ?? true;
 
       // Net worth
       final txRes = await Supabase.instance.client.from('transactions').select('type,amount').eq('user_id', user.id);
@@ -270,6 +281,91 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       child: _savingProfile ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('حفظ التغييرات', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
                     )),
+                  ]),
+                ),
+                const SizedBox(height: 12),
+
+                // Preferences (Language + Theme)
+                _accordionCard(
+                  icon: '⚙️', title: 'التفضيلات',
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('اللغة', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      Expanded(child: GestureDetector(
+                        onTap: () async {
+                          setState(() => _appLang = 'ar');
+                          final p = await SharedPreferences.getInstance();
+                          await p.setString('lang', 'ar');
+                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تغيير اللغة إلى العربية ✅ (أعد تشغيل التطبيق)', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFF10B981)));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _appLang == 'ar' ? const Color(0xFF3B7EF6) : const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(child: Text('🇦🇪 العربية', style: TextStyle(color: _appLang == 'ar' ? Colors.white : const Color(0xFF94A3B8), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                        ),
+                      )),
+                      const SizedBox(width: 8),
+                      Expanded(child: GestureDetector(
+                        onTap: () async {
+                          setState(() => _appLang = 'en');
+                          final p = await SharedPreferences.getInstance();
+                          await p.setString('lang', 'en');
+                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Language changed to English ✅ (Restart app)', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFF10B981)));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _appLang == 'en' ? const Color(0xFF3B7EF6) : const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(child: Text('🇬🇧 English', style: TextStyle(color: _appLang == 'en' ? Colors.white : const Color(0xFF94A3B8), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                        ),
+                      )),
+                    ]),
+                    const SizedBox(height: 20),
+                    const Text('الثيم', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      Expanded(child: GestureDetector(
+                        onTap: () async {
+                          setState(() => _isDarkMode = true);
+                          final p = await SharedPreferences.getInstance();
+                          await p.setBool('darkMode', true);
+                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تفعيل الوضع الداكن ✅ (أعد تشغيل التطبيق)', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFF10B981)));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _isDarkMode ? const Color(0xFF1E293B) : const Color(0xFF0F172A),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: _isDarkMode ? const Color(0xFF3B7EF6) : Colors.transparent, width: 1.5),
+                          ),
+                          child: Center(child: Text('🌙 داكن', style: TextStyle(color: _isDarkMode ? Colors.white : const Color(0xFF94A3B8), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                        ),
+                      )),
+                      const SizedBox(width: 8),
+                      Expanded(child: GestureDetector(
+                        onTap: () async {
+                          setState(() => _isDarkMode = false);
+                          final p = await SharedPreferences.getInstance();
+                          await p.setBool('darkMode', false);
+                          if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تفعيل الوضع الفاتح ✅ (أعد تشغيل التطبيق)', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFF10B981)));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: !_isDarkMode ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: !_isDarkMode ? const Color(0xFF3B7EF6) : Colors.transparent, width: 1.5),
+                          ),
+                          child: Center(child: Text('☀️ فاتح', style: TextStyle(color: !_isDarkMode ? const Color(0xFF1E293B) : const Color(0xFF94A3B8), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                        ),
+                      )),
+                    ]),
                   ]),
                 ),
                 const SizedBox(height: 12),
