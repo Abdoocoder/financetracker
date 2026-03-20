@@ -38,7 +38,12 @@ class ChartsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('نظرة عامة (6 أشهر)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 14)),
+          const Text('نظرة عامة (6 أشهر)',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Cairo',
+                  fontSize: 14)),
           const SizedBox(height: 24),
           SizedBox(
             height: 200,
@@ -53,12 +58,16 @@ class ChartsCard extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < months6Data.length) {
+                        if (value.toInt() >= 0 &&
+                            value.toInt() < months6Data.length) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               months6Data[value.toInt()]['month'],
-                              style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo'),
+                              style: const TextStyle(
+                                  color: Color(0xFF94A3B8),
+                                  fontSize: 10,
+                                  fontFamily: 'Cairo'),
                             ),
                           );
                         }
@@ -66,9 +75,12 @@ class ChartsCard extends StatelessWidget {
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: const FlGridData(show: false),
                 borderData: FlBorderData(show: false),
@@ -114,15 +126,20 @@ class ChartsCard extends StatelessWidget {
       if (m['income'] > maxVal) maxVal = m['income'];
       if (m['expense'] > maxVal) maxVal = m['expense'];
     }
-    return maxVal == 0 ? 100 : maxVal * 1.2; 
+    return maxVal == 0 ? 100 : maxVal * 1.2;
   }
 
   Widget _buildLegend(Color color, String label) {
     return Row(
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 6),
-        Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+        Text(label,
+            style: const TextStyle(
+                color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
       ],
     );
   }
@@ -138,7 +155,12 @@ class ChartsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('توزيع المصاريف (هذا الشهر)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 14)),
+          const Text('توزيع المصاريف (هذا الشهر)',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Cairo',
+                  fontSize: 14)),
           const SizedBox(height: 16),
           ...categoryData.map((cat) {
             return Padding(
@@ -147,7 +169,11 @@ class ChartsCard extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: Text(cat['category'], style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo')),
+                    child: Text(cat['category'],
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontFamily: 'Cairo')),
                   ),
                   Expanded(
                     flex: 5,
@@ -166,7 +192,11 @@ class ChartsCard extends StatelessWidget {
                     width: 70,
                     child: Text(
                       '${cat['amount'].toStringAsFixed(0)} $currency',
-                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'Cairo'),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Cairo'),
                       textAlign: TextAlign.left,
                     ),
                   ),

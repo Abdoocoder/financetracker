@@ -53,7 +53,8 @@ class GamificationCard extends StatelessWidget {
               color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Center(child: Text(icon, style: const TextStyle(fontSize: 24))),
+            child:
+                Center(child: Text(icon, style: const TextStyle(fontSize: 24))),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -63,8 +64,18 @@ class GamificationCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('المستوى $rank', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
-                    Text('$score نقطة', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'Cairo')),
+                    Text('المستوى $rank',
+                        style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.w900,
+                            fontFamily: 'Cairo',
+                            fontSize: 13)),
+                    Text('$score نقطة',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Cairo')),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -78,7 +89,14 @@ class GamificationCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(score >= 100 ? 'أنت في أعلى مستوى، حافظ عليه!' : 'تحكم بنفقاتك أكثر لرفع مستواك وفتح شارات جديدة 🏆', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+                Text(
+                    score >= 100
+                        ? 'أنت في أعلى مستوى، حافظ عليه!'
+                        : 'تحكم بنفقاتك أكثر لرفع مستواك وفتح شارات جديدة 🏆',
+                    style: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 10,
+                        fontFamily: 'Cairo')),
               ],
             ),
           ),

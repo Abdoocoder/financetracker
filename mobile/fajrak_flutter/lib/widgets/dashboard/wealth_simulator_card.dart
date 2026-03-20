@@ -24,7 +24,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
     final double r = (_expectedReturn / 100) / 12;
     final int n = (_years * 12).toInt();
     final double p = _monthlyContribution;
-    
+
     double futureValue = 0;
     if (r > 0) {
       futureValue = p * ((pow(1 + r, n) - 1) / r);
@@ -42,31 +42,48 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: const [
+          const Row(
+            children: [
               Text('💰', style: TextStyle(fontSize: 18)),
               SizedBox(width: 8),
-              Text('محاكي الثروة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 14)),
+              Text('محاكي الثروة',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Cairo',
+                      fontSize: 14)),
             ],
           ),
           const SizedBox(height: 16),
           Center(
             child: Text(
               '${futureValue.toStringAsFixed(0)} ${widget.currency}',
-              style: const TextStyle(color: Color(0xFF10B981), fontSize: 26, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+              style: const TextStyle(
+                  color: Color(0xFF10B981),
+                  fontSize: 26,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Cairo'),
             ),
           ),
           const Center(
-            child: Text('الثروة المتوقعة بناءً على المعطيات', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+            child: Text('الثروة المتوقعة بناءً على المعطيات',
+                style: TextStyle(
+                    color: Color(0xFF94A3B8),
+                    fontSize: 11,
+                    fontFamily: 'Cairo')),
           ),
           const SizedBox(height: 24),
-          _buildSlider('الاستثمار الشهري', _monthlyContribution, 0, 5000, '${_monthlyContribution.toStringAsFixed(0)}', (val) {
+          _buildSlider('الاستثمار الشهري', _monthlyContribution, 0, 5000,
+              _monthlyContribution.toStringAsFixed(0), (val) {
             setState(() => _monthlyContribution = val);
           }),
-          _buildSlider('السنوات', _years, 1, 40, '${_years.toStringAsFixed(0)} سنة', (val) {
+          _buildSlider(
+              'السنوات', _years, 1, 40, '${_years.toStringAsFixed(0)} سنة',
+              (val) {
             setState(() => _years = val);
           }),
-          _buildSlider('العائد السنوي المتوقع', _expectedReturn, 1, 20, '${_expectedReturn.toStringAsFixed(1)}%', (val) {
+          _buildSlider('العائد السنوي المتوقع', _expectedReturn, 1, 20,
+              '${_expectedReturn.toStringAsFixed(1)}%', (val) {
             setState(() => _expectedReturn = val);
           }),
         ],
@@ -74,15 +91,25 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
     );
   }
 
-  Widget _buildSlider(String label, double value, double min, double max, String formattedValue, ValueChanged<double> onChanged) {
+  Widget _buildSlider(String label, double value, double min, double max,
+      String formattedValue, ValueChanged<double> onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(color: Color(0xFFE2E8F0), fontSize: 12, fontFamily: 'Cairo')),
-            Text(formattedValue, style: const TextStyle(color: Color(0xFF3B7EF6), fontSize: 13, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+            Text(label,
+                style: const TextStyle(
+                    color: Color(0xFFE2E8F0),
+                    fontSize: 12,
+                    fontFamily: 'Cairo')),
+            Text(formattedValue,
+                style: const TextStyle(
+                    color: Color(0xFF3B7EF6),
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Cairo')),
           ],
         ),
         SliderTheme(

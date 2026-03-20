@@ -32,7 +32,8 @@ class _ChallengesCardState extends State<ChallengesCard> {
   double _getProgress(int id) {
     if (id == 1) {
       if (widget.expensesFood == 0) return 100.0;
-      return (100.0 - (widget.expensesFood / widget.expectedFoodLimit * 100)).clamp(0.0, 100.0);
+      return (100.0 - (widget.expensesFood / widget.expectedFoodLimit * 100))
+          .clamp(0.0, 100.0);
     }
     if (id == 2) {
       final target = widget.income * 0.1;
@@ -72,11 +73,20 @@ class _ChallengesCardState extends State<ChallengesCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('🏆 تحديات الادخار', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 14)),
+              const Text('🏆 تحديات الادخار',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Cairo',
+                      fontSize: 14)),
               if (_activeChallenge != null)
                 GestureDetector(
                   onTap: () => setState(() => _activeChallenge = null),
-                  child: const Text('الكل', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+                  child: const Text('الكل',
+                      style: TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 12,
+                          fontFamily: 'Cairo')),
                 )
             ],
           ),
@@ -90,16 +100,23 @@ class _ChallengesCardState extends State<ChallengesCard> {
   Widget _buildActiveChallenge() {
     final active = _challenges.firstWhere((c) => c['id'] == _activeChallenge);
     final pct = _getProgress(active['id'] as int);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         children: [
           Text(active['icon'] as String, style: const TextStyle(fontSize: 36)),
           const SizedBox(height: 8),
-          Text(active['title'] as String, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Cairo')),
+          Text(active['title'] as String,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Cairo')),
           const SizedBox(height: 4),
-          Text('${active['days']} يوم', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+          Text('${active['days']} يوم',
+              style: const TextStyle(
+                  color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
@@ -111,7 +128,12 @@ class _ChallengesCardState extends State<ChallengesCard> {
             ),
           ),
           const SizedBox(height: 6),
-          Text('${pct.toStringAsFixed(0)}%', style: const TextStyle(color: Color(0xFF93C5FD), fontSize: 13, fontWeight: FontWeight.w900, fontFamily: 'monospace')),
+          Text('${pct.toStringAsFixed(0)}%',
+              style: const TextStyle(
+                  color: Color(0xFF93C5FD),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'monospace')),
         ],
       ),
     );
@@ -128,8 +150,9 @@ class _ChallengesCardState extends State<ChallengesCard> {
       children: _challenges.map((c) {
         final pct = _getProgress(c['id'] as int);
         final isCompleted = pct >= 100;
-        final color = isCompleted ? const Color(0xFF10B981) : const Color(0xFF3B7EF6);
-        
+        final color =
+            isCompleted ? const Color(0xFF10B981) : const Color(0xFF3B7EF6);
+
         return GestureDetector(
           onTap: () => setState(() => _activeChallenge = c['id'] as int),
           child: Container(
@@ -147,7 +170,12 @@ class _ChallengesCardState extends State<ChallengesCard> {
                 Expanded(
                   child: Text(
                     c['title'] as String,
-                    style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Cairo', height: 1.3),
+                    style: const TextStyle(
+                        color: Color(0xFFCBD5E1),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Cairo',
+                        height: 1.3),
                     textAlign: TextAlign.right,
                   ),
                 ),
@@ -163,7 +191,13 @@ class _ChallengesCardState extends State<ChallengesCard> {
                 const SizedBox(height: 4),
                 Text(
                   '${isCompleted ? '✅ ' : ''}${pct.toStringAsFixed(0)}%',
-                  style: TextStyle(color: isCompleted ? const Color(0xFF6EE7B7) : const Color(0xFF93C5FD), fontSize: 10, fontWeight: FontWeight.w900, fontFamily: 'monospace'),
+                  style: TextStyle(
+                      color: isCompleted
+                          ? const Color(0xFF6EE7B7)
+                          : const Color(0xFF93C5FD),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'monospace'),
                 ),
               ],
             ),

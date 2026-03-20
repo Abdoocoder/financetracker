@@ -66,7 +66,8 @@ class _MainScreenState extends State<MainScreen> {
                 _navItem(1, Icons.pie_chart_outline, 'الميزانية'),
                 _navItem(2, Icons.credit_card_outlined, 'الديون'),
                 _navItem(3, Icons.swap_vert, 'المعاملات'),
-                _navItem(4, Icons.dashboard_outlined, 'الرئيسية', badge: _unreadAlerts),
+                _navItem(4, Icons.dashboard_outlined, 'الرئيسية',
+                    badge: _unreadAlerts),
               ],
             ),
           ),
@@ -88,37 +89,53 @@ class _MainScreenState extends State<MainScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF3B7EF6).withValues(alpha: 0.15) : Colors.transparent,
+                  color: isSelected
+                      ? const Color(0xFF3B7EF6).withValues(alpha: 0.15)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isSelected ? _filledIcon(icon) : icon,
-                  color: isSelected ? const Color(0xFF3B7EF6) : const Color(0xFF64748B),
+                  color: isSelected
+                      ? const Color(0xFF3B7EF6)
+                      : const Color(0xFF64748B),
                   size: 24,
                 ),
               ),
               if (badge > 0)
                 Positioned(
-                  top: 0, right: 0,
+                  top: 0,
+                  right: 0,
                   child: Container(
-                    width: 16, height: 16,
-                    decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
-                    child: Center(child: Text('$badge', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900))),
+                    width: 16,
+                    height: 16,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFFEF4444), shape: BoxShape.circle),
+                    child: Center(
+                        child: Text('$badge',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w900))),
                   ),
                 ),
             ],
           ),
           const SizedBox(height: 2),
-          Text(label, style: TextStyle(
-            fontSize: 10,
-            fontFamily: 'Cairo',
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-            color: isSelected ? const Color(0xFF3B7EF6) : const Color(0xFF64748B),
-          )),
+          Text(label,
+              style: TextStyle(
+                fontSize: 10,
+                fontFamily: 'Cairo',
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                color: isSelected
+                    ? const Color(0xFF3B7EF6)
+                    : const Color(0xFF64748B),
+              )),
           if (isSelected)
             Container(
               margin: const EdgeInsets.only(top: 3),
-              width: 20, height: 3,
+              width: 20,
+              height: 3,
               decoration: BoxDecoration(
                 color: const Color(0xFF3B7EF6),
                 borderRadius: BorderRadius.circular(2),
