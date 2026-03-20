@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -50,6 +52,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Goals');
     _load();
   }
 
@@ -221,19 +224,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       'name': nameCtrl.text,
                       'icon': selectedIcon,
                       'target_amount': double.tryParse(targetCtrl.text) ?? 0,
-                      'current_amount': double.tryParse(currentCtrl.text) ?? 0,
-                      'deadline': deadlineDate.isEmpty ? null : deadlineDate,
-                    };
-                    if (existing != null) {
-                      await Supabase.instance.client
-                          .from('savings_goals')
-                          .update(data)
-                          .eq('id', existing['id']);
-                    } else {
-                      await Supabase.instance.client
-                          .from('savings_goals')
-                          .insert(data);
-                    }
                     if (ctx.mounted) Navigator.pop(ctx);
                     await _load();
                   },

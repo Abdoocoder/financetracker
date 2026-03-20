@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
@@ -39,67 +42,77 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Achievements');
     _load();
   }
 
   Future<void> _load() async {
     final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
 
-    // استدعاء API الإنجازات
     try {
-      final res = await Supabase.instance.client.functions.invoke(
-        'gamification',
-        body: {'user_id': user.id},
-      );
-      // إذا ما يشتغل الـ function، نجلب من user_stats مباشرة
-    } catch (_) {}
-
-    final stats = await Supabase.instance.client
-        .from('user_stats')
-        .select('points, badges')
-        .eq('id', user.id)
-        .maybeSingle();
-
-    if (stats != null && mounted) {
-      final points = (stats['points'] as num?)?.toInt() ?? 0;
-      final badges = (stats['badges'] as List?)?.cast<String>() ?? [];
-
-      String levelTitle = '🌱 مبتدئ';
-      int level = 1;
-      int nextLevel = 50;
-      if (points >= 1200) {
-        level = 6;
-        levelTitle = '👑 حر مالياً';
-        nextLevel = 9999;
-      } else if (points >= 700) {
-        level = 5;
-        levelTitle = '💎 ثري مبتدئ';
-        nextLevel = 1200;
-      } else if (points >= 350) {
-        level = 4;
-        levelTitle = '📈 مستثمر';
-        nextLevel = 700;
-      } else if (points >= 150) {
-        level = 3;
-        levelTitle = '💪 مدخر';
-        nextLevel = 350;
-      } else if (points >= 50) {
-        level = 2;
-        levelTitle = '🔥 متتبع';
-        nextLevel = 150;
+      // استدعاء API الإنجازات
+      try {
+        await Supabase.instance.client.functions.invoke(
+          'gamification',
+          body: {'user_id': user.id},
+        );
+        // إذا ما يشتغل الـ function، نجلب من user_stats مباشرة
+      } catch (_) {
+        // This catch is for the gamification function specifically,
+        // the outer catch will handle general errors.
       }
 
-      setState(() {
-        _points = points;
-        _badges = badges;
-        _level = level;
-        _levelTitle = levelTitle;
-        _nextLevel = nextLevel;
-        _loading = false;
-      });
-    } else {
-      setState(() => _loading = false);
+      final stats = await Supabase.instance.client
+          .from('user_stats')
+          .select('points, badges')
+          .eq('id', user.id)
+          .maybeSingle();
+
+      if (stats != null && mounted) {
+        final points = (stats['points'] as num?)?.toInt() ?? 0;
+        final badges = (stats['badges'] as List?)?.cast<String>() ?? [];
+
+        String levelTitle = '🌱 مبتدئ';
+        int level = 1;
+        int nextLevel = 50;
+        if (points >= 1200) {
+          level = 6;
+          levelTitle = '👑 حر مالياً';
+          nextLevel = 9999;
+        } else if (points >= 700) {
+          level = 5;
+          levelTitle = '💎 ثري مبتدئ';
+          nextLevel = 1200;
+        } else if (points >= 350) {
+          level = 4;
+          levelTitle = '📈 مستثمر';
+          nextLevel = 700;
+        } else if (points >= 150) {
+          level = 3;
+          levelTitle = '💪 مدخر';
+          nextLevel = 350;
+        } else if (points >= 50) {
+          level = 2;
+          levelTitle = '🔥 متتبع';
+          nextLevel = 150;
+        }
+
+        setState(() {
+          _points = points;
+          _badges = badges;
+          _level = level;
+          _levelTitle = levelTitle;
+          _nextLevel = nextLevel;
+        });
+      }
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Achievements Load');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 

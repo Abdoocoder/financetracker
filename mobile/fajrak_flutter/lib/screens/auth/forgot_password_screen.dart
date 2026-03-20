@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -13,6 +15,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _loading = false;
   bool _sent = false;
 
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('ForgotPassword');
+  }
+
   Future<void> _send() async {
     setState(() => _loading = true);
     try {
@@ -24,16 +32,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _sent = true;
         _loading = false;
       });
-    } catch (_) {
-      setState(() => _loading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('حدث خطأ — تحقق من البريد',
-                  style: TextStyle(fontFamily: 'Cairo')),
-              backgroundColor: Color(0xFFEF4444)),
-        );
-      }
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'ForgotPassword Action');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 

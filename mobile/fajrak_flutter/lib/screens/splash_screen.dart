@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/analytics_service.dart';
+import '../utils/error_handler.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -29,17 +31,33 @@ class _SplashScreenState extends State<SplashScreen>
       CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
     );
     _controller.forward();
-    _navigate();
+    AnalyticsService.logScreenView('Splash');
+    _checkUser();
   }
 
-  Future<void> _navigate() async {
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session != null) {
-      Navigator.pushReplacementNamed(context, '/main');
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
+  Future<void> _checkUser() async {
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      final user = Supabase.instance.client.auth.currentUser;
+      if (mounted) {
+        if (user == null) {
+          Navigator.pushReplacementNamed(context, '/login');
+        } else {
+          final res = await Supabase.instance.client
+              .from('profiles')
+              .select('onboarding_done')
+              .eq('id', user.id)
+              .maybeSingle();
+
+          if (res != null && res['onboarding_done'] == true) {
+            Navigator.pushReplacementNamed(context, '/main');
+          } else {
+            Navigator.pushReplacementNamed(context, '/onboarding');
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Splash CheckUser');
     }
   }
 

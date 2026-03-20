@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -16,6 +18,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _obscure = true;
   String? _error;
   bool _success = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('ResetPassword');
+  }
 
   Future<void> _reset() async {
     if (_passwordController.text != _confirmController.text) {
@@ -38,8 +46,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       setState(() => _success = true);
       await Future.delayed(const Duration(seconds: 2));
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
-    } on AuthException catch (e) {
-      setState(() => _error = e.message);
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'ResetPassword Action');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

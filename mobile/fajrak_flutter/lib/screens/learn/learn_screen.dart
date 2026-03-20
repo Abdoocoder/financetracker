@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -157,6 +159,7 @@ class _LearnScreenState extends State<LearnScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Learn');
     _load();
   }
 
@@ -243,22 +246,6 @@ class _LearnScreenState extends State<LearnScreen> {
     final newStreak = lastLesson == yesterday ? currentStreak + 1 : 1;
 
     await Supabase.instance.client.from('profiles').update({
-      'lesson_streak': newStreak,
-      'last_lesson_date': today,
-    }).eq('id', user.id);
-
-    setState(() {
-      _completed = true;
-      _streak = newStreak;
-    });
-
-    if (mounted && newStreak % 7 == 0) {
-      showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-                backgroundColor: const Color(0xFF0F1629),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
                 content: Column(mainAxisSize: MainAxisSize.min, children: [
                   const Text('🔥', style: TextStyle(fontSize: 56)),
                   const SizedBox(height: 12),

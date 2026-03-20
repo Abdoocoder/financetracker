@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,6 +18,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _loading = false;
   bool _obscure = true;
   String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('Register');
+  }
 
   Future<void> _register() async {
     if (_nameController.text.isEmpty ||
@@ -37,8 +45,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (res.user != null && mounted) {
         Navigator.pushReplacementNamed(context, '/onboarding');
       }
-    } on AuthException catch (e) {
-      setState(() => _error = e.message);
+    } catch (e) {
+      if (mounted) {
+        ErrorHandler.handle(e, context: context, developerMessage: 'Register Action');
+        // Optionally, if ErrorHandler doesn't update _error, you might do it here
+        // if (e is AuthException) {
+        //   setState(() => _error = e.message);
+        // } else {
+        //   setState(() => _error = 'An unexpected error occurred.');
+        // }
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
