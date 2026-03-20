@@ -17,11 +17,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _error;
 
   Future<void> _register() async {
-    if (_nameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_nameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
       setState(() => _error = 'يرجى ملء جميع الحقول');
       return;
     }
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final res = await Supabase.instance.client.auth.signUp(
         email: _emailController.text.trim(),
@@ -49,17 +54,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const SizedBox(height: 40),
               Container(
-                width: 72, height: 72,
+                width: 72,
+                height: 72,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
+                  gradient: const LinearGradient(
+                      colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Center(child: Text('ف', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo'))),
+                child: const Center(
+                    child: Text('ف',
+                        style: TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            fontFamily: 'Cairo'))),
               ),
               const SizedBox(height: 24),
-              const Text('إنشاء حساب جديد', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')),
+              const Text('إنشاء حساب جديد',
+                  style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              const Text('ابدأ رحلتك نحو الحرية المالية', style: TextStyle(fontSize: 14, color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+              const Text('ابدأ رحلتك نحو الحرية المالية',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF94A3B8),
+                      fontFamily: 'Cairo')),
               const SizedBox(height: 32),
               if (_error != null) ...[
                 Container(
@@ -67,35 +89,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
                   ),
-                  child: Text(_error!, style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontSize: 13), textAlign: TextAlign.center),
+                  child: Text(_error!,
+                      style: const TextStyle(
+                          color: Color(0xFFEF4444),
+                          fontFamily: 'Cairo',
+                          fontSize: 13),
+                      textAlign: TextAlign.center),
                 ),
                 const SizedBox(height: 16),
               ],
               TextFormField(
                 controller: _nameController,
-                style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(labelText: 'الاسم الكامل', prefixIcon: Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
+                style:
+                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                decoration: const InputDecoration(
+                    labelText: 'الاسم الكامل',
+                    prefixIcon:
+                        Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 textDirection: TextDirection.ltr,
-                style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(labelText: 'البريد الإلكتروني', prefixIcon: Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
+                style:
+                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                decoration: const InputDecoration(
+                    labelText: 'البريد الإلكتروني',
+                    prefixIcon:
+                        Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style:
+                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                   labelText: 'كلمة المرور',
-                  prefixIcon: const Icon(Icons.lock_outlined, color: Color(0xFF94A3B8)),
+                  prefixIcon:
+                      const Icon(Icons.lock_outlined, color: Color(0xFF94A3B8)),
                   suffixIcon: IconButton(
-                    icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: const Color(0xFF94A3B8)),
+                    icon: Icon(
+                        _obscure
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: const Color(0xFF94A3B8)),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
@@ -104,17 +146,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ElevatedButton(
                 onPressed: _loading ? null : _register,
                 child: _loading
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Text('إنشاء الحساب'),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('لديك حساب بالفعل؟', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+                  const Text('لديك حساب بالفعل؟',
+                      style: TextStyle(
+                          color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
                   TextButton(
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-                    child: const Text('سجل دخولك', style: TextStyle(color: Color(0xFF3B7EF6), fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, '/login'),
+                    child: const Text('سجل دخولك',
+                        style: TextStyle(
+                            color: Color(0xFF3B7EF6),
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),

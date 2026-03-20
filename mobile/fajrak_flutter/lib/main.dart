@@ -13,7 +13,6 @@ import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
 import 'services/notification_service.dart';
 
-
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -38,10 +37,10 @@ void main() async {
     ),
     anonKey: const String.fromEnvironment(
       'SUPABASE_ANON_KEY',
-      defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd2N2dHB3c2FpZGxqZWNxYmFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTUxNTQsImV4cCI6MjA4ODU3MTE1NH0.AgwLNG0i3srUCixr_b47of6ur7RlCZuUio7DivPzlCw',
+      defaultValue:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd2N2dHB3c2FpZGxqZWNxYmFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTUxNTQsImV4cCI6MjA4ODU3MTE1NH0.AgwLNG0i3srUCixr_b47of6ur7RlCZuUio7DivPzlCw',
     ),
   );
-
 
   await NotificationService.initialize();
 

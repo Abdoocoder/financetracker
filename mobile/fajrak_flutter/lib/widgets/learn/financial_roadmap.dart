@@ -12,10 +12,10 @@ class FinancialRoadmap extends StatelessWidget {
   Widget build(BuildContext context) {
     final stages = [
       {'id': 'awareness', 'icon': '🌱', 'title': 'الوعي'},
-      {'id': 'debt',      'icon': '💳', 'title': 'الديون'},
+      {'id': 'debt', 'icon': '💳', 'title': 'الديون'},
       {'id': 'emergency', 'icon': '🛡️', 'title': 'الطوارئ'},
       {'id': 'investing', 'icon': '📈', 'title': 'الاستثمار'},
-      {'id': 'wealth',    'icon': '👑', 'title': 'الثروة'},
+      {'id': 'wealth', 'icon': '👑', 'title': 'الثروة'},
     ];
 
     int currentIndex = stages.indexWhere((s) => s['id'] == currentStage);
@@ -44,7 +44,11 @@ class FinancialRoadmap extends StatelessWidget {
               final s = stages[index];
               final bool isPast = index < currentIndex;
               final bool isCurrent = index == currentIndex;
-              final Color color = isCurrent ? const Color(0xFF3B7EF6) : (isPast ? const Color(0xFF10B981) : const Color(0xFF475569));
+              final Color color = isCurrent
+                  ? const Color(0xFF3B7EF6)
+                  : (isPast
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFF475569));
 
               return Column(
                 children: [
@@ -52,15 +56,32 @@ class FinancialRoadmap extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: isCurrent ? color.withValues(alpha: 0.1) : const Color(0xFF0F1629),
+                      color: isCurrent
+                          ? color.withValues(alpha: 0.1)
+                          : const Color(0xFF0F1629),
                       shape: BoxShape.circle,
-                      border: Border.all(color: color, width: isCurrent ? 2 : 1),
-                      boxShadow: isCurrent ? [BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 10)] : null,
+                      border:
+                          Border.all(color: color, width: isCurrent ? 2 : 1),
+                      boxShadow: isCurrent
+                          ? [
+                              BoxShadow(
+                                  color: color.withValues(alpha: 0.3),
+                                  blurRadius: 10)
+                            ]
+                          : null,
                     ),
-                    child: Center(child: Text(s['icon'] as String, style: const TextStyle(fontSize: 20))),
+                    child: Center(
+                        child: Text(s['icon'] as String,
+                            style: const TextStyle(fontSize: 20))),
                   ),
                   const SizedBox(height: 6),
-                  Text(s['title'] as String, style: TextStyle(color: color, fontSize: 10, fontWeight: isCurrent ? FontWeight.w900 : FontWeight.w500, fontFamily: 'Cairo')),
+                  Text(s['title'] as String,
+                      style: TextStyle(
+                          color: color,
+                          fontSize: 10,
+                          fontWeight:
+                              isCurrent ? FontWeight.w900 : FontWeight.w500,
+                          fontFamily: 'Cairo')),
                 ],
               );
             }),

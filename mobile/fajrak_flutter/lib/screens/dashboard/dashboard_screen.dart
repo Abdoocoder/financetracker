@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
 import '../../widgets/dashboard/quick_links_card.dart';
@@ -45,7 +44,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _txType = 'expense';
   bool _saving = false;
 
-  final _categories = ['طعام', 'مواصلات', 'فواتير', 'صحة', 'ترفيه', 'تسوق', 'راتب', 'عمل حر', 'أخرى'];
+  final _categories = [
+    'طعام',
+    'مواصلات',
+    'فواتير',
+    'صحة',
+    'ترفيه',
+    'تسوق',
+    'راتب',
+    'عمل حر',
+    'أخرى'
+  ];
 
   @override
   void initState() {
@@ -64,19 +73,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (user == null) return;
     final now = DateTime.now();
     final firstDayCurrentMonth = DateTime(now.year, now.month, 1);
-    final firstDay6MonthsAgo = DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
+    final firstDay6MonthsAgo =
+        DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
 
     final results = await Future.wait<dynamic>([
-      Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
-      Supabase.instance.client.from('transactions').select('type, amount, transaction_date, category').eq('user_id', user.id).gte('transaction_date', firstDay6MonthsAgo),
-      Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
-      Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
-      Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
-      Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
-      Supabase.instance.client.from('alerts').select('id').eq('user_id', user.id).eq('is_read', false).count(),
-      Supabase.instance.client.from('debts').select('id').eq('user_id', user.id).eq('is_paid', true).count(),
-      Supabase.instance.client.from('savings_goals').select('id').eq('user_id', user.id).filter('current_amount', 'gte', 'target_amount').count(),
-      Supabase.instance.client.from('profiles').select('lesson_streak').eq('id', user.id).single(),
+      Supabase.instance.client
+          .from('profiles')
+          .select('full_name, monthly_income, currency')
+          .eq('id', user.id)
+          .single(),
+      Supabase.instance.client
+          .from('transactions')
+          .select('type, amount, transaction_date, category')
+          .eq('user_id', user.id)
+          .gte('transaction_date', firstDay6MonthsAgo),
+      Supabase.instance.client
+          .from('transactions')
+          .select('id, type, amount, category, description, transaction_date')
+          .eq('user_id', user.id)
+          .order('transaction_date', ascending: false)
+          .limit(5),
+      Supabase.instance.client
+          .from('debts')
+          .select('remaining_amount, monthly_payment')
+          .eq('user_id', user.id)
+          .eq('is_paid', false),
+      Supabase.instance.client
+          .from('investments')
+          .select('shares, current_price')
+          .eq('user_id', user.id),
+      Supabase.instance.client
+          .from('savings_goals')
+          .select('current_amount, target_amount')
+          .eq('user_id', user.id),
+      Supabase.instance.client
+          .from('alerts')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('is_read', false)
+          .count(),
+      Supabase.instance.client
+          .from('debts')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('is_paid', true)
+          .count(),
+      Supabase.instance.client
+          .from('savings_goals')
+          .select('id')
+          .eq('user_id', user.id)
+          .filter('current_amount', 'gte', 'target_amount')
+          .count(),
+      Supabase.instance.client
+          .from('profiles')
+          .select('lesson_streak')
+          .eq('id', user.id)
+          .single(),
     ]);
 
     final profile = results[0] as Map<String, dynamic>;
@@ -89,31 +141,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     double txIncome = 0, txExpenses = 0, prevExpenses = 0;
     Map<String, double> catMap = {};
-    
+
     // Group tx into months and categories
     List<Map<String, dynamic>> months6 = List.generate(6, (i) {
       final d = DateTime(now.year, now.month - (5 - i), 1);
       final key = '${d.year}-${d.month.toString().padLeft(2, '0')}';
-      return {'month': '${d.month}/${d.year}', 'key': key, 'income': 0.0, 'expense': 0.0};
+      return {
+        'month': '${d.month}/${d.year}',
+        'key': key,
+        'income': 0.0,
+        'expense': 0.0
+      };
     });
 
     for (final tx in txs) {
       final amount = (tx['amount'] as num).toDouble();
       final dateStr = tx['transaction_date'] as String?;
       if (dateStr == null) continue;
-      
+
       final key = dateStr.substring(0, 7); // YYYY-MM
       final isIncome = tx['type'] == 'income';
-      
+
       for (var m in months6) {
         if (m['key'] == key) {
-          if (isIncome) m['income'] += amount;
-          else m['expense'] += amount;
+          if (isIncome) {
+            m['income'] += amount;
+          } else {
+            m['expense'] += amount;
+          }
         }
       }
 
       final txDate = DateTime.parse(dateStr);
-      if (txDate.isAfter(firstDayCurrentMonth.subtract(const Duration(days: 1)))) {
+      if (txDate
+          .isAfter(firstDayCurrentMonth.subtract(const Duration(days: 1)))) {
         if (isIncome) {
           txIncome += amount;
         } else {
@@ -121,15 +182,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final cat = tx['category'] as String? ?? 'أخرى';
           catMap[cat] = (catMap[cat] ?? 0) + amount;
         }
-      } else if (txDate.isAfter(DateTime(now.year, now.month - 1, 1).subtract(const Duration(days: 1))) && 
-                 txDate.isBefore(firstDayCurrentMonth)) {
+      } else if (txDate.isAfter(DateTime(now.year, now.month - 1, 1)
+              .subtract(const Duration(days: 1))) &&
+          txDate.isBefore(firstDayCurrentMonth)) {
         if (!isIncome) {
           prevExpenses += amount;
         }
       }
     }
 
-    final sortedCats = catMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final sortedCats = catMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
     final categories = sortedCats.take(5).map((e) {
       return {
         'category': e.key,
@@ -140,21 +203,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
     final income = txIncome > 0 ? txIncome : profileIncome;
-    final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
-    final totalMonthly = debts.fold(0.0, (a, d) => a + (d['monthly_payment'] as num? ?? 0).toDouble());
-    final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
-    final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
-    final goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num? ?? 0).toDouble());
+    final totalDebt = debts.fold(
+        0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+    final totalMonthly = debts.fold(
+        0.0, (a, d) => a + (d['monthly_payment'] as num? ?? 0).toDouble());
+    final invValue = investments.fold(
+        0.0,
+        (a, i) =>
+            a +
+            (i['shares'] as num).toDouble() *
+                (i['current_price'] as num).toDouble());
+    final goalsSaved =
+        goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+    final goalsTarget = goals.fold(
+        0.0, (a, g) => a + (g['target_amount'] as num? ?? 0).toDouble());
 
     // Health Score
     int score = 0;
     final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
-    if (savingsRate >= 0.2) score += 30;
-    else if (savingsRate >= 0.1) score += 20;
+    if (savingsRate >= 0.2) {
+      score += 30;
+    } else if (savingsRate >= 0.1)
+      score += 20;
     else if (savingsRate > 0) score += 10;
     final debtRatio = income > 0 ? totalDebt / (income * 12) : 1;
-    if (totalDebt == 0) score += 25;
-    else if (debtRatio < 0.3) score += 20;
+    if (totalDebt == 0) {
+      score += 25;
+    } else if (debtRatio < 0.3)
+      score += 20;
     else if (debtRatio < 0.6) score += 10;
     if (goalsSaved > 0) score += 20;
     if (invValue > 0) score += 15;
@@ -162,35 +238,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Stage
     String stage = 'awareness';
-    if (totalDebt > 0 && (income > 0 && totalMonthly / income > 0.3)) stage = 'debt';
-    else if (totalDebt == 0 && goalsSaved < income * 3) stage = 'emergency';
-    else if (invValue > 0) stage = 'investing';
+    if (totalDebt > 0 && (income > 0 && totalMonthly / income > 0.3)) {
+      stage = 'debt';
+    } else if (totalDebt == 0 && goalsSaved < income * 3)
+      stage = 'emergency';
+    else if (invValue > 0)
+      stage = 'investing';
     else if (invValue > income * 12) stage = 'wealth';
 
-    if (mounted) setState(() {
-      _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
-      _currency = profile['currency'] as String? ?? 'JOD';
-      _income = income;
-      _expenses = txExpenses;
-      _net = income - txExpenses;
-      _recentTx = recent.cast<Map<String, dynamic>>();
-      _months6Data = months6;
-      _categoryData = categories;
-      _totalDebt = totalDebt;
-      _invValue = invValue;
-      _goalsSaved = goalsSaved;
-      _goalsTarget = goalsTarget;
-      _prevExpenses = prevExpenses;
-      _healthScore = score.clamp(0, 100);
-      _stage = stage;
-      _unreadAlerts = alertsRes.count ?? 0;
-      _paidDebts = (results[7] as dynamic).count ?? 0;
-      _reachedGoals = (results[8] as dynamic).count ?? 0;
-      _streak = ((results[9] as Map<String, dynamic>)['lesson_streak'] as num?)?.toInt() ?? 0;
-      _txCount = txs.length;
-      _hasInvestments = investments.isNotEmpty;
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
+        _currency = profile['currency'] as String? ?? 'JOD';
+        _income = income;
+        _expenses = txExpenses;
+        _net = income - txExpenses;
+        _recentTx = recent.cast<Map<String, dynamic>>();
+        _months6Data = months6;
+        _categoryData = categories;
+        _totalDebt = totalDebt;
+        _invValue = invValue;
+        _goalsSaved = goalsSaved;
+        _goalsTarget = goalsTarget;
+        _prevExpenses = prevExpenses;
+        _healthScore = score.clamp(0, 100);
+        _stage = stage;
+        _unreadAlerts = alertsRes.count ?? 0;
+        _paidDebts = (results[7] as dynamic).count ?? 0;
+        _reachedGoals = (results[8] as dynamic).count ?? 0;
+        _streak =
+            ((results[9] as Map<String, dynamic>)['lesson_streak'] as num?)
+                    ?.toInt() ??
+                0;
+        _txCount = txs.length;
+        _hasInvestments = investments.isNotEmpty;
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _quickAdd() async {
@@ -213,14 +297,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
     await _load();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('تم الإضافة ✅', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFF10B981), duration: const Duration(seconds: 2)),
+        const SnackBar(
+            content:
+                Text('تم الإضافة ✅', style: TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: Color(0xFF10B981),
+            duration: Duration(seconds: 2)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Scaffold(backgroundColor: Color(0xFF070B14), body: Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+    if (_loading)
+      return const Scaffold(
+          backgroundColor: Color(0xFF070B14),
+          body: Center(
+              child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
 
     return Scaffold(
       backgroundColor: const Color(0xFF070B14),
@@ -247,15 +339,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 16),
                   _buildQuickAdd(),
                   const SizedBox(height: 16),
-                  BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
+                  BudgetProgressCard(
+                      income: _income,
+                      expenses: _expenses,
+                      currency: _currency),
                   const SizedBox(height: 16),
-                  QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
+                  QuickLinksCards(
+                      totalDebt: _totalDebt,
+                      invValue: _invValue,
+                      goalsSaved: _goalsSaved,
+                      goalsTarget: _goalsTarget,
+                      currency: _currency),
                   const SizedBox(height: 16),
                   _buildStage(),
                   const SizedBox(height: 16),
                   GamificationCard(score: _healthScore),
                   const SizedBox(height: 12),
-                  BadgesGrid( // Added BadgesGrid
+                  BadgesGrid(
+                    // Added BadgesGrid
                     score: _healthScore,
                     txCount: _txCount,
                     paidDebts: _paidDebts,
@@ -264,19 +365,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     hasInvestments: _hasInvestments,
                   ),
                   const SizedBox(height: 16),
-                  ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
+                  ChartsCard(
+                      months6Data: _months6Data,
+                      categoryData: _categoryData,
+                      currency: _currency),
                   const SizedBox(height: 16),
                   WealthSimulatorCard(currency: _currency),
                   const SizedBox(height: 16),
                   _buildRecentTransactions(),
                   const SizedBox(height: 16),
                   ChallengesCard(
-                    expensesFood: _categoryData.firstWhere((c) => c['category'] == 'طعام', orElse: () => {'amount': 0.0})['amount'] as double,
+                    expensesFood: _categoryData.firstWhere(
+                        (c) => c['category'] == 'طعام',
+                        orElse: () => {'amount': 0.0})['amount'] as double,
                     income: _income,
                     net: _net,
                     prevExpenses: _prevExpenses,
                     currentExpenses: _expenses,
-                    expensesEntertainment: _categoryData.firstWhere((c) => c['category'] == 'ترفيه', orElse: () => {'amount': 0.0})['amount'] as double,
+                    expensesEntertainment: _categoryData.firstWhere(
+                        (c) => c['category'] == 'ترفيه',
+                        orElse: () => {'amount': 0.0})['amount'] as double,
                     currency: _currency,
                   ),
                 ],
@@ -294,37 +402,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(_name.isNotEmpty ? '👋 أهلاً $_name' : 'لوحة التحكم',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  fontFamily: 'Cairo')),
           const Text('فجرك المالي يبدأ اليوم 🌅',
-            style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+              style: TextStyle(
+                  fontSize: 12, color: Color(0xFF64748B), fontFamily: 'Cairo')),
         ]),
         if (_unreadAlerts > 0)
           GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AlertsScreen())),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const AlertsScreen())),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
+                border: Border.all(
+                    color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
                   const Text('🔔', style: TextStyle(fontSize: 14)),
                   const SizedBox(width: 6),
-                  Text('$_unreadAlerts', style: const TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                  Text('$_unreadAlerts',
+                      style: const TextStyle(
+                          color: Color(0xFFF87171),
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'Cairo')),
                 ],
               ),
             ),
           )
         else
           Container(
-            width: 44, height: 44,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
+              gradient: const LinearGradient(
+                  colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Center(child: Text('ف', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo'))),
+            child: const Center(
+                child: Text('ف',
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        fontFamily: 'Cairo'))),
           ),
       ],
     );
@@ -342,14 +469,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         children: [
           Container(
-            width: 80, height: 80,
-            decoration: BoxDecoration(color: const Color(0xFF3B7EF6).withValues(alpha: 0.1), shape: BoxShape.circle),
-            child: const Center(child: Text('👋', style: TextStyle(fontSize: 40))),
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+                color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
+                shape: BoxShape.circle),
+            child:
+                const Center(child: Text('👋', style: TextStyle(fontSize: 40))),
           ),
           const SizedBox(height: 20),
-          const Text('مرحباً بك في فجرك!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+          const Text('مرحباً بك في فجرك!',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Cairo')),
           const SizedBox(height: 8),
-          const Text('رحلتك المالية تبدأ الآن. أضف أول معاملة لك أو قم ببناء ميزانيتك لتبدأ.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo')),
+          const Text(
+              'رحلتك المالية تبدأ الآن. أضف أول معاملة لك أو قم ببناء ميزانيتك لتبدأ.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo')),
         ],
       ),
     );
@@ -357,11 +497,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildStatCards() {
     return Row(children: [
-      Expanded(child: _statCard('الدخل', _income, const Color(0xFF10B981), '↑')),
+      Expanded(
+          child: _statCard('الدخل', _income, const Color(0xFF10B981), '↑')),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('المصاريف', _expenses, const Color(0xFFEF4444), '↓')),
+      Expanded(
+          child:
+              _statCard('المصاريف', _expenses, const Color(0xFFEF4444), '↓')),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('الصافي', _net, _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), '=')),
+      Expanded(
+          child: _statCard(
+              'الصافي',
+              _net,
+              _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+              '=')),
     ]);
   }
 
@@ -376,17 +524,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(children: [
         Text(icon, style: TextStyle(color: color, fontSize: 12)),
         const SizedBox(height: 4),
-        FittedBox(child: Text('${value.abs().toStringAsFixed(0)}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'))),
-        Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+        FittedBox(
+            child: Text(value.abs().toStringAsFixed(0),
+                style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    fontFamily: 'Cairo'))),
+        Text(label,
+            style: const TextStyle(
+                color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
       ]),
     );
   }
 
   Widget _buildHealthScore() {
-    final color = _healthScore >= 80 ? const Color(0xFF10B981) :
-                  _healthScore >= 60 ? const Color(0xFF3B7EF6) :
-                  _healthScore >= 40 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
-    final label = _healthScore >= 80 ? 'ممتاز 🌟' : _healthScore >= 60 ? 'جيد 💪' : _healthScore >= 40 ? 'متوسط ⚡' : 'يحتاج تحسين';
+    final color = _healthScore >= 80
+        ? const Color(0xFF10B981)
+        : _healthScore >= 60
+            ? const Color(0xFF3B7EF6)
+            : _healthScore >= 40
+                ? const Color(0xFFF59E0B)
+                : const Color(0xFFEF4444);
+    final label = _healthScore >= 80
+        ? 'ممتاز 🌟'
+        : _healthScore >= 60
+            ? 'جيد 💪'
+            : _healthScore >= 40
+                ? 'متوسط ⚡'
+                : 'يحتاج تحسين';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -397,18 +563,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       child: Row(children: [
         SizedBox(
-          width: 64, height: 64,
+          width: 64,
+          height: 64,
           child: Stack(alignment: Alignment.center, children: [
-            CircularProgressIndicator(value: _healthScore / 100, color: color, backgroundColor: const Color(0xFF1E293B), strokeWidth: 6),
-            Text('$_healthScore', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18, fontFamily: 'Cairo')),
+            CircularProgressIndicator(
+                value: _healthScore / 100,
+                color: color,
+                backgroundColor: const Color(0xFF1E293B),
+                strokeWidth: 6),
+            Text('$_healthScore',
+                style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    fontFamily: 'Cairo')),
           ]),
         ),
         const SizedBox(width: 16),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('💊 نقاط الصحة المالية', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('💊 نقاط الصحة المالية',
+              style: TextStyle(
+                  color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
           const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
-          Text('/100 نقطة', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
+          Text(label,
+              style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                  fontFamily: 'Cairo')),
+          const Text('/100 نقطة',
+              style: TextStyle(
+                  color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
         ])),
       ]),
     );
@@ -416,7 +603,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildComparisonCard() {
     final diff = _expenses - _prevExpenses;
-    final percent = _prevExpenses > 0 ? (diff / _prevExpenses * 100).abs() : 0.0;
+    final percent =
+        _prevExpenses > 0 ? (diff / _prevExpenses * 100).abs() : 0.0;
     final isLess = diff <= 0;
     final color = isLess ? const Color(0xFF10B981) : const Color(0xFFEF4444);
 
@@ -428,14 +616,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(children: [
-        Icon(isLess ? Icons.trending_down : Icons.trending_up, color: color, size: 24),
+        Icon(isLess ? Icons.trending_down : Icons.trending_up,
+            color: color, size: 24),
         const SizedBox(width: 12),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(isLess ? 'أداء رائع! ✨' : 'انتباه للمصاريف! ⚠️', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
-          Text(isLess 
-            ? 'أنفقت ${percent.toStringAsFixed(0)}% أقل من الشهر الماضي' 
-            : 'أنفقت ${percent.toStringAsFixed(0)}% أكثر من الشهر الماضي',
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+        Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(isLess ? 'أداء رائع! ✨' : 'انتباه للمصاريف! ⚠️',
+              style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Cairo',
+                  fontSize: 13)),
+          Text(
+              isLess
+                  ? 'أنفقت ${percent.toStringAsFixed(0)}% أقل من الشهر الماضي'
+                  : 'أنفقت ${percent.toStringAsFixed(0)}% أكثر من الشهر الماضي',
+              style: const TextStyle(
+                  color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
         ])),
       ]),
     );
@@ -450,7 +648,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: const Color(0xFF1E293B)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('⚡ إضافة سريعة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+        const Text('⚡ إضافة سريعة',
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+                fontFamily: 'Cairo')),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(
@@ -459,11 +662,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent,
+                  color: _txType == 'income'
+                      ? const Color(0xFF10B981).withValues(alpha: 0.2)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : const Color(0xFF1E293B)),
+                  border: Border.all(
+                      color: _txType == 'income'
+                          ? const Color(0xFF10B981)
+                          : const Color(0xFF1E293B)),
                 ),
-                child: const Center(child: Text('دخل', style: TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                child: const Center(
+                    child: Text('دخل',
+                        style: TextStyle(
+                            color: Color(0xFF10B981),
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w700))),
               ),
             ),
           ),
@@ -474,11 +687,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent,
+                  color: _txType == 'expense'
+                      ? const Color(0xFFEF4444).withValues(alpha: 0.2)
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : const Color(0xFF1E293B)),
+                  border: Border.all(
+                      color: _txType == 'expense'
+                          ? const Color(0xFFEF4444)
+                          : const Color(0xFF1E293B)),
                 ),
-                child: const Center(child: Text('مصروف', style: TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                child: const Center(
+                    child: Text('مصروف',
+                        style: TextStyle(
+                            color: Color(0xFFEF4444),
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w700))),
               ),
             ),
           ),
@@ -496,13 +719,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: () => setState(() => _selectedCategory = cat),
                 child: Container(
                   margin: const EdgeInsets.only(left: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: selected ? const Color(0xFF3B7EF6).withValues(alpha: 0.2) : const Color(0xFF1E293B),
+                    color: selected
+                        ? const Color(0xFF3B7EF6).withValues(alpha: 0.2)
+                        : const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: selected ? const Color(0xFF3B7EF6) : Colors.transparent),
+                    border: Border.all(
+                        color: selected
+                            ? const Color(0xFF3B7EF6)
+                            : Colors.transparent),
                   ),
-                  child: Text(cat, style: TextStyle(color: selected ? const Color(0xFF3B7EF6) : const Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+                  child: Text(cat,
+                      style: TextStyle(
+                          color: selected
+                              ? const Color(0xFF3B7EF6)
+                              : const Color(0xFF94A3B8),
+                          fontSize: 12,
+                          fontFamily: 'Cairo')),
                 ),
               );
             },
@@ -518,13 +753,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
               decoration: InputDecoration(
                 hintText: 'المبلغ',
-                hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
+                hintStyle: const TextStyle(
+                    color: Color(0xFF64748B), fontFamily: 'Cairo'),
                 filled: true,
                 fillColor: const Color(0xFF1E293B),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 suffixText: _currency,
-                suffixStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
+                suffixStyle: const TextStyle(
+                    color: Color(0xFF64748B), fontFamily: 'Cairo'),
               ),
             ),
           ),
@@ -538,8 +778,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: _saving
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Text('إضافة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2))
+                  : const Text('إضافة',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'Cairo')),
             ),
           ),
         ]),
@@ -567,8 +815,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(s.$1, style: const TextStyle(fontSize: 24)),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('مرحلتك الحالية', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
-          Text(s.$2, style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+          const Text('مرحلتك الحالية',
+              style: TextStyle(
+                  color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+          Text(s.$2,
+              style: TextStyle(
+                  color: s.$3,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  fontFamily: 'Cairo')),
         ]),
       ]),
     );
@@ -576,31 +831,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildRecentTransactions() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('آخر المعاملات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: 'Cairo')),
+      const Text('آخر المعاملات',
+          style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              fontFamily: 'Cairo')),
       const SizedBox(height: 10),
       ..._recentTx.map((tx) {
         final isIncome = tx['type'] == 'income';
         final amount = (tx['amount'] as num).toDouble();
-        final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+        final color =
+            isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: const Color(0xFF0F1629), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF1E293B))),
+          decoration: BoxDecoration(
+              color: const Color(0xFF0F1629),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF1E293B))),
           child: Row(children: [
-            Container(width: 38, height: 38, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-              child: Center(child: Text(isIncome ? '💰' : '💸', style: const TextStyle(fontSize: 16)))),
+            Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10)),
+                child: Center(
+                    child: Text(isIncome ? '💰' : '💸',
+                        style: const TextStyle(fontSize: 16)))),
             const SizedBox(width: 10),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tx['description'] ?? tx['category'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
-              Text(tx['category'] ?? '', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
-            ])),
-            Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $_currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+            Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Text(tx['description'] ?? tx['category'] ?? '',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Cairo',
+                          fontSize: 13)),
+                  Text(tx['category'] ?? '',
+                      style: const TextStyle(
+                          color: Color(0xFF94A3B8),
+                          fontSize: 11,
+                          fontFamily: 'Cairo')),
+                ])),
+            Text(
+                '${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $_currency',
+                style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Cairo',
+                    fontSize: 13)),
           ]),
         );
       }),
       if (_recentTx.isEmpty)
-        Container(padding: const EdgeInsets.all(24), alignment: Alignment.center,
-          child: const Text('لا توجد معاملات بعد', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo'))),
+        Container(
+            padding: const EdgeInsets.all(24),
+            alignment: Alignment.center,
+            child: const Text('لا توجد معاملات بعد',
+                style:
+                    TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo'))),
     ]);
   }
 }

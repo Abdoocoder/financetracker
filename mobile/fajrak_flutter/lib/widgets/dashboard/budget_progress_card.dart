@@ -15,9 +15,13 @@ class BudgetProgressCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double remaining = income - expenses;
-    final double percentage = income > 0 ? (expenses / income).clamp(0.0, 1.0) : 0.0;
-    final Color progressColor = percentage > 0.9 ? const Color(0xFFEF4444) : 
-                                percentage > 0.7 ? const Color(0xFFF59E0B) : const Color(0xFF10B981);
+    final double percentage =
+        income > 0 ? (expenses / income).clamp(0.0, 1.0) : 0.0;
+    final Color progressColor = percentage > 0.9
+        ? const Color(0xFFEF4444)
+        : percentage > 0.7
+            ? const Color(0xFFF59E0B)
+            : const Color(0xFF10B981);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -32,8 +36,18 @@ class BudgetProgressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('الميزانية الشهرية', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 14)),
-              Text('${percentage >= 1 ? 0 : remaining.toStringAsFixed(0)} $currency متبقي', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+              const Text('الميزانية الشهرية',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Cairo',
+                      fontSize: 14)),
+              Text(
+                  '${percentage >= 1 ? 0 : remaining.toStringAsFixed(0)} $currency متبقي',
+                  style: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 12,
+                      fontFamily: 'Cairo')),
             ],
           ),
           const SizedBox(height: 16),
@@ -50,8 +64,16 @@ class BudgetProgressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('مصروف: ${expenses.toStringAsFixed(0)} $currency', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
-              Text('دخل: ${income.toStringAsFixed(0)} $currency', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+              Text('مصروف: ${expenses.toStringAsFixed(0)} $currency',
+                  style: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                      fontFamily: 'Cairo')),
+              Text('دخل: ${income.toStringAsFixed(0)} $currency',
+                  style: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                      fontFamily: 'Cairo')),
             ],
           ),
         ],
