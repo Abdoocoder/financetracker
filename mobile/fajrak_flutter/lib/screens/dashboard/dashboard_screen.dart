@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import '../../widgets/dashboard/charts_card.dart';
+import '../../widgets/dashboard/budget_progress_card.dart';
+import '../../widgets/dashboard/quick_links_card.dart';
+import '../../widgets/dashboard/gamification_card.dart';
+import '../../widgets/dashboard/wealth_simulator_card.dart';
+import '../../widgets/dashboard/challenges_card.dart';
+import 'screens/splash_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -15,6 +23,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
+  List<Map<String, dynamic>> _months6Data = [];
+  List<Map<String, dynamic>> _categoryData = [];
+  double _totalDebt = 0;
+  double _invValue = 0;
+  double _goalsSaved = 0;
+  double _goalsTarget = 0;
   String _stage = 'awareness';
 
   // Quick Add
@@ -41,15 +55,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
     final now = DateTime.now();
-    final firstDay = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
+    final firstDayCurrentMonth = DateTime(now.year, now.month, 1);
+    final firstDay6MonthsAgo = DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
 
     final results = await Future.wait<dynamic>([
       Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
-      Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
+      Supabase.instance.client.from('transactions').select('type, amount, transaction_date, category').eq('user_id', user.id).gte('transaction_date', firstDay6MonthsAgo),
       Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
       Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
       Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
-      Supabase.instance.client.from('savings_goals').select('current_amount').eq('user_id', user.id),
+      Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
     ]);
 
     final profile = results[0] as Map<String, dynamic>;
@@ -60,10 +75,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final goals = results[5] as List;
 
     double txIncome = 0, txExpenses = 0;
+    Map<String, double> catMap = {};
+    
+    // Group tx into months and categories
+    List<Map<String, dynamic>> months6 = List.generate(6, (i) {
+      final d = DateTime(now.year, now.month - (5 - i), 1);
+      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}';
+      return {'month': '${d.month}/${d.year}', 'key': key, 'income': 0.0, 'expense': 0.0};
+    });
+
     for (final tx in txs) {
-      if (tx['type'] == 'income') txIncome += (tx['amount'] as num).toDouble();
-      else txExpenses += (tx['amount'] as num).toDouble();
+      final amount = (tx['amount'] as num).toDouble();
+      final dateStr = tx['transaction_date'] as String?;
+      if (dateStr == null) continue;
+      
+      final key = dateStr.substring(0, 7); // YYYY-MM
+      final isIncome = tx['type'] == 'income';
+      
+      for (var m in months6) {
+        if (m['key'] == key) {
+          if (isIncome) m['income'] += amount;
+          else m['expense'] += amount;
+        }
+      }
+
+      final txDate = DateTime.parse(dateStr);
+      if (txDate.isAfter(firstDayCurrentMonth.subtract(const Duration(days: 1)))) {
+        if (isIncome) {
+          txIncome += amount;
+        } else {
+          txExpenses += amount;
+          final cat = tx['category'] as String? ?? 'أخرى';
+          catMap[cat] = (catMap[cat] ?? 0) + amount;
+        }
+      }
     }
+
+    final sortedCats = catMap.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final categories = sortedCats.take(5).map((e) {
+      return {
+        'category': e.key,
+        'amount': e.value,
+        'percentage': txExpenses > 0 ? e.value / txExpenses : 0.0,
+      };
+    }).toList();
 
     final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
     final income = txIncome > 0 ? txIncome : profileIncome;
@@ -71,6 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final totalMonthly = debts.fold(0.0, (a, d) => a + (d['monthly_payment'] as num? ?? 0).toDouble());
     final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
     final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+    final goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num? ?? 0).toDouble());
 
     // Health Score
     int score = 0;
@@ -100,6 +156,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _expenses = txExpenses;
       _net = income - txExpenses;
       _recentTx = recent.cast<Map<String, dynamic>>();
+      _months6Data = months6;
+      _categoryData = categories;
+      _totalDebt = totalDebt;
+      _invValue = invValue;
+      _goalsSaved = goalsSaved;
+      _goalsTarget = goalsTarget;
       _healthScore = score.clamp(0, 100);
       _stage = stage;
       _loading = false;
@@ -151,11 +213,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 16),
                 _buildStatCards(),
                 const SizedBox(height: 16),
+                BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
+                const SizedBox(height: 16),
+                QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
+                const SizedBox(height: 16),
                 _buildHealthScore(),
                 const SizedBox(height: 16),
                 _buildQuickAdd(),
                 const SizedBox(height: 16),
                 _buildStage(),
+                const SizedBox(height: 16),
+                GamificationCard(score: _healthScore),
+                const SizedBox(height: 16),
+                ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
+                const SizedBox(height: 16),
+                WealthSimulatorCard(currency: _currency),
+                const SizedBox(height: 16),
+                ChallengesCard(currency: _currency),
                 const SizedBox(height: 16),
                 _buildRecentTransactions(),
               ],
