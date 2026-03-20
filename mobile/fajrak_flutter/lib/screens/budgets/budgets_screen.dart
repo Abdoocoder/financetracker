@@ -40,7 +40,7 @@ class BudgetsScreen extends StatefulWidget {
 class _BudgetsScreenState extends State<BudgetsScreen> {
   bool _loading = true;
   double _income = 0, _totalDebtPayments = 0;
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
   Map<String, double> _spending = {};
   List<Map<String, dynamic>> _budgets = [];
   List<Map<String, dynamic>> _goals = [];

@@ -24,7 +24,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   String _filter = 'all';
   String _search = '';
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
   int? _filterMonth;
   int? _filterYear;
 
