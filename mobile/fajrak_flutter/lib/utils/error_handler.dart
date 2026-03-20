@@ -6,9 +6,9 @@ import 'dart:developer' as dev;
 class ErrorHandler {
   /// Standardized error handling method.
   /// Shows a Snackbar and logs the error to analytics.
-  static void handle(dynamic error, {BuildContext? context, String? developerMessage}) {
+  static void handle(dynamic error, {StackTrace? st, BuildContext? context, String? developerMessage}) {
     final String errorMessage = error.toString();
-    dev.log('Error: $errorMessage', name: 'ErrorHandler', error: error);
+    dev.log('Error: $errorMessage', name: 'ErrorHandler', error: error, stackTrace: st);
 
     // Log to Supabase Analytics
     AnalyticsService.logError(

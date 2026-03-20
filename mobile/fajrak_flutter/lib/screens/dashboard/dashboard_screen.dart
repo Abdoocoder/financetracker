@@ -328,7 +328,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF070B14),
       body: RefreshIndicator(
-        onRefresh: _load,
+        onRefresh: _loadAll,
         color: const Color(0xFF3B7EF6),
         child: SafeArea(
           child: SingleChildScrollView(
