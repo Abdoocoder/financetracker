@@ -408,7 +408,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     dropdownColor: const Color(0xFF1E293B),
-                    initialValue: _filterMonth ?? DateTime.now().month,
+                    value: _filterMonth ?? DateTime.now().month,
                     style: const TextStyle(
                         color: Colors.white, fontFamily: 'Cairo'),
                     decoration: const InputDecoration(
@@ -426,7 +426,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     dropdownColor: const Color(0xFF1E293B),
-                    initialValue: _filterYear ?? DateTime.now().year,
+                    value: _filterYear ?? DateTime.now().year,
                     style: const TextStyle(
                         color: Colors.white, fontFamily: 'Cairo'),
                     decoration: const InputDecoration(
