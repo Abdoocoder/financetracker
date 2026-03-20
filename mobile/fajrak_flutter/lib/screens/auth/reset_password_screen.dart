@@ -152,10 +152,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 obscureText: _obscure,
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'reset_confirm'.tr(),
                   prefixIcon:
-                      Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
+                      const Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
                 ),
               ),
               const SizedBox(height: 32),

@@ -84,10 +84,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   keyboardType: TextInputType.emailAddress,
                   style:
                       const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       labelText: 'forgot_email'.tr(),
                       prefixIcon:
-                          Icon(Icons.email_outlined, color: Color(0xFF64748B))),
+                          const Icon(Icons.email_outlined, color: Color(0xFF64748B))),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(

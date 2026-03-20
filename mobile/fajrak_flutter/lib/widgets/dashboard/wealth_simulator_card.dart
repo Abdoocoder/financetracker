@@ -43,12 +43,12 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Text('💰', style: TextStyle(fontSize: 18)),
-              SizedBox(width: 8),
+              const Text('💰', style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
               Text('wealthSimulator'.tr(),
-                  style: TextStyle(
+                  style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Cairo',

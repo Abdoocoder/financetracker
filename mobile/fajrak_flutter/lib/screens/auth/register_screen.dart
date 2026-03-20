@@ -106,22 +106,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _nameController,
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     labelText: 'settings_name'.tr(),
                     prefixIcon:
-                        Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
+                        const Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                textDirection: TextDirection.ltr,
+
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     labelText: 'forgot_email'.tr(),
                     prefixIcon:
-                        Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
+                        const Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
               ),
               const SizedBox(height: 16),
               TextFormField(

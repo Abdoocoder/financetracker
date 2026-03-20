@@ -119,14 +119,14 @@ class MoreScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.language,
+                        const Icon(Icons.language,
                             color: Color(0xFF3B7EF6), size: 20),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text('settings_lang_en'.tr(),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,

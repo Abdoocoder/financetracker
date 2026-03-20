@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:io';
 import '../../main.dart';
+import '../../widgets/settings/testimonial_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -853,6 +854,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             )),
                       ]),
                     ),
+                    const SizedBox(height: 12),
+                    const TestimonialCard(),
                     const SizedBox(height: 12),
 
                     // Account & Danger Zone (Accordion)
