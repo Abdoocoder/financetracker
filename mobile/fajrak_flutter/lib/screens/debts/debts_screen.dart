@@ -75,23 +75,43 @@ class _DebtsScreenState extends State<DebtsScreen> {
   void _showCelebration(String name) {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF0F1629),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: Color(0xFF10B981), width: 1.5)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Text('🎉', style: TextStyle(fontSize: 56)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
+          Container(
+            width: 80, height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF10B981).withOpacity(0.1),
+              border: Border.all(color: const Color(0xFF10B981).withOpacity(0.4), width: 2),
+              boxShadow: [BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 20, spreadRadius: 5)],
+            ),
+            child: const Center(child: Text('🎉', style: TextStyle(fontSize: 40))),
+          ),
+          const SizedBox(height: 16),
           const Text('أحرار من الدين!', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
           const SizedBox(height: 8),
-          Text('"$name"', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w700, fontFamily: 'Cairo')),
+          Text('"$name"', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w700, fontFamily: 'Cairo', fontSize: 16)),
           const SizedBox(height: 12),
-          const Text('تهانيّ! لقد سددت هذا الدين بالكامل 💪', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            onPressed: () => Navigator.pop(context),
-            child: const Text('شكراً 🙌', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.07), borderRadius: BorderRadius.circular(12)),
+            child: const Text(
+              'نفس المؤمن معلقة بدينه حتى يُقضى عنه\nتهانيّ! لقد سددت هذا الدين بالكامل 💪',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 12, height: 1.6),
+            ),
           ),
+          const SizedBox(height: 20),
+          SizedBox(width: double.infinity, child: ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('شكراً 🙌 الحمد لله', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+          )),
+          const SizedBox(height: 8),
         ]),
       ),
     );
@@ -122,9 +142,11 @@ class _DebtsScreenState extends State<DebtsScreen> {
     final remainingCtrl = TextEditingController(text: existing?['remaining_amount']?.toString() ?? '');
     final monthlyCtrl = TextEditingController(text: existing?['monthly_payment']?.toString() ?? '');
     final notesCtrl = TextEditingController(text: existing?['notes'] ?? '');
+    final paymentDayCtrl = TextEditingController(text: existing?['payment_day']?.toString() ?? '');
     int priority = (existing?['priority'] as int?) ?? 3;
     bool receivedAmount = false;
     bool autoDeduct = existing?['auto_deduct'] as bool? ?? true;
+    String dueDate = existing?['due_date'] as String? ?? '';
 
     await showModalBottomSheet(
       context: context,
@@ -147,7 +169,37 @@ class _DebtsScreenState extends State<DebtsScreen> {
               Expanded(child: _field(remainingCtrl, 'المتبقي', const TextInputType.numberWithOptions(decimal: true))),
             ]),
             const SizedBox(height: 10),
-            _field(monthlyCtrl, 'القسط الشهري', const TextInputType.numberWithOptions(decimal: true)),
+            Row(children: [
+              Expanded(child: _field(monthlyCtrl, 'القسط الشهري', const TextInputType.numberWithOptions(decimal: true))),
+              const SizedBox(width: 10),
+              Expanded(child: _field(paymentDayCtrl, 'يوم الدفع (1-28)', const TextInputType.numberWithOptions(decimal: false))),
+            ]),
+            const SizedBox(height: 10),
+            // Due Date Picker
+            GestureDetector(
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: ctx,
+                  initialDate: dueDate.isNotEmpty ? DateTime.tryParse(dueDate) ?? DateTime.now().add(const Duration(days: 30)) : DateTime.now().add(const Duration(days: 30)),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+                  builder: (c, child) => Theme(data: ThemeData.dark(), child: child!),
+                );
+                if (picked != null) setS(() => dueDate = picked.toIso8601String().split('T')[0]);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
+                child: Row(children: [
+                  const Icon(Icons.calendar_today_outlined, color: Color(0xFF64748B), size: 18),
+                  const SizedBox(width: 10),
+                  Text(
+                    dueDate.isNotEmpty ? '📅 تاريخ الاستحقاق: $dueDate' : '📅 تاريخ الاستحقاق (اختياري)',
+                    style: TextStyle(color: dueDate.isNotEmpty ? Colors.white : const Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 13),
+                  ),
+                ]),
+              ),
+            ),
             const SizedBox(height: 10),
             _field(notesCtrl, 'ملاحظات (اختياري)', TextInputType.text),
             const SizedBox(height: 12),
@@ -219,12 +271,15 @@ class _DebtsScreenState extends State<DebtsScreen> {
               onPressed: () async {
                 if (nameCtrl.text.isEmpty || originalCtrl.text.isEmpty) return;
                 final user = Supabase.instance.client.auth.currentUser!;
+                final payDay = int.tryParse(paymentDayCtrl.text);
                 final data = {
                   'user_id': user.id,
                   'name': nameCtrl.text,
                   'original_amount': double.tryParse(originalCtrl.text.replaceAll(',', '.')) ?? 0,
                   'remaining_amount': double.tryParse(remainingCtrl.text.replaceAll(',', '.')) ?? double.tryParse(originalCtrl.text.replaceAll(',', '.')) ?? 0,
                   'monthly_payment': double.tryParse(monthlyCtrl.text.replaceAll(',', '.')) ?? 0,
+                  'payment_day': (payDay != null && payDay >= 1 && payDay <= 28) ? payDay : null,
+                  'due_date': dueDate.isEmpty ? null : dueDate,
                   'notes': notesCtrl.text.isEmpty ? null : notesCtrl.text,
                   'priority': priority,
                   'is_paid': false,
@@ -446,8 +501,26 @@ class _DebtsScreenState extends State<DebtsScreen> {
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('${pct.toStringAsFixed(0)}% مسدد', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
-          if ((debt['monthly_payment'] as num).toDouble() > 0)
-            Text('${(debt['monthly_payment'] as num).toStringAsFixed(0)}/شهر', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
+          Row(children: [
+            if ((debt['monthly_payment'] as num).toDouble() > 0)
+              Text('${(debt['monthly_payment'] as num).toStringAsFixed(0)}/شهر', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
+            if (debt['payment_day'] != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(color: const Color(0xFF3B7EF6).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                child: Text('يوم ${debt['payment_day']}', style: const TextStyle(color: Color(0xFF3B7EF6), fontSize: 10, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              ),
+            ],
+            if (debt['due_date'] != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(color: const Color(0xFFF59E0B).withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                child: Text('📅 ${(debt['due_date'] as String).substring(0, 10)}', style: const TextStyle(color: Color(0xFFF59E0B), fontSize: 10, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ]),
         ]),
         const SizedBox(height: 8),
         // Payment row

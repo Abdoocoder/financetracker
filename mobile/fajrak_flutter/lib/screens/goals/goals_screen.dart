@@ -13,6 +13,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
   bool _loading = true;
   String _currency = 'JOD';
 
+  static const _goalIcons = [
+    '🎯', '🚗', '🏠', '💍', '💎', '✈️', '💻', '📱', '📚',
+    '👑', '🌍', '🎓', '💼', '🏋️', '🤌', '💚', '🚀', '⭐',
+    '🌱', '📊', '📅', '💰', '🎁', '🛡️', '⚡', '🔥', '💡', '📦',
+    '🪙', '🏝️',
+  ];
+
   @override
   void initState() { super.initState(); _load(); }
 
@@ -34,52 +41,106 @@ class _GoalsScreenState extends State<GoalsScreen> {
     final nameCtrl = TextEditingController(text: existing?['name'] ?? '');
     final targetCtrl = TextEditingController(text: existing?['target_amount']?.toString() ?? '');
     final currentCtrl = TextEditingController(text: existing?['current_amount']?.toString() ?? '0');
-    final deadlineCtrl = TextEditingController(text: existing?['deadline'] ?? '');
+    String selectedIcon = existing?['icon'] as String? ?? '🎯';
+    String deadlineDate = existing?['deadline'] as String? ?? '';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF0F1629),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 20, right: 20, top: 20),
-        child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 16),
-          Text(existing != null ? 'تعديل الهدف' : 'هدف ادخار جديد', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')),
-          const SizedBox(height: 20),
-          _field(nameCtrl, 'اسم الهدف (مثال: سيارة، حج، طوارئ)', TextInputType.text),
-          const SizedBox(height: 10),
-          _field(targetCtrl, 'المبلغ المستهدف', const TextInputType.numberWithOptions(decimal: true)),
-          const SizedBox(height: 10),
-          _field(currentCtrl, 'المبلغ المدخر حالياً', const TextInputType.numberWithOptions(decimal: true)),
-          const SizedBox(height: 10),
-          _field(deadlineCtrl, 'تاريخ الهدف (اختياري)', TextInputType.datetime),
-          const SizedBox(height: 20),
-          SizedBox(width: double.infinity, child: ElevatedButton(
-            onPressed: () async {
-              final user = Supabase.instance.client.auth.currentUser!;
-              HapticFeedback.mediumImpact();
-              final data = {
-                'user_id': user.id,
-                'name': nameCtrl.text,
-                'target_amount': double.tryParse(targetCtrl.text) ?? 0,
-                'current_amount': double.tryParse(currentCtrl.text) ?? 0,
-                'deadline': deadlineCtrl.text.isEmpty ? null : deadlineCtrl.text,
-              };
-              if (existing != null) {
-                await Supabase.instance.client.from('savings_goals').update(data).eq('id', existing['id']);
-              } else {
-                await Supabase.instance.client.from('savings_goals').insert(data);
-              }
-              if (ctx.mounted) Navigator.pop(ctx);
-              await _load();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            child: Text(existing != null ? 'حفظ التعديل' : 'إضافة الهدف', style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
-          )),
-          const SizedBox(height: 16),
-        ])),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 20, right: 20, top: 20),
+          child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            Text(existing != null ? 'تعديل الهدف' : 'هدف ادخار جديد', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')),
+            const SizedBox(height: 20),
+            // Icon Picker
+            const Align(alignment: Alignment.centerRight, child: Text('اختر أيقونة', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo'))),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 120,
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 10, mainAxisSpacing: 4, crossAxisSpacing: 4),
+                itemCount: _goalIcons.length,
+                itemBuilder: (_, i) {
+                  final icon = _goalIcons[i];
+                  final selected = icon == selectedIcon;
+                  return GestureDetector(
+                    onTap: () => setS(() => selectedIcon = icon),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: selected ? const Color(0xFF3B7EF6).withOpacity(0.25) : const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: selected ? const Color(0xFF3B7EF6) : Colors.transparent),
+                      ),
+                      child: Center(child: Text(icon, style: const TextStyle(fontSize: 18))),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            _field(nameCtrl, 'اسم الهدف (مثال: سيارة، حج، طوارئ)', TextInputType.text),
+            const SizedBox(height: 10),
+            _field(targetCtrl, 'المبلغ المستهدف', const TextInputType.numberWithOptions(decimal: true)),
+            const SizedBox(height: 10),
+            _field(currentCtrl, 'المبلغ المدخر حالياً', const TextInputType.numberWithOptions(decimal: true)),
+            const SizedBox(height: 10),
+            // Deadline Date Picker
+            GestureDetector(
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: ctx,
+                  initialDate: deadlineDate.isNotEmpty ? DateTime.tryParse(deadlineDate) ?? DateTime.now().add(const Duration(days: 180)) : DateTime.now().add(const Duration(days: 180)),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+                  builder: (c, child) => Theme(data: ThemeData.dark(), child: child!),
+                );
+                if (picked != null) setS(() => deadlineDate = picked.toIso8601String().split('T')[0]);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
+                child: Row(children: [
+                  const Icon(Icons.calendar_today_outlined, color: Color(0xFF64748B), size: 18),
+                  const SizedBox(width: 10),
+                  Text(
+                    deadlineDate.isNotEmpty ? 'تاريخ الهدف: $deadlineDate' : '📅 تاريخ الهدف (اختياري)',
+                    style: TextStyle(color: deadlineDate.isNotEmpty ? Colors.white : const Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 13),
+                  ),
+                ]),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(width: double.infinity, child: ElevatedButton(
+              onPressed: () async {
+                final user = Supabase.instance.client.auth.currentUser!;
+                HapticFeedback.mediumImpact();
+                final data = {
+                  'user_id': user.id,
+                  'name': nameCtrl.text,
+                  'icon': selectedIcon,
+                  'target_amount': double.tryParse(targetCtrl.text) ?? 0,
+                  'current_amount': double.tryParse(currentCtrl.text) ?? 0,
+                  'deadline': deadlineDate.isEmpty ? null : deadlineDate,
+                };
+                if (existing != null) {
+                  await Supabase.instance.client.from('savings_goals').update(data).eq('id', existing['id']);
+                } else {
+                  await Supabase.instance.client.from('savings_goals').insert(data);
+                }
+                if (ctx.mounted) Navigator.pop(ctx);
+                await _load();
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              child: Text(existing != null ? 'حفظ التعديل' : 'إضافة الهدف', style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+            )),
+            const SizedBox(height: 16),
+          ])),
+        ),
       ),
     );
   }
@@ -238,6 +299,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         ),
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Row(children: [
+                            // Show emoji icon if available
+                            if ((goal['icon'] as String?) != null)
+                              Text(goal['icon'] as String, style: const TextStyle(fontSize: 22)),
+                            if ((goal['icon'] as String?) != null) const SizedBox(width: 8),
                             Expanded(child: Text(goal['name'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 15))),
                             if (isDone) const Text('✅', style: TextStyle(fontSize: 18)),
                             const SizedBox(width: 8),
