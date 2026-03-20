@@ -65,7 +65,7 @@ void main() async {
       supportedLocales: const [Locale('ar'), Locale('en')],
       path: 'assets/i18n',
       fallbackLocale: const Locale('ar'),
-      child: const FajrakApp(),
+      child: FajrakApp(key: FajrakApp.appKey),
     ),
   );
 }
@@ -73,10 +73,11 @@ void main() async {
 class FajrakApp extends StatefulWidget {
   const FajrakApp({super.key});
 
+  static final GlobalKey<_FajrakAppState> appKey = GlobalKey<_FajrakAppState>();
+
   static void updateAppState(BuildContext context, {bool? isDarkMode}) {
-    final state = context.findAncestorStateOfType<_FajrakAppState>();
-    if (state != null && isDarkMode != null) {
-      state.setTheme(isDarkMode);
+    if (isDarkMode != null) {
+      appKey.currentState?.setTheme(isDarkMode);
     }
   }
 
