@@ -55,31 +55,75 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     return monthly * ((((1 + r) * ((1 + r) * n - 1)) / r));
   }
 
+  String? _editingId;
+
   Future<void> _addInvestment() async {
     if (_symbolCtrl.text.isEmpty || _sharesCtrl.text.isEmpty) return;
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
     setState(() => _saving = true);
     HapticFeedback.mediumImpact();
-    await Supabase.instance.client.from('investments').insert({
-      'user_id': user.id,
-      'symbol': _symbolCtrl.text.toUpperCase(),
-      'name': _nameCtrl.text.isEmpty ? _symbolCtrl.text.toUpperCase() : _nameCtrl.text,
-      'shares': double.tryParse(_sharesCtrl.text) ?? 0,
-      'avg_buy_price': double.tryParse(_avgPriceCtrl.text) ?? 0,
-      'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
-      'is_halal': _isHalal,
-      'type': 'etf',
-      'currency': 'USD',
-    });
+    if (_editingId != null) {
+      await Supabase.instance.client.from('investments').update({
+        'symbol': _symbolCtrl.text.toUpperCase(),
+        'name': _nameCtrl.text.isEmpty ? _symbolCtrl.text.toUpperCase() : _nameCtrl.text,
+        'shares': double.tryParse(_sharesCtrl.text) ?? 0,
+        'avg_buy_price': double.tryParse(_avgPriceCtrl.text) ?? 0,
+        'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
+        'is_halal': _isHalal,
+      }).eq('id', _editingId!);
+    } else {
+      await Supabase.instance.client.from('investments').insert({
+        'user_id': user.id,
+        'symbol': _symbolCtrl.text.toUpperCase(),
+        'name': _nameCtrl.text.isEmpty ? _symbolCtrl.text.toUpperCase() : _nameCtrl.text,
+        'shares': double.tryParse(_sharesCtrl.text) ?? 0,
+        'avg_buy_price': double.tryParse(_avgPriceCtrl.text) ?? 0,
+        'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
+        'is_halal': _isHalal,
+        'type': 'etf',
+        'currency': 'USD',
+      });
+    }
     _symbolCtrl.clear(); _nameCtrl.clear();
     _sharesCtrl.clear(); _avgPriceCtrl.clear(); _currentPriceCtrl.clear();
+    _editingId = null;
     setState(() => _saving = false);
     Navigator.pop(context);
     await _load();
   }
 
-  void _showAddDialog() {
+  Future<void> _deleteInvestment(String id) async {
+    final confirm = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
+      backgroundColor: const Color(0xFF0F1629),
+      title: const Text('حذف الاستثمار', style: TextStyle(color: Colors.white, fontFamily: 'Cairo')),
+      content: const Text('هل أنت متأكد؟', style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
+        TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('حذف', style: TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
+      ],
+    ));
+    if (confirm == true) {
+      await Supabase.instance.client.from('investments').delete().eq('id', id);
+      await _load();
+    }
+  }
+
+  void _showAddDialog({Map<String, dynamic>? existing}) {
+    if (existing != null) {
+      _editingId = existing['id'].toString();
+      _symbolCtrl.text = existing['symbol'] ?? '';
+      _nameCtrl.text = existing['name'] ?? '';
+      _sharesCtrl.text = existing['shares'].toString();
+      _avgPriceCtrl.text = existing['avg_buy_price'].toString();
+      _currentPriceCtrl.text = existing['current_price'].toString();
+      _isHalal = existing['is_halal'] as bool? ?? false;
+    } else {
+      _editingId = null;
+      _symbolCtrl.clear(); _nameCtrl.clear();
+      _sharesCtrl.clear(); _avgPriceCtrl.clear(); _currentPriceCtrl.clear();
+      _isHalal = true;
+    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -332,6 +376,10 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             Text('\$${value.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
             Text('${gain >= 0 ? '+' : ''}${gainPct.toStringAsFixed(1)}%', style: TextStyle(color: gain >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), fontSize: 12, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
           ]),
+          const SizedBox(width: 8),
+          GestureDetector(onTap: () => _showAddDialog(existing: inv), child: Container(width: 28, height: 28, decoration: BoxDecoration(color: const Color(0xFF3B7EF6).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(7), border: Border.all(color: const Color(0xFF3B7EF6).withValues(alpha: 0.2))), child: const Icon(Icons.edit, color: Color(0xFF3B7EF6), size: 14))),
+          const SizedBox(width: 6),
+          GestureDetector(onTap: () => _deleteInvestment(inv['id'].toString()), child: Container(width: 28, height: 28, decoration: BoxDecoration(color: const Color(0xFFEF4444).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(7), border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2))), child: const Icon(Icons.close, color: Color(0xFFEF4444), size: 14))),
         ]),
         const SizedBox(height: 10),
         ClipRRect(

@@ -8,6 +8,7 @@ import '../../widgets/dashboard/quick_links_card.dart';
 import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
+import '../alerts/alerts_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,6 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _healthScore = 0;
   String _currency = 'JOD';
   String _name = '';
+  int _unreadAlerts = 0;
   List<Map<String, dynamic>> _recentTx = [];
   List<Map<String, dynamic>> _months6Data = [];
   List<Map<String, dynamic>> _categoryData = [];
@@ -65,6 +67,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
       Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
       Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
+      Supabase.instance.client.from('alerts').select('id').eq('user_id', user.id).eq('is_read', false).count(),
     ]);
 
     final profile = results[0] as Map<String, dynamic>;
@@ -73,6 +76,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final debts = results[3] as List;
     final investments = results[4] as List;
     final goals = results[5] as List;
+    final alertsRes = results[6] as dynamic;
 
     double txIncome = 0, txExpenses = 0, prevExpenses = 0;
     Map<String, double> catMap = {};
@@ -170,6 +174,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _prevExpenses = prevExpenses;
       _healthScore = score.clamp(0, 100);
       _stage = stage;
+      _unreadAlerts = alertsRes.count ?? 0;
       _loading = false;
     });
   }
@@ -217,35 +222,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 _buildHeader(),
                 const SizedBox(height: 16),
-                _buildStatCards(),
-                const SizedBox(height: 16),
-                BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
-                const SizedBox(height: 16),
-                QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
-                const SizedBox(height: 16),
-                _buildHealthScore(),
-                const SizedBox(height: 16),
-                _buildQuickAdd(),
-                const SizedBox(height: 16),
-                _buildStage(),
-                const SizedBox(height: 16),
-                GamificationCard(score: _healthScore),
-                const SizedBox(height: 16),
-                ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
-                const SizedBox(height: 16),
-                WealthSimulatorCard(currency: _currency),
-                const SizedBox(height: 16),
-                ChallengesCard(
-                  expensesFood: _categoryData.firstWhere((c) => c['category'] == 'طعام', orElse: () => {'amount': 0.0})['amount'] as double,
-                  income: _income,
-                  net: _net,
-                  prevExpenses: _prevExpenses,
-                  currentExpenses: _expenses,
-                  expensesEntertainment: _categoryData.firstWhere((c) => c['category'] == 'ترفيه', orElse: () => {'amount': 0.0})['amount'] as double,
-                  currency: _currency,
-                ),
-                const SizedBox(height: 16),
-                _buildRecentTransactions(),
+                if (_income == 0 && _expenses == 0 && _recentTx.isEmpty)
+                  _buildEmptyState()
+                else ...[
+                  _buildStatCards(),
+                  const SizedBox(height: 16),
+                  _buildHealthScore(),
+                  const SizedBox(height: 16),
+                  _buildQuickAdd(),
+                  const SizedBox(height: 16),
+                  BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
+                  const SizedBox(height: 16),
+                  QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
+                  const SizedBox(height: 16),
+                  _buildStage(),
+                  const SizedBox(height: 16),
+                  GamificationCard(score: _healthScore),
+                  const SizedBox(height: 16),
+                  ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
+                  const SizedBox(height: 16),
+                  WealthSimulatorCard(currency: _currency),
+                  const SizedBox(height: 16),
+                  _buildRecentTransactions(),
+                  const SizedBox(height: 16),
+                  ChallengesCard(
+                    expensesFood: _categoryData.firstWhere((c) => c['category'] == 'طعام', orElse: () => {'amount': 0.0})['amount'] as double,
+                    income: _income,
+                    net: _net,
+                    prevExpenses: _prevExpenses,
+                    currentExpenses: _expenses,
+                    expensesEntertainment: _categoryData.firstWhere((c) => c['category'] == 'ترفيه', orElse: () => {'amount': 0.0})['amount'] as double,
+                    currency: _currency,
+                  ),
+                ],
               ],
             ),
           ),
@@ -264,15 +273,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const Text('فجرك المالي يبدأ اليوم 🌅',
             style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontFamily: 'Cairo')),
         ]),
-        Container(
-          width: 44, height: 44,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
-            borderRadius: BorderRadius.circular(12),
+        if (_unreadAlerts > 0)
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AlertsScreen())),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  const Text('🔔', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text('$_unreadAlerts', style: const TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                ],
+              ),
+            ),
+          )
+        else
+          Container(
+            width: 44, height: 44,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(child: Text('ف', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo'))),
           ),
-          child: const Center(child: Text('ف', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo'))),
-        ),
       ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F1629),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF1E293B)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 80, height: 80,
+            decoration: BoxDecoration(color: const Color(0xFF3B7EF6).withValues(alpha: 0.1), shape: BoxShape.circle),
+            child: const Center(child: Text('👋', style: TextStyle(fontSize: 40))),
+          ),
+          const SizedBox(height: 20),
+          const Text('مرحباً بك في فجرك!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+          const SizedBox(height: 8),
+          const Text('رحلتك المالية تبدأ الآن. أضف أول معاملة لك أو قم ببناء ميزانيتك لتبدأ.', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo')),
+        ],
+      ),
     );
   }
 
