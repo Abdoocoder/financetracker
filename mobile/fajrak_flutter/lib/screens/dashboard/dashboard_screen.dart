@@ -119,12 +119,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .eq('is_paid', true)
           .count(),
       Supabase.instance.client
-          .from('savings_goals')
-          .select('id')
-          .eq('user_id', user.id)
-          .filter('current_amount', 'gte', 'target_amount')
-          .count(),
-      Supabase.instance.client
           .from('profiles')
           .select('lesson_streak')
           .eq('id', user.id)
@@ -160,13 +154,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (dateStr == null) continue;
 
       final key = dateStr.substring(0, 7); // YYYY-MM
-      final isIncome = tx['type'] == 'income';
+      final type = tx['type'] as String?;
+      final isIncome = type == 'income';
+      final isExpense = type == 'expense';
 
       for (var m in months6) {
         if (m['key'] == key) {
           if (isIncome) {
             m['income'] += amount;
-          } else {
+          } else if (isExpense) {
             m['expense'] += amount;
           }
         }
@@ -177,7 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .isAfter(firstDayCurrentMonth.subtract(const Duration(days: 1)))) {
         if (isIncome) {
           txIncome += amount;
-        } else {
+        } else if (isExpense) {
           txExpenses += amount;
           final cat = tx['category'] as String? ?? 'أخرى';
           catMap[cat] = (catMap[cat] ?? 0) + amount;
@@ -185,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       } else if (txDate.isAfter(DateTime(now.year, now.month - 1, 1)
               .subtract(const Duration(days: 1))) &&
           txDate.isBefore(firstDayCurrentMonth)) {
-        if (!isIncome) {
+        if (isExpense) {
           prevExpenses += amount;
         }
       }
@@ -265,11 +261,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _stage = stage;
         _unreadAlerts = alertsRes.count ?? 0;
         _paidDebts = (results[7] as dynamic).count ?? 0;
-        _reachedGoals = (results[8] as dynamic).count ?? 0;
-        _streak =
-            ((results[9] as Map<String, dynamic>)['lesson_streak'] as num?)
-                    ?.toInt() ??
-                0;
+        _reachedGoals = goals.where((g) => (g['current_amount'] as num).toDouble() >= (g['target_amount'] as num? ?? 0).toDouble()).length;
+        _streak = ((results[8] as Map<String, dynamic>)['lesson_streak'] as num?)?.toInt() ?? 0;
         _txCount = txs.length;
         _hasInvestments = investments.isNotEmpty;
         _loading = false;
