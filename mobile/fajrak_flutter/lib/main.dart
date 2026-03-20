@@ -5,6 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
+import 'utils/error_handler.dart';
+import 'services/analytics_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -45,6 +48,17 @@ void main() async {
 
   await NotificationService.initialize();
   await EasyLocalization.ensureInitialized();
+
+  // Global Error Handling
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    ErrorHandler.handle(details.exception, developerMessage: 'FlutterError: ${details.library}');
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    ErrorHandler.handle(error, developerMessage: 'PlatformError');
+    return true;
+  };
 
   runApp(
     EasyLocalization(

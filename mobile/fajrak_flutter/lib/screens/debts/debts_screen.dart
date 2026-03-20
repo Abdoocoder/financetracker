@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,6 +33,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Debts');
     _load();
   }
 
@@ -73,6 +76,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
         });
       }
     } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Debts Load');
+    } finally {
       if (mounted) setState(() => _loading = false);
     }
   }

@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -48,6 +50,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Budgets');
     _load();
   }
 
@@ -118,11 +121,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
           _budgets = List<Map<String, dynamic>>.from(budgets);
           _goals = List<Map<String, dynamic>>.from(results[4] as List);
           _totalDebtPayments = debtTotal;
-          _loading = false;
         });
       }
       if (expenses > 0) {} // suppress unused local
     } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Budgets Load');
+    } finally {
       if (mounted) setState(() => _loading = false);
     }
   }

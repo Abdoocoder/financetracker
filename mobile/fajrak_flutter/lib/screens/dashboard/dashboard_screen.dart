@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
 import '../../widgets/dashboard/quick_links_card.dart';
@@ -60,7 +62,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _load();
+    AnalyticsService.logScreenView('Dashboard');
+    _loadAll();
   }
 
   @override
@@ -69,205 +72,213 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.dispose();
   }
 
-  Future<void> _load() async {
+  Future<void> _loadAll() async {
     final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
     final now = DateTime.now();
     final firstDayCurrentMonth = DateTime(now.year, now.month, 1);
     final firstDay6MonthsAgo =
         DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
 
-    final results = await Future.wait<dynamic>([
-      Supabase.instance.client
-          .from('profiles')
-          .select('full_name, monthly_income, currency')
-          .eq('id', user.id)
-          .single(),
-      Supabase.instance.client
-          .from('transactions')
-          .select('type, amount, transaction_date, category')
-          .eq('user_id', user.id)
-          .gte('transaction_date', firstDay6MonthsAgo),
-      Supabase.instance.client
-          .from('transactions')
-          .select('id, type, amount, category, description, transaction_date')
-          .eq('user_id', user.id)
-          .order('transaction_date', ascending: false)
-          .limit(5),
-      Supabase.instance.client
-          .from('debts')
-          .select('remaining_amount, monthly_payment')
-          .eq('user_id', user.id)
-          .eq('is_paid', false),
-      Supabase.instance.client
-          .from('investments')
-          .select('shares, current_price')
-          .eq('user_id', user.id),
-      Supabase.instance.client
-          .from('savings_goals')
-          .select('current_amount, target_amount')
-          .eq('user_id', user.id),
-      Supabase.instance.client
-          .from('alerts')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('is_read', false)
-          .count(),
-      Supabase.instance.client
-          .from('debts')
-          .select('id')
-          .eq('user_id', user.id)
-          .eq('is_paid', true)
-          .count(),
-      Supabase.instance.client
-          .from('profiles')
-          .select('lesson_streak')
-          .eq('id', user.id)
-          .single(),
-    ]);
+    try {
+      final results = await Future.wait<dynamic>([
+        Supabase.instance.client
+            .from('profiles')
+            .select('full_name, monthly_income, currency')
+            .eq('id', user.id)
+            .single(),
+        Supabase.instance.client
+            .from('transactions')
+            .select('type, amount, transaction_date, category')
+            .eq('user_id', user.id)
+            .gte('transaction_date', firstDay6MonthsAgo),
+        Supabase.instance.client
+            .from('transactions')
+            .select('id, type, amount, category, description, transaction_date')
+            .eq('user_id', user.id)
+            .order('transaction_date', ascending: false)
+            .limit(5),
+        Supabase.instance.client
+            .from('debts')
+            .select('remaining_amount, monthly_payment')
+            .eq('user_id', user.id)
+            .eq('is_paid', false),
+        Supabase.instance.client
+            .from('investments')
+            .select('shares, current_price')
+            .eq('user_id', user.id),
+        Supabase.instance.client
+            .from('savings_goals')
+            .select('current_amount, target_amount')
+            .eq('user_id', user.id),
+        Supabase.instance.client
+            .from('alerts')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('is_read', false)
+            .count(),
+        Supabase.instance.client
+            .from('debts')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('is_paid', true)
+            .count(),
+        Supabase.instance.client
+            .from('profiles')
+            .select('lesson_streak')
+            .eq('id', user.id)
+            .single(),
+      ]);
 
-    final profile = results[0] as Map<String, dynamic>;
-    final txs = results[1] as List;
-    final recent = results[2] as List;
-    final debts = results[3] as List;
-    final investments = results[4] as List;
-    final goals = results[5] as List;
-    final alertsRes = results[6] as dynamic;
+      final profile = results[0] as Map<String, dynamic>;
+      final txs = results[1] as List;
+      final recent = results[2] as List;
+      final debts = results[3] as List;
+      final investments = results[4] as List;
+      final goals = results[5] as List;
+      final alertsRes = results[6] as dynamic;
 
-    double txIncome = 0, txExpenses = 0, prevExpenses = 0;
-    Map<String, double> catMap = {};
+      double txIncome = 0, txExpenses = 0, prevExpenses = 0;
+      Map<String, double> catMap = {};
 
-    // Group tx into months and categories
-    List<Map<String, dynamic>> months6 = List.generate(6, (i) {
-      final d = DateTime(now.year, now.month - (5 - i), 1);
-      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}';
-      return {
-        'month': '${d.month}/${d.year}',
-        'key': key,
-        'income': 0.0,
-        'expense': 0.0
-      };
-    });
+      // Group tx into months and categories
+      List<Map<String, dynamic>> months6 = List.generate(6, (i) {
+        final d = DateTime(now.year, now.month - (5 - i), 1);
+        final key = '${d.year}-${d.month.toString().padLeft(2, '0')}';
+        return {
+          'month': '${d.month}/${d.year}',
+          'key': key,
+          'income': 0.0,
+          'expense': 0.0
+        };
+      });
 
-    for (final tx in txs) {
-      final amount = (tx['amount'] as num).toDouble();
-      final dateStr = tx['transaction_date'] as String?;
-      if (dateStr == null) continue;
+      for (final tx in txs) {
+        final amount = (tx['amount'] as num).toDouble();
+        final dateStr = tx['transaction_date'] as String?;
+        if (dateStr == null) continue;
 
-      final key = dateStr.substring(0, 7); // YYYY-MM
-      final type = tx['type'] as String?;
-      final isIncome = type == 'income';
-      final isExpense = type == 'expense';
+        final key = dateStr.substring(0, 7); // YYYY-MM
+        final type = tx['type'] as String?;
+        final isIncome = type == 'income';
+        final isExpense = type == 'expense';
 
-      for (var m in months6) {
-        if (m['key'] == key) {
+        for (var m in months6) {
+          if (m['key'] == key) {
+            if (isIncome) {
+              m['income'] += amount;
+            } else if (isExpense) {
+              m['expense'] += amount;
+            }
+          }
+        }
+
+        final txDate = DateTime.parse(dateStr);
+        if (txDate
+            .isAfter(firstDayCurrentMonth.subtract(const Duration(days: 1)))) {
           if (isIncome) {
-            m['income'] += amount;
+            txIncome += amount;
           } else if (isExpense) {
-            m['expense'] += amount;
+            txExpenses += amount;
+            final cat = tx['category'] as String? ?? 'أخرى';
+            catMap[cat] = (catMap[cat] ?? 0) + amount;
+          }
+        } else if (txDate.isAfter(DateTime(now.year, now.month - 1, 1)
+                .subtract(const Duration(days: 1))) &&
+            txDate.isBefore(firstDayCurrentMonth)) {
+          if (isExpense) {
+            prevExpenses += amount;
           }
         }
       }
 
-      final txDate = DateTime.parse(dateStr);
-      if (txDate
-          .isAfter(firstDayCurrentMonth.subtract(const Duration(days: 1)))) {
-        if (isIncome) {
-          txIncome += amount;
-        } else if (isExpense) {
-          txExpenses += amount;
-          final cat = tx['category'] as String? ?? 'أخرى';
-          catMap[cat] = (catMap[cat] ?? 0) + amount;
-        }
-      } else if (txDate.isAfter(DateTime(now.year, now.month - 1, 1)
-              .subtract(const Duration(days: 1))) &&
-          txDate.isBefore(firstDayCurrentMonth)) {
-        if (isExpense) {
-          prevExpenses += amount;
-        }
+      final sortedCats = catMap.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      final categories = sortedCats.take(5).map((e) {
+        return {
+          'category': e.key,
+          'amount': e.value,
+          'percentage': txExpenses > 0 ? e.value / txExpenses : 0.0,
+        };
+      }).toList();
+
+      final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
+      final income = txIncome > 0 ? txIncome : profileIncome;
+      final totalDebt = debts.fold(
+          0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+      final totalMonthly = debts.fold(
+          0.0, (a, d) => a + (d['monthly_payment'] as num? ?? 0).toDouble());
+      final invValue = investments.fold(
+          0.0,
+          (a, i) =>
+              a +
+              (i['shares'] as num).toDouble() *
+                  (i['current_price'] as num).toDouble());
+      final goalsSaved =
+          goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+      final goalsTarget = goals.fold(
+          0.0, (a, g) => a + (g['target_amount'] as num? ?? 0).toDouble());
+
+      // Health Score
+      int score = 0;
+      final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
+      if (savingsRate >= 0.2) {
+        score += 30;
+      } else if (savingsRate >= 0.1)
+        score += 20;
+      else if (savingsRate > 0) score += 10;
+      final debtRatio = income > 0 ? totalDebt / (income * 12) : 1;
+      if (totalDebt == 0) {
+        score += 25;
+      } else if (debtRatio < 0.3)
+        score += 20;
+      else if (debtRatio < 0.6) score += 10;
+      if (goalsSaved > 0) score += 20;
+      if (invValue > 0) score += 15;
+      if (txs.length >= 10) score += 10;
+
+      // Stage
+      String stage = 'awareness';
+      if (totalDebt > 0 && (income > 0 && totalMonthly / income > 0.3)) {
+        stage = 'debt';
+      } else if (totalDebt == 0 && goalsSaved < income * 3)
+        stage = 'emergency';
+      else if (invValue > 0)
+        stage = 'investing';
+      else if (invValue > income * 12) stage = 'wealth';
+
+      if (mounted) {
+        setState(() {
+          _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
+          _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
+          _income = income;
+          _expenses = txExpenses;
+          _net = income - txExpenses;
+          _recentTx = recent.cast<Map<String, dynamic>>();
+          _months6Data = months6;
+          _categoryData = categories;
+          _totalDebt = totalDebt;
+          _invValue = invValue;
+          _goalsSaved = goalsSaved;
+          _goalsTarget = goalsTarget;
+          _prevExpenses = prevExpenses;
+          _healthScore = score.clamp(0, 100);
+          _stage = stage;
+          _unreadAlerts = alertsRes.count ?? 0;
+          _paidDebts = (results[7] as dynamic).count ?? 0;
+          _reachedGoals = goals.where((g) => (g['current_amount'] as num).toDouble() >= (g['target_amount'] as num? ?? 0).toDouble()).length;
+          _streak = ((results[8] as Map<String, dynamic>)['lesson_streak'] as num?)?.toInt() ?? 0;
+          _txCount = txs.length;
+          _hasInvestments = investments.isNotEmpty;
+        });
       }
-    }
-
-    final sortedCats = catMap.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-    final categories = sortedCats.take(5).map((e) {
-      return {
-        'category': e.key,
-        'amount': e.value,
-        'percentage': txExpenses > 0 ? e.value / txExpenses : 0.0,
-      };
-    }).toList();
-
-    final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
-    final income = txIncome > 0 ? txIncome : profileIncome;
-    final totalDebt = debts.fold(
-        0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
-    final totalMonthly = debts.fold(
-        0.0, (a, d) => a + (d['monthly_payment'] as num? ?? 0).toDouble());
-    final invValue = investments.fold(
-        0.0,
-        (a, i) =>
-            a +
-            (i['shares'] as num).toDouble() *
-                (i['current_price'] as num).toDouble());
-    final goalsSaved =
-        goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
-    final goalsTarget = goals.fold(
-        0.0, (a, g) => a + (g['target_amount'] as num? ?? 0).toDouble());
-
-    // Health Score
-    int score = 0;
-    final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
-    if (savingsRate >= 0.2) {
-      score += 30;
-    } else if (savingsRate >= 0.1)
-      score += 20;
-    else if (savingsRate > 0) score += 10;
-    final debtRatio = income > 0 ? totalDebt / (income * 12) : 1;
-    if (totalDebt == 0) {
-      score += 25;
-    } else if (debtRatio < 0.3)
-      score += 20;
-    else if (debtRatio < 0.6) score += 10;
-    if (goalsSaved > 0) score += 20;
-    if (invValue > 0) score += 15;
-    if (txs.length >= 10) score += 10;
-
-    // Stage
-    String stage = 'awareness';
-    if (totalDebt > 0 && (income > 0 && totalMonthly / income > 0.3)) {
-      stage = 'debt';
-    } else if (totalDebt == 0 && goalsSaved < income * 3)
-      stage = 'emergency';
-    else if (invValue > 0)
-      stage = 'investing';
-    else if (invValue > income * 12) stage = 'wealth';
-
-    if (mounted) {
-      setState(() {
-        _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
-        _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
-        _income = income;
-        _expenses = txExpenses;
-        _net = income - txExpenses;
-        _recentTx = recent.cast<Map<String, dynamic>>();
-        _months6Data = months6;
-        _categoryData = categories;
-        _totalDebt = totalDebt;
-        _invValue = invValue;
-        _goalsSaved = goalsSaved;
-        _goalsTarget = goalsTarget;
-        _prevExpenses = prevExpenses;
-        _healthScore = score.clamp(0, 100);
-        _stage = stage;
-        _unreadAlerts = alertsRes.count ?? 0;
-        _paidDebts = (results[7] as dynamic).count ?? 0;
-        _reachedGoals = goals.where((g) => (g['current_amount'] as num).toDouble() >= (g['target_amount'] as num? ?? 0).toDouble()).length;
-        _streak = ((results[8] as Map<String, dynamic>)['lesson_streak'] as num?)?.toInt() ?? 0;
-        _txCount = txs.length;
-        _hasInvestments = investments.isNotEmpty;
-        _loading = false;
-      });
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Dashboard LoadAll');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -278,22 +289,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (user == null) return;
     setState(() => _saving = true);
     HapticFeedback.mediumImpact();
-    await Supabase.instance.client.from('transactions').insert({
-      'user_id': user.id,
-      'type': _txType,
-      'amount': amount,
-      'category': _selectedCategory,
-      'description': _selectedCategory,
-      'transaction_date': DateTime.now().toIso8601String().split('T')[0],
-    });
-    _amountController.clear();
-    setState(() => _saving = false);
-    await _load();
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text('تم الإضافة ✅', style: TextStyle(fontFamily: 'Cairo')),
             backgroundColor: Color(0xFF10B981),
             duration: Duration(seconds: 2)),
       );
