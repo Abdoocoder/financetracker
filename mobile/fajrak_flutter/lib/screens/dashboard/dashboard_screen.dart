@@ -8,6 +8,7 @@ import '../../widgets/dashboard/quick_links_card.dart';
 import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
+import '../../widgets/dashboard/badges_grid.dart';
 import '../alerts/alerts_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -32,6 +33,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _goalsTarget = 0;
   double _prevExpenses = 0;
   String _stage = 'awareness';
+  int _txCount = 0;
+  int _paidDebts = 0;
+  int _reachedGoals = 0;
+  int _streak = 0;
+  bool _hasInvestments = false;
 
   // Quick Add
   final _amountController = TextEditingController();
@@ -68,6 +74,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
       Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
       Supabase.instance.client.from('alerts').select('id').eq('user_id', user.id).eq('is_read', false).count(),
+      Supabase.instance.client.from('debts').select('id').eq('user_id', user.id).eq('is_paid', true).count(),
+      Supabase.instance.client.from('savings_goals').select('id').eq('user_id', user.id).filter('current_amount', 'gte', 'target_amount').count(),
+      Supabase.instance.client.from('profiles').select('lesson_streak').eq('id', user.id).single(),
     ]);
 
     final profile = results[0] as Map<String, dynamic>;
@@ -175,6 +184,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _healthScore = score.clamp(0, 100);
       _stage = stage;
       _unreadAlerts = alertsRes.count ?? 0;
+      _paidDebts = (results[7] as dynamic).count ?? 0;
+      _reachedGoals = (results[8] as dynamic).count ?? 0;
+      _streak = ((results[9] as Map<String, dynamic>)['lesson_streak'] as num?)?.toInt() ?? 0;
+      _txCount = txs.length;
+      _hasInvestments = investments.isNotEmpty;
       _loading = false;
     });
   }
@@ -229,6 +243,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 16),
                   _buildHealthScore(),
                   const SizedBox(height: 16),
+                  _buildComparisonCard(), // Added Comparison Card
+                  const SizedBox(height: 16),
                   _buildQuickAdd(),
                   const SizedBox(height: 16),
                   BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
@@ -238,6 +254,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _buildStage(),
                   const SizedBox(height: 16),
                   GamificationCard(score: _healthScore),
+                  const SizedBox(height: 12),
+                  BadgesGrid( // Added BadgesGrid
+                    score: _healthScore,
+                    txCount: _txCount,
+                    paidDebts: _paidDebts,
+                    reachedGoals: _reachedGoals,
+                    streak: _streak,
+                    hasInvestments: _hasInvestments,
+                  ),
                   const SizedBox(height: 16),
                   ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
                   const SizedBox(height: 16),
@@ -384,6 +409,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 4),
           Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
           Text('/100 نقطة', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
+        ])),
+      ]),
+    );
+  }
+
+  Widget _buildComparisonCard() {
+    final diff = _expenses - _prevExpenses;
+    final percent = _prevExpenses > 0 ? (diff / _prevExpenses * 100).abs() : 0.0;
+    final isLess = diff <= 0;
+    final color = isLess ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Row(children: [
+        Icon(isLess ? Icons.trending_down : Icons.trending_up, color: color, size: 24),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(isLess ? 'أداء رائع! ✨' : 'انتباه للمصاريف! ⚠️', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+          Text(isLess 
+            ? 'أنفقت ${percent.toStringAsFixed(0)}% أقل من الشهر الماضي' 
+            : 'أنفقت ${percent.toStringAsFixed(0)}% أكثر من الشهر الماضي',
+            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
         ])),
       ]),
     );

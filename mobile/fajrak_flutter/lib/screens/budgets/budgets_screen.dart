@@ -27,6 +27,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   String _currency = 'JOD';
   Map<String, double> _spending = {};
   List<Map<String, dynamic>> _budgets = [];
+  List<Map<String, dynamic>> _goals = [];
   int _month = DateTime.now().month;
   final int _year = DateTime.now().year;
 
@@ -45,6 +46,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         Supabase.instance.client.from('transactions').select('type, amount, category').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
         Supabase.instance.client.from('budgets').select('*').eq('user_id', user.id).eq('month', _month).eq('year', _year),
         Supabase.instance.client.from('debts').select('monthly_payment').eq('user_id', user.id).eq('is_paid', false),
+        Supabase.instance.client.from('savings_goals').select('*').eq('user_id', user.id),
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
@@ -69,6 +71,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         _income = income > 0 ? income : (profile['monthly_income'] as num?)?.toDouble() ?? 0;
         _spending = Map.fromEntries(cats.entries.toList()..sort((a, b) => b.value.compareTo(a.value)));
         _budgets = List<Map<String, dynamic>>.from(budgets);
+        _goals = List<Map<String, dynamic>>.from(results[4] as List);
         _totalDebtPayments = debtTotal;
         _loading = false;
       });
@@ -211,7 +214,17 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     if (_budgets.isEmpty) insights.add({'icon': '💡', 'type': 'info', 'text': 'أضف ميزانية لكل فئة لتتبع إنفاقك بدقة'});
     if (available > _income * 0.2 && _income > 0) insights.add({'icon': '💰', 'type': 'success', 'text': 'فائض ${available.toStringAsFixed(0)} $_currency — فكر في الاستثمار!'});
     if (totalBudgeted > available && available > 0) insights.add({'icon': '⚠️', 'type': 'warning', 'text': 'ميزانيتك تتجاوز المتاح بـ ${(totalBudgeted - available).toStringAsFixed(0)} $_currency'});
-    return insights.take(3).toList();
+    
+    // Savings Insights
+    for (final g in _goals) {
+      final current = (g['current_amount'] as num).toDouble();
+      final target = (g['target_amount'] as num).toDouble();
+      if (target > 0 && current < target && (current / target) > 0.9) {
+        insights.add({'icon': '🎯', 'type': 'success', 'text': 'أنت على وشك تحقيق هدف ${g['title']}! (${(target - current).toStringAsFixed(0)} متبقي)'});
+      }
+    }
+
+    return insights.take(4).toList();
   }
 
   Color _insightColor(String type) {
