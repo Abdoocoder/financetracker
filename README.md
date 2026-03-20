@@ -225,6 +225,19 @@ npm run dev
 
 ## Changelog
 
+### v3.7.0 — 2026-03-20 *(Latest)*
+- 🌍 **Full i18n Flutter** — ar.json + en.json complete bilingual support
+- 📊 **Analytics Service** — user behavior tracking
+- 🛡️ **Error Handler** — comprehensive try/catch across all screens
+- 🎓 **Enhanced Onboarding** — complete first-user experience
+- 💬 **Testimonial Card** — user success stories in settings
+- 🗺️ **Financial Roadmap** — visual wealth journey widget
+- 🏅 **Badges Grid** — achievements display widget
+- 🆘 **Help Screen** — in-app help center
+- 🔑 **Reset Password Screen** — full password reset flow
+- 🔧 **i18n Scripts** — extract_i18n.js + replace_translations.py
+
+
 ### v3.8.0 — 2026-03-20 *(Latest)*
 - 🛡️ **Global Error Handling** — `ErrorHandler` utility catches all errors app-wide, logs to Supabase Analytics, shows user-friendly Snackbars
 - 📊 **Analytics Service** — `AnalyticsService` logs screen views + custom events to `app_events` Supabase table
