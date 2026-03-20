@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../widgets/learn/financial_roadmap.dart';
 
 class LearnScreen extends StatefulWidget {
   const LearnScreen({super.key});
@@ -168,6 +169,9 @@ class _LearnScreenState extends State<LearnScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
+          // Roadmap
+          FinancialRoadmap(currentStage: _stage),
+          const SizedBox(height: 16),
           // Stage + Streak
           Row(children: [
             Expanded(child: Container(
