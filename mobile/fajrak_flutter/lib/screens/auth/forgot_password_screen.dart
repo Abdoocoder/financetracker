@@ -87,7 +87,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style:
                       const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                   decoration: InputDecoration(
-                      labelText: 'forgot_email'.tr(),
+                      labelText: 'البريد الإلكتروني',
                       prefixIcon:
                           const Icon(Icons.email_outlined, color: Color(0xFF64748B))),
                 ),

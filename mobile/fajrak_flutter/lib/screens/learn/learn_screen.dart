@@ -338,7 +338,7 @@ class _LearnScreenState extends State<LearnScreen> {
                 Text(info.$1, style: const TextStyle(fontSize: 22)),
                 const SizedBox(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('learn_stage'.tr(),
+                  Text('مرحلتك',
                       style: const TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 10,

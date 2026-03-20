@@ -125,7 +125,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
         'is_halal': _isHalal,
         'type': 'etf',
-        'currency': 'inv_usd'.tr(),
+        'currency': 'دولار',
       });
     }
     _symbolCtrl.clear();
@@ -152,11 +152,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text('trans_cancel'.tr(),
+                    child: Text('إلغاء',
                         style: const TextStyle(fontFamily: 'Cairo'))),
                 TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: Text('delete'.tr(),
+                    child: Text('حذف',
                         style: const TextStyle(
                             color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
               ],
@@ -391,10 +391,10 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             _field(_sharesCtrl, 'عدد الأسهم',
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_avgPriceCtrl, 'inv_avg_price'.tr(),
+            _field(_avgPriceCtrl, 'متوسط سعر الشراء',
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_currentPriceCtrl, 'inv_current_price'.tr(),
+            _field(_currentPriceCtrl, 'السعر الحالي',
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 12),
             GestureDetector(
@@ -442,7 +442,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   child: _saving
                       ? const CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2)
-                      : Text('trans_add'.tr(),
+                      : Text('إضافة معاملة',
                           style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900,
@@ -518,7 +518,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFF3B7EF6)),
-            tooltip: 'inv_refresh'.tr(),
+            tooltip: 'تحديث السعر',
             onPressed: () async {
               setState(() => _loading = true);
               try {
@@ -731,7 +731,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         const Text('🚀', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 10),
                         Expanded(
-                            child: Text('wealthSimulator'.tr(),
+                            child: Text('محاكي الثروة',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w900,
@@ -756,7 +756,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           border: Border.all(color: const Color(0xFF1E293B))),
                       child: Column(children: [
                         _slider(
-                            'monthlyInvestment'.tr(),
+                            'الاستثمار الشهري',
                             '\$${_monthly.toStringAsFixed(0)}',
                             _monthly,
                             10,
@@ -769,7 +769,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                             1,
                             30,
                             (v) => setState(() => _years = v.toInt())),
-                        _slider('annualReturn'.tr(), '${_rate.toStringAsFixed(0)}%',
+                        _slider('العائد السنوي', '${_rate.toStringAsFixed(0)}%',
                             _rate, 1, 20, (v) => setState(() => _rate = v)),
                         const SizedBox(height: 16),
                         Container(
@@ -1069,7 +1069,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                    child: _miniField(_buySharesCtrl, 'inv_shares'.tr(),
+                    child: _miniField(_buySharesCtrl, 'عدد الأسهم',
                         const TextInputType.numberWithOptions(decimal: true))),
                 const SizedBox(width: 8),
                 Expanded(

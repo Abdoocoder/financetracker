@@ -111,9 +111,9 @@ class ChartsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegend(const Color(0xFF10B981), 'trans_income'.tr()),
+              _buildLegend(const Color(0xFF10B981), 'دخل'),
               const SizedBox(width: 16),
-              _buildLegend(const Color(0xFFEF4444), 'trans_expense'.tr()),
+              _buildLegend(const Color(0xFFEF4444), 'مصروف'),
             ],
           )
         ],

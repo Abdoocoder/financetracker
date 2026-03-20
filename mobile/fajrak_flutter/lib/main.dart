@@ -109,7 +109,7 @@ class _FajrakAppState extends State<FajrakApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'app_name'.tr(),
+      title: 'فجرك',
       debugShowCheckedModeBanner: false,
       theme: _isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
       localizationsDelegates: context.localizationDelegates,

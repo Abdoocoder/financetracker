@@ -22,15 +22,15 @@ class QuickLinksCards extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: _buildCard(context, 'health_debt'.tr(), '💳', totalDebt,
+            child: _buildCard(context, 'ديون', '💳', totalDebt,
                 const Color(0xFFEF4444), '/debts')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'health_investing'.tr(), '📈', invValue,
+            child: _buildCard(context, 'استثمار', '📈', invValue,
                 const Color(0xFF10B981), '/investments')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'health_savings'.tr(), '🛡️', goalsSaved,
+            child: _buildCard(context, 'ادخار', '🛡️', goalsSaved,
                 const Color(0xFF3B7EF6), '/goals')),
       ],
     );

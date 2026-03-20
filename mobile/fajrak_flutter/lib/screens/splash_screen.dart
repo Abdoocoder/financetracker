@@ -110,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text('app_name'.tr(),
+                Text('فجرك',
                   style: const TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w900,

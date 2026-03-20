@@ -74,7 +74,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.credit_card_outlined,
-                    'health_debt'.tr(),
+                    'ديون',
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -90,7 +90,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.track_changes,
-                    'nav_goals'.tr(),
+                    'الأهداف',
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -122,7 +122,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.settings_outlined,
-                    'nav_settings'.tr(),
+                    'الإعدادات',
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -155,7 +155,7 @@ class _MoreScreenState extends State<MoreScreen> {
                         const Icon(Icons.language,
                             color: Color(0xFF3B7EF6), size: 20),
                         const SizedBox(width: 8),
-                        Text('settings_lang_en'.tr(),
+                        Text('English',
                             style: const TextStyle(
                                 fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w700,

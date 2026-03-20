@@ -86,7 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           .single();
       _nameCtrl.text = profile['full_name'] as String? ?? '';
       _incomeCtrl.text = profile['monthly_income']?.toString() ?? '';
-      _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
+      _currency = profile['currency'] as String? ?? 'JOD';
       _birthDate = profile['birth_date'] as String? ?? '';
       _jobTitleCtrl.text = profile['job_title'] as String? ?? '';
       _phoneCtrl.text = profile['phone'] as String? ?? '';
@@ -213,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final buffer = StringBuffer();
     buffer.writeln('التاريخ,النوع,المبلغ,الفئة,الوصف');
     for (final tx in data) {
-      final type = tx['type'] == 'income' ? 'trans_income'.tr() : 'trans_expense'.tr();
+      final type = tx['type'] == 'income' ? 'دخل' : 'مصروف';
       buffer.writeln(
           '${tx['transaction_date']},$type,${tx['amount']},${tx['category'] ?? ''},${tx['description'] ?? ''}');
     }
@@ -260,7 +260,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
-        title: Text('settings_title'.tr(),
+        title: Text('الإعدادات',
             style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -278,7 +278,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Profile section (Accordion)
                     _accordionCard(
                       icon: '👤',
-                      title: 'settings_profile_info'.tr(),
+                      title: 'معلومات الملف الشخصي',
                       initiallyExpanded: true,
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,14 +358,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ]),
                             ),
                             const SizedBox(height: 20),
-                            _inputField(_nameCtrl, 'settings_name'.tr(),
+                            _inputField(_nameCtrl, 'الاسم الكامل',
                                 Icons.person_outline),
                             const SizedBox(height: 10),
-                            _inputField(_jobTitleCtrl, 'settings_job_title'.tr(),
+                            _inputField(_jobTitleCtrl, 'المسمى الوظيفي',
                                 Icons.work_outline),
                             const SizedBox(height: 10),
                             _inputField(
-                                _phoneCtrl, 'settings_phone'.tr(), Icons.phone_outlined,
+                                _phoneCtrl, 'رقم الهاتف', Icons.phone_outlined,
                                 type: TextInputType.phone),
                             const SizedBox(height: 10),
                             GestureDetector(
@@ -398,7 +398,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Text(
                                       _birthDate.isNotEmpty
                                           ? _birthDate
-                                          : 'settings_birth_date'.tr(),
+                                          : 'تاريخ الميلاد',
                                       style: TextStyle(
                                           color: _birthDate.isNotEmpty
                                               ? Colors.white
@@ -409,19 +409,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             const SizedBox(height: 20),
                             _sectionTitle('💰 الإعدادات المالية'),
-                            _inputField(_incomeCtrl, 'settings_income'.tr(),
+                            _inputField(_incomeCtrl, 'الراتب الشهري',
                                 Icons.account_balance_wallet_outlined,
                                 type: const TextInputType.numberWithOptions(
                                     decimal: true)),
                             const SizedBox(height: 12),
-                            Text('settings_currency'.tr(),
+                            Text('العملة',
                                 style: const TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontFamily: 'Cairo',
                                     fontSize: 13)),
                             const SizedBox(height: 8),
                             Row(
-                                children: ['inv_jod'.tr(), 'inv_usd'.tr(), 'SAR', 'AED', 'KWD']
+                                children: ['JOD', 'دولار', 'SAR', 'AED', 'KWD']
                                     .map((c) => Expanded(
                                             child: Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -481,7 +481,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               color: Colors.white))
-                                      : Text('settings_save'.tr(),
+                                      : Text('حفظ',
                                           style: const TextStyle(
                                               fontFamily: 'Cairo',
                                               fontWeight: FontWeight.w900,
@@ -494,11 +494,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Preferences (Language + Theme)
                     _accordionCard(
                       icon: '⚙️',
-                      title: 'settings_preferences'.tr(),
+                      title: 'التفضيلات',
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('settings_language'.tr(),
+                            Text('اللغة',
                                 style: const TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontSize: 13,
@@ -518,7 +518,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                             content: Text(
-                                                'toast_settings_saved'.tr(),
+                                                'تم حفظ الإعدادات',
                                                 style: const TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
@@ -557,7 +557,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                             content: Text(
-                                                'toast_settings_saved'.tr(),
+                                                'تم حفظ الإعدادات',
                                                 style: const TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
@@ -627,7 +627,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         width: 1.5),
                                   ),
                                   child: Center(
-                                      child: Text('settings_dark'.tr(),
+                                      child: Text('الوضع الداكن',
                                           style: TextStyle(
                                               color: _isDarkMode
                                                   ? Colors.white
@@ -671,7 +671,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         width: 1.5),
                                   ),
                                   child: Center(
-                                      child: Text('settings_light'.tr(),
+                                      child: Text('الوضع الفاتح',
                                           style: TextStyle(
                                               color: !_isDarkMode
                                                   ? const Color(0xFF1E293B)
@@ -688,7 +688,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Assets section (Accordion)
                     _accordionCard(
                       icon: '💎',
-                      title: 'settings_assets_title'.tr(),
+                      title: 'الأصول الشخصية',
                       badge: 'صافي الثروة',
                       child: Column(children: [
                         Container(
@@ -821,7 +821,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Share App (Accordion)
                     _accordionCard(
                       icon: '🔗',
-                      title: 'share_title'.tr(),
+                      title: 'مشاركة فجرك',
                       child: Column(children: [
                         const Text('🌅', style: TextStyle(fontSize: 40)),
                         const SizedBox(height: 10),
@@ -989,7 +989,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10))),
-                              child: Text('trans_cancel'.tr(),
+                              child: Text('إلغاء',
                                   style: const TextStyle(fontFamily: 'Cairo')),
                             )),
                           ]),
