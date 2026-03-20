@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -10,12 +12,28 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentStep = 0;
+
   final _incomeController = TextEditingController();
   int _salaryDay = 25;
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
   bool _loading = false;
 
-  final List<String> _currencies = ['inv_jod'.tr(), 'inv_usd'.tr(), 'SAR', 'AED'];
+  final List<String> _currencies = ['JOD', 'USD', 'SAR', 'AED'];
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.logScreenView('Onboarding');
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _incomeController.dispose();
+    super.dispose();
+  }
 
   Future<void> _save() async {
     setState(() => _loading = true);
@@ -42,178 +60,264 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         });
       }
 
+      AnalyticsService.logEvent('onboarding_complete', {
+        'income': income,
+        'currency': _currency,
+        'salary_day': _salaryDay,
+      });
+
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-        );
-      }
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Onboarding Save');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
+  void _nextPage() {
+    if (_currentStep < 3) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _save();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isEn = context.locale.languageCode == 'en';
+
     return Scaffold(
       backgroundColor: const Color(0xFF070B14),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 40),
-              const Text('مرحباً! 👋',
-                  style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      fontFamily: 'Cairo')),
-              const SizedBox(height: 8),
-              const Text('دعنا نعرف وضعك المالي لنساعدك بشكل أفضل',
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: Color(0xFF94A3B8),
-                      fontFamily: 'Cairo')),
-              const SizedBox(height: 40),
-              _buildCard(
-                title: 'settings_income'.tr(),
-                icon: Icons.account_balance_wallet_outlined,
-                child: TextFormField(
-                  controller: _incomeController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(
-                      color: Colors.white, fontFamily: 'Cairo', fontSize: 18),
-                  decoration: const InputDecoration(
-                      labelText: 'أدخل راتبك الشهري',
-                      prefixIcon:
-                          Icon(Icons.attach_money, color: Color(0xFF10B981))),
-                ),
+        child: Column(
+          children: [
+            // Progress dots
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(4, (index) => _buildDot(index)),
               ),
-              const SizedBox(height: 16),
-              _buildCard(
-                title: 'يوم استلام الراتب',
-                icon: Icons.calendar_today_outlined,
-                child: Column(
-                  children: [
-                    Text('اليوم $_salaryDay من كل شهر',
-                        style: const TextStyle(
-                            color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
-                    Slider(
-                      value: _salaryDay.toDouble(),
-                      min: 1,
-                      max: 28,
-                      divisions: 27,
-                      activeColor: const Color(0xFF3B7EF6),
-                      onChanged: (v) => setState(() => _salaryDay = v.round()),
-                    ),
-                  ],
-                ),
+            ),
+            
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (idx) => setState(() => _currentStep = idx),
+                children: [
+                  _slideIntro(isEn),
+                  _slideIncome(isEn),
+                  _slideSalaryDay(isEn),
+                  _slideSummary(isEn),
+                ],
               ),
-              const SizedBox(height: 16),
-              _buildCard(
-                title: 'settings_currency'.tr(),
-                icon: Icons.currency_exchange,
-                child: Row(
-                  children: _currencies
-                      .map((c) => Expanded(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4),
-                              child: GestureDetector(
-                                onTap: () => setState(() => _currency = c),
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: _currency == c
-                                        ? const Color(0xFF3B7EF6)
-                                        : const Color(0xFF1E293B),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(c,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: _currency == c
-                                              ? Colors.white
-                                              : const Color(0xFF94A3B8),
-                                          fontFamily: 'Cairo',
-                                          fontWeight: FontWeight.w700)),
-                                ),
-                              ),
+            ),
+
+            // Controls
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _loading ? null : _nextPage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B7EF6),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 8,
+                        shadowColor: const Color(0xFF3B7EF6).withOpacity(0.4),
+                      ),
+                      child: _loading
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : Text(
+                              _currentStep == 3 
+                                ? (isEn ? 'Start Your Journey 🚀' : 'ابدأ رحلتك المادية 🚀')
+                                : (isEn ? 'Continue' : 'استمرار'),
+                              style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16),
                             ),
-                          ))
-                      .toList(),
-                ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _loading ? null : _save,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B7EF6),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    elevation: 8,
-                    shadowColor: const Color(0xFF3B7EF6).withOpacity(0.4),
+                    ),
                   ),
-                  child: _loading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white))
-                      : const Text('ابدأ رحلتك المالية 🚀',
-                          style: TextStyle(
-                              fontFamily: 'Cairo',
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16)),
-                ),
+                  if (_currentStep > 0 && !_loading)
+                    TextButton(
+                      onPressed: () => _pageController.previousPage(
+                        duration: const Duration(milliseconds: 400),
+                        curve: Curves.easeInOut,
+                      ),
+                      child: Text(isEn ? 'Back' : 'رجوع', style: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo')),
+                    ),
+                ],
               ),
-              const SizedBox(height: 20),
-              const Center(
-                  child: Text('يمكنك دائماً تعديل هذه الإعدادات لاحقاً',
-                      style: TextStyle(
-                          color: Color(0xFF475569),
-                          fontSize: 12,
-                          fontFamily: 'Cairo'))),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildCard(
-      {required String title, required IconData icon, required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(20),
+  Widget _buildDot(int index) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      height: 8,
+      width: _currentStep == index ? 24 : 8,
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1629),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        color: _currentStep == index ? const Color(0xFF3B7EF6) : const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(4),
       ),
+    );
+  }
+
+  Widget _slideIntro(bool isEn) {
+    return Padding(
+      padding: const EdgeInsets.all(30),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(children: [
-            Icon(icon, color: const Color(0xFF3B7EF6), size: 20),
-            const SizedBox(width: 8),
-            Text(title,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Cairo',
-                    fontSize: 15)),
-          ]),
+          Container(
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              color: const Color(0xFF3B7EF6).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Text('✨', style: TextStyle(fontSize: 80)),
+          ),
+          const SizedBox(height: 40),
+          Text(
+            isEn ? 'Welcome to Fajrak!' : 'مرحباً بك في فجرك!',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+          ),
           const SizedBox(height: 16),
-          child,
+          Text(
+            isEn 
+              ? 'Your companion on the road to financial freedom. Let\'s set up your profile.'
+              : 'رفيقك في طريق الحرية المالية. دعنا نجهز ملفك الشخصي.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 16, fontFamily: 'Cairo', height: 1.6),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _slideIncome(bool isEn) {
+    return _slideBase(
+      icon: '💰',
+      title: isEn ? 'Monthly Income' : 'الدخل الشهري',
+      subtitle: isEn ? 'This helps us calculate your budgets automatically.' : 'يساعدنا هذا في حساب ميزانياتك تلقائياً.',
+      child: TextFormField(
+        controller: _incomeController,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+        decoration: InputDecoration(
+          hintText: '0',
+          hintStyle: const TextStyle(color: Color(0xFF1E293B)),
+          suffixText: _currency,
+          suffixStyle: const TextStyle(color: Color(0xFF3B7EF6), fontSize: 16, fontWeight: FontWeight.bold),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 20),
+        ),
+      ),
+    );
+  }
+
+  Widget _slideSalaryDay(bool isEn) {
+    return _slideBase(
+      icon: '📅',
+      title: isEn ? 'Payday' : 'يوم الراتب',
+      subtitle: isEn ? 'When do you usually receive your income?' : 'متى تستلم دخلك الشهري عادةً؟',
+      child: Column(
+        children: [
+          Text(
+            isEn ? 'Day $_salaryDay' : 'اليوم $_salaryDay',
+            style: const TextStyle(color: Color(0xFF3B7EF6), fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+          ),
+          const SizedBox(height: 20),
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              trackHeight: 8,
+              activeTrackColor: const Color(0xFF3B7EF6),
+              inactiveTrackColor: const Color(0xFF1E293B),
+              thumbColor: Colors.white,
+              overlayColor: const Color(0xFF3B7EF6).withOpacity(0.2),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
+            ),
+            child: Slider(
+              value: _salaryDay.toDouble(),
+              min: 1,
+              max: 28,
+              divisions: 27,
+              onChanged: (v) => setState(() => _salaryDay = v.round()),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _slideSummary(bool isEn) {
+    return _slideBase(
+      icon: '🌍',
+      title: isEn ? 'Preferred Currency' : 'العملة المفضلة',
+      subtitle: isEn ? 'Choose your main currency for tracking.' : 'اختر عملتك الرئيسية للتتبع.',
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        alignment: WrapAlignment.center,
+        children: _currencies.map((c) => _buildCurrencyToken(c)).toList(),
+      ),
+    );
+  }
+
+  Widget _buildCurrencyToken(String c) {
+    final isSelected = _currency == c;
+    return GestureDetector(
+      onTap: () => setState(() => _currency = c),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF3B7EF6) : const Color(0xFF0F1629),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? const Color(0xFF3B7EF6) : const Color(0xFF1E293B), width: 2),
+        ),
+        child: Text(
+          c,
+          style: TextStyle(color: isSelected ? Colors.white : const Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _slideBase({required String icon, required String title, required String subtitle, required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 50)),
+          const SizedBox(height: 20),
+          Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+          const SizedBox(height: 8),
+          Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14, fontFamily: 'Cairo')),
+          const SizedBox(height: 40),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F1629),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0xFF1E293B)),
+            ),
+            child: child,
+          ),
         ],
       ),
     );

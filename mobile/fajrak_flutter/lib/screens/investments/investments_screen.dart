@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -40,6 +42,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Investments');
     _load();
   }
 
@@ -518,12 +521,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             tooltip: 'inv_refresh'.tr(),
             onPressed: () async {
               setState(() => _loading = true);
-              await _load();
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('تم تحديث بيانات المحفظة ✅',
-                          style: TextStyle(fontFamily: 'Cairo')),
                       backgroundColor: Color(0xFF10B981),
                       duration: Duration(seconds: 2)),
                 );

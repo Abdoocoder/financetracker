@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../utils/error_handler.dart';
+import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -29,6 +31,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   @override
   void initState() {
     super.initState();
+    AnalyticsService.logScreenView('Transactions');
     _load();
   }
 
@@ -43,9 +46,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     } else {
       if (mounted) setState(() => _loadingMore = true);
     }
-
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
 
     final profile = await Supabase.instance.client
         .from('profiles')
