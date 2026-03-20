@@ -224,8 +224,25 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       'name': nameCtrl.text,
                       'icon': selectedIcon,
                       'target_amount': double.tryParse(targetCtrl.text) ?? 0,
-                    if (ctx.mounted) Navigator.pop(ctx);
-                    await _load();
+                      'current_amount': double.tryParse(currentCtrl.text) ?? 0,
+                      'deadline': deadlineDate.isEmpty ? null : deadlineDate,
+                    };
+                    try {
+                      if (existing != null) {
+                        await Supabase.instance.client
+                            .from('savings_goals')
+                            .update(data)
+                            .eq('id', existing['id']);
+                      } else {
+                        await Supabase.instance.client
+                            .from('savings_goals')
+                            .insert(data);
+                      }
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      await _load();
+                    } catch (e) {
+                      if (ctx.mounted) ErrorHandler.handle(e, context: ctx, developerMessage: 'Goals Save');
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF3B7EF6),

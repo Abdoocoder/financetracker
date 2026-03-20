@@ -521,9 +521,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             tooltip: 'inv_refresh'.tr(),
             onPressed: () async {
               setState(() => _loading = true);
-                      backgroundColor: Color(0xFF10B981),
-                      duration: Duration(seconds: 2)),
-                );
+              try {
+                await _load();
+              } catch (e) {
+                if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Investments Refresh');
+              } finally {
+                if (mounted) setState(() => _loading = false);
               }
             },
           ),
