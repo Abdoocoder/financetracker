@@ -22,7 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _incomeCtrl = TextEditingController();
   final _jobTitleCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
   String _birthDate = '';
   String _salaryDay = '1';
 

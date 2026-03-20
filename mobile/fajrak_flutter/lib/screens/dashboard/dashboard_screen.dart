@@ -23,7 +23,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   double _income = 0, _expenses = 0, _net = 0;
   int _healthScore = 0;
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
   String _name = '';
   int _unreadAlerts = 0;
   List<Map<String, dynamic>> _recentTx = [];

@@ -24,7 +24,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   List<Map<String, dynamic>> _paidDebts = [];
   bool _loading = true;
   bool _showPaid = false;
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
   String? _paymentDebtId;
   final _paymentCtrl = TextEditingController();
   bool _payingSaving = false;

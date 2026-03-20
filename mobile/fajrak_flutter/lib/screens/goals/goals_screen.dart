@@ -14,7 +14,7 @@ class GoalsScreen extends StatefulWidget {
 class _GoalsScreenState extends State<GoalsScreen> {
   List<Map<String, dynamic>> _goals = [];
   bool _loading = true;
-  String _currency = 'inv_jod'.tr();
+  String _currency = 'JOD';
 
   static const _goalIcons = [
     '🎯',
