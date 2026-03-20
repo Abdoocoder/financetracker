@@ -485,10 +485,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     final filtered = _filtered;
-    final income = filtered
+    final income = _allTransactions
         .where((t) => t['type'] == 'income')
         .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
-    final expenses = filtered
+    final expenses = _allTransactions
         .where((t) => t['type'] == 'expense')
         .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
 
