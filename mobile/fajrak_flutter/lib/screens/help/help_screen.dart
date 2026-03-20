@@ -91,7 +91,7 @@ class _HelpScreenState extends State<HelpScreen> {
         {
           'q': 'كيف أنشئ هدفاً للادخار؟',
           'a':
-              'اذهب لصفحة الأهداف واضغط 'goals_new'.tr(). حدد اسم الهدف، المبلغ المستهدف، والتاريخ المطلوب.'
+              'اذهب لصفحة الأهداف واضغط ${'goals_new'.tr()}. حدد اسم الهدف، المبلغ المستهدف، والتاريخ المطلوب.'
         },
         {
           'q': 'كيف أضيف مبلغاً لهدفي؟',
@@ -158,12 +158,12 @@ class _HelpScreenState extends State<HelpScreen> {
                 onChanged: (v) => setState(() => _search = v),
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'help_search'.tr(),
-                  hintStyle:
-                      TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
+                  prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
+                  hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
                   contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: InputBorder.none,
                 ),
               ),
