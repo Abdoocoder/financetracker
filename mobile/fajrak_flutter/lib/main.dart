@@ -48,7 +48,6 @@ void main() async {
   );
 
   await NotificationService.initialize();
-  await EasyLocalization.ensureInitialized();
 
   // Global Error Handling
   FlutterError.onError = (details) {
