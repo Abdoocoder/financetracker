@@ -223,7 +223,14 @@ npm run dev
 
 ## Changelog
 
-### v3.6.0 — 2026-03-20 *(Latest)*
+### v3.7.0 — 2026-03-20 *(Latest)*
+- 🔍 **Full Parity Audit** — Completed a forensic audit of all 11+ screens comparing Flutter vs. Web.
+- 🛠️ **Audit Report Generated** — Identified 15+ functional and UI gaps (Accordions, CSV Logic, Live Prices).
+- 🔑 **Reset Password Verified** — Confirmed full functionality of the password reset flow in Flutter.
+- 📱 **Mobile App Status** — Achievement of ~90% feature parity; implementation phase for remaining 10% started.
+
+
+### v3.6.0 — 2026-03-20
 - 🎯 **Smart Challenges Card** — auto-calculated from real user data, matches web logic (no manual input)
 - 📊 **Charts Card** — real 6-month income/expense charts from Supabase
 - 💼 **Budget Progress Card** — real budget tracking with progress bars
