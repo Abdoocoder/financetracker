@@ -339,9 +339,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 _buildHeader(),
                 const SizedBox(height: 16),
-                if (_income == 0 && _expenses == 0 && _recentTx.isEmpty)
-                  _buildEmptyState()
-                else ...[
+                ...[
                   _buildStatCards(),
                   const SizedBox(height: 16),
                   _buildHealthScore(),
@@ -489,7 +487,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const Center(child: Text('👋', style: TextStyle(fontSize: 40))),
           ),
           const SizedBox(height: 20),
-          Text('onboard_welcome'.tr(),
+          Text('أهلاً بك في فجرك 🌅',
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -497,7 +495,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   fontFamily: 'Cairo')),
           const SizedBox(height: 8),
           Text(
-              'gamif_start'.tr(),
+              'ابدأ بتسجيل أول معاملة لترى تحليلاتك المالية',
               textAlign: TextAlign.center,
               style: const TextStyle(
                   color: Color(0xFF94A3B8), fontSize: 13, fontFamily: 'Cairo')),
