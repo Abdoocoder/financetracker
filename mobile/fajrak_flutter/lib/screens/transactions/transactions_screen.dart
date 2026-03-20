@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:convert';
 
 
 class TransactionsScreen extends StatefulWidget {
@@ -44,17 +45,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final profile = await Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single();
     if (mounted) _currency = profile['currency'] as String? ?? 'JOD';
 
-    var query = Supabase.instance.client.from('transactions').select('*').eq('user_id', user.id);
-    
+    final baseQ = Supabase.instance.client.from('transactions').select('*').eq('user_id', user.id);
+    List data;
     if (_filterMonth != null && _filterYear != null) {
       final start = DateTime(_filterYear!, _filterMonth!, 1).toIso8601String().split('T')[0];
       final end = DateTime(_filterYear!, _filterMonth! + 1, 0).toIso8601String().split('T')[0];
-      query = query.gte('transaction_date', start).lte('transaction_date', end);
+      data = await baseQ.gte('transaction_date', start).lte('transaction_date', end).order('transaction_date', ascending: false).limit(_limit);
+    } else {
+      data = await baseQ.order('transaction_date', ascending: false).limit(_limit);
     }
-
-    query = query.order('transaction_date', ascending: false).limit(_limit);
-
-    final data = await query;
     if (mounted) {
       setState(() {
         _transactions = List<Map<String, dynamic>>.from(data);
@@ -101,7 +100,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       final dir = await getTemporaryDirectory();
       final ts = DateTime.now().millisecondsSinceEpoch;
       final file = File('${dir.path}/fajrak_transactions_$ts.csv');
-      await file.writeAsString('﻿${buffer.toString()}', encoding: const Utf8Codec());
+      await file.writeAsString('\u{feff}${buffer.toString()}', encoding: utf8);
 
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'text/csv')],
