@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import '../../main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -587,15 +588,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   final p =
                                       await SharedPreferences.getInstance();
                                   await p.setBool('darkMode', true);
-                                  if (mounted)
+                                  if (mounted) {
+                                    FajrakApp.updateAppState(context, isDarkMode: true);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(
-                                                'تم تفعيل الوضع الداكن ✅ (أعد تشغيل التطبيق)',
+                                                'تم تفعيل الوضع الداكن ✅',
                                                 style: TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
                                                 Color(0xFF10B981)));
+                                  }
                                 },
                                 child: Container(
                                   padding:
@@ -629,15 +632,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   final p =
                                       await SharedPreferences.getInstance();
                                   await p.setBool('darkMode', false);
-                                  if (mounted)
+                                  if (mounted) {
+                                    FajrakApp.updateAppState(context, isDarkMode: false);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(
-                                                'تم تفعيل الوضع الفاتح ✅ (أعد تشغيل التطبيق)',
+                                                'تم تفعيل الوضع الفاتح ✅',
                                                 style: TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
                                                 Color(0xFF10B981)));
+                                  }
                                 },
                                 child: Container(
                                   padding:

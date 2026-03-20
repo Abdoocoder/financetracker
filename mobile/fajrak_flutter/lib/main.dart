@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -47,15 +48,48 @@ void main() async {
   runApp(const FajrakApp());
 }
 
-class FajrakApp extends StatelessWidget {
+class FajrakApp extends StatefulWidget {
   const FajrakApp({super.key});
+
+  static void updateAppState(BuildContext context, {bool? isDarkMode}) {
+    final state = context.findAncestorStateOfType<_FajrakAppState>();
+    if (state != null && isDarkMode != null) {
+      state.setTheme(isDarkMode);
+    }
+  }
+
+  @override
+  State<FajrakApp> createState() => _FajrakAppState();
+}
+
+class _FajrakAppState extends State<FajrakApp> {
+  bool _isDarkMode = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isDarkMode = prefs.getBool('darkMode') ?? true;
+    });
+  }
+
+  void setTheme(bool isDark) {
+    setState(() {
+      _isDarkMode = isDark;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'فجرك',
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(),
+      theme: _isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [
@@ -76,7 +110,7 @@ class FajrakApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildTheme() {
+  ThemeData _buildDarkTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -124,6 +158,74 @@ class FajrakApp extends StatelessWidget {
         ),
         labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
         hintStyle: const TextStyle(color: Color(0xFF475569)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF3B7EF6),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: const TextStyle(
+            fontFamily: 'Cairo',
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFF3B7EF6),
+        secondary: Color(0xFF10B981),
+        surface: Colors.white,
+        error: Color(0xFFEF4444),
+      ),
+      fontFamily: 'Cairo',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFFF8FAFC),
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFF0F172A)),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Cairo',
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF0F172A),
+        ),
+      ),
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF3B7EF6)),
+        ),
+        labelStyle: const TextStyle(color: Color(0xFF64748B)),
+        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
