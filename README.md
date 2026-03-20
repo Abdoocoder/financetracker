@@ -224,10 +224,12 @@ npm run dev
 ## Changelog
 
 ### v3.7.0 — 2026-03-20 *(Latest)*
-- 🔍 **Full Parity Audit** — Completed a forensic audit of all 11+ screens comparing Flutter vs. Web.
-- 🛠️ **Audit Report Generated** — Identified 15+ functional and UI gaps (Accordions, CSV Logic, Live Prices).
-- 🔑 **Reset Password Verified** — Confirmed full functionality of the password reset flow in Flutter.
-- 📱 **Mobile App Status** — Achievement of ~90% feature parity; implementation phase for remaining 10% started.
+- 🌟 **100% Flutter-Web Parity** — Successfully achieved 100% feature and visual parity between the native Flutter app and the Next.js React web app.
+- 🛠️ **Dashboard Enhancements** — Added Gamification BadgesGrid and MonthCompareCard natively.
+- 💸 **CSV Export** — Full native support for generating and sharing UTC-8 CSV transaction reports via `share_plus`.
+- 🎓 **Financial Roadmap** — Integrated the 5-stage visual financial journey into the Learn tab.
+- 🤖 **Savings AI Advisor** — Augmented the Budget Advisor to dynamically track and encourage active `savings_goals`.
+- ⚙️ **Settings & Personalization** — Dark/Light theme toggles and JOD/USD currency swapping fully synchronized locally.
 
 
 ### v3.6.0 — 2026-03-20
