@@ -104,13 +104,13 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                textDirection: TextDirection.ltr,
+
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                decoration: const InputDecoration(
-                    labelText: 'forgot_email'.tr(),
+                decoration: InputDecoration(
+                    labelText: 'settings_password'.tr(),
                     prefixIcon:
-                        Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
+                        const Icon(Icons.lock_outline, color: Color(0xFF94A3B8))),
               ),
               const SizedBox(height: 16),
               TextFormField(

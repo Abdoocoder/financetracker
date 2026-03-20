@@ -730,7 +730,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       child: Row(children: [
                         const Text('🚀', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 10),
-                        const Expanded(
+                        Expanded(
                             child: Text('wealthSimulator'.tr(),
                                 style: TextStyle(
                                     color: Colors.white,

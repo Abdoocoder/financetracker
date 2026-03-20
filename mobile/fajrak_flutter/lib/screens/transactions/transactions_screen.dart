@@ -302,13 +302,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: const InputDecoration(labelText: 'trans_amount'.tr()),
+              decoration: InputDecoration(labelText: 'trans_amount'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: catController,
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: const InputDecoration(labelText: 'trans_category'.tr()),
+              decoration: InputDecoration(labelText: 'trans_category'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
