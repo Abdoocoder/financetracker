@@ -47,41 +47,61 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (mounted) setState(() => _loadingMore = true);
     }
 
-    final profile = await Supabase.instance.client
-        .from('profiles')
-        .select('currency')
-        .eq('id', user.id)
-        .single();
-    if (mounted) _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
-
-    final baseQ = Supabase.instance.client
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.id);
-    List data;
-    if (_filterMonth != null && _filterYear != null) {
-      final start = DateTime(_filterYear!, _filterMonth!, 1)
-          .toIso8601String()
-          .split('T')[0];
-      final end = DateTime(_filterYear!, _filterMonth! + 1, 0)
-          .toIso8601String()
-          .split('T')[0];
-      data = await baseQ
-          .gte('transaction_date', start)
-          .lte('transaction_date', end)
-          .order('transaction_date', ascending: false)
-          .limit(_limit);
-    } else {
-      data =
-          await baseQ.order('transaction_date', ascending: false).limit(_limit);
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
     }
-    if (mounted) {
-      setState(() {
-        _transactions = List<Map<String, dynamic>>.from(data);
-        _hasMore = data.length == _limit;
-        _loading = false;
-        _loadingMore = false;
-      });
+
+    try {
+      final profile = await Supabase.instance.client
+          .from('profiles')
+          .select('currency')
+          .eq('id', user.id)
+          .single();
+      if (mounted) _currency = profile['currency'] as String? ?? 'inv_jod'.tr();
+
+      final baseQ = Supabase.instance.client
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id);
+      List data;
+      if (_filterMonth != null && _filterYear != null) {
+        final start = DateTime(_filterYear!, _filterMonth!, 1)
+            .toIso8601String()
+            .split('T')[0];
+        final end = DateTime(_filterYear!, _filterMonth! + 1, 0)
+            .toIso8601String()
+            .split('T')[0];
+        data = await baseQ
+            .gte('transaction_date', start)
+            .lte('transaction_date', end)
+            .order('transaction_date', ascending: false)
+            .limit(_limit);
+      } else {
+        data = await baseQ
+            .order('transaction_date', ascending: false)
+            .limit(_limit);
+      }
+      if (mounted) {
+        setState(() {
+          if (reset) {
+            _transactions = List<Map<String, dynamic>>.from(data);
+          } else {
+            _transactions.addAll(List<Map<String, dynamic>>.from(data));
+          }
+          _hasMore = data.length == _limit;
+        });
+      }
+    } catch (e) {
+      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Transactions Load');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+        });
+      }
     }
   }
 
