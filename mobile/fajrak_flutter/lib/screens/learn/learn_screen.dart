@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -291,11 +292,12 @@ class _LearnScreenState extends State<LearnScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading)
+    if (_loading) {
       return const Scaffold(
           backgroundColor: Color(0xFF070B14),
           body: Center(
               child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+    }
 
     final info = _stageInfo[_stage]!;
 
@@ -329,8 +331,8 @@ class _LearnScreenState extends State<LearnScreen> {
                 Text(info.$1, style: const TextStyle(fontSize: 22)),
                 const SizedBox(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('مرحلتك',
-                      style: TextStyle(
+                  Text('learn_stage'.tr(),
+                      style: const TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 10,
                           fontFamily: 'Cairo')),

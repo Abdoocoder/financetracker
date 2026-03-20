@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class FinancialRoadmap extends StatelessWidget {
@@ -12,9 +13,9 @@ class FinancialRoadmap extends StatelessWidget {
   Widget build(BuildContext context) {
     final stages = [
       {'id': 'awareness', 'icon': '🌱', 'title': 'الوعي'},
-      {'id': 'debt', 'icon': '💳', 'title': 'الديون'},
-      {'id': 'emergency', 'icon': '🛡️', 'title': 'الطوارئ'},
-      {'id': 'investing', 'icon': '📈', 'title': 'الاستثمار'},
+      {'id': 'debt', 'icon': '💳', 'title': 'health_debt'.tr()},
+      {'id': 'emergency', 'icon': '🛡️', 'title': 'health_emergency'.tr()},
+      {'id': 'investing', 'icon': '📈', 'title': 'health_investing'.tr()},
       {'id': 'wealth', 'icon': '👑', 'title': 'الثروة'},
     ];
 

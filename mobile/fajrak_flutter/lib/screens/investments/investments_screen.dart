@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -62,11 +63,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         .from('investments')
         .select('*')
         .eq('user_id', user.id);
-    if (mounted)
+    if (mounted) {
       setState(() {
         _investments = List<Map<String, dynamic>>.from(data);
         _loading = false;
       });
+    }
   }
 
   double get _totalValue => _investments.fold(
@@ -120,7 +122,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
         'is_halal': _isHalal,
         'type': 'etf',
-        'currency': 'USD',
+        'currency': 'inv_usd'.tr(),
       });
     }
     _symbolCtrl.clear();
@@ -147,12 +149,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: const Text('إلغاء',
-                        style: TextStyle(fontFamily: 'Cairo'))),
+                    child: Text('trans_cancel'.tr(),
+                        style: const TextStyle(fontFamily: 'Cairo'))),
                 TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: const Text('حذف',
-                        style: TextStyle(
+                    child: Text('delete'.tr(),
+                        style: const TextStyle(
                             color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
               ],
             ));
@@ -386,10 +388,10 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             _field(_sharesCtrl, 'عدد الأسهم',
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_avgPriceCtrl, 'متوسط سعر الشراء',
+            _field(_avgPriceCtrl, 'inv_avg_price'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_currentPriceCtrl, 'السعر الحالي',
+            _field(_currentPriceCtrl, 'inv_current_price'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 12),
             GestureDetector(
@@ -437,8 +439,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   child: _saving
                       ? const CircularProgressIndicator(
                           color: Colors.white, strokeWidth: 2)
-                      : const Text('إضافة',
-                          style: TextStyle(
+                      : Text('trans_add'.tr(),
+                          style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900,
                               fontSize: 15)),
@@ -513,7 +515,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFF3B7EF6)),
-            tooltip: 'تحديث الأسعار',
+            tooltip: 'inv_refresh'.tr(),
             onPressed: () async {
               setState(() => _loading = true);
               await _load();
@@ -729,7 +731,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         const Text('🚀', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 10),
                         const Expanded(
-                            child: Text('محاكي الثروة',
+                            child: Text('wealthSimulator'.tr(),
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w900,
@@ -754,7 +756,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           border: Border.all(color: const Color(0xFF1E293B))),
                       child: Column(children: [
                         _slider(
-                            'الاستثمار الشهري',
+                            'monthlyInvestment'.tr(),
                             '\$${_monthly.toStringAsFixed(0)}',
                             _monthly,
                             10,
@@ -767,7 +769,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                             1,
                             30,
                             (v) => setState(() => _years = v.toInt())),
-                        _slider('العائد السنوي', '${_rate.toStringAsFixed(0)}%',
+                        _slider('annualReturn'.tr(), '${_rate.toStringAsFixed(0)}%',
                             _rate, 1, 20, (v) => setState(() => _rate = v)),
                         const SizedBox(height: 16),
                         Container(
@@ -1067,7 +1069,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                    child: _miniField(_buySharesCtrl, 'الوحدات',
+                    child: _miniField(_buySharesCtrl, 'inv_shares'.tr(),
                         const TextInputType.numberWithOptions(decimal: true))),
                 const SizedBox(width: 8),
                 Expanded(

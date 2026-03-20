@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,10 +32,11 @@ class _LoginScreenState extends State<LoginScreen> {
         _error = e.message;
       });
     } finally {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _loading = false;
         });
+      }
     }
   }
 
@@ -106,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: const InputDecoration(
-                    labelText: 'البريد الإلكتروني',
+                    labelText: 'forgot_email'.tr(),
                     prefixIcon:
                         Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
               ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class ChallengesCard extends StatefulWidget {
@@ -82,8 +83,8 @@ class _ChallengesCardState extends State<ChallengesCard> {
               if (_activeChallenge != null)
                 GestureDetector(
                   onTap: () => setState(() => _activeChallenge = null),
-                  child: const Text('الكل',
-                      style: TextStyle(
+                  child: Text('trans_all'.tr(),
+                      style: const TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 12,
                           fontFamily: 'Cairo')),

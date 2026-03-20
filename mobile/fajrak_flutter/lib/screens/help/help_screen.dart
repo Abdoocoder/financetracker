@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -90,7 +91,7 @@ class _HelpScreenState extends State<HelpScreen> {
         {
           'q': 'كيف أنشئ هدفاً للادخار؟',
           'a':
-              'اذهب لصفحة الأهداف واضغط "هدف جديد". حدد اسم الهدف، المبلغ المستهدف، والتاريخ المطلوب.'
+              'اذهب لصفحة الأهداف واضغط 'goals_new'.tr(). حدد اسم الهدف، المبلغ المستهدف، والتاريخ المطلوب.'
         },
         {
           'q': 'كيف أضيف مبلغاً لهدفي؟',
@@ -158,7 +159,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: const InputDecoration(
-                  hintText: '🔍 ابحث عن سؤال...',
+                  hintText: 'help_search'.tr(),
                   hintStyle:
                       TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
                   contentPadding:

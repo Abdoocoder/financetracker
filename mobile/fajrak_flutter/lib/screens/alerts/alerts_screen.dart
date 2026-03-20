@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -28,11 +29,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', ascending: false);
-    if (mounted)
+    if (mounted) {
       setState(() {
         _alerts = List<Map<String, dynamic>>.from(data);
         _loading = false;
       });
+    }
   }
 
   Future<void> _markAllRead() async {
@@ -43,23 +45,25 @@ class _AlertsScreenState extends State<AlertsScreen> {
         .update({'is_read': true})
         .eq('user_id', user.id)
         .eq('is_read', false);
-    if (mounted)
+    if (mounted) {
       setState(() {
         for (var a in _alerts) {
           a['is_read'] = true;
         }
       });
+    }
   }
 
   Future<void> _markRead(String id) async {
     await Supabase.instance.client
         .from('alerts')
         .update({'is_read': true}).eq('id', id);
-    if (mounted)
+    if (mounted) {
       setState(() {
         final idx = _alerts.indexWhere((a) => a['id'].toString() == id);
         if (idx != -1) _alerts[idx]['is_read'] = true;
       });
+    }
   }
 
   Future<void> _deleteAll() async {
@@ -74,8 +78,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Future<void> _deleteAlert(String id) async {
     await Supabase.instance.client.from('alerts').delete().eq('id', id);
-    if (mounted)
+    if (mounted) {
       setState(() => _alerts.removeWhere((a) => a['id'].toString() == id));
+    }
   }
 
   Future<void> _generateAlerts() async {
@@ -101,7 +106,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       Navigator.pushNamed(context, '/debts');
     } else if (title.contains('ميزانية') || msg.contains('ميزانية'))
       Navigator.pushNamed(context, '/budgets');
-    else if (title.contains('هدف') || msg.contains('هدف'))
+    else if (title.contains('goals_count'.tr()) || msg.contains('goals_count'.tr()))
       Navigator.pushNamed(context, '/goals');
     else if (title.contains('استثمار') || msg.contains('استثمار'))
       Navigator.pushNamed(context, '/investments');
@@ -154,8 +159,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
           backgroundColor: const Color(0xFF070B14),
-          title: const Text('التنبيهات',
-              style: TextStyle(
+          title: Text('nav_alerts'.tr(),
+              style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,
                   color: Colors.white)),

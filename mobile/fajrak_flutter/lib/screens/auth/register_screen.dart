@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -106,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: const InputDecoration(
-                    labelText: 'الاسم الكامل',
+                    labelText: 'settings_name'.tr(),
                     prefixIcon:
                         Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
               ),
@@ -118,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: const InputDecoration(
-                    labelText: 'البريد الإلكتروني',
+                    labelText: 'forgot_email'.tr(),
                     prefixIcon:
                         Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
               ),

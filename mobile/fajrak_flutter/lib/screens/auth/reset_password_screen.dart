@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -132,7 +133,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'كلمة المرور الجديدة',
+                  labelText: 'reset_new'.tr(),
                   prefixIcon:
                       const Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
                   suffixIcon: IconButton(
@@ -152,7 +153,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: const InputDecoration(
-                  labelText: 'تأكيد كلمة المرور',
+                  labelText: 'reset_confirm'.tr(),
                   prefixIcon:
                       Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
                 ),

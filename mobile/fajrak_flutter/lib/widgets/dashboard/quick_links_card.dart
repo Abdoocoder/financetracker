@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class QuickLinksCards extends StatelessWidget {
@@ -21,15 +22,15 @@ class QuickLinksCards extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: _buildCard(context, 'الديون', '💳', totalDebt,
+            child: _buildCard(context, 'health_debt'.tr(), '💳', totalDebt,
                 const Color(0xFFEF4444), '/debts')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'الاستثمار', '📈', invValue,
+            child: _buildCard(context, 'health_investing'.tr(), '📈', invValue,
                 const Color(0xFF10B981), '/investments')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'الادخار', '🛡️', goalsSaved,
+            child: _buildCard(context, 'health_savings'.tr(), '🛡️', goalsSaved,
                 const Color(0xFF3B7EF6), '/goals')),
       ],
     );
