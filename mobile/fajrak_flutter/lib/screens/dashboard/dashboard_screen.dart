@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
-import '../../widgets/dashboard/quick_links_card.dart';
+import '../../widgets/dashboard/quick_links_card.dart'; // QuickLinksCards
 import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
@@ -21,6 +21,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
+  List<Map<String, dynamic>> _months6Data = [];
+  List<Map<String, dynamic>> _categoryData = [];
+  double _totalDebt = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
+  double _prevExpenses = 0;
+  double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
   final _amountController = TextEditingController();
   String _selectedCategory = 'طعام';
@@ -94,6 +99,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _recentTx = recent.cast<Map<String, dynamic>>();
         _healthScore = score.clamp(0, 100);
         _stage = stage;
+        _totalDebt = totalDebt;
+        _invValue = invValue;
+        _goalsSaved = goalsSaved;
         _loading = false;
       });
     } catch (e) {
@@ -151,17 +159,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
               _buildStage(),
               const SizedBox(height: 16),
-              ChartsCard(currency: _currency),
+              ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
               const SizedBox(height: 16),
               BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
               const SizedBox(height: 16),
-              QuickLinksCard(currency: _currency),
+              QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
               const SizedBox(height: 16),
-              GamificationCard(healthScore: _healthScore),
+              GamificationCard(score: _healthScore),
               const SizedBox(height: 16),
               WealthSimulatorCard(currency: _currency),
               const SizedBox(height: 16),
-              ChallengesCard(currency: _currency),
+              ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
               const SizedBox(height: 16),
               _buildRecentTransactions(),
             ]),
