@@ -46,16 +46,19 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF0A0F1E),
-          border: Border(top: BorderSide(color: Color(0xFF1E293B))),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
         ),
         child: SafeArea(
           child: Padding(
@@ -79,6 +82,9 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _navItem(int index, IconData icon, String label, {int badge = 0}) {
     final isSelected = _currentIndex == index;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () => setState(() => _currentIndex = index),
       behavior: HitTestBehavior.opaque,
@@ -91,15 +97,15 @@ class _MainScreenState extends State<MainScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFF3B7EF6).withValues(alpha: 0.15)
+                      ? colorScheme.primary.withValues(alpha: 0.15)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isSelected ? _filledIcon(icon) : icon,
                   color: isSelected
-                      ? const Color(0xFF3B7EF6)
-                      : const Color(0xFF64748B),
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
                   size: 24,
                 ),
               ),
@@ -129,8 +135,8 @@ class _MainScreenState extends State<MainScreen> {
                 fontFamily: 'Cairo',
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
                 color: isSelected
-                    ? const Color(0xFF3B7EF6)
-                    : const Color(0xFF64748B),
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
               )),
           if (isSelected)
             Container(
@@ -138,7 +144,7 @@ class _MainScreenState extends State<MainScreen> {
               width: 20,
               height: 3,
               decoration: BoxDecoration(
-                color: const Color(0xFF3B7EF6),
+                color: colorScheme.primary,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

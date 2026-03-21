@@ -11,7 +11,7 @@ const _priorityColors = [
   Color(0xFF8B9CC8),
   Color(0xFF4A5568),
 ];
-const _priorityLabels = ['عالية جداً', 'عالية', 'متوسطة', 'منخفضة', 'مؤجلة'];
+final _priorityLabels = ['priority_very_high'.tr(), 'priority_high'.tr(), 'priority_medium'.tr(), 'priority_low'.tr(), 'priority_deferred'.tr()];
 
 class DebtsScreen extends StatefulWidget {
   const DebtsScreen({super.key});
@@ -135,8 +135,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                 const Center(child: Text('🎉', style: TextStyle(fontSize: 40))),
           ),
           const SizedBox(height: 16),
-          const Text('أحرار من الدين!',
-              style: TextStyle(
+          Text('debts_celebration_title'.tr(),
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
@@ -154,10 +154,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
             decoration: BoxDecoration(
                 color: const Color(0xFF10B981).withOpacity(0.07),
                 borderRadius: BorderRadius.circular(12)),
-            child: const Text(
-              'نفس المؤمن معلقة بدينه حتى يُقضى عنه\nتهانيّ! لقد سددت هذا الدين بالكامل 💪',
+            child: Text(
+              'debts_celebration_msg'.tr(),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                   color: Color(0xFF94A3B8),
                   fontFamily: 'Cairo',
                   fontSize: 12,
@@ -175,8 +175,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12))),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('شكراً 🙌 الحمد لله',
-                    style: TextStyle(
+                child: Text('debts_celebration_btn'.tr(),
+                    style: const TextStyle(
                         fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
               )),
           const SizedBox(height: 8),
@@ -190,18 +190,18 @@ class _DebtsScreenState extends State<DebtsScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF0F1629),
-        title: const Text('حذف الدين',
-            style: TextStyle(color: Colors.white, fontFamily: 'Cairo')),
-        content: const Text('هل أنت متأكد؟ لا يمكن التراجع.',
-            style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+        title: Text('debts_delete_title'.tr(),
+            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
+        content: Text('confirm_delete'.tr(),
+            style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child:
-                  Text('إلغاء', style: const TextStyle(fontFamily: 'Cairo'))),
+                  Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('حذف',
+              child: Text('delete'.tr(),
                   style: const TextStyle(
                       color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
         ],
@@ -251,32 +251,32 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     color: const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text(existing != null ? 'تعديل الدين' : 'دين جديد',
+            Text(existing != null ? 'debts_edit'.tr() : 'debts_new'.tr(),
                 style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
                     fontFamily: 'Cairo')),
             const SizedBox(height: 20),
-            _field(nameCtrl, 'الاسم (مثال: بطاقة Visa)', TextInputType.text),
+            _field(nameCtrl, 'debts_name_hint'.tr(), TextInputType.text),
             const SizedBox(height: 10),
             Row(children: [
               Expanded(
-                  child: _field(originalCtrl, 'المبلغ الأصلي',
+                  child: _field(originalCtrl, 'debts_original_amount'.tr(),
                       const TextInputType.numberWithOptions(decimal: true))),
               const SizedBox(width: 10),
               Expanded(
-                  child: _field(remainingCtrl, 'المتبقي',
+                  child: _field(remainingCtrl, 'debts_remaining_amount'.tr(),
                       const TextInputType.numberWithOptions(decimal: true))),
             ]),
             const SizedBox(height: 10),
             Row(children: [
               Expanded(
-                  child: _field(monthlyCtrl, 'القسط الشهري',
+                  child: _field(monthlyCtrl, 'debts_monthly_payment'.tr(),
                       const TextInputType.numberWithOptions(decimal: true))),
               const SizedBox(width: 10),
               Expanded(
-                  child: _field(paymentDayCtrl, 'يوم الدفع (1-28)',
+                  child: _field(paymentDayCtrl, 'debts_payment_day'.tr(),
                       const TextInputType.numberWithOptions(decimal: false))),
             ]),
             const SizedBox(height: 10),
@@ -310,8 +310,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   const SizedBox(width: 10),
                   Text(
                     dueDate.isNotEmpty
-                        ? '📅 تاريخ الاستحقاق: $dueDate'
-                        : '📅 تاريخ الاستحقاق (اختياري)',
+                        ? 'debts_due_date_value'.tr(args: [dueDate])
+                        : 'debts_due_date_hint'.tr(),
                     style: TextStyle(
                         color: dueDate.isNotEmpty
                             ? Colors.white
@@ -323,12 +323,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            _field(notesCtrl, 'ملاحظات (اختياري)', TextInputType.text),
+            _field(notesCtrl, 'debts_notes_hint'.tr(), TextInputType.text),
             const SizedBox(height: 12),
             // Priority
             const Align(
                 alignment: Alignment.centerRight,
-                child: Text('الأولوية',
+                child: Text(' الأولوية ',
                     style: TextStyle(
                         color: Color(0xFF94A3B8),
                         fontSize: 12,
@@ -387,7 +387,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           : const Color(0xFF64748B),
                       size: 24),
                   const SizedBox(width: 10),
-                  Text('خصم تلقائي',
+                  Text('debts_auto_deduct'.tr(),
                       style: TextStyle(
                           color: autoDeduct
                               ? const Color(0xFF10B981)
@@ -427,7 +427,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                   : const Color(0xFF64748B),
                               size: 20),
                           const SizedBox(width: 10),
-                          Text('💳 استلمت هذا المبلغ اليوم',
+                          Text('debts_received_today'.tr(),
                               style: TextStyle(
                                   color: receivedAmount
                                       ? const Color(0xFF3B7EF6)
@@ -436,10 +436,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                   fontWeight: FontWeight.w700)),
                         ]),
                         if (receivedAmount)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 4, right: 30),
-                            child: Text('سيُضاف تلقائياً كدخل في معاملاتك',
-                                style: TextStyle(
+                           Padding(
+                            padding: const EdgeInsets.only(top: 4, right: 30),
+                            child: Text('debts_received_today_desc'.tr(),
+                                style: const TextStyle(
                                     color: Color(0xFF64748B),
                                     fontSize: 11,
                                     fontFamily: 'Cairo')),
@@ -514,7 +514,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'حفظ التعديل' : 'إضافة معاملة',
+                  child: Text(existing != null ? 'debts_save_edit'.tr() : 'debts_save'.tr(),
                       style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w900,
@@ -563,7 +563,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
-        title: Text('ديون',
+        title: Text('debts_title'.tr(),
             style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -589,19 +589,19 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   Row(children: [
                     Expanded(
                         child: _statCard(
-                            'إجمالي المتبقي',
+                            'debts_total_remaining'.tr(),
                             '${totalRemaining.toStringAsFixed(0)} $_currency',
                             const Color(0xFFEF4444))),
                     const SizedBox(width: 8),
                     Expanded(
                         child: _statCard(
-                            'مسدد',
+                            'debts_paid'.tr(),
                             '${paidPct.toStringAsFixed(0)}%',
                             const Color(0xFF10B981))),
                     const SizedBox(width: 8),
                     Expanded(
                         child: _statCard(
-                            'أقساط شهرية',
+                            'debts_monthly_total'.tr(),
                             '${totalMonthly.toStringAsFixed(0)} $_currency',
                             const Color(0xFFF59E0B))),
                   ]),
@@ -623,8 +623,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('إجمالي ما سددته',
-                                  style: TextStyle(
+                               Text('debts_total_paid_life'.tr(),
+                                  style: const TextStyle(
                                       color: Color(0xFF94A3B8),
                                       fontSize: 12,
                                       fontFamily: 'Cairo')),
@@ -640,8 +640,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Text('ديون مسددة',
-                                  style: TextStyle(
+                               Text('debts_paid_count'.tr(),
+                                  style: const TextStyle(
                                       color: Color(0xFF94A3B8),
                                       fontSize: 11,
                                       fontFamily: 'Cairo')),
@@ -669,8 +669,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('التقدم الإجمالي',
-                                  style: TextStyle(
+                               Text('debts_overall_progress'.tr(),
+                                  style: const TextStyle(
                                       color: Color(0xFF94A3B8),
                                       fontSize: 12,
                                       fontFamily: 'Cairo',
@@ -695,13 +695,13 @@ class _DebtsScreenState extends State<DebtsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                  'مسدد: ${(totalOriginal - totalRemaining).toStringAsFixed(0)} $_currency',
+                                  'debts_paid_amount'.tr(args: [(totalOriginal - totalRemaining).toStringAsFixed(0), _currency]),
                                   style: const TextStyle(
                                       color: Color(0xFF64748B),
                                       fontSize: 10,
                                       fontFamily: 'Cairo')),
                               Text(
-                                  'الأصل: ${totalOriginal.toStringAsFixed(0)} $_currency',
+                                  'debts_original_amount_label'.tr(args: [totalOriginal.toStringAsFixed(0), _currency]),
                                   style: const TextStyle(
                                       color: Color(0xFF64748B),
                                       fontSize: 10,
@@ -715,11 +715,11 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   if (_debts.isEmpty)
                     Container(
                         padding: const EdgeInsets.all(40),
-                        child: const Column(children: [
-                          Text('🎉', style: TextStyle(fontSize: 48)),
-                          SizedBox(height: 12),
-                          Text('لا ديون نشطة — أحسنت!',
-                              style: TextStyle(
+                        child: Column(children: [
+                          const Text('🎉', style: TextStyle(fontSize: 48)),
+                          const SizedBox(height: 12),
+                          Text('debts_no_active'.tr(),
+                              style: const TextStyle(
                                   color: Color(0xFF94A3B8),
                                   fontFamily: 'Cairo',
                                   fontSize: 15)),
@@ -739,9 +739,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(color: const Color(0xFF1E293B))),
                         child: Row(children: [
-                          const Expanded(
-                              child: Text('✅ الديون المسددة',
-                                  style: TextStyle(
+                           Expanded(
+                              child: Text('debts_show_paid'.tr(),
+                                  style: const TextStyle(
                                       color: Colors.white,
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700))),

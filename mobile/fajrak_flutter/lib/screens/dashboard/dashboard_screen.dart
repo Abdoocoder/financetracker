@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/dashboard/charts_card.dart';
@@ -125,37 +125,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _amountController.clear();
       await _load();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم الإضافة ✅', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFF10B981)));
+        SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFF10B981)));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('حدث خطأ', style: TextStyle(fontFamily: 'Cairo')), backgroundColor: Color(0xFFEF4444)));
+        SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFFEF4444)));
     }
     setState(() => _saving = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Scaffold(
-      backgroundColor: Color(0xFF070B14),
-      body: Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    if (_loading) return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Center(child: CircularProgressIndicator(color: colorScheme.primary)));
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: _load,
-        color: const Color(0xFF3B7EF6),
+        color: colorScheme.primary,
         child: SafeArea(
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildHeader(),
+              _buildHeader(colorScheme),
               const SizedBox(height: 16),
-              _buildStatCards(),
+              _buildStatCards(colorScheme),
               const SizedBox(height: 16),
-              _buildHealthScore(),
+              _buildHealthScore(colorScheme),
               const SizedBox(height: 16),
-              _buildQuickAdd(),
+              _buildQuickAdd(colorScheme),
               const SizedBox(height: 16),
               _buildStage(),
               const SizedBox(height: 16),
@@ -171,7 +174,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
               ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
               const SizedBox(height: 16),
-              _buildRecentTransactions(),
+              _buildRecentTransactions(colorScheme),
             ]),
           ),
         ),
@@ -179,31 +182,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ColorScheme colorScheme) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_name.isNotEmpty ? '👋 أهلاً $_name' : 'لوحة التحكم',
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')),
-        const Text('فجرك المالي يبدأ اليوم 🌅',
-          style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+        Text(_name.isNotEmpty ? 'onboard_welcome'.tr(args: [_name]) : 'dash_title'.tr(),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: colorScheme.onSurface, fontFamily: 'Cairo')),
+        Text('dash_subtitle'.tr(),
+          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
       ]),
       Container(width: 44, height: 44,
-        decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]), borderRadius: BorderRadius.circular(12)),
-        child: const Center(child: Text('ف', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')))),
+        decoration: BoxDecoration(gradient: LinearGradient(colors: [colorScheme.primary, const Color(0xFF8B5CF6)]), borderRadius: BorderRadius.circular(12)),
+        child: Center(child: Text('ف', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')))),
     ]);
   }
 
-  Widget _buildStatCards() {
+  Widget _buildStatCards(ColorScheme colorScheme) {
     return Row(children: [
-      Expanded(child: _statCard('الدخل', _income, const Color(0xFF10B981), '↑')),
+      Expanded(child: _statCard('dash_income'.tr(), _income, const Color(0xFF10B981), '↑', colorScheme)),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('المصاريف', _expenses, const Color(0xFFEF4444), '↓')),
+      Expanded(child: _statCard('dash_expenses'.tr(), _expenses, const Color(0xFFEF4444), '↓', colorScheme)),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('الصافي', _net, _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), '=')),
+      Expanded(child: _statCard('dash_net'.tr(), _net, _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), '=', colorScheme)),
     ]);
   }
 
-  Widget _statCard(String label, double value, Color color, String icon) {
+  Widget _statCard(String label, double value, Color color, String icon, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.2))),
@@ -211,67 +214,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(icon, style: TextStyle(color: color, fontSize: 12)),
         const SizedBox(height: 4),
         FittedBox(child: Text('${value.abs().toStringAsFixed(0)}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'))),
-        Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
       ]),
     );
   }
 
-  Widget _buildHealthScore() {
-    final color = _healthScore >= 80 ? const Color(0xFF10B981) : _healthScore >= 60 ? const Color(0xFF3B7EF6) : _healthScore >= 40 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
-    final label = _healthScore >= 80 ? 'ممتاز 🌟' : _healthScore >= 60 ? 'جيد 💪' : _healthScore >= 40 ? 'متوسط ⚡' : 'يحتاج تحسين';
+  Widget _buildHealthScore(ColorScheme colorScheme) {
+    final color = _healthScore >= 80 ? const Color(0xFF10B981) : _healthScore >= 60 ? colorScheme.primary : _healthScore >= 40 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
+    final label = _healthScore >= 80 ? 'health_excellent'.tr() : _healthScore >= 60 ? 'health_good'.tr() : _healthScore >= 40 ? 'health_fair'.tr() : 'health_poor'.tr();
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF0F1629), borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withValues(alpha: 0.3))),
+      decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withValues(alpha: 0.3))),
       child: Row(children: [
         SizedBox(width: 64, height: 64, child: Stack(alignment: Alignment.center, children: [
-          CircularProgressIndicator(value: _healthScore / 100, color: color, backgroundColor: const Color(0xFF1E293B), strokeWidth: 6),
+          CircularProgressIndicator(value: _healthScore / 100, color: color, backgroundColor: colorScheme.outlineVariant, strokeWidth: 6),
           Text('$_healthScore', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18, fontFamily: 'Cairo')),
         ])),
         const SizedBox(width: 16),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('💊 نقاط الصحة المالية', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+          Text('health_score'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
-          const Text('/100 نقطة', style: TextStyle(color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
+          Text('/100 نقطة', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
         ])),
       ]),
     );
   }
 
-  Widget _buildQuickAdd() {
+  Widget _buildQuickAdd(ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF0F1629), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF1E293B))),
+      decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: colorScheme.outlineVariant)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('⚡ إضافة سريعة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+        Text('quick_add_title'.tr(), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'income'),
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : const Color(0xFF1E293B))),
-              child: const Center(child: Text('دخل', style: TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              decoration: BoxDecoration(color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : colorScheme.outlineVariant)),
+              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
           const SizedBox(width: 8),
           Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'expense'),
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : const Color(0xFF1E293B))),
-              child: const Center(child: Text('مصروف', style: TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              decoration: BoxDecoration(color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : colorScheme.outlineVariant)),
+              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
         ]),
         const SizedBox(height: 12),
         SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: _categories.length,
           itemBuilder: (_, i) { final cat = _categories[i]; final selected = cat == _selectedCategory;
             return GestureDetector(onTap: () => setState(() => _selectedCategory = cat),
               child: Container(margin: const EdgeInsets.only(left: 8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(color: selected ? const Color(0xFF3B7EF6).withValues(alpha: 0.2) : const Color(0xFF1E293B), borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? const Color(0xFF3B7EF6) : Colors.transparent)),
-                child: Text(cat, style: TextStyle(color: selected ? const Color(0xFF3B7EF6) : const Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')))); })),
+                decoration: BoxDecoration(color: selected ? colorScheme.primary.withValues(alpha: 0.2) : colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? colorScheme.primary : colorScheme.outlineVariant)),
+                child: Text(cat, style: TextStyle(color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')))); })),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: TextField(controller: _amountController, keyboardType: TextInputType.number, textAlign: TextAlign.right,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-            decoration: InputDecoration(hintText: 'المبلغ', hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'), filled: true, fillColor: const Color(0xFF1E293B), border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), suffixText: _currency, suffixStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo')))),
+            style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+            decoration: InputDecoration(hintText: 'trans_amount'.tr(), hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontFamily: 'Cairo'), filled: true, fillColor: colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), suffixText: _currency, suffixStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')))),
           const SizedBox(width: 8),
           GestureDetector(onTap: _saving ? null : _quickAdd,
-            child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), decoration: BoxDecoration(color: const Color(0xFF3B7EF6), borderRadius: BorderRadius.circular(10)),
-              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text('إضافة', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),
+            child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(10)),
+              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),
         ]),
       ]),
     );
@@ -293,31 +296,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(s.$1, style: const TextStyle(fontSize: 24)),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('مرحلتك الحالية', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+          Text('learn_stage'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
           Text(s.$2, style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         ]),
       ]),
     );
   }
 
-  Widget _buildRecentTransactions() {
+  Widget _buildRecentTransactions(ColorScheme colorScheme) {
     if (_recentTx.isEmpty) return const SizedBox();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('آخر المعاملات', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white, fontFamily: 'Cairo')),
+      Text('dash_recent'.tr(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface, fontFamily: 'Cairo')),
       const SizedBox(height: 10),
       ..._recentTx.map((tx) {
         final isIncome = tx['type'] == 'income';
         final amount = (tx['amount'] as num).toDouble();
         final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
         return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: const Color(0xFF0F1629), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF1E293B))),
+          decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: colorScheme.outlineVariant)),
           child: Row(children: [
             Container(width: 38, height: 38, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
               child: Center(child: Text(isIncome ? '💰' : '💸', style: const TextStyle(fontSize: 16)))),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tx['description'] ?? tx['category'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
-              Text(tx['category'] ?? '', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+              Text(tx['description'] ?? tx['category'] ?? '', style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
+              Text(tx['category'] ?? '', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
             ])),
             Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $_currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
           ]));

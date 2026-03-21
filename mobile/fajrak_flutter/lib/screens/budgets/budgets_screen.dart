@@ -185,7 +185,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: colorScheme.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
@@ -200,22 +200,22 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
             Text(existing != null ? 'تعديل الميزانية' : 'ميزانية جديدة',
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: colorScheme.onSurface,
                     fontFamily: 'Cairo')),
             const SizedBox(height: 20),
             if (existing == null) ...[
               Align(
                   alignment: Alignment.centerRight,
                   child: Text('الفئة',
-                      style: const TextStyle(
-                          color: Color(0xFF94A3B8),
+                      style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 12,
                           fontFamily: 'Cairo'))),
               const SizedBox(height: 8),
@@ -226,20 +226,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   crossAxisSpacing: 8,
                   childAspectRatio: 1,
                   children: _categories.map((cat) {
-                    final isSelected = selectedCat == cat['key'];
-                    return GestureDetector(
-                      onTap: () =>
-                          setS(() => selectedCat = cat['key'] as String),
-                      child: Container(
+                                child: Container(
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFF3B7EF6).withOpacity(0.15)
-                              : const Color(0xFF1E293B),
+                              ? colorScheme.primary.withOpacity(0.15)
+                              : colorScheme.surface,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF3B7EF6).withOpacity(0.4)
-                                  : Colors.transparent),
+                                  ? colorScheme.primary
+                                  : colorScheme.outlineVariant),
                         ),
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -250,10 +246,15 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                               Text(cat['key'] as String,
                                   style: TextStyle(
                                       color: isSelected
-                                          ? const Color(0xFF93C5FD)
-                                          : const Color(0xFF94A3B8),
+                                          ? colorScheme.primary
+                                          : colorScheme.onSurfaceVariant,
                                       fontSize: 10,
                                       fontFamily: 'Cairo',
+                                      fontWeight: FontWeight.w700),
+                                  textAlign: TextAlign.center),
+                            ]),
+                      ),
+ontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700),
                                   textAlign: TextAlign.center),
                             ]),
@@ -267,16 +268,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+              style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
               decoration: InputDecoration(
                 labelText: 'الحد الشهري ($_currency)',
-                labelStyle: const TextStyle(
-                    color: Color(0xFF64748B), fontFamily: 'Cairo'),
+                labelStyle: TextStyle(
+                    color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
                 filled: true,
-                fillColor: const Color(0xFF1E293B),
+                fillColor: colorScheme.surface,
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none),
+                    borderSide: BorderSide(color: colorScheme.outlineVariant)),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
@@ -316,7 +317,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                     await _load();
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B7EF6),
+                      backgroundColor: colorScheme.primary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -429,6 +430,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final available = _income - _totalDebtPayments;
     final totalBudgeted = _budgets.fold(
         0.0, (a, b) => a + (b['monthly_limit'] as num).toDouble());
@@ -437,27 +440,26 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     final insights = _getAdvisorInsights();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070B14),
-        title: const Text('الميزانية',
+        title: Text('الميزانية',
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
-                color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+                color: colorScheme.onSurface)),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         actions: [
           IconButton(
-              icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)),
+              icon: Icon(Icons.add, color: colorScheme.primary),
               onPressed: () => _showAddDialog())
         ],
       ),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
+          ? Center(
+              child: CircularProgressIndicator(color: colorScheme.primary))
           : RefreshIndicator(
               onRefresh: _load,
-              color: const Color(0xFF3B7EF6),
+              color: colorScheme.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -484,19 +486,19 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                     horizontal: 16, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: _month == i + 1
-                                      ? const Color(0xFF3B7EF6)
-                                      : const Color(0xFF0F1629),
+                                      ? colorScheme.primary
+                                      : colorScheme.surface,
                                   borderRadius: BorderRadius.circular(100),
                                   border: Border.all(
                                       color: _month == i + 1
-                                          ? const Color(0xFF3B7EF6)
-                                          : const Color(0xFF1E293B)),
+                                          ? colorScheme.primary
+                                          : colorScheme.outlineVariant),
                                 ),
                                 child: Text(_months[i],
                                     style: TextStyle(
                                         color: _month == i + 1
                                             ? Colors.white
-                                            : const Color(0xFF94A3B8),
+                                            : colorScheme.onSurfaceVariant,
                                         fontFamily: 'Cairo',
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700)),
@@ -510,16 +512,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                              color: const Color(0xFF0F1629),
+                              color: colorScheme.surface,
                               borderRadius: BorderRadius.circular(16),
                               border:
-                                  Border.all(color: const Color(0xFF1E293B))),
+                                  Border.all(color: colorScheme.outlineVariant)),
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('📋 ملخص الشهر',
+                                Text('📋 ملخص الشهر',
                                     style: TextStyle(
-                                        color: Color(0xFF94A3B8),
+                                        color: colorScheme.onSurfaceVariant,
                                         fontSize: 12,
                                         fontFamily: 'Cairo',
                                         fontWeight: FontWeight.w900)),
@@ -533,15 +535,15 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                       '💳 أقساط الديون',
                                       '-${_totalDebtPayments.toStringAsFixed(0)} $_currency',
                                       const Color(0xFFFCA5A5)),
-                                const Divider(
-                                    color: Color(0xFF1E293B), height: 20),
+                                Divider(
+                                    color: colorScheme.outlineVariant, height: 20),
                                 Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      const Text('✅ المتاح للإنفاق',
+                                      Text('✅ المتاح للإنفاق',
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color: colorScheme.onSurface,
                                               fontWeight: FontWeight.w900,
                                               fontFamily: 'Cairo')),
                                       Text(
@@ -560,9 +562,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text('منفق من الفئات',
+                                        Text('منفق من الفئات',
                                             style: TextStyle(
-                                                color: Color(0xFF64748B),
+                                                color: colorScheme.onSurfaceVariant,
                                                 fontSize: 11,
                                                 fontFamily: 'Cairo')),
                                         Text(
@@ -570,8 +572,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                             style: TextStyle(
                                                 color: totalSpent >
                                                         totalBudgeted
-                                                    ? const Color(0xFFEF4444)
-                                                    : const Color(0xFF94A3B8),
+                                                    ? colorScheme.error
+                                                    : colorScheme.onSurfaceVariant,
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w700,
                                                 fontFamily: 'Cairo')),
@@ -585,10 +587,10 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                                   .clamp(0.0, 1.0)
                                               : 0,
                                           backgroundColor:
-                                              const Color(0xFF1E293B),
+                                              colorScheme.outlineVariant,
                                           color: totalSpent > totalBudgeted
-                                              ? const Color(0xFFEF4444)
-                                              : const Color(0xFF3B7EF6),
+                                              ? colorScheme.error
+                                              : colorScheme.primary,
                                           minHeight: 8)),
                                 ],
                               ]),
@@ -600,10 +602,10 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                       if (insights.isNotEmpty) ...[
                         Container(
                           decoration: BoxDecoration(
-                              color: const Color(0xFF0F1629),
+                              color: colorScheme.surface,
                               borderRadius: BorderRadius.circular(16),
                               border:
-                                  Border.all(color: const Color(0xFF1E293B))),
+                                  Border.all(color: colorScheme.outlineVariant)),
                           child: Column(children: [
                             const Padding(
                               padding: EdgeInsets.all(14),
@@ -618,7 +620,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                         fontFamily: 'Cairo')),
                               ]),
                             ),
-                            const Divider(color: Color(0xFF1E293B), height: 1),
+                            Divider(color: colorScheme.outlineVariant, height: 1),
                             Padding(
                               padding: const EdgeInsets.all(12),
                               child: Column(
@@ -657,13 +659,13 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                         Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [
-                              const Color(0xFF3B7EF6).withOpacity(0.08),
-                              const Color(0xFF8B5CF6).withOpacity(0.06)
+                              colorScheme.primary.withOpacity(0.08),
+                              colorScheme.secondary.withOpacity(0.06)
                             ]),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                                 color:
-                                    const Color(0xFF3B7EF6).withOpacity(0.2)),
+                                    colorScheme.primary.withOpacity(0.2)),
                           ),
                           child: Column(children: [
                             Padding(
@@ -672,10 +674,10 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                 const Text('⚖️',
                                     style: TextStyle(fontSize: 18)),
                                 const SizedBox(width: 8),
-                                const Expanded(
+                                Expanded(
                                     child: Text('قاعدة 50/30/20 المقترحة',
                                         style: TextStyle(
-                                            color: Colors.white,
+                                            color: colorScheme.onSurface,
                                             fontWeight: FontWeight.w900,
                                             fontFamily: 'Cairo',
                                             fontSize: 13))),
@@ -685,16 +687,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                         context: context,
                                         builder: (_) => AlertDialog(
                                               backgroundColor:
-                                                  const Color(0xFF0F1629),
-                                              title: const Text(
+                                                  colorScheme.surface,
+                                              title: Text(
                                                   'تطبيق 50/30/20',
                                                   style: TextStyle(
-                                                      color: Colors.white,
+                                                      color: colorScheme.onSurface,
                                                       fontFamily: 'Cairo')),
-                                              content: const Text(
+                                              content: Text(
                                                   'سيتم إنشاء أو تعديل الميزانيات لتناسب التوزيع المقترح. هل تريد المتابعة؟',
                                                   style: TextStyle(
-                                                      color: Color(0xFF94A3B8),
+                                                      color: colorScheme.onSurfaceVariant,
                                                       fontFamily: 'Cairo')),
                                               actions: [
                                                 TextButton(
@@ -709,10 +711,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                                     onPressed: () =>
                                                         Navigator.pop(
                                                             context, true),
-                                                    child: const Text('✨ تطبيق',
+                                                    child: Text('✨ تطبيق',
                                                         style: TextStyle(
-                                                            color: Color(
-                                                                0xFF3B7EF6),
+                                                            color: colorScheme.primary,
                                                             fontFamily:
                                                                 'Cairo'))),
                                               ],
@@ -723,7 +724,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 6),
                                       decoration: BoxDecoration(
-                                          color: const Color(0xFF3B7EF6),
+                                          color: colorScheme.primary,
                                           borderRadius:
                                               BorderRadius.circular(8)),
                                       child: const Text('تطبيق ✨',
@@ -743,14 +744,14 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                         '50%',
                                         '🏠 ضروريات',
                                         (available * 0.5).round().toDouble(),
-                                        const Color(0xFF3B7EF6))),
+                                        colorScheme.primary)),
                                 const SizedBox(width: 8),
                                 Expanded(
                                     child: _rule502030Card(
                                         '30%',
                                         '🎯 رغبات',
                                         (available * 0.3).round().toDouble(),
-                                        const Color(0xFF8B5CF6))),
+                                        colorScheme.secondary)),
                                 const SizedBox(width: 8),
                                 Expanded(
                                     child: _rule502030Card(
@@ -767,9 +768,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
                       // Budgets list
                       if (_budgets.isNotEmpty) ...[
-                        const Text('ميزانياتي',
+                        Text('ميزانياتي',
                             style: TextStyle(
-                                color: Colors.white,
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'Cairo',
                                 fontSize: 15)),
@@ -780,9 +781,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
                       // Category spending
                       if (_spending.isNotEmpty) ...[
-                        const Text('الإنفاق حسب الفئة',
+                        Text('الإنفاق حسب الفئة',
                             style: TextStyle(
-                                color: Colors.white,
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'Cairo',
                                 fontSize: 15)),
@@ -797,24 +798,24 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                             margin: const EdgeInsets.only(bottom: 8),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                                color: const Color(0xFF0F1629),
+                                color: colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border:
-                                    Border.all(color: const Color(0xFF1E293B))),
+                                    Border.all(color: colorScheme.outlineVariant)),
                             child: Column(children: [
                               Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(e.key,
-                                        style: const TextStyle(
-                                            color: Colors.white,
+                                        style: TextStyle(
+                                            color: colorScheme.onSurface,
                                             fontFamily: 'Cairo',
                                             fontSize: 13)),
                                     Text(
                                         '${e.value.toStringAsFixed(0)} $_currency (${pct.toStringAsFixed(0)}%)',
-                                        style: const TextStyle(
-                                            color: Color(0xFF94A3B8),
+                                        style: TextStyle(
+                                            color: colorScheme.onSurfaceVariant,
                                             fontFamily: 'Cairo',
                                             fontSize: 12)),
                                   ]),
@@ -823,8 +824,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                   borderRadius: BorderRadius.circular(3),
                                   child: LinearProgressIndicator(
                                       value: pct / 100,
-                                      backgroundColor: const Color(0xFF1E293B),
-                                      color: const Color(0xFF3B7EF6),
+                                      backgroundColor: colorScheme.outlineVariant,
+                                      color: colorScheme.primary,
                                       minHeight: 5)),
                             ]),
                           );
@@ -841,8 +842,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text(label,
-              style: const TextStyle(
-                  color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 13)),
+              style: TextStyle(
+                  color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 13)),
           Text(value,
               style: TextStyle(
                   color: color,
@@ -874,8 +875,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   fontSize: 13,
                   fontFamily: 'Cairo')),
           Text(label,
-              style: const TextStyle(
-                  color: Color(0xFF64748B), fontSize: 9, fontFamily: 'Cairo'),
+              style: TextStyle(
+                  color: colorScheme.onSurfaceVariant.withOpacity(0.8), fontSize: 9, fontFamily: 'Cairo'),
               textAlign: TextAlign.center),
         ]),
       );
@@ -899,14 +900,14 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: const Color(0xFF0F1629),
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
               color: over
-                  ? const Color(0xFFEF4444).withOpacity(0.3)
+                  ? colorScheme.error.withOpacity(0.3)
                   : warn
-                      ? const Color(0xFFF59E0B).withOpacity(0.2)
-                      : const Color(0xFF1E293B))),
+                      ? Colors.orange.withOpacity(0.2)
+                      : colorScheme.outlineVariant)),
       child: Column(children: [
         Row(children: [
           Container(
@@ -924,8 +925,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                 Text(b['category'] as String,
-                    style: const TextStyle(
-                        color: Colors.white,
+                    style: TextStyle(
+                        color: colorScheme.onSurface,
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.w800,
                         fontSize: 14)),
@@ -951,12 +952,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   width: 30,
                   height: 30,
                   decoration: BoxDecoration(
-                      color: const Color(0xFF3B7EF6).withOpacity(0.1),
+                      color: colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: const Color(0xFF3B7EF6).withOpacity(0.2))),
-                  child: const Icon(Icons.edit,
-                      color: Color(0xFF3B7EF6), size: 14))),
+                          color: colorScheme.primary.withOpacity(0.2))),
+                  child: Icon(Icons.edit,
+                      color: colorScheme.primary, size: 14))),
           const SizedBox(width: 6),
           GestureDetector(
               onTap: () => _deleteBudget(b['id'].toString()),
@@ -976,7 +977,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
             borderRadius: BorderRadius.circular(5),
             child: LinearProgressIndicator(
                 value: pct,
-                backgroundColor: const Color(0xFF1E293B),
+                backgroundColor: colorScheme.outlineVariant,
                 color: color,
                 minHeight: 8)),
         const SizedBox(height: 6),
@@ -997,8 +998,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                     fontFamily: 'Cairo'))
           ]),
           Text('الحد: ${limit.toStringAsFixed(0)} $_currency',
-              style: const TextStyle(
-                  color: Color(0xFF64748B), fontSize: 11, fontFamily: 'Cairo')),
+              style: TextStyle(
+                  color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
         ]),
       ]),
     );

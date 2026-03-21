@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class QuickLinksCards extends StatelessWidget {
@@ -38,14 +37,18 @@ class QuickLinksCards extends StatelessWidget {
 
   Widget _buildCard(BuildContext context, String title, String icon,
       double value, Color color, String route) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, route),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
+          color: isDark ? color.withValues(alpha: 0.1) : color.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: 0.2)),
+          border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.15)),
         ),
         child: Column(
           children: [
@@ -60,8 +63,8 @@ class QuickLinksCards extends StatelessWidget {
                         fontFamily: 'Cairo'))),
             const SizedBox(height: 2),
             Text(title,
-                style: const TextStyle(
-                    color: Color(0xFF94A3B8),
+                style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: 10,
                     fontFamily: 'Cairo')),
           ],

@@ -180,7 +180,7 @@ function useDashboardData() {
     }
 
     fetchPhase1()
-  }, [currentUser])
+  }, [currentUser, CACHE_TTL, supabase])
 
   return { data, setData, recentTx, loading, supabase }
 }

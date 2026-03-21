@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
@@ -27,25 +27,21 @@ export default function LearnPage() {
   const [completed, setCompleted] = useState(false)
   const [streak, setStreak] = useState(0)
 
-  useEffect(() => {
+  const loadLesson = useCallback(async () => {
     if (!user) return
-    loadLesson()
-  }, [user])
-
-  async function loadLesson() {
     setLoading(true)
     try {
       const now = new Date()
       const dayOfMonth = now.getDate()
 
       const [txRes, debtRes, goalRes, invRes] = await Promise.all([
-        supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', user!.id),
-        supabase.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user!.id).eq('is_paid', false),
-        supabase.from('savings_goals').select('current_amount, target_amount').eq('user_id', user!.id),
-        supabase.from('investments').select('id', { count: 'exact', head: true }).eq('user_id', user!.id),
+        supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
+        supabase.from('investments').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
       ])
 
-      const { data: profile } = await supabase.from('profiles').select('monthly_income').eq('id', user!.id).single()
+      const { data: profile } = await supabase.from('profiles').select('monthly_income').eq('id', user.id).single()
       const income = profile?.monthly_income ?? 0
       const debts = debtRes.data ?? []
       const goals = goalRes.data ?? []
@@ -79,7 +75,7 @@ export default function LearnPage() {
       const { data: profileData } = await supabase
         .from('profiles')
         .select('lesson_streak, last_lesson_date')
-        .eq('id', user!.id)
+        .eq('id', user.id)
         .single()
 
       const today = now.toISOString().split('T')[0]
@@ -94,7 +90,11 @@ export default function LearnPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, supabase, lang, streak])
+
+  useEffect(() => {
+    loadLesson()
+  }, [loadLesson])
 
   async function markComplete() {
     const today = new Date().toISOString().split('T')[0]

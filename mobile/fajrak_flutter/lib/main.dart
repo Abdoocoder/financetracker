@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -63,9 +65,14 @@ void main() async {
   final appState = AppState();
 
   runApp(
-    ChangeNotifierProvider.value(
-      value: appState,
-      child: const FajrakApp(),
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/i18n',
+      fallbackLocale: const Locale('ar'),
+      child: ChangeNotifierProvider.value(
+        value: appState,
+        child: const FajrakApp(),
+      ),
     ),
   );
 }
@@ -80,13 +87,9 @@ class FajrakApp extends StatelessWidget {
       title: 'فجرك',
       debugShowCheckedModeBanner: false,
       theme: appState.isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
-      locale: appState.locale,
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      locale: context.locale, // Use context.locale from EasyLocalization
+      supportedLocales: context.supportedLocales,
+      localizationsDelegates: context.localizationDelegates,
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
@@ -109,8 +112,12 @@ class FajrakApp extends StatelessWidget {
         primary: Color(0xFF3B7EF6),
         secondary: Color(0xFF10B981),
         surface: Color(0xFF0F1629),
+        onSurface: Colors.white,
+        onSurfaceVariant: Color(0xFF94A3B8),
+        outlineVariant: Color(0xFF1E293B),
         error: Color(0xFFEF4444),
       ),
+      dividerColor: const Color(0xFF1E293B),
       fontFamily: 'Cairo',
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF070B14),
@@ -176,8 +183,12 @@ class FajrakApp extends StatelessWidget {
         primary: Color(0xFF3B7EF6),
         secondary: Color(0xFF10B981),
         surface: Colors.white,
+        onSurface: Color(0xFF0F172A),
+        onSurfaceVariant: Color(0xFF64748B),
+        outlineVariant: Color(0xFFE2E8F0),
         error: Color(0xFFEF4444),
       ),
+      dividerColor: const Color(0xFFE2E8F0),
       fontFamily: 'Cairo',
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFFF8FAFC),
