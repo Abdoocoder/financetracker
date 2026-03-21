@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { UserProvider, useUser } from '@/lib/user-context'
 import { ThemeProvider } from '@/lib/theme-context'
@@ -20,14 +20,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const supabase = createClient()
 
-  const fetchCount = async () => {
+  const fetchCount = useCallback(async () => {
     if (!user) return
     const { count } = await supabase.from('alerts')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('is_read', false)
     setAlertsCount(count ?? 0)
-  }
+  }, [user, supabase])
 
   useEffect(() => {
     if (!user) return
@@ -42,7 +42,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       }, () => fetchCount())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
-  }, [user, pathname])
+  }, [user, pathname, fetchCount, supabase])
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>

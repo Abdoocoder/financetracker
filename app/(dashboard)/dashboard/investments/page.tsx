@@ -251,7 +251,7 @@ export default function InvestmentsPage() {
     setInvestments(result)
     setLoading(false)
     try { sessionStorage.setItem(cacheKey, JSON.stringify({ d: result, ts: Date.now() })) } catch {}
-  }, [supabase])
+  }, [currentUser, supabase])
 
   const fetchExchangeRate = useCallback(async () => {
     try {
@@ -287,7 +287,7 @@ export default function InvestmentsPage() {
       load()
     }
     autoRefresh()
-  }, [load, fetchExchangeRate, currentUser])
+  }, [load, fetchExchangeRate, currentUser, supabase])
 
   function startEditInv(inv: Investment) {
     setEditingInv(inv)
