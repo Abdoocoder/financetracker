@@ -69,8 +69,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnim,
@@ -83,15 +86,15 @@ class _SplashScreenState extends State<SplashScreen>
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)],
+                    gradient: LinearGradient(
+                      colors: [colorScheme.primary, colorScheme.secondary],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF3B7EF6).withValues(alpha: 0.4),
+                        color: colorScheme.primary.withValues(alpha: 0.4),
                         blurRadius: 30,
                         spreadRadius: 5,
                       ),
@@ -111,29 +114,29 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: 24),
                 Text('فجرك',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: colorScheme.onSurface,
                     fontFamily: 'Cairo',
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'إدارة شؤونك المالية',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF94A3B8),
+                    color: colorScheme.onSurfaceVariant,
                     fontFamily: 'Cairo',
                   ),
                 ),
                 const SizedBox(height: 60),
-                const SizedBox(
+                SizedBox(
                   width: 30,
                   height: 30,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Color(0xFF3B7EF6),
+                    color: colorScheme.primary,
                   ),
                 ),
               ],

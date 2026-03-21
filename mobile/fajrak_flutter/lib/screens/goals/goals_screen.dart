@@ -92,173 +92,176 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setS) => Padding(
-          padding: EdgeInsets.only(
-              bottom: MediaQuery.of(ctx).viewInsets.bottom,
-              left: 20,
-              right: 20,
-              top: 20),
-          child: SingleChildScrollView(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(2))),
-            const SizedBox(height: 16),
-            Text(existing != null ? 'تعديل الهدف' : 'هدف ادخار جديد',
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                    fontFamily: 'Cairo')),
-            const SizedBox(height: 20),
-            // Icon Picker
-            const Align(
-                alignment: Alignment.centerRight,
-                child: Text('اختر أيقونة',
-                    style: TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 12,
-                        fontFamily: 'Cairo'))),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 120,
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 10,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4),
-                itemCount: _goalIcons.length,
-                itemBuilder: (_, i) {
-                  final icon = _goalIcons[i];
-                  final selected = icon == selectedIcon;
-                  return GestureDetector(
-                    onTap: () => setS(() => selectedIcon = icon),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: selected
-                            ? const Color(0xFF3B7EF6).withOpacity(0.25)
-                            : const Color(0xFF1E293B),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                            color: selected
-                                ? const Color(0xFF3B7EF6)
-                                : Colors.transparent),
+        builder: (ctx, setS) {
+          final colorScheme = Theme.of(ctx).colorScheme;
+          return Padding(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                left: 20,
+                right: 20,
+                top: 20),
+            child: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 16),
+              Text(existing != null ? 'تعديل الهدف' : 'هدف ادخار جديد',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: colorScheme.onSurface,
+                      fontFamily: 'Cairo')),
+              const SizedBox(height: 20),
+              // Icon Picker
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('اختر أيقونة',
+                      style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: 12,
+                          fontFamily: 'Cairo'))),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 120,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 10,
+                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 4),
+                  itemCount: _goalIcons.length,
+                  itemBuilder: (_, i) {
+                    final icon = _goalIcons[i];
+                    final selected = icon == selectedIcon;
+                    return GestureDetector(
+                      onTap: () => setS(() => selectedIcon = icon),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? colorScheme.primary.withOpacity(0.25)
+                              : colorScheme.outlineVariant,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: selected
+                                  ? colorScheme.primary
+                                  : Colors.transparent),
+                        ),
+                        child: Center(
+                            child:
+                                Text(icon, style: const TextStyle(fontSize: 18))),
                       ),
-                      child: Center(
-                          child:
-                              Text(icon, style: const TextStyle(fontSize: 18))),
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            _field(nameCtrl, 'اسم الهدف (مثال: سيارة، حج، طوارئ)',
-                TextInputType.text),
-            const SizedBox(height: 10),
-            _field(targetCtrl, 'المبلغ المستهدف',
-                const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 10),
-            _field(currentCtrl, 'المبلغ المدخر حالياً',
-                const TextInputType.numberWithOptions(decimal: true)),
-            const SizedBox(height: 10),
-            // Deadline Date Picker
-            GestureDetector(
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: ctx,
-                  initialDate: deadlineDate.isNotEmpty
-                      ? DateTime.tryParse(deadlineDate) ??
-                          DateTime.now().add(const Duration(days: 180))
-                      : DateTime.now().add(const Duration(days: 180)),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
-                  builder: (c, child) =>
-                      Theme(data: ThemeData.dark(), child: child!),
-                );
-                if (picked != null) {
-                  setS(() =>
-                      deadlineDate = picked.toIso8601String().split('T')[0]);
-                }
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Row(children: [
-                  const Icon(Icons.calendar_today_outlined,
-                      color: Color(0xFF64748B), size: 18),
-                  const SizedBox(width: 10),
-                  Text(
-                    deadlineDate.isNotEmpty
-                        ? 'تاريخ الهدف: $deadlineDate'
-                        : '📅 تاريخ الهدف (اختياري)',
-                    style: TextStyle(
-                        color: deadlineDate.isNotEmpty
-                            ? Colors.white
-                            : const Color(0xFF64748B),
-                        fontFamily: 'Cairo',
-                        fontSize: 13),
-                  ),
-                ]),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final user = Supabase.instance.client.auth.currentUser!;
-                    HapticFeedback.mediumImpact();
-                    final data = {
-                      'user_id': user.id,
-                      'name': nameCtrl.text,
-                      'icon': selectedIcon,
-                      'target_amount': double.tryParse(targetCtrl.text) ?? 0,
-                      'current_amount': double.tryParse(currentCtrl.text) ?? 0,
-                      'deadline': deadlineDate.isEmpty ? null : deadlineDate,
-                    };
-                    try {
-                      if (existing != null) {
-                        await Supabase.instance.client
-                            .from('savings_goals')
-                            .update(data)
-                            .eq('id', existing['id']);
-                      } else {
-                        await Supabase.instance.client
-                            .from('savings_goals')
-                            .insert(data);
-                      }
-                      if (ctx.mounted) Navigator.pop(ctx);
-                      await _load();
-                    } catch (e) {
-                      if (ctx.mounted) ErrorHandler.handle(e, context: ctx, developerMessage: 'Goals Save');
-                    }
+                    );
                   },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B7EF6),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'حفظ التعديل' : 'إضافة الهدف',
-                      style: const TextStyle(
+                ),
+              ),
+              const SizedBox(height: 12),
+              _field(ctx, nameCtrl, 'اسم الهدف (مثال: سيارة، حج، طوارئ)',
+                  TextInputType.text),
+              const SizedBox(height: 10),
+              _field(ctx, targetCtrl, 'المبلغ المستهدف',
+                  const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 10),
+              _field(ctx, currentCtrl, 'المبلغ المدخر حالياً',
+                  const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 10),
+              // Deadline Date Picker
+              GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: ctx,
+                    initialDate: deadlineDate.isNotEmpty
+                        ? DateTime.tryParse(deadlineDate) ??
+                            DateTime.now().add(const Duration(days: 180))
+                        : DateTime.now().add(const Duration(days: 180)),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365 * 10)),
+                    builder: (c, child) =>
+                        Theme(data: Theme.of(ctx), child: child!),
+                  );
+                  if (picked != null) {
+                    setS(() =>
+                        deadlineDate = picked.toIso8601String().split('T')[0]);
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                      color: colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Row(children: [
+                    Icon(Icons.calendar_today_outlined,
+                        color: colorScheme.onSurfaceVariant, size: 18),
+                    const SizedBox(width: 10),
+                    Text(
+                      deadlineDate.isNotEmpty
+                          ? 'تاريخ الهدف: $deadlineDate'
+                          : '📅 تاريخ الهدف (اختياري)',
+                      style: TextStyle(
+                          color: deadlineDate.isNotEmpty
+                              ? colorScheme.onSurface
+                              : colorScheme.onSurfaceVariant,
                           fontFamily: 'Cairo',
-                          fontWeight: FontWeight.w900,
-                          fontSize: 15)),
-                )),
-            const SizedBox(height: 16),
-          ])),
-        ),
+                          fontSize: 13),
+                    ),
+                  ]),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final user = Supabase.instance.client.auth.currentUser!;
+                      HapticFeedback.mediumImpact();
+                      final data = {
+                        'user_id': user.id,
+                        'name': nameCtrl.text,
+                        'icon': selectedIcon,
+                        'target_amount': double.tryParse(targetCtrl.text) ?? 0,
+                        'current_amount': double.tryParse(currentCtrl.text) ?? 0,
+                        'deadline': deadlineDate.isEmpty ? null : deadlineDate,
+                      };
+                      try {
+                        if (existing != null) {
+                          await Supabase.instance.client
+                              .from('savings_goals')
+                              .update(data)
+                              .eq('id', existing['id']);
+                        } else {
+                          await Supabase.instance.client
+                              .from('savings_goals')
+                              .insert(data);
+                        }
+                        if (ctx.mounted) Navigator.pop(ctx);
+                        await _load();
+                      } catch (e) {
+                        if (ctx.mounted) ErrorHandler.handle(e, context: ctx, developerMessage: 'Goals Save');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12))),
+                    child: Text(existing != null ? 'حفظ التعديل' : 'إضافة الهدف',
+                        style: const TextStyle(
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15)),
+                  )),
+              const SizedBox(height: 16),
+            ])),
+          );
+        },
       ),
     );
   }
@@ -268,84 +271,88 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom,
-            left: 20,
-            right: 20,
-            top: 20),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                  color: const Color(0xFF1E293B),
-                  borderRadius: BorderRadius.circular(2))),
-          const SizedBox(height: 16),
-          Text('إضافة مبلغ لـ ${goal['name']}',
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  fontFamily: 'Cairo')),
-          const SizedBox(height: 20),
-          _field(amountCtrl, 'المبلغ المضاف',
-              const TextInputType.numberWithOptions(decimal: true)),
-          const SizedBox(height: 20),
-          SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  final amount = double.tryParse(amountCtrl.text) ?? 0;
-                  if (amount <= 0) return;
-                  HapticFeedback.mediumImpact();
-                  final current = (goal['current_amount'] as num).toDouble();
-                  await Supabase.instance.client
-                      .from('savings_goals')
-                      .update({'current_amount': current + amount}).eq(
-                          'id', goal['id']);
-                  if (ctx.mounted) Navigator.pop(ctx);
-                  await _load();
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12))),
-                child: Text('إضافة معاملة',
-                    style: const TextStyle(
-                        fontFamily: 'Cairo',
-                        fontWeight: FontWeight.w900,
-                        fontSize: 15)),
-              )),
-          const SizedBox(height: 16),
-        ]),
-      ),
+      builder: (ctx) {
+        final colorScheme = Theme.of(ctx).colorScheme;
+        return Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+              left: 20,
+              right: 20,
+              top: 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            Text('إضافة مبلغ لـ ${goal['name']}',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: colorScheme.onSurface,
+                    fontFamily: 'Cairo')),
+            const SizedBox(height: 20),
+            _field(ctx, amountCtrl, 'المبلغ المضاف',
+                const TextInputType.numberWithOptions(decimal: true)),
+            const SizedBox(height: 20),
+            SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final amount = double.tryParse(amountCtrl.text) ?? 0;
+                    if (amount <= 0) return;
+                    HapticFeedback.mediumImpact();
+                    final current = (goal['current_amount'] as num).toDouble();
+                    await Supabase.instance.client
+                        .from('savings_goals')
+                        .update({'current_amount': current + amount}).eq(
+                            'id', goal['id']);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                    await _load();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                  child: Text('إضافة معاملة',
+                      style: const TextStyle(
+                          fontFamily: 'Cairo',
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15)),
+                )),
+            const SizedBox(height: 16),
+          ]),
+        );
+      },
     );
   }
 
   Future<void> _deleteGoal(String id) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF0F1629),
-        title: const Text('حذف الهدف',
-            style: TextStyle(color: Colors.white, fontFamily: 'Cairo')),
-        content: const Text('هل أنت متأكد؟ لا يمكن التراجع.',
-            style: TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+        backgroundColor: colorScheme.surface,
+        title: Text('حذف الهدف',
+            style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo')),
+        content: Text('هل أنت متأكد؟ لا يمكن التراجع.',
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child:
-                  Text('إلغاء', style: const TextStyle(fontFamily: 'Cairo'))),
+                  const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('حذف',
-                  style: const TextStyle(
+              child: const Text('حذف',
+                  style: TextStyle(
                       color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
         ],
       ),
@@ -360,28 +367,32 @@ class _GoalsScreenState extends State<GoalsScreen> {
   }
 
   TextField _field(
-          TextEditingController ctrl, String hint, TextInputType type) =>
-      TextField(
-        controller: ctrl,
-        keyboardType: type,
-        textAlign: TextAlign.right,
-        style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle:
-              const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
-          filled: true,
-          fillColor: const Color(0xFF1E293B),
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        ),
-      );
+          BuildContext context, TextEditingController ctrl, String hint, TextInputType type) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return TextField(
+      controller: ctrl,
+      keyboardType: type,
+      textAlign: TextAlign.right,
+      style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle:
+            TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+        filled: true,
+        fillColor: colorScheme.outlineVariant,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final totalTarget =
         _goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
     final totalSaved =
@@ -392,36 +403,35 @@ class _GoalsScreenState extends State<GoalsScreen> {
         .length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070B14),
-        title: const Text('أهداف الادخار',
+        title: Text('أهداف الادخار',
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
-                color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+                color: colorScheme.onSurface)),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         actions: [
           IconButton(
-              icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)),
+              icon: Icon(Icons.add, color: colorScheme.primary),
               onPressed: () => _showAddDialog())
         ],
       ),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
+          ? Center(
+              child: CircularProgressIndicator(color: colorScheme.primary))
           : RefreshIndicator(
               onRefresh: _load,
-              color: const Color(0xFF3B7EF6),
+              color: colorScheme.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 child: Column(children: [
-                  // ملخص
+                  // Summary
                   Row(children: [
                     Expanded(
                         child: _statCard('🎯', '${_goals.length}', 'أهداف',
-                            const Color(0xFF3B7EF6))),
+                            colorScheme.primary)),
                     const SizedBox(width: 8),
                     Expanded(
                         child: _statCard('✅', '$completed', 'مكتمل',
@@ -429,31 +439,31 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                         child: _statCard('💰', totalSaved.toStringAsFixed(0),
-                            'مدخر', const Color(0xFF8B5CF6))),
+                            'مدخر', colorScheme.secondary)),
                   ]),
                   const SizedBox(height: 16),
 
-                  // شريط التقدم الكلي
+                  // Total progress bar
                   if (_goals.isNotEmpty) ...[
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF0F1629),
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFF1E293B))),
+                          border: Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('التقدم الكلي',
+                              Text('التقدم الكلي',
                                   style: TextStyle(
-                                      color: Color(0xFF94A3B8),
+                                      color: colorScheme.onSurfaceVariant,
                                       fontFamily: 'Cairo',
                                       fontSize: 12)),
                               Text(
                                   '${totalSaved.toStringAsFixed(0)} / ${totalTarget.toStringAsFixed(0)} $_currency',
-                                  style: const TextStyle(
-                                      color: Colors.white,
+                                  style: TextStyle(
+                                      color: colorScheme.onSurface,
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12)),
@@ -465,9 +475,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
                               value: totalTarget > 0
                                   ? (totalSaved / totalTarget).clamp(0.0, 1.0)
                                   : 0,
-                              backgroundColor: const Color(0xFF1E293B),
-                              valueColor: const AlwaysStoppedAnimation(
-                                  Color(0xFF8B5CF6)),
+                              backgroundColor: colorScheme.outlineVariant,
+                              valueColor: AlwaysStoppedAnimation(
+                                  colorScheme.secondary),
                               minHeight: 10,
                             )),
                       ]),
@@ -475,20 +485,20 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     const SizedBox(height: 16),
                   ],
 
-                  // الأهداف
+                  // Goals
                   if (_goals.isEmpty)
                     Container(
                       padding: const EdgeInsets.all(40),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF0F1629),
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFF1E293B))),
+                          border: Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
                         const Text('🎯', style: TextStyle(fontSize: 48)),
                         const SizedBox(height: 12),
-                        const Text('لا توجد أهداف بعد',
+                        Text('لا توجد أهداف بعد',
                             style: TextStyle(
-                                color: Color(0xFF94A3B8),
+                                color: colorScheme.onSurfaceVariant,
                                 fontFamily: 'Cairo',
                                 fontSize: 15)),
                         const SizedBox(height: 16),
@@ -510,23 +520,22 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       final color = isDone
                           ? const Color(0xFF10B981)
                           : progress >= 0.7
-                              ? const Color(0xFF3B7EF6)
-                              : const Color(0xFF8B5CF6);
+                              ? colorScheme.primary
+                              : colorScheme.secondary;
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0F1629),
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(14),
                           border:
-                              Border.all(color: color.withValues(alpha: 0.2)),
+                              Border.all(color: color.withOpacity(0.2)),
                         ),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(children: [
-                                // Show emoji icon if available
                                 if ((goal['icon'] as String?) != null)
                                   Text(goal['icon'] as String,
                                       style: const TextStyle(fontSize: 22)),
@@ -534,8 +543,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                   const SizedBox(width: 8),
                                 Expanded(
                                     child: Text(goal['name'] ?? '',
-                                        style: const TextStyle(
-                                            color: Colors.white,
+                                        style: TextStyle(
+                                            color: colorScheme.onSurface,
                                             fontWeight: FontWeight.w900,
                                             fontFamily: 'Cairo',
                                             fontSize: 15))),
@@ -549,15 +558,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                         width: 28,
                                         height: 28,
                                         decoration: BoxDecoration(
-                                            color: const Color(0xFF3B7EF6)
+                                            color: colorScheme.primary
                                                 .withOpacity(0.1),
                                             borderRadius:
                                                 BorderRadius.circular(7),
                                             border: Border.all(
-                                                color: const Color(0xFF3B7EF6)
+                                                color: colorScheme.primary
                                                     .withOpacity(0.2))),
-                                        child: const Icon(Icons.edit,
-                                            color: Color(0xFF3B7EF6),
+                                        child: Icon(Icons.edit,
+                                            color: colorScheme.primary,
                                             size: 14))),
                                 const SizedBox(width: 6),
                                 GestureDetector(
@@ -583,7 +592,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                   borderRadius: BorderRadius.circular(6),
                                   child: LinearProgressIndicator(
                                     value: progress,
-                                    backgroundColor: const Color(0xFF1E293B),
+                                    backgroundColor: colorScheme.outlineVariant,
                                     valueColor: AlwaysStoppedAnimation(color),
                                     minHeight: 10,
                                   )),
@@ -601,8 +610,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                             fontWeight: FontWeight.w700)),
                                     Text(
                                         'متبقي: ${remaining.toStringAsFixed(0)} $_currency',
-                                        style: const TextStyle(
-                                            color: Color(0xFF94A3B8),
+                                        style: TextStyle(
+                                            color: colorScheme.onSurfaceVariant,
                                             fontFamily: 'Cairo',
                                             fontSize: 12)),
                                   ]),
@@ -617,7 +626,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                           foregroundColor: color,
                                           side: BorderSide(
                                               color:
-                                                  color.withValues(alpha: 0.4)),
+                                                  color.withOpacity(0.4)),
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 10),
                                           shape: RoundedRectangleBorder(
@@ -642,9 +651,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
+          color: color.withOpacity(0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.2))),
+          border: Border.all(color: color.withOpacity(0.2))),
       child: Column(children: [
         Text(icon, style: const TextStyle(fontSize: 20)),
         const SizedBox(height: 4),
@@ -655,8 +664,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 fontSize: 16,
                 fontFamily: 'Cairo')),
         Text(label,
-            style: const TextStyle(
-                color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
       ]),
     );
   }

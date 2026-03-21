@@ -10,6 +10,7 @@ class FinancialRoadmap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final stages = [
       {'id': 'awareness', 'icon': '🌱', 'title': 'الوعي'},
       {'id': 'debt', 'icon': '💳', 'title': 'ديون'},
@@ -34,7 +35,7 @@ class FinancialRoadmap extends StatelessWidget {
             top: 25,
             child: Container(
               height: 2,
-              color: const Color(0xFF1E293B),
+              color: colorScheme.outlineVariant,
             ),
           ),
           // Stages
@@ -45,10 +46,10 @@ class FinancialRoadmap extends StatelessWidget {
               final bool isPast = index < currentIndex;
               final bool isCurrent = index == currentIndex;
               final Color color = isCurrent
-                  ? const Color(0xFF3B7EF6)
+                  ? colorScheme.primary
                   : (isPast
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFF475569));
+                      ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF10B981) : const Color(0xFF059669))
+                      : colorScheme.onSurfaceVariant);
 
               return Column(
                 children: [
@@ -58,14 +59,14 @@ class FinancialRoadmap extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isCurrent
                           ? color.withValues(alpha: 0.1)
-                          : const Color(0xFF0F1629),
+                          : colorScheme.surface,
                       shape: BoxShape.circle,
                       border:
                           Border.all(color: color, width: isCurrent ? 2 : 1),
                       boxShadow: isCurrent
                           ? [
                               BoxShadow(
-                                  color: color.withValues(alpha: 0.3),
+                                  color: color.withOpacity(0.3),
                                   blurRadius: 10)
                             ]
                           : null,

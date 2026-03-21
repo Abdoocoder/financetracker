@@ -10,6 +10,8 @@ class GamificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     String rank;
     String icon;
     Color color;
@@ -33,16 +35,18 @@ class GamificationCard extends StatelessWidget {
     } else {
       rank = 'ماسي';
       icon = '💎';
-      color = const Color(0xFF3B7EF6);
+      color = colorScheme.primary;
       progress = score >= 100 ? 1.0 : (score - 80) / 20;
     }
+
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1629),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: color.withValues(alpha: isDark ? 0.3 : 0.2)),
       ),
       child: Row(
         children: [
@@ -50,7 +54,7 @@ class GamificationCard extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withValues(alpha: isDark ? 0.1 : 0.08),
               shape: BoxShape.circle,
             ),
             child:
@@ -71,8 +75,8 @@ class GamificationCard extends StatelessWidget {
                             fontFamily: 'Cairo',
                             fontSize: 13)),
                     Text('$score نقطة',
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: colorScheme.onSurface,
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'Cairo')),
@@ -83,7 +87,7 @@ class GamificationCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: const Color(0xFF1E293B),
+                    backgroundColor: colorScheme.outlineVariant,
                     color: color,
                     minHeight: 6,
                   ),
@@ -93,8 +97,8 @@ class GamificationCard extends StatelessWidget {
                     score >= 100
                         ? 'أنت في أعلى مستوى، حافظ عليه!'
                         : 'تحكم بنفقاتك أكثر لرفع مستواك وفتح شارات جديدة 🏆',
-                    style: const TextStyle(
-                        color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 10,
                         fontFamily: 'Cairo')),
               ],
