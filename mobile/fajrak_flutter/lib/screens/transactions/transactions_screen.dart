@@ -84,8 +84,31 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             .order('transaction_date', ascending: false)
             .limit(_limit);
       }
+      // Fetch totals for summary
+      PostgrestFilterBuilder<List<Map<String, dynamic>>> totalsQ = Supabase
+          .instance.client
+          .from('transactions')
+          .select('*')
+          .eq('user_id', user.id);
+
+      List<Map<String, dynamic>> allDataForSummary;
+      if (_filterMonth != null && _filterYear != null) {
+        final start = DateTime(_filterYear!, _filterMonth!, 1)
+            .toIso8601String()
+            .split('T')[0];
+        final end = DateTime(_filterYear!, _filterMonth! + 1, 0)
+            .toIso8601String()
+            .split('T')[0];
+        allDataForSummary = await totalsQ
+            .gte('transaction_date', start)
+            .lte('transaction_date', end);
+      } else {
+        allDataForSummary = await totalsQ;
+      }
+
       if (mounted) {
         setState(() {
+          _allTransactions = allDataForSummary;
           if (reset) {
             _transactions = List<Map<String, dynamic>>.from(data);
           } else {
@@ -784,8 +807,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Widget _statCard(String label, double value, Color color) {
+    // Show + for positive net/income, and - for negative net/expense
+    final isNegative = value < 0;
+    final absValue = value.abs();
+    final sign = isNegative ? '-' : (label == 'الصافي' || label == 'الدخل' ? '+' : '');
+
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
@@ -793,7 +821,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
       child: Column(children: [
         FittedBox(
-            child: Text('${value.toStringAsFixed(0)}+',
+            child: Text('$sign${absValue.toStringAsFixed(0)}',
                 style: TextStyle(
                     color: color,
                     fontWeight: FontWeight.w900,
