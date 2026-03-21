@@ -43,7 +43,7 @@ export function PushPrompt() {
       } catch {}
     }
     checkAndShow()
-  }, [supported, subscribed, user])
+  }, [supported, subscribed, user, subscribe, supabase])
 
   if (!show) return null
 

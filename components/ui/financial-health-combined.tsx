@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
@@ -65,12 +65,7 @@ export function FinancialHealthCombined(props: Props) {
 
   const score = calcHealthScore(props)
 
-  useEffect(() => {
-    if (!user) return
-    loadRoadmap()
-  }, [user])
-
-  async function loadRoadmap() {
+  const loadRoadmap = useCallback(async () => {
     if (!user) return
     const now = new Date()
     const firstDay = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
@@ -154,7 +149,11 @@ export function FinancialHealthCombined(props: Props) {
       netWorth: totalPersonalAssets + totalInvested + totalSavings - totalDebt,
       smallestDebt: smallestDebt ? { name: smallestDebt.name, amount: Number(smallestDebt.remaining_amount), monthly: Number(smallestDebt.monthly_payment) } : null
     })
-  }
+  }, [user, ar, supabase, score])
+
+  useEffect(() => {
+    loadRoadmap()
+  }, [loadRoadmap])
 
   // ── الألوان ──
   const scoreColor = score >= 75 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444'
