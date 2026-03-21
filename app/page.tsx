@@ -417,7 +417,7 @@ export default function LandingPage() {
           </div>
           <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
           <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-            "كل رحلة ثراء تبدأ بخطوة" — بُني بـ ❤️ من الأردن للعالم العربي
+            &quot;كل رحلة ثراء تبدأ بخطوة&quot; — بُني بـ ❤️ من الأردن للعالم العربي
           </p>
         </div>
       </section>

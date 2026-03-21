@@ -78,7 +78,7 @@ function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: ()
         onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
         <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>أحرار من الدين!</div>
-        <div style={{ fontSize: 15, color: 'var(--accent-green-light)', fontWeight: 700, marginBottom: 12 }}>"{debtName}"</div>
+        <div style={{ fontSize: 15, color: 'var(--accent-green-light)', fontWeight: 700, marginBottom: 12 }}>&quot;{debtName}&quot;</div>
         <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>تهانيّ! لقد سددت هذا الدين بالكامل. خطوة عظيمة نحو حريتك المالية 💪</div>
         <button onClick={onClose} style={{ marginTop: 24, padding: '10px 28px', borderRadius: 12, background: 'var(--accent-green)', color: 'white', border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
           شكراً 🙌
