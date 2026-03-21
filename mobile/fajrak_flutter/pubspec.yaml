@@ -31,10 +31,6 @@ dependencies:
   package_info_plus: ^9.0.0
   share_plus: ^12.0.1
   path_provider: ^2.1.5
-<<<<<<< HEAD
-=======
-  easy_localization: ^3.0.3
->>>>>>> eb13937ecbeee6945e662d064a189ba6e8c513b4
   provider: ^6.1.1
 
 dev_dependencies:
