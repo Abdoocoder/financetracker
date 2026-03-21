@@ -60,12 +60,14 @@ class _ChallengesCardState extends State<ChallengesCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1629),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,9 +75,9 @@ class _ChallengesCardState extends State<ChallengesCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('🏆 تحديات الادخار',
+              Text('🏆 تحديات الادخار',
                   style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Cairo',
                       fontSize: 14)),
@@ -83,23 +85,24 @@ class _ChallengesCardState extends State<ChallengesCard> {
                 GestureDetector(
                   onTap: () => setState(() => _activeChallenge = null),
                   child: Text('الكل',
-                      style: const TextStyle(
-                          color: Color(0xFF94A3B8),
+                      style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 12,
                           fontFamily: 'Cairo')),
                 )
             ],
           ),
           const SizedBox(height: 16),
-          _activeChallenge != null ? _buildActiveChallenge() : _buildGrid(),
+          _activeChallenge != null ? _buildActiveChallenge(colorScheme) : _buildGrid(colorScheme),
         ],
       ),
     );
   }
 
-  Widget _buildActiveChallenge() {
+  Widget _buildActiveChallenge(ColorScheme colorScheme) {
     final active = _challenges.firstWhere((c) => c['id'] == _activeChallenge);
     final pct = _getProgress(active['id'] as int);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -108,29 +111,29 @@ class _ChallengesCardState extends State<ChallengesCard> {
           Text(active['icon'] as String, style: const TextStyle(fontSize: 36)),
           const SizedBox(height: 8),
           Text(active['title'] as String,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Cairo')),
           const SizedBox(height: 4),
           Text('${active['days']} يوم',
-              style: const TextStyle(
-                  color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+              style: TextStyle(
+                  color: colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: pct / 100,
-              backgroundColor: const Color(0xFF1E293B),
-              color: const Color(0xFF3B7EF6),
+              backgroundColor: colorScheme.outlineVariant,
+              color: colorScheme.primary,
               minHeight: 8,
             ),
           ),
           const SizedBox(height: 6),
           Text('${pct.toStringAsFixed(0)}%',
-              style: const TextStyle(
-                  color: Color(0xFF93C5FD),
+              style: TextStyle(
+                  color: isDark ? const Color(0xFF10B981) : colorScheme.primary,
                   fontSize: 13,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'monospace')),
@@ -139,7 +142,8 @@ class _ChallengesCardState extends State<ChallengesCard> {
     );
   }
 
-  Widget _buildGrid() {
+  Widget _buildGrid(ColorScheme colorScheme) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 10,
@@ -150,17 +154,18 @@ class _ChallengesCardState extends State<ChallengesCard> {
       children: _challenges.map((c) {
         final pct = _getProgress(c['id'] as int);
         final isCompleted = pct >= 100;
-        final color =
-            isCompleted ? const Color(0xFF10B981) : const Color(0xFF3B7EF6);
+        final color = isCompleted
+            ? (isDark ? const Color(0xFF10B981) : colorScheme.primary)
+            : colorScheme.primary;
 
         return GestureDetector(
           onTap: () => setState(() => _activeChallenge = c['id'] as int),
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF334155)),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -170,8 +175,8 @@ class _ChallengesCardState extends State<ChallengesCard> {
                 Expanded(
                   child: Text(
                     c['title'] as String,
-                    style: const TextStyle(
-                        color: Color(0xFFCBD5E1),
+                    style: TextStyle(
+                        color: colorScheme.onSurface,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'Cairo',
@@ -183,7 +188,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
                     value: pct / 100,
-                    backgroundColor: const Color(0xFF1E293B),
+                    backgroundColor: colorScheme.outlineVariant,
                     color: color,
                     minHeight: 4,
                   ),
@@ -193,8 +198,8 @@ class _ChallengesCardState extends State<ChallengesCard> {
                   '${isCompleted ? '✅ ' : ''}${pct.toStringAsFixed(0)}%',
                   style: TextStyle(
                       color: isCompleted
-                          ? const Color(0xFF6EE7B7)
-                          : const Color(0xFF93C5FD),
+                          ? (isDark ? const Color(0xFF6EE7B7) : colorScheme.primary)
+                          : (isDark ? colorScheme.secondary : colorScheme.primary),
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'monospace'),

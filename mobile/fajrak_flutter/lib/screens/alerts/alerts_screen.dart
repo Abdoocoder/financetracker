@@ -157,6 +157,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final unreadCount = _alerts.where((a) => a['is_read'] == false).length;
     final filtered = _alerts.where((a) {
       if (_filter == 'unread') return a['is_read'] == false;
@@ -167,22 +169,21 @@ class _AlertsScreenState extends State<AlertsScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-          backgroundColor: const Color(0xFF070B14),
           title: Text('التنبيهات',
-              style: const TextStyle(
+              style: TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,
-                  color: Colors.white)),
-          iconTheme: const IconThemeData(color: Colors.white)),
+                  color: colorScheme.onSurface)),
+          iconTheme: IconThemeData(color: colorScheme.onSurface)),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
+          ? Center(
+              child: CircularProgressIndicator(color: colorScheme.primary))
           : RefreshIndicator(
               onRefresh: _load,
-              color: const Color(0xFF3B7EF6),
-              backgroundColor: const Color(0xFF1E293B),
+              color: colorScheme.primary,
+              backgroundColor: colorScheme.surface,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -195,8 +196,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
                           children: [
                             Row(children: [
                               Text('${_alerts.length} تنبيه',
-                                  style: const TextStyle(
-                                      color: Color(0xFF94A3B8),
+                                  style: TextStyle(
+                                      color: colorScheme.onSurfaceVariant,
                                       fontFamily: 'Cairo',
                                       fontSize: 13)),
                               if (unreadCount > 0) ...[
@@ -221,9 +222,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                               if (unreadCount > 0)
                                 TextButton(
                                     onPressed: _markAllRead,
-                                    child: const Text('تحديد الكل كمقروء',
+                                    child: Text('تحديد الكل كمقروء',
                                         style: TextStyle(
-                                            color: Color(0xFF3B7EF6),
+                                            color: colorScheme.primary,
                                             fontFamily: 'Cairo',
                                             fontSize: 12,
                                             fontWeight: FontWeight.w900))),
@@ -245,12 +246,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [
-                              const Color(0xFF3B7EF6).withOpacity(0.08),
-                              const Color(0xFF8B5CF6).withOpacity(0.08)
+                              colorScheme.primary.withOpacity(0.08),
+                              colorScheme.secondary.withOpacity(0.08)
                             ]),
                             border: Border.all(
                                 color:
-                                    const Color(0xFF3B7EF6).withOpacity(0.2)),
+                                    colorScheme.primary.withOpacity(0.2)),
                             borderRadius: BorderRadius.circular(16)),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,14 +261,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                     width: 44,
                                     height: 44,
                                     decoration: BoxDecoration(
-                                        gradient: const LinearGradient(colors: [
-                                          Color(0xFF3B7EF6),
-                                          Color(0xFF8B5CF6)
+                                        gradient: LinearGradient(colors: [
+                                          colorScheme.primary,
+                                          colorScheme.secondary
                                         ]),
                                         borderRadius: BorderRadius.circular(12),
                                         boxShadow: [
                                           BoxShadow(
-                                              color: const Color(0xFF3B7EF6)
+                                              color: colorScheme.primary
                                                   .withOpacity(0.4),
                                               blurRadius: 16)
                                         ]),
@@ -275,20 +276,20 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                         child: Text('🤖',
                                             style: TextStyle(fontSize: 20)))),
                                 const SizedBox(width: 12),
-                                const Expanded(
+                                Expanded(
                                     child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                       Text('المساعد المالي الذكي',
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color: colorScheme.onSurface,
                                               fontWeight: FontWeight.w900,
                                               fontFamily: 'Cairo',
                                               fontSize: 14)),
                                       Text('تحليل محفظتك وتوليد تنبيهات مخصصة',
                                           style: TextStyle(
-                                              color: Color(0xFF94A3B8),
+                                              color: colorScheme.onSurfaceVariant,
                                               fontFamily: 'Cairo',
                                               fontSize: 12)),
                                     ])),
@@ -301,7 +302,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                         _generating ? null : _generateAlerts,
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor:
-                                            const Color(0xFF3B7EF6),
+                                            colorScheme.primary,
                                         foregroundColor: Colors.white,
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 12),
@@ -328,11 +329,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(children: [
-                          _filterTab('all', 'الكل (${_alerts.length})'),
-                          _filterTab('unread', 'غير مقروء ($unreadCount)'),
-                          _filterTab('warning', '⚠️ تحذيرات'),
-                          _filterTab('achievement', '🏆 إنجازات'),
-                          _filterTab('motivation', '💡 نصائح'),
+                          _filterTab('all', 'الكل (${_alerts.length})', colorScheme),
+                          _filterTab('unread', 'غير مقروء ($unreadCount)', colorScheme),
+                          _filterTab('warning', '⚠️ تحذيرات', colorScheme),
+                          _filterTab('achievement', '🏆 إنجازات', colorScheme),
+                          _filterTab('motivation', '💡 نصائح', colorScheme),
                         ]),
                       ),
                       const SizedBox(height: 16),
@@ -353,9 +354,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                             : '💡',
                                 style: const TextStyle(fontSize: 40)),
                             const SizedBox(height: 12),
-                            const Text('لا توجد تنبيهات في هذه الفئة',
+                            Text('لا توجد تنبيهات في هذه الفئة',
                                 style: TextStyle(
-                                    color: Color(0xFF94A3B8),
+                                    color: colorScheme.onSurfaceVariant,
                                     fontFamily: 'Cairo',
                                     fontSize: 14)),
                           ]),
@@ -379,12 +380,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: isRead
-                                      ? const Color(0xFF0F1629)
+                                      ? colorScheme.surface
                                       : color.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
                                       color: isRead
-                                          ? const Color(0xFF1E293B)
+                                          ? colorScheme.outlineVariant
                                           : color.withOpacity(0.3)),
                                 ),
                                 child: Row(
@@ -415,9 +416,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                                         '',
                                                     style: TextStyle(
                                                         color: isRead
-                                                            ? const Color(
-                                                                0xFF94A3B8)
-                                                            : Colors.white,
+                                                            ? colorScheme.onSurfaceVariant
+                                                            : colorScheme.onSurface,
                                                         fontWeight: isRead
                                                             ? FontWeight.w700
                                                             : FontWeight.w900,
@@ -443,15 +443,15 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                               alert['message'] as String? ?? '',
                                               style: TextStyle(
                                                   color: isRead
-                                                      ? const Color(0xFF64748B)
-                                                      : const Color(0xFF94A3B8),
+                                                      ? colorScheme.onSurfaceVariant.withOpacity(0.7)
+                                                      : colorScheme.onSurfaceVariant,
                                                   fontFamily: 'Cairo',
                                                   fontSize: 12,
                                                   height: 1.6)),
                                           const SizedBox(height: 8),
                                           Text(date,
-                                              style: const TextStyle(
-                                                  color: Color(0xFF64748B),
+                                              style: TextStyle(
+                                                  color: colorScheme.onSurfaceVariant,
                                                   fontFamily: 'Cairo',
                                                   fontSize: 10)),
                                         ],
@@ -476,7 +476,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
     );
   }
 
-  Widget _filterTab(String key, String label) => Padding(
+  Widget _filterTab(String key, String label, ColorScheme colorScheme) => Padding(
         padding: const EdgeInsets.only(left: 8),
         child: GestureDetector(
           onTap: () => setState(() => _filter = key),
@@ -484,14 +484,15 @@ class _AlertsScreenState extends State<AlertsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: _filter == key
-                  ? const Color(0xFF3B7EF6)
-                  : const Color(0xFF1E293B),
+                  ? colorScheme.primary
+                  : colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: _filter == key ? colorScheme.primary : colorScheme.outlineVariant),
             ),
             child: Text(label,
                 style: TextStyle(
                     color:
-                        _filter == key ? Colors.white : const Color(0xFF94A3B8),
+                        _filter == key ? Colors.white : colorScheme.onSurfaceVariant,
                     fontFamily: 'Cairo',
                     fontSize: 12,
                     fontWeight: FontWeight.w700)),

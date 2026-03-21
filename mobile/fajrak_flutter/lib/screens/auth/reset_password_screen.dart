@@ -55,13 +55,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('تعيين كلمة المرور',
-            style: TextStyle(fontFamily: 'Cairo')),
+        title: Text('تعيين كلمة المرور',
+            style: TextStyle(fontFamily: 'Cairo', color: colorScheme.onSurface)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -73,8 +77,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                      colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
+                  gradient: LinearGradient(
+                      colors: [colorScheme.primary, colorScheme.secondary]),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Center(
@@ -82,17 +86,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         Icon(Icons.lock_reset, size: 40, color: Colors.white)),
               ),
               const SizedBox(height: 24),
-              const Text('تعيين كلمة مرور جديدة',
+              Text('تعيين كلمة مرور جديدة',
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              const Text('أدخل كلمة المرور الجديدة لتأمين حسابك',
+              Text('أدخل كلمة المرور الجديدة لتأمين حسابك',
                   style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF94A3B8),
+                      color: colorScheme.onSurfaceVariant,
                       fontFamily: 'Cairo'),
                   textAlign: TextAlign.center),
               const SizedBox(height: 32),
@@ -101,15 +105,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   padding: const EdgeInsets.all(12),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withOpacity(0.1),
+                    color: (theme.brightness == Brightness.dark
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFF059669))
+                        .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: const Color(0xFF10B981).withOpacity(0.3)),
+                        color: (theme.brightness == Brightness.dark
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFF059669))
+                            .withValues(alpha: 0.3)),
                   ),
-                  child: const Text(
+                  child: Text(
                       'تم تغيير كلمة المرور بنجاح! جاري التحويل...',
                       style: TextStyle(
-                          color: Color(0xFF10B981),
+                          color: theme.brightness == Brightness.dark
+                              ? const Color(0xFF10B981)
+                              : const Color(0xFF059669),
                           fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),
@@ -121,14 +133,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   padding: const EdgeInsets.all(12),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withOpacity(0.1),
+                    color: colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: const Color(0xFFEF4444).withOpacity(0.3)),
+                        color: colorScheme.error.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
-                      style: const TextStyle(
-                          color: Color(0xFFEF4444),
+                      style: TextStyle(
+                          color: colorScheme.error,
                           fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),
@@ -139,17 +151,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 controller: _passwordController,
                 obscureText: _obscure,
                 style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                    TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                   labelText: 'كلمة المرور الجديدة',
                   prefixIcon:
-                      const Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
+                      Icon(Icons.lock_outline, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
                     icon: Icon(
                         _obscure
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: const Color(0xFF94A3B8)),
+                        color: colorScheme.onSurfaceVariant),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
@@ -159,22 +171,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 controller: _confirmController,
                 obscureText: _obscure,
                 style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                    TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                   labelText: 'تأكيد كلمة المرور',
                   prefixIcon:
-                      const Icon(Icons.lock_outline, color: Color(0xFF94A3B8)),
+                      Icon(Icons.lock_outline, color: colorScheme.onSurfaceVariant),
                 ),
               ),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _loading || _success ? null : _reset,
                 child: _loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white))
+                            strokeWidth: 2, color: colorScheme.onPrimary))
                     : const Text('تعيين كلمة المرور'),
               ),
             ],

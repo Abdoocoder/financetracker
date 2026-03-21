@@ -15,32 +15,39 @@ class ChartsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (months6Data.isNotEmpty) _buildBarChart(),
+        if (months6Data.isNotEmpty) _buildBarChart(theme, colorScheme),
         if (categoryData.isNotEmpty) ...[
           const SizedBox(height: 16),
-          _buildCategoryBreakdown(),
+          _buildCategoryBreakdown(theme, colorScheme),
         ],
       ],
     );
   }
 
-  Widget _buildBarChart() {
+  Widget _buildBarChart(ThemeData theme, ColorScheme colorScheme) {
+    final isDark = theme.brightness == Brightness.dark;
+    final incomeColor = isDark ? const Color(0xFF10B981) : colorScheme.primary;
+    final expenseColor = isDark ? const Color(0xFFEF4444) : colorScheme.error;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1629),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('نظرة عامة (6 أشهر)',
+          Text('نظرة عامة (6 أشهر)',
               style: TextStyle(
-                  color: Colors.white,
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'Cairo',
                   fontSize: 14)),
@@ -48,7 +55,7 @@ class ChartsCard extends StatelessWidget {
           SizedBox(
             height: 200,
             child: BarChart(
-              BarChartData(
+               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
                 maxY: _getMaxY(),
                 barTouchData: BarTouchData(enabled: false),
@@ -64,8 +71,8 @@ class ChartsCard extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               months6Data[value.toInt()]['month'],
-                              style: const TextStyle(
-                                  color: Color(0xFF94A3B8),
+                              style: TextStyle(
+                                  color: colorScheme.onSurfaceVariant,
                                   fontSize: 10,
                                   fontFamily: 'Cairo'),
                             ),
@@ -90,13 +97,13 @@ class ChartsCard extends StatelessWidget {
                     barRods: [
                       BarChartRodData(
                         toY: e.value['income'],
-                        color: const Color(0xFF10B981),
+                        color: incomeColor,
                         width: 10,
                         borderRadius: BorderRadius.circular(3),
                       ),
                       BarChartRodData(
                         toY: e.value['expense'],
-                        color: const Color(0xFFEF4444),
+                        color: expenseColor,
                         width: 10,
                         borderRadius: BorderRadius.circular(3),
                       ),
@@ -110,9 +117,9 @@ class ChartsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegend(const Color(0xFF10B981), 'دخل'),
+              _buildLegend(incomeColor, 'دخل', colorScheme),
               const SizedBox(width: 16),
-              _buildLegend(const Color(0xFFEF4444), 'مصروف'),
+              _buildLegend(expenseColor, 'مصروف', colorScheme),
             ],
           )
         ],
@@ -129,7 +136,7 @@ class ChartsCard extends StatelessWidget {
     return maxVal == 0 ? 100 : maxVal * 1.2;
   }
 
-  Widget _buildLegend(Color color, String label) {
+  Widget _buildLegend(Color color, String label, ColorScheme colorScheme) {
     return Row(
       children: [
         Container(
@@ -138,26 +145,26 @@ class ChartsCard extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
         const SizedBox(width: 6),
         Text(label,
-            style: const TextStyle(
-                color: Color(0xFF94A3B8), fontSize: 12, fontFamily: 'Cairo')),
+            style: TextStyle(
+                color: colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
       ],
     );
   }
 
-  Widget _buildCategoryBreakdown() {
+  Widget _buildCategoryBreakdown(ThemeData theme, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1629),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF1E293B)),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('توزيع المصاريف (هذا الشهر)',
+          Text('توزيع المصاريف (هذا الشهر)',
               style: TextStyle(
-                  color: Colors.white,
+                  color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'Cairo',
                   fontSize: 14)),
@@ -170,8 +177,8 @@ class ChartsCard extends StatelessWidget {
                   Expanded(
                     flex: 2,
                     child: Text(cat['category'],
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: colorScheme.onSurface,
                             fontSize: 13,
                             fontFamily: 'Cairo')),
                   ),
@@ -181,8 +188,8 @@ class ChartsCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: cat['percentage'],
-                        backgroundColor: const Color(0xFF1E293B),
-                        color: const Color(0xFF3B7EF6),
+                        backgroundColor: colorScheme.outlineVariant,
+                        color: colorScheme.primary,
                         minHeight: 8,
                       ),
                     ),
@@ -192,8 +199,8 @@ class ChartsCard extends StatelessWidget {
                     width: 70,
                     child: Text(
                       '${cat['amount'].toStringAsFixed(0)} $currency',
-                      style: const TextStyle(
-                          color: Colors.white,
+                      style: TextStyle(
+                          color: colorScheme.onSurface,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           fontFamily: 'Cairo'),

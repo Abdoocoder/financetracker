@@ -62,8 +62,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -74,8 +77,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                      colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)]),
+                  gradient: LinearGradient(
+                      colors: [colorScheme.primary, colorScheme.secondary]),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Center(
@@ -87,31 +90,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             fontFamily: 'Cairo'))),
               ),
               const SizedBox(height: 24),
-              const Text('إنشاء حساب جديد',
+              Text('إنشاء حساب جديد',
                   style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              const Text('ابدأ رحلتك نحو الحرية المالية',
+              Text('ابدأ رحلتك نحو الحرية المالية',
                   style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF94A3B8),
+                      color: colorScheme.onSurfaceVariant,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 32),
               if (_error != null) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                    color: colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                        color: colorScheme.error.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
-                      style: const TextStyle(
-                          color: Color(0xFFEF4444),
+                      style: TextStyle(
+                          color: colorScheme.error,
                           fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),
@@ -120,41 +123,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
               TextFormField(
                 controller: _nameController,
-                style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                     labelText: 'الاسم الكامل',
                     prefixIcon:
-                        const Icon(Icons.person_outlined, color: Color(0xFF94A3B8))),
+                        Icon(Icons.person_outlined, color: colorScheme.onSurfaceVariant)),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-
-                style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                     labelText: 'البريد الإلكتروني',
                     prefixIcon:
-                        const Icon(Icons.email_outlined, color: Color(0xFF94A3B8))),
+                        Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                   labelText: 'كلمة المرور',
                   prefixIcon:
-                      const Icon(Icons.lock_outlined, color: Color(0xFF94A3B8)),
+                      Icon(Icons.lock_outlined, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
                     icon: Icon(
                         _obscure
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: const Color(0xFF94A3B8)),
+                        color: colorScheme.onSurfaceVariant),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
@@ -163,26 +162,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ElevatedButton(
                 onPressed: _loading ? null : _register,
                 child: _loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white))
+                            strokeWidth: 2, color: colorScheme.onPrimary))
                     : const Text('إنشاء الحساب'),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('لديك حساب بالفعل؟',
+                  Text('لديك حساب بالفعل؟',
                       style: TextStyle(
-                          color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+                          color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/login'),
-                    child: const Text('سجل دخولك',
+                    child: Text('سجل دخولك',
                         style: TextStyle(
-                            color: Color(0xFF3B7EF6),
+                            color: colorScheme.primary,
                             fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700)),
                   ),

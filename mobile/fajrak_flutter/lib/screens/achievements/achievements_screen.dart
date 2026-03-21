@@ -118,25 +118,28 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     if (_loading) {
-      return const Scaffold(
-          backgroundColor: Color(0xFF070B14),
+      return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
           body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+              child: CircularProgressIndicator(color: colorScheme.primary)));
     }
 
     final progress = _nextLevel < 9999 ? _points / _nextLevel : 1.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070B14),
-        title: const Text('الإنجازات',
+        backgroundColor: colorScheme.surface,
+        title: Text('الإنجازات',
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
-                color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+                color: colorScheme.onSurface)),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -145,26 +148,26 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                  colors: [Color(0xFF1E1B4B), Color(0xFF0F1629)],
+              gradient: LinearGradient(
+                  colors: [colorScheme.surfaceContainerHighest, colorScheme.surface],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                  color: const Color(0xFF3B7EF6).withValues(alpha: 0.3)),
+                  color: colorScheme.primary.withValues(alpha: 0.3)),
             ),
             child: Column(children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(_levelTitle,
-                      style: const TextStyle(
-                          color: Colors.white,
+                      style: TextStyle(
+                          color: colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                           fontSize: 22,
                           fontFamily: 'Cairo')),
                   Text('المستوى $_level',
-                      style: const TextStyle(
-                          color: Color(0xFF94A3B8),
+                      style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
                           fontFamily: 'Cairo',
                           fontSize: 13)),
                 ]),
@@ -172,12 +175,12 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                      color: const Color(0xFF3B7EF6).withValues(alpha: 0.2),
+                      color: colorScheme.primary.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF3B7EF6))),
+                      border: Border.all(color: colorScheme.primary)),
                   child: Text('$_points نقطة',
-                      style: const TextStyle(
-                          color: Color(0xFF3B7EF6),
+                      style: TextStyle(
+                          color: colorScheme.primary,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'Cairo')),
                 ),
@@ -187,22 +190,22 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress.clamp(0.0, 1.0),
-                  backgroundColor: const Color(0xFF1E293B),
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFF3B7EF6)),
+                  backgroundColor: colorScheme.outlineVariant,
+                  valueColor: AlwaysStoppedAnimation(colorScheme.primary),
                   minHeight: 8,
                 ),
               ),
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text('$_points نقطة',
-                    style: const TextStyle(
-                        color: Color(0xFF64748B),
+                    style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
                         fontFamily: 'Cairo')),
                 if (_nextLevel < 9999)
                   Text('$_nextLevel للمستوى التالي',
-                      style: const TextStyle(
-                          color: Color(0xFF64748B),
+                      style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: 11,
                           fontFamily: 'Cairo')),
               ]),
@@ -214,8 +217,8 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
           Align(
               alignment: Alignment.centerRight,
               child: Text('الشارات (${_badges.length}/${_badgeInfo.length})',
-                  style: const TextStyle(
-                      color: Colors.white,
+                  style: TextStyle(
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
                       fontFamily: 'Cairo'))),
@@ -237,13 +240,13 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: earned
-                      ? const Color(0xFF3B7EF6).withValues(alpha: 0.1)
-                      : const Color(0xFF0F1629),
+                      ? colorScheme.primary.withValues(alpha: 0.1)
+                      : colorScheme.surface,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                       color: earned
-                          ? const Color(0xFF3B7EF6).withValues(alpha: 0.4)
-                          : const Color(0xFF1E293B)),
+                          ? colorScheme.primary.withValues(alpha: 0.4)
+                          : colorScheme.outlineVariant),
                 ),
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -253,22 +256,22 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                               fontSize: 28,
                               color: earned
                                   ? null
-                                  : const Color(0xFF334155)
+                                  : colorScheme.outlineVariant
                                       .withValues(alpha: 0.5))),
                       const SizedBox(height: 6),
                       Text(info.$2,
                           style: TextStyle(
                               color: earned
-                                  ? Colors.white
-                                  : const Color(0xFF334155),
+                                  ? colorScheme.onSurface
+                                  : colorScheme.onSurfaceVariant,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                               fontFamily: 'Cairo'),
                           textAlign: TextAlign.center,
                           maxLines: 2),
                       Text(info.$3,
-                          style: const TextStyle(
-                              color: Color(0xFF64748B),
+                          style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
                               fontSize: 9,
                               fontFamily: 'Cairo')),
                     ]),
