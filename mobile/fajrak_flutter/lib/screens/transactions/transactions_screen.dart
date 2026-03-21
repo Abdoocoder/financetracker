@@ -134,10 +134,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (user == null) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('جارِ تجهيز ملف CSV…',
-              style: TextStyle(fontFamily: 'Cairo')),
-          duration: Duration(seconds: 2)),
+      SnackBar(
+          content: Text('settings_exporting'.tr(),
+              style: const TextStyle(fontFamily: 'Cairo')),
+          duration: const Duration(seconds: 2)),
     );
 
     try {
@@ -151,18 +151,18 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (list.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('لا توجد معاملات لتصديرها',
-                    style: TextStyle(fontFamily: 'Cairo'))),
+            SnackBar(
+                content: Text('settings_no_export'.tr(),
+                    style: const TextStyle(fontFamily: 'Cairo'))),
           );
         }
         return;
       }
 
       final buffer = StringBuffer();
-      buffer.writeln('التاريخ,النوع,المبلغ ($_currency),الفئة,الوصف');
+      buffer.writeln('${'trans_date'.tr()},${'inv_type'.tr()},${'trans_amount'.tr()} ($_currency),${'trans_category'.tr()},${'trans_description'.tr()}');
       for (final tx in list) {
-        final type = tx['type'] == 'income' ? 'دخل' : 'مصروف';
+        final type = tx['type'] == 'income' ? 'trans_income'.tr() : 'trans_expense'.tr();
         final amount = (tx['amount'] as num? ?? 0).toStringAsFixed(2);
         final cat = (tx['category'] ?? '').toString().replaceAll(',', '،');
         final desc = (tx['description'] ?? '')
@@ -179,7 +179,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'text/csv')],
-        text: 'معاملات فجرك 🌅',
+        text: 'trans_title'.tr(),
       );
     } catch (e) {
       if (mounted) {
@@ -248,7 +248,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             const SizedBox(height: 16),
             Center(
                 child: Text(
-                    existing != null ? 'تعديل المعاملة' : 'إضافة معاملة',
+                    existing != null ? 'trans_edit'.tr() : 'trans_new'.tr(),
                     style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
@@ -274,9 +274,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 ? const Color(0xFF10B981)
                                 : Colors.transparent),
                       ),
-                      child: const Center(
-                          child: Text('💰 دخل',
-                              style: TextStyle(
+                      child: Center(
+                          child: Text('trans_income'.tr(),
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w700))),
@@ -298,9 +298,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 ? const Color(0xFFEF4444)
                                 : Colors.transparent),
                       ),
-                      child: const Center(
-                          child: Text('💸 مصروف',
-                              style: TextStyle(
+                      child: Center(
+                          child: Text('trans_expense'.tr(),
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w700))),
@@ -346,19 +346,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: InputDecoration(labelText: 'المبلغ'),
+              decoration: InputDecoration(labelText: 'trans_amount'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: catController,
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: InputDecoration(labelText: 'الفئة'),
+              decoration: InputDecoration(labelText: 'trans_category'.tr()),
             ),
             const SizedBox(height: 12),
             TextFormField(
               controller: descController,
               style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-              decoration: const InputDecoration(labelText: 'الوصف (اختياري)'),
+              decoration: InputDecoration(labelText: 'trans_description'.tr()),
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -395,7 +395,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10))),
-                child: Text(existing != null ? 'حفظ التعديل' : 'إضافة معاملة',
+                child: Text(existing != null ? 'trans_save_edit'.tr() : 'trans_save'.tr(),
                     style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Cairo',
@@ -420,8 +420,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('تصفية حسب التاريخ',
-                style: TextStyle(
+            Text('filter_date'.tr(),
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -435,10 +435,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     value: _filterMonth ?? DateTime.now().month,
                     style: const TextStyle(
                         color: Colors.white, fontFamily: 'Cairo'),
-                    decoration: const InputDecoration(
-                        labelText: 'الشهر',
+                    decoration: InputDecoration(
+                        labelText: 'month'.tr(),
                         filled: true,
-                        fillColor: Color(0xFF1E293B)),
+                        fillColor: const Color(0xFF1E293B)),
                     items: List.generate(
                         12,
                         (i) => DropdownMenuItem(
@@ -453,10 +453,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     value: _filterYear ?? DateTime.now().year,
                     style: const TextStyle(
                         color: Colors.white, fontFamily: 'Cairo'),
-                    decoration: const InputDecoration(
-                        labelText: 'السنة',
+                    decoration: InputDecoration(
+                        labelText: 'year'.tr(),
                         filled: true,
-                        fillColor: Color(0xFF1E293B)),
+                        fillColor: const Color(0xFF1E293B)),
                     items: List.generate(5, (i) {
                       final year = DateTime.now().year - i;
                       return DropdownMenuItem(
@@ -480,8 +480,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       Navigator.pop(ctx);
                       _load(reset: true);
                     },
-                    child: const Text('إلغاء التصفية',
-                        style: TextStyle(
+                    child: Text('cancel_filter'.tr(),
+                        style: const TextStyle(
                             color: Color(0xFFEF4444), fontFamily: 'Cairo')),
                   ),
                 ),
@@ -493,8 +493,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3B7EF6)),
-                    child: const Text('تطبيق',
-                        style: TextStyle(
+                    child: Text('apply'.tr(),
+                        style: const TextStyle(
                             color: Colors.white, fontFamily: 'Cairo')),
                   ),
                 ),
@@ -527,13 +527,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('المعاملات',
+            Text('trans_title'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'Cairo',
                     fontSize: 18)),
-            Text('${filtered.length} معاملة',
+            Text('trans_count'.tr(args: [filtered.length.toString()]),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
@@ -562,7 +562,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           children: [
                             const Text('💸', style: TextStyle(fontSize: 48)),
                             const SizedBox(height: 16),
-                            Text('لا توجد معاملات!',
+                            Text('trans_empty'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontSize: 18,
@@ -613,7 +613,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   onChanged: (v) => setState(() => _search = v.toLowerCase()),
                   style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                   decoration: InputDecoration(
-                    hintText: 'ابحث...',
+                    hintText: 'search_hint'.tr(),
                     prefixIcon: Icon(Icons.search, color: colorScheme.onSurfaceVariant),
                     filled: true,
                     fillColor: colorScheme.surface,
@@ -642,11 +642,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _filterChip('all', 'الكل', colorScheme),
+                _filterChip('all', 'trans_all'.tr(), colorScheme),
                 const SizedBox(width: 8),
-                _filterChip('income', 'دخل', colorScheme),
+                _filterChip('income', 'trans_income'.tr(), colorScheme),
                 const SizedBox(width: 8),
-                _filterChip('expense', 'مصروف', colorScheme),
+                _filterChip('expense', 'trans_expense'.tr(), colorScheme),
               ],
             ),
           ),
@@ -687,16 +687,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       child: Row(
         children: [
           Expanded(
-              child: _statCard('الصافي', inc - exp,
+              child: _statCard('trans_total_net'.tr(), inc - exp,
                   inc - exp >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
                   colorScheme,
                   isNet: true)),
           const SizedBox(width: 8),
           Expanded(
-              child: _statCard('المصاريف', exp, const Color(0xFFEF4444), colorScheme)),
+              child: _statCard('trans_total_expenses'.tr(), exp, const Color(0xFFEF4444), colorScheme)),
           const SizedBox(width: 8),
           Expanded(
-              child: _statCard('الدخل', inc, const Color(0xFF10B981), colorScheme)),
+              child: _statCard('trans_total_income'.tr(), inc, const Color(0xFF10B981), colorScheme)),
         ],
       ),
     );
@@ -708,7 +708,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (isNet) {
       sign = value > 0 ? "+" : (value < 0 ? "-" : "");
     } else {
-      sign = label == 'الدخل' ? "+" : "-";
+      sign = label == 'trans_total_income'.tr() ? "+" : "-";
     }
 
     return Container(

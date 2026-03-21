@@ -112,10 +112,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (idx) => setState(() => _currentStep = idx),
                 children: [
-                  _slideIntro(isEn, colorScheme),
-                  _slideIncome(isEn, colorScheme),
-                  _slideSalaryDay(isEn, colorScheme),
-                  _slideSummary(isEn, colorScheme),
+                  _slideIntro(colorScheme),
+                  _slideIncome(colorScheme),
+                  _slideSalaryDay(colorScheme),
+                  _slideSummary(colorScheme),
                 ],
               ),
             ),
@@ -141,8 +141,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2))
                           : Text(
                               _currentStep == 3 
-                                ? (isEn ? 'Start Your Journey 🚀' : 'ابدأ رحلتك المادية 🚀')
-                                : (isEn ? 'Continue' : 'استمرار'),
+                                ? 'onboarding_start'.tr()
+                                : 'continue'.tr(),
                               style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16),
                             ),
                     ),
@@ -153,7 +153,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeInOut,
                       ),
-                      child: Text(isEn ? 'Back' : 'رجوع', style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                      child: Text('back'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                     ),
                 ],
               ),
@@ -177,7 +177,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideIntro(bool isEn, ColorScheme colorScheme) {
+  Widget _slideIntro(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.all(30),
       child: Column(
@@ -193,15 +193,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 40),
           Text(
-            isEn ? 'Welcome to Fajrak!' : 'مرحباً بك في فجرك!',
+            'onboarding_welcome_title'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
           ),
           const SizedBox(height: 16),
           Text(
-            isEn 
-              ? 'Your companion on the road to financial freedom. Let\'s set up your profile.'
-              : 'رفيقك في طريق الحرية المالية. دعنا نجهز ملفك الشخصي.',
+            'onboarding_welcome_subtitle'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16, fontFamily: 'Cairo', height: 1.6),
           ),
@@ -210,12 +208,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideIncome(bool isEn, ColorScheme colorScheme) {
+  Widget _slideIncome(ColorScheme colorScheme) {
     return _slideBase(
       colorScheme: colorScheme,
       icon: '💰',
-      title: isEn ? 'Monthly Income' : 'الدخل الشهري',
-      subtitle: isEn ? 'This helps us calculate your budgets automatically.' : 'يساعدنا هذا في حساب ميزانياتك تلقائياً.',
+      title: 'settings_income'.tr(),
+      subtitle: 'onboarding_income_subtitle'.tr(),
       child: TextFormField(
         controller: _incomeController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -233,16 +231,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideSalaryDay(bool isEn, ColorScheme colorScheme) {
+  Widget _slideSalaryDay(ColorScheme colorScheme) {
     return _slideBase(
       colorScheme: colorScheme,
       icon: '📅',
-      title: isEn ? 'Payday' : 'يوم الراتب',
-      subtitle: isEn ? 'When do you usually receive your income?' : 'متى تستلم دخلك الشهري عادةً؟',
+      title: 'onboarding_payday_title'.tr(),
+      subtitle: 'onboarding_payday_subtitle'.tr(),
       child: Column(
         children: [
           Text(
-            isEn ? 'Day $_salaryDay' : 'اليوم $_salaryDay',
+            'onboarding_day_value'.tr(args: [_salaryDay.toString()]),
             style: TextStyle(color: colorScheme.primary, fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
           ),
           const SizedBox(height: 20),
@@ -268,12 +266,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideSummary(bool isEn, ColorScheme colorScheme) {
+  Widget _slideSummary(ColorScheme colorScheme) {
     return _slideBase(
       colorScheme: colorScheme,
       icon: '🌍',
-      title: isEn ? 'Preferred Currency' : 'العملة المفضلة',
-      subtitle: isEn ? 'Choose your main currency for tracking.' : 'اختر عملتك الرئيسية للتتبع.',
+      title: 'settings_currency'.tr(),
+      subtitle: 'onboarding_currency_subtitle'.tr(),
       child: Wrap(
         spacing: 12,
         runSpacing: 12,

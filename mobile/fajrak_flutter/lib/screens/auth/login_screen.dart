@@ -85,14 +85,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('مرحباً بعودتك',
+              Text('auth_login_welcome'.tr(),
                   style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                       color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
-              const SizedBox(height: 8),
-              Text('سجل دخولك لمتابعة وضعك المالي',
+               const SizedBox(height: 8),
+              Text('auth_login_subtitle'.tr(),
                   style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'البريد الإلكتروني',
+                    labelText: 'auth_email'.tr(),
                     prefixIcon:
                         Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
               ),
@@ -131,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: _obscure,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'كلمة المرور',
+                  labelText: 'auth_password'.tr(),
                   prefixIcon:
                       Icon(Icons.lock_outlined, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextButton(
                   onPressed: () =>
                       Navigator.pushNamed(context, '/forgot-password'),
-                  child: Text('نسيت كلمة المرور؟',
+                  child: Text('auth_forgot_password'.tr(),
                       style: TextStyle(
                           color: colorScheme.primary, fontFamily: 'Cairo')),
                 ),
@@ -164,19 +164,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: colorScheme.onPrimary))
-                    : const Text('تسجيل الدخول'),
+                    :  Text('auth_login_button'.tr()),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('ليس لديك حساب؟',
+                  Text('auth_no_account'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/register'),
-                    child: Text('سجل مجاناً',
+                    child: Text('auth_register_now'.tr(),
                         style: TextStyle(
                             color: colorScheme.primary,
                             fontFamily: 'Cairo',

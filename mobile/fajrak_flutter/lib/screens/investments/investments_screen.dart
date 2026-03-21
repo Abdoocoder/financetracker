@@ -147,22 +147,22 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           final colorScheme = theme.colorScheme;
           return AlertDialog(
             backgroundColor: colorScheme.surface,
-            title: Text('حذف الاستثمار',
+            title: Text('inv_delete_title'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurface, fontFamily: 'Cairo')),
-            content: Text('هل أنت متأكد؟',
+            content: Text('confirm_delete'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text('إلغاء',
+                  child: Text('cancel'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontFamily: 'Cairo'))),
               TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text('حذف',
+                  child: Text('delete'.tr(),
                       style: TextStyle(
                           color: colorScheme.error, fontFamily: 'Cairo'))),
             ],
@@ -252,7 +252,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       color: Theme.of(context).colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2))),
               const SizedBox(height: 16),
-              Text('سجل معاملات $symbol',
+              Text('inv_tx_history_symbol'.tr(args: [symbol]),
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -263,7 +263,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 Center(
                     child: Padding(
                         padding: const EdgeInsets.all(20),
-                        child: Text('لا توجد معاملات بعد',
+                        child: Text('inv_empty'.tr(),
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 fontFamily: 'Cairo'))))
@@ -308,7 +308,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                 Text(
-                                    '${isBuy ? "شراء" : "بيع"} ${shares.toStringAsFixed(4)} وحدة',
+                                    '${isBuy ? "inv_buy".tr() : "inv_sell".tr()} ${shares.toStringAsFixed(4)} وحدة',
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface,
                                         fontFamily: 'Cairo',
@@ -332,7 +332,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                                         fontFamily: 'monospace',
                                         fontSize: 13)),
                                 if (comm > 0)
-                                  Text('عمولة \$${comm.toStringAsFixed(2)}',
+                                  Text('inv_commission'.tr(args: [comm.toStringAsFixed(2)]),
                                       style: TextStyle(
                                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                                           fontSize: 10,
@@ -389,24 +389,24 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     color: Theme.of(context).colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text('إضافة استثمار',
+            Text('inv_new'.tr(),
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontFamily: 'Cairo')),
             const SizedBox(height: 20),
-            _field(_symbolCtrl, 'الرمز (مثال: SPUS)', TextInputType.text),
+            _field(_symbolCtrl, 'inv_symbol_hint'.tr(), TextInputType.text),
             const SizedBox(height: 10),
-            _field(_nameCtrl, 'الاسم (اختياري)', TextInputType.text),
+            _field(_nameCtrl, 'inv_name_hint'.tr(), TextInputType.text),
             const SizedBox(height: 10),
-            _field(_sharesCtrl, 'عدد الأسهم',
+            _field(_sharesCtrl, 'inv_shares_hint'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_avgPriceCtrl, 'متوسط سعر الشراء',
+            _field(_avgPriceCtrl, 'inv_avg_price_hint'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_currentPriceCtrl, 'السعر الحالي',
+            _field(_currentPriceCtrl, 'inv_current_price_hint'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 12),
             GestureDetector(
@@ -436,7 +436,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           : const Color(0xFF64748B),
                       size: 20),
                   const SizedBox(width: 10),
-                  Text('استثمار حلال 🕌',
+                  Text('inv_halal'.tr(),
                       style: TextStyle(
                           color: _isHalal
                               ? const Color(0xFF10B981)
@@ -460,8 +460,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   child: _saving
                       ? CircularProgressIndicator(
                           color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2)
-                      : const Text('إضافة معاملة',
-                          style: TextStyle(
+                      : Text('inv_save'.tr(),
+                          style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900,
                               fontSize: 15)),
@@ -508,7 +508,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
-        title: Text('الاستثمارات',
+        title: Text('inv_title'.tr(),
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -538,7 +538,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           ),
           IconButton(
             icon: Icon(Icons.refresh, color: colorScheme.primary),
-            tooltip: 'تحديث السعر',
+            tooltip: 'inv_refresh'.tr(),
             onPressed: () async {
               setState(() => _loading = true);
               try {
@@ -579,7 +579,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                               colorScheme.primary.withValues(alpha: 0.2)),
                     ),
                     child: Column(children: [
-                      Text('قيمة المحفظة',
+                      Text('inv_total_value'.tr(),
                           style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontFamily: 'Cairo',
@@ -622,13 +622,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _miniStat(
-                                'التكلفة',
+                                'inv_cost'.tr(),
                                 '\$${_totalCost.toStringAsFixed(0)}',
                                 colorScheme.onSurfaceVariant),
-                            _miniStat('الأسهم', '${_investments.length}',
+                            _miniStat('inv_assets'.tr(), '${_investments.length}',
                                 colorScheme.primary),
                             _miniStat(
-                                'الحلال',
+                                'inv_halal'.tr(),
                                 '${_investments.where((i) => i['is_halal'] == true).length}',
                                 const Color(0xFF10B981)),
                           ]),
@@ -645,7 +645,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('توزيع المحفظة',
+                            Text('inv_portfolio_chart'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w900,
@@ -750,7 +750,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         const Text('🚀', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 10),
                         Expanded(
-                            child: Text('محاكي الثروة',
+                            child: Text('wealthSimulator'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w900,
@@ -775,20 +775,20 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           border: Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
                         _slider(
-                            'الاستثمار الشهري',
+                            'monthlyInvestment'.tr(),
                             '\$${_monthly.toStringAsFixed(0)}',
                             _monthly,
                             10,
                             1000,
                             (v) => setState(() => _monthly = v)),
                         _slider(
-                            'المدة (سنوات)',
-                            '$_years سنة',
+                            'duration'.tr(),
+                            '${_years.toInt()} ${'year'.tr()}',
                             _years.toDouble(),
                             1,
                             30,
                             (v) => setState(() => _years = v.toInt())),
-                        _slider('العائد السنوي', '${_rate.toStringAsFixed(0)}%',
+                        _slider('annualReturn'.tr(), '${_rate.toStringAsFixed(0)}%',
                             _rate, 1, 20, (v) => setState(() => _rate = v)),
                         const SizedBox(height: 16),
                         Container(
