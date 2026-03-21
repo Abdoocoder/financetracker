@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -74,7 +75,7 @@ export default function PrivacyPage() {
       </section>
 
       <div style={{ borderTop: "1px solid #1e293b", paddingTop: 24, color: "#475569", fontSize: 13 }}>
-        <a href="/" style={{ color: "#3B7EF6", textDecoration: "none" }}>← Back to Fajrak</a>
+        <Link href="/" style={{ color: "#3B7EF6", textDecoration: "none" }}>← Back to Fajrak</Link>
       </div>
     </div>
   )
