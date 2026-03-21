@@ -19,7 +19,7 @@ export function AndroidBatteryTip() {
         <button onClick={() => { localStorage.setItem('battery_tip_dismissed', '1'); setShow(false) }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 18, cursor: 'pointer', padding: 0 }}>×</button>
       </div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 12 }}>
-        لضمان وصول الإشعارات حتى عند إغلاق الشاشة، افتح إعدادات البطارية وحدد "غير محدود" لتطبيق Chrome
+        لضمان وصول الإشعارات حتى عند إغلاق الشاشة، افتح إعدادات البطارية وحدد &quot;غير محدود&quot; لتطبيق Chrome
       </div>
       <button
         onClick={() => {

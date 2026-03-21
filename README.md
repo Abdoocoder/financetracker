@@ -225,6 +225,11 @@ npm run dev
 
 ## Changelog
 
+### v3.9.0 — 2026-03-21
+- 🛡️ **Full Project Audit** — Comprehensive health check completed (dependencies, types, linting).
+- 🔧 **Build Fixes** — Resolved several ESLint errors (unescaped entities & incorrect link usage) enabling successful production build.
+- ⚙️ **Environment Sync** — Verified `.env.local` against example for all required integration keys.
+
 ### v3.7.0 — 2026-03-20 *(Latest)*
 - 🌍 **Full i18n Flutter** — ar.json + en.json complete bilingual support
 - 📊 **Analytics Service** — user behavior tracking
