@@ -87,10 +87,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isEn = context.locale.languageCode == 'en';
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -99,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (index) => _buildDot(index)),
+                children: List.generate(4, (index) => _buildDot(index, colorScheme)),
               ),
             ),
             
@@ -109,10 +112,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (idx) => setState(() => _currentStep = idx),
                 children: [
-                  _slideIntro(isEn),
-                  _slideIncome(isEn),
-                  _slideSalaryDay(isEn),
-                  _slideSummary(isEn),
+                  _slideIntro(colorScheme),
+                  _slideIncome(colorScheme),
+                  _slideSalaryDay(colorScheme),
+                  _slideSummary(colorScheme),
                 ],
               ),
             ),
@@ -127,19 +130,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: ElevatedButton(
                       onPressed: _loading ? null : _nextPage,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B7EF6),
-                        foregroundColor: Colors.white,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 8,
-                        shadowColor: const Color(0xFF3B7EF6).withOpacity(0.4),
+                        shadowColor: colorScheme.primary.withValues(alpha: 0.4),
                       ),
                       child: _loading
-                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2))
                           : Text(
                               _currentStep == 3 
-                                ? (isEn ? 'Start Your Journey 🚀' : 'ابدأ رحلتك المادية 🚀')
-                                : (isEn ? 'Continue' : 'استمرار'),
+                                ? 'onboarding_start'.tr()
+                                : 'continue'.tr(),
                               style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16),
                             ),
                     ),
@@ -150,7 +153,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeInOut,
                       ),
-                      child: Text(isEn ? 'Back' : 'رجوع', style: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo')),
+                      child: Text('back'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                     ),
                 ],
               ),
@@ -161,20 +164,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildDot(int index) {
+  Widget _buildDot(int index, ColorScheme colorScheme) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.symmetric(horizontal: 4),
       height: 8,
       width: _currentStep == index ? 24 : 8,
       decoration: BoxDecoration(
-        color: _currentStep == index ? const Color(0xFF3B7EF6) : const Color(0xFF1E293B),
+        color: _currentStep == index ? colorScheme.primary : colorScheme.outlineVariant,
         borderRadius: BorderRadius.circular(4),
       ),
     );
   }
 
-  Widget _slideIntro(bool isEn) {
+  Widget _slideIntro(ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.all(30),
       child: Column(
@@ -183,45 +186,44 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B7EF6).withOpacity(0.1),
+              color: colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Text('✨', style: TextStyle(fontSize: 80)),
           ),
           const SizedBox(height: 40),
           Text(
-            isEn ? 'Welcome to Fajrak!' : 'مرحباً بك في فجرك!',
+            'onboarding_welcome_title'.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+            style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
           ),
           const SizedBox(height: 16),
           Text(
-            isEn 
-              ? 'Your companion on the road to financial freedom. Let\'s set up your profile.'
-              : 'رفيقك في طريق الحرية المالية. دعنا نجهز ملفك الشخصي.',
+            'onboarding_welcome_subtitle'.tr(),
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 16, fontFamily: 'Cairo', height: 1.6),
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16, fontFamily: 'Cairo', height: 1.6),
           ),
         ],
       ),
     );
   }
 
-  Widget _slideIncome(bool isEn) {
+  Widget _slideIncome(ColorScheme colorScheme) {
     return _slideBase(
+      colorScheme: colorScheme,
       icon: '💰',
-      title: isEn ? 'Monthly Income' : 'الدخل الشهري',
-      subtitle: isEn ? 'This helps us calculate your budgets automatically.' : 'يساعدنا هذا في حساب ميزانياتك تلقائياً.',
+      title: 'settings_income'.tr(),
+      subtitle: 'onboarding_income_subtitle'.tr(),
       child: TextFormField(
         controller: _incomeController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+        style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
         decoration: InputDecoration(
           hintText: '0',
-          hintStyle: const TextStyle(color: Color(0xFF1E293B)),
+          hintStyle: TextStyle(color: colorScheme.outlineVariant),
           suffixText: _currency,
-          suffixStyle: const TextStyle(color: Color(0xFF3B7EF6), fontSize: 16, fontWeight: FontWeight.bold),
+          suffixStyle: TextStyle(color: colorScheme.primary, fontSize: 16, fontWeight: FontWeight.bold),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 20),
         ),
@@ -229,25 +231,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideSalaryDay(bool isEn) {
+  Widget _slideSalaryDay(ColorScheme colorScheme) {
     return _slideBase(
+      colorScheme: colorScheme,
       icon: '📅',
-      title: isEn ? 'Payday' : 'يوم الراتب',
-      subtitle: isEn ? 'When do you usually receive your income?' : 'متى تستلم دخلك الشهري عادةً؟',
+      title: 'onboarding_payday_title'.tr(),
+      subtitle: 'onboarding_payday_subtitle'.tr(),
       child: Column(
         children: [
           Text(
-            isEn ? 'Day $_salaryDay' : 'اليوم $_salaryDay',
-            style: const TextStyle(color: Color(0xFF3B7EF6), fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+            'onboarding_day_value'.tr(args: [_salaryDay.toString()]),
+            style: TextStyle(color: colorScheme.primary, fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
           ),
           const SizedBox(height: 20),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 8,
-              activeTrackColor: const Color(0xFF3B7EF6),
-              inactiveTrackColor: const Color(0xFF1E293B),
-              thumbColor: Colors.white,
-              overlayColor: const Color(0xFF3B7EF6).withOpacity(0.2),
+              activeTrackColor: colorScheme.primary,
+              inactiveTrackColor: colorScheme.outlineVariant,
+              thumbColor: colorScheme.onPrimary,
+              overlayColor: colorScheme.primary.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
             ),
             child: Slider(
@@ -263,21 +266,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideSummary(bool isEn) {
+  Widget _slideSummary(ColorScheme colorScheme) {
     return _slideBase(
+      colorScheme: colorScheme,
       icon: '🌍',
-      title: isEn ? 'Preferred Currency' : 'العملة المفضلة',
-      subtitle: isEn ? 'Choose your main currency for tracking.' : 'اختر عملتك الرئيسية للتتبع.',
+      title: 'settings_currency'.tr(),
+      subtitle: 'onboarding_currency_subtitle'.tr(),
       child: Wrap(
         spacing: 12,
         runSpacing: 12,
         alignment: WrapAlignment.center,
-        children: _currencies.map((c) => _buildCurrencyToken(c)).toList(),
+        children: _currencies.map((c) => _buildCurrencyToken(c, colorScheme)).toList(),
       ),
     );
   }
 
-  Widget _buildCurrencyToken(String c) {
+  Widget _buildCurrencyToken(String c, ColorScheme colorScheme) {
     final isSelected = _currency == c;
     return GestureDetector(
       onTap: () => setState(() => _currency = c),
@@ -285,19 +289,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF3B7EF6) : const Color(0xFF0F1629),
+          color: isSelected ? colorScheme.primary : colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? const Color(0xFF3B7EF6) : const Color(0xFF1E293B), width: 2),
+          border: Border.all(color: isSelected ? colorScheme.primary : colorScheme.outlineVariant, width: 2),
         ),
         child: Text(
           c,
-          style: TextStyle(color: isSelected ? Colors.white : const Color(0xFF94A3B8), fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );
   }
 
-  Widget _slideBase({required String icon, required String title, required String subtitle, required Widget child}) {
+  Widget _slideBase({required ColorScheme colorScheme, required String icon, required String title, required String subtitle, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(
@@ -305,21 +309,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(icon, style: const TextStyle(fontSize: 50)),
           const SizedBox(height: 20),
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+          Text(title, style: TextStyle(color: colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
           const SizedBox(height: 8),
-          Text(subtitle, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14, fontFamily: 'Cairo')),
+          Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14, fontFamily: 'Cairo')),
           const SizedBox(height: 40),
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1629),
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF1E293B)),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: child,
           ),
         ],
       ),
+    );
+  }
     );
   }
 }

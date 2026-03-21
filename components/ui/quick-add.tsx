@@ -41,7 +41,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       if (data) setLastTx(data)
     }
     loadLast()
-  }, [supabase])
+  }, [supabase, user])
 
   async function save() {
     if (!selected || !amount) return

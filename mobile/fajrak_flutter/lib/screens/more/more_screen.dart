@@ -44,8 +44,10 @@ class _MoreScreenState extends State<MoreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding:
@@ -53,9 +55,9 @@ class _MoreScreenState extends State<MoreScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1629),
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFF1E293B)),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Column(
               children: [
@@ -65,7 +67,7 @@ class _MoreScreenState extends State<MoreScreen> {
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
+                    color: colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -78,7 +80,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const DebtsScreen()))),
+                            builder: (_) => const DebtsScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.pie_chart_outline,
@@ -86,7 +88,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const BudgetsScreen()))),
+                            builder: (_) => const BudgetsScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.track_changes,
@@ -94,7 +96,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const GoalsScreen()))),
+                            builder: (_) => const GoalsScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.trending_up,
@@ -102,7 +104,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const InvestmentsScreen()))),
+                            builder: (_) => const InvestmentsScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.menu_book_outlined,
@@ -110,7 +112,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const LearnScreen()))),
+                            builder: (_) => const LearnScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.notifications_none,
@@ -118,7 +120,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const AlertsScreen()))),
+                            builder: (_) => const AlertsScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.settings_outlined,
@@ -126,13 +128,13 @@ class _MoreScreenState extends State<MoreScreen> {
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const SettingsScreen()))),
+                            builder: (_) => const SettingsScreen())), colorScheme),
                 _menuItem(
                     context,
                     Icons.help_outline,
                     'المساعدة',
                     () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const HelpScreen()))),
+                        MaterialPageRoute(builder: (_) => const HelpScreen())), colorScheme),
 
                 const SizedBox(height: 16),
 
@@ -142,25 +144,26 @@ class _MoreScreenState extends State<MoreScreen> {
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1E293B),
-                      foregroundColor: Colors.white,
+                      backgroundColor: colorScheme.surface,
+                      foregroundColor: colorScheme.onSurface,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: colorScheme.outlineVariant)),
                       elevation: 0,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.language,
-                            color: Color(0xFF3B7EF6), size: 20),
+                        Icon(Icons.language,
+                            color: colorScheme.primary, size: 20),
                         const SizedBox(width: 8),
                         Text('English',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,
-                                color: Color(0xFF93C5FD))),
+                                color: colorScheme.onSurface)),
                       ],
                     ),
                   ),
@@ -174,34 +177,34 @@ class _MoreScreenState extends State<MoreScreen> {
   }
 
   Widget _menuItem(
-      BuildContext context, IconData icon, String title, VoidCallback onTap) {
+      BuildContext context, IconData icon, String title, VoidCallback onTap, ColorScheme colorScheme) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF070B14).withValues(alpha: 0.5),
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF1E293B)),
+          border: Border.all(color: colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF94A3B8), size: 22),
+            Icon(icon, color: colorScheme.onSurfaceVariant, size: 22),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
                   fontFamily: 'Cairo',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            const Icon(Icons.arrow_back_ios_new,
-                color: Color(0xFF334155), size: 14),
+            Icon(Icons.arrow_back_ios_new,
+                color: colorScheme.outlineVariant, size: 14),
           ],
         ),
       ),

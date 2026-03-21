@@ -119,20 +119,22 @@ class _TestimonialCardState extends State<TestimonialCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final isEn = context.locale.languageCode == 'en';
     final canSubmit = _nameCtrl.text.isNotEmpty && _textCtrl.text.length >= 20;
 
     return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+      data: theme.copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        iconColor: const Color(0xFF64748B),
-        collapsedIconColor: const Color(0xFF64748B),
+        iconColor: colorScheme.onSurfaceVariant,
+        collapsedIconColor: colorScheme.onSurfaceVariant,
         title: Row(children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B),
+              color: colorScheme.outlineVariant,
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Text('⭐', style: TextStyle(fontSize: 18)),
@@ -141,8 +143,8 @@ class _TestimonialCardState extends State<TestimonialCard> {
           Expanded(
             child: Text(
               isEn ? 'Share Your Experience' : 'شارك تجربتك',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: colorScheme.onSurface,
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 fontSize: 15,
@@ -152,13 +154,13 @@ class _TestimonialCardState extends State<TestimonialCard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B7EF6).withOpacity(0.15),
+              color: colorScheme.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               isEn ? 'New' : 'جديد',
-              style: const TextStyle(
-                color: Color(0xFF3B7EF6),
+              style: TextStyle(
+                color: colorScheme.primary,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Cairo',
@@ -170,19 +172,19 @@ class _TestimonialCardState extends State<TestimonialCard> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            child: _submitted && !_existing ? _buildSuccess(isEn) : _buildForm(isEn, canSubmit),
+            child: _submitted && !_existing ? _buildSuccess(isEn, colorScheme) : _buildForm(isEn, canSubmit, colorScheme),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSuccess(bool isEn) {
+  Widget _buildSuccess(bool isEn, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withOpacity(0.1),
-        border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+        color: const Color(0xFF10B981).withValues(alpha: 0.1),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -203,7 +205,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
     );
   }
 
-  Widget _buildForm(bool isEn, bool canSubmit) {
+  Widget _buildForm(bool isEn, bool canSubmit, ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -211,8 +213,8 @@ class _TestimonialCardState extends State<TestimonialCard> {
           isEn
               ? 'Your review will appear on our landing page after approval.'
               : 'رأيك سيظهر في صفحتنا الرئيسية بعد المراجعة.',
-          style: const TextStyle(
-            color: Color(0xFF94A3B8),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
             fontFamily: 'Cairo',
             fontSize: 12,
             height: 1.7,
@@ -223,8 +225,8 @@ class _TestimonialCardState extends State<TestimonialCard> {
         // Stars
         Text(
           isEn ? 'Rating' : 'التقييم',
-          style: const TextStyle(
-            color: Color(0xFF94A3B8),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
             fontFamily: 'Cairo',
             fontSize: 12,
@@ -241,7 +243,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 padding: const EdgeInsets.only(right: 6),
                 child: Icon(
                   starNum <= _stars ? Icons.star : Icons.star_border,
-                  color: starNum <= _stars ? const Color(0xFFF59E0B) : const Color(0xFF1E293B),
+                  color: starNum <= _stars ? const Color(0xFFF59E0B) : colorScheme.onSurfaceVariant.withOpacity(0.3),
                   size: 32,
                 ),
               ),
@@ -261,15 +263,15 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 children: [
                   Text(
                     isEn ? 'Name' : 'الاسم',
-                    style: const TextStyle(
-                      color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Cairo',
                       fontSize: 12,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  _inputField(_nameCtrl, isEn ? 'Your name' : 'اسمك'),
+                  _inputField(_nameCtrl, isEn ? 'Your name' : 'اسمك', colorScheme),
                 ],
               ),
             ),
@@ -281,8 +283,8 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 children: [
                   Text(
                     isEn ? 'Country' : 'الدولة',
-                    style: const TextStyle(
-                      color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Cairo',
                       fontSize: 12,
@@ -292,16 +294,16 @@ class _TestimonialCardState extends State<TestimonialCard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF334155)),
+                      border: Border.all(color: colorScheme.outlineVariant),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _country,
                         isExpanded: true,
-                        dropdownColor: const Color(0xFF1E293B),
-                        icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                        dropdownColor: colorScheme.surface,
+                        icon: Icon(Icons.arrow_drop_down, color: colorScheme.onSurface),
                         items: _countries.map((c) => DropdownMenuItem(
                           value: c,
                           child: Text(c, style: const TextStyle(fontSize: 20)),
@@ -322,15 +324,15 @@ class _TestimonialCardState extends State<TestimonialCard> {
         // Role
         Text(
           isEn ? 'Job Title (optional)' : 'الوظيفة (اختياري)',
-          style: const TextStyle(
-            color: Color(0xFF94A3B8),
+          style: TextStyle(
+            color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
             fontFamily: 'Cairo',
             fontSize: 12,
           ),
         ),
         const SizedBox(height: 6),
-        _inputField(_roleCtrl, isEn ? 'e.g. Software Engineer' : 'مثال: مهندس برمجيات'),
+        _inputField(_roleCtrl, isEn ? 'e.g. Software Engineer' : 'مثال: مهندس برمجيات', colorScheme),
         const SizedBox(height: 16),
 
         // Text
@@ -339,8 +341,8 @@ class _TestimonialCardState extends State<TestimonialCard> {
           children: [
             Text(
               isEn ? 'Your Review' : 'رأيك بالتطبيق',
-              style: const TextStyle(
-                color: Color(0xFF94A3B8),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Cairo',
                 fontSize: 12,
@@ -349,7 +351,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
             Text(
               '${_textCtrl.text.length}/20+',
               style: TextStyle(
-                color: _textCtrl.text.length < 20 ? const Color(0xFFEF4444) : const Color(0xFF10B981),
+                color: _textCtrl.text.length < 20 ? colorScheme.error : const Color(0xFF10B981),
                 fontFamily: 'Cairo',
                 fontSize: 12,
               ),
@@ -361,19 +363,19 @@ class _TestimonialCardState extends State<TestimonialCard> {
           controller: _textCtrl,
           onChanged: (v) => setState(() {}),
           maxLines: 4,
-          style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontSize: 13),
+          style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 13),
           decoration: InputDecoration(
             hintText: isEn ? 'What do you like most about Fajrak?' : 'ما الذي أعجبك في التطبيق؟',
-            hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 13),
+            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 13),
             filled: true,
-            fillColor: const Color(0xFF1E293B),
+            fillColor: colorScheme.outlineVariant,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF334155)),
+              borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0xFF334155)),
+              borderSide: BorderSide(color: colorScheme.outlineVariant),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           ),
@@ -386,13 +388,13 @@ class _TestimonialCardState extends State<TestimonialCard> {
           child: ElevatedButton(
             onPressed: (!canSubmit || _saving) ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: canSubmit ? const Color(0xFFF59E0B) : const Color(0xFF1E293B),
+              backgroundColor: canSubmit ? const Color(0xFFF59E0B) : colorScheme.outlineVariant,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: _saving
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimary))
                 : Text(
                     _existing
                         ? (isEn ? 'Update Review ⭐' : 'تحديث التقييم ⭐')
@@ -424,23 +426,23 @@ class _TestimonialCardState extends State<TestimonialCard> {
     );
   }
 
-  Widget _inputField(TextEditingController ctrl, String hint) {
+  Widget _inputField(TextEditingController ctrl, String hint, ColorScheme colorScheme) {
     return TextField(
       controller: ctrl,
       onChanged: (v) => setState(() {}),
-      style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontSize: 13),
+      style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 13),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 13),
+        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 13),
         filled: true,
-        fillColor: const Color(0xFF1E293B),
+        fillColor: colorScheme.outlineVariant,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF334155)),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF334155)),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
       ),

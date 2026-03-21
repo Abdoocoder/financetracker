@@ -53,8 +53,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -66,8 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 72,
                 height: 72,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)],
+                  gradient: LinearGradient(
+                    colors: [colorScheme.primary, colorScheme.secondary],
                   ),
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -81,31 +85,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text('مرحباً بعودتك',
+              Text('auth_login_welcome'.tr(),
                   style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
-              const SizedBox(height: 8),
-              const Text('سجل دخولك لمتابعة وضعك المالي',
+               const SizedBox(height: 8),
+              Text('auth_login_subtitle'.tr(),
                   style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF94A3B8),
+                      color: colorScheme.onSurfaceVariant,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 40),
               if (_error != null) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                    color: colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                        color: colorScheme.error.withValues(alpha: 0.3)),
                   ),
                   child: Text(_error!,
-                      style: const TextStyle(
-                          color: Color(0xFFEF4444),
+                      style: TextStyle(
+                          color: colorScheme.error,
                           fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),
@@ -115,30 +119,27 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-
-                style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'البريد الإلكتروني',
+                    labelText: 'auth_email'.tr(),
                     prefixIcon:
-                        const Icon(Icons.lock_outline, color: Color(0xFF94A3B8))),
+                        Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'كلمة المرور',
+                  labelText: 'auth_password'.tr(),
                   prefixIcon:
-                      const Icon(Icons.lock_outlined, color: Color(0xFF94A3B8)),
+                      Icon(Icons.lock_outlined, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
                     icon: Icon(
                         _obscure
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
-                        color: const Color(0xFF94A3B8)),
+                        color: colorScheme.onSurfaceVariant),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),
@@ -149,35 +150,35 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextButton(
                   onPressed: () =>
                       Navigator.pushNamed(context, '/forgot-password'),
-                  child: const Text('نسيت كلمة المرور؟',
+                  child: Text('auth_forgot_password'.tr(),
                       style: TextStyle(
-                          color: Color(0xFF3B7EF6), fontFamily: 'Cairo')),
+                          color: colorScheme.primary, fontFamily: 'Cairo')),
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loading ? null : _login,
                 child: _loading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white))
-                    : const Text('تسجيل الدخول'),
+                            strokeWidth: 2, color: colorScheme.onPrimary))
+                    :  Text('auth_login_button'.tr()),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('ليس لديك حساب؟',
+                  Text('auth_no_account'.tr(),
                       style: TextStyle(
-                          color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+                          color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/register'),
-                    child: const Text('سجل مجاناً',
+                    child: Text('auth_register_now'.tr(),
                         style: TextStyle(
-                            color: Color(0xFF3B7EF6),
+                            color: colorScheme.primary,
                             fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700)),
                   ),
