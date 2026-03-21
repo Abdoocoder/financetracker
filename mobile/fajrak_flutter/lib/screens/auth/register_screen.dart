@@ -29,7 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty) {
-      setState(() => _error = 'يرجى ملء جميع الحقول');
+      setState(() => _error = 'auth_error_fill_fields'.tr());
       return;
     }
     setState(() {
@@ -48,12 +48,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         ErrorHandler.handle(e, context: context, developerMessage: 'Register Action');
-        // Optionally, if ErrorHandler doesn't update _error, you might do it here
-        // if (e is AuthException) {
-        //   setState(() => _error = e.message);
-        // } else {
-        //   setState(() => _error = 'An unexpected error occurred.');
-        // }
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -90,14 +84,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             fontFamily: 'Cairo'))),
               ),
               const SizedBox(height: 24),
-              Text('إنشاء حساب جديد',
+              Text('auth_register_title'.tr(),
                   style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
                       color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              Text('ابدأ رحلتك نحو الحرية المالية',
+              Text('auth_register_subtitle'.tr(),
                   style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -125,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _nameController,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'الاسم الكامل',
+                    labelText: 'auth_full_name'.tr(),
                     prefixIcon:
                         Icon(Icons.person_outlined, color: colorScheme.onSurfaceVariant)),
               ),
@@ -135,7 +129,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 keyboardType: TextInputType.emailAddress,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'البريد الإلكتروني',
+                    labelText: 'auth_email'.tr(),
                     prefixIcon:
                         Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
               ),
@@ -145,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: _obscure,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'كلمة المرور',
+                  labelText: 'auth_password'.tr(),
                   prefixIcon:
                       Icon(Icons.lock_outlined, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
@@ -167,19 +161,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: colorScheme.onPrimary))
-                    : const Text('إنشاء الحساب'),
+                    : Text('auth_register_button'.tr()),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('لديك حساب بالفعل؟',
+                  Text('auth_have_account'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/login'),
-                    child: Text('سجل دخولك',
+                    child: Text('auth_login_now'.tr(),
                         style: TextStyle(
                             color: colorScheme.primary,
                             fontFamily: 'Cairo',

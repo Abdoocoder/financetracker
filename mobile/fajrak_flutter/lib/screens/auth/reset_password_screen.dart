@@ -27,11 +27,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Future<void> _reset() async {
     if (_passwordController.text != _confirmController.text) {
-      setState(() => _error = 'كلمات المرور غير متطابقة');
+      setState(() => _error = 'auth_error_passwords_dont_match'.tr());
       return;
     }
     if (_passwordController.text.length < 6) {
-      setState(() => _error = 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      setState(() => _error = 'auth_error_password_too_short'.tr());
       return;
     }
 
@@ -61,7 +61,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('تعيين كلمة المرور',
+        title: Text('auth_reset_password_title'.tr(),
             style: TextStyle(fontFamily: 'Cairo', color: colorScheme.onSurface)),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -86,14 +86,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         Icon(Icons.lock_reset, size: 40, color: Colors.white)),
               ),
               const SizedBox(height: 24),
-              Text('تعيين كلمة مرور جديدة',
+              Text('auth_reset_password_subtitle'.tr(),
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              Text('أدخل كلمة المرور الجديدة لتأمين حسابك',
+              Text('auth_reset_password_desc'.tr(),
                   style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -117,7 +117,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             .withValues(alpha: 0.3)),
                   ),
                   child: Text(
-                      'تم تغيير كلمة المرور بنجاح! جاري التحويل...',
+                      'auth_reset_password_success'.tr(),
                       style: TextStyle(
                           color: theme.brightness == Brightness.dark
                               ? const Color(0xFF10B981)
@@ -153,7 +153,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'كلمة المرور الجديدة',
+                  labelText: 'auth_new_password'.tr(),
                   prefixIcon:
                       Icon(Icons.lock_outline, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
@@ -173,7 +173,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'تأكيد كلمة المرور',
+                  labelText: 'auth_confirm_password'.tr(),
                   prefixIcon:
                       Icon(Icons.lock_outline, color: colorScheme.onSurfaceVariant),
                 ),
@@ -187,7 +187,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: colorScheme.onPrimary))
-                    : const Text('تعيين كلمة المرور'),
+                    :  Text('auth_reset_password_button'.tr()),
               ),
             ],
           ),

@@ -15,7 +15,7 @@ class AppState extends ChangeNotifier {
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('darkMode') ?? true;
-    final lang = prefs.getString('language') ?? 'ar';
+    final lang = prefs.getString('language_code') ?? 'ar';
     _locale = Locale(lang);
     notifyListeners();
   }
@@ -31,6 +31,6 @@ class AppState extends ChangeNotifier {
     _locale = locale;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('language', locale.languageCode);
+    await prefs.setString('language_code', locale.languageCode);
   }
 }
