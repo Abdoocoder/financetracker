@@ -152,7 +152,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B7EF6).withOpacity(0.15),
+              color: const Color(0xFF3B7EF6).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -181,8 +181,8 @@ class _TestimonialCardState extends State<TestimonialCard> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withOpacity(0.1),
-        border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+        color: const Color(0xFF10B981).withValues(alpha: 0.1),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class ChallengesCard extends StatefulWidget {
@@ -159,7 +158,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B).withOpacity(0.5),
+              color: const Color(0xFF1E293B).withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xFF334155)),
             ),
