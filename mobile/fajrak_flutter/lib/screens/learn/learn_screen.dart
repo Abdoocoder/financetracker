@@ -94,37 +94,46 @@ class _LearnScreenState extends State<LearnScreen> {
     ],
     'investing': [
       {
+        'title': 'learn_lesson_investing_0_title',
+        'body': 'learn_lesson_investing_0_body'
       },
       {
-        'title': '📅 Dollar Cost Averaging',
-        'body':
-            'استثمر مبلغاً ثابتاً كل شهر بغض النظر عن السعر. الاستمرارية تتفوق على الذكاء.'
+        'title': 'learn_lesson_investing_1_title',
+        'body': 'learn_lesson_investing_1_body'
+      },
+      {
+        'title': 'learn_lesson_investing_2_title',
+        'body': 'learn_lesson_investing_2_body'
+      },
+      {
+        'title': 'learn_lesson_investing_3_title',
+        'body': 'learn_lesson_investing_3_body'
+      },
+      {
+        'title': 'learn_lesson_investing_4_title',
+        'body': 'learn_lesson_investing_4_body'
       },
     ],
     'wealth': [
       {
-        'title': '👑 الثروة الحقيقية هي الحرية',
-        'body':
-            '"الثروة الحقيقية هي القدرة على الاستيقاظ صباح الاثنين وأن تقرر أنت ماذا تفعل."'
+        'title': 'learn_lesson_wealth_0_title',
+        'body': 'learn_lesson_wealth_0_body'
       },
       {
-        'title': '🌅 اليد العليا خير من اليد السفلى',
-        'body':
-            'قال ﷺ: "اليد العليا خير من اليد السفلى". هدفك من بناء ثروتك أن تكون دائماً صاحب اليد العليا.'
+        'title': 'learn_lesson_wealth_1_title',
+        'body': 'learn_lesson_wealth_1_body'
       },
       {
-        'title': '🤝 الصدقة لا تنقص المال',
-        'body': 'قال ﷺ: "ما نقص مال من صدقة". الصدقة تبارك المال ولا تنقصه.'
+        'title': 'learn_lesson_wealth_2_title',
+        'body': 'learn_lesson_wealth_2_body'
       },
       {
-        'title': '🏗️ بناء مصادر دخل متعددة',
-        'body':
-            'دراسة IRS: متوسط المليونيرين 7 مصادر دخل. ابدأ بمصدر ثانٍ بسيط.'
+        'title': 'learn_lesson_wealth_3_title',
+        'body': 'learn_lesson_wealth_3_body'
       },
       {
-        'title': '🎓 رأس المال البشري',
-        'body':
-            'استثمار 1,000 دولار في مهارة مهنية يعود بـ 10x. استثمارك في نفسك هو الأضمن.'
+        'title': 'learn_lesson_wealth_4_title',
+        'body': 'learn_lesson_wealth_4_body'
       },
     ],
   };
@@ -140,66 +149,75 @@ class _LearnScreenState extends State<LearnScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
-    final now = DateTime.now();
-    final today = now.toIso8601String().split('T')[0];
+    try {
+      final now = DateTime.now();
+      final today = now.toIso8601String().split('T')[0];
 
-    final results = await Future.wait<dynamic>([
-      Supabase.instance.client
-          .from('profiles')
-          .select('lesson_streak, last_lesson_date, monthly_income')
-          .eq('id', user.id)
-          .single(),
-      Supabase.instance.client
-          .from('debts')
-          .select('remaining_amount, monthly_payment')
-          .eq('user_id', user.id)
-          .eq('is_paid', false),
-      Supabase.instance.client
-          .from('investments')
-          .select('id')
-          .eq('user_id', user.id)
-          .count(),
-    ]);
+      final results = await Future.wait<dynamic>([
+        Supabase.instance.client
+            .from('profiles')
+            .select('lesson_streak, last_lesson_date, monthly_income')
+            .eq('id', user.id)
+            .maybeSingle(),
+        Supabase.instance.client
+            .from('debts')
+            .select('remaining_amount, monthly_payment')
+            .eq('user_id', user.id)
+            .eq('is_paid', false),
+        Supabase.instance.client
+            .from('investments')
+            .select('id', const FetchOptions(count: CountOption.exact))
+            .eq('user_id', user.id)
+            .limit(1),
+      ]);
 
-    final profile = results[0] as Map<String, dynamic>;
-    final debts = results[1] as List;
-    final invRes = results[2] as dynamic;
+      final profile = (results[0] as Map<String, dynamic>?) ?? {};
+      final debts = (results[1] as List?) ?? [];
+      final invRes = results[2] as PostgrestResponse;
 
-    final income = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
-    final totalDebt = debts.fold(
-        0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
-    final totalMonthly = debts.fold(
-        0.0, (a, d) => a + (d['monthly_payment'] as num? ?? 0).toDouble());
-    final hasInvestments = (invRes.count ?? 0) > 0;
+      final income = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
+      final totalDebt = debts.fold(
+          0.0, (a, d) => a + ((d['remaining_amount'] as num?)?.toDouble() ?? 0));
+      final totalMonthly = debts.fold(
+          0.0, (a, d) => a + ((d['monthly_payment'] as num?)?.toDouble() ?? 0));
+      final hasInvestments = (invRes.count ?? 0) > 0;
 
-    String stage = 'awareness';
-    if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
-      stage = 'debt';
-    } else if (totalDebt == 0 && !hasInvestments) {
-      stage = 'emergency';
-    } else if (hasInvestments) {
-      stage = 'investing';
-    }
-    final lessons = _lessons[stage] ?? _lessons['awareness']!;
-    final lessonRaw = lessons[(now.day - 1) % lessons.length];
-    final Map<String, String> lesson = {
-      'title': lessonRaw['title']!.tr(),
-      'body': lessonRaw['body']!.tr(),
-      'url': lessonRaw['url'] ?? '',
-    };
+      String stage = 'awareness';
+      if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
+        stage = 'debt';
+      } else if (totalDebt == 0 && !hasInvestments) {
+        stage = 'emergency';
+      } else if (hasInvestments) {
+        stage = 'investing';
+      }
 
-    final streak = (profile['lesson_streak'] as num?)?.toInt() ?? 0;
-    final lastLesson = profile['last_lesson_date'] as String?;
-    final completed = lastLesson == today;
+      final lessons = _lessons[stage] ?? _lessons['awareness']!;
+      final lessonRaw = lessons[(now.day - 1) % lessons.length];
+      
+      final Map<String, String> lesson = {
+        'title': (lessonRaw['title'] ?? 'learn_title').tr(),
+        'body': (lessonRaw['body'] ?? '').tr(),
+        'url': lessonRaw['url'] ?? '',
+      };
 
-    if (mounted) {
-      setState(() {
-        _stage = stage;
-        _lesson = lesson;
-        _streak = streak;
-        _completed = completed;
-        _loading = false;
-      });
+      final streak = (profile['lesson_streak'] as num?)?.toInt() ?? 0;
+      final lastLesson = profile['last_lesson_date'] as String?;
+      final completed = lastLesson == today;
+
+      if (mounted) {
+        setState(() {
+          _stage = stage;
+          _lesson = lesson;
+          _streak = streak;
+          _completed = completed;
+          _loading = false;
+        });
+      }
+    } catch (e, st) {
+      if (mounted) {
+        ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Learn Load Failure');
+        setState(() => _loading = false);
+      }
     }
   }
 
