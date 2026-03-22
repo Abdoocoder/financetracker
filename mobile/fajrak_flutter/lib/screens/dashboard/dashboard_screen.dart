@@ -107,8 +107,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       String stage = 'awareness';
       if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
         stage = 'debt';
-      } else if (totalDebt == 0 && goalsSaved < income * 3) stage = 'emergency';
-      else if (invValue > 0) stage = 'investing';
+      } else if (totalDebt == 0 && goalsSaved < income * 3) {
+        stage = 'emergency';
+      } else if (invValue > 0) {
+        stage = 'investing';
+      }
 
       if (mounted) {
         setState(() {
