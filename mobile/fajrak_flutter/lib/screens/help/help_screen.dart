@@ -176,7 +176,7 @@ class _HelpScreenState extends State<HelpScreen> {
                           child: Icon(Icons.support_agent,
                               color: Color(0xFF3B7EF6)))),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

@@ -394,7 +394,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     color: colorScheme.surface,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(color: colorScheme.outlineVariant)),
-                                                            Text(
+                                child: Row(children: [
+                                  Icon(Icons.cake_outlined, color: colorScheme.onSurfaceVariant, size: 20),
+                                  const SizedBox(width: 12),
+                                  Text(
                                       _birthDate.isNotEmpty
                                           ? _birthDate
                                           : 'settings_birth_date'.tr(),
@@ -403,6 +406,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               ? colorScheme.onSurface
                                               : colorScheme.onSurfaceVariant,
                                           fontFamily: 'Cairo')),
+                                  const Spacer(),
+                                  Icon(Icons.calendar_today_outlined, color: colorScheme.onSurfaceVariant, size: 16),
                                 ]),
                               ),
                             ),
@@ -1040,6 +1045,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ]),
             childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             children: [child],
+          ),
         ),
       );
   }

@@ -326,7 +326,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             _field(notesCtrl, 'debts_notes_hint'.tr(), TextInputType.text),
             const SizedBox(height: 12),
             // Priority
-            const Align(
+            Align(
                 alignment: Alignment.centerRight,
                 child: Text('debts_priority'.tr(),
                     style: TextStyle(

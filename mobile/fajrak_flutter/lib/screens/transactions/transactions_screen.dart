@@ -628,7 +628,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   backgroundColor: colorScheme.surface,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colorScheme.outlineVariant)),
+                      side: BorderSide(color: colorScheme.outlineVariant)),
                 ),
               ),
             ],

@@ -149,7 +149,7 @@ class _MoreScreenState extends State<MoreScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: colorScheme.outlineVariant)),
+                          side: BorderSide(color: colorScheme.outlineVariant)),
                       elevation: 0,
                     ),
                     child: Row(
