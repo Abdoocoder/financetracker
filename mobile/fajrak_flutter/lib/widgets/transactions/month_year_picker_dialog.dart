@@ -47,7 +47,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
               Expanded(
                 child: DropdownButtonFormField<int>(
                   dropdownColor: const Color(0xFF1E293B),
-                  value: _selectedMonth,
+                  initialValue: _selectedMonth,
                   style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                   decoration: InputDecoration(
                       labelText: 'month'.tr(),
@@ -64,7 +64,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
               Expanded(
                 child: DropdownButtonFormField<int>(
                   dropdownColor: const Color(0xFF1E293B),
-                  value: _selectedYear,
+                  initialValue: _selectedYear,
                   style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                   decoration: InputDecoration(
                       labelText: 'year'.tr(),
