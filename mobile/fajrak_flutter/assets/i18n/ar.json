@@ -148,6 +148,11 @@
   "debts_auto_off": "معطل — يدوي فقط",
   "debts_progress": "التقدم الإجمالي",
   "debts_per_month": "/شهر",
+  "priority_very_high": "عاجل جداً",
+  "priority_high": "عالية",
+  "priority_medium": "متوسطة",
+  "priority_low": "منخفضة",
+  "priority_deferred": "مؤجل",
 
   "inv_title": "المحفظة",
   "inv_add": "إضافة",

@@ -32,13 +32,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   String _currency = 'JOD';
   double _totalPaidAmount = 0;
 
-  final List<String> _priorityLabels = [
-    'priority_very_high'.tr(),
-    'priority_high'.tr(),
-    'priority_medium'.tr(),
-    'priority_low'.tr(),
-    'priority_deferred'.tr()
-  ];
+  final List<String> _priorityLabels = [];
 
   @override
   void initState() {
@@ -127,18 +121,18 @@ class _DebtsScreenState extends State<DebtsScreen> {
     }
   }
 
-  void _showAddDialog({Map<String, dynamic>? existing}) {
+  void _showAddDialog({Map<String, dynamic>? existing, List<String>? labels}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => AddDebtDialog(
         existing: existing,
         onSaved: _load,
         priorityColors: _priorityColors,
-        priorityLabels: _priorityLabels,
+        priorityLabels: labels ?? _priorityLabels,
         baseCurrency: _currency,
       ),
     );
@@ -146,6 +140,17 @@ class _DebtsScreenState extends State<DebtsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+
+    final priorityLabels = [
+      'priority_very_high'.tr(),
+      'priority_high'.tr(),
+      'priority_medium'.tr(),
+      'priority_low'.tr(),
+      'priority_deferred'.tr(),
+    ];
+
     final totalRemaining = _debts.fold(
         0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
     final totalOriginal = _debts.fold(
@@ -154,15 +159,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
         0.0, (a, d) => a + (d['monthly_payment'] as num).toDouble());
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070B14),
-        title: Text('debts_title'.tr(),
-            style: const TextStyle(
-                fontFamily: 'Cairo',
-                fontWeight: FontWeight.w900,
-                color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text('debts_title'.tr()),
         actions: [
           IconButton(
               icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)),
@@ -202,13 +201,13 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                   fontSize: 15)),
                         ]))
                   else
-                    ..._debts.map((d) => DebtListItem(
+    ..._debts.map((d) => DebtListItem(
                           key: ValueKey(d['id']),
                           debt: d,
                           currency: _currency,
                           priorityColors: _priorityColors,
-                          priorityLabels: _priorityLabels,
-                          onEdit: (debt) => _showAddDialog(existing: debt),
+                          priorityLabels: priorityLabels,
+                          onEdit: (debt) => _showAddDialog(existing: debt, labels: priorityLabels),
                           onDelete: _deleteDebt,
                           onPaymentComplete: _load,
                           onCelebration: _showCelebration,
@@ -221,14 +220,14 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                            color: const Color(0xFF0F1629),
+                            color: cs.surface,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFF1E293B))),
+                            border: Border.all(color: cs.outlineVariant)),
                         child: Row(children: [
                           Expanded(
                               child: Text('debts_show_paid'.tr(),
-                                  style: const TextStyle(
-                                      color: Colors.white,
+                                  style: TextStyle(
+                                      color: cs.onSurface,
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700))),
                           Text('${_paidDebts.length}',

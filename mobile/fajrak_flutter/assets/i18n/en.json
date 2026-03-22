@@ -148,6 +148,11 @@
   "debts_auto_off": "Disabled — manual only",
   "debts_progress": "Overall Progress",
   "debts_per_month": "/mo",
+  "priority_very_high": "Urgent",
+  "priority_high": "High",
+  "priority_medium": "Medium",
+  "priority_low": "Low",
+  "priority_deferred": "Deferred",
 
   "inv_title": "Portfolio",
   "inv_add": "Add",

@@ -172,6 +172,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Padding(
       padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -184,14 +185,14 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: cs.outlineVariant,
                 borderRadius: BorderRadius.circular(2))),
         const SizedBox(height: 16),
         Text(widget.existing != null ? 'debts_edit'.tr() : 'debts_new'.tr(),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
+                color: cs.onSurface,
                 fontFamily: 'Cairo')),
         const SizedBox(height: 20),
         _field(_nameCtrl, 'debts_name_hint'.tr(), TextInputType.text),
@@ -203,12 +204,12 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(color: cs.outlineVariant, borderRadius: BorderRadius.circular(10)),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: _selectedCurrency,
-                dropdownColor: const Color(0xFF1E293B),
-                style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontSize: 13),
+                dropdownColor: cs.surface,
+                style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 13),
                 items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                 onChanged: (v) { if (v != null) { setState(() => _selectedCurrency = v); _fetchRate(); } },
               ),
@@ -267,7 +268,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: cs.outlineVariant,
                 borderRadius: BorderRadius.circular(10)),
             child: Row(children: [
               const Icon(Icons.calendar_today_outlined,
@@ -279,8 +280,8 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                     : 'debts_due_date_hint'.tr(),
                 style: TextStyle(
                     color: _dueDate.isNotEmpty
-                        ? Colors.white
-                        : const Color(0xFF64748B),
+                        ? cs.onSurface
+                        : cs.onSurfaceVariant,
                     fontFamily: 'Cairo',
                     fontSize: 13),
               ),
@@ -293,8 +294,8 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         Align(
             alignment: Alignment.centerRight,
             child: Text('debts_priority'.tr(),
-                style: const TextStyle(
-                    color: Color(0xFF94A3B8),
+                style: TextStyle(
+                    color: cs.onSurfaceVariant,
                     fontSize: 12,
                     fontFamily: 'Cairo'))),
         const SizedBox(height: 8),
@@ -311,7 +312,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                             color: _priority == i + 1
                                 ? widget.priorityColors[i]
                                     .withValues(alpha: 0.25)
-                                : const Color(0xFF1E293B),
+                                : cs.outlineVariant,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                                 color: _priority == i + 1
@@ -337,12 +338,12 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             decoration: BoxDecoration(
               color: _autoDeduct
                   ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                  : const Color(0xFF1E293B),
+                  : cs.outlineVariant,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                   color: _autoDeduct
                       ? const Color(0xFF10B981).withValues(alpha: 0.4)
-                      : const Color(0xFF334155)),
+                      : cs.outlineVariant),
             ),
             child: Row(children: [
               Icon(_autoDeduct ? Icons.toggle_on : Icons.toggle_off,
