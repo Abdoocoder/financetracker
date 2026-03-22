@@ -59,8 +59,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     final rate = await CurrencyService.fetchExchangeRate(_selectedCurrency, widget.baseCurrency);
     if (mounted && !_isRateManual) {
       setState(() {
-        _exchangeRate = rate;
-        _exchangeRateController.text = rate.toString();
+        _exchangeRate = rate ?? 1.0;
+        _exchangeRateController.text = (rate ?? 1.0).toString();
       });
     }
   }

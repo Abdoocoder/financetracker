@@ -75,7 +75,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     final rate = await CurrencyService.fetchExchangeRate(_selectedCurrency, widget.baseCurrency);
     if (mounted && !_isRateManual) {
       setState(() {
-        _exchangeRateCtrl.text = rate.toString();
+        _exchangeRateCtrl.text = (rate ?? 1.0).toString();
       });
     }
   }
