@@ -129,6 +129,9 @@ const translations = {
     trans_total_income:   'الدخل الكلي',
     trans_total_expenses: 'المصاريف الكلية',
     trans_total_net:      'الصافي',
+    trans_exchange_rate:  'سعر الصرف',
+    trans_equivalent:     'المعادل',
+    trans_currency:       'العملة',
 
     // Debts
     debts_title:          'إدارة الديون',
@@ -509,6 +512,9 @@ const translations = {
     trans_total_income:   'Total Income',
     trans_total_expenses: 'Total Expenses',
     trans_total_net:      'Net',
+    trans_exchange_rate:  'Exchange Rate',
+    trans_equivalent:     'Equivalent',
+    trans_currency:       'Currency',
 
     // Debts
     debts_title:          'Debt Manager',

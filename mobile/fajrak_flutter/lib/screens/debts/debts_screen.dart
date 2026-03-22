@@ -139,6 +139,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         onSaved: _load,
         priorityColors: _priorityColors,
         priorityLabels: _priorityLabels,
+        baseCurrency: _currency,
       ),
     );
   }

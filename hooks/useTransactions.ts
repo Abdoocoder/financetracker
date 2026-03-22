@@ -5,6 +5,7 @@ import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
 import { clearUserCache } from '@/lib/cache'
+import { fetchExchangeRate } from '@/lib/currency'
 import type { Transaction } from '@/types'
 
 const PAGE_SIZE = 20
@@ -14,6 +15,9 @@ export type TransactionFilter = 'all' | 'income' | 'expense'
 export interface TransactionForm {
   type: string
   amount: string
+  original_amount: string
+  original_currency: string
+  exchange_rate: string
   category: string
   description: string
   transaction_date: string
@@ -25,6 +29,9 @@ export interface TransactionForm {
 const DEFAULT_FORM: TransactionForm = {
   type: 'expense',
   amount: '',
+  original_amount: '',
+  original_currency: '', // سيتم تعبئتها من ملف المستخدم
+  exchange_rate: '1',
   category: '',
   description: '',
   transaction_date: new Date().toISOString().split('T')[0],
@@ -53,9 +60,33 @@ export function useTransactions() {
   const [filterYear, setFilterYear] = useState(now.getFullYear())
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
 
-  const { user: currentUser } = useUser()
+  const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
   const supabase = createClient()
+
+  // جلب سعر الصرف تلقائياً
+  useEffect(() => {
+    async function getRate() {
+      if (!profile?.currency || !form.original_currency) return
+      if (form.original_currency === profile.currency) {
+        setForm(f => ({ ...f, exchange_rate: '1' }))
+        return
+      }
+      const rate = await fetchExchangeRate(form.original_currency, profile.currency)
+      if (rate) {
+        setForm(f => ({ ...f, exchange_rate: rate.toString() }))
+      }
+    }
+    getRate()
+  }, [form.original_currency, profile?.currency])
+
+  // تحديث المبلغ المعادل (Amount) تلقائياً
+  useEffect(() => {
+    const orig = parseFloat(form.original_amount.replace(",", ".")) || 0
+    const rate = parseFloat(form.exchange_rate.replace(",", ".")) || 1
+    const baseAmount = (orig * rate).toFixed(2)
+    setForm(f => ({ ...f, amount: baseAmount }))
+  }, [form.original_amount, form.exchange_rate])
 
   const load = useCallback(async () => {
     const user = currentUser
@@ -75,7 +106,10 @@ export function useTransactions() {
 
   function openAdd() {
     setEditingId(null)
-    setForm(DEFAULT_FORM)
+    setForm({
+      ...DEFAULT_FORM,
+      original_currency: profile?.currency || 'JOD',
+    })
     setShowForm(true)
   }
 
@@ -84,6 +118,9 @@ export function useTransactions() {
     setForm({
       type: tx.type,
       amount: tx.amount.toString(),
+      original_amount: (tx.original_amount || tx.amount).toString(),
+      original_currency: tx.original_currency || profile?.currency || 'JOD',
+      exchange_rate: (tx.exchange_rate || 1).toString(),
       category: tx.category ?? '',
       description: tx.description ?? '',
       transaction_date: tx.transaction_date,
@@ -111,7 +148,11 @@ export function useTransactions() {
     if (!user) return
     if (editingId) {
       const { error } = await supabase.from('transactions').update({
-        type: form.type, amount: parseFloat(form.amount),
+        type: form.type, 
+        amount: parseFloat(form.amount.replace(",", ".")),
+        original_amount: parseFloat(form.original_amount.replace(",", ".")),
+        original_currency: form.original_currency,
+        exchange_rate: parseFloat(form.exchange_rate.replace(",", ".")),
         category: form.category, description: form.description,
         transaction_date: form.transaction_date,
       }).eq('id', editingId)
@@ -119,7 +160,11 @@ export function useTransactions() {
       toast.success(t('toast_edited'))
     } else {
       const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: form.type, amount: parseFloat(form.amount),
+        user_id: user.id, type: form.type, 
+        amount: parseFloat(form.amount.replace(",", ".")),
+        original_amount: parseFloat(form.original_amount.replace(",", ".")),
+        original_currency: form.original_currency,
+        exchange_rate: parseFloat(form.exchange_rate.replace(",", ".")),
         category: form.category, description: form.description,
         transaction_date: form.transaction_date,
       })

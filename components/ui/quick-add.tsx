@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 
 const CATEGORIES_AR = [
   { key: 'food', label: 'طعام', labelEn: 'Food', icon: '🍔', type: 'expense' },
@@ -23,9 +24,32 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const supabase = createClient()
   const [selected, setSelected] = useState<typeof CATEGORIES_AR[0] | null>(null)
   const [amount, setAmount] = useState('')
+  const [currency, setCurrency] = useState('')
+  const [exchangeRate, setExchangeRate] = useState(1)
   const [saving, setSaving] = useState(false)
-  const [lastTx, setLastTx] = useState<{ category: string; amount: number; type: string } | null>(null)
+  const [lastTx, setLastTx] = useState<{ category: string; amount: number; type: string; original_amount?: number; original_currency?: string; exchange_rate?: number } | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
+
+  const { profile } = useUser()
+  const baseCurrency = profile?.currency || 'JOD'
+
+  useEffect(() => {
+    if (!currency && baseCurrency) setCurrency(baseCurrency)
+  }, [baseCurrency, currency])
+
+  // جلب سعر الصرف تلقائياً
+  useEffect(() => {
+    async function getRate() {
+      if (!currency || !baseCurrency) return
+      if (currency === baseCurrency) {
+        setExchangeRate(1)
+        return
+      }
+      const rate = await fetchExchangeRate(currency, baseCurrency)
+      if (rate) setExchangeRate(rate)
+    }
+    getRate()
+  }, [currency, baseCurrency])
 
   // جلب آخر معاملة
   useEffect(() => {
@@ -47,10 +71,16 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
     if (!selected || !amount) return
     setSaving(true)
     if (!user) { setSaving(false); return }
+    const numAmount = parseFloat(amount.replace(",", "."))
+    const baseAmount = numAmount * exchangeRate
+
     await supabase.from('transactions').insert({
       user_id: user.id,
       type: selected.type,
-      amount: parseFloat(amount.replace(",", ".")),
+      amount: baseAmount,
+      original_amount: numAmount,
+      original_currency: currency,
+      exchange_rate: exchangeRate,
       category: selected.label,
       description: null,
       transaction_date: new Date().toISOString().split('T')[0],
@@ -73,6 +103,9 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       user_id: user.id,
       type: lastTx.type,
       amount: lastTx.amount,
+      original_amount: lastTx.original_amount || lastTx.amount,
+      original_currency: lastTx.original_currency || baseCurrency,
+      exchange_rate: lastTx.exchange_rate || 1,
       category: lastTx.category,
       description: lang === 'en' ? 'Repeat' : 'تكرار',
       transaction_date: new Date().toISOString().split('T')[0],
@@ -122,36 +155,56 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
 
       {/* Amount input */}
       {selected && (
-        <div style={{ display: 'flex', gap: 8, animation: 'fadeSlideIn 0.2s ease' }}>
-          <input
-            type="number"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            placeholder={lang === "en" ? "Amount..." : "المبلغ..."}
-            autoFocus
-            onKeyDown={e => e.key === 'Enter' && save()}
-            style={{
-              flex: 1, padding: '12px 14px', borderRadius: 12,
-              border: '1px solid var(--accent-blue)',
-              background: 'var(--bg-secondary)', color: 'var(--text-primary)',
-              fontSize: 16, outline: 'none', fontFamily: 'inherit',
-              textAlign: 'center', fontWeight: 700,
-            }}
-          />
-          <button
-            onClick={save}
-            disabled={saving || !amount}
-            style={{
-              padding: '12px 20px', borderRadius: 12, border: 'none',
-              background: selected.type === 'income' ? 'var(--accent-green)' : 'var(--accent-blue)',
-              color: 'white', fontSize: 14, fontWeight: 700,
-              cursor: saving || !amount ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit', opacity: saving || !amount ? 0.5 : 1,
-              transition: 'opacity 0.15s',
-            }}
-          >
-            {saving ? '⏳' : (lang === 'en' ? '+ Save' : '+ حفظ')}
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, animation: 'fadeSlideIn 0.2s ease' }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="number"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              placeholder={lang === "en" ? "Amount..." : "المبلغ..."}
+              autoFocus
+              onKeyDown={e => e.key === 'Enter' && save()}
+              style={{
+                flex: 1, padding: '12px 14px', borderRadius: 12,
+                border: '1px solid var(--accent-blue)',
+                background: 'var(--bg-secondary)', color: 'var(--text-primary)',
+                fontSize: 16, outline: 'none', fontFamily: 'inherit',
+                textAlign: 'center', fontWeight: 700,
+              }}
+            />
+            <select
+              value={currency}
+              onChange={e => setCurrency(e.target.value)}
+              style={{
+                padding: '0 10px', borderRadius: 12, border: '1px solid var(--border)',
+                background: 'var(--bg-secondary)', color: 'var(--text-primary)',
+                fontSize: 14, fontWeight: 700, fontFamily: 'inherit', outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
+            </select>
+            <button
+              onClick={save}
+              disabled={saving || !amount}
+              style={{
+                padding: '12px 20px', borderRadius: 12, border: 'none',
+                background: selected.type === 'income' ? 'var(--accent-green)' : 'var(--accent-blue)',
+                color: 'white', fontSize: 14, fontWeight: 700,
+                cursor: saving || !amount ? 'not-allowed' : 'pointer',
+                fontFamily: 'inherit', opacity: saving || !amount ? 0.5 : 1,
+                transition: 'opacity 0.15s',
+              }}
+            >
+              {saving ? '⏳' : (lang === 'en' ? '+ Save' : '+ حفظ')}
+            </button>
+          </div>
+          {currency !== baseCurrency && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 4px', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
+              <span>Rate: {exchangeRate.toFixed(4)}</span>
+              <span>≈ {(parseFloat(amount) * exchangeRate || 0).toFixed(2)} {baseCurrency}</span>
+            </div>
+          )}
         </div>
       )}
 

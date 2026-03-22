@@ -224,6 +224,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       builder: (ctx) => AddTransactionDialog(
         existing: existing,
         onSaved: () => _load(reset: true),
+        baseCurrency: _currency,
       ),
     );
   }

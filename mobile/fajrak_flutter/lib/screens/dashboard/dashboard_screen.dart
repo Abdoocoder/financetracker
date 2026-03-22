@@ -16,6 +16,7 @@ import '../../widgets/dashboard/dashboard_health_score.dart';
 import '../../widgets/dashboard/dashboard_quick_add.dart';
 import '../../widgets/dashboard/dashboard_stage_card.dart';
 import '../../widgets/dashboard/recent_transactions_list.dart';
+import '../../services/currency_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -135,14 +136,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _quickAdd(String type, double amount, String category) async {
+  Future<void> _quickAdd(String type, double amount, String category, {double? originalAmount, String? originalCurrency, double? exchangeRate}) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
     HapticFeedback.mediumImpact();
     try {
       await Supabase.instance.client.from('transactions').insert({
-        'user_id': user.id, 'type': type, 'amount': amount,
-        'category': category, 'description': category,
+        'user_id': user.id, 
+        'type': type, 
+        'amount': amount,
+        'original_amount': originalAmount ?? amount,
+        'original_currency': originalCurrency ?? _currency,
+        'exchange_rate': exchangeRate ?? 1.0,
+        'category': category, 
+        'description': category,
         'transaction_date': DateTime.now().toIso8601String().split('T')[0],
       });
       await _load();

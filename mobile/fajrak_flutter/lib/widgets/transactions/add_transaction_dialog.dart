@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../services/currency_service.dart';
 
 class AddTransactionDialog extends StatefulWidget {
   final Map<String, dynamic>? existing;
   final VoidCallback onSaved;
+  final String baseCurrency;
 
   const AddTransactionDialog({
     super.key,
     this.existing,
     required this.onSaved,
+    this.baseCurrency = 'JOD',
   });
 
   @override
@@ -22,6 +23,11 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   late final TextEditingController _descController;
   late final TextEditingController _catController;
   late final ValueNotifier<DateTime> _dateController;
+  
+  String _selectedCurrency = '';
+  double _exchangeRate = 1.0;
+  final _exchangeRateController = TextEditingController(text: '1.0');
+  bool _isRateManual = false;
 
   @override
   void initState() {
@@ -33,6 +39,30 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _dateController = ValueNotifier<DateTime>(widget.existing != null
         ? DateTime.parse(widget.existing!['transaction_date'])
         : DateTime.now());
+    
+    _selectedCurrency = widget.existing?['original_currency'] ?? widget.baseCurrency;
+    _exchangeRate = (widget.existing?['exchange_rate'] as num?)?.toDouble() ?? 1.0;
+    _exchangeRateController.text = _exchangeRate.toString();
+    if (_selectedCurrency != widget.baseCurrency && widget.existing == null) {
+      _fetchRate();
+    }
+  }
+
+  Future<void> _fetchRate() async {
+    if (_selectedCurrency == widget.baseCurrency) {
+      setState(() {
+        _exchangeRate = 1.0;
+        _exchangeRateController.text = '1.0';
+      });
+      return;
+    }
+    final rate = await CurrencyService.fetchExchangeRate(_selectedCurrency, widget.baseCurrency);
+    if (mounted && !_isRateManual) {
+      setState(() {
+        _exchangeRate = rate;
+        _exchangeRateController.text = rate.toString();
+      });
+    }
   }
 
   @override
@@ -47,10 +77,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   Future<void> _save() async {
     final user = Supabase.instance.client.auth.currentUser!;
+    final origAmount = double.tryParse(_amountController.text) ?? 0;
+    final rate = double.tryParse(_exchangeRateController.text) ?? 1.0;
+    final baseAmount = _selectedCurrency == widget.baseCurrency ? origAmount : (origAmount * rate);
+
     final data = {
       'user_id': user.id,
       'type': _typeController.value,
-      'amount': double.tryParse(_amountController.text) ?? 0,
+      'amount': baseAmount,
+      'original_amount': origAmount,
+      'original_currency': _selectedCurrency,
+      'exchange_rate': rate,
       'category': _catController.text,
       'description': _descController.text.isEmpty ? null : _descController.text,
       'transaction_date': _dateController.value.toIso8601String().split('T')[0],
@@ -181,13 +218,90 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _amountController,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-            decoration: InputDecoration(labelText: 'trans_amount'.tr()),
+          Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: TextFormField(
+                  controller: _amountController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                  decoration: InputDecoration(labelText: 'trans_amount'.tr()),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedCurrency,
+                      dropdownColor: const Color(0xFF1E293B),
+                      style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                      items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                      onChanged: (v) {
+                        if (v != null) {
+                          setState(() => _selectedCurrency = v);
+                          _fetchRate();
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+          if (_selectedCurrency != widget.baseCurrency) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF334155), width: 1),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _exchangeRateController,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo'),
+                          decoration: InputDecoration(
+                            labelText: 'trans_exchange_rate'.tr(),
+                            labelStyle: const TextStyle(fontSize: 12),
+                            isDense: true,
+                          ),
+                          onChanged: (v) => _isRateManual = true,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('trans_equivalent'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${((double.tryParse(_amountController.text) ?? 0) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
+                              style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           TextFormField(
             controller: _catController,

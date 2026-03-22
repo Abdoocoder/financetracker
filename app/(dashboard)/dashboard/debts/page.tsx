@@ -16,6 +16,7 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { clearUserCache } from '@/lib/cache'
 import { haptic } from '@/lib/haptic'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
@@ -93,14 +94,28 @@ export default function DebtsPage() {
   const [paidDebts, setPaidDebts] = useState<any[]>([])
   const [showPaid, setShowPaid] = useState(false)
   const [totalPaidAmount, setTotalPaidAmount] = useState(0)
-  const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false, received_amount: false })
+  const [form, setForm] = useState({ 
+    name: '', 
+    original_amount: '', 
+    original_amount_foreign: '',
+    remaining_amount: '', 
+    monthly_payment: '', 
+    due_date: '', 
+    priority: '3', 
+    notes: '', 
+    payment_day: '1', 
+    auto_deduct: false, 
+    received_amount: false,
+    currency: '',
+    exchange_rate: '1'
+  })
   const [saving, setSaving] = useState(false)
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null)
   const [paymentAmount, setPaymentAmount] = useState('')
+  const [paymentCurrency, setPaymentCurrency] = useState('')
   const [payingSaving, setPayingSaving] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
   const [celebration, setCelebration] = useState<string | null>(null)
@@ -109,15 +124,34 @@ export default function DebtsPage() {
   const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load(true) })
 
+  const { user: currentUser, profile } = useUser()
+  const baseCurrency = profile?.currency || 'JOD'
+
+  useEffect(() => {
+    if (!form.currency && baseCurrency) setForm(f => ({ ...f, currency: baseCurrency }))
+  }, [baseCurrency, form.currency])
+
+  // جلب سعر الصرف تلقائياً للنموذج
+  useEffect(() => {
+    async function getRate() {
+      if (!form.currency || !baseCurrency || form.currency === baseCurrency) {
+        setForm(f => ({ ...f, exchange_rate: '1' }))
+        return
+      }
+      const rate = await fetchExchangeRate(form.currency, baseCurrency)
+      if (rate) setForm(f => ({ ...f, exchange_rate: rate.toString() }))
+    }
+    getRate()
+  }, [form.currency, baseCurrency])
+
   const load = useCallback(async (silent = false) => {
-    const user = currentUser
-    if (!user) return
+    if (!currentUser) return
     if (!silent) setLoading(true)
     // الديون النشطة
-    const { data: active } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority')
+    const { data: active } = await supabase.from('debts').select('*').eq('user_id', currentUser.id).eq('is_paid', false).order('priority')
     setDebts(active ?? [])
     // الديون المسددة
-    const { data: paid } = await supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', true).order('updated_at', { ascending: false })
+    const { data: paid } = await supabase.from('debts').select('*').eq('user_id', currentUser.id).eq('is_paid', true).order('updated_at', { ascending: false })
     setPaidDebts(paid ?? [])
     // إجمالي المبالغ المسددة
     const total = (paid ?? []).reduce((a, d) => a + Number(d.original_amount), 0)
@@ -129,33 +163,88 @@ export default function DebtsPage() {
 
   function openAdd() {
     setEditingId(null)
-    setForm({ name: '', original_amount: '', remaining_amount: '', monthly_payment: '', due_date: '', priority: '3', notes: '', payment_day: '1', auto_deduct: false, received_amount: false })
+    setForm({ 
+      name: '', 
+      original_amount: '', 
+      original_amount_foreign: '',
+      remaining_amount: '', 
+      monthly_payment: '', 
+      due_date: '', 
+      priority: '3', 
+      notes: '', 
+      payment_day: '1', 
+      auto_deduct: false, 
+      received_amount: false,
+      currency: baseCurrency,
+      exchange_rate: '1'
+    })
     setShowForm(true)
   }
 
   function startEdit(d: any) {
     setEditingId(d.id)
-    setForm({ name: d.name, original_amount: d.original_amount.toString(), remaining_amount: d.remaining_amount.toString(), monthly_payment: d.monthly_payment?.toString() ?? '', due_date: d.due_date ?? '', priority: d.priority.toString(), notes: d.notes ?? '', payment_day: d.payment_day?.toString() ?? '1', auto_deduct: d.auto_deduct ?? false, received_amount: false })
+    setForm({ 
+      name: d.name, 
+      original_amount: d.original_amount.toString(), 
+      original_amount_foreign: (d.original_amount_foreign || d.original_amount).toString(),
+      remaining_amount: d.remaining_amount.toString(), 
+      monthly_payment: d.monthly_payment?.toString() ?? '', 
+      due_date: d.due_date ?? '', 
+      priority: d.priority.toString(), 
+      notes: d.notes ?? '', 
+      payment_day: d.payment_day?.toString() ?? '1', 
+      auto_deduct: d.auto_deduct ?? false, 
+      received_amount: false,
+      currency: d.currency || baseCurrency,
+      exchange_rate: '1'
+    })
     setShowForm(true)
   }
 
   async function saveDebt() {
-    if (!form.name || !form.original_amount) { toast.warning(t('toast_fill_required')); return }
+    if (!form.name || (!form.original_amount && !form.original_amount_foreign)) { toast.warning(t('toast_fill_required')); return }
     setSaving(true)
-    const user = currentUser
-    if (!user) return
+    if (!currentUser) return
+
+    const isMulti = form.currency !== baseCurrency
+    const origForeign = parseFloat(form.original_amount_foreign.replace(",", ".")) || 0
+    const rate = parseFloat(form.exchange_rate) || 1
+    const origBase = isMulti ? (origForeign * rate) : parseFloat(form.original_amount.replace(",", "."))
+
     if (editingId) {
-      const { error } = await supabase.from('debts').update({ name: form.name, original_amount: parseFloat(form.original_amount.replace(",", ".")), remaining_amount: parseFloat(form.remaining_amount.replace(",", ".")), monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct }).eq('id', editingId)
+      const { error } = await supabase.from('debts').update({ 
+        name: form.name, 
+        original_amount: origBase,
+        original_amount_foreign: isMulti ? origForeign : origBase,
+        remaining_amount: isMulti ? (origForeign * rate) : parseFloat(form.remaining_amount.replace(",", ".")), 
+        remaining_amount_foreign: isMulti ? origForeign : origBase,
+        currency: form.currency,
+        monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, 
+        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct 
+      }).eq('id', editingId)
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_edited'))
     } else {
-      const { error } = await supabase.from('debts').insert({ user_id: user.id, name: form.name, original_amount: parseFloat(form.original_amount.replace(",", ".")), remaining_amount: parseFloat(form.original_amount.replace(",", ".")), monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct })
+      const { error } = await supabase.from('debts').insert({ 
+        user_id: currentUser.id, 
+        name: form.name, 
+        original_amount: origBase,
+        original_amount_foreign: isMulti ? origForeign : origBase,
+        remaining_amount: origBase,
+        remaining_amount_foreign: isMulti ? origForeign : origBase,
+        currency: form.currency,
+        monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, 
+        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct 
+      })
       // إضافة معاملة دخل إذا استلم المبلغ
       if (!error && form.received_amount) {
         await supabase.from('transactions').insert({
-          user_id: user.id,
+          user_id: currentUser.id,
           type: 'income',
-          amount: parseFloat(form.original_amount.replace(",", ".")),
+          amount: origBase,
+          original_amount: isMulti ? origForeign : origBase,
+          original_currency: form.currency,
+          exchange_rate: rate,
           category: lang === 'ar' ? 'قرض مستلم' : 'Loan Received',
           description: lang === 'ar' ? `قرض مستلم: ${form.name}` : `Loan Received: ${form.name}`,
           transaction_date: new Date().toISOString().split('T')[0],
@@ -174,36 +263,68 @@ export default function DebtsPage() {
   }
 
   async function makePayment(debtId: string) {
-    const amount = parseFloat(paymentAmount)
-    if (!amount || amount <= 0) { toast.warning(t('toast_fill_required')); return }
+    const payAmount = parseFloat(paymentAmount)
+    if (!payAmount || payAmount <= 0) { toast.warning(t('toast_fill_required')); return }
     setPayingSaving(true)
-    const user = currentUser
-    if (!user) return
+    if (!currentUser) return
     const debt = debts.find(d => d.id === debtId)
     if (!debt) return
-    const newRemaining = Math.max(0, debt.remaining_amount - amount)
-    await supabase.from('debt_payments').insert({ debt_id: debtId, user_id: user.id, amount, payment_date: new Date().toISOString().split('T')[0] })
+
+    // جلب سعر الصرف إذا كانت عملة الدفع مختلفة عن عملة الدين
+    let rateToDebtCurrency = 1
+    let rateToBaseCurrency = 1
+    const debtCurrency = debt.currency || baseCurrency
+
+    if (paymentCurrency !== debtCurrency) {
+      const rate = await fetchExchangeRate(paymentCurrency, debtCurrency)
+      if (rate) rateToDebtCurrency = rate
+    }
+    if (paymentCurrency !== baseCurrency) {
+      const rate = await fetchExchangeRate(paymentCurrency, baseCurrency)
+      if (rate) rateToBaseCurrency = rate
+    }
+
+    const amountInDebtCurrency = payAmount * rateToDebtCurrency
+    const amountInBaseCurrency = payAmount * rateToBaseCurrency
+
+    const newRemainingForeign = Math.max(0, (debt.remaining_amount_foreign || debt.remaining_amount) - amountInDebtCurrency)
+    const newRemainingBase = Math.max(0, debt.remaining_amount - amountInBaseCurrency)
+
+    await supabase.from('debt_payments').insert({ 
+      debt_id: debtId, 
+      user_id: currentUser.id, 
+      amount: amountInBaseCurrency, 
+      original_amount: payAmount,
+      original_currency: paymentCurrency,
+      exchange_rate: rateToBaseCurrency,
+      payment_date: new Date().toISOString().split('T')[0] 
+    })
 
     // تعليم تنبيه الدين كمقروء تلقائياً
     const paidDebt = debts.find(d => d.id === debtId)
     if (paidDebt) {
       await supabase.from('alerts')
         .update({ is_read: true })
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .eq('is_read', false)
         .ilike('title', `%${paidDebt.name}%`)
     }
-    await supabase.from('debts').update({ remaining_amount: newRemaining, is_paid: newRemaining === 0 }).eq('id', debtId)
-    if (newRemaining === 0) {
+    await supabase.from('debts').update({ 
+      remaining_amount: newRemainingBase, 
+      remaining_amount_foreign: newRemainingForeign,
+      is_paid: newRemainingBase <= 0.01 
+    }).eq('id', debtId)
+    
+    if (newRemainingBase <= 0.01) {
       // ── احتفال ──
       setCelebration(debt.name)
       setShowConfetti(true)
       haptic(200)
-      clearUserCache(user.id)
+      clearUserCache(currentUser.id)
     } else {
-      toast.success(`${t('toast_payment_done')} ${amount} JOD`)
+      toast.success(`${t('toast_payment_done')} ${payAmount} ${paymentCurrency}`)
     }
-    setPaymentDebtId(null); setPaymentAmount(''); setPayingSaving(false); load()
+    setPaymentDebtId(null); setPaymentAmount(''); setPaymentCurrency(''); setPayingSaving(false); load()
   }
 
   const totalRemaining = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
@@ -297,8 +418,12 @@ export default function DebtsPage() {
                   </div>
                   <div style={{ textAlign: 'left', flexShrink: 0 }}>
                     <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace' }}>
-                      {Number(debt.remaining_amount).toFixed(0)}<span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 2 }}> JOD</span>
+                      {Number(debt.remaining_amount_foreign || debt.remaining_amount).toFixed(0)}
+                      <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 2 }}> {debt.currency || baseCurrency}</span>
                     </div>
+                    {debt.currency && debt.currency !== baseCurrency && (
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>≈ {Number(debt.remaining_amount).toFixed(0)} {baseCurrency}</div>
+                    )}
                     {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}/شهر</div>}
                   </div>
                   <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
@@ -313,14 +438,21 @@ export default function DebtsPage() {
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{pct.toFixed(0)}% مسدد</span>
                   {paymentDebtId === debt.id ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <select 
+                        value={paymentCurrency || debt.currency || baseCurrency} 
+                        onChange={e => setPaymentCurrency(e.target.value)}
+                        style={{ padding: '6px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 11, fontFamily: 'inherit', outline: 'none' }}
+                      >
+                        {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
+                      </select>
                       <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)}
                         placeholder={lang === "en" ? "Amount" : "المبلغ"} autoFocus onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)}
-                        style={{ width: 90, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }} />
+                        style={{ width: 70, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }} />
                       <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
                         style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
-                        {payingSaving ? '⏳' : (lang === 'en' ? '✓ Pay' : '✓ دفع')}
+                        {payingSaving ? '⏳' : (lang === 'en' ? '✓' : '✓')}
                       </button>
-                      <button onClick={() => { setPaymentDebtId(null); setPaymentAmount('') }}
+                      <button onClick={() => { setPaymentDebtId(null); setPaymentAmount(''); setPaymentCurrency('') }}
                         style={{ padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
                     </div>
                   ) : (
@@ -382,12 +514,32 @@ export default function DebtsPage() {
             <Input placeholder={lang === "en" ? "e.g. Visa Card" : "مثال: بطاقة Visa"} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label={t('debts_original')}>
-              <Input type="number" placeholder="0" value={form.original_amount} onChange={e => setForm(f => ({ ...f, original_amount: e.target.value }))} />
+            <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
+              <Input type="number" placeholder="0" value={form.currency === baseCurrency ? form.original_amount : form.original_amount_foreign} onChange={e => form.currency === baseCurrency ? setForm(f => ({ ...f, original_amount: e.target.value })) : setForm(f => ({ ...f, original_amount_foreign: e.target.value }))} />
             </FormField>
-            <FormField label={t('debts_remaining')}>
-              <Input type="number" placeholder="0" value={form.remaining_amount} onChange={e => setForm(f => ({ ...f, remaining_amount: e.target.value }))} />
+            <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
+              <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+                {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
+              </Select>
             </FormField>
+          </div>
+
+          {form.currency !== baseCurrency && (
+            <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 12, marginBottom: 12, border: '1px dashed var(--border)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                <FormField label={t('trans_exchange_rate') || 'سعر الصرف'}>
+                   <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => setForm(f => ({ ...f, exchange_rate: e.target.value }))} />
+                </FormField>
+                <FormField label="المعادل">
+                   <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, textAlign: 'center', fontSize: 13 }}>
+                     {(parseFloat(form.original_amount_foreign) * parseFloat(form.exchange_rate) || 0).toFixed(2)} {baseCurrency}
+                   </div>
+                </FormField>
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={t('debts_monthly')}>
               <Input type="number" placeholder="0" value={form.monthly_payment} onChange={e => setForm(f => ({ ...f, monthly_payment: e.target.value }))} />
             </FormField>

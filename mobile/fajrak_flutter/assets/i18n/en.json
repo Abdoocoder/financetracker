@@ -93,6 +93,8 @@
   "trans_total_income": "Total Income",
   "trans_total_expenses": "Total Expenses",
   "trans_total_net": "Net",
+  "trans_exchange_rate": "Exchange Rate",
+  "trans_equivalent": "Equivalent",
   "trans_count": "{} transactions",
 
   "debts_title": "Debts",

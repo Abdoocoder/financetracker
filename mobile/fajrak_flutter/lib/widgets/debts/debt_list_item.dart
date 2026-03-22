@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
+import '../../services/currency_service.dart';
 
 class DebtListItem extends StatefulWidget {
   final Map<String, dynamic> debt;
@@ -32,6 +33,24 @@ class _DebtListItemState extends State<DebtListItem> {
   bool _isPaying = false;
   bool _payingSaving = false;
   final _paymentCtrl = TextEditingController();
+  
+  String _paymentCurrency = '';
+  double _paymentExchangeRate = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _paymentCurrency = widget.currency;
+  }
+
+  Future<void> _updatePaymentRate() async {
+    if (_paymentCurrency == widget.currency) {
+      if (mounted) setState(() => _paymentExchangeRate = 1.0);
+      return;
+    }
+    final rate = await CurrencyService.fetchExchangeRate(_paymentCurrency, widget.currency);
+    if (mounted) setState(() => _paymentExchangeRate = rate);
+  }
 
   @override
   void dispose() {
@@ -45,14 +64,45 @@ class _DebtListItemState extends State<DebtListItem> {
     setState(() => _payingSaving = true);
     
     try {
-      final newRemaining = ((widget.debt['remaining_amount'] as num).toDouble() - amount)
-          .clamp(0.0, double.infinity);
+      final user = Supabase.instance.client.auth.currentUser!;
+      final amountInBaseCurrency = _paymentCurrency == widget.currency ? amount : (amount * _paymentExchangeRate);
+      
+      final currentRemaining = (widget.debt['remaining_amount'] as num).toDouble();
+      final newRemaining = (currentRemaining - amountInBaseCurrency).clamp(0.0, double.infinity);
           
+      // 1. Update Debt
       await Supabase.instance.client.from('debts').update({
         'remaining_amount': newRemaining,
+        'remaining_amount_foreign': _paymentCurrency == widget.debt['currency'] 
+            ? ((widget.debt['remaining_amount_foreign'] as num?)?.toDouble() ?? currentRemaining) - amount
+            : null, // Reset if currency doesn't match or re-calculate
         'is_paid': newRemaining == 0,
       }).eq('id', widget.debt['id']);
       
+      // 2. Insert Debt Payment
+      await Supabase.instance.client.from('debt_payments').insert({
+        'debt_id': widget.debt['id'],
+        'user_id': user.id,
+        'amount': amountInBaseCurrency,
+        'original_amount': amount,
+        'original_currency': _paymentCurrency,
+        'exchange_rate': _paymentExchangeRate,
+        'payment_date': DateTime.now().toIso8601String(),
+      });
+
+      // 3. Insert Transaction
+      await Supabase.instance.client.from('transactions').insert({
+        'user_id': user.id,
+        'type': 'expense',
+        'amount': amountInBaseCurrency,
+        'original_amount': amount,
+        'original_currency': _paymentCurrency,
+        'exchange_rate': _paymentExchangeRate,
+        'category': 'debts_title'.tr(),
+        'description': '${'debts_paid'.tr()}: ${widget.debt['name']}',
+        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+      });
+
       _paymentCtrl.clear();
       setState(() {
         _payingSaving = false;
@@ -222,62 +272,69 @@ class _DebtListItemState extends State<DebtListItem> {
         
         // Payment row
         if (_isPaying)
-          Row(children: [
-            Expanded(
-                child: TextField(
-              controller: _paymentCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 13, fontFamily: 'Cairo'),
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                  hintText: 'المبلغ',
-                  hintStyle: const TextStyle(color: Color(0xFF64748B)),
-                  filled: true,
-                  fillColor: const Color(0xFF1E293B),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-              autofocus: true,
-            )),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: _payingSaving ? null : _makePayment,
-              child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFF10B981),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Text(_payingSaving ? '⏳' : '✓ دفع',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Cairo'))),
-            ),
-            const SizedBox(width: 6),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isPaying = false;
-                  _paymentCtrl.clear();
-                });
-              },
-              child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: const Text('✕',
-                      style:
-                          TextStyle(color: Color(0xFF94A3B8), fontSize: 12))),
-            ),
-          ])
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Expanded(
+                  flex: 3,
+                  child: TextField(
+                    controller: _paymentCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo'),
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                        hintText: 'trans_amount'.tr(),
+                        hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                        filled: true,
+                        fillColor: const Color(0xFF1E293B),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                    autofocus: true,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(8)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _paymentCurrency,
+                      dropdownColor: const Color(0xFF1E293B),
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                      onChanged: (v) { if (v != null) { setState(() => _paymentCurrency = v); _updatePaymentRate(); } },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _payingSaving ? null : _makePayment,
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(8)),
+                      child: Text(_payingSaving ? '⏳' : '✓',
+                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Cairo'))),
+                ),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: () { setState(() { _isPaying = false; _paymentCtrl.clear(); }); },
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(8)),
+                      child: const Text('✕', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13))),
+                ),
+              ]),
+              if (_paymentCurrency != widget.currency)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 4),
+                  child: Text(
+                    'Rate: ${_paymentExchangeRate.toStringAsFixed(4)} | ≈ ${((double.tryParse(_paymentCtrl.text) ?? 0) * _paymentExchangeRate).toStringAsFixed(2)} ${widget.currency}',
+                    style: TextStyle(color: const Color(0xFF94A3B8).withValues(alpha: 0.7), fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                  ),
+                ),
+            ],
+          )
         else
           Align(
             alignment: Alignment.centerLeft,
