@@ -107,37 +107,6 @@ class _MoreScreenState extends State<MoreScreen> {
                     title: 'nav_help'.tr(),
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpScreen())),
                     colorScheme: colorScheme),
-
-                const SizedBox(height: 16),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.surface,
-                      foregroundColor: colorScheme.onSurface,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(color: colorScheme.outlineVariant)),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.language, color: colorScheme.primary, size: 20),
-                        const SizedBox(width: 8),
-                        Text('English',
-                            style: TextStyle(
-                                fontFamily: 'Cairo',
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15,
-                                color: colorScheme.onSurface)),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
