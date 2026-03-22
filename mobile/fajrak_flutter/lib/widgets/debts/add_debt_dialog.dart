@@ -151,8 +151,9 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   }
 
   TextField _field(
-          TextEditingController ctrl, String hint, TextInputType type) =>
-      TextField(
+          TextEditingController ctrl, String hint, TextInputType type) {
+    final cs = Theme.of(context).colorScheme;
+    return TextField(
         controller: ctrl,
         keyboardType: type,
         textAlign: TextAlign.right,

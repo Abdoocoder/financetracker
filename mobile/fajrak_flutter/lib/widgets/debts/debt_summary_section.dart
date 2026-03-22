@@ -19,8 +19,7 @@ class DebtSummarySection extends StatelessWidget {
     required this.paidCount,
   });
 
-  @override
-  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final paidPct = totalOriginal > 0
         ? ((totalOriginal - totalRemaining) / totalOriginal * 100)
         : 0.0;
@@ -33,19 +32,22 @@ class DebtSummarySection extends StatelessWidget {
               child: _statCard(
                   'debts_total_remaining'.tr(),
                   '${totalRemaining.toStringAsFixed(0)} $currency',
-                  const Color(0xFFEF4444))),
+                  const Color(0xFFEF4444),
+                  cs)),
           const SizedBox(width: 8),
           Expanded(
               child: _statCard(
                   'debts_paid'.tr(),
                   '${paidPct.toStringAsFixed(0)}%',
-                  const Color(0xFF10B981))),
+                  const Color(0xFF10B981),
+                  cs)),
           const SizedBox(width: 8),
           Expanded(
               child: _statCard(
                   'debts_monthly_total'.tr(),
                   '${totalMonthly.toStringAsFixed(0)} $currency',
-                  const Color(0xFFF59E0B))),
+                  const Color(0xFFF59E0B),
+                  cs)),
         ]),
         const SizedBox(height: 12),
 
@@ -148,7 +150,7 @@ class DebtSummarySection extends StatelessWidget {
     );
   }
 
-  Widget _statCard(String label, String value, Color color) {
+  Widget _statCard(String label, String value, Color color, ColorScheme cs) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
