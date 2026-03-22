@@ -186,7 +186,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
       await Share.shareXFiles(
         [XFile(file.path, mimeType: 'text/csv')],
-        text: 'trans_title'.tr(),
+        subject: 'trans_title'.tr(),
       );
     } catch (e) {
       if (mounted) {

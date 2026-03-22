@@ -158,13 +158,16 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     setState(() => _appLang = langCode);
     if (mounted) {
       await context.setLocale(Locale(langCode));
-      context.read<AppState>().setLocale(Locale(langCode));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: const Color(0xFF10B981),
-        ),
-      );
+      if (mounted) {
+        context.read<AppState>().setLocale(Locale(langCode));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('toast_settings_saved'.tr(),
+                style: const TextStyle(fontFamily: 'Cairo')),
+            backgroundColor: const Color(0xFF10B981),
+          ),
+        );
+      }
     }
   }
 
