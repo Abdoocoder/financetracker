@@ -1,26 +1,16 @@
-'use client'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
+import LandingClient from '@/components/layout/LandingClient'
 
-export default function LandingPage() {
-  const [showSticky, setShowSticky] = useState(false)
-  const [testimonials, setTestimonials] = useState<any[]>([])
+export default async function LandingPage() {
+  const supabase = await createClient()
+  const { data: testimonials } = await supabase
+    .from('testimonials')
+    .select('*')
+    .eq('is_visible', true)
+    .order('created_at')
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowSticky(window.scrollY > window.innerHeight * 0.8)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.from('testimonials').select('*').eq('is_visible', true).order('created_at').then(({ data }) => {
-      if (data && data.length > 0) setTestimonials(data)
-    })
-  }, [])
+  const testimonialsList = testimonials || []
 
   return (
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', direction: 'rtl', fontFamily: 'inherit', overflowX: 'hidden' }}>
@@ -289,7 +279,7 @@ export default function LandingPage() {
           <p style={{ fontSize: 15, color: 'var(--text-muted)' }}>آراء حقيقية من مستخدمين في العالم العربي</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
-          {testimonials.map((t, i) => (
+          {testimonialsList.map((t, i) => (
             <div key={i} style={{ padding: 24, borderRadius: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{ display: 'flex', gap: 2 }}>
                 {Array(t.stars).fill(0).map((_, s) => (
@@ -430,14 +420,7 @@ export default function LandingPage() {
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} فجرك — إدارة مالية ذكية للعالم العربي</p>
       </footer>
 
-      {/* Sticky CTA */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200, background: 'rgba(10,12,18,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(59,126,246,0.2)', padding: '14px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, transform: showSticky ? 'translateY(0)' : 'translateY(100%)', transition: 'transform 0.4s ease' }}>
-        <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>جاهز تتحكم في أموالك؟</div>
-          <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>مجاني تماماً · بدون بطاقة ائتمانية</div>
-        </div>
-        <Link href="/register" style={{ padding: '12px 28px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', whiteSpace: 'nowrap', boxShadow: '0 0 20px rgba(59,126,246,0.4)' }}>ابدأ الآن ←</Link>
-      </div>
+      <LandingClient />
 
       <style>{`
         @keyframes pulse {
