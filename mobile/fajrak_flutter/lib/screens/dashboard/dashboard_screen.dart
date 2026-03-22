@@ -8,6 +8,7 @@ import '../../widgets/dashboard/quick_links_card.dart'; // QuickLinksCards
 import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
+import '../../widgets/dashboard/dashboard_header.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -167,7 +168,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildHeader(colorScheme),
+              DashboardHeader(name: _name),
               const SizedBox(height: 16),
               _buildStatCards(colorScheme),
               const SizedBox(height: 16),
@@ -195,20 +196,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildHeader(ColorScheme colorScheme) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_name.isNotEmpty ? 'dash_welcome'.tr(args: [_name]) : 'dash_title'.tr(),
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: colorScheme.onSurface, fontFamily: 'Cairo')),
-        Text('dash_subtitle'.tr(),
-          style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
-      ]),
-      Container(width: 44, height: 44,
-        decoration: BoxDecoration(gradient: LinearGradient(colors: [colorScheme.primary, const Color(0xFF8B5CF6)]), borderRadius: BorderRadius.circular(12)),
-        child: Center(child: Text('ف', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, fontFamily: 'Cairo')))),
-    ]);
   }
 
   Widget _buildStatCards(ColorScheme colorScheme) {
