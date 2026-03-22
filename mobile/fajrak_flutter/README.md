@@ -52,9 +52,6 @@ flutter run
 
 # بناء APK للتوزيع
 flutter build apk --release
-
-# بناء APK محسّن (حجم أصغر)
-flutter build apk --release --split-per-abi
 ```
 
 الـ APK الناتج يكون في:
