@@ -47,9 +47,9 @@ class QuickLinksCards extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: isDark ? color.withOpacity(0.1) : color.withOpacity(0.05),
+          color: isDark ? color.withValues(alpha: 0.1) : color.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(isDark ? 0.2 : 0.15)),
+          border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.15)),
         ),
         child: Column(
           children: [

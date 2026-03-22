@@ -19,7 +19,6 @@ class MoreScreen extends StatefulWidget {
 }
 
 class _MoreScreenState extends State<MoreScreen> {
-  bool _loading = false;
 
   @override
   void initState() {
@@ -30,15 +29,12 @@ class _MoreScreenState extends State<MoreScreen> {
 
   void _load() async {
     if (!mounted) return;
-    setState(() => _loading = true);
     try {
       // No explicit Supabase calls in this screen's initial load based on the provided context,
       // but if there were, they would be wrapped here.
       // Example: await Supabase.instance.client.from('table').select();
     } catch (e) {
       if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'More Load');
-    } finally {
-      if (mounted) setState(() => _loading = false);
     }
   }
 

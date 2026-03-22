@@ -24,10 +24,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
-  List<Map<String, dynamic>> _months6Data = [];
-  List<Map<String, dynamic>> _categoryData = [];
+  final List<Map<String, dynamic>> _months6Data = [];
+  final List<Map<String, dynamic>> _categoryData = [];
   double _totalDebt = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
-  double _prevExpenses = 0;
+  final double _prevExpenses = 0;
   double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
   final _amountController = TextEditingController();
@@ -81,8 +81,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       double txIncome = 0, txExpenses = 0;
       for (final tx in txs) {
-        if (tx['type'] == 'income') txIncome += (tx['amount'] as num).toDouble();
-        else txExpenses += (tx['amount'] as num).toDouble();
+        if (tx['type'] == 'income') {
+          txIncome += (tx['amount'] as num).toDouble();
+        } else {
+          txExpenses += (tx['amount'] as num).toDouble();
+        }
       }
 
       final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
@@ -94,18 +97,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       int score = 0;
       final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
-      if (savingsRate >= 0.2) score += 30; else if (savingsRate >= 0.1) score += 20; else if (savingsRate > 0) score += 10;
-      if (totalDebt == 0) score += 25; else if (income > 0 && totalDebt / (income * 12) < 0.3) score += 15;
+      if (savingsRate >= 0.2) {
+        score += 30;
+      } else if (savingsRate >= 0.1) score += 20; else if (savingsRate > 0) score += 10;
+      if (totalDebt == 0) {
+        score += 25;
+      } else if (income > 0 && totalDebt / (income * 12) < 0.3) score += 15;
       if (goalsSaved > 0) score += 20;
       if (invValue > 0) score += 15;
       if (txs.length >= 10) score += 10;
 
       String stage = 'awareness';
-      if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) stage = 'debt';
-      else if (totalDebt == 0 && goalsSaved < income * 3) stage = 'emergency';
+      if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
+        stage = 'debt';
+      } else if (totalDebt == 0 && goalsSaved < income * 3) stage = 'emergency';
       else if (invValue > 0) stage = 'investing';
 
-      if (mounted) setState(() {
+      if (mounted) {
+        setState(() {
         _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
         _currency = profile['currency'] as String? ?? 'JOD';
         _income = income;
@@ -120,6 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
         _loading = false;
       });
+      }
     } catch (e) {
       if (mounted) setState(() => _loading = false);
     }
@@ -140,11 +150,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
       _amountController.clear();
       await _load();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFF10B981)));
+      }
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFFEF4444)));
+      }
     }
     setState(() => _saving = false);
   }
@@ -154,9 +168,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    if (_loading) return Scaffold(
+    if (_loading) {
+      return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(child: CircularProgressIndicator(color: colorScheme.primary)));
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -215,7 +231,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(children: [
         Text(icon, style: TextStyle(color: color, fontSize: 12)),
         const SizedBox(height: 4),
-        FittedBox(child: Text('${value.abs().toStringAsFixed(0)}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'))),
+        FittedBox(child: Text(value.abs().toStringAsFixed(0), style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'))),
         Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
       ]),
     );
@@ -299,7 +315,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('stage'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
-          Text('learn_stage_${_stage}'.tr(), style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+          Text('learn_stage_$_stage'.tr(), style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         ]),
       ]),
     );

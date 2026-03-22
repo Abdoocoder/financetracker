@@ -145,7 +145,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: selected
-                              ? colorScheme.primary.withOpacity(0.25)
+                              ? colorScheme.primary.withValues(alpha: 0.25)
                               : colorScheme.outlineVariant,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
@@ -530,7 +530,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(14),
                           border:
-                              Border.all(color: color.withOpacity(0.2)),
+                              Border.all(color: color.withValues(alpha: 0.2)),
                         ),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -559,12 +559,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                         height: 28,
                                         decoration: BoxDecoration(
                                             color: colorScheme.primary
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                             borderRadius:
                                                 BorderRadius.circular(7),
                                             border: Border.all(
                                                 color: colorScheme.primary
-                                                    .withOpacity(0.2))),
+                                                    .withValues(alpha: 0.2))),
                                         child: Icon(Icons.edit,
                                             color: colorScheme.primary,
                                             size: 14))),
@@ -577,12 +577,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                         height: 28,
                                         decoration: BoxDecoration(
                                             color: const Color(0xFFEF4444)
-                                                .withOpacity(0.1),
+                                                .withValues(alpha: 0.1),
                                             borderRadius:
                                                 BorderRadius.circular(7),
                                             border: Border.all(
                                                 color: const Color(0xFFEF4444)
-                                                    .withOpacity(0.2))),
+                                                    .withValues(alpha: 0.2))),
                                         child: const Icon(Icons.close,
                                             color: Color(0xFFEF4444),
                                             size: 14))),
@@ -626,7 +626,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                           foregroundColor: color,
                                           side: BorderSide(
                                               color:
-                                                  color.withOpacity(0.4)),
+                                                  color.withValues(alpha: 0.4)),
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 10),
                                           shape: RoundedRectangleBorder(
@@ -651,9 +651,9 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2))),
+          border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(children: [
         Text(icon, style: const TextStyle(fontSize: 20)),
         const SizedBox(height: 4),
