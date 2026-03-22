@@ -12,11 +12,11 @@ class FinancialRoadmap extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final stages = [
-      {'id': 'awareness', 'icon': '🌱', 'title': 'الوعي'},
-      {'id': 'debt', 'icon': '💳', 'title': 'ديون'},
-      {'id': 'emergency', 'icon': '🛡️', 'title': 'طوارئ'},
-      {'id': 'investing', 'icon': '📈', 'title': 'استثمار'},
-      {'id': 'wealth', 'icon': '👑', 'title': 'الثروة'},
+      {'id': 'awareness', 'icon': '🌱', 'title': 'roadmap_awareness'.tr()},
+      {'id': 'debt', 'icon': '💳', 'title': 'roadmap_debt'.tr()},
+      {'id': 'emergency', 'icon': '🛡️', 'title': 'roadmap_emergency'.tr()},
+      {'id': 'investing', 'icon': '📈', 'title': 'roadmap_investing'.tr()},
+      {'id': 'wealth', 'icon': '👑', 'title': 'roadmap_wealth'.tr()},
     ];
 
     int currentIndex = stages.indexWhere((s) => s['id'] == currentStage);

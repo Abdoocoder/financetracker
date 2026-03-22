@@ -190,7 +190,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                   ],
                 ]),
                 Text(
-                    '${shares.toStringAsFixed(4)} سهم • \$${currentPrice.toStringAsFixed(2)}',
+                    '${shares.toStringAsFixed(4)} ${"inv_shares_suffix".tr()} • \$${currentPrice.toStringAsFixed(2)}',
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
@@ -260,7 +260,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
-            child: const Text('سجل المعاملات',
+            child: Text('inv_tx_history'.tr().replaceAll('📋 ', ''),
                 style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 11,
@@ -277,7 +277,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
-            child: const Text('+ تسجيل شراء',
+            child: Text('inv_record_buy'.tr(),
                 style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 11,
@@ -294,15 +294,15 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
             child: Column(children: [
               Row(children: [
                 Expanded(
-                    child: _miniField(_buySharesCtrl, 'عدد الأسهم',
+                    child: _miniField(_buySharesCtrl, 'inv_shares_count_hint'.tr(),
                         const TextInputType.numberWithOptions(decimal: true))),
                 const SizedBox(width: 8),
                 Expanded(
-                    child: _miniField(_buyPriceCtrl, 'السعر \$',
+                    child: _miniField(_buyPriceCtrl, 'inv_price_with_dollar_hint'.tr(),
                         const TextInputType.numberWithOptions(decimal: true))),
                 const SizedBox(width: 8),
                 Expanded(
-                    child: _miniField(_buyCommCtrl, 'العمولة \$',
+                    child: _miniField(_buyCommCtrl, 'inv_comm_hint'.tr(),
                         const TextInputType.numberWithOptions(decimal: true))),
               ]),
               const SizedBox(height: 10),
@@ -322,7 +322,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                             height: 14,
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Colors.white))
-                        : const Text('تسجيل',
+                        : Text('inv_submit_btn'.tr(),
                             style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w900,
