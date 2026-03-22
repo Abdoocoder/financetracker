@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
@@ -48,7 +47,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
-        title: Text('auth_forgot_password_title'.tr(),
+        title: Text('auth_forgot_password_title',
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -61,25 +60,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ? Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 const Text('📧', style: TextStyle(fontSize: 64)),
                 const SizedBox(height: 20),
-                Text('auth_sent_title'.tr(),
+                Text('auth_sent_title',
                     style: TextStyle(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 24,
                         fontFamily: 'Cairo')),
                 const SizedBox(height: 12),
-                Text('auth_sent_subtitle'.tr(),
+                Text('auth_sent_subtitle',
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 32),
                 ElevatedButton(
                     onPressed: () => Navigator.pop(context),
-                    child:  Text('auth_back_to_login'.tr(),
+                    child:  Text('auth_back_to_login',
                         style: const TextStyle(fontFamily: 'Cairo'))),
               ])
             : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('auth_forgot_password_desc'.tr(),
+                Text('auth_forgot_password_desc',
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
                     textAlign: TextAlign.center),
@@ -90,7 +89,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style:
                       TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                   decoration: InputDecoration(
-                      labelText: 'auth_email'.tr(),
+                      labelText: 'auth_email',
                       prefixIcon:
                           Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
                 ),
@@ -100,7 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: _loading
                       ? CircularProgressIndicator(
                           color: colorScheme.onPrimary, strokeWidth: 2)
-                      :  Text('auth_send_reset_link'.tr(),
+                      :  Text('auth_send_reset_link',
                           style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900)),
