@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
+
 import '../debts/debts_screen.dart';
 import '../budgets/budgets_screen.dart';
 import '../goals/goals_screen.dart';
@@ -10,6 +11,8 @@ import '../learn/learn_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../settings/settings_screen.dart';
 import '../help/help_screen.dart';
+
+import '../../widgets/more/more_menu_item.dart';
 
 class MoreScreen extends StatefulWidget {
   const MoreScreen({super.key});
@@ -30,9 +33,7 @@ class _MoreScreenState extends State<MoreScreen> {
   void _load() async {
     if (!mounted) return;
     try {
-      // No explicit Supabase calls in this screen's initial load based on the provided context,
-      // but if there were, they would be wrapped here.
-      // Example: await Supabase.instance.client.from('table').select();
+      // No explicit Supabase calls in this screen's initial load
     } catch (e) {
       if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'More Load');
     }
@@ -46,8 +47,7 @@ class _MoreScreenState extends State<MoreScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.only(top: 24, left: 16, right: 16, bottom: 40),
+          padding: const EdgeInsets.only(top: 24, left: 16, right: 16, bottom: 40),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -57,7 +57,6 @@ class _MoreScreenState extends State<MoreScreen> {
             ),
             child: Column(
               children: [
-                // Top handle (like a bottom sheet)
                 Container(
                   width: 40,
                   height: 4,
@@ -68,73 +67,49 @@ class _MoreScreenState extends State<MoreScreen> {
                   ),
                 ),
 
-                // Menu items matching the screenshot
-                _menuItem(
-                    context,
-                    Icons.credit_card_outlined,
-                    'nav_debts'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const DebtsScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.pie_chart_outline,
-                    'nav_budgets'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const BudgetsScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.track_changes,
-                    'nav_goals'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const GoalsScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.trending_up,
-                    'nav_investments'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const InvestmentsScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.menu_book_outlined,
-                    'nav_learn'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const LearnScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.notifications_none,
-                    'nav_alerts'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const AlertsScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.settings_outlined,
-                    'nav_settings'.tr(),
-                    () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const SettingsScreen())), colorScheme),
-                _menuItem(
-                    context,
-                    Icons.help_outline,
-                    'nav_help'.tr(),
-                    () => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const HelpScreen())), colorScheme),
+                MoreMenuItem(
+                    icon: Icons.credit_card_outlined,
+                    title: 'nav_debts'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DebtsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.pie_chart_outline,
+                    title: 'nav_budgets'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BudgetsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.track_changes,
+                    title: 'nav_goals'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const GoalsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.trending_up,
+                    title: 'nav_investments'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InvestmentsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.menu_book_outlined,
+                    title: 'nav_learn'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LearnScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.notifications_none,
+                    title: 'nav_alerts'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AlertsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.settings_outlined,
+                    title: 'nav_settings'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.help_outline,
+                    title: 'nav_help'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpScreen())),
+                    colorScheme: colorScheme),
 
                 const SizedBox(height: 16),
 
-                // Language toggle button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -151,8 +126,7 @@ class _MoreScreenState extends State<MoreScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.language,
-                            color: colorScheme.primary, size: 20),
+                        Icon(Icons.language, color: colorScheme.primary, size: 20),
                         const SizedBox(width: 8),
                         Text('English',
                             style: TextStyle(
@@ -167,41 +141,6 @@ class _MoreScreenState extends State<MoreScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _menuItem(
-      BuildContext context, IconData icon, String title, VoidCallback onTap, ColorScheme colorScheme) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.outlineVariant),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: colorScheme.onSurfaceVariant, size: 22),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontFamily: 'Cairo',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Icon(Icons.arrow_back_ios_new,
-                color: colorScheme.outlineVariant, size: 14),
-          ],
         ),
       ),
     );
