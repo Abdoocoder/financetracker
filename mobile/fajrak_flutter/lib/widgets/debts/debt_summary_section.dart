@@ -19,6 +19,8 @@ class DebtSummarySection extends StatelessWidget {
     required this.paidCount,
   });
 
+  @override
+  Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final paidPct = totalOriginal > 0
         ? ((totalOriginal - totalRemaining) / totalOriginal * 100)
