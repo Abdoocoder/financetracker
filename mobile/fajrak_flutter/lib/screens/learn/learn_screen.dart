@@ -182,7 +182,7 @@ class _LearnScreenState extends State<LearnScreen> {
     final dayOfMonth = now.day;
     final lessons = _lessons[stage] ?? _lessons['awareness']!;
     final lessonRaw = lessons[(now.day - 1) % lessons.length];
-    final lesson = {
+    final Map<String, String> lesson = {
       'title': lessonRaw['title']!.tr(),
       'body': lessonRaw['body']!.tr(),
       'url': lessonRaw['url'] ?? '',
