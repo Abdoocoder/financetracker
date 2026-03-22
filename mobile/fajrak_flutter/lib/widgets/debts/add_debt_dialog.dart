@@ -170,6 +170,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
       );
+  }
 
   @override
   Widget build(BuildContext context) {
