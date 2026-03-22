@@ -20,20 +20,26 @@ subprojects {
 subprojects {
     val subproject = this
     if (subproject.name != "app") {
-        subproject.afterEvaluate {
-            if (subproject.plugins.hasPlugin("com.android.library") || subproject.plugins.hasPlugin("com.android.application")) {
-                val android = subproject.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
+        val configureAndroid: (Project) -> Unit = { proj ->
+            if (proj.plugins.hasPlugin("com.android.library") || proj.plugins.hasPlugin("com.android.application")) {
+                val android = proj.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
                 android?.apply {
                     compileSdkVersion(34)
                     if (namespace == null) {
-                        namespace = if (subproject.name == "flutter_app_badger") {
+                        namespace = if (proj.name == "flutter_app_badger") {
                             "fr.g123k.flutterappbadge.flutterappbadger"
                         } else {
-                            "com.fajrak.app.plugins.${subproject.name.replace("-", "_")}"
+                            "com.fajrak.app.plugins.${proj.name.replace("-", "_")}"
                         }
                     }
                 }
             }
+        }
+
+        if (subproject.state.executed) {
+            configureAndroid(subproject)
+        } else {
+            subproject.afterEvaluate(configureAndroid)
         }
     }
 }
