@@ -216,8 +216,7 @@
 - 🔔 **إشعارات Native** — تصل حتى لو التطبيق مغلق كلياً
 - 🔐 **FCM Bridge** — Java ↔ JavaScript لتسجيل Token تلقائياً
 - 💾 **Session Persistence** — لا تسجيل دخول عند كل فتح
-- 🚀 **GitHub Actions** — بناء APK تلقائي عند كل push
-- 🔗 **رابط تنزيل ديناميكي** — يشير لأحدث إصدار دائماً
+- 📱 **Native Android APK** — بناء APK جاهز للتنزيل
 - 🛡️ **Middleware fix** — تجاوز SSR للتطبيق Native
 
 ### v2.1.0 — 2026-03-17
@@ -276,7 +275,7 @@
 - ☀️ **Light Mode محسّن** — عمق وظلال وألوان أفضل
 - 💰 **إصلاح صافي الثروة** — استخدام السعر الحالي بدل سعر الشراء
 - 🔢 **إصلاح الأرقام العشرية** — عرض أرقام نظيفة بدون .075
-- 🗑️ إزالة Vercel Cron المكرر — GitHub Actions فقط
+- 🛡️ **نظام معالجة الأخطاء** — ErrorHandler مركزي
 - ➕ إضافة فئة **صلة الرحم** في المعاملات
 
 ### v1.4.0 — 2026-03-15
@@ -377,7 +376,7 @@ UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
 | ![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel&logoColor=white) | Hosting | Latest |
 | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?logoColor=white) | رسوم بيانية تفاعلية | Latest |
 | ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwind-css&logoColor=white) | Styling | 3.x |
-| ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=github-actions&logoColor=white) | CRON Jobs | Latest |
+| ![cron-job.org](https://img.shields.io/badge/cron--job.org-Automation-3B7EF6?style=flat-square) | CRON Jobs | Free |
 | ![CoinGecko](https://img.shields.io/badge/CoinGecko-8DC63F?logoColor=white) | أسعار العملات الرقمية | Free API |
 | ![WebPush](https://img.shields.io/badge/Web_Push-5A0FC8?logo=pwa&logoColor=white) | Push Notifications | VAPID |
 | ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white) | Native Mobile App | 3.x |
@@ -413,23 +412,18 @@ UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
 
 ## ⚙️ CRON Jobs — الأتمتة اليومية
 
-تعمل عبر **GitHub Actions** (UTC+3):
+تعمل عبر **cron-job.org** (توقيت عمان UTC+3):
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  ⏰ 6:00 ص   │  smart-notifications.yml  │  تنبيهات صباحية + ذكية     │
-│  ⏰ 8:00 ص   │  auto-salary.yml          │  إضافة الراتب التلقائي     │
-│  ⏰ 9:00 ص   │  auto-debt.yml            │  خصم الأقساط التلقائي       │
-│  ⏰ 6:00 م   │  smart-notifications.yml  │  تذكير مسائي               │
-│  ⏰ 7:00 م   │  wealth-guidance.yml      │  توجيه بناء الثروة         │
-│  ⏰ 8:00 ص ج │  smart-notifications.yml  │  تقرير أسبوعي (الجمعة فقط) │
-└─────────────────────────────────────────────────────────────────────────┘
-```
+| الوقت | الوصف |
+|:----:|:-----------:|
+| 6:00 ص | تنبيهات صباحية + تنبيهات ذكية |
+| 8:00 ص | إضافة الراتب التلقائي (صامت) |
+| 9:00 ص | خصم الأقساط التلقائي (صامت) |
+| 6:00 م | تذكير مسائي (عند الحاجة) |
+| 7:00 م | نصيحة بناء الثروة اليومية |
+| الجمعة | تقرير المقارنة الأسبوعي |
 
-**GitHub Secrets المطلوبة:**
-```
-CRON_SECRET=your_secret_here
-```
+**ملاحظة:** تم تأمين جميع الروابط بـ `CRON_SECRET`.
 
 ---
 
