@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import '../app_state.dart';
 import 'package:flutter/material.dart';
 import '../services/analytics_service.dart';
 import 'dart:developer' as dev;
@@ -17,7 +19,7 @@ class ErrorHandler {
     );
 
     if (context != null && context.mounted) {
-      final isEn = context.locale.languageCode == 'en';
+      final isEn = context.read<AppState>().locale.languageCode == 'en';
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
