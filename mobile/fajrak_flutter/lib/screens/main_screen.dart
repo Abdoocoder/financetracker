@@ -6,7 +6,8 @@ import 'debts/debts_screen.dart';
 import 'budgets/budgets_screen.dart';
 import 'more/more_screen.dart';
 import 'package:easy_localization/easy_localization.dart';
-
+import 'package:provider/provider.dart';
+import '../app_state.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -15,8 +16,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 4; // الرئيسية
-  int _unreadAlerts = 0;
+  int _currentIndex = 4; // Dashboard
 
   final List<Widget> _screens = [
     const MoreScreen(),
@@ -29,19 +29,9 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUnreadCount();
-  }
-
-  Future<void> _loadUnreadCount() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-    final res = await Supabase.instance.client
-        .from('alerts')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('is_read', false)
-        .count();
-    if (mounted) setState(() => _unreadAlerts = res.count);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AppState>().loadUnreadAlerts();
+    });
   }
 
   @override
@@ -66,12 +56,11 @@ class _MainScreenState extends State<MainScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _navItem(0, Icons.more_horiz, 'الإعدادات'),
-                _navItem(1, Icons.pie_chart_outline, 'الميزانية الشهرية'), // Fallback since no nav_budgets
-                _navItem(2, Icons.credit_card_outlined, 'الديون'),
-                _navItem(3, Icons.swap_vert, 'المعاملات'),
-                _navItem(4, Icons.dashboard_outlined, 'الرئيسية',
-                    badge: _unreadAlerts),
+                _navItem(0, Icons.more_horiz, 'nav_settings'.tr()),
+                _navItem(1, Icons.pie_chart_outline, 'nav_budgets'.tr()),
+                _navItem(2, Icons.credit_card_outlined, 'nav_debts'.tr()),
+                _navItem(3, Icons.swap_vert, 'nav_transactions'.tr()),
+                _navItem(4, Icons.dashboard_outlined, 'nav_home'.tr()),
               ],
             ),
           ),
@@ -80,7 +69,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _navItem(int index, IconData icon, String label, {int badge = 0}) {
+  Widget _navItem(int index, IconData icon, String label) {
     final isSelected = _currentIndex == index;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -109,23 +98,6 @@ class _MainScreenState extends State<MainScreen> {
                   size: 24,
                 ),
               ),
-              if (badge > 0)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: const BoxDecoration(
-                        color: Color(0xFFEF4444), shape: BoxShape.circle),
-                    child: Center(
-                        child: Text('$badge',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900))),
-                  ),
-                ),
             ],
           ),
           const SizedBox(height: 2),

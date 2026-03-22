@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../app_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AlertsScreen extends StatefulWidget {
@@ -54,6 +56,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
           a['is_read'] = true;
         }
       });
+      context.read<AppState>().loadUnreadAlerts();
     }
   }
 
@@ -66,6 +69,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
         final idx = _alerts.indexWhere((a) => a['id'].toString() == id);
         if (idx != -1) _alerts[idx]['is_read'] = true;
       });
+      context.read<AppState>().decrementUnreadAlerts();
     }
   }
 
@@ -77,7 +81,10 @@ class _AlertsScreenState extends State<AlertsScreen> {
           .from('alerts')
           .delete()
           .eq('user_id', user.id);
-      if (mounted) setState(() => _alerts.clear());
+      if (mounted) {
+        setState(() => _alerts.clear());
+        context.read<AppState>().clearUnreadAlerts();
+      }
     } catch (e, st) {
       if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Delete All Alerts');
     }
@@ -88,6 +95,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       await Supabase.instance.client.from('alerts').delete().eq('id', id);
       if (mounted) {
         setState(() => _alerts.removeWhere((a) => a['id'].toString() == id));
+        context.read<AppState>().loadUnreadAlerts();
       }
     } catch (e, st) {
       if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Delete Single Alert');
