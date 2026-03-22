@@ -1,10 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
-import '../../utils/error_handler.dart';
-import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../app_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../app_state.dart';
+import '../../services/analytics_service.dart';
+import '../../utils/error_handler.dart';
+import '../../widgets/alerts/ai_generator_card.dart';
+import '../../widgets/alerts/alert_actions.dart';
+import '../../widgets/alerts/alert_filter_tabs.dart';
+import '../../widgets/alerts/alert_header.dart';
+import '../../widgets/alerts/alert_list_item.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -29,47 +35,59 @@ class _AlertsScreenState extends State<AlertsScreen> {
   Future<void> _load() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    final data = await Supabase.instance.client
-        .from('alerts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', ascending: false);
-    if (mounted) {
-      setState(() {
-        _alerts = List<Map<String, dynamic>>.from(data);
-        _loading = false;
-      });
+    try {
+      final data = await Supabase.instance.client
+          .from('alerts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', ascending: false);
+      if (mounted) {
+        setState(() {
+          _alerts = List<Map<String, dynamic>>.from(data);
+          _loading = false;
+        });
+      }
+    } catch (e, st) {
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Load Alerts');
     }
   }
 
   Future<void> _markAllRead() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    await Supabase.instance.client
-        .from('alerts')
-        .update({'is_read': true})
-        .eq('user_id', user.id)
-        .eq('is_read', false);
-    if (mounted) {
-      setState(() {
-        for (var a in _alerts) {
-          a['is_read'] = true;
-        }
-      });
-      context.read<AppState>().loadUnreadAlerts();
+    try {
+      await Supabase.instance.client
+          .from('alerts')
+          .update({'is_read': true})
+          .eq('user_id', user.id)
+          .eq('is_read', false);
+      if (mounted) {
+        setState(() {
+          for (var a in _alerts) {
+            a['is_read'] = true;
+          }
+        });
+        context.read<AppState>().loadUnreadAlerts();
+      }
+    } catch (e, st) {
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Mark All Read');
     }
   }
 
   Future<void> _markRead(String id) async {
-    await Supabase.instance.client
-        .from('alerts')
-        .update({'is_read': true}).eq('id', id);
-    if (mounted) {
-      setState(() {
-        final idx = _alerts.indexWhere((a) => a['id'].toString() == id);
-        if (idx != -1) _alerts[idx]['is_read'] = true;
-      });
-      context.read<AppState>().decrementUnreadAlerts();
+    try {
+      await Supabase.instance.client
+          .from('alerts')
+          .update({'is_read': true}).eq('id', id);
+      if (mounted) {
+        setState(() {
+          final idx = _alerts.indexWhere((a) => a['id'].toString() == id);
+          if (idx != -1) _alerts[idx]['is_read'] = true;
+        });
+        context.read<AppState>().decrementUnreadAlerts();
+      }
+    } catch (e, st) {
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Mark Read');
     }
   }
 
@@ -77,10 +95,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
     try {
-      await Supabase.instance.client
-          .from('alerts')
-          .delete()
-          .eq('user_id', user.id);
+      await Supabase.instance.client.from('alerts').delete().eq('user_id', user.id);
       if (mounted) {
         setState(() => _alerts.clear());
         context.read<AppState>().clearUnreadAlerts();
@@ -98,13 +113,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
         context.read<AppState>().loadUnreadAlerts();
       }
     } catch (e, st) {
-      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Delete Single Alert');
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Delete Alert');
     }
   }
 
   Future<void> _generateAlerts() async {
     setState(() => _generating = true);
-    // Since we don't have the web API URL, we simulate or show error for now
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -120,7 +134,6 @@ class _AlertsScreenState extends State<AlertsScreen> {
     final title = (alert['title'] ?? '').toString().toLowerCase();
     final msg = (alert['message'] ?? '').toString().toLowerCase();
 
-    // Attempt navigation based on text (very basic routing)
     if (title.contains('دين') || msg.contains('دين') || title.contains('قسط')) {
       Navigator.pushNamed(context, '/debts');
     } else if (title.contains('ميزانية') || msg.contains('ميزانية')) {
@@ -187,8 +200,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   color: colorScheme.onSurface)),
           iconTheme: IconThemeData(color: colorScheme.onSurface)),
       body: _loading
-          ? Center(
-              child: CircularProgressIndicator(color: colorScheme.primary))
+          ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
           : RefreshIndicator(
               onRefresh: _load,
               color: colorScheme.primary,
@@ -199,155 +211,38 @@ class _AlertsScreenState extends State<AlertsScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Header Actions
                       Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(children: [
-                              Text('alerts_count'.tr(args: [_alerts.length.toString()]),
-                                  style: TextStyle(
-                                      color: colorScheme.onSurfaceVariant,
-                                      fontFamily: 'Cairo',
-                                      fontSize: 13)),
-                              if (unreadCount > 0) ...[
-                                const SizedBox(width: 8),
-                                Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                        color: const Color(0xFFEF4444)
-                                            .withValues(alpha: 0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: Text('alerts_unread_count'.tr(args: [unreadCount.toString()]),
-                                        style: const TextStyle(
-                                            color: Color(0xFFEF4444),
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w900,
-                                            fontFamily: 'Cairo'))),
-                              ]
-                            ]),
-                            Row(children: [
-                              if (unreadCount > 0)
-                                TextButton(
-                                    onPressed: _markAllRead,
-                                    child: Text('alerts_mark_all_read'.tr(),
-                                        style: TextStyle(
-                                            color: colorScheme.primary,
-                                            fontFamily: 'Cairo',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w900))),
-                              if (_alerts.isNotEmpty)
-                                TextButton(
-                                    onPressed: _deleteAll,
-                                    child: Text('alerts_delete_all'.tr(),
-                                        style: const TextStyle(
-                                            color: Color(0xFFEF4444),
-                                            fontFamily: 'Cairo',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w900))),
-                            ]),
-                          ]),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          AlertHeader(
+                            totalCount: _alerts.length,
+                            unreadCount: unreadCount,
+                            colorScheme: colorScheme,
+                          ),
+                          AlertActions(
+                            unreadCount: unreadCount,
+                            hasAlerts: _alerts.isNotEmpty,
+                            onMarkAllRead: _markAllRead,
+                            onDeleteAll: _deleteAll,
+                            colorScheme: colorScheme,
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 16),
-
-                      // AI Generator Card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: [
-                              colorScheme.primary.withValues(alpha: 0.08),
-                              colorScheme.secondary.withValues(alpha: 0.08)
-                            ]),
-                            border: Border.all(
-                                color:
-                                    colorScheme.primary.withValues(alpha: 0.2)),
-                            borderRadius: BorderRadius.circular(16)),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(children: [
-                                Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                        gradient: LinearGradient(colors: [
-                                          colorScheme.primary,
-                                          colorScheme.secondary
-                                        ]),
-                                        borderRadius: BorderRadius.circular(12),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: colorScheme.primary
-                                                  .withValues(alpha: 0.4),
-                                              blurRadius: 16)
-                                        ]),
-                                    child: const Center(
-                                        child: Text('🤖',
-                                            style: TextStyle(fontSize: 20)))),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                    child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                      Text('alerts_ai_title'.tr(),
-                                          style: TextStyle(
-                                              color: colorScheme.onSurface,
-                                              fontWeight: FontWeight.w900,
-                                              fontFamily: 'Cairo',
-                                              fontSize: 14)),
-                                      Text('alerts_ai_subtitle'.tr(),
-                                          style: TextStyle(
-                                              color: colorScheme.onSurfaceVariant,
-                                              fontFamily: 'Cairo',
-                                              fontSize: 12)),
-                                    ])),
-                              ]),
-                              const SizedBox(height: 16),
-                              SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed:
-                                        _generating ? null : _generateAlerts,
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            colorScheme.primary,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12))),
-                                    child: _generating
-                                        ? const SizedBox(
-                                            width: 20,
-                                            height: 20,
-                                            child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                                color: Colors.white))
-                                        : Text('alerts_ai_generate'.tr(),
-                                            style: const TextStyle(
-                                                fontFamily: 'Cairo',
-                                                fontWeight: FontWeight.w900)),
-                                  )),
-                            ]),
+                      AIGeneratorCard(
+                        generating: _generating,
+                        onGenerate: _generateAlerts,
+                        colorScheme: colorScheme,
                       ),
                       const SizedBox(height: 20),
-
-                      // Filters
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(children: [
-                          _filterTab('all', '${'alerts_filter_all'.tr()} (${_alerts.length})', colorScheme),
-                          _filterTab('unread', '${'alerts_filter_unread'.tr()} ($unreadCount)', colorScheme),
-                          _filterTab('warning', 'alerts_filter_warning'.tr(), colorScheme),
-                          _filterTab('achievement', 'alerts_filter_achievement'.tr(), colorScheme),
-                          _filterTab('motivation', 'alerts_filter_motivation'.tr(), colorScheme),
-                        ]),
+                      AlertFilterTabs(
+                        currentFilter: _filter,
+                        totalCount: _alerts.length,
+                        unreadCount: unreadCount,
+                        onFilterChanged: (v) => setState(() => _filter = v),
+                        colorScheme: colorScheme,
                       ),
                       const SizedBox(height: 16),
-
-                      // Alerts List
                       if (filtered.isEmpty)
                         Center(
                             child: Padding(
@@ -363,11 +258,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                             : '💡',
                                 style: const TextStyle(fontSize: 40)),
                             const SizedBox(height: 12),
-                             Text('alerts_empty'.tr(),
-                                 style: TextStyle(
-                                     color: colorScheme.onSurfaceVariant,
-                                     fontFamily: 'Cairo',
-                                     fontSize: 14)),
+                            Text('alerts_empty'.tr(),
+                                style: TextStyle(
+                                    color: colorScheme.onSurfaceVariant,
+                                    fontFamily: 'Cairo',
+                                    fontSize: 14)),
                           ]),
                         ))
                       else
@@ -377,105 +272,13 @@ class _AlertsScreenState extends State<AlertsScreen> {
                           itemCount: filtered.length,
                           itemBuilder: (context, i) {
                             final alert = filtered[i];
-                            final color = _getColor(alert['type'] as String?);
-                            final isRead = alert['is_read'] as bool? ?? true;
-                            final date = (alert['created_at'] as String?)
-                                    ?.split('T')[0] ??
-                                '';
-                            return GestureDetector(
+                            return AlertListItem(
+                              alert: alert,
+                              color: _getColor(alert['type'] as String?),
+                              icon: _getIcon(alert['type'] as String?),
                               onTap: () => _navigateAlert(alert),
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: isRead
-                                      ? colorScheme.surface
-                                      : color.withValues(alpha: 0.08),
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                      color: isRead
-                                          ? colorScheme.outlineVariant
-                                          : color.withValues(alpha: 0.3)),
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                          color: color.withValues(alpha: 0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: Icon(
-                                          _getIcon(alert['type'] as String?),
-                                          color: color,
-                                          size: 20),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(children: [
-                                            Expanded(
-                                                child: Text(
-                                                    alert['title'] as String? ??
-                                                        '',
-                                                    style: TextStyle(
-                                                        color: isRead
-                                                            ? colorScheme.onSurfaceVariant
-                                                            : colorScheme.onSurface,
-                                                        fontWeight: isRead
-                                                            ? FontWeight.w700
-                                                            : FontWeight.w900,
-                                                        fontFamily: 'Cairo',
-                                                        fontSize: 14))),
-                                            if (!isRead)
-                                              Container(
-                                                  width: 8,
-                                                  height: 8,
-                                                  decoration: BoxDecoration(
-                                                      color: color,
-                                                      shape: BoxShape.circle,
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                            color: color
-                                                                .withValues(alpha: 
-                                                                    0.5),
-                                                            blurRadius: 8)
-                                                      ])),
-                                          ]),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                              alert['message'] as String? ?? '',
-                                              style: TextStyle(
-                                                  color: isRead
-                                                      ? colorScheme.onSurfaceVariant.withValues(alpha: 0.7)
-                                                      : colorScheme.onSurfaceVariant,
-                                                  fontFamily: 'Cairo',
-                                                  fontSize: 12,
-                                                  height: 1.6)),
-                                          const SizedBox(height: 8),
-                                          Text(date,
-                                              style: TextStyle(
-                                                  color: colorScheme.onSurfaceVariant,
-                                                  fontFamily: 'Cairo',
-                                                  fontSize: 10)),
-                                        ],
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.close, size: 16),
-                                      color: const Color(0xFFEF4444)
-                                          .withValues(alpha: 0.7),
-                                      onPressed: () =>
-                                          _deleteAlert(alert['id'].toString()),
-                                    )
-                                  ],
-                                ),
-                              ),
+                              onDelete: () => _deleteAlert(alert['id'].toString()),
+                              colorScheme: colorScheme,
                             );
                           },
                         ),
@@ -484,28 +287,4 @@ class _AlertsScreenState extends State<AlertsScreen> {
             ),
     );
   }
-
-  Widget _filterTab(String key, String label, ColorScheme colorScheme) => Padding(
-        padding: const EdgeInsets.only(left: 8),
-        child: GestureDetector(
-          onTap: () => setState(() => _filter = key),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: _filter == key
-                  ? colorScheme.primary
-                  : colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _filter == key ? colorScheme.primary : colorScheme.outlineVariant),
-            ),
-            child: Text(label,
-                style: TextStyle(
-                    color:
-                        _filter == key ? Colors.white : colorScheme.onSurfaceVariant,
-                    fontFamily: 'Cairo',
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700)),
-          ),
-        ),
-      );
 }

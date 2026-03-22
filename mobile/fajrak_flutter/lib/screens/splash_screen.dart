@@ -48,10 +48,12 @@ class _SplashScreenState extends State<SplashScreen>
               .eq('id', user.id)
               .maybeSingle();
 
-          if (res != null && res['onboarding_done'] == true) {
-            Navigator.pushReplacementNamed(context, '/main');
-          } else {
-            Navigator.pushReplacementNamed(context, '/onboarding');
+          if (mounted) {
+            if (res != null && res['onboarding_done'] == true) {
+              Navigator.pushReplacementNamed(context, '/main');
+            } else {
+              Navigator.pushReplacementNamed(context, '/onboarding');
+            }
           }
         }
       }
