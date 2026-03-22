@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 class AppState extends ChangeNotifier {
   bool _isDarkMode = true;
@@ -23,6 +24,16 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _updateBadge() async {
+    if (await FlutterAppBadger.isAppBadgeSupported()) {
+      if (_unreadAlerts > 0) {
+        FlutterAppBadger.updateBadgeCount(_unreadAlerts);
+      } else {
+        FlutterAppBadger.removeBadge();
+      }
+    }
+  }
+
   Future<void> loadUnreadAlerts() async {
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -31,9 +42,9 @@ class AppState extends ChangeNotifier {
           .from('alerts')
           .select('id')
           .eq('user_id', user.id)
-          .eq('is_read', false)
-          .count();
-      _unreadAlerts = res.count;
+          .eq('is_read', false);
+      _unreadAlerts = (res as List).length;
+      _updateBadge();
       notifyListeners();
     } catch (_) {}
   }
@@ -41,12 +52,14 @@ class AppState extends ChangeNotifier {
   void decrementUnreadAlerts() {
     if (_unreadAlerts > 0) {
       _unreadAlerts--;
+      _updateBadge();
       notifyListeners();
     }
   }
 
   void clearUnreadAlerts() {
     _unreadAlerts = 0;
+    _updateBadge();
     notifyListeners();
   }
 
