@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
@@ -112,7 +113,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       color: colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2))),
               const SizedBox(height: 16),
-              Text(existing != null ? 'goals_edit' : 'goals_new',
+              Text(existing != null ? 'goals_edit'.tr() : 'goals_new'.tr(),
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -122,7 +123,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               // Icon Picker
               Align(
                   alignment: Alignment.centerRight,
-                  child: Text('goals_choose_icon',
+                  child: Text('goals_choose_icon'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12,
@@ -161,13 +162,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              _field(ctx, nameCtrl, 'goals_name_hint',
+              _field(ctx, nameCtrl, 'goals_name_hint'.tr(),
                   TextInputType.text),
               const SizedBox(height: 10),
-              _field(ctx, targetCtrl, 'goals_target_amount',
+              _field(ctx, targetCtrl, 'goals_target_amount'.tr(),
                   const TextInputType.numberWithOptions(decimal: true)),
               const SizedBox(height: 10),
-              _field(ctx, currentCtrl, 'goals_current_amount',
+              _field(ctx, currentCtrl, 'goals_current_amount'.tr(),
                   const TextInputType.numberWithOptions(decimal: true)),
               const SizedBox(height: 10),
               // Deadline Date Picker
@@ -202,7 +203,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     Text(
                       deadlineDate.isNotEmpty
                           ? 'goals_deadline_value'.tr(args: [deadlineDate])
-                          : 'goals_deadline_hint',
+                          : 'goals_deadline_hint'.tr(),
                       style: TextStyle(
                           color: deadlineDate.isNotEmpty
                               ? colorScheme.onSurface
@@ -251,7 +252,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12))),
-                    child: Text(existing != null ? 'goals_save_edit' : 'goals_save',
+                    child: Text(existing != null ? 'goals_save_edit'.tr() : 'goals_save'.tr(),
                         style: const TextStyle(
                             fontFamily: 'Cairo',
                             fontWeight: FontWeight.w900,
@@ -296,7 +297,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     color: colorScheme.onSurface,
                     fontFamily: 'Cairo')),
             const SizedBox(height: 20),
-            _field(ctx, amountCtrl, 'goals_amount_to_add',
+            _field(ctx, amountCtrl, 'goals_amount_to_add'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 20),
             SizedBox(
@@ -320,7 +321,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text('goals_save',
+                  child: Text('goals_save'.tr(),
                       style: const TextStyle(
                           fontFamily: 'Cairo',
                           fontWeight: FontWeight.w900,
@@ -339,18 +340,18 @@ class _GoalsScreenState extends State<GoalsScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: colorScheme.surface,
-        title: Text('goals_delete_title',
+        title: Text('goals_delete_title'.tr(),
             style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo')),
-        content: Text('confirm_delete',
+        content: Text('confirm_delete'.tr(),
             style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
               child:
-                   Text('cancel', style: const TextStyle(fontFamily: 'Cairo'))),
+                   Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child:  Text('delete',
+              child:  Text('delete'.tr(),
                   style: const TextStyle(
                       color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
         ],
@@ -404,7 +405,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('goals_title',
+        title: Text('goals_title'.tr(),
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -429,16 +430,16 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   // Summary
                   Row(children: [
                     Expanded(
-                        child: _statCard('🎯', '${_goals.length}', 'goals_count_label',
+                        child: _statCard('🎯', '${_goals.length}', 'goals_count_label'.tr(),
                             colorScheme.primary)),
                     const SizedBox(width: 8),
                     Expanded(
-                        child: _statCard('✅', '$completed', 'goals_completed_label',
+                        child: _statCard('✅', '$completed', 'goals_completed_label'.tr(),
                             const Color(0xFF10B981))),
                     const SizedBox(width: 8),
                     Expanded(
                         child: _statCard('💰', totalSaved.toStringAsFixed(0),
-                            'goals_saved_label', colorScheme.secondary)),
+                            'goals_saved_label'.tr(), colorScheme.secondary)),
                   ]),
                   const SizedBox(height: 16),
 
@@ -454,7 +455,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                               Text('goals_overall_progress',
+                               Text('goals_overall_progress'.tr(),
                                   style: TextStyle(
                                       color: colorScheme.onSurfaceVariant,
                                       fontFamily: 'Cairo',
@@ -495,7 +496,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       child: Column(children: [
                         const Text('🎯', style: TextStyle(fontSize: 48)),
                         const SizedBox(height: 12),
-                        Text('goals_empty',
+                        Text('goals_empty'.tr(),
                             style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontFamily: 'Cairo',
@@ -503,7 +504,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                             onPressed: () => _showAddDialog(),
-                            child:  Text('goals_add_first',
+                            child:  Text('goals_add_first'.tr(),
                                 style: const TextStyle(fontFamily: 'Cairo'))),
                       ]),
                     )
@@ -631,7 +632,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                           shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(10))),
-                                       child:  Text('goals_add_saving',
+                                       child:  Text('goals_add_saving'.tr(),
                                            style: const TextStyle(
                                                fontFamily: 'Cairo',
                                                fontWeight: FontWeight.w700)),

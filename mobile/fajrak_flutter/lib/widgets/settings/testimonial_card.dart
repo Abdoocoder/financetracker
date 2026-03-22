@@ -1,7 +1,6 @@
-import 'package:provider/provider.dart';
-import '../app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class TestimonialCard extends StatefulWidget {
   const TestimonialCard({super.key});
@@ -92,7 +91,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.read<AppState>().locale.languageCode == 'en' ? 'Review submitted successfully!' : 'تم إرسال التقييم بنجاح!',
+              context.locale.languageCode == 'en' ? 'Review submitted successfully!' : 'تم إرسال التقييم بنجاح!',
               style: const TextStyle(fontFamily: 'Cairo'),
             ),
             backgroundColor: const Color(0xFF10B981),
@@ -104,7 +103,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.read<AppState>().locale.languageCode == 'en' ? 'Error submitting review.' : 'حدث خطأ أثناء الإرسال.',
+              context.locale.languageCode == 'en' ? 'Error submitting review.' : 'حدث خطأ أثناء الإرسال.',
               style: const TextStyle(fontFamily: 'Cairo'),
             ),
             backgroundColor: const Color(0xFFEF4444),
@@ -122,7 +121,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isEn = context.read<AppState>().locale.languageCode == 'en';
+    final isEn = context.locale.languageCode == 'en';
     final canSubmit = _nameCtrl.text.isNotEmpty && _textCtrl.text.length >= 20;
 
     return Theme(

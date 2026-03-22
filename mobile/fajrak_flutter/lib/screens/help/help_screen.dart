@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -11,92 +12,92 @@ class _HelpScreenState extends State<HelpScreen> {
   String _search = '';
   List<Map<String, dynamic>> get _localizedFaqs => [
     {
-      'section': 'help_faq_dashboard_title',
+      'section': 'help_faq_dashboard_title'.tr(),
       'items': [
         {
-          'q': 'help_faq_dashboard_q1',
-          'a': 'help_faq_dashboard_a1'
+          'q': 'help_faq_dashboard_q1'.tr(),
+          'a': 'help_faq_dashboard_a1'.tr()
         },
         {
-          'q': 'help_faq_dashboard_q2',
-          'a': 'help_faq_dashboard_a2'
+          'q': 'help_faq_dashboard_q2'.tr(),
+          'a': 'help_faq_dashboard_a2'.tr()
         },
         {
-          'q': 'help_faq_dashboard_q3',
-          'a': 'help_faq_dashboard_a3'
+          'q': 'help_faq_dashboard_q3'.tr(),
+          'a': 'help_faq_dashboard_a3'.tr()
         },
       ],
     },
     {
-      'section': 'help_faq_transactions_title',
+      'section': 'help_faq_transactions_title'.tr(),
       'items': [
         {
-          'q': 'help_faq_transactions_q1',
-          'a': 'help_faq_transactions_a1'
+          'q': 'help_faq_transactions_q1'.tr(),
+          'a': 'help_faq_transactions_a1'.tr()
         },
         {
-          'q': 'help_faq_transactions_q2',
-          'a': 'help_faq_transactions_a2'
+          'q': 'help_faq_transactions_q2'.tr(),
+          'a': 'help_faq_transactions_a2'.tr()
         },
         {
-          'q': 'help_faq_transactions_q3',
-          'a': 'help_faq_transactions_a3'
+          'q': 'help_faq_transactions_q3'.tr(),
+          'a': 'help_faq_transactions_a3'.tr()
         },
       ],
     },
     {
-      'section': 'help_faq_debts_title',
+      'section': 'help_faq_debts_title'.tr(),
       'items': [
         {
-          'q': 'help_faq_debts_q1',
-          'a': 'help_faq_debts_a1'
+          'q': 'help_faq_debts_q1'.tr(),
+          'a': 'help_faq_debts_a1'.tr()
         },
         {
-          'q': 'help_faq_debts_q2',
-          'a': 'help_faq_debts_a2'
+          'q': 'help_faq_debts_q2'.tr(),
+          'a': 'help_faq_debts_a2'.tr()
         },
         {
-          'q': 'help_faq_debts_q3',
-          'a': 'help_faq_debts_a3'
+          'q': 'help_faq_debts_q3'.tr(),
+          'a': 'help_faq_debts_a3'.tr()
         },
       ],
     },
     {
-      'section': 'help_faq_budget_title',
+      'section': 'help_faq_budget_title'.tr(),
       'items': [
         {
-          'q': 'help_faq_budget_q1',
-          'a': 'help_faq_budget_a1'
+          'q': 'help_faq_budget_q1'.tr(),
+          'a': 'help_faq_budget_a1'.tr()
         },
         {
-          'q': 'help_faq_budget_q2',
-          'a': 'help_faq_budget_a2'
+          'q': 'help_faq_budget_q2'.tr(),
+          'a': 'help_faq_budget_a2'.tr()
         },
       ],
     },
     {
-      'section': 'help_faq_goals_title',
+      'section': 'help_faq_goals_title'.tr(),
       'items': [
         {
-          'q': 'help_faq_goals_q1',
-          'a': 'help_faq_goals_a1'
+          'q': 'help_faq_goals_q1'.tr(),
+          'a': 'help_faq_goals_a1'.tr()
         },
         {
-          'q': 'help_faq_goals_q2',
-          'a': 'help_faq_goals_a2'
+          'q': 'help_faq_goals_q2'.tr(),
+          'a': 'help_faq_goals_a2'.tr()
         },
       ],
     },
     {
-      'section': 'help_faq_investments_title',
+      'section': 'help_faq_investments_title'.tr(),
       'items': [
         {
-          'q': 'help_faq_investments_q1',
-          'a': 'help_faq_investments_a1'
+          'q': 'help_faq_investments_q1'.tr(),
+          'a': 'help_faq_investments_a1'.tr()
         },
         {
-          'q': 'help_faq_investments_q2',
-          'a': 'help_faq_investments_a2'
+          'q': 'help_faq_investments_q2'.tr(),
+          'a': 'help_faq_investments_a2'.tr()
         },
       ],
     },
@@ -121,7 +122,7 @@ class _HelpScreenState extends State<HelpScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
-        title: Text('help_title',
+        title: Text('help_title'.tr(),
             style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -144,7 +145,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 style:
                     const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  hintText: 'help_search_hint',
+                  hintText: 'help_search_hint'.tr(),
                   prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
                   hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
                   contentPadding:
@@ -179,13 +180,13 @@ class _HelpScreenState extends State<HelpScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('help_contact_title',
+                        Text('help_contact_title'.tr(),
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'Cairo',
                                 fontSize: 13)),
-                        Text('help_contact_subtitle',
+                        Text('help_contact_subtitle'.tr(),
                             style: const TextStyle(
                                 color: Color(0xFF94A3B8),
                                 fontFamily: 'Cairo',
