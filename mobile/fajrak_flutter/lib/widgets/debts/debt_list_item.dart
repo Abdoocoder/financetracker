@@ -229,7 +229,7 @@ class _DebtListItemState extends State<DebtListItem> {
                 minHeight: 8)),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('${pct.toStringAsFixed(0)}% مسدد',
+          Text('debts_paid_pct'.tr(args: [pct.toStringAsFixed(0)]),
               style: TextStyle(
                   color: cs.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
           Row(children: [
@@ -246,7 +246,7 @@ class _DebtListItemState extends State<DebtListItem> {
                 decoration: BoxDecoration(
                     color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6)),
-                child: Text('يوم ${widget.debt['payment_day']}',
+                child: Text('debts_day_label'.tr(args: [widget.debt['payment_day'].toString()]),
                     style: const TextStyle(
                         color: Color(0xFF3B7EF6),
                         fontSize: 10,
@@ -357,7 +357,7 @@ class _DebtListItemState extends State<DebtListItem> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                           color: const Color(0xFF10B981).withValues(alpha: 0.2))),
-                  child: const Text('+ دفعة',
+                  child: Text('debts_add_payment_btn'.tr(),
                       style: TextStyle(
                           color: Color(0xFF6EE7B7),
                           fontSize: 12,
