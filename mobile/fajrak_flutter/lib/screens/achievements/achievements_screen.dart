@@ -3,6 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 
+import '../../widgets/achievements/level_card.dart';
+import '../../widgets/achievements/badge_grid.dart';
+
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({super.key});
   @override
@@ -53,17 +56,12 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     }
 
     try {
-      // استدعاء API الإنجازات
       try {
         await Supabase.instance.client.functions.invoke(
           'gamification',
           body: {'user_id': user.id},
         );
-        // إذا ما يشتغل الـ function، نجلب من user_stats مباشرة
-      } catch (_) {
-        // This catch is for the gamification function specifically,
-        // the outer catch will handle general errors.
-      }
+      } catch (_) {}
 
       final stats = await Supabase.instance.client
           .from('user_stats')
@@ -123,159 +121,31 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     if (_loading) {
       return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: Center(
-              child: CircularProgressIndicator(color: colorScheme.primary)));
+          body: Center(child: CircularProgressIndicator(color: colorScheme.primary)));
     }
-
-    final progress = _nextLevel < 9999 ? _points / _nextLevel : 1.0;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
-        title: Text('الإنجازات',
-            style: TextStyle(
-                fontFamily: 'Cairo',
-                fontWeight: FontWeight.w900,
-                color: colorScheme.onSurface)),
-        iconTheme: IconThemeData(color: colorScheme.onSurface),
+        title: const Text('الإنجازات',
+            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
-          // Level Card
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [colorScheme.surfaceContainerHighest, colorScheme.surface],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                  color: colorScheme.primary.withValues(alpha: 0.3)),
-            ),
-            child: Column(children: [
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(_levelTitle,
-                      style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 22,
-                          fontFamily: 'Cairo')),
-                  Text('المستوى $_level',
-                      style: TextStyle(
-                          color: colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo',
-                          fontSize: 13)),
-                ]),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                      color: colorScheme.primary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: colorScheme.primary)),
-                  child: Text('$_points نقطة',
-                      style: TextStyle(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.w900,
-                          fontFamily: 'Cairo')),
-                ),
-              ]),
-              const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: progress.clamp(0.0, 1.0),
-                  backgroundColor: colorScheme.outlineVariant,
-                  valueColor: AlwaysStoppedAnimation(colorScheme.primary),
-                  minHeight: 8,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('$_points نقطة',
-                    style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
-                        fontSize: 11,
-                        fontFamily: 'Cairo')),
-                if (_nextLevel < 9999)
-                  Text('$_nextLevel للمستوى التالي',
-                      style: TextStyle(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: 11,
-                          fontFamily: 'Cairo')),
-              ]),
-            ]),
+          LevelCard(
+            level: _level,
+            levelTitle: _levelTitle,
+            points: _points,
+            nextLevel: _nextLevel,
+            colorScheme: colorScheme,
           ),
           const SizedBox(height: 20),
-
-          // Badges
-          Align(
-              alignment: Alignment.centerRight,
-              child: Text('الشارات (${_badges.length}/${_badgeInfo.length})',
-                  style: TextStyle(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16,
-                      fontFamily: 'Cairo'))),
-          const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.9),
-            itemCount: _badgeInfo.length,
-            itemBuilder: (_, i) {
-              final key = _badgeInfo.keys.elementAt(i);
-              final info = _badgeInfo[key]!;
-              final earned = _badges.contains(key);
-              return Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: earned
-                      ? colorScheme.primary.withValues(alpha: 0.1)
-                      : colorScheme.surface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                      color: earned
-                          ? colorScheme.primary.withValues(alpha: 0.4)
-                          : colorScheme.outlineVariant),
-                ),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(info.$1,
-                          style: TextStyle(
-                              fontSize: 28,
-                              color: earned
-                                  ? null
-                                  : colorScheme.outlineVariant
-                                      .withValues(alpha: 0.5))),
-                      const SizedBox(height: 6),
-                      Text(info.$2,
-                          style: TextStyle(
-                              color: earned
-                                  ? colorScheme.onSurface
-                                  : colorScheme.onSurfaceVariant,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Cairo'),
-                          textAlign: TextAlign.center,
-                          maxLines: 2),
-                      Text(info.$3,
-                          style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: 9,
-                              fontFamily: 'Cairo')),
-                    ]),
-              );
-            },
+          BadgeGrid(
+            earnedBadges: _badges,
+            badgeInfo: _badgeInfo,
+            colorScheme: colorScheme,
           ),
         ]),
       ),

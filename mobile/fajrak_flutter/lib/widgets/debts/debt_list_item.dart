@@ -45,7 +45,6 @@ class _DebtListItemState extends State<DebtListItem> {
     setState(() => _payingSaving = true);
     
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
       final newRemaining = ((widget.debt['remaining_amount'] as num).toDouble() - amount)
           .clamp(0.0, double.infinity);
           

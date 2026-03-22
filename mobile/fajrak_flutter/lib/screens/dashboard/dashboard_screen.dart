@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
-import '../../widgets/dashboard/quick_links_card.dart'; // QuickLinksCards
+import '../../widgets/dashboard/quick_links_card.dart';
 import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/dashboard_header.dart';
+
+import '../../widgets/dashboard/dashboard_stats.dart';
+import '../../widgets/dashboard/dashboard_health_score.dart';
+import '../../widgets/dashboard/dashboard_quick_add.dart';
+import '../../widgets/dashboard/dashboard_stage_card.dart';
+import '../../widgets/dashboard/recent_transactions_list.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -20,7 +27,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   double _income = 0, _expenses = 0, _net = 0;
   int _healthScore = 0;
-  String _txType = 'expense';
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
@@ -30,30 +36,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final double _prevExpenses = 0;
   double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
-  final _amountController = TextEditingController();
-  bool _saving = false;
-  String _selectedCategory = 'طعام';
-  final _categories = ['طعام','مواصلات','فواتير','صحة','ترفيه','تسوق','راتب','عمل حر','أخرى'];
-
-  String _getCategoryName(String key) {
-    switch (key) {
-      case 'طعام': return 'cat_food'.tr();
-      case 'مواصلات': return 'cat_transport'.tr();
-      case 'فواتير': return 'cat_bills'.tr();
-      case 'صحة': return 'cat_health'.tr();
-      case 'ترفيه': return 'cat_entertainment'.tr();
-      case 'تسوق': return 'cat_shopping'.tr();
-      case 'راتب': return 'cat_salary'.tr();
-      case 'عمل حر': return 'cat_freelance'.tr();
-      default: return 'cat_others'.tr();
-    }
-  }
 
   @override
   void initState() { super.initState(); _load(); }
-
-  @override
-  void dispose() { _amountController.dispose(); super.dispose(); }
 
   Future<void> _load() async {
     try {
@@ -135,20 +120,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> _quickAdd() async {
-    final amount = double.tryParse(_amountController.text.trim());
-    if (amount == null || amount <= 0) return;
+  Future<void> _quickAdd(String type, double amount, String category) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    setState(() => _saving = true);
     HapticFeedback.mediumImpact();
     try {
       await Supabase.instance.client.from('transactions').insert({
-        'user_id': user.id, 'type': _txType, 'amount': amount,
-        'category': _selectedCategory, 'description': _selectedCategory,
+        'user_id': user.id, 'type': type, 'amount': amount,
+        'category': category, 'description': category,
         'transaction_date': DateTime.now().toIso8601String().split('T')[0],
       });
-      _amountController.clear();
       await _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -160,7 +141,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFFEF4444)));
       }
     }
-    setState(() => _saving = false);
   }
 
   @override
@@ -186,13 +166,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               DashboardHeader(name: _name),
               const SizedBox(height: 16),
-              _buildStatCards(colorScheme),
+              DashboardStats(income: _income, expenses: _expenses, net: _net, colorScheme: colorScheme),
               const SizedBox(height: 16),
-              _buildHealthScore(colorScheme),
+              DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
               const SizedBox(height: 16),
-              _buildQuickAdd(colorScheme),
+              DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
               const SizedBox(height: 16),
-              _buildStage(),
+              DashboardStageCard(stage: _stage),
               const SizedBox(height: 16),
               ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
               const SizedBox(height: 16),
@@ -206,143 +186,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
               ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
               const SizedBox(height: 16),
-              _buildRecentTransactions(colorScheme),
+              RecentTransactionsList(transactions: _recentTx, currency: _currency, colorScheme: colorScheme),
             ]),
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildStatCards(ColorScheme colorScheme) {
-    return Row(children: [
-      Expanded(child: _statCard('dash_income'.tr(), _income, const Color(0xFF10B981), '↑', colorScheme)),
-      const SizedBox(width: 8),
-      Expanded(child: _statCard('dash_expenses'.tr(), _expenses, const Color(0xFFEF4444), '↓', colorScheme)),
-      const SizedBox(width: 8),
-      Expanded(child: _statCard('dash_net'.tr(), _net, _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), '=', colorScheme)),
-    ]);
-  }
-
-  Widget _statCard(String label, double value, Color color, String icon, ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14), border: Border.all(color: color.withValues(alpha: 0.2))),
-      child: Column(children: [
-        Text(icon, style: TextStyle(color: color, fontSize: 12)),
-        const SizedBox(height: 4),
-        FittedBox(child: Text(value.abs().toStringAsFixed(0), style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'))),
-        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
-      ]),
-    );
-  }
-
-  Widget _buildHealthScore(ColorScheme colorScheme) {
-    final color = _healthScore >= 80 ? const Color(0xFF10B981) : _healthScore >= 60 ? colorScheme.primary : _healthScore >= 40 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
-    final label = _healthScore >= 80 ? 'health_excellent'.tr() : _healthScore >= 60 ? 'health_good'.tr() : _healthScore >= 40 ? 'health_fair'.tr() : 'health_poor'.tr();
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withValues(alpha: 0.3))),
-      child: Row(children: [
-        SizedBox(width: 64, height: 64, child: Stack(alignment: Alignment.center, children: [
-          CircularProgressIndicator(value: _healthScore / 100, color: color, backgroundColor: colorScheme.outlineVariant, strokeWidth: 6),
-          Text('$_healthScore', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18, fontFamily: 'Cairo')),
-        ])),
-        const SizedBox(width: 16),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('health_score'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
-          Text('dash_points_per_100'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
-        ])),
-      ]),
-    );
-  }
-
-  Widget _buildQuickAdd(ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: colorScheme.outlineVariant)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('quick_add_title'.tr(), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'income'),
-            child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
-          const SizedBox(width: 8),
-          Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'expense'),
-            child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
-        ]),
-        const SizedBox(height: 12),
-        SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: _categories.length,
-          itemBuilder: (_, i) { final cat = _categories[i]; final selected = cat == _selectedCategory;
-            return GestureDetector(onTap: () => setState(() => _selectedCategory = cat),
-              child: Container(margin: const EdgeInsets.only(left: 8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(color: selected ? colorScheme.primary.withValues(alpha: 0.2) : colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? colorScheme.primary : colorScheme.outlineVariant)),
-                child: Text(_getCategoryName(cat), style: TextStyle(color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')))); })),
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: TextField(controller: _amountController, keyboardType: TextInputType.number, textAlign: TextAlign.right,
-            style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
-            decoration: InputDecoration(hintText: 'trans_amount'.tr(), hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontFamily: 'Cairo'), filled: true, fillColor: colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), suffixText: _currency, suffixStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')))),
-          const SizedBox(width: 8),
-          GestureDetector(onTap: _saving ? null : _quickAdd,
-            child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(10)),
-              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),
-        ]),
-      ]),
-    );
-  }
-
-  Widget _buildStage() {
-    final stages = {
-      'awareness': ('🌱', 'مرحلة الوعي', const Color(0xFF8B5CF6)),
-      'debt': ('💳', 'مرحلة سداد الديون', const Color(0xFFEF4444)),
-      'emergency': ('🛡️', 'مرحلة الطوارئ', const Color(0xFFF59E0B)),
-      'investing': ('📈', 'مرحلة الاستثمار', const Color(0xFF10B981)),
-      'wealth': ('👑', 'مرحلة الثروة', const Color(0xFF3B7EF6)),
-    };
-    final s = stages[_stage] ?? stages['awareness']!;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: s.$3.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(14), border: Border.all(color: s.$3.withValues(alpha: 0.25))),
-      child: Row(children: [
-        Text(s.$1, style: const TextStyle(fontSize: 24)),
-        const SizedBox(width: 12),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('stage'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
-          Text('learn_stage_$_stage'.tr(), style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
-        ]),
-      ]),
-    );
-  }
-
-  Widget _buildRecentTransactions(ColorScheme colorScheme) {
-    if (_recentTx.isEmpty) return const SizedBox();
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('dash_recent'.tr(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface, fontFamily: 'Cairo')),
-      const SizedBox(height: 10),
-      ..._recentTx.map((tx) {
-        final isIncome = tx['type'] == 'income';
-        final amount = (tx['amount'] as num).toDouble();
-        final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
-        return Container(margin: const EdgeInsets.only(bottom: 8), padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: colorScheme.outlineVariant)),
-          child: Row(children: [
-            Container(width: 38, height: 38, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-              child: Center(child: Text(isIncome ? '💰' : '💸', style: const TextStyle(fontSize: 16)))),
-            const SizedBox(width: 10),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tx['description'] ?? _getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
-              Text(_getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
-            ])),
-            Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $_currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
-          ]));
-      }),
-    ]);
   }
 }
