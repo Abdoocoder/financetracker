@@ -50,8 +50,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
           .from('profiles')
           .select('currency')
           .eq('id', user.id)
-          .single();
-      _currency = profile['currency'] as String? ?? 'JOD';
+          .maybeSingle();
+      _currency = profile?['currency'] as String? ?? 'JOD';
       
       final active = await Supabase.instance.client
           .from('debts')

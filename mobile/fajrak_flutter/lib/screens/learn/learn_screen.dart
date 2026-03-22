@@ -262,22 +262,22 @@ class _LearnScreenState extends State<LearnScreen> {
                     const Text('🔥', style: TextStyle(fontSize: 56)),
                     const SizedBox(height: 12),
                     Text('learn_streak_consecutive'.tr(args: [newStreak.toString()]),
-                        style: const TextStyle(
-                            color: Color(0xFFF59E0B),
+                        style: TextStyle(
+                            color: cs.primary,
                             fontWeight: FontWeight.w900,
                             fontSize: 22,
                             fontFamily: 'Cairo')),
                     const SizedBox(height: 8),
                     Text('learn_streak_congrats'.tr(),
-                        style: const TextStyle(
-                            color: Color(0xFF94A3B8), fontFamily: 'Cairo'),
+                        style: TextStyle(
+                            color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
                         textAlign: TextAlign.center),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF59E0B),
-                          foregroundColor: Colors.white,
+                          backgroundColor: cs.primary,
+                          foregroundColor: cs.onPrimary,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12))),
                       child: Text('learn_streak_continue'.tr(),
@@ -332,8 +332,8 @@ class _LearnScreenState extends State<LearnScreen> {
                 const SizedBox(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('learn_stage_label'.tr(),
-                      style: const TextStyle(
-                          color: Color(0xFF94A3B8),
+                      style: TextStyle(
+                          color: cs.onSurfaceVariant.withValues(alpha: 0.7),
                           fontSize: 10,
                           fontFamily: 'Cairo')),
                   Text(info.$2,
@@ -356,14 +356,14 @@ class _LearnScreenState extends State<LearnScreen> {
               child: Column(children: [
                 const Text('🔥', style: TextStyle(fontSize: 22)),
                 Text('$_streak',
-                    style: const TextStyle(
-                        color: Color(0xFFF59E0B),
+                    style: TextStyle(
+                        color: cs.primary,
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
                         fontFamily: 'Cairo')),
                 Text('learn_streak_day'.tr(),
-                    style: const TextStyle(
-                        color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                        color: cs.onSurfaceVariant.withValues(alpha: 0.7),
                         fontSize: 10,
                         fontFamily: 'Cairo')),
               ]),
@@ -454,15 +454,15 @@ class _LearnScreenState extends State<LearnScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('learn_did_you_know'.tr(),
-                      style: const TextStyle(
-                          color: Color(0xFF3B7EF6),
+                      style: TextStyle(
+                          color: cs.primary,
                           fontWeight: FontWeight.w800,
                           fontSize: 12,
                           fontFamily: 'Cairo')),
                   const SizedBox(height: 6),
                   Text('learn_did_you_know_msg'.tr(),
-                      style: const TextStyle(
-                          color: Color(0xFF64748B),
+                      style: TextStyle(
+                          color: cs.onSurfaceVariant,
                           fontSize: 12,
                           fontFamily: 'Cairo',
                           height: 1.6)),

@@ -24,15 +24,15 @@ class PaidDebtItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
               Text(debt['name'] ?? '',
-                  style: const TextStyle(
-                      color: Colors.white,
+                  style: TextStyle(
+                      color: cs.onSurface,
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w700,
                       fontSize: 13)),
               if (debt['updated_at'] != null)
                 Text(debt['updated_at'].toString().substring(0, 10),
-                    style: const TextStyle(
-                        color: Color(0xFF64748B),
+                    style: TextStyle(
+                        color: cs.onSurfaceVariant,
                         fontSize: 11,
                         fontFamily: 'Cairo')),
             ])),

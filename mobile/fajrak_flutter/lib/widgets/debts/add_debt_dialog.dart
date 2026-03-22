@@ -156,13 +156,13 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         controller: ctrl,
         keyboardType: type,
         textAlign: TextAlign.right,
-        style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+        style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
         decoration: InputDecoration(
             hintText: hint,
             hintStyle:
-                const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
+                TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.6), fontFamily: 'Cairo'),
             filled: true,
-            fillColor: const Color(0xFF1E293B),
+            fillColor: cs.surfaceContainerHigh,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none),
@@ -224,7 +224,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             Expanded(child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('trans_equivalent'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+                Text('trans_equivalent'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
                 const SizedBox(height: 4),
                 Text(
                   '${((double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0) * (double.tryParse(_exchangeRateCtrl.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
@@ -312,7 +312,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                             color: _priority == i + 1
                                 ? widget.priorityColors[i]
                                     .withValues(alpha: 0.25)
-                                : cs.outlineVariant,
+                                : cs.surfaceContainerHigh,
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
                                 color: _priority == i + 1
@@ -370,13 +370,13 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: _receivedAmount
-                    ? const Color(0xFF3B7EF6).withValues(alpha: 0.1)
-                    : const Color(0xFF1E293B),
+                    ? cs.primary.withValues(alpha: 0.1)
+                    : cs.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                     color: _receivedAmount
-                        ? const Color(0xFF3B7EF6).withValues(alpha: 0.4)
-                        : const Color(0xFF334155)),
+                        ? cs.primary.withValues(alpha: 0.4)
+                        : cs.outlineVariant),
               ),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
