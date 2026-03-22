@@ -294,25 +294,23 @@ class _LearnScreenState extends State<LearnScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final bgColor = theme.scaffoldBackgroundColor;
+
     if (_loading) {
-      return const Scaffold(
-          backgroundColor: Color(0xFF070B14),
+      return Scaffold(
+          backgroundColor: bgColor,
           body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B7EF6))));
+              child: CircularProgressIndicator(color: cs.primary)));
     }
 
     final info = _stageInfo[_stage]!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070B14),
-        title: Text('learn_title'.tr(),
-            style: const TextStyle(
-                fontFamily: 'Cairo',
-                fontWeight: FontWeight.w900,
-                color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: Text('learn_title'.tr()),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -377,7 +375,7 @@ class _LearnScreenState extends State<LearnScreen> {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F1629),
+              color: cs.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: info.$3.withValues(alpha: 0.2)),
               boxShadow: [
@@ -390,17 +388,17 @@ class _LearnScreenState extends State<LearnScreen> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(_lesson['title'] ?? '',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: cs.onSurface,
                       fontFamily: 'Cairo',
                       height: 1.4)),
               const SizedBox(height: 16),
               Text(_lesson['body'] ?? '',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF94A3B8),
+                      color: cs.onSurfaceVariant,
                       fontFamily: 'Cairo',
                       height: 1.7)),
               const SizedBox(height: 20),
@@ -448,10 +446,10 @@ class _LearnScreenState extends State<LearnScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-                color: const Color(0xFF3B7EF6).withValues(alpha: 0.06),
+                color: cs.primary.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                    color: const Color(0xFF3B7EF6).withValues(alpha: 0.15))),
+                    color: cs.primary.withValues(alpha: 0.15))),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
