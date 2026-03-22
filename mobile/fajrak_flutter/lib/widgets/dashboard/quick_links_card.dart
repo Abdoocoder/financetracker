@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class QuickLinksCards extends StatelessWidget {
   final double totalDebt;
   final double invValue;
   final double goalsSaved;
-  final double goalsTarget;
   final String currency;
 
   const QuickLinksCards({
@@ -12,7 +12,6 @@ class QuickLinksCards extends StatelessWidget {
     required this.totalDebt,
     required this.invValue,
     required this.goalsSaved,
-    required this.goalsTarget,
     required this.currency,
   });
 
@@ -46,22 +45,24 @@ class QuickLinksCards extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: isDark ? color.withValues(alpha: 0.1) : color.withValues(alpha: 0.05),
+          color: isDark ? color.withOpacity(0.1) : color.withOpacity(0.05),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withValues(alpha: isDark ? 0.2 : 0.15)),
+          border: Border.all(color: color.withOpacity(isDark ? 0.2 : 0.15)),
         ),
         child: Column(
           children: [
             Text(icon, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 6),
             FittedBox(
-                child: Text('${value.toStringAsFixed(0)} $currency',
-                    style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12,
-                        fontFamily: 'Cairo'))),
-            const SizedBox(height: 2),
+              child: Text(
+                '${value.toStringAsFixed(0)} $currency',
+                style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 14,
+                    fontFamily: 'Cairo'),
+              ),
+            ),
             Text(title,
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
@@ -73,4 +74,3 @@ class QuickLinksCards extends StatelessWidget {
     );
   }
 }
-```
