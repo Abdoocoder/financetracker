@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:http/http.dart' as http;
 
 import '../../app_state.dart';
 import '../../services/analytics_service.dart';
@@ -119,13 +120,33 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Future<void> _generateAlerts() async {
     setState(() => _generating = true);
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('alerts_generate_success'.tr(),
-              style: const TextStyle(fontFamily: 'Cairo'))));
-      setState(() => _generating = false);
-      _load();
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) throw Exception('No session');
+
+      final response = await http.post(
+        Uri.parse('https://fajrak.com/api/alerts'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${session.accessToken}',
+        },
+      );
+
+      if (mounted) {
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('alerts_generate_success'.tr(),
+                  style: const TextStyle(fontFamily: 'Cairo'))));
+          _load();
+          context.read<AppState>().loadUnreadAlerts();
+        } else {
+          throw Exception('Failed to generate alerts: ${response.statusCode}');
+        }
+      }
+    } catch (e, st) {
+      if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Generate Alerts Error');
+    } finally {
+      if (mounted) setState(() => _generating = false);
     }
   }
 

@@ -33,6 +33,8 @@ dependencies:
   path_provider: ^2.1.5
   easy_localization: ^3.0.3
   provider: ^6.1.1
+  http: ^1.2.1
+  flutter_app_badger: ^1.5.0
 
 dev_dependencies:
   flutter_test:

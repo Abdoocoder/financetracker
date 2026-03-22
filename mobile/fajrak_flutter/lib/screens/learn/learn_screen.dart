@@ -166,21 +166,20 @@ class _LearnScreenState extends State<LearnScreen> {
             .eq('is_paid', false),
         Supabase.instance.client
             .from('investments')
-            .select('id', const FetchOptions(count: CountOption.exact))
-            .eq('user_id', user.id)
-            .limit(1),
+            .select('id')
+            .eq('user_id', user.id),
       ]);
 
       final profile = (results[0] as Map<String, dynamic>?) ?? {};
       final debts = (results[1] as List?) ?? [];
-      final invRes = results[2] as PostgrestResponse;
+      final invList = (results[2] as List?) ?? [];
 
       final income = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
       final totalDebt = debts.fold(
           0.0, (a, d) => a + ((d['remaining_amount'] as num?)?.toDouble() ?? 0));
       final totalMonthly = debts.fold(
           0.0, (a, d) => a + ((d['monthly_payment'] as num?)?.toDouble() ?? 0));
-      final hasInvestments = (invRes.count ?? 0) > 0;
+      final hasInvestments = invList.isNotEmpty;
 
       String stage = 'awareness';
       if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
