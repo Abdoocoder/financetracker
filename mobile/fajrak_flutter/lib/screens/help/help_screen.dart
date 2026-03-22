@@ -118,16 +118,21 @@ class _HelpScreenState extends State<HelpScreen> {
         .where((s) => (s['items'] as List).isNotEmpty)
         .toList();
 
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final bgColor = theme.scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF070B14),
+      backgroundColor: bgColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070B14),
+        backgroundColor: bgColor,
+        elevation: 0,
         title: Text('help_title'.tr(),
-            style: const TextStyle(
+            style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
-                color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white),
+                color: cs.onSurface)),
+        iconTheme: IconThemeData(color: cs.onSurface),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -137,17 +142,16 @@ class _HelpScreenState extends State<HelpScreen> {
             // Search Bar
             Container(
               decoration: BoxDecoration(
-                  color: const Color(0xFF0F1629),
+                  color: cs.surface,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF1E293B))),
+                  border: Border.all(color: cs.outlineVariant)),
               child: TextField(
                 onChanged: (v) => setState(() => _search = v),
-                style:
-                    const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
                   hintText: 'help_search_hint'.tr(),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
-                  hintStyle: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo'),
+                  prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant),
+                  hintStyle: TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.6), fontFamily: 'Cairo'),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: InputBorder.none,
@@ -181,14 +185,14 @@ class _HelpScreenState extends State<HelpScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('help_contact_title'.tr(),
-                            style: const TextStyle(
-                                color: Colors.white,
+                            style: TextStyle(
+                                color: cs.onSurface,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'Cairo',
                                 fontSize: 13)),
                         Text('help_contact_subtitle'.tr(),
-                            style: const TextStyle(
-                                color: Color(0xFF94A3B8),
+                            style: TextStyle(
+                                color: cs.onSurfaceVariant,
                                 fontFamily: 'Cairo',
                                 fontSize: 11)),
                       ],
@@ -241,41 +245,42 @@ class _FAQItemState extends State<_FAQItem> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: _open
-            ? const Color(0xFF0F1629)
-            : const Color(0xFF0F1629).withValues(alpha: 0.5),
+            ? cs.surface
+            : cs.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: _open
-                ? const Color(0xFF3B7EF6).withValues(alpha: 0.3)
-                : const Color(0xFF1E293B)),
+                ? cs.primary.withValues(alpha: 0.3)
+                : cs.outlineVariant),
       ),
       child: Column(
         children: [
-          ListTile(
+            ListTile(
             onTap: () => setState(() => _open = !_open),
             title: Text(widget.q,
                 style: TextStyle(
-                    color: _open ? Colors.white : const Color(0xFFCBD5E1),
+                    color: _open ? cs.onSurface : cs.onSurfaceVariant,
                     fontWeight: _open ? FontWeight.w900 : FontWeight.w700,
                     fontFamily: 'Cairo',
                     fontSize: 13)),
             trailing: AnimatedRotation(
               duration: const Duration(milliseconds: 200),
               turns: _open ? 0.5 : 0,
-              child: const Icon(Icons.keyboard_arrow_down,
-                  color: Color(0xFF64748B)),
+              child: Icon(Icons.keyboard_arrow_down,
+                  color: cs.onSurfaceVariant),
             ),
           ),
           if (_open)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Text(widget.a,
-                  style: const TextStyle(
-                      color: Color(0xFF94A3B8),
+                  style: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontFamily: 'Cairo',
                       fontSize: 12,
                       height: 1.6)),

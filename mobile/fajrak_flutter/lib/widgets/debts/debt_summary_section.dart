@@ -64,8 +64,8 @@ class DebtSummarySection extends StatelessWidget {
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('debts_total_paid_life'.tr(),
-                    style: const TextStyle(
-                        color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                        color: cs.onSurfaceVariant,
                         fontSize: 12,
                         fontFamily: 'Cairo')),
                 Text('${lifeTimePaid.toStringAsFixed(0)} $currency',
@@ -78,8 +78,8 @@ class DebtSummarySection extends StatelessWidget {
               const Spacer(),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text('debts_paid_count'.tr(),
-                    style: const TextStyle(
-                        color: Color(0xFF94A3B8),
+                    style: TextStyle(
+                        color: cs.onSurfaceVariant,
                         fontSize: 11,
                         fontFamily: 'Cairo')),
                 Text('$paidCount 🎯',
@@ -97,14 +97,14 @@ class DebtSummarySection extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-              color: const Color(0xFF0F1629),
+              color: cs.surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF1E293B))),
+              border: Border.all(color: cs.outlineVariant)),
           child: Column(children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('debts_overall_progress'.tr(),
-                  style: const TextStyle(
-                      color: Color(0xFF94A3B8),
+                  style: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontSize: 12,
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w700)),
@@ -120,7 +120,7 @@ class DebtSummarySection extends StatelessWidget {
                 borderRadius: BorderRadius.circular(5),
                 child: LinearProgressIndicator(
                     value: (paidPct / 100).clamp(0.0, 1.0),
-                    backgroundColor: const Color(0xFF1E293B),
+                    backgroundColor: cs.outlineVariant,
                     color: const Color(0xFF10B981),
                     minHeight: 10)),
             const SizedBox(height: 6),
@@ -130,15 +130,15 @@ class DebtSummarySection extends StatelessWidget {
                     (totalOriginal - totalRemaining).toStringAsFixed(0),
                     currency
                   ]),
-                  style: const TextStyle(
-                      color: Color(0xFF64748B),
+                  style: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontSize: 10,
                       fontFamily: 'Cairo')),
               Text(
                   'debts_original_amount_label'
                       .tr(args: [totalOriginal.toStringAsFixed(0), currency]),
-                  style: const TextStyle(
-                      color: Color(0xFF64748B),
+                  style: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontSize: 10,
                       fontFamily: 'Cairo')),
             ]),
@@ -152,9 +152,9 @@ class DebtSummarySection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       decoration: BoxDecoration(
-          color: const Color(0xFF0F1629),
+          color: cs.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF1E293B))),
+          border: Border.all(color: cs.outlineVariant)),
       child: Column(children: [
         Text(value,
             style: TextStyle(
@@ -164,8 +164,8 @@ class DebtSummarySection extends StatelessWidget {
                 fontFamily: 'Cairo')),
         const SizedBox(height: 4),
         Text(label,
-            style: const TextStyle(
-                color: Color(0xFF64748B), fontSize: 10, fontFamily: 'Cairo'),
+            style: TextStyle(
+                color: cs.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo'),
             textAlign: TextAlign.center),
       ]),
     );

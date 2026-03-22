@@ -130,17 +130,20 @@ class _DebtListItemState extends State<DebtListItem> {
     final priorityIndex = ((widget.debt['priority'] as int?) ?? 3) - 1;
     final prioColor = widget.priorityColors[priorityIndex.clamp(0, 4)];
 
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1629),
+        color: cs.surface,
         borderRadius: BorderRadius.circular(15),
         border: Border(
           left: BorderSide(color: prioColor, width: 3),
-          top: const BorderSide(color: Color(0xFF1E293B)),
-          right: const BorderSide(color: Color(0xFF1E293B)),
-          bottom: const BorderSide(color: Color(0xFF1E293B)),
+          top: BorderSide(color: cs.outlineVariant),
+          right: BorderSide(color: cs.outlineVariant),
+          bottom: BorderSide(color: cs.outlineVariant),
         ),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -169,16 +172,16 @@ class _DebtListItemState extends State<DebtListItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                 Text(widget.debt['name'] ?? '',
-                    style: const TextStyle(
-                        color: Colors.white,
+                    style: TextStyle(
+                        color: cs.onSurface,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Cairo',
                         fontSize: 14)),
                 if (widget.debt['notes'] != null &&
                     (widget.debt['notes'] as String).isNotEmpty)
                   Text(widget.debt['notes'],
-                      style: const TextStyle(
-                          color: Color(0xFF64748B),
+                      style: TextStyle(
+                          color: cs.onSurfaceVariant,
                           fontSize: 11,
                           fontFamily: 'Cairo'),
                       overflow: TextOverflow.ellipsis),
@@ -221,19 +224,19 @@ class _DebtListItemState extends State<DebtListItem> {
             borderRadius: BorderRadius.circular(5),
             child: LinearProgressIndicator(
                 value: (pct / 100).clamp(0.0, 1.0),
-                backgroundColor: const Color(0xFF1E293B),
+                backgroundColor: cs.outlineVariant,
                 color: const Color(0xFF10B981),
                 minHeight: 8)),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('${pct.toStringAsFixed(0)}% مسدد',
-              style: const TextStyle(
-                  color: Color(0xFF94A3B8), fontSize: 11, fontFamily: 'Cairo')),
+              style: TextStyle(
+                  color: cs.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
           Row(children: [
             if ((widget.debt['monthly_payment'] as num).toDouble() > 0)
               Text('${(widget.debt['monthly_payment'] as num).toStringAsFixed(0)}/شهر',
-                  style: const TextStyle(
-                      color: Color(0xFF64748B),
+                  style: TextStyle(
+                      color: cs.onSurfaceVariant,
                       fontSize: 11,
                       fontFamily: 'Cairo')),
             if (widget.debt['payment_day'] != null) ...[
@@ -282,27 +285,27 @@ class _DebtListItemState extends State<DebtListItem> {
                   child: TextField(
                     controller: _paymentCtrl,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo'),
+                    style: TextStyle(color: cs.onSurface, fontSize: 13, fontFamily: 'Cairo'),
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                         hintText: 'trans_amount'.tr(),
-                        hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                        hintStyle: TextStyle(color: cs.onSurfaceVariant),
                         filled: true,
-                        fillColor: const Color(0xFF1E293B),
+                        fillColor: cs.surfaceContainerHigh,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
                     autofocus: true,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Container(
+                  Container(
                   padding: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: cs.surfaceContainerHigh, borderRadius: BorderRadius.circular(8)),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _paymentCurrency,
-                      dropdownColor: const Color(0xFF1E293B),
-                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      dropdownColor: cs.surface,
+                      style: TextStyle(color: cs.onSurface, fontSize: 11, fontWeight: FontWeight.bold),
                       items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                       onChanged: (v) { if (v != null) { setState(() => _paymentCurrency = v); _updatePaymentRate(); } },
                     ),
@@ -322,8 +325,8 @@ class _DebtListItemState extends State<DebtListItem> {
                   onTap: () { setState(() { _isPaying = false; _paymentCtrl.clear(); }); },
                   child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(8)),
-                      child: const Text('✕', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13))),
+                      decoration: BoxDecoration(color: cs.surfaceContainerHigh, borderRadius: BorderRadius.circular(8)),
+                      child: Text('✕', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13))),
                 ),
               ]),
               if (_paymentCurrency != widget.currency)
