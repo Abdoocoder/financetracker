@@ -198,6 +198,10 @@
   "inv_jod": "د.أ",
   "inv_tx_history": "📋 تاريخ المعاملات",
   "inv_portfolio_chart": "📊 توزيع المحفظة",
+  "inv_fetch_price": "جلب السعر",
+  "inv_portfolio_count": "محفظتي ({})",
+  "inv_halal_tip": "تأكد من استثمارك في صناديق حلال مثل SPUS أو HLAL",
+  "inv_add_first": "أضف استثمارك الأول",
 
   "goals_title": "أهداف الادخار",
   "goals_add": "إضافة",

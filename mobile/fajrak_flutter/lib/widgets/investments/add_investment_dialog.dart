@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../services/investments_service.dart';
 
 class AddInvestmentDialog extends StatefulWidget {
   final Map<String, dynamic>? existing;
@@ -21,6 +22,7 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
   late final TextEditingController _currentPriceCtrl;
   bool _isHalal = true;
   bool _saving = false;
+  bool _fetchingPrice = false;
   String? _editingId;
 
   @override
@@ -47,6 +49,26 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
     _avgPriceCtrl.dispose();
     _currentPriceCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchLivePrice() async {
+    final symbol = _symbolCtrl.text.trim();
+    if (symbol.isEmpty) return;
+
+    setState(() => _fetchingPrice = true);
+    try {
+      final price = await InvestmentsService.fetchPrice(symbol);
+      if (price != null && mounted) {
+        setState(() {
+          _currentPriceCtrl.text = price.toStringAsFixed(2);
+          if (_avgPriceCtrl.text.isEmpty) {
+            _avgPriceCtrl.text = price.toStringAsFixed(2);
+          }
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _fetchingPrice = false);
+    }
   }
 
   Future<void> _addInvestment() async {
@@ -140,7 +162,17 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
                 color: Theme.of(context).colorScheme.onSurface,
                 fontFamily: 'Cairo')),
         const SizedBox(height: 20),
-        _field(_symbolCtrl, 'inv_symbol_hint'.tr(), TextInputType.text),
+        Row(children: [
+          Expanded(child: _field(_symbolCtrl, 'inv_symbol_hint'.tr(), TextInputType.text)),
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: _fetchingPrice ? null : _fetchLivePrice,
+            icon: _fetchingPrice
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                : Icon(Icons.download, color: Theme.of(context).colorScheme.primary),
+            tooltip: 'inv_fetch_price'.tr(),
+          ),
+        ]),
         const SizedBox(height: 10),
         _field(_nameCtrl, 'inv_name_hint'.tr(), TextInputType.text),
         const SizedBox(height: 10),

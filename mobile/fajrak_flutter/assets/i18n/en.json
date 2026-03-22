@@ -198,6 +198,10 @@
   "inv_jod": "JOD",
   "inv_tx_history": "📋 Transaction History",
   "inv_portfolio_chart": "📊 Portfolio Breakdown",
+  "inv_fetch_price": "Fetch Price",
+  "inv_portfolio_count": "My Portfolio ({})",
+  "inv_halal_tip": "Ensure your investment is in halal funds like SPUS or HLAL",
+  "inv_add_first": "Add your first investment",
 
   "goals_title": "Savings Goals",
   "goals_add": "Add",
