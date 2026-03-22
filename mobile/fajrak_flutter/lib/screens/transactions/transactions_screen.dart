@@ -184,9 +184,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('خطأ في التصدير: $e',
-                  style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text('error_export'.tr(args: [e.toString()]))),
         );
       }
     }

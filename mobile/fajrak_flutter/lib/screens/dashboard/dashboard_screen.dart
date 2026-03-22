@@ -28,11 +28,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
   final _amountController = TextEditingController();
-  String _selectedCategory = 'طعام';
-  String _txType = 'expense';
-  bool _saving = false;
-
   final _categories = ['طعام','مواصلات','فواتير','صحة','ترفيه','تسوق','راتب','عمل حر','أخرى'];
+
+  String _getCategoryName(String key) {
+    switch (key) {
+      case 'طعام': return 'cat_food'.tr();
+      case 'مواصلات': return 'cat_transport'.tr();
+      case 'فواتير': return 'cat_bills'.tr();
+      case 'صحة': return 'cat_health'.tr();
+      case 'ترفيه': return 'cat_entertainment'.tr();
+      case 'تسوق': return 'cat_shopping'.tr();
+      case 'راتب': return 'cat_salary'.tr();
+      case 'عمل حر': return 'cat_freelance'.tr();
+      default: return 'cat_others'.tr();
+    }
+  }
 
   @override
   void initState() { super.initState(); _load(); }
@@ -102,6 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _totalDebt = totalDebt;
         _invValue = invValue;
         _goalsSaved = goalsSaved;
+        _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
         _loading = false;
       });
     } catch (e) {
@@ -185,7 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildHeader(ColorScheme colorScheme) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_name.isNotEmpty ? 'onboard_welcome'.tr(args: [_name]) : 'dash_title'.tr(),
+        Text(_name.isNotEmpty ? 'dash_welcome'.tr(args: [_name]) : 'dash_title'.tr(),
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: colorScheme.onSurface, fontFamily: 'Cairo')),
         Text('dash_subtitle'.tr(),
           style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
@@ -235,7 +246,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text('health_score'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
-          Text('/100 نقطة', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+          Text('dash_points_per_100'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
         ])),
       ]),
     );
@@ -265,7 +276,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return GestureDetector(onTap: () => setState(() => _selectedCategory = cat),
               child: Container(margin: const EdgeInsets.only(left: 8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(color: selected ? colorScheme.primary.withValues(alpha: 0.2) : colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? colorScheme.primary : colorScheme.outlineVariant)),
-                child: Text(cat, style: TextStyle(color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')))); })),
+                child: Text(_getCategoryName(cat), style: TextStyle(color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')))); })),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: TextField(controller: _amountController, keyboardType: TextInputType.number, textAlign: TextAlign.right,
@@ -296,8 +307,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(s.$1, style: const TextStyle(fontSize: 24)),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('learn_stage'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
-          Text(s.$2, style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+          Text('stage'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+          Text('learn_stage_${_stage}'.tr(), style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         ]),
       ]),
     );
@@ -319,8 +330,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Center(child: Text(isIncome ? '💰' : '💸', style: const TextStyle(fontSize: 16)))),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tx['description'] ?? tx['category'] ?? '', style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
-              Text(tx['category'] ?? '', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+              Text(tx['description'] ?? _getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
+              Text(_getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
             ])),
             Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $_currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
           ]));

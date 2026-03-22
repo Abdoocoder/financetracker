@@ -212,9 +212,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
 
     final buffer = StringBuffer();
-    buffer.writeln('التاريخ,النوع,المبلغ,الفئة,الوصف');
+    buffer.writeln('csv_header'.tr());
     for (final tx in data) {
-      final type = tx['type'] == 'income' ? 'دخل' : 'مصروف';
+      final type = tx['type'] == 'income' ? 'csv_income'.tr() : 'csv_expense'.tr();
       buffer.writeln(
           '${tx['transaction_date']},$type,${tx['amount']},${tx['category'] ?? ''},${tx['description'] ?? ''}');
     }
@@ -224,18 +224,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         '${directory.path}/fajrak_export_${DateTime.now().millisecondsSinceEpoch}.csv');
     await file.writeAsString('\uFEFF${buffer.toString()}');
 
-    await Share.shareXFiles([XFile(file.path)], text: 'تصدير معاملات فجرك 🌅');
+    await Share.shareXFiles([XFile(file.path)], text: 'settings_export_msg'.tr());
     setState(() => _loading = false);
   }
 
   void _shareApp() {
-    const text =
-        'جربت فجرك؟ تطبيق مالي عربي مجاني يساعدك تتحكم في مصاريفك وتبني ثروتك 🌅\n\nhttps://fajrak.com';
+    final text = 'settings_share_msg'.tr();
     Share.share(text);
   }
 
   Future<void> _deleteAccount() async {
-    if (_deleteInputCtrl.text.trim() != 'حذف حسابي') return;
+    if (_deleteInputCtrl.text.trim() != 'settings_delete_confirm_text'.tr()) return;
     setState(() => _deleting = true);
     final user = Supabase.instance.client.auth.currentUser!;
     try {
@@ -327,11 +326,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                      Text(
-                                          _nameCtrl.text.isNotEmpty
-                                              ? _nameCtrl.text
-                                              : 'اسمك',
-                                          style: TextStyle(
+                                          Text(
+                                              _nameCtrl.text.isNotEmpty
+                                                  ? _nameCtrl.text
+                                                  : 'settings_your_name'.tr(),
+                                              style: TextStyle(
                                               color: colorScheme.onSurface,
                                               fontWeight: FontWeight.w900,
                                               fontSize: 14,
@@ -345,7 +344,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      const Text('عضو',
+                                      Text('settings_member'.tr(),
                                           style: TextStyle(
                                               color: Color(0xFF64748B),
                                               fontSize: 9,
@@ -581,13 +580,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   if (mounted) {
                                     context.read<AppState>().setTheme(true);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content: Text(
-                                                'تم تفعيل الوضع الداكن ✅',
-                                                style: TextStyle(
+                                                'settings_dark_success'.tr(),
+                                                style: const TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
-                                                Color(0xFF10B981)));
+                                                const Color(0xFF10B981)));
                                   }
                                 },
                                 child: Container(
@@ -625,13 +624,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   if (mounted) {
                                     context.read<AppState>().setTheme(false);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content: Text(
-                                                'تم تفعيل الوضع الفاتح ✅',
-                                                style: TextStyle(
+                                                'settings_light_success'.tr(),
+                                                style: const TextStyle(
                                                     fontFamily: 'Cairo')),
                                             backgroundColor:
-                                                Color(0xFF10B981)));
+                                                const Color(0xFF10B981)));
                                   }
                                 },
                                 child: Container(
@@ -666,8 +665,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Assets section (Accordion)
                     _accordionCard(
                       icon: '💎',
-                      title: 'الأصول الشخصية',
-                      badge: 'صافي الثروة',
+                      title: 'settings_assets_title'.tr(),
+                      badge: 'settings_net_worth'.tr(),
                       child: Column(children: [
                         Container(
                           padding: const EdgeInsets.all(16),
@@ -681,7 +680,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   color: const Color(0xFF3B7EF6)
                                       .withOpacity(0.15))),
                           child: Column(children: [
-                            Text('💎 صافي ثروتك',
+                            Text('settings_your_net_worth'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontSize: 12,

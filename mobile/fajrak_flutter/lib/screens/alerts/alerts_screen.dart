@@ -99,9 +99,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
     // Since we don't have the web API URL, we simulate or show error for now
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('تم إرسال طلب التوليد بنجاح',
-              style: TextStyle(fontFamily: 'Cairo'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('alerts_generate_success'.tr(),
+              style: const TextStyle(fontFamily: 'Cairo'))));
       setState(() => _generating = false);
       _load();
     }
@@ -171,7 +171,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-          title: Text('التنبيهات',
+          title: Text('alerts_title'.tr(),
               style: TextStyle(
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,
@@ -195,7 +195,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(children: [
-                              Text('${_alerts.length} تنبيه',
+                              Text('alerts_count'.tr(args: [_alerts.length.toString()]),
                                   style: TextStyle(
                                       color: colorScheme.onSurfaceVariant,
                                       fontFamily: 'Cairo',
@@ -210,7 +210,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                             .withOpacity(0.1),
                                         borderRadius:
                                             BorderRadius.circular(12)),
-                                    child: Text('$unreadCount غير مقروء',
+                                    child: Text('alerts_unread_count'.tr(args: [unreadCount.toString()]),
                                         style: const TextStyle(
                                             color: Color(0xFFEF4444),
                                             fontSize: 10,
@@ -222,7 +222,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                               if (unreadCount > 0)
                                 TextButton(
                                     onPressed: _markAllRead,
-                                    child: Text('تحديد الكل كمقروء',
+                                    child: Text('alerts_mark_all_read'.tr(),
                                         style: TextStyle(
                                             color: colorScheme.primary,
                                             fontFamily: 'Cairo',
@@ -231,8 +231,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
                               if (_alerts.isNotEmpty)
                                 TextButton(
                                     onPressed: _deleteAll,
-                                    child: const Text('حذف الكل',
-                                        style: TextStyle(
+                                    child: Text('alerts_delete_all'.tr(),
+                                        style: const TextStyle(
                                             color: Color(0xFFEF4444),
                                             fontFamily: 'Cairo',
                                             fontSize: 12,
@@ -281,13 +281,13 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                      Text('المساعد المالي الذكي',
+                                      Text('alerts_ai_title'.tr(),
                                           style: TextStyle(
                                               color: colorScheme.onSurface,
                                               fontWeight: FontWeight.w900,
                                               fontFamily: 'Cairo',
                                               fontSize: 14)),
-                                      Text('تحليل محفظتك وتوليد تنبيهات مخصصة',
+                                      Text('alerts_ai_subtitle'.tr(),
                                           style: TextStyle(
                                               color: colorScheme.onSurfaceVariant,
                                               fontFamily: 'Cairo',
@@ -316,8 +316,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                             child: CircularProgressIndicator(
                                                 strokeWidth: 2,
                                                 color: Colors.white))
-                                        : const Text('✨ توليد تنبيهات جديدة',
-                                            style: TextStyle(
+                                        : Text('alerts_ai_generate'.tr(),
+                                            style: const TextStyle(
                                                 fontFamily: 'Cairo',
                                                 fontWeight: FontWeight.w900)),
                                   )),
@@ -329,11 +329,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(children: [
-                          _filterTab('all', 'الكل (${_alerts.length})', colorScheme),
-                          _filterTab('unread', 'غير مقروء ($unreadCount)', colorScheme),
-                          _filterTab('warning', '⚠️ تحذيرات', colorScheme),
-                          _filterTab('achievement', '🏆 إنجازات', colorScheme),
-                          _filterTab('motivation', '💡 نصائح', colorScheme),
+                          _filterTab('all', '${'alerts_filter_all'.tr()} (${_alerts.length})', colorScheme),
+                          _filterTab('unread', '${'alerts_filter_unread'.tr()} ($unreadCount)', colorScheme),
+                          _filterTab('warning', 'alerts_filter_warning'.tr(), colorScheme),
+                          _filterTab('achievement', 'alerts_filter_achievement'.tr(), colorScheme),
+                          _filterTab('motivation', 'alerts_filter_motivation'.tr(), colorScheme),
                         ]),
                       ),
                       const SizedBox(height: 16),
@@ -354,11 +354,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                             : '💡',
                                 style: const TextStyle(fontSize: 40)),
                             const SizedBox(height: 12),
-                            Text('لا توجد تنبيهات في هذه الفئة',
-                                style: TextStyle(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontFamily: 'Cairo',
-                                    fontSize: 14)),
+                             Text('alerts_empty'.tr(),
+                                 style: TextStyle(
+                                     color: colorScheme.onSurfaceVariant,
+                                     fontFamily: 'Cairo',
+                                     fontSize: 14)),
                           ]),
                         ))
                       else

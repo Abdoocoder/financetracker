@@ -125,7 +125,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
         'is_halal': _isHalal,
         'type': 'etf',
-        'currency': 'دولار',
+        'currency': 'USD', // DB value should be standard
       });
     }
     _symbolCtrl.clear();
@@ -308,14 +308,14 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                 Text(
-                                    '${isBuy ? "inv_buy".tr() : "inv_sell".tr()} ${shares.toStringAsFixed(4)} وحدة',
+                                    '${isBuy ? "inv_buy".tr() : "inv_sell".tr()} ${shares.toStringAsFixed(4)} ${"inv_unit".tr()}',
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface,
                                         fontFamily: 'Cairo',
                                         fontWeight: FontWeight.w700,
                                         fontSize: 13)),
                                 Text(
-                                    '${tx['transaction_date']} • سعر \$${price.toStringAsFixed(2)}',
+                                    '${tx['transaction_date']} • ${"inv_price".tr()} \$${price.toStringAsFixed(2)}',
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                                         fontFamily: 'Cairo',
@@ -527,7 +527,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 border: Border.all(color: colorScheme.outlineVariant),
               ),
               child: Text(
-                _showInUsd ? '💵 USD' : '🇯🇴 JOD',
+                _showInUsd ? 'inv_currency_usd'.tr() : 'inv_currency_jod'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 11,

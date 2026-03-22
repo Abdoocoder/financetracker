@@ -20,107 +20,80 @@ class _LearnScreenState extends State<LearnScreen> {
   Map<String, String> _lesson = {'title': '', 'body': '', 'url': ''};
 
   final _stageInfo = {
-    'awareness': ('🌱', 'مرحلة الوعي', const Color(0xFF8B5CF6)),
-    'debt': ('💳', 'مرحلة سداد الديون', const Color(0xFFEF4444)),
-    'emergency': ('🛡️', 'مرحلة الطوارئ', const Color(0xFFF59E0B)),
-    'investing': ('📈', 'مرحلة الاستثمار', const Color(0xFF10B981)),
-    'wealth': ('👑', 'مرحلة الثروة', const Color(0xFF3B7EF6)),
+    'awareness': ('🌱', 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
+    'debt': ('💳', 'learn_stage_debt'.tr(), const Color(0xFFEF4444)),
+    'emergency': ('🛡️', 'learn_stage_emergency'.tr(), const Color(0xFFF59E0B)),
+    'investing': ('📈', 'learn_stage_investing'.tr(), const Color(0xFF10B981)),
+    'wealth': ('👑', 'learn_stage_wealth'.tr(), const Color(0xFF3B7EF6)),
   };
 
   final _lessons = {
     'awareness': [
       {
-        'title': '🌱 رحلة الثروة تبدأ بتسجيل أول معاملة',
-        'body':
-            'تتبع المصاريف يقلل الإنفاق غير الواعي بنسبة 20%. سجّل مصاريف اليوم الآن.'
+        'title': 'learn_lesson_awareness_0_title',
+        'body': 'learn_lesson_awareness_0_body',
+        'url':
+            'https://www.youtube.com/results?search_query=financial+awareness+tracking'
       },
       {
-        'title': '💡 ما لا يُقاس لا يُحسَّن',
-        'body': 'الوعي المالي هو أول خطوات الثروة. أضف دخلك ومصاريفك هذا الشهر.'
+        'title': 'learn_lesson_awareness_1_title',
+        'body': 'learn_lesson_awareness_1_body'
       },
       {
-        'title': '🧠 تأثير اللاتة',
-        'body':
-            'إنفاق 5 دنانير يومياً = 1,825 دينار سنوياً. المصاريف الصغيرة المتكررة هي أكبر عدو للثروة.'
+        'title': 'learn_lesson_awareness_2_title',
+        'body': 'learn_lesson_awareness_2_body'
       },
       {
-        'title': '📊 قاعدة 50/30/20',
-        'body':
-            '50% للضروريات، 30% للرغبات، 20% للادخار. هذه النسب أثبتت نجاحها علمياً.'
+        'title': 'learn_lesson_awareness_3_title',
+        'body': 'learn_lesson_awareness_3_body'
       },
       {
-        'title': '🎯 هدف مكتوب يرفع احتمال التحقق 42%',
-        'body':
-            'كتابة الأهداف المالية ترفع احتمال تحقيقها. ما هدفك المالي لهذا العام؟'
+        'title': 'learn_lesson_awareness_4_title',
+        'body': 'learn_lesson_awareness_4_body'
       },
     ],
     'debt': [
       {
-        'title': '🎯 استراتيجية كرة الثلج',
-        'body': 'ابدأ بأصغر دين للحصول على دافع نفسي فوري. كل دين تسدده انتصار!'
+        'title': 'learn_lesson_debt_0_title',
+        'body': 'learn_lesson_debt_0_body'
       },
       {
-        'title': '💰 تكلفة الدين الخفية',
-        'body':
-            'دين 10,000 دينار بفائدة 20% = 23,000 دينار إجمالاً إذا دفعت الحد الأدنى فقط!'
+        'title': 'learn_lesson_debt_1_title',
+        'body': 'learn_lesson_debt_1_body'
       },
       {
-        'title': '⚖️ نفس المؤمن معلقة بدينه',
-        'body':
-            'قال ﷺ: "نفس المؤمن معلقة بدينه حتى يُقضى عنه". من يسعى لسداد دينه بنية صادقة يُعينه الله.'
+        'title': 'learn_lesson_debt_2_title',
+        'body': 'learn_lesson_debt_2_body'
       },
       {
-        'title': '🤲 دعاء الهم والدين',
-        'body':
-            '"اللهم إني أعوذ بك من الهم والحَزَن، والعجز والكسل، والجبن والبخل، وغلبة الدين وقهر الرجال". رواه البخاري.'
+        'title': 'learn_lesson_debt_3_title',
+        'body': 'learn_lesson_debt_3_body'
       },
       {
-        'title': '💚 من أراد الأداء أدى الله عنه',
-        'body':
-            'قال ﷺ: "من أخذ أموال الناس يريد أداءها أدى الله عنه". النية الصادقة تستجلب عون الله.'
+        'title': 'learn_lesson_debt_4_title',
+        'body': 'learn_lesson_debt_4_body'
       },
     ],
     'emergency': [
       {
-        'title': '🛡️ 65% لا يملكون 500 دولار',
-        'body': 'صندوق الطوارئ ليس رفاهية — هو الفارق بين أزمة وكارثة.'
+        'title': 'learn_lesson_emergency_0_title',
+        'body': 'learn_lesson_emergency_0_body'
       },
       {
-        'title': '🎯 3-6 أشهر من المصاريف',
-        'body':
-            'اجمع مصاريفك الضرورية الشهرية × 3 إذا كنت موظفاً، × 6 إذا كنت حراً.'
+        'title': 'learn_lesson_emergency_1_title',
+        'body': 'learn_lesson_emergency_1_body'
       },
       {
-        'title': '💡 استراتيجية الـ 1%',
-        'body':
-            'ابدأ بادخار 1% من الراتب وارفعها 1% كل شهر. التغيير التدريجي أكثر فاعلية.'
+        'title': 'learn_lesson_emergency_2_title',
+        'body': 'learn_lesson_emergency_2_body'
       },
       {
-        'title': '🛡️ حكمة يوسف عليه السلام',
-        'body':
-            '"تَزْرَعُونَ سَبْعَ سِنِينَ دَأَبًا فَمَا حَصَدتُّمْ فَذَرُوهُ فِي سُنبُلِهِ" (يوسف:47).'
+        'title': 'learn_lesson_emergency_3_title',
+        'body': 'learn_lesson_emergency_3_body'
       },
     ],
     'investing': [
       {
-        'title': '📈 قاعدة 72',
-        'body':
-            '72 ÷ معدل العائد = سنوات المضاعفة. عائد 8%: أموالك تتضاعف كل 9 سنوات.'
-      },
-      {
-        'title': '🕌 الاستثمار الحلال فرصة',
-        'body':
-            'مؤشر DJIM الإسلامي تفوق على S&P 500 في 7 من آخر 10 سنوات. SPUS خيار ممتاز.'
-      },
-      {
-        'title': '🌍 التنويع وجبة مجانية',
-        'body':
-            'هاري ماركويتز: "التنويع هو الوجبة المجانية الوحيدة في الاستثمار".'
-      },
-      {
-        'title': '🚫 إن الله طيب لا يقبل إلا طيباً',
-        'body':
-            'المال الحرام لا تُقبل معه صدقة ولا دعاء. احرص على مصادر دخل حلال.'
       },
       {
         'title': '📅 Dollar Cost Averaging',
@@ -208,7 +181,12 @@ class _LearnScreenState extends State<LearnScreen> {
 
     final dayOfMonth = now.day;
     final lessons = _lessons[stage] ?? _lessons['awareness']!;
-    final lesson = lessons[(dayOfMonth - 1) % lessons.length];
+    final lessonRaw = lessons[(now.day - 1) % lessons.length];
+    final lesson = {
+      'title': lessonRaw['title']!.tr(),
+      'body': lessonRaw['body']!.tr(),
+      'url': lessonRaw['url'] ?? '',
+    };
 
     final streak = (profile['lesson_streak'] as num?)?.toInt() ?? 0;
     final lastLesson = profile['last_lesson_date'] as String?;
@@ -266,15 +244,15 @@ class _LearnScreenState extends State<LearnScreen> {
                   content: Column(mainAxisSize: MainAxisSize.min, children: [
                     const Text('🔥', style: TextStyle(fontSize: 56)),
                     const SizedBox(height: 12),
-                    Text('$newStreak يوم متواصل!',
+                    Text('learn_streak_consecutive'.tr(args: [newStreak.toString()]),
                         style: const TextStyle(
                             color: Color(0xFFF59E0B),
                             fontWeight: FontWeight.w900,
                             fontSize: 22,
                             fontFamily: 'Cairo')),
                     const SizedBox(height: 8),
-                    const Text('مبروك! الاستمرارية هي سر النجاح 💪',
-                        style: TextStyle(
+                    Text('learn_streak_congrats'.tr(),
+                        style: const TextStyle(
                             color: Color(0xFF94A3B8), fontFamily: 'Cairo'),
                         textAlign: TextAlign.center),
                     const SizedBox(height: 16),
@@ -285,8 +263,8 @@ class _LearnScreenState extends State<LearnScreen> {
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12))),
-                      child: const Text('🎯 واصل!',
-                          style: TextStyle(
+                      child: Text('learn_streak_continue'.tr(),
+                          style: const TextStyle(
                               fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
                     ),
                   ]),
@@ -312,8 +290,8 @@ class _LearnScreenState extends State<LearnScreen> {
       backgroundColor: const Color(0xFF070B14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF070B14),
-        title: const Text('درس اليوم',
-            style: TextStyle(
+        title: Text('learn_title'.tr(),
+            style: const TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: Colors.white)),
@@ -338,7 +316,7 @@ class _LearnScreenState extends State<LearnScreen> {
                 Text(info.$1, style: const TextStyle(fontSize: 22)),
                 const SizedBox(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('مرحلتك',
+                  Text('learn_stage_label'.tr(),
                       style: const TextStyle(
                           color: Color(0xFF94A3B8),
                           fontSize: 10,
@@ -368,8 +346,8 @@ class _LearnScreenState extends State<LearnScreen> {
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
                         fontFamily: 'Cairo')),
-                const Text('يوم',
-                    style: TextStyle(
+                Text('learn_streak_day'.tr(),
+                    style: const TextStyle(
                         color: Color(0xFF94A3B8),
                         fontSize: 10,
                         fontFamily: 'Cairo')),
@@ -421,8 +399,8 @@ class _LearnScreenState extends State<LearnScreen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text('✅ أتممت الدرس',
-                          style: TextStyle(
+                      child: Text('learn_complete_lesson'.tr(),
+                          style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900,
                               fontSize: 15)),
@@ -437,9 +415,9 @@ class _LearnScreenState extends State<LearnScreen> {
                       border: Border.all(
                           color:
                               const Color(0xFF10B981).withValues(alpha: 0.3))),
-                  child: const Center(
-                      child: Text('✅ مكتمل — أحسنت!',
-                          style: TextStyle(
+                  child: Center(
+                      child: Text('learn_completed_msg'.tr(),
+                          style: const TextStyle(
                               color: Color(0xFF10B981),
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900,
@@ -457,19 +435,18 @@ class _LearnScreenState extends State<LearnScreen> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                     color: const Color(0xFF3B7EF6).withValues(alpha: 0.15))),
-            child: const Column(
+            child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('💡 هل تعلم؟',
-                      style: TextStyle(
+                  Text('learn_did_you_know'.tr(),
+                      style: const TextStyle(
                           color: Color(0xFF3B7EF6),
                           fontWeight: FontWeight.w800,
                           fontSize: 12,
                           fontFamily: 'Cairo')),
-                  SizedBox(height: 6),
-                  Text(
-                      'الدروس تتغير يومياً وتُخصَّص لمرحلتك المالية. كل 7 أيام درس إسلامي مرتبط بالرزق.',
-                      style: TextStyle(
+                  const SizedBox(height: 6),
+                  Text('learn_did_you_know_msg'.tr(),
+                      style: const TextStyle(
                           color: Color(0xFF64748B),
                           fontSize: 12,
                           fontFamily: 'Cairo',

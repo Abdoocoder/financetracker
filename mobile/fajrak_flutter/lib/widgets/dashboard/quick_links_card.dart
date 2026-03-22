@@ -21,15 +21,15 @@ class QuickLinksCards extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: _buildCard(context, 'ديون', '💳', totalDebt,
+            child: _buildCard(context, 'nav_debts'.tr(), '💳', totalDebt,
                 const Color(0xFFEF4444), '/debts')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'استثمار', '📈', invValue,
+            child: _buildCard(context, 'nav_investments'.tr(), '📈', invValue,
                 const Color(0xFF10B981), '/investments')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'ادخار', '🛡️', goalsSaved,
+            child: _buildCard(context, 'nav_goals'.tr(), '🛡️', goalsSaved,
                 const Color(0xFF3B7EF6), '/goals')),
       ],
     );
@@ -73,3 +73,4 @@ class QuickLinksCards extends StatelessWidget {
     );
   }
 }
+```

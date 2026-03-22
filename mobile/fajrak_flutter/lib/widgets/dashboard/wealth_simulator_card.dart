@@ -49,7 +49,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             children: [
               const Text('💰', style: TextStyle(fontSize: 18)),
               const SizedBox(width: 8),
-              Text('محاكي الثروة',
+              Text('wealth_title'.tr(),
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
@@ -69,23 +69,23 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             ),
           ),
           Center(
-            child: Text('الثروة المتوقعة بناءً على المعطيات',
+            child: Text('wealth_simulator_subtitle'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 11,
                     fontFamily: 'Cairo')),
           ),
           const SizedBox(height: 24),
-          _buildSlider('الاستثمار الشهري', _monthlyContribution, 0, 5000,
+          _buildSlider('wealth_monthly_investment'.tr(), _monthlyContribution, 0, 5000,
               _monthlyContribution.toStringAsFixed(0), (val) {
             setState(() => _monthlyContribution = val);
           }, colorScheme),
           _buildSlider(
-              'السنوات', _years, 1, 40, '${_years.toStringAsFixed(0)} سنة',
+              'wealth_expected_years'.tr(), _years, 1, 40, 'wealth_years_val'.tr(args: [_years.toStringAsFixed(0)]),
               (val) {
             setState(() => _years = val);
           }, colorScheme),
-          _buildSlider('العائد السنوي المتوقع', _expectedReturn, 1, 20,
+          _buildSlider('wealth_expected_yield'.tr(), _expectedReturn, 1, 20,
               '${_expectedReturn.toStringAsFixed(1)}%', (val) {
             setState(() => _expectedReturn = val);
           }, colorScheme),
