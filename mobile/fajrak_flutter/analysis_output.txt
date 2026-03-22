@@ -1,153 +1,63 @@
+Resolving dependencies...
+Downloading packages...
+  app_links 6.4.1 (7.0.0 available)
+  async 2.12.0 (2.13.0 available)
+  cross_file 0.3.5 (0.3.5+2 available)
+  fl_chart 1.1.0 (1.2.0 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  lints 5.1.1 (6.1.0 available)
+  meta 1.17.0 (1.18.2 available)
+  path_provider_android 2.2.19 (2.2.22 available)
+  path_provider_foundation 2.4.2 (2.6.0 available)
+  shared_preferences 2.5.3 (2.5.4 available)
+  shared_preferences_android 2.4.13 (2.4.21 available)
+  shared_preferences_foundation 2.5.4 (2.5.6 available)
+  source_span 1.10.1 (1.10.2 available)
+  sqflite_android 2.4.1 (2.4.2+3 available)
+  sqflite_common 2.5.5 (2.5.6 available)
+  synchronized 3.3.1 (3.4.0 available)
+  test_api 0.7.10 (0.7.11 available)
+  url_launcher_android 6.3.20 (6.3.28 available)
+  url_launcher_ios 6.3.4 (6.4.1 available)
+  url_launcher_linux 3.2.1 (3.2.2 available)
+  url_launcher_macos 3.2.3 (3.2.5 available)
+  url_launcher_web 2.4.1 (2.4.2 available)
+  url_launcher_windows 3.1.4 (3.1.5 available)
+! vector_math 2.3.0 (overridden)
+  vm_service 14.3.1 (15.0.2 available)
+  win32 5.13.0 (6.0.0 available)
+Got dependencies!
+25 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
 Analyzing fajrak_flutter...                                     
 
-warning - Unused import: 'package:shared_preferences/shared_preferences.dart' - lib\main.dart:8:8 - unused_import
-warning - Unused import: 'services/analytics_service.dart' - lib\main.dart:11:8 - unused_import
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\achievements\achievements_screen.dart:3:8 - unused_import
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\alerts\alerts_screen.dart:1:8 - unused_import
-   info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:119:7 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:121:7 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:123:7 - curly_braces_in_flow_control_structures
    info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:127:7 - curly_braces_in_flow_control_structures
    info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:129:7 - curly_braces_in_flow_control_structures
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:209:46 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:248:55 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:249:55 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:253:61 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:271:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:383:47 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:388:51 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:397:56 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:436:66 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\alerts\alerts_screen.dart:463:44 - deprecated_member_use
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\auth\forgot_password_screen.dart:1:8 - unused_import
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\auth\login_screen.dart:1:8 - unused_import
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\onboarding_screen.dart:135:62 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\onboarding_screen.dart:186:46 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\onboarding_screen.dart:250:53 - deprecated_member_use
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\auth\register_screen.dart:1:8 - unused_import
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\auth\reset_password_screen.dart:1:8 - unused_import
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\reset_password_screen.dart:104:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\reset_password_screen.dart:107:56 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\reset_password_screen.dart:124:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\auth\reset_password_screen.dart:127:56 - deprecated_member_use
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\budgets\budgets_screen.dart:1:8 - unused_import
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:236:57 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:241:61 - deprecated_member_use
-   info - Statements in an if should be enclosed in a block - lib\screens\budgets\budgets_screen.dart:354:9 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\budgets\budgets_screen.dart:370:9 - curly_braces_in_flow_control_structures
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:631:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:634:56 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:660:55 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:661:55 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:666:61 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:860:26 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:862:45 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:906:45 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:908:49 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:916:32 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:954:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:957:58 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:967:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\budgets\budgets_screen.dart:970:58 - deprecated_member_use
-   info - The private field _months6Data could be 'final' - lib\screens\dashboard\dashboard_screen.dart:24:30 - prefer_final_fields
-   info - The private field _categoryData could be 'final' - lib\screens\dashboard\dashboard_screen.dart:25:30 - prefer_final_fields
-   info - The private field _goalsTarget could be 'final' - lib\screens\dashboard\dashboard_screen.dart:26:58 - prefer_final_fields
-   info - The private field _prevExpenses could be 'final' - lib\screens\dashboard\dashboard_screen.dart:27:10 - prefer_final_fields
-   info - The private field _foodSpending could be 'final' - lib\screens\dashboard\dashboard_screen.dart:28:10 - prefer_final_fields
-   info - The private field _entertainmentSpending could be 'final' - lib\screens\dashboard\dashboard_screen.dart:28:29 - prefer_final_fields
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:69:37 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:70:14 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:82:31 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:82:73 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:82:112 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:83:27 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:83:96 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:89:71 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:90:59 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:91:30 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:93:20 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:127:20 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:130:20 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:138:19 - curly_braces_in_flow_control_structures
-   info - Unnecessary use of string interpolation - lib\screens\dashboard\dashboard_screen.dart:213:31 - unnecessary_string_interpolations
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\debts\debts_screen.dart:1:8 - unused_import
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:124:46 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:126:50 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:129:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:155:48 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:348:58 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:375:49 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:380:53 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:409:51 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:414:55 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:616:58 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:619:62 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:769:61 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:773:42 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:817:26 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:819:45 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:863:34 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:874:48 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:910:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:913:58 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:923:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:926:58 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:955:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:970:52 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:1056:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\debts\debts_screen.dart:1059:58 - deprecated_member_use
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\goals\goals_screen.dart:1:8 - unused_import
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\goals\goals_screen.dart:146:55 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\goals\goals_screen.dart:553:50 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\goals\goals_screen.dart:558:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\goals\goals_screen.dart:571:50 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\goals\goals_screen.dart:576:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\help\help_screen.dart:177:50 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\help\help_screen.dart:179:54 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\help\help_screen.dart:187:58 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\help\help_screen.dart:263:39 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\help\help_screen.dart:267:43 - deprecated_member_use
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\investments\investments_screen.dart:1:8 - unused_import
-   info - Don't use 'BuildContext's across async gaps - lib\screens\investments\investments_screen.dart:138:19 - use_build_context_synchronously
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\investments\investments_screen.dart:288:48 - deprecated_member_use
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\investments\investments_screen.dart:527:53 - use_build_context_synchronously
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\investments\investments_screen.dart:1051:63 - deprecated_member_use
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\learn\learn_screen.dart:1:8 - unused_import
-   info - Statements in an if should be enclosed in a block - lib\screens\learn\learn_screen.dart:206:7 - curly_braces_in_flow_control_structures
-   info - Statements in an if should be enclosed in a block - lib\screens\learn\learn_screen.dart:207:30 - curly_braces_in_flow_control_structures
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\main_screen.dart:8:8 - unused_import
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\more\more_screen.dart:1:8 - unused_import
-warning - The value of the field '_loading' isn't used - lib\screens\more\more_screen.dart:22:8 - unused_field
-warning - Unused import: '../../main.dart' - lib\screens\settings\settings_screen.dart:11:8 - unused_import
-   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\screens\settings\settings_screen.dart:227:11 - deprecated_member_use
-   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\screens\settings\settings_screen.dart:227:17 - deprecated_member_use
-   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\screens\settings\settings_screen.dart:234:5 - deprecated_member_use
-   info - 'share' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\screens\settings\settings_screen.dart:234:11 - deprecated_member_use
-   info - Don't use 'BuildContext's across async gaps - lib\screens\settings\settings_screen.dart:517:35 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:519:58 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps - lib\screens\settings\settings_screen.dart:556:35 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:558:58 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:605:37 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:606:58 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:649:37 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:650:58 - use_build_context_synchronously
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\settings\settings_screen.dart:699:57 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\settings\settings_screen.dart:700:57 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\settings\settings_screen.dart:705:40 - deprecated_member_use
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\settings\settings_screen.dart:883:45 - use_build_context_synchronously
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\settings\settings_screen.dart:912:42 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\settings\settings_screen.dart:1050:56 - deprecated_member_use
-   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\settings\settings_screen.dart:1053:60 - deprecated_member_use
-warning - The declaration '_infoRow' isn't referenced - lib\screens\settings\settings_screen.dart:1136:10 - unused_element
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\splash_screen.dart:1:8 - unused_import
-   info - Don't use 'BuildContext's across async gaps - lib\screens\splash_screen.dart:53:44 - use_build_context_synchronously
-   info - Don't use 'BuildContext's across async gaps - lib\screens\splash_screen.dart:55:44 - use_build_context_synchronously
-warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\screens\transactions\transactions_screen.dart:1:8 - unused_import
-   info - The private field _allTransactions could be 'final' - lib\screens\transactions\transactions_screen.dart:20:30 - prefer_final_fields
-   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\screens\transactions\transactions_screen.dart:157:13 - deprecated_member_use
-   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\screens\transactions\transactions_screen.dart:157:19 - deprecated_member_use
-   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\screens\transactions\transactions_screen.dart:367:54 - use_build_context_synchronously
-   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\transactions\transactions_screen.dart:412:21 - deprecated_member_use
-   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\transactions\transactions_screen.dart:430:21 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:131:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:135:7 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\alerts\alerts_screen.dart:137:7 - curly_braces_in_flow_control_structures
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\screens\budgets\budgets_screen.dart:3:8 - unnecessary_import
+   info - The private field _foodSpending could be 'final' - lib\screens\dashboard\dashboard_screen.dart:31:10 - prefer_final_fields
+   info - The private field _entertainmentSpending could be 'final' - lib\screens\dashboard\dashboard_screen.dart:31:29 - prefer_final_fields
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:102:38 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:102:77 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:105:65 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:113:61 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\dashboard\dashboard_screen.dart:114:30 - curly_braces_in_flow_control_structures
+   info - Don't use 'BuildContext's across async gaps - lib\screens\splash_screen.dart:52:44 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\splash_screen.dart:54:44 - use_build_context_synchronously
+warning - The value of the field '_loadingMore' isn't used - lib\screens\transactions\transactions_screen.dart:29:8 - unused_field
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\screens\transactions\transactions_screen.dart:189:13 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\screens\transactions\transactions_screen.dart:189:19 - deprecated_member_use
+warning - The value of the local variable 'user' isn't used - lib\widgets\debts\debt_list_item.dart:48:13 - unused_local_variable
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\widgets\settings\export_delete_section.dart:65:11 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\widgets\settings\export_delete_section.dart:65:17 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\widgets\settings\export_delete_section.dart:71:5 - deprecated_member_use
+   info - 'share' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\widgets\settings\export_delete_section.dart:71:11 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\widgets\settings\export_delete_section.dart:193:71 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\widgets\settings\preferences_section.dart:161:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\widgets\settings\preferences_section.dart:162:28 - use_build_context_synchronously
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\widgets\transactions\month_year_picker_dialog.dart:50:19 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\widgets\transactions\month_year_picker_dialog.dart:67:19 - deprecated_member_use
+warning - Unused import: 'package:easy_localization/easy_localization.dart' - lib\widgets\transactions\transaction_list_item.dart:2:8 - unused_import
 
-149 issues found. (ran in 25.4s)
