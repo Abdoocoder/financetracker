@@ -21,6 +21,9 @@ export interface Transaction {
   type: TransactionType
   category: string
   amount: number
+  original_amount?: number
+  original_currency?: string
+  exchange_rate?: number
   description: string | null
   transaction_date: string
   is_recurring: boolean
@@ -34,7 +37,10 @@ export interface Debt {
   user_id: string
   name: string
   original_amount: number
+  original_amount_foreign?: number
   remaining_amount: number
+  remaining_amount_foreign?: number
+  currency?: string
   monthly_payment: number
   due_date: string | null
   priority: number
@@ -49,6 +55,9 @@ export interface DebtPayment {
   debt_id: string
   user_id: string
   amount: number
+  original_amount?: number
+  original_currency?: string
+  exchange_rate?: number
   payment_date: string
   notes: string | null
   created_at: string

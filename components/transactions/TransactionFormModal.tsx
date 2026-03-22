@@ -2,6 +2,8 @@
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { useI18n } from '@/lib/i18n'
+import { CURRENCIES } from '@/lib/currency'
+import { useUser } from '@/lib/user-context'
 import type { TransactionForm } from '@/hooks/useTransactions'
 
 const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
@@ -18,6 +20,10 @@ interface Props {
 
 export function TransactionFormModal({ editingId, form, saving, onClose, onSave, onChange }: Props) {
   const { t, lang } = useI18n()
+  const { profile } = useUser()
+  const baseCurrency = profile?.currency || 'JOD'
+  const isMultiCurrency = form.original_currency && form.original_currency !== baseCurrency
+
   return (
     <Modal title={editingId ? t('trans_edit') : `+ ${t('trans_add')}`} onClose={onClose}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
@@ -27,9 +33,47 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
           </button>
         ))}
       </div>
-      <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
-        <Input type="number" placeholder="0.00" value={form.amount} onChange={e => onChange({ amount: e.target.value })} />
-      </FormField>
+
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', marginBottom: 16 }}>
+        <div style={{ flex: 2 }}>
+          <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
+            <Input 
+              type="number" 
+              placeholder="0.00" 
+              value={isMultiCurrency ? form.original_amount : form.amount} 
+              onChange={e => isMultiCurrency ? onChange({ original_amount: e.target.value }) : onChange({ amount: e.target.value, original_amount: e.target.value })} 
+            />
+          </FormField>
+        </div>
+        <div style={{ flex: 1 }}>
+          <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
+            <Select value={form.original_currency || baseCurrency} onChange={e => onChange({ original_currency: e.target.value })}>
+              {CURRENCIES.map(c => (
+                <option key={c.value} value={c.value}>{c.value}</option>
+              ))}
+            </Select>
+          </FormField>
+        </div>
+      </div>
+
+      {isMultiCurrency && (
+        <div style={{ background: 'var(--bg-secondary)', padding: '12px', borderRadius: 12, marginBottom: 16, border: '1px dashed var(--border)', animation: 'slideDown 0.2s ease' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <FormField label={lang === 'en' ? 'Exchange Rate' : 'سعر الصرف'}>
+              <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => onChange({ exchange_rate: e.target.value })} />
+            </FormField>
+            <FormField label={lang === 'en' ? 'Equivalent' : 'المعادل'}>
+              <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, direction: 'ltr', textAlign: 'center', fontSize: 13 }}>
+                {form.amount} {baseCurrency}
+              </div>
+            </FormField>
+          </div>
+          <style>{`
+            @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+          `}</style>
+        </div>
+      )}
+
       <FormField label={lang === 'en' ? 'Category' : 'الفئة'}>
         <Select value={form.category} onChange={e => onChange({ category: e.target.value })}>
           <option value="">{lang === 'en' ? 'Select category' : 'اختر فئة'}</option>

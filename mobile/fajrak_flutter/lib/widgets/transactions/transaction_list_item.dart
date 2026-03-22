@@ -88,6 +88,16 @@ class TransactionListItem extends StatelessWidget {
                         fontSize: 15,
                         fontFamily: 'Cairo'),
                   ),
+                  if (transaction['original_currency'] != null && transaction['original_currency'] != currency)
+                    Text(
+                      '${(transaction['original_amount'] as num).toDouble().toStringAsFixed(0)} ${transaction['original_currency']}',
+                      style: TextStyle(
+                        color: color.withValues(alpha: 0.6),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo'
+                      ),
+                    ),
                   Text(
                     transaction['transaction_date'] ?? '',
                     style: TextStyle(

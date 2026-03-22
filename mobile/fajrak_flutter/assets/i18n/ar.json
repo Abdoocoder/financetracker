@@ -93,6 +93,8 @@
   "trans_total_income": "إجمالي الدخل",
   "trans_total_expenses": "إجمالي المصاريف",
   "trans_total_net": "الصافي",
+  "trans_exchange_rate": "سعر الصرف",
+  "trans_equivalent": "المعادل",
   "trans_count": "{} معاملات",
 
   "debts_title": "الديون",

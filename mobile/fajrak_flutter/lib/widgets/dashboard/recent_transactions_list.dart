@@ -54,7 +54,22 @@ class RecentTransactionsList extends StatelessWidget {
               Text(tx['description'] ?? _getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
               Text(_getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
             ])),
-            Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                if (tx['original_currency'] != null && tx['original_currency'] != currency)
+                    Text(
+                      '${(tx['original_amount'] as num).toDouble().toStringAsFixed(0)} ${tx['original_currency']}',
+                      style: TextStyle(
+                        color: color.withValues(alpha: 0.6),
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Cairo'
+                      ),
+                    ),
+              ],
+            ),
           ]),
         );
       }),

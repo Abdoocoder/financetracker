@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../services/currency_service.dart';
 
 class AddDebtDialog extends StatefulWidget {
   final Map<String, dynamic>? existing;
   final VoidCallback onSaved;
   final List<Color> priorityColors;
   final List<String> priorityLabels;
+  final String baseCurrency;
 
   const AddDebtDialog({
     super.key,
@@ -14,6 +15,7 @@ class AddDebtDialog extends StatefulWidget {
     required this.onSaved,
     required this.priorityColors,
     required this.priorityLabels,
+    this.baseCurrency = 'JOD',
   });
 
   @override
@@ -32,14 +34,18 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   late bool _autoDeduct;
   late String _dueDate;
 
+  String _selectedCurrency = '';
+  final _exchangeRateCtrl = TextEditingController(text: '1.0');
+  bool _isRateManual = false;
+
   @override
   void initState() {
     super.initState();
     _nameCtrl = TextEditingController(text: widget.existing?['name'] ?? '');
     _originalCtrl = TextEditingController(
-        text: widget.existing?['original_amount']?.toString() ?? '');
+        text: widget.existing?['original_amount_foreign']?.toString() ?? widget.existing?['original_amount']?.toString() ?? '');
     _remainingCtrl = TextEditingController(
-        text: widget.existing?['remaining_amount']?.toString() ?? '');
+        text: widget.existing?['remaining_amount_foreign']?.toString() ?? widget.existing?['remaining_amount']?.toString() ?? '');
     _monthlyCtrl = TextEditingController(
         text: widget.existing?['monthly_payment']?.toString() ?? '');
     _notesCtrl = TextEditingController(text: widget.existing?['notes'] ?? '');
@@ -48,6 +54,30 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     _priority = (widget.existing?['priority'] as int?) ?? 3;
     _autoDeduct = widget.existing?['auto_deduct'] as bool? ?? true;
     _dueDate = widget.existing?['due_date'] as String? ?? '';
+    
+    _selectedCurrency = widget.existing?['currency'] ?? widget.baseCurrency;
+    final rate = (widget.existing?['exchange_rate'] as num?)?.toDouble() ?? 1.0;
+    _exchangeRateCtrl.text = rate.toString();
+    
+    if (_selectedCurrency != widget.baseCurrency && widget.existing == null) {
+      _fetchRate();
+    }
+  }
+
+  Future<void> _fetchRate() async {
+    if (_selectedCurrency == widget.baseCurrency) {
+      setState(() {
+        _exchangeRateCtrl.text = '1.0';
+      });
+      return;
+    }
+    // Note: We need to import the currency service but it might already be available or we use a static method
+    final rate = await CurrencyService.fetchExchangeRate(_selectedCurrency, widget.baseCurrency);
+    if (mounted && !_isRateManual) {
+      setState(() {
+        _exchangeRateCtrl.text = rate.toString();
+      });
+    }
   }
 
   @override
@@ -58,6 +88,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     _monthlyCtrl.dispose();
     _notesCtrl.dispose();
     _paymentDayCtrl.dispose();
+    _exchangeRateCtrl.dispose();
     super.dispose();
   }
 
@@ -67,12 +98,23 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     }
     final user = Supabase.instance.client.auth.currentUser!;
     final payDay = int.tryParse(_paymentDayCtrl.text);
+    
+    final origForeign = double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0;
+    final remForeign = double.tryParse(_remainingCtrl.text.replaceAll(',', '.')) ?? origForeign;
+    final rate = double.tryParse(_exchangeRateCtrl.text) ?? 1.0;
+    
+    final origBase = _selectedCurrency == widget.baseCurrency ? origForeign : (origForeign * rate);
+    final remBase = _selectedCurrency == widget.baseCurrency ? remForeign : (remForeign * rate);
+
     final data = {
       'user_id': user.id,
       'name': _nameCtrl.text,
-      'original_amount': double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0,
-      'remaining_amount': double.tryParse(_remainingCtrl.text.replaceAll(',', '.')) ??
-          double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0,
+      'original_amount': origBase,
+      'remaining_amount': remBase,
+      'original_amount_foreign': origForeign,
+      'remaining_amount_foreign': remForeign,
+      'currency': _selectedCurrency,
+      'exchange_rate': rate,
       'monthly_payment': double.tryParse(_monthlyCtrl.text.replaceAll(',', '.')) ?? 0,
       'payment_day': (payDay != null && payDay >= 1 && payDay <= 28) ? payDay : null,
       'due_date': _dueDate.isEmpty ? null : _dueDate,
@@ -93,7 +135,10 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         await Supabase.instance.client.from('transactions').insert({
           'user_id': user.id,
           'type': 'income',
-          'amount': double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0,
+          'amount': origBase,
+          'original_amount': origForeign,
+          'original_currency': _selectedCurrency,
+          'exchange_rate': rate,
           'category': 'debt_received_cat'.tr(),
           'description': 'debt_received_desc'.tr(args: [_nameCtrl.text]),
           'transaction_date': DateTime.now().toIso8601String().split('T')[0],
@@ -154,11 +199,42 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           Expanded(
               child: _field(_originalCtrl, 'debts_original_amount'.tr(),
                   const TextInputType.numberWithOptions(decimal: true))),
-          const SizedBox(width: 10),
-          Expanded(
-              child: _field(_remainingCtrl, 'debts_remaining_amount'.tr(),
-                  const TextInputType.numberWithOptions(decimal: true))),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedCurrency,
+                dropdownColor: const Color(0xFF1E293B),
+                style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontSize: 13),
+                items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                onChanged: (v) { if (v != null) { setState(() => _selectedCurrency = v); _fetchRate(); } },
+              ),
+            ),
+          ),
         ]),
+        const SizedBox(height: 10),
+        if (_selectedCurrency != widget.baseCurrency) ...[
+          Row(children: [
+            Expanded(child: _field(_exchangeRateCtrl, 'trans_exchange_rate'.tr(), const TextInputType.numberWithOptions(decimal: true))),
+            const SizedBox(width: 10),
+            Expanded(child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('trans_equivalent'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+                const SizedBox(height: 4),
+                Text(
+                  '${((double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0) * (double.tryParse(_exchangeRateCtrl.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
+                  style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 13, fontFamily: 'Cairo'),
+                ),
+              ],
+            )),
+          ]),
+          const SizedBox(height: 10),
+        ],
+        _field(_remainingCtrl, 'debts_remaining_amount'.tr(),
+            const TextInputType.numberWithOptions(decimal: true)),
         const SizedBox(height: 10),
         Row(children: [
           Expanded(
