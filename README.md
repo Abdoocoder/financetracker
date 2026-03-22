@@ -229,6 +229,8 @@ npm run dev
 - 🛡️ **Full Project Audit** — Comprehensive health check completed (dependencies, types, linting).
 - 🔧 **Build Fixes** — Resolved several ESLint errors (unescaped entities & incorrect link usage) enabling successful production build.
 - ⚙️ **Environment Sync** — Verified `.env.local` against example for all required integration keys.
+- 📱 **Flutter App Stabilization** — Deep structural repairs across Settings and Onboarding, complete state restoration, and full `easy_localization` integration.
+- ⚡ **Release APK** — Successfully compiled the stable, release-ready Android APK (`app-release.apk`, 55.1 MB).
 
 ### v3.7.0 — 2026-03-20 *(Latest)*
 - 🌍 **Full i18n Flutter** — ar.json + en.json complete bilingual support
