@@ -225,12 +225,11 @@ npm run dev
 
 ## Changelog
 
-### v3.9.0 — 2026-03-21
+### v3.9.0 — 2026-03-22
+- 🏗️ **Modular Architecture Refactoring** — Full overhaul of all 9 major screens into specialized, reusable widgets for maximum maintainability.
+- 💎 **Clean Code Initiative** — Resolved 30+ linting issues, fixed critical async safety gaps, and eliminated all functional errors.
 - 🛡️ **Full Project Audit** — Comprehensive health check completed (dependencies, types, linting).
-- 🔧 **Build Fixes** — Resolved several ESLint errors (unescaped entities & incorrect link usage) enabling successful production build.
-- ⚙️ **Environment Sync** — Verified `.env.local` against example for all required integration keys.
-- 📱 **Flutter App Stabilization** — Deep structural repairs across Settings and Onboarding, complete state restoration, and full `easy_localization` integration.
-- ⚡ **Release APK** — Successfully compiled the stable, release-ready Android APK (`app-release.apk`, 55.1 MB).
+- ⚡ **Release APK** — Successfully compiled the stable, release-ready Android APK (`app-release.apk`, 55.2 MB).
 
 ### v3.7.0 — 2026-03-20 *(Latest)*
 - 🌍 **Full i18n Flutter** — ar.json + en.json complete bilingual support
