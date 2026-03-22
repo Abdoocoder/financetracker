@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
@@ -85,14 +84,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('auth_login_welcome'.tr(),
+              Text('auth_login_welcome',
                   style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                       color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
                const SizedBox(height: 8),
-              Text('auth_login_subtitle'.tr(),
+              Text('auth_login_subtitle',
                   style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -121,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 keyboardType: TextInputType.emailAddress,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'auth_email'.tr(),
+                    labelText: 'auth_email',
                     prefixIcon:
                         Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
               ),
@@ -131,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: _obscure,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'auth_password'.tr(),
+                  labelText: 'auth_password',
                   prefixIcon:
                       Icon(Icons.lock_outlined, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
@@ -150,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: TextButton(
                   onPressed: () =>
                       Navigator.pushNamed(context, '/forgot-password'),
-                  child: Text('auth_forgot_password'.tr(),
+                  child: Text('auth_forgot_password',
                       style: TextStyle(
                           color: colorScheme.primary, fontFamily: 'Cairo')),
                 ),
@@ -164,19 +163,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: colorScheme.onPrimary))
-                    :  Text('auth_login_button'.tr()),
+                    :  Text('auth_login_button'),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('auth_no_account'.tr(),
+                  Text('auth_no_account',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/register'),
-                    child: Text('auth_register_now'.tr(),
+                    child: Text('auth_register_now',
                         style: TextStyle(
                             color: colorScheme.primary,
                             fontFamily: 'Cairo',

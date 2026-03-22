@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
@@ -27,11 +26,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Future<void> _reset() async {
     if (_passwordController.text != _confirmController.text) {
-      setState(() => _error = 'auth_error_passwords_dont_match'.tr());
+      setState(() => _error = 'auth_error_passwords_dont_match');
       return;
     }
     if (_passwordController.text.length < 6) {
-      setState(() => _error = 'auth_error_password_too_short'.tr());
+      setState(() => _error = 'auth_error_password_too_short');
       return;
     }
 
@@ -61,7 +60,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('auth_reset_password_title'.tr(),
+        title: Text('auth_reset_password_title',
             style: TextStyle(fontFamily: 'Cairo', color: colorScheme.onSurface)),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -86,14 +85,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         Icon(Icons.lock_reset, size: 40, color: Colors.white)),
               ),
               const SizedBox(height: 24),
-              Text('auth_reset_password_subtitle'.tr(),
+              Text('auth_reset_password_subtitle',
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              Text('auth_reset_password_desc'.tr(),
+              Text('auth_reset_password_desc',
                   style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -117,7 +116,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             .withValues(alpha: 0.3)),
                   ),
                   child: Text(
-                      'auth_reset_password_success'.tr(),
+                      'auth_reset_password_success',
                       style: TextStyle(
                           color: theme.brightness == Brightness.dark
                               ? const Color(0xFF10B981)
@@ -153,7 +152,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'auth_new_password'.tr(),
+                  labelText: 'auth_new_password',
                   prefixIcon:
                       Icon(Icons.lock_outline, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
@@ -173,7 +172,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 style:
                     TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'auth_confirm_password'.tr(),
+                  labelText: 'auth_confirm_password',
                   prefixIcon:
                       Icon(Icons.lock_outline, color: colorScheme.onSurfaceVariant),
                 ),
@@ -187,7 +186,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: colorScheme.onPrimary))
-                    :  Text('auth_reset_password_button'.tr()),
+                    :  Text('auth_reset_password_button'),
               ),
             ],
           ),

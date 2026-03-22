@@ -5,7 +5,6 @@ import 'transactions/transactions_screen.dart';
 import 'debts/debts_screen.dart';
 import 'budgets/budgets_screen.dart';
 import 'more/more_screen.dart';
-import 'package:easy_localization/easy_localization.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

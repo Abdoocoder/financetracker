@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/dashboard/charts_card.dart';
@@ -125,10 +124,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _amountController.clear();
       await _load();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFF10B981)));
+        SnackBar(content: Text('toast_saved', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFF10B981)));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFFEF4444)));
+        SnackBar(content: Text('toast_error_save', style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFFEF4444)));
     }
     setState(() => _saving = false);
   }
@@ -185,9 +184,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildHeader(ColorScheme colorScheme) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_name.isNotEmpty ? 'onboard_welcome'.tr(args: [_name]) : 'dash_title'.tr(),
+        Text(_name.isNotEmpty ? 'onboard_welcome'.tr(args: [_name]) : 'dash_title',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: colorScheme.onSurface, fontFamily: 'Cairo')),
-        Text('dash_subtitle'.tr(),
+        Text('dash_subtitle',
           style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
       ]),
       Container(width: 44, height: 44,
@@ -198,11 +197,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildStatCards(ColorScheme colorScheme) {
     return Row(children: [
-      Expanded(child: _statCard('dash_income'.tr(), _income, const Color(0xFF10B981), '↑', colorScheme)),
+      Expanded(child: _statCard('dash_income', _income, const Color(0xFF10B981), '↑', colorScheme)),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('dash_expenses'.tr(), _expenses, const Color(0xFFEF4444), '↓', colorScheme)),
+      Expanded(child: _statCard('dash_expenses', _expenses, const Color(0xFFEF4444), '↓', colorScheme)),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('dash_net'.tr(), _net, _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), '=', colorScheme)),
+      Expanded(child: _statCard('dash_net', _net, _net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), '=', colorScheme)),
     ]);
   }
 
@@ -221,7 +220,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildHealthScore(ColorScheme colorScheme) {
     final color = _healthScore >= 80 ? const Color(0xFF10B981) : _healthScore >= 60 ? colorScheme.primary : _healthScore >= 40 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
-    final label = _healthScore >= 80 ? 'health_excellent'.tr() : _healthScore >= 60 ? 'health_good'.tr() : _healthScore >= 40 ? 'health_fair'.tr() : 'health_poor'.tr();
+    final label = _healthScore >= 80 ? 'health_excellent' : _healthScore >= 60 ? 'health_good' : _healthScore >= 40 ? 'health_fair' : 'health_poor';
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withValues(alpha: 0.3))),
@@ -232,7 +231,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ])),
         const SizedBox(width: 16),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('health_score'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+          Text('health_score', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
           const SizedBox(height: 4),
           Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
           Text('/100 نقطة', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
@@ -246,18 +245,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: colorScheme.outlineVariant)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('quick_add_title'.tr(), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+        Text('quick_add_title', style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'income'),
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              child: Center(child: Text('trans_income', style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
           const SizedBox(width: 8),
           Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'expense'),
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              child: Center(child: Text('trans_expense', style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
         ]),
         const SizedBox(height: 12),
         SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: _categories.length,
@@ -270,11 +269,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Row(children: [
           Expanded(child: TextField(controller: _amountController, keyboardType: TextInputType.number, textAlign: TextAlign.right,
             style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
-            decoration: InputDecoration(hintText: 'trans_amount'.tr(), hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontFamily: 'Cairo'), filled: true, fillColor: colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), suffixText: _currency, suffixStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')))),
+            decoration: InputDecoration(hintText: 'trans_amount', hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontFamily: 'Cairo'), filled: true, fillColor: colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), suffixText: _currency, suffixStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')))),
           const SizedBox(width: 8),
           GestureDetector(onTap: _saving ? null : _quickAdd,
             child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(10)),
-              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),
+              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),
         ]),
       ]),
     );
@@ -296,7 +295,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(s.$1, style: const TextStyle(fontSize: 24)),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('learn_stage'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
+          Text('learn_stage', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
           Text(s.$2, style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         ]),
       ]),
@@ -306,7 +305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildRecentTransactions(ColorScheme colorScheme) {
     if (_recentTx.isEmpty) return const SizedBox();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('dash_recent'.tr(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface, fontFamily: 'Cairo')),
+      Text('dash_recent', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface, fontFamily: 'Cairo')),
       const SizedBox(height: 10),
       ..._recentTx.map((tx) {
         final isIncome = tx['type'] == 'income';

@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty) {
-      setState(() => _error = 'auth_error_fill_fields'.tr());
+      setState(() => _error = 'auth_error_fill_fields');
       return;
     }
     setState(() {
@@ -84,14 +83,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             fontFamily: 'Cairo'))),
               ),
               const SizedBox(height: 24),
-              Text('auth_register_title'.tr(),
+              Text('auth_register_title',
                   style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
                       color: colorScheme.onSurface,
                       fontFamily: 'Cairo')),
               const SizedBox(height: 8),
-              Text('auth_register_subtitle'.tr(),
+              Text('auth_register_subtitle',
                   style: TextStyle(
                       fontSize: 14,
                       color: colorScheme.onSurfaceVariant,
@@ -119,7 +118,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 controller: _nameController,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'auth_full_name'.tr(),
+                    labelText: 'auth_full_name',
                     prefixIcon:
                         Icon(Icons.person_outlined, color: colorScheme.onSurfaceVariant)),
               ),
@@ -129,7 +128,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 keyboardType: TextInputType.emailAddress,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                    labelText: 'auth_email'.tr(),
+                    labelText: 'auth_email',
                     prefixIcon:
                         Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant)),
               ),
@@ -139,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 obscureText: _obscure,
                 style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  labelText: 'auth_password'.tr(),
+                  labelText: 'auth_password',
                   prefixIcon:
                       Icon(Icons.lock_outlined, color: colorScheme.onSurfaceVariant),
                   suffixIcon: IconButton(
@@ -161,19 +160,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: colorScheme.onPrimary))
-                    : Text('auth_register_button'.tr()),
+                    : Text('auth_register_button'),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('auth_have_account'.tr(),
+                  Text('auth_have_account',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/login'),
-                    child: Text('auth_login_now'.tr(),
+                    child: Text('auth_login_now',
                         style: TextStyle(
                             color: colorScheme.primary,
                             fontFamily: 'Cairo',
