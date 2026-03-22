@@ -1,0 +1,62 @@
+Running Gradle task 'assembleRelease'...                        
+Incorrect package="fr.g123k.flutterappbadge.flutterappbadger" found in source AndroidManifest.xml: C:\Users\skyli\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_app_badger-1.5.0\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported.
+Recommendation: remove package="fr.g123k.flutterappbadge.flutterappbadger" from the source AndroidManifest.xml: C:\Users\skyli\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_app_badger-1.5.0\android\src\main\AndroidManifest.xml.
+lib/widgets/dashboard/dashboard_quick_add.dart:42:49: Error: A value of type 'double?' can't be assigned to a variable of type 'double'.
+    if (mounted) setState(() => _exchangeRate = rate);
+                                                ^
+lib/widgets/transactions/add_transaction_dialog.dart:80:18: Error: The getter 'Supabase' isn't defined for the type '_AddTransactionDialogState'.
+ - '_AddTransactionDialogState' is from 'package:fajrak/widgets/transactions/add_transaction_dialog.dart' ('lib/widgets/transactions/add_transaction_dialog.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Supabase'.
+    final user = Supabase.instance.client.auth.currentUser!;
+                 ^^^^^^^^
+lib/widgets/transactions/add_transaction_dialog.dart:98:13: Error: The getter 'Supabase' isn't defined for the type '_AddTransactionDialogState'.
+ - '_AddTransactionDialogState' is from 'package:fajrak/widgets/transactions/add_transaction_dialog.dart' ('lib/widgets/transactions/add_transaction_dialog.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Supabase'.
+      await Supabase.instance.client
+            ^^^^^^^^
+lib/widgets/transactions/add_transaction_dialog.dart:103:13: Error: The getter 'Supabase' isn't defined for the type '_AddTransactionDialogState'.
+ - '_AddTransactionDialogState' is from 'package:fajrak/widgets/transactions/add_transaction_dialog.dart' ('lib/widgets/transactions/add_transaction_dialog.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Supabase'.
+      await Supabase.instance.client.from('transactions').insert(data);
+            ^^^^^^^^
+lib/widgets/debts/debt_list_item.dart:53:56: Error: A value of type 'double?' can't be assigned to a variable of type 'double'.
+    if (mounted) setState(() => _paymentExchangeRate = rate);
+                                                       ^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build completed with 2 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':flutter_app_badger:processReleaseManifest'.
+> A failure occurred while executing com.android.build.gradle.tasks.ProcessLibraryManifest$ProcessLibWorkAction
+   > Incorrect package="fr.g123k.flutterappbadge.flutterappbadger" found in source AndroidManifest.xml: C:\Users\skyli\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_app_badger-1.5.0\android\src\main\AndroidManifest.xml.
+     Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported.
+     Recommendation: remove package="fr.g123k.flutterappbadge.flutterappbadger" from the source AndroidManifest.xml: C:\Users\skyli\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_app_badger-1.5.0\android\src\main\AndroidManifest.xml.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildRelease'.
+> Process 'command 'C:\src\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+BUILD FAILED in 23s
+Running Gradle task 'assembleRelease'...                           24.0s
+Gradle task assembleRelease failed with exit code 1
