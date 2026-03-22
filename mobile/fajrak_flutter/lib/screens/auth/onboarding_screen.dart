@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import '../app_state.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
@@ -88,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isEn = context.locale.languageCode == 'en';
+    final isEn = context.read<AppState>().locale.languageCode == 'en';
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(

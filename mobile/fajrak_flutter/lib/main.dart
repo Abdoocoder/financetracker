@@ -64,14 +64,9 @@ void main() async {
   final appState = AppState();
 
   runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      path: 'assets/i18n',
-      fallbackLocale: const Locale('ar'),
-      child: ChangeNotifierProvider.value(
-        value: appState,
-        child: const FajrakApp(),
-      ),
+    ChangeNotifierProvider.value(
+      value: appState,
+      child: const FajrakApp(),
     ),
   );
 }
@@ -86,9 +81,13 @@ class FajrakApp extends StatelessWidget {
       title: 'فجرك',
       debugShowCheckedModeBanner: false,
       theme: appState.isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
-      locale: context.locale, // Use context.locale from EasyLocalization
-      supportedLocales: context.supportedLocales,
-      localizationsDelegates: context.localizationDelegates,
+      locale: appState.locale,
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       initialRoute: '/splash',
       routes: {
         '/splash': (context) => const SplashScreen(),
