@@ -190,7 +190,9 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                       : () async {
                           setState(() => _loggingOut = true);
                           await Supabase.instance.client.auth.signOut();
-                          if (mounted) Navigator.pushReplacementNamed(context, '/login');
+                          if (mounted) {
+                            Navigator.pushReplacementNamed(context, '/login');
+                          }
                         },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFEF4444),
