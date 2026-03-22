@@ -9,6 +9,7 @@ import '../../widgets/investments/portfolio_chart_card.dart';
 import '../../widgets/investments/wealth_simulator_card.dart';
 import '../../widgets/investments/investment_list_item.dart';
 import '../../widgets/investments/add_investment_dialog.dart';
+import '../../services/investments_service.dart';
 
 class InvestmentsScreen extends StatefulWidget {
   const InvestmentsScreen({super.key});
@@ -29,7 +30,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     _load();
   }
 
-  Future<void> _load() async {
+  Future<void> _load({bool refreshPrices = false}) async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
@@ -38,9 +39,29 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           .from('investments')
           .select('*')
           .eq('user_id', user.id);
+      
+      var investments = List<Map<String, dynamic>>.from(data);
+
+      if (refreshPrices) {
+        for (var i = 0; i < investments.length; i++) {
+          final symbol = investments[i]['symbol'] as String?;
+          if (symbol != null) {
+            final newPrice = await InvestmentsService.fetchPrice(symbol);
+            if (newPrice != null) {
+              investments[i]['current_price'] = newPrice;
+              // Update in DB
+              await Supabase.instance.client
+                  .from('investments')
+                  .update({'current_price': newPrice})
+                  .eq('id', investments[i]['id']);
+            }
+          }
+        }
+      }
+
       if (mounted) {
         setState(() {
-          _investments = List<Map<String, dynamic>>.from(data);
+          _investments = investments;
           _loading = false;
         });
       }
@@ -110,7 +131,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       backgroundColor: const Color(0xFF0F1629),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (_) => AddInvestmentDialog(onSaved: _load),
+      builder: (_) => AddInvestmentDialog(onSaved: () => _load()),
     );
   }
 
@@ -155,7 +176,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             tooltip: 'inv_refresh'.tr(),
             onPressed: () async {
               setState(() => _loading = true);
-              await _load();
+              await _load(refreshPrices: true);
             },
           ),
           IconButton(
@@ -165,8 +186,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       ),
       body: _loading
           ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
-          : RefreshIndicator(
-              onRefresh: _load,
+            : RefreshIndicator(
+              onRefresh: () => _load(refreshPrices: true),
               color: colorScheme.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -201,7 +222,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       child: Column(children: [
                         const Text('📈', style: TextStyle(fontSize: 48)),
                         const SizedBox(height: 12),
-                        Text('لا توجد استثمارات بعد',
+                        Text('inv_empty'.tr(),
                             style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
                                 fontFamily: 'Cairo',
@@ -209,14 +230,14 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                             onPressed: _showAddDialog,
-                            child: const Text('أضف استثمارك الأول',
-                                style: TextStyle(fontFamily: 'Cairo'))),
+                            child: Text('inv_add_first'.tr(),
+                                style: const TextStyle(fontFamily: 'Cairo'))),
                       ]),
                     )
                   else ...[
                     Align(
                         alignment: Alignment.centerRight,
-                        child: Text('محفظتي (${_investments.length})',
+                        child: Text('inv_portfolio_count'.tr(args: [_investments.length.toString()]),
                             style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
@@ -244,7 +265,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                           child: Text(
-                              'تأكد من استثمارك في صناديق حلال مثل SPUS أو HLAL',
+                              'inv_halal_tip'.tr(),
                               style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
                                   fontFamily: 'Cairo',
