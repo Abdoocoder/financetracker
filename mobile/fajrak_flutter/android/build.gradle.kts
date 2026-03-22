@@ -12,41 +12,29 @@ val newBuildDir: Directory =
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {
-    val subproject = this
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(subproject.name)
-    subproject.layout.buildDirectory.value(newSubprojectBuildDir)
-}
+    val newSubprojectBuildDir: Directory = newBuildDir.dir(name)
+    layout.buildDirectory.value(newSubprojectBuildDir)
 
-subprojects {
-    val subproject = this
-    if (subproject.name != "app") {
-        val configureAndroid: (Project) -> Unit = { proj ->
-            if (proj.plugins.hasPlugin("com.android.library") || proj.plugins.hasPlugin("com.android.application")) {
-                val android = proj.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
+    if (name != "app") {
+        afterEvaluate {
+            if (plugins.hasPlugin("com.android.library") || plugins.hasPlugin("com.android.application")) {
+                val android = extensions.findByName("android") as? com.android.build.gradle.BaseExtension
                 android?.apply {
                     compileSdkVersion(34)
                     if (namespace == null) {
-                        namespace = if (proj.name == "flutter_app_badger") {
+                        namespace = if (name == "flutter_app_badger") {
                             "fr.g123k.flutterappbadge.flutterappbadger"
                         } else {
-                            "com.fajrak.app.plugins.${proj.name.replace("-", "_")}"
+                            "com.fajrak.app.plugins.${name.replace("-", "_")}"
                         }
                     }
                 }
             }
         }
-
-        if (subproject.state.executed) {
-            configureAndroid(subproject)
-        } else {
-            subproject.afterEvaluate(configureAndroid)
-        }
     }
 }
 
-subprojects {
-    project.evaluationDependsOn(":app")
-}
+// Removed circular evaluation dependency on :app
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
