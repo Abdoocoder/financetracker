@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../services/currency_service.dart';
 
@@ -38,7 +39,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
       return;
     }
     final rate = await CurrencyService.fetchExchangeRate(_selectedCurrency, widget.currency);
-    if (mounted) setState(() => _exchangeRate = rate);
+    if (mounted) setState(() => _exchangeRate = rate ?? 1.0);
   }
 
   final _categories = ['طعام','مواصلات','فواتير','صحة','ترفيه','تسوق','راتب','عمل حر','أخرى'];

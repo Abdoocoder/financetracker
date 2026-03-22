@@ -24,8 +24,13 @@ subprojects {
             if (subproject.plugins.hasPlugin("com.android.library") || subproject.plugins.hasPlugin("com.android.application")) {
                 val android = subproject.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
                 android?.apply {
+                    compileSdkVersion(34)
                     if (namespace == null) {
-                        namespace = "com.fajrak.app.plugins.${subproject.name.replace("-", "_")}"
+                        namespace = if (subproject.name == "flutter_app_badger") {
+                            "fr.g123k.flutterappbadge.flutterappbadger"
+                        } else {
+                            "com.fajrak.app.plugins.${subproject.name.replace("-", "_")}"
+                        }
                     }
                 }
             }

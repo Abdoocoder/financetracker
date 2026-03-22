@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
@@ -49,7 +50,7 @@ class _DebtListItemState extends State<DebtListItem> {
       return;
     }
     final rate = await CurrencyService.fetchExchangeRate(_paymentCurrency, widget.currency);
-    if (mounted) setState(() => _paymentExchangeRate = rate);
+    if (mounted) setState(() => _paymentExchangeRate = rate ?? 1.0);
   }
 
   @override
