@@ -189,6 +189,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     final limitCtrl = TextEditingController(
         text: existing?['monthly_limit']?.toString() ?? '');
 
+    final colorScheme = Theme.of(context).colorScheme;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -840,7 +841,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     );
   }
 
-  Widget _summaryRow(String label, String value, Color color) => Padding(
+  Widget _summaryRow(String label, String value, Color color) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
         padding: const EdgeInsets.only(bottom: 6),
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -855,15 +858,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   fontSize: 13)),
         ]),
       );
+  }
 
-  Widget _rule502030Card(
-          String pct, String label, double amount, Color color) =>
-      Container(
-        padding: const EdgeInsets.all(10),
+  Widget _rule502030Card(String pct, String label, double amount, Color color) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
+            color: color.withOpacity(0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2))),
+            border: Border.all(color: color.withOpacity(0.15))),
         child: Column(children: [
           Text(pct,
               style: TextStyle(
@@ -873,9 +877,9 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   fontFamily: 'Cairo')),
           Text(amount.toStringAsFixed(0),
               style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 13,
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 10,
                   fontFamily: 'Cairo')),
           Text(label,
               style: TextStyle(
@@ -883,9 +887,11 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
               textAlign: TextAlign.center),
         ]),
       );
+  }
 
   Widget _budgetCard(Map<String, dynamic> b) {
-    final cat = _categories.firstWhere((c) => c['key'] == b['category'],
+    final colorScheme = Theme.of(context).colorScheme;
+    final cat = _localizedCategories.firstWhere((c) => c['key'] == b['category'],
         orElse: () => {'key': b['category'], 'icon': '📝'});
     final spent = _spending[b['category']] ?? 0;
     final limit = (b['monthly_limit'] as num).toDouble();

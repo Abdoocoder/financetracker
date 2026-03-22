@@ -5,6 +5,7 @@ class QuickLinksCards extends StatelessWidget {
   final double totalDebt;
   final double invValue;
   final double goalsSaved;
+  final double goalsTarget;
   final String currency;
 
   const QuickLinksCards({
@@ -12,6 +13,7 @@ class QuickLinksCards extends StatelessWidget {
     required this.totalDebt,
     required this.invValue,
     required this.goalsSaved,
+    required this.goalsTarget,
     required this.currency,
   });
 
