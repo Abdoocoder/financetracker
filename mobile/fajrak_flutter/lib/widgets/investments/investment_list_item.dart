@@ -1,0 +1,337 @@
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'investment_transaction_history.dart';
+import 'add_investment_dialog.dart';
+
+class InvestmentListItem extends StatefulWidget {
+  final Map<String, dynamic> inv;
+  final Function(String id) onDelete;
+  final VoidCallback onChanged;
+
+  const InvestmentListItem({
+    super.key,
+    required this.inv,
+    required this.onDelete,
+    required this.onChanged,
+  });
+
+  @override
+  State<InvestmentListItem> createState() => _InvestmentListItemState();
+}
+
+class _InvestmentListItemState extends State<InvestmentListItem> {
+  bool _showBuyForm = false;
+  final _buySharesCtrl = TextEditingController();
+  final _buyPriceCtrl = TextEditingController();
+  final _buyCommCtrl = TextEditingController(text: '0.5');
+  bool _savingBuy = false;
+
+  @override
+  void dispose() {
+    _buySharesCtrl.dispose();
+    _buyPriceCtrl.dispose();
+    _buyCommCtrl.dispose();
+    super.dispose();
+  }
+
+  void _showAddDialog() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF0F1629),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (_) => AddInvestmentDialog(
+        existing: widget.inv,
+        onSaved: widget.onChanged,
+      ),
+    );
+  }
+
+  void _showTxHistory() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (_) => InvestmentTxHistoryModal(
+        invId: widget.inv['id'].toString(),
+        symbol: widget.inv['symbol'],
+      ),
+    );
+  }
+
+  Future<void> _recordBuy() async {
+    final shares = double.tryParse(_buySharesCtrl.text);
+    final price = double.tryParse(_buyPriceCtrl.text);
+    final commission = double.tryParse(_buyCommCtrl.text) ?? 0.0;
+    if (shares == null || shares <= 0 || price == null || price <= 0) return;
+
+    setState(() => _savingBuy = true);
+    final user = Supabase.instance.client.auth.currentUser!;
+
+    try {
+      await Supabase.instance.client.from('investment_transactions').insert({
+        'investment_id': widget.inv['id'],
+        'user_id': user.id,
+        'type': 'buy',
+        'shares': shares,
+        'price': price,
+        'commission': commission,
+        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+      });
+
+      final oldShares = (widget.inv['shares'] as num).toDouble();
+      final oldAvg = (widget.inv['avg_buy_price'] as num).toDouble();
+      final totalShares = oldShares + shares;
+      final newAvg = totalShares > 0
+          ? ((oldShares * oldAvg) + (shares * price)) / totalShares
+          : price;
+
+      await Supabase.instance.client.from('investments').update({
+        'shares': totalShares,
+        'avg_buy_price': newAvg,
+        'current_price': price,
+      }).eq('id', widget.inv['id']);
+
+      _buySharesCtrl.clear();
+      _buyPriceCtrl.clear();
+      _buyCommCtrl.text = '0.5';
+
+      setState(() {
+        _showBuyForm = false;
+        _savingBuy = false;
+      });
+      widget.onChanged();
+    } catch (e) {
+      if (mounted) setState(() => _savingBuy = false);
+    }
+  }
+
+  TextField _miniField(
+      TextEditingController ctrl, String hint, TextInputType type) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return TextField(
+      controller: ctrl,
+      keyboardType: type,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+          color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 12),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(
+            color: colorScheme.onSurfaceVariant,
+            fontFamily: 'Cairo',
+            fontSize: 10),
+        filled: true,
+        fillColor: colorScheme.surface,
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final inv = widget.inv;
+    final shares = (inv['shares'] as num).toDouble();
+    final avgPrice = (inv['avg_buy_price'] as num).toDouble();
+    final currentPrice = (inv['current_price'] as num).toDouble();
+    final value = shares * currentPrice;
+    final cost = shares * avgPrice;
+    final gain = value - cost;
+    final gainPct = cost > 0 ? (gain / cost * 100) : 0.0;
+    final isHalal = inv['is_halal'] as bool? ?? false;
+
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: colorScheme.outlineVariant)),
+      child: Column(children: [
+        Row(children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12)),
+            child: Center(
+                child: Text(inv['symbol']?.toString().substring(0, 1) ?? '?',
+                    style: TextStyle(
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Cairo',
+                        fontSize: 18))),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Row(children: [
+                  Text(inv['symbol'] ?? '',
+                      style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'Cairo',
+                          fontSize: 14)),
+                  if (isHalal) ...[
+                    const SizedBox(width: 6),
+                    const Text('🕌', style: TextStyle(fontSize: 12))
+                  ],
+                ]),
+                Text(
+                    '${shares.toStringAsFixed(4)} سهم • \$${currentPrice.toStringAsFixed(2)}',
+                    style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: 11,
+                        fontFamily: 'Cairo')),
+              ])),
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text('\$${value.toStringAsFixed(2)}',
+                style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Cairo')),
+            Text('${gain >= 0 ? '+' : ''}${gainPct.toStringAsFixed(1)}%',
+                style: TextStyle(
+                    color: gain >= 0
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFFEF4444),
+                    fontSize: 12,
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.w700)),
+          ]),
+          const SizedBox(width: 8),
+          GestureDetector(
+              onTap: _showAddDialog,
+              child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                      color: colorScheme.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(7),
+                      border: Border.all(
+                          color: colorScheme.primary.withValues(alpha: 0.2))),
+                  child:
+                      Icon(Icons.edit, color: colorScheme.primary, size: 14))),
+          const SizedBox(width: 6),
+          GestureDetector(
+              onTap: () => widget.onDelete(inv['id'].toString()),
+              child: Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                      color: colorScheme.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(7),
+                      border: Border.all(
+                          color: colorScheme.error.withValues(alpha: 0.2))),
+                  child:
+                      Icon(Icons.close, color: colorScheme.error, size: 14))),
+        ]),
+        const SizedBox(height: 10),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: cost > 0 ? (value / (cost * 2)).clamp(0.0, 1.0) : 0,
+            backgroundColor: colorScheme.outlineVariant,
+            valueColor: AlwaysStoppedAnimation(
+                gain >= 0 ? const Color(0xFF10B981) : colorScheme.error),
+            minHeight: 4,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+              child: OutlinedButton(
+            onPressed: _showTxHistory,
+            style: OutlinedButton.styleFrom(
+                foregroundColor: colorScheme.onSurfaceVariant,
+                side: BorderSide(color: colorScheme.outlineVariant),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8))),
+            child: const Text('سجل المعاملات',
+                style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700)),
+          )),
+          const SizedBox(width: 8),
+          Expanded(
+              child: OutlinedButton(
+            onPressed: () => setState(() => _showBuyForm = !_showBuyForm),
+            style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF10B981),
+                side: BorderSide(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8))),
+            child: const Text('+ تسجيل شراء',
+                style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700)),
+          )),
+        ]),
+        if (_showBuyForm) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10)),
+            child: Column(children: [
+              Row(children: [
+                Expanded(
+                    child: _miniField(_buySharesCtrl, 'عدد الأسهم',
+                        const TextInputType.numberWithOptions(decimal: true))),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: _miniField(_buyPriceCtrl, 'السعر \$',
+                        const TextInputType.numberWithOptions(decimal: true))),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: _miniField(_buyCommCtrl, 'العمولة \$',
+                        const TextInputType.numberWithOptions(decimal: true))),
+              ]),
+              const SizedBox(height: 10),
+              SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _savingBuy ? null : _recordBuy,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8))),
+                    child: _savingBuy
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : const Text('تسجيل',
+                            style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12)),
+                  )),
+            ]),
+          ),
+        ],
+      ]),
+    );
+  }
+}
