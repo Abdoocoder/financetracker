@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,6 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   double _income = 0, _expenses = 0, _net = 0;
   int _healthScore = 0;
+  String _txType = 'expense';
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
@@ -28,6 +30,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
   final _amountController = TextEditingController();
+  bool _saving = false;
+  String _selectedCategory = 'طعام';
   final _categories = ['طعام','مواصلات','فواتير','صحة','ترفيه','تسوق','راتب','عمل حر','أخرى'];
 
   String _getCategoryName(String key) {

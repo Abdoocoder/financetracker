@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../../app_state.dart';
@@ -1039,9 +1040,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ]),
             childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
             children: [child],
-          ),
         ),
       );
+  }
   Widget _netWorthStat(String label, double value, Color color) {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(children: [
