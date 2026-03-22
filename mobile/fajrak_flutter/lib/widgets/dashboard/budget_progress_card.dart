@@ -39,14 +39,14 @@ class BudgetProgressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('الميزانية الشهرية',
+              Text('dash_summary_month'.tr(),
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Cairo',
                       fontSize: 14)),
               Text(
-                  '${percentage >= 1 ? 0 : remaining.toStringAsFixed(0)} $currency متبقي',
+                  '${percentage >= 1 ? 0 : remaining.toStringAsFixed(0)} $currency ${"goals_remaining".tr()}',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -67,12 +67,12 @@ class BudgetProgressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('مصروف: ${expenses.toStringAsFixed(0)} $currency',
+              Text('${"trans_expense".tr()}: ${expenses.toStringAsFixed(0)} $currency',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 11,
                       fontFamily: 'Cairo')),
-              Text('دخل: ${income.toStringAsFixed(0)} $currency',
+              Text('${"trans_income".tr()}: ${income.toStringAsFixed(0)} $currency',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 11,

@@ -45,7 +45,7 @@ class ChartsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('نظرة عامة (6 أشهر)',
+          Text('dash_overview_6m'.tr(),
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
@@ -117,9 +117,9 @@ class ChartsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegend(incomeColor, 'دخل', colorScheme),
+              _buildLegend(incomeColor, 'dash_income'.tr(), colorScheme),
               const SizedBox(width: 16),
-              _buildLegend(expenseColor, 'مصروف', colorScheme),
+              _buildLegend(expenseColor, 'dash_expenses'.tr(), colorScheme),
             ],
           )
         ],
@@ -162,7 +162,7 @@ class ChartsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('توزيع المصاريف (هذا الشهر)',
+          Text('dash_spent_from_categories'.tr(),
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,

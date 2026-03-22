@@ -18,22 +18,22 @@ class GamificationCard extends StatelessWidget {
     double progress;
 
     if (score < 40) {
-      rank = 'برونزي';
+      rank = 'gamif_rank_bronze'.tr();
       icon = '🥉';
       color = const Color(0xFFCD7F32);
       progress = score / 40;
     } else if (score < 60) {
-      rank = 'فضي';
+      rank = 'gamif_rank_silver'.tr();
       icon = '🥈';
       color = const Color(0xFFC0C0C0);
       progress = (score - 40) / 20;
     } else if (score < 80) {
-      rank = 'ذهبي';
+      rank = 'gamif_rank_gold'.tr();
       icon = '🥇';
       color = const Color(0xFFFFD700);
       progress = (score - 60) / 20;
     } else {
-      rank = 'ماسي';
+      rank = 'gamif_rank_diamond'.tr();
       icon = '💎';
       color = colorScheme.primary;
       progress = score >= 100 ? 1.0 : (score - 80) / 20;
@@ -68,13 +68,13 @@ class GamificationCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('المستوى $rank',
+                    Text('${"learn_stage_label".tr()} $rank',
                         style: TextStyle(
                             color: color,
                             fontWeight: FontWeight.w900,
                             fontFamily: 'Cairo',
                             fontSize: 13)),
-                    Text('$score نقطة',
+                    Text('$score ${"gamif_points".tr()}',
                         style: TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 12,
@@ -95,8 +95,8 @@ class GamificationCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                     score >= 100
-                        ? 'أنت في أعلى مستوى، حافظ عليه!'
-                        : 'تحكم بنفقاتك أكثر لرفع مستواك وفتح شارات جديدة 🏆',
+                        ? 'gamif_max_level'.tr()
+                        : 'gamif_next_level_tip'.tr(),
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 10,

@@ -52,10 +52,10 @@ class _ChallengesCardState extends State<ChallengesCard> {
   }
 
   final _challenges = [
-    {'id': 1, 'icon': '🍔', 'title': 'أسبوع بدون مطاعم', 'days': 7},
-    {'id': 2, 'icon': '💰', 'title': 'وفّر 10% من دخلك', 'days': 30},
-    {'id': 3, 'icon': '📉', 'title': 'أنفق أقل من الشهر الماضي', 'days': 30},
-    {'id': 4, 'icon': '🎯', 'title': 'صفر مصاريف غير ضرورية', 'days': 14},
+    {'id': 1, 'icon': '🍔', 'title': 'challenge_1_title'.tr(), 'days': 7},
+    {'id': 2, 'icon': '💰', 'title': 'challenge_2_title'.tr(), 'days': 30},
+    {'id': 3, 'icon': '📉', 'title': 'challenge_3_title'.tr(), 'days': 30},
+    {'id': 4, 'icon': '🎯', 'title': 'challenge_4_title'.tr(), 'days': 14},
   ];
 
   @override
@@ -75,7 +75,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('🏆 تحديات الادخار',
+              Text('dash_challenges'.tr(),
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
@@ -84,7 +84,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
               if (_activeChallenge != null)
                 GestureDetector(
                   onTap: () => setState(() => _activeChallenge = null),
-                  child: Text('الكل',
+                  child: Text('trans_all'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12,
@@ -117,7 +117,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Cairo')),
           const SizedBox(height: 4),
-          Text('${active['days']} يوم',
+          Text('${active['days']} ${"learn_streak_day".tr()}',
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
           const SizedBox(height: 12),

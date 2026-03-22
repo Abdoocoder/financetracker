@@ -5,31 +5,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-const _categories = [
-  {'key': 'طعام', 'icon': '🍔'},
-  {'key': 'مواصلات', 'icon': '🚗'},
-  {'key': 'فواتير', 'icon': '💡'},
-  {'key': 'صحة', 'icon': '💊'},
-  {'key': 'ملابس', 'icon': '👕'},
-  {'key': 'ترفيه', 'icon': '🎮'},
-  {'key': 'تعليم', 'icon': '📚'},
-  {'key': 'أخرى', 'icon': '📝'},
+List<Map<String, dynamic>> get _localizedCategories => [
+  {'key': 'طعام', 'icon': '🍔', 'label': 'cat_food'.tr()},
+  {'key': 'مواصلات', 'icon': '🚗', 'label': 'cat_transport'.tr()},
+  {'key': 'فواتير', 'icon': '💡', 'label': 'cat_bills'.tr()},
+  {'key': 'صحة', 'icon': '💊', 'label': 'cat_health'.tr()},
+  {'key': 'ملابس', 'icon': '👕', 'label': 'cat_clothes'.tr()},
+  {'key': 'ترفيه', 'icon': '🎮', 'label': 'cat_entertainment'.tr()},
+  {'key': 'تعليم', 'icon': '📚', 'label': 'cat_education'.tr()},
+  {'key': 'أخرى', 'icon': '📝', 'label': 'cat_others'.tr()},
 ];
 
-const _months = [
-  'يناير',
-  'فبراير',
-  'مارس',
-  'أبريل',
-  'مايو',
-  'يونيو',
-  'يوليو',
-  'أغسطس',
-  'سبتمبر',
-  'أكتوبر',
-  'نوفمبر',
-  'ديسمبر'
+List<String> get _localizedMonths => [
+  'month_jan'.tr(), 'month_feb'.tr(), 'month_mar'.tr(), 'month_apr'.tr(),
+  'month_may'.tr(), 'month_jun'.tr(), 'month_jul'.tr(), 'month_aug'.tr(),
+  'month_sep'.tr(), 'month_oct'.tr(), 'month_nov'.tr(), 'month_dec'.tr(),
 ];
+
+String _getCategoryName(String key) {
+  switch (key) {
+    case 'طعام': return 'cat_food'.tr();
+    case 'مواصلات': return 'cat_transport'.tr();
+    case 'فواتير': return 'cat_bills'.tr();
+    case 'صحة': return 'cat_health'.tr();
+    case 'ملابس': return 'cat_clothes'.tr();
+    case 'ترفيه': return 'cat_entertainment'.tr();
+    case 'تعليم': return 'cat_education'.tr();
+    case 'تسوق': return 'cat_shopping'.tr();
+    case 'راتب': return 'cat_salary'.tr();
+    case 'عمل حر': return 'cat_freelance'.tr();
+    default: return 'cat_others'.tr();
+  }
+}
 
 class BudgetsScreen extends StatefulWidget {
   const BudgetsScreen({super.key});
@@ -169,16 +176,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     }
     await _load();
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('تم تطبيق التوزيع المقترح ✨',
-              style: TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: Color(0xFF10B981)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('budget_apply_success'.tr(),
+              style: const TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: const Color(0xFF10B981)));
     }
   }
 
   void _showAddDialog({Map<String, dynamic>? existing}) {
     String selectedCat =
-        existing?['category'] as String? ?? _categories[0]['key'] as String;
+        existing?['category'] as String? ?? _localizedCategories[0]['key'] as String;
     final limitCtrl = TextEditingController(
         text: existing?['monthly_limit']?.toString() ?? '');
 
@@ -203,7 +210,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                     color: colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text(existing != null ? 'تعديل الميزانية' : 'ميزانية جديدة',
+            Text(existing != null ? 'budget_edit'.tr() : 'budget_new'.tr(),
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
@@ -213,7 +220,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
             if (existing == null) ...[
               Align(
                   alignment: Alignment.centerRight,
-                  child: Text('الفئة',
+                  child: Text('budget_category'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 12,
@@ -225,8 +232,11 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   childAspectRatio: 1,
-                  children: _categories.map((cat) {
-                                child: Container(
+                  children: _localizedCategories.map((cat) {
+                    final isSelected = cat['key'] == selectedCat;
+                    return GestureDetector(
+                      onTap: () => setS(() => selectedCat = cat['key'] as String),
+                      child: Container(
                         decoration: BoxDecoration(
                           color: isSelected
                               ? colorScheme.primary.withOpacity(0.15)
@@ -243,18 +253,13 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                               Text(cat['icon'] as String,
                                   style: const TextStyle(fontSize: 20)),
                               const SizedBox(height: 4),
-                              Text(cat['key'] as String,
+                              Text(cat['label'] as String,
                                   style: TextStyle(
                                       color: isSelected
                                           ? colorScheme.primary
                                           : colorScheme.onSurfaceVariant,
                                       fontSize: 10,
                                       fontFamily: 'Cairo',
-                                      fontWeight: FontWeight.w700),
-                                  textAlign: TextAlign.center),
-                            ]),
-                      ),
-ontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700),
                                   textAlign: TextAlign.center),
                             ]),
@@ -270,7 +275,7 @@ ontFamily: 'Cairo',
               textAlign: TextAlign.right,
               style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
               decoration: InputDecoration(
-                labelText: 'الحد الشهري ($_currency)',
+                labelText: 'budget_monthly_limit'.tr(args: [_currency]),
                 labelStyle: TextStyle(
                     color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
                 filled: true,
@@ -299,10 +304,10 @@ ontFamily: 'Cairo',
                           _budgets.any((b) => b['category'] == selectedCat);
                       if (exists) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('ميزانية هذه الفئة موجودة مسبقاً',
-                                    style: TextStyle(fontFamily: 'Cairo')),
-                                backgroundColor: Color(0xFFF59E0B)));
+                             SnackBar(
+                                content: Text('budget_category_exists'.tr(),
+                                    style: const TextStyle(fontFamily: 'Cairo')),
+                                backgroundColor: const Color(0xFFF59E0B)));
                         return;
                       }
                       await Supabase.instance.client.from('budgets').insert({
@@ -322,7 +327,7 @@ ontFamily: 'Cairo',
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12))),
-                  child: Text(existing != null ? 'حفظ' : 'إضافة معاملة',
+                  child: Text(existing != null ? 'save'.tr() : 'add'.tr(),
                       style: const TextStyle(
                           fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
                 )),
@@ -349,14 +354,14 @@ ontFamily: 'Cairo',
           'icon': '🔴',
           'type': 'danger',
           'text':
-              'تجاوزت ميزانية ${b['category']} بـ ${(spent - limit).toStringAsFixed(0)} $_currency'
+              'budget_insight_over'.tr(args: [_getCategoryName(b['category']), (spent - limit).toStringAsFixed(0), _currency])
         });
       } else if (limit > 0 && (spent / limit) > 0.8)
         insights.add({
           'icon': '🔶',
           'type': 'warning',
           'text':
-              'اقتربت من حد ${b['category']} — ${(limit - spent).toStringAsFixed(0)} $_currency متبقي'
+              'budget_insight_near'.tr(args: [_getCategoryName(b['category']), (limit - spent).toStringAsFixed(0), _currency])
         });
     }
     if (_income > 0 && totalSpent > 0) {
@@ -365,36 +370,34 @@ ontFamily: 'Cairo',
         insights.add({
           'icon': '🚨',
           'type': 'danger',
-          'text': 'أنفقت ${ratio.toStringAsFixed(0)}% من دخلك — خطر!'
+          'text': 'budget_insight_ratio_danger'.tr(args: [ratio.toStringAsFixed(0)])
         });
       } else if (ratio < 70)
         insights.add({
           'icon': '✅',
           'type': 'success',
-          'text': 'ممتاز! أنفقت ${ratio.toStringAsFixed(0)}% فقط من دخلك'
+          'text': 'budget_insight_ratio_success'.tr(args: [ratio.toStringAsFixed(0)])
         });
     }
     if (_budgets.isEmpty) {
       insights.add({
         'icon': '💡',
         'type': 'info',
-        'text': 'أضف ميزانية لكل فئة لتتبع إنفاقك بدقة'
+        'text': 'budget_insight_empty'.tr()
       });
-    }
-    if (available > _income * 0.2 && _income > 0) {
+    } else if (available > totalBudgeted) {
       insights.add({
         'icon': '💰',
         'type': 'success',
         'text':
-            'فائض ${available.toStringAsFixed(0)} $_currency — فكر في الاستثمار!'
+            'budget_insight_surplus'.tr(args: [available.toStringAsFixed(0), _currency])
       });
-    }
-    if (totalBudgeted > available && available > 0) {
+    } else if (available < totalBudgeted) {
       insights.add({
-        'icon': '⚠️',
-        'type': 'warning',
+        'icon': '📉',
+        'type': 'danger',
         'text':
-            'ميزانيتك تتجاوز المتاح بـ ${(totalBudgeted - available).toStringAsFixed(0)} $_currency'
+            'budget_insight_deficit'.tr(args: [(totalBudgeted - available).toStringAsFixed(0), _currency])
       });
     }
 
@@ -407,7 +410,7 @@ ontFamily: 'Cairo',
           'icon': '🎯',
           'type': 'success',
           'text':
-              'أنت على وشك تحقيق هدف ${g['title']}! (${(target - current).toStringAsFixed(0)} متبقي)'
+              'budget_insight_goal_near'.tr(args: [g['title'] ?? '', (target - current).toStringAsFixed(0)])
         });
       }
     }
@@ -442,7 +445,7 @@ ontFamily: 'Cairo',
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('الميزانية',
+        title: Text('nav_budgets'.tr(),
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -494,7 +497,7 @@ ontFamily: 'Cairo',
                                           ? colorScheme.primary
                                           : colorScheme.outlineVariant),
                                 ),
-                                child: Text(_months[i],
+                                child: Text(_localizedMonths[i],
                                     style: TextStyle(
                                         color: _month == i + 1
                                             ? Colors.white
@@ -519,7 +522,7 @@ ontFamily: 'Cairo',
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('📋 ملخص الشهر',
+                                Text('dash_summary_month'.tr(),
                                     style: TextStyle(
                                         color: colorScheme.onSurfaceVariant,
                                         fontSize: 12,
@@ -527,12 +530,12 @@ ontFamily: 'Cairo',
                                         fontWeight: FontWeight.w900)),
                                 const SizedBox(height: 12),
                                 _summaryRow(
-                                    '💵 الدخل',
+                                    'dash_income'.tr(),
                                     '+${_income.toStringAsFixed(0)} $_currency',
                                     const Color(0xFF6EE7B7)),
                                 if (_totalDebtPayments > 0)
                                   _summaryRow(
-                                      '💳 أقساط الديون',
+                                      'dash_debts_payment'.tr(),
                                       '-${_totalDebtPayments.toStringAsFixed(0)} $_currency',
                                       const Color(0xFFFCA5A5)),
                                 Divider(
@@ -541,7 +544,7 @@ ontFamily: 'Cairo',
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text('✅ المتاح للإنفاق',
+                                      Text('dash_available_spending'.tr(),
                                           style: TextStyle(
                                               color: colorScheme.onSurface,
                                               fontWeight: FontWeight.w900,
@@ -562,7 +565,7 @@ ontFamily: 'Cairo',
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text('منفق من الفئات',
+                                         Text('dash_spent_from_categories'.tr(),
                                             style: TextStyle(
                                                 color: colorScheme.onSurfaceVariant,
                                                 fontSize: 11,
@@ -607,16 +610,16 @@ ontFamily: 'Cairo',
                               border:
                                   Border.all(color: colorScheme.outlineVariant)),
                           child: Column(children: [
-                            const Padding(
-                              padding: EdgeInsets.all(14),
+                            Padding(
+                              padding: const EdgeInsets.all(14),
                               child: Row(children: [
-                                Text('🤖', style: TextStyle(fontSize: 18)),
-                                SizedBox(width: 8),
-                                Text('المستشار المالي',
+                                const Text('🤖', style: TextStyle(fontSize: 18)),
+                                const SizedBox(width: 8),
+                                 Text('dash_financial_advisor'.tr(),
                                     style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w900,
-                                        color: Colors.white,
+                                        color: colorScheme.onSurface,
                                         fontFamily: 'Cairo')),
                               ]),
                             ),
@@ -675,7 +678,7 @@ ontFamily: 'Cairo',
                                     style: TextStyle(fontSize: 18)),
                                 const SizedBox(width: 8),
                                 Expanded(
-                                    child: Text('قاعدة 50/30/20 المقترحة',
+                                    child: Text('dash_rule_503020'.tr(),
                                         style: TextStyle(
                                             color: colorScheme.onSurface,
                                             fontWeight: FontWeight.w900,
@@ -689,12 +692,12 @@ ontFamily: 'Cairo',
                                               backgroundColor:
                                                   colorScheme.surface,
                                               title: Text(
-                                                  'تطبيق 50/30/20',
+                                                  'dash_rule_confirm_title'.tr(),
                                                   style: TextStyle(
                                                       color: colorScheme.onSurface,
                                                       fontFamily: 'Cairo')),
                                               content: Text(
-                                                  'سيتم إنشاء أو تعديل الميزانيات لتناسب التوزيع المقترح. هل تريد المتابعة؟',
+                                                  'dash_rule_confirm_body'.tr(),
                                                   style: TextStyle(
                                                       color: colorScheme.onSurfaceVariant,
                                                       fontFamily: 'Cairo')),
@@ -703,7 +706,7 @@ ontFamily: 'Cairo',
                                                     onPressed: () =>
                                                         Navigator.pop(
                                                             context, false),
-                                                    child: Text('إلغاء',
+                                                     child: Text('cancel'.tr(),
                                                         style: const TextStyle(
                                                             fontFamily:
                                                                 'Cairo'))),
@@ -727,8 +730,8 @@ ontFamily: 'Cairo',
                                           color: colorScheme.primary,
                                           borderRadius:
                                               BorderRadius.circular(8)),
-                                      child: const Text('تطبيق ✨',
-                                          style: TextStyle(
+                                      child: Text('dash_rule_apply'.tr(),
+                                          style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
                                               fontFamily: 'Cairo',
@@ -742,21 +745,21 @@ ontFamily: 'Cairo',
                                 Expanded(
                                     child: _rule502030Card(
                                         '50%',
-                                        '🏠 ضروريات',
+                                        'dash_rule_necessities'.tr(),
                                         (available * 0.5).round().toDouble(),
                                         colorScheme.primary)),
                                 const SizedBox(width: 8),
                                 Expanded(
                                     child: _rule502030Card(
                                         '30%',
-                                        '🎯 رغبات',
+                                        'dash_rule_wants'.tr(),
                                         (available * 0.3).round().toDouble(),
                                         colorScheme.secondary)),
                                 const SizedBox(width: 8),
                                 Expanded(
                                     child: _rule502030Card(
                                         '20%',
-                                        '💰 ادخار',
+                                        'dash_rule_savings'.tr(),
                                         (available * 0.2).round().toDouble(),
                                         const Color(0xFF10B981))),
                               ]),
@@ -768,7 +771,7 @@ ontFamily: 'Cairo',
 
                       // Budgets list
                       if (_budgets.isNotEmpty) ...[
-                        Text('ميزانياتي',
+                        Text('dash_my_budgets'.tr(),
                             style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
@@ -781,7 +784,7 @@ ontFamily: 'Cairo',
 
                       // Category spending
                       if (_spending.isNotEmpty) ...[
-                        Text('الإنفاق حسب الفئة',
+                        Text('dash_spending_by_category'.tr(),
                             style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,

@@ -54,8 +54,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           'user_id': user.id,
           'type': 'income',
           'amount': income,
-          'category': 'راتب',
-          'description': 'الراتب الشهري (تلقائي)',
+          'category': 'cat_salary'.tr(),
+          'description': 'onboarding_income_desc'.tr(),
           'transaction_date': DateTime.now().toIso8601String().split('T')[0],
         });
       }

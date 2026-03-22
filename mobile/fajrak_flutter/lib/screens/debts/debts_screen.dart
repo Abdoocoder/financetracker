@@ -328,7 +328,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             // Priority
             const Align(
                 alignment: Alignment.centerRight,
-                child: Text(' الأولوية ',
+                child: Text('debts_priority'.tr(),
                     style: TextStyle(
                         color: Color(0xFF94A3B8),
                         fontSize: 12,
@@ -498,10 +498,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           'amount': double.tryParse(
                                   originalCtrl.text.replaceAll(',', '.')) ??
                               0,
-                          'category': 'قرض مستلم',
-                          'description': 'قرض مستلم: ${nameCtrl.text}',
-                          'transaction_date':
-                              DateTime.now().toIso8601String().split('T')[0],
+                          'category': 'debt_received_cat'.tr(),
+                          'description': 'debt_received_desc'.tr(args: [nameCtrl.text]),
+                          'transaction_date': DateTime.now().toIso8601String().split('T')[0],
                         });
                       }
                     }

@@ -76,7 +76,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.credit_card_outlined,
-                    'ديون',
+                    'nav_debts'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -84,7 +84,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.pie_chart_outline,
-                    'الميزانية',
+                    'nav_budgets'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -92,7 +92,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.track_changes,
-                    'الأهداف',
+                    'nav_goals'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -100,7 +100,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.trending_up,
-                    'الاستثمارات',
+                    'nav_investments'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -108,7 +108,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.menu_book_outlined,
-                    'التعلم',
+                    'nav_learn'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -116,7 +116,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.notifications_none,
-                    'الإشعارات',
+                    'nav_alerts'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -124,7 +124,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.settings_outlined,
-                    'الإعدادات',
+                    'nav_settings'.tr(),
                     () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -132,7 +132,7 @@ class _MoreScreenState extends State<MoreScreen> {
                 _menuItem(
                     context,
                     Icons.help_outline,
-                    'المساعدة',
+                    'nav_help'.tr(),
                     () => Navigator.push(context,
                         MaterialPageRoute(builder: (_) => const HelpScreen())), colorScheme),
 
