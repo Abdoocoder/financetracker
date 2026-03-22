@@ -29,3 +29,26 @@ Downloading packages...
 Got dependencies!
 25 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
+Running Gradle task 'assembleRelease'...                        
+lib/screens/learn/learn_screen.dart:198:19: Error: A value of type 'Map<String, dynamic>' can't be assigned to a variable of type 'Map<String, String>'.
+ - 'Map' is from 'dart:core'.
+        _lesson = lesson;
+                  ^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildRelease'.
+> Process 'command 'C:\src\flutter\bin\flutter.bat'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 28s
+Running Gradle task 'assembleRelease'...                           29.1s
+Gradle task assembleRelease failed with exit code 1
