@@ -38,7 +38,7 @@ jobs:
       - name: Build APK
         working-directory: mobile/fajrak_flutter
         run: |
-          flutter build apk --release --verbose \
+          flutter build apk --release \
             --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
             --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
 

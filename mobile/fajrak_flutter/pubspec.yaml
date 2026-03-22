@@ -20,7 +20,7 @@ dependencies:
   firebase_messaging: ^16.1.2
 
   # UI
-  fl_chart: ^0.71.0
+  fl_chart: ^1.1.0
   shimmer: ^3.0.0
   cached_network_image: ^3.3.1
 
@@ -31,6 +31,10 @@ dependencies:
   package_info_plus: ^9.0.0
   share_plus: ^12.0.1
   path_provider: ^2.1.5
+<<<<<<< HEAD
+=======
+  easy_localization: ^3.0.3
+>>>>>>> eb13937ecbeee6945e662d064a189ba6e8c513b4
   provider: ^6.1.1
 
 dev_dependencies:
@@ -38,4 +42,16 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 dependency_overrides:
-  vector_math: ^2.1.4
+  vector_math: ^2.3.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/i18n/
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700

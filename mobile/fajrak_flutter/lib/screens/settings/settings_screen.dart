@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../../app_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -164,7 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       setState(() => _savingProfile = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('toast_saved', style: const TextStyle(fontFamily: 'Cairo')),
+          content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
           backgroundColor: const Color(0xFF10B981)));
     }
   }
@@ -184,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       setState(() => _savingAssets = false);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
-              Text('toast_saved', style: const TextStyle(fontFamily: 'Cairo')),
+              Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
           backgroundColor: const Color(0xFF10B981)));
     }
   }
@@ -203,7 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (data.isEmpty) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text('settings_no_export',
+            content: Text('settings_no_export'.tr(),
                 style: const TextStyle(fontFamily: 'Cairo'))));
       }
       setState(() => _loading = false);
@@ -261,7 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('settings_title',
+        title: Text('settings_title'.tr(),
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -279,7 +280,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Profile section (Accordion)
                     _accordionCard(
                       icon: '👤',
-                      title: 'settings_profile_info',
+                      title: 'settings_profile_info'.tr(),
                       initiallyExpanded: true,
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,14 +360,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ]),
                             ),
                             const SizedBox(height: 20),
-                            _inputField(_nameCtrl, 'settings_name',
+                            _inputField(_nameCtrl, 'settings_name'.tr(),
                                 Icons.person_outline),
                             const SizedBox(height: 10),
-                            _inputField(_jobTitleCtrl, 'settings_job_title',
+                            _inputField(_jobTitleCtrl, 'settings_job_title'.tr(),
                                 Icons.work_outline),
                             const SizedBox(height: 10),
                             _inputField(
-                                _phoneCtrl, 'settings_phone', Icons.phone_outlined,
+                                _phoneCtrl, 'settings_phone'.tr(), Icons.phone_outlined,
                                 type: TextInputType.phone),
                             const SizedBox(height: 10),
                             GestureDetector(
@@ -396,7 +397,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                             Text(
                                       _birthDate.isNotEmpty
                                           ? _birthDate
-                                          : 'settings_birth_date',
+                                          : 'settings_birth_date'.tr(),
                                       style: TextStyle(
                                           color: _birthDate.isNotEmpty
                                               ? colorScheme.onSurface
@@ -406,13 +407,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            _sectionTitle('settings_financial'),
-                            _inputField(_incomeCtrl, 'settings_income',
+                            _sectionTitle('settings_financial'.tr()),
+                            _inputField(_incomeCtrl, 'settings_income'.tr(),
                                 Icons.account_balance_wallet_outlined,
                                 type: const TextInputType.numberWithOptions(
                                     decimal: true)),
                             const SizedBox(height: 12),
-                            Text('settings_currency',
+                            Text('settings_currency'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontFamily: 'Cairo',
@@ -476,7 +477,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           child: CircularProgressIndicator(
                                               strokeWidth: 2,
                                               color: Colors.white))
-                                      : Text('save',
+                                      : Text('save'.tr(),
                                           style: const TextStyle(
                                               fontFamily: 'Cairo',
                                               fontWeight: FontWeight.w900,
@@ -489,11 +490,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Preferences (Language + Theme)
                     _accordionCard(
                       icon: '⚙️',
-                      title: 'settings_preferences',
+                      title: 'settings_preferences'.tr(),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('settings_language',
+                            Text('settings_language'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontSize: 13,
@@ -510,7 +511,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         context.read<AppState>().setLocale(const Locale('ar'));
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text('toast_settings_saved',
+                                            content: Text('toast_settings_saved'.tr(),
                                               style: const TextStyle(fontFamily: 'Cairo')),
                                             backgroundColor: const Color(0xFF10B981)));
                                       }
@@ -523,7 +524,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         border: Border.all(color: _appLang == 'ar' ? colorScheme.primary : colorScheme.outlineVariant),
                                       ),
                                       child: Center(
-                                          child: Text('settings_lang_ar',
+                                          child: Text('settings_lang_ar'.tr(),
                                               style: TextStyle(
                                                   color: _appLang == 'ar' ? Colors.white : colorScheme.onSurfaceVariant,
                                                   fontFamily: 'Cairo',
@@ -540,7 +541,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         context.read<AppState>().setLocale(const Locale('en'));
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
-                                            content: Text('toast_settings_saved',
+                                            content: Text('toast_settings_saved'.tr(),
                                               style: const TextStyle(fontFamily: 'Cairo')),
                                             backgroundColor: const Color(0xFF10B981)));
                                       }
@@ -553,7 +554,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         border: Border.all(color: _appLang == 'en' ? colorScheme.primary : colorScheme.outlineVariant),
                                       ),
                                       child: Center(
-                                          child: Text('settings_lang_en',
+                                          child: Text('settings_lang_en'.tr(),
                                               style: TextStyle(
                                                   color: _appLang == 'en' ? Colors.white : colorScheme.onSurfaceVariant,
                                                   fontFamily: 'Cairo',
@@ -562,7 +563,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   )),
                             ]),
                             const SizedBox(height: 20),
-                            Text('settings_theme',
+                            Text('settings_theme'.tr(),
                                 style: TextStyle(
                                     color: const Color(0xFF94A3B8),
                                     fontSize: 13,
@@ -604,7 +605,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         width: 1.5),
                                   ),
                                   child: Center(
-                                      child: Text('settings_dark',
+                                      child: Text('settings_dark'.tr(),
                                           style: TextStyle(
                                               color: _isDarkMode
                                                   ? colorScheme.onPrimaryContainer
@@ -648,7 +649,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         width: 1.5),
                                   ),
                                   child: Center(
-                                      child: Text('settings_light',
+                                      child: Text('settings_light'.tr(),
                                           style: TextStyle(
                                               color: !_isDarkMode
                                                   ? colorScheme.onPrimaryContainer
@@ -700,13 +701,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  _netWorthStat('health_tracking', _cashBalance,
+                                  _netWorthStat('health_tracking'.tr(), _cashBalance,
                                       const Color(0xFF3B7EF6)),
-                                  _netWorthStat('health_savings', _savings,
+                                  _netWorthStat('health_savings'.tr(), _savings,
                                       const Color(0xFF8B5CF6)),
-                                  _netWorthStat('health_investing', _investments,
+                                  _netWorthStat('health_investing'.tr(), _investments,
                                       const Color(0xFF10B981)),
-                                  _netWorthStat('health_debt', -_totalDebt,
+                                  _netWorthStat('health_debt'.tr(), -_totalDebt,
                                       const Color(0xFFEF4444)),
                                 ]),
                           ]),
@@ -714,19 +715,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         const SizedBox(height: 20),
                         Row(children: [
                           Expanded(
-                              child: _assetField(_realEstateCtrl, 'settings_assets_realestate')),
+                              child: _assetField(_realEstateCtrl, 'settings_assets_realestate'.tr())),
                           const SizedBox(width: 8),
                           Expanded(
-                              child: _assetField(_vehiclesCtrl, 'settings_assets_vehicles')),
+                              child: _assetField(_vehiclesCtrl, 'settings_assets_vehicles'.tr())),
                         ]),
                         const SizedBox(height: 8),
                         Row(children: [
                           Expanded(
                               child: _assetField(
-                                  _jewelryCtrl, 'settings_assets_jewelry')),
+                                  _jewelryCtrl, 'settings_assets_jewelry'.tr())),
                           const SizedBox(width: 8),
                           Expanded(
-                              child: _assetField(_otherAssetsCtrl, 'settings_assets_other')),
+                              child: _assetField(_otherAssetsCtrl, 'settings_assets_other'.tr())),
                         ]),
                         const SizedBox(height: 16),
                         SizedBox(
@@ -746,7 +747,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       height: 20,
                                       child: CircularProgressIndicator(
                                           strokeWidth: 2, color: Colors.white))
-                                  : Text('save',
+                                  : Text('save'.tr(),
                                       style: const TextStyle(
                                           fontFamily: 'Cairo',
                                           fontWeight: FontWeight.w900)),
@@ -758,12 +759,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Data Export (Accordion)
                     _accordionCard(
                       icon: '📥',
-                      title: 'settings_export',
+                      title: 'settings_export'.tr(),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                'settings_assets_desc',
+                                'settings_assets_desc'.tr(),
                                 style: const TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontSize: 12,
@@ -776,7 +777,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onPressed: _loading ? null : _exportData,
                                   icon: const Icon(Icons.file_download_outlined,
                                       size: 20),
-                                  label: Text('settings_export',
+                                  label: Text('settings_export'.tr(),
                                       style: const TextStyle(
                                           fontFamily: 'Cairo',
                                           fontWeight: FontWeight.w900)),
@@ -798,11 +799,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Share App (Accordion)
                     _accordionCard(
                       icon: '🔗',
-                      title: 'share_title',
+                      title: 'share_title'.tr(),
                       child: Column(children: [
                         const Text('🌅', style: TextStyle(fontSize: 40)),
                         const SizedBox(height: 10),
-                        Text('share_subtitle',
+                        Text('share_subtitle'.tr(),
                             style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
@@ -810,7 +811,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 fontSize: 14)),
                         const SizedBox(height: 8),
                         Text(
-                            'share_body',
+                            'share_body'.tr(),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
@@ -828,7 +829,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       const EdgeInsets.symmetric(vertical: 14),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12))),
-                              child: Text('share_btn',
+                              child: Text('share_btn'.tr(),
                                   style: const TextStyle(
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w900)),
@@ -842,7 +843,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Account & Danger Zone (Accordion)
                     _accordionCard(
                       icon: '⚠️',
-                      title: 'settings_account_danger_zone',
+                      title: 'settings_account_danger_zone'.tr(),
                       child: Column(children: [
                         // Logout
                         SizedBox(
@@ -868,7 +869,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12))),
                               child: Text(
-                                  _loggingOut ? '⏳...' : 'settings_logout',
+                                  _loggingOut ? '⏳...' : 'settings_logout'.tr(),
                                   style: const TextStyle(
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700)),
@@ -888,14 +889,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         .withOpacity(0.7),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12)),
-                                child: Text('delete',
+                                child: Text('delete'.tr(),
                                     style: const TextStyle(
                                         fontFamily: 'Cairo',
                                         fontWeight: FontWeight.w700,
                                         fontSize: 12)),
                               )),
                         ] else ...[
-                          Text('settings_delete_account_warning',
+                          Text('settings_delete_account_warning'.tr(),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
@@ -909,7 +910,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             style: TextStyle(
                                 color: colorScheme.onSurface, fontFamily: 'Cairo'),
                             decoration: InputDecoration(
-                                hintText: 'delete_account_confirmation_text',
+                                hintText: 'delete_account_confirmation_text'.tr(),
                                 hintStyle: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
                                     fontFamily: 'Cairo'),
@@ -927,7 +928,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Expanded(
                                 child: ElevatedButton(
                               onPressed: (_deleteInputCtrl.text.trim() !=
-                                          'حذف حسابي' || // This hardcoded string should also be replaced if 'delete_account_confirmation_text' is the expected input
+                                          'حذف حسابي' || // This hardcoded string should also be replaced if 'delete_account_confirmation_text'.tr() is the expected input
                                       _deleting)
                                   ? null
                                   : _deleteAccount,
@@ -944,7 +945,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       height: 18,
                                       child: CircularProgressIndicator(
                                           strokeWidth: 2, color: Colors.white))
-                                  : Text('confirm_delete',
+                                  : Text('confirm_delete'.tr(),
                                       style: const TextStyle(
                                           fontFamily: 'Cairo',
                                           fontWeight: FontWeight.w700)),
@@ -966,7 +967,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10))),
-                              child: Text('cancel',
+                              child: Text('cancel'.tr(),
                                   style: const TextStyle(fontFamily: 'Cairo')),
                             )),
                           ]),

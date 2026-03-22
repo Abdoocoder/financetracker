@@ -1,5 +1,4 @@
-import 'package:provider/provider.dart';
-import '../app_state.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
@@ -90,7 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isEn = context.read<AppState>().locale.languageCode == 'en';
+    final isEn = context.locale.languageCode == 'en';
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
@@ -142,8 +141,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2))
                           : Text(
                               _currentStep == 3 
-                                ? 'onboarding_start'
-                                : 'continue',
+                                ? 'onboarding_start'.tr()
+                                : 'continue'.tr(),
                               style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16),
                             ),
                     ),
@@ -154,7 +153,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeInOut,
                       ),
-                      child: Text('back', style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                      child: Text('back'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                     ),
                 ],
               ),
@@ -194,13 +193,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 40),
           Text(
-            'onboarding_welcome_title',
+            'onboarding_welcome_title'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
           ),
           const SizedBox(height: 16),
           Text(
-            'onboarding_welcome_subtitle',
+            'onboarding_welcome_subtitle'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16, fontFamily: 'Cairo', height: 1.6),
           ),
@@ -213,8 +212,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return _slideBase(
       colorScheme: colorScheme,
       icon: '💰',
-      title: 'settings_income',
-      subtitle: 'onboarding_income_subtitle',
+      title: 'settings_income'.tr(),
+      subtitle: 'onboarding_income_subtitle'.tr(),
       child: TextFormField(
         controller: _incomeController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -236,8 +235,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return _slideBase(
       colorScheme: colorScheme,
       icon: '📅',
-      title: 'onboarding_payday_title',
-      subtitle: 'onboarding_payday_subtitle',
+      title: 'onboarding_payday_title'.tr(),
+      subtitle: 'onboarding_payday_subtitle'.tr(),
       child: Column(
         children: [
           Text(
@@ -271,8 +270,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return _slideBase(
       colorScheme: colorScheme,
       icon: '🌍',
-      title: 'settings_currency',
-      subtitle: 'onboarding_currency_subtitle',
+      title: 'settings_currency'.tr(),
+      subtitle: 'onboarding_currency_subtitle'.tr(),
       child: Wrap(
         spacing: 12,
         runSpacing: 12,

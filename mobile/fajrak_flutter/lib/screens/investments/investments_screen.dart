@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
@@ -146,22 +147,22 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           final colorScheme = theme.colorScheme;
           return AlertDialog(
             backgroundColor: colorScheme.surface,
-            title: Text('inv_delete_title',
+            title: Text('inv_delete_title'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurface, fontFamily: 'Cairo')),
-            content: Text('confirm_delete',
+            content: Text('confirm_delete'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text('cancel',
+                  child: Text('cancel'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontFamily: 'Cairo'))),
               TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: Text('delete',
+                  child: Text('delete'.tr(),
                       style: TextStyle(
                           color: colorScheme.error, fontFamily: 'Cairo'))),
             ],
@@ -262,7 +263,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 Center(
                     child: Padding(
                         padding: const EdgeInsets.all(20),
-                        child: Text('inv_empty',
+                        child: Text('inv_empty'.tr(),
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 fontFamily: 'Cairo'))))
@@ -307,7 +308,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                 Text(
-                                    '${isBuy ? "inv_buy" : "inv_sell"} ${shares.toStringAsFixed(4)} وحدة',
+                                    '${isBuy ? "inv_buy".tr() : "inv_sell".tr()} ${shares.toStringAsFixed(4)} وحدة',
                                     style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface,
                                         fontFamily: 'Cairo',
@@ -388,24 +389,24 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     color: Theme.of(context).colorScheme.outlineVariant,
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 16),
-            Text('inv_new',
+            Text('inv_new'.tr(),
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                     color: Theme.of(context).colorScheme.onSurface,
                     fontFamily: 'Cairo')),
             const SizedBox(height: 20),
-            _field(_symbolCtrl, 'inv_symbol_hint', TextInputType.text),
+            _field(_symbolCtrl, 'inv_symbol_hint'.tr(), TextInputType.text),
             const SizedBox(height: 10),
-            _field(_nameCtrl, 'inv_name_hint', TextInputType.text),
+            _field(_nameCtrl, 'inv_name_hint'.tr(), TextInputType.text),
             const SizedBox(height: 10),
-            _field(_sharesCtrl, 'inv_shares_hint',
+            _field(_sharesCtrl, 'inv_shares_hint'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_avgPriceCtrl, 'inv_avg_price_hint',
+            _field(_avgPriceCtrl, 'inv_avg_price_hint'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 10),
-            _field(_currentPriceCtrl, 'inv_current_price_hint',
+            _field(_currentPriceCtrl, 'inv_current_price_hint'.tr(),
                 const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 12),
             GestureDetector(
@@ -435,7 +436,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           : const Color(0xFF64748B),
                       size: 20),
                   const SizedBox(width: 10),
-                  Text('inv_halal',
+                  Text('inv_halal'.tr(),
                       style: TextStyle(
                           color: _isHalal
                               ? const Color(0xFF10B981)
@@ -459,7 +460,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   child: _saving
                       ? CircularProgressIndicator(
                           color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2)
-                      : Text('inv_save',
+                      : Text('inv_save'.tr(),
                           style: const TextStyle(
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w900,
@@ -507,7 +508,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
-        title: Text('inv_title',
+        title: Text('inv_title'.tr(),
             style: TextStyle(
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
@@ -537,7 +538,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           ),
           IconButton(
             icon: Icon(Icons.refresh, color: colorScheme.primary),
-            tooltip: 'inv_refresh',
+            tooltip: 'inv_refresh'.tr(),
             onPressed: () async {
               setState(() => _loading = true);
               try {
@@ -578,7 +579,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                               colorScheme.primary.withValues(alpha: 0.2)),
                     ),
                     child: Column(children: [
-                      Text('inv_total_value',
+                      Text('inv_total_value'.tr(),
                           style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontFamily: 'Cairo',
@@ -621,13 +622,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _miniStat(
-                                'inv_cost',
+                                'inv_cost'.tr(),
                                 '\$${_totalCost.toStringAsFixed(0)}',
                                 colorScheme.onSurfaceVariant),
-                            _miniStat('inv_assets', '${_investments.length}',
+                            _miniStat('inv_assets'.tr(), '${_investments.length}',
                                 colorScheme.primary),
                             _miniStat(
-                                'inv_halal',
+                                'inv_halal'.tr(),
                                 '${_investments.where((i) => i['is_halal'] == true).length}',
                                 const Color(0xFF10B981)),
                           ]),
@@ -644,7 +645,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('inv_portfolio_chart',
+                            Text('inv_portfolio_chart'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w900,
@@ -749,7 +750,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         const Text('🚀', style: TextStyle(fontSize: 20)),
                         const SizedBox(width: 10),
                         Expanded(
-                            child: Text('wealthSimulator',
+                            child: Text('wealthSimulator'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w900,
@@ -774,20 +775,20 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           border: Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
                         _slider(
-                            'monthlyInvestment',
+                            'monthlyInvestment'.tr(),
                             '\$${_monthly.toStringAsFixed(0)}',
                             _monthly,
                             10,
                             1000,
                             (v) => setState(() => _monthly = v)),
                         _slider(
-                            'duration',
-                            '${_years.toInt()} ${'year'}',
+                            'duration'.tr(),
+                            '${_years.toInt()} ${'year'.tr()}',
                             _years.toDouble(),
                             1,
                             30,
                             (v) => setState(() => _years = v.toInt())),
-                        _slider('annualReturn', '${_rate.toStringAsFixed(0)}%',
+                        _slider('annualReturn'.tr(), '${_rate.toStringAsFixed(0)}%',
                             _rate, 1, 20, (v) => setState(() => _rate = v)),
                         const SizedBox(height: 16),
                         Container(
