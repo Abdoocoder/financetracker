@@ -19,7 +19,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Map<String, dynamic>> _transactions = [];
   List<Map<String, dynamic>> _allTransactions = [];
   bool _loading = true;
-  bool _loadingMore = false;
   int _limit = 20;
   bool _hasMore = true;
 
@@ -430,7 +429,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     dropdownColor: const Color(0xFF1E293B),
-                    value: _filterMonth ?? DateTime.now().month,
+                    initialValue: _filterMonth ?? DateTime.now().month,
                     style: const TextStyle(
                         color: Colors.white, fontFamily: 'Cairo'),
                     decoration: InputDecoration(
@@ -448,7 +447,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     dropdownColor: const Color(0xFF1E293B),
-                    value: _filterYear ?? DateTime.now().year,
+                    initialValue: _filterYear ?? DateTime.now().year,
                     style: const TextStyle(
                         color: Colors.white, fontFamily: 'Cairo'),
                     decoration: InputDecoration(
@@ -710,9 +709,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -770,7 +769,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(

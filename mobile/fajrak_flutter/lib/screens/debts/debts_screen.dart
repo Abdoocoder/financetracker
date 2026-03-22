@@ -121,12 +121,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF10B981).withOpacity(0.1),
+              color: const Color(0xFF10B981).withValues(alpha: 0.1),
               border: Border.all(
-                  color: const Color(0xFF10B981).withOpacity(0.4), width: 2),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.4), width: 2),
               boxShadow: [
                 BoxShadow(
-                    color: const Color(0xFF10B981).withOpacity(0.3),
+                    color: const Color(0xFF10B981).withValues(alpha: 0.3),
                     blurRadius: 20,
                     spreadRadius: 5)
               ],
@@ -152,7 +152,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.07),
+                color: const Color(0xFF10B981).withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(12)),
             child: Text(
               'debts_celebration_msg'.tr(),
@@ -345,7 +345,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 8),
                               decoration: BoxDecoration(
                                 color: priority == i + 1
-                                    ? _priorityColors[i].withOpacity(0.25)
+                                    ? _priorityColors[i].withValues(alpha: 0.25)
                                     : const Color(0xFF1E293B),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
@@ -372,12 +372,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: autoDeduct
-                      ? const Color(0xFF10B981).withOpacity(0.1)
+                      ? const Color(0xFF10B981).withValues(alpha: 0.1)
                       : const Color(0xFF1E293B),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                       color: autoDeduct
-                          ? const Color(0xFF10B981).withOpacity(0.4)
+                          ? const Color(0xFF10B981).withValues(alpha: 0.4)
                           : const Color(0xFF334155)),
                 ),
                 child: Row(children: [
@@ -406,12 +406,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: receivedAmount
-                        ? const Color(0xFF3B7EF6).withOpacity(0.1)
+                        ? const Color(0xFF3B7EF6).withValues(alpha: 0.1)
                         : const Color(0xFF1E293B),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                         color: receivedAmount
-                            ? const Color(0xFF3B7EF6).withOpacity(0.4)
+                            ? const Color(0xFF3B7EF6).withValues(alpha: 0.4)
                             : const Color(0xFF334155)),
                   ),
                   child: Column(
@@ -612,10 +612,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       padding: const EdgeInsets.all(14),
                       margin: const EdgeInsets.only(bottom: 12),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.08),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                              color: const Color(0xFF10B981).withOpacity(0.2))),
+                              color: const Color(0xFF10B981).withValues(alpha: 0.2))),
                       child: Row(children: [
                         const Text('💪', style: TextStyle(fontSize: 28)),
                         const SizedBox(width: 12),
@@ -765,11 +765,11 @@ class _DebtsScreenState extends State<DebtsScreen> {
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
                                 color:
-                                    const Color(0xFF10B981).withOpacity(0.05),
+                                    const Color(0xFF10B981).withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                     color: const Color(0xFF10B981)
-                                        .withOpacity(0.15))),
+                                        .withValues(alpha: 0.15))),
                             child: Row(children: [
                               const Text('✅', style: TextStyle(fontSize: 24)),
                               const SizedBox(width: 12),
@@ -813,9 +813,9 @@ class _DebtsScreenState extends State<DebtsScreen> {
   Widget _statCard(String label, String value, Color color) => Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withOpacity(0.2))),
+            border: Border.all(color: color.withValues(alpha: 0.2))),
         child: Column(children: [
           FittedBox(
               child: Text(value,
@@ -859,7 +859,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-                color: prioColor.withOpacity(0.12),
+                color: prioColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8)),
             child: Center(
                 child: Container(
@@ -870,7 +870,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         color: prioColor,
                         boxShadow: [
                           BoxShadow(
-                              color: prioColor.withOpacity(0.5), blurRadius: 6)
+                              color: prioColor.withValues(alpha: 0.5), blurRadius: 6)
                         ]))),
           ),
           const SizedBox(width: 10),
@@ -906,10 +906,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                      color: const Color(0xFF3B7EF6).withOpacity(0.1),
+                      color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(7),
                       border: Border.all(
-                          color: const Color(0xFF3B7EF6).withOpacity(0.2))),
+                          color: const Color(0xFF3B7EF6).withValues(alpha: 0.2))),
                   child: const Icon(Icons.edit,
                       color: Color(0xFF3B7EF6), size: 14))),
           const SizedBox(width: 6),
@@ -919,10 +919,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withOpacity(0.1),
+                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(7),
                       border: Border.all(
-                          color: const Color(0xFFEF4444).withOpacity(0.2))),
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.2))),
                   child: const Icon(Icons.close,
                       color: Color(0xFFEF4444), size: 14))),
         ]),
@@ -951,7 +951,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                    color: const Color(0xFF3B7EF6).withOpacity(0.1),
+                    color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6)),
                 child: Text('يوم ${debt['payment_day']}',
                     style: const TextStyle(
@@ -966,7 +966,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withOpacity(0.1),
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6)),
                 child: Text(
                     '📅 ${(debt['due_date'] as String).substring(0, 10)}',
@@ -1052,10 +1052,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.1),
+                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: const Color(0xFF10B981).withOpacity(0.2))),
+                          color: const Color(0xFF10B981).withValues(alpha: 0.2))),
                   child: const Text('+ دفعة',
                       style: TextStyle(
                           color: Color(0xFF6EE7B7),

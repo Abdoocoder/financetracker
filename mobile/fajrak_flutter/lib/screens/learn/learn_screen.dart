@@ -175,11 +175,11 @@ class _LearnScreenState extends State<LearnScreen> {
     String stage = 'awareness';
     if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
       stage = 'debt';
-    } else if (totalDebt == 0 && !hasInvestments)
+    } else if (totalDebt == 0 && !hasInvestments) {
       stage = 'emergency';
-    else if (hasInvestments) stage = 'investing';
-
-    final dayOfMonth = now.day;
+    } else if (hasInvestments) {
+      stage = 'investing';
+    }
     final lessons = _lessons[stage] ?? _lessons['awareness']!;
     final lessonRaw = lessons[(now.day - 1) % lessons.length];
     final Map<String, String> lesson = {

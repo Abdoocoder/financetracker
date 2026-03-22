@@ -66,7 +66,7 @@ class FinancialRoadmap extends StatelessWidget {
                       boxShadow: isCurrent
                           ? [
                               BoxShadow(
-                                  color: color.withOpacity(0.3),
+                                  color: color.withValues(alpha: 0.3),
                                   blurRadius: 10)
                             ]
                           : null,

@@ -160,9 +160,9 @@ class _HelpScreenState extends State<HelpScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                  color: const Color(0xFF3B7EF6).withOpacity(0.05),
+                  color: const Color(0xFF3B7EF6).withValues(alpha: 0.05),
                   border: Border.all(
-                      color: const Color(0xFF3B7EF6).withOpacity(0.2)),
+                      color: const Color(0xFF3B7EF6).withValues(alpha: 0.2)),
                   borderRadius: BorderRadius.circular(16)),
               child: Row(
                 children: [
@@ -170,7 +170,7 @@ class _HelpScreenState extends State<HelpScreen> {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                          color: const Color(0xFF3B7EF6).withOpacity(0.1),
+                          color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12)),
                       child: const Center(
                           child: Icon(Icons.support_agent,
@@ -246,11 +246,11 @@ class _FAQItemState extends State<_FAQItem> {
       decoration: BoxDecoration(
         color: _open
             ? const Color(0xFF0F1629)
-            : const Color(0xFF0F1629).withOpacity(0.5),
+            : const Color(0xFF0F1629).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: _open
-                ? const Color(0xFF3B7EF6).withOpacity(0.3)
+                ? const Color(0xFF3B7EF6).withValues(alpha: 0.3)
                 : const Color(0xFF1E293B)),
       ),
       child: Column(

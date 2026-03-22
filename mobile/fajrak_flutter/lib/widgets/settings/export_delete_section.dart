@@ -1,0 +1,306 @@
+import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'settings_accordion.dart';
+
+class ExportDeleteSection extends StatefulWidget {
+  const ExportDeleteSection({super.key});
+  @override
+  State<ExportDeleteSection> createState() => _ExportDeleteSectionState();
+}
+
+class _ExportDeleteSectionState extends State<ExportDeleteSection> {
+  bool _loading = false;
+  bool _loggingOut = false;
+  bool _showDeleteConfirm = false;
+  final _deleteInputCtrl = TextEditingController();
+  bool _deleting = false;
+
+  @override
+  void dispose() {
+    _deleteInputCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _exportData() async {
+    setState(() => _loading = true);
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+
+    final txRes = await Supabase.instance.client
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('transaction_date', ascending: false);
+    final data = txRes as List;
+    if (data.isEmpty) {
+      if (mounted) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('settings_no_export'.tr(),
+                style: const TextStyle(fontFamily: 'Cairo'))));
+      }
+      return;
+    }
+
+    final buffer = StringBuffer();
+    buffer.writeln('csv_header'.tr());
+    for (final tx in data) {
+      final type = tx['type'] == 'income' ? 'csv_income'.tr() : 'csv_expense'.tr();
+      buffer.writeln(
+          '${tx['transaction_date']},$type,${tx['amount']},${tx['category'] ?? ''},${tx['description'] ?? ''}');
+    }
+
+    final directory = await getTemporaryDirectory();
+    final file = File(
+        '${directory.path}/fajrak_export_${DateTime.now().millisecondsSinceEpoch}.csv');
+    await file.writeAsString('\uFEFF${buffer.toString()}');
+
+    await Share.shareXFiles([XFile(file.path)], text: 'settings_export_msg'.tr());
+    if (mounted) setState(() => _loading = false);
+  }
+
+  void _shareApp() {
+    final text = 'settings_share_msg'.tr();
+    Share.share(text);
+  }
+
+  Future<void> _deleteAccount() async {
+    if (_deleteInputCtrl.text.trim() != 'settings_delete_confirm_text'.tr()) return;
+    setState(() => _deleting = true);
+    final user = Supabase.instance.client.auth.currentUser!;
+    try {
+      await Supabase.instance.client
+          .rpc('delete_user_account', params: {'user_id': user.id});
+    } catch (_) {}
+    await Supabase.instance.client.auth.signOut();
+    if (mounted) Navigator.pushReplacementNamed(context, '/login');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      children: [
+        // Export
+        SettingsAccordion(
+          icon: '📥',
+          title: 'settings_export'.tr(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'settings_assets_desc'.tr(),
+                style: const TextStyle(
+                  color: Color(0xFF94A3B8),
+                  fontSize: 12,
+                  fontFamily: 'Cairo',
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _loading ? null : _exportData,
+                  icon: const Icon(Icons.file_download_outlined, size: 20),
+                  label: Text(
+                    'settings_export'.tr(),
+                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.surface,
+                    foregroundColor: colorScheme.onSurface,
+                    side: BorderSide(color: colorScheme.outlineVariant),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Share
+        SettingsAccordion(
+          icon: '🔗',
+          title: 'share_title'.tr(),
+          child: Column(
+            children: [
+              const Text('🌅', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 10),
+              Text(
+                'share_subtitle'.tr(),
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Cairo',
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'share_body'.tr(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                  fontFamily: 'Cairo',
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _shareApp,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B7EF6),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    'share_btn'.tr(),
+                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Danger Zone
+        SettingsAccordion(
+          icon: '⚠️',
+          title: 'settings_account_danger_zone'.tr(),
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _loggingOut
+                      ? null
+                      : () async {
+                          setState(() => _loggingOut = true);
+                          await Supabase.instance.client.auth.signOut();
+                          if (mounted) Navigator.pushReplacementNamed(context, '/login');
+                        },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFEF4444),
+                    side: const BorderSide(color: Color(0xFFEF4444)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text(
+                    _loggingOut ? '⏳...' : 'settings_logout'.tr(),
+                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Divider(color: colorScheme.outlineVariant),
+              const SizedBox(height: 10),
+              if (!_showDeleteConfirm)
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () => setState(() => _showDeleteConfirm = true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFEF4444).withValues(alpha: 0.7),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      'delete'.tr(),
+                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 12),
+                    ),
+                  ),
+                )
+              else ...[
+                Text(
+                  'settings_delete_account_warning'.tr(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 12,
+                    fontFamily: 'Cairo',
+                    height: 1.6,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _deleteInputCtrl,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                  decoration: InputDecoration(
+                    hintText: 'delete_account_confirmation_text'.tr(),
+                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+                    filled: true,
+                    fillColor: colorScheme.surface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: colorScheme.error, width: 0.5),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: (_deleteInputCtrl.text.trim() != 'settings_delete_confirm_text'.tr() || _deleting)
+                            ? null
+                            : _deleteAccount,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFEF4444),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: _deleting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : Text(
+                                'confirm_delete'.tr(),
+                                style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setState(() {
+                            _showDeleteConfirm = false;
+                            _deleteInputCtrl.clear();
+                          });
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: colorScheme.onSurfaceVariant,
+                          side: BorderSide(color: colorScheme.outlineVariant),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}

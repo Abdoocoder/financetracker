@@ -297,7 +297,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                  color: color.withOpacity(0.1),
+                                  color: color.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10)),
                               child: Center(
                                   child: Text(isBuy ? '📈' : '📉',
@@ -1071,7 +1071,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             style: OutlinedButton.styleFrom(
                 foregroundColor: const Color(0xFF10B981),
                 side:
-                    BorderSide(color: const Color(0xFF10B981).withOpacity(0.3)),
+                    BorderSide(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),

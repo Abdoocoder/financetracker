@@ -243,7 +243,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 padding: const EdgeInsets.only(right: 6),
                 child: Icon(
                   starNum <= _stars ? Icons.star : Icons.star_border,
-                  color: starNum <= _stars ? const Color(0xFFF59E0B) : colorScheme.onSurfaceVariant.withOpacity(0.3),
+                  color: starNum <= _stars ? const Color(0xFFF59E0B) : colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                   size: 32,
                 ),
               ),

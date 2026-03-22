@@ -215,7 +215,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                         horizontal: 8, vertical: 2),
                                     decoration: BoxDecoration(
                                         color: const Color(0xFFEF4444)
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         borderRadius:
                                             BorderRadius.circular(12)),
                                     child: Text('alerts_unread_count'.tr(args: [unreadCount.toString()]),
@@ -254,12 +254,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [
-                              colorScheme.primary.withOpacity(0.08),
-                              colorScheme.secondary.withOpacity(0.08)
+                              colorScheme.primary.withValues(alpha: 0.08),
+                              colorScheme.secondary.withValues(alpha: 0.08)
                             ]),
                             border: Border.all(
                                 color:
-                                    colorScheme.primary.withOpacity(0.2)),
+                                    colorScheme.primary.withValues(alpha: 0.2)),
                             borderRadius: BorderRadius.circular(16)),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +277,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                         boxShadow: [
                                           BoxShadow(
                                               color: colorScheme.primary
-                                                  .withOpacity(0.4),
+                                                  .withValues(alpha: 0.4),
                                               blurRadius: 16)
                                         ]),
                                     child: const Center(
@@ -389,12 +389,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                 decoration: BoxDecoration(
                                   color: isRead
                                       ? colorScheme.surface
-                                      : color.withOpacity(0.08),
+                                      : color.withValues(alpha: 0.08),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
                                       color: isRead
                                           ? colorScheme.outlineVariant
-                                          : color.withOpacity(0.3)),
+                                          : color.withValues(alpha: 0.3)),
                                 ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,7 +403,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                       width: 40,
                                       height: 40,
                                       decoration: BoxDecoration(
-                                          color: color.withOpacity(0.1),
+                                          color: color.withValues(alpha: 0.1),
                                           borderRadius:
                                               BorderRadius.circular(10)),
                                       child: Icon(
@@ -441,7 +441,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                                       boxShadow: [
                                                         BoxShadow(
                                                             color: color
-                                                                .withOpacity(
+                                                                .withValues(alpha: 
                                                                     0.5),
                                                             blurRadius: 8)
                                                       ])),
@@ -451,7 +451,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                               alert['message'] as String? ?? '',
                                               style: TextStyle(
                                                   color: isRead
-                                                      ? colorScheme.onSurfaceVariant.withOpacity(0.7)
+                                                      ? colorScheme.onSurfaceVariant.withValues(alpha: 0.7)
                                                       : colorScheme.onSurfaceVariant,
                                                   fontFamily: 'Cairo',
                                                   fontSize: 12,
@@ -468,7 +468,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                     IconButton(
                                       icon: const Icon(Icons.close, size: 16),
                                       color: const Color(0xFFEF4444)
-                                          .withOpacity(0.7),
+                                          .withValues(alpha: 0.7),
                                       onPressed: () =>
                                           _deleteAlert(alert['id'].toString()),
                                     )
