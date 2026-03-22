@@ -123,18 +123,19 @@ class _AlertsScreenState extends State<AlertsScreen> {
     // Attempt navigation based on text (very basic routing)
     if (title.contains('دين') || msg.contains('دين') || title.contains('قسط')) {
       Navigator.pushNamed(context, '/debts');
-    } else if (title.contains('ميزانية') || msg.contains('ميزانية'))
+    } else if (title.contains('ميزانية') || msg.contains('ميزانية')) {
       Navigator.pushNamed(context, '/budgets');
-    else if (title.contains('عدد الأهداف') || msg.contains('عدد الأهداف'))
+    } else if (title.contains('عدد الأهداف') || msg.contains('عدد الأهداف')) {
       Navigator.pushNamed(context, '/goals');
-    else if (title.contains('استثمار') || msg.contains('استثمار'))
+    } else if (title.contains('استثمار') || msg.contains('استثمار')) {
       Navigator.pushNamed(context, '/investments');
-    else if (title.contains('معاملة') ||
+    } else if (title.contains('معاملة') ||
         msg.contains('معاملة') ||
-        msg.contains('مصاريف'))
+        msg.contains('مصاريف')) {
       Navigator.pushNamed(context, '/transactions');
-    else if (title.contains('درس') || msg.contains('تعلم'))
+    } else if (title.contains('درس') || msg.contains('تعلم')) {
       Navigator.pushNamed(context, '/learn');
+    }
   }
 
   IconData _getIcon(String? type) {

@@ -34,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Map<String, dynamic>> _categoryData = [];
   double _totalDebt = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
   final double _prevExpenses = 0;
-  double _foodSpending = 0, _entertainmentSpending = 0;
+  final double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
 
   @override
@@ -84,13 +84,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
       if (savingsRate >= 0.2) {
         score += 30;
-      } else if (savingsRate >= 0.1) score += 20; else if (savingsRate > 0) score += 10;
+      } else if (savingsRate >= 0.1) {
+        score += 20;
+      } else if (savingsRate > 0) {
+        score += 10;
+      }
       if (totalDebt == 0) {
         score += 25;
-      } else if (income > 0 && totalDebt / (income * 12) < 0.3) score += 15;
-      if (goalsSaved > 0) score += 20;
-      if (invValue > 0) score += 15;
-      if (txs.length >= 10) score += 10;
+      } else if (income > 0 && totalDebt / (income * 12) < 0.3) {
+        score += 15;
+      }
+      if (goalsSaved > 0) {
+        score += 20;
+      }
+      if (invValue > 0) {
+        score += 15;
+      }
+      if (txs.length >= 10) {
+        score += 10;
+      }
 
       String stage = 'awareness';
       if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {

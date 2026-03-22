@@ -51,7 +51,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         });
       }
     } else {
-      if (mounted) setState(() => _loadingMore = true);
+      // No-op for now as _loadingMore is removed
     }
 
     final user = Supabase.instance.client.auth.currentUser;
@@ -131,7 +131,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (mounted) {
         setState(() {
           _loading = false;
-          _loadingMore = false;
         });
       }
     }
