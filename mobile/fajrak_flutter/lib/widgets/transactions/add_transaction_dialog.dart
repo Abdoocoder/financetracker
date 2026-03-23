@@ -140,10 +140,10 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             Center(
               child: Text(
                 widget.existing != null ? 'trans_edit'.tr() : 'trans_new'.tr(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: theme.colorScheme.onSurface,
                   fontFamily: 'Cairo',
                 ),
               ),
@@ -215,8 +215,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                       const SizedBox(width: 12),
                       Text(
                         DateFormat('yyyy-MM-dd').format(date),
-                        style: const TextStyle(
-                          color: Colors.white, 
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface, 
                           fontFamily: 'Cairo',
                           fontSize: 16,
                         ),
@@ -241,8 +241,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   child: TextFormField(
                     controller: _amountController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    style: const TextStyle(
-                      color: Colors.white, 
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface, 
                       fontFamily: 'Cairo', 
                       fontSize: 18, 
                       fontWeight: FontWeight.bold
@@ -273,8 +273,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                         dropdownColor: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         isExpanded: true,
-                        style: const TextStyle(
-                          color: Colors.white, 
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface, 
                           fontFamily: 'Cairo', 
                           fontWeight: FontWeight.bold
                         ),
@@ -316,10 +316,10 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                           child: TextFormField(
                             controller: _exchangeRateController,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Cairo'),
+                            style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14, fontFamily: 'Cairo'),
                             decoration: InputDecoration(
                               labelText: 'trans_exchange_rate'.tr(),
-                              labelStyle: const TextStyle(fontSize: 12),
+                              labelStyle: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                               isDense: true,
                               fillColor: Colors.transparent,
                               border: InputBorder.none,
@@ -365,7 +365,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             _buildLabel('trans_category'.tr()),
             TextFormField(
               controller: _catController,
-              style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+              style: TextStyle(color: theme.colorScheme.onSurface, fontFamily: 'Cairo'),
               decoration: InputDecoration(
                 hintText: 'e.g., Food, Transport...',
                 fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
@@ -377,7 +377,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             TextFormField(
               controller: _descController,
               maxLines: 2,
-              style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+              style: TextStyle(color: theme.colorScheme.onSurface, fontFamily: 'Cairo'),
               decoration: InputDecoration(
                 hintText: 'Add a note (optional)',
                 fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
