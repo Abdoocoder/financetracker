@@ -59,6 +59,7 @@
 - **Saving Challenges** — 4 auto-tracked challenges
 - **Interactive Charts** with Recharts + Tooltips
 - Quick Add with last transaction repeat
+- **Premium Design**: Modernized UI with gradients, glassmorphism, and Cairo typography.
 - **94% performance boost** with Lazy Loading
 
 ### 💸 Transactions
@@ -238,7 +239,16 @@ npm run test:coverage
 
 ## 📝 Changelog
 
-### v3.10.0 — 2026-03-23 *(Latest)*
+### v3.11.0 — 2026-03-24 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 💎 **UI Modernization** | Premium redesign with gradients, glassmorphism, and high-visibility typography |
+| 🛡️ **Security Alignment** | Migrated all hardcoded secrets to `.env` and decommissioned `secrets.dart` |
+| 🎨 **Theme Fixes** | Corrected primary color and visibility issues in Light Mode |
+| ⚙️ **Config Alignment** | Synchronized Firebase credentials across Web and Android environments |
+
+### v3.10.0 — 2026-03-23
 
 | Change | Description |
 |:-------|:------------|
