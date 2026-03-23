@@ -39,18 +39,15 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   // Get Supabase credentials from environment variables
-  final supabaseUrl = dotenv.env['SUPABASE_URL'];
-  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+  final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
 
-  if (supabaseUrl == null || supabaseAnonKey == null) {
-    // In development, you can set fallback values for local testing
-    // In production, these should always be set via environment variables
-    if (kDebugMode) {
-      throw Exception(
-        'Missing Supabase credentials. Please create a .env file based on .env.example',
-      );
-    }
-    rethrow;
+  // Credentials are required - fail fast with clear error message
+  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+    throw Exception(
+      'Missing Supabase credentials. Please create a .env file based on .env.example\n'
+      'Required: SUPABASE_URL, SUPABASE_ANON_KEY',
+    );
   }
 
   await Supabase.initialize(
