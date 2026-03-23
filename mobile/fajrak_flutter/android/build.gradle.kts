@@ -20,7 +20,7 @@ subprojects {
             if (plugins.hasPlugin("com.android.library") || plugins.hasPlugin("com.android.application")) {
                 val android = extensions.findByName("android") as? com.android.build.gradle.BaseExtension
                 android?.apply {
-                    compileSdkVersion(34)
+                    compileSdkVersion(36)
                     if (namespace == null) {
                         namespace = if (name == "flutter_app_badger") {
                             "fr.g123k.flutterappbadge.flutterappbadger"

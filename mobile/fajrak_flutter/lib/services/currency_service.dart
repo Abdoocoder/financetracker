@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class CurrencyService {
   static const String _baseUrl = 'https://open.er-api.com/v6/latest';
@@ -27,7 +28,7 @@ class CurrencyService {
       }
       return null;
     } catch (e) {
-      print('Error fetching exchange rate: $e');
+      debugPrint('Error fetching exchange rate: $e');
       return null;
     }
   }

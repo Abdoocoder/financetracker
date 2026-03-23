@@ -37,7 +37,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
 
   String _selectedCurrency = '';
   final _exchangeRateCtrl = TextEditingController(text: '1.0');
-  bool _isRateManual = false;
+  final bool _isRateManual = false;
 
   @override
   void initState() {
