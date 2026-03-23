@@ -110,6 +110,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
     return Container(
       padding: EdgeInsets.only(
@@ -242,15 +243,15 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     controller: _amountController,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     style: TextStyle(
-                      color: theme.colorScheme.onSurface, 
+                      color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
                       fontFamily: 'Cairo', 
-                      fontSize: 18, 
-                      fontWeight: FontWeight.bold
+                      fontSize: 24, 
+                      fontWeight: FontWeight.w900
                     ),
                     decoration: InputDecoration(
                       hintText: '0.00',
-                      hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-                      fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
+                      fillColor: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.6),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
                   ),
@@ -274,9 +275,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                         borderRadius: BorderRadius.circular(12),
                         isExpanded: true,
                         style: TextStyle(
-                          color: theme.colorScheme.onSurface, 
+                          color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
                           fontFamily: 'Cairo', 
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.w900
                         ),
                         items: ['JOD','USD','SAR','AED','EGP','TRY','EUR']
                             .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -316,10 +317,18 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                           child: TextFormField(
                             controller: _exchangeRateController,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                            style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14, fontFamily: 'Cairo'),
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
+                              fontSize: 16, 
+                              fontFamily: 'Cairo', 
+                              fontWeight: FontWeight.bold
+                            ),
                             decoration: InputDecoration(
                               labelText: 'trans_exchange_rate'.tr(),
-                              labelStyle: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                              labelStyle: TextStyle(
+                                fontSize: 12, 
+                                color: isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.7) : const Color(0xFF0F172A).withValues(alpha: 0.7)
+                              ),
                               isDense: true,
                               fillColor: Colors.transparent,
                               border: InputBorder.none,
@@ -365,10 +374,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             _buildLabel('trans_category'.tr()),
             TextFormField(
               controller: _catController,
-              style: TextStyle(color: theme.colorScheme.onSurface, fontFamily: 'Cairo'),
+              style: TextStyle(
+                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
+                fontFamily: 'Cairo', 
+                fontWeight: FontWeight.bold
+              ),
               decoration: InputDecoration(
                 hintText: 'e.g., Food, Transport...',
-                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                hintStyle: TextStyle(
+                  color: isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.35) : const Color(0xFF0F172A).withValues(alpha: 0.35)
+                ),
+                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.7),
               ),
             ),
             const SizedBox(height: 20),
@@ -377,10 +393,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             TextFormField(
               controller: _descController,
               maxLines: 2,
-              style: TextStyle(color: theme.colorScheme.onSurface, fontFamily: 'Cairo'),
+              style: TextStyle(
+                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
+                fontFamily: 'Cairo', 
+                fontWeight: FontWeight.bold
+              ),
               decoration: InputDecoration(
                 hintText: 'Add a note (optional)',
-                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                hintStyle: TextStyle(
+                  color: isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.35) : const Color(0xFF0F172A).withValues(alpha: 0.35)
+                ),
+                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.7),
               ),
             ),
             const SizedBox(height: 32),
