@@ -1,704 +1,1393 @@
-<div align="center">
+<style>
+/* Fajrak Arabic README Modern Styles */
+:root {
+  --fajrak-primary: #FF6B35;
+  --fajrak-secondary: #FFB347;
+  --fajrak-accent: #4ECDC4;
+  --fajrak-dark: #1A1A2E;
+  --fajrak-light: #F7F7F7;
+  --gradient-sunset: linear-gradient(135deg, #FF6B35 0%, #FFB347 50%, #FF8E53 100%);
+  --gradient-ocean: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-emerald: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  --gradient-coral: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 40px rgba(255, 107, 53, 0.3);
+}
 
-<img src="https://raw.githubusercontent.com/Abdoocoder/financetracker/main/public/favicon.ico" width="80" height="80" alt="Fajrak Logo" />
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-# Fajrak
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--fajrak-light);
+  color: #333;
+  line-height: 1.8;
+  direction: rtl;
+  text-align: right;
+}
 
-**منصة إدارة مالية شخصية ذكية**
-*Smart Personal Finance Manager*
+/* Hero Section */
+.hero {
+  background: var(--gradient-sunset);
+  padding: 80px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
 
-[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fajrak.com-3B7EF6?style=for-the-badge&logoColor=white)](https://fajrak.com/)
-[![Download APK](https://img.shields.io/badge/📱_Android-Native_Flutter-3ECF8E?style=for-the-badge&logoColor=white)](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-release.apk)
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  animation: pulse 8s ease-in-out infinite;
+}
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)](https://vercel.com)
-[![Recharts](https://img.shields.io/badge/Recharts-Charts-22B5BF?style=flat-square)](https://recharts.org)
-[![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square&logo=pwa)](https://fajrak.com/)
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
 
----
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+}
 
-*كلنا نحلم بالثراء — هنا تبدأ الرحلة*
-*We all dream of wealth — here the journey begins*
+.hero-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 30px;
+  box-shadow: var(--shadow-glow);
+  margin-bottom: 30px;
+  transition: transform 0.3s ease;
+}
 
+.hero-logo:hover {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  color: white;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.hero-tagline {
+  font-size: 1.4rem;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.9);
+  font-style: italic;
+}
+
+/* Navigation Pills */
+.nav-pills {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.nav-pill {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 50px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.nav-pill:hover {
+  background: rgba(255,255,255,0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Language Switch */
+.lang-switch {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  border-radius: 50px;
+  display: inline-flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.lang-switch a {
+  color: white;
+  text-decoration: none;
+  padding: 5px 15px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.lang-switch a:hover, .lang-switch a.active {
+  background: rgba(255,255,255,0.3);
+  opacity: 1;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+
+/* Section Headers */
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  background: var(--gradient-sunset);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 15px;
+}
+
+.section-header p {
+  color: #666;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Feature Cards Grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  margin-bottom: 60px;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 20px;
+  padding: 35px;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(0,0,0,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-sunset);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 50px rgba(255, 107, 53, 0.15);
+}
+
+.feature-card:hover::before {
+  transform: scaleX(1);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.feature-card h3 {
+  font-size: 1.4rem;
+  color: var(--fajrak-dark);
+  margin-bottom: 15px;
+}
+
+.feature-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-card li {
+  padding: 8px 0;
+  padding-right: 25px;
+  position: relative;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+.feature-card li::before {
+  content: '←';
+  position: absolute;
+  right: 0;
+  color: var(--fajrak-primary);
+  transition: transform 0.3s ease;
+}
+
+.feature-card li:hover {
+  color: var(--fajrak-primary);
+}
+
+.feature-card li:hover::before {
+  transform: translateX(5px);
+}
+
+/* Callout Boxes */
+.callout {
+  padding: 25px 30px;
+  border-radius: 15px;
+  margin: 30px 0;
+  position: relative;
+}
+
+.callout-info {
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(78, 205, 196, 0.05) 100%);
+  border-right: 4px solid var(--fajrak-accent);
+}
+
+.callout-warning {
+  background: linear-gradient(135deg, rgba(255, 179, 71, 0.1) 0%, rgba(255, 179, 71, 0.05) 100%);
+  border-right: 4px solid var(--fajrak-secondary);
+}
+
+.callout-success {
+  background: linear-gradient(135deg, rgba(56, 239, 125, 0.1) 0%, rgba(56, 239, 125, 0.05) 100%);
+  border-right: 4px solid #38ef7d;
+}
+
+.callout-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.callout p {
+  color: #555;
+  margin: 0;
+}
+
+/* Quick Start Section */
+.quickstart {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--shadow-soft);
+}
+
+.quickstart h3 {
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  color: var(--fajrak-dark);
+}
+
+.code-block {
+  background: #1a1a2e;
+  border-radius: 12px;
+  padding: 20px 25px;
+  margin: 15px 0;
+  overflow-x: auto;
+  position: relative;
+}
+
+.code-block code {
+  color: #e0e0e0;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  direction: ltr;
+  text-align: left;
+  display: block;
+}
+
+.code-block .comment {
+  color: #6a9955;
+}
+
+.code-block .command {
+  color: #4ec9b0;
+}
+
+.code-block .string {
+  color: #ce9178;
+}
+
+/* Tech Stack Cards */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin: 40px 0;
+}
+
+.tech-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.tech-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.tech-card h4 {
+  color: var(--fajrak-dark);
+  margin-bottom: 8px;
+}
+
+.tech-card p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.tech-badge {
+  display: inline-block;
+  background: var(--gradient-sunset);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin-top: 12px;
+}
+
+/* Roadmap */
+.roadmap {
+  position: relative;
+  padding-right: 40px;
+}
+
+.roadmap::before {
+  content: '';
+  position: absolute;
+  right: 15px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--fajrak-primary), var(--fajrak-accent));
+  border-radius: 3px;
+}
+
+.roadmap-item {
+  position: relative;
+  padding: 20px 0;
+  padding-right: 30px;
+}
+
+.roadmap-item::before {
+  content: '';
+  position: absolute;
+  right: -32px;
+  top: 25px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border: 3px solid var(--fajrak-primary);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.roadmap-item:hover::before {
+  background: var(--fajrak-primary);
+  transform: scale(1.2);
+}
+
+.roadmap-item.completed::before {
+  background: var(--fajrak-accent);
+  border-color: var(--fajrak-accent);
+}
+
+.roadmap-item h4 {
+  color: var(--fajrak-dark);
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.roadmap-item p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* Changelog Styles */
+.changelog {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: var(--shadow-soft);
+}
+
+.version {
+  border-bottom: 1px solid #eee;
+  padding: 25px 0;
+}
+
+.version:last-child {
+  border-bottom: none;
+}
+
+.version-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.version-number {
+  background: var(--gradient-sunset);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.version-date {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.version-features {
+  list-style: none;
+  padding: 0;
+}
+
+.version-features li {
+  padding: 8px 0;
+  padding-right: 30px;
+  position: relative;
+  color: #555;
+}
+
+.version-features li::before {
+  content: '✨';
+  position: absolute;
+  right: 0;
+}
+
+/* Security Badge */
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.security-item {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.security-item:hover {
+  transform: scale(1.05);
+}
+
+.security-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+/* Comparison Table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  margin: 30px 0;
+}
+
+.comparison-table th {
+  background: var(--gradient-sunset);
+  color: white;
+  padding: 18px 20px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.comparison-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  transition: background 0.3s ease;
+}
+
+.comparison-table tr:hover td {
+  background: rgba(255, 107, 53, 0.03);
+}
+
+.comparison-table .status-yes {
+  color: var(--fajrak-accent);
+  font-weight: 600;
+}
+
+/* Footer */
+.footer {
+  background: var(--fajrak-dark);
+  color: white;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.footer-logo {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.footer p {
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 10px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+  background: var(--fajrak-primary);
+  transform: translateY(-3px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Gamification Box */
+.gamification-box {
+  background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(255, 179, 71, 0.05) 100%);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 30px 0;
+  border: 2px solid rgba(255, 107, 53, 0.1);
+}
+
+.gamification-box h3 {
+  color: var(--fajrak-primary);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.level-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.level-item {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.level-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+  
+  .hero-tagline {
+    font-size: 1.1rem;
+  }
+  
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header h2 {
+    font-size: 1.8rem;
+  }
+  
+  .container {
+    padding: 40px 15px;
+  }
+}
+</style>
+
+<div class="hero">
+  <div class="hero-content">
+    <img src="https://fajrak.com/icon-192.png" alt="شعار فجرك" class="hero-logo" />
+    
+    <h1>Fajrak — فجرك 🌅</h1>
+    <p class="hero-tagline">منصة إدارة مالية شخصية ذكية</p>
+    <p class="hero-subtitle">Smart Personal Finance Manager</p>
+    
+    <div class="nav-pills">
+      <a href="https://fajrak.com" class="nav-pill">🌐 العرض التجريبي</a>
+      <a href="https://fajrak.com/download" class="nav-pill">📱 التحميل</a>
+      <a href="https://github.com/Abdoocoder/financetracker" class="nav-pill">💻 الكود المصدري</a>
+    </div>
+    
+    <div class="lang-switch">
+      <a href="./README.md">🇬🇧 English</a>
+      <a href="./README.ar.md" class="active">🇸🇦 العربية</a>
+    </div>
+  </div>
 </div>
 
----
-
-## ✨ لمحة سريعة / Overview
-
-> فجرك هو أول أداة مالية عربية ذكية تمشي مع المستخدم خطوة بخطوة — من أول دينار يسجّله حتى يحقق حريته المالية.
->
-> **رؤيتنا:** أن يكون كل إنسان على دراية كاملة بوضعه المالي، ويملك خطة واضحة للتحسين — بغض النظر عن دخله أو مستواه — حتى ينجح في تحقيق حريته المالية.
->
-> مستلهم من قيم الإسلام في السعي والعمل والقناعة 🕌
-
-```
-🌅 وعي مالي  →  💳 سداد الديون  →  🛡️ صندوق طوارئ  →  📈 استثمار  →  👑 حرية مالية
-```
-
----
-
-## 🖥️ Screenshots
-
-<div align="center">
-
-| Dashboard | Transactions | Budget |
-|:---------:|:------------:|:------:|
-| ملخص شهري + خارطة الثراء + محاكي الثروة + رسوم بيانية | بحث + فلترة + Swipe | ملخص تلقائي + فئات |
-
+<div class="container">
+  
+  <!-- Vision Section -->
+  <section class="section">
+    <div class="section-header">
+      <h2>✨ رؤيتنا</h2>
+      <p>تمكين الوعي المالي لكل أسرة عربية</p>
+    </div>
+    
+    <div class="callout callout-info">
+      <div class="callout-title">🌟 بيان الرؤية</div>
+      <p>أن يكون كل إنسان على دراية كاملة بوضعه المالي، ويملك خطة واضحة للتحسين — بغض النظر عن دخله أو مستواه — حتى ينجح في تحقيق <strong>حريته المالية</strong>.</p>
+    </div>
+    
+    <div class="feature-grid" style="grid-template-columns: repeat(5, 1fr);">
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 2.5rem;">🌅</div>
+        <div style="font-weight: 600; margin-top: 10px;">وعي مالي</div>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 2.5rem;">💳</div>
+        <div style="font-weight: 600; margin-top: 10px;">سداد الديون</div>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 2.5rem;">🛡️</div>
+        <div style="font-weight: 600; margin-top: 10px;">صندوق طوارئ</div>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 2.5rem;">📈</div>
+        <div style="font-weight: 600; margin-top: 10px;">استثمار</div>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 2.5rem;">👑</div>
+        <div style="font-weight: 600; margin-top: 10px;">حرية مالية</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Screenshots Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>📸 لقطات الشاشة</h2>
+      <p>شاهد فجرك في action</p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px;">
+      <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); transition: transform 0.3s ease;">
+        <img src="./public/screenshots/welcome.jpeg" alt="شاشة الترحيب" style="width: 100%; height: auto; display: block;" />
+        <div style="padding: 15px; text-align: center; font-weight: 600;">🌅 الترحيب</div>
+      </div>
+      
+      <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); transition: transform 0.3s ease;">
+        <img src="./public/screenshots/login.jpeg" alt="شاشة الدخول" style="width: 100%; height: auto; display: block;" />
+        <div style="padding: 15px; text-align: center; font-weight: 600;">🔐 الدخول</div>
+      </div>
+      
+      <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); transition: transform 0.3s ease;">
+        <img src="./public/screenshots/regester.jpeg" alt="شاشة التسجيل" style="width: 100%; height: auto; display: block;" />
+        <div style="padding: 15px; text-align: center; font-weight: 600;">📝 التسجيل</div>
+      </div>
+      
+      <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); transition: transform 0.3s ease;">
+        <img src="./public/screenshots/settings.jpeg" alt="شاشة الإعدادات" style="width: 100%; height: auto; display: block;" />
+        <div style="padding: 15px; text-align: center; font-weight: 600;">⚙️ الإعدادات</div>
+      </div>
+      
+      <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-soft); transition: transform 0.3s ease;">
+        <img src="./public/screenshots/more.jpeg" alt="المزيد من الميزات" style="width: 100%; height: auto; display: block;" />
+        <div style="padding: 15px; text-align: center; font-weight: 600;">📱 المزيد</div>
+      </div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(255, 179, 71, 0.05)); border-radius: 15px; padding: 30px; text-align: center;">
+      <img src="./public/fajrak_feature_graphic.png" alt="Fajrak Feature Graphic" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: var(--shadow-soft);" />
+      <p style="margin-top: 15px; color: #666; font-size: 0.95rem;">📱 فجرك — مدير المالية الشخصية الذكي</p>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🚀 الميزات الرئيسية</h2>
+      <p>كل ما تحتاجه لإدارة أموالك باحترافية</p>
+    </div>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🏠</span>
+        <h3>لوحة التحكم</h3>
+        <ul>
+          <li>ملخص شهري: الدخل، المصروف، الصافي</li>
+          <li>نقاط الصحة المالية — من 0 إلى 100</li>
+          <li>خارطة الثراء — 5 مراحل مالية</li>
+          <li>محاكي الثروة — حساب نمو الفائض</li>
+          <li>تحديات الادخار — 4 تحديات تلقائية</li>
+          <li>رسوم بيانية تفاعلية مع Recharts</li>
+          <li>إضافة سريعة مع تكرار آخر معاملة</li>
+          <li><strong>تحسين الأداء بنسبة 94%</strong></li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💸</span>
+        <h3>المعاملات المالية</h3>
+        <ul>
+          <li>إضافة / تعديل / حذف المعاملات</li>
+          <li>معاملات متكررة — تنفذ تلقائياً</li>
+          <li>قادمة ومنجزة</li>
+          <li>بحث نصي + فلترة بالنوع والشهر</li>
+          <li>سحب للحذف على الموبايل</li>
+          <li>تصدير CSV</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💳</span>
+        <h3>إدارة الديون</h3>
+        <ul>
+          <li>شريط تقدم مرئي</li>
+          <li>خصم تلقائي شهري (CRON)</li>
+          <li>تحديد يوم الخصم لكل دين</li>
+          <li>سجل كامل للدفعات</li>
+          <li>احتفال Confetti عند السداد الكامل</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3>الميزانية الذكية</h3>
+        <ul>
+          <li>ملخص تلقائي من بيانات التطبيق</li>
+          <li>مستشار مالي ذكي — تحليل وتوصيات</li>
+          <li>قاعدة 50/30/20 — توزيع تلقائي</li>
+          <li>حدود إنفاق يدوية لكل فئة</li>
+          <li>تحذيرات عند الاقتراب أو التجاوز</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📈</span>
+        <h3>الاستثمارات</h3>
+        <ul>
+          <li>أسهم + عملات رقمية (15+ عملة)</li>
+          <li>أسعار حية محدثة</li>
+          <li>دعم الاستثمار الحلال ✅</li>
+          <li>محاكي الثروة التفاعلي</li>
+          <li>ملخص المحفظة الاستثمارية</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🔔</span>
+        <h3>التنبيهات الذكية</h3>
+        <ul>
+          <li>Firebase FCM للأندرويد</li>
+          <li>Web Push للآيفون</li>
+          <li>تقارير صباحية ومسائية وأسبوعية</li>
+          <li>سياسة ذكية — إشعارات مفيدة فقط</li>
+          <li>إدارة اشتراكات Push</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📖</span>
+        <h3>الدروس اليومية الإسلامية</h3>
+        <ul>
+          <li>آيات قرآنية عن الرزق</li>
+          <li>أحاديث عن الأخلاق المالية</li>
+          <li>أدعية يومية</li>
+          <li>مخصصة حسب مرحلتك المالية</li>
+          <li>25 درس علمي جديد</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h3>نظام الإنجازات</h3>
+        <ul>
+          <li>نظام مستويات حسب نقاط الصحة</li>
+          <li>شارات الإنجاز</li>
+          <li>تتبع السلسلة اليومية</li>
+          <li>معالم التعلم</li>
+          <li>تحديات مالية</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Mobile Apps Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>📱 منصات الهاتف</h2>
+      <p>استخدم فجرك من أي جهاز</p>
+    </div>
+    
+    <div class="feature-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="feature-card" style="text-align: center;">
+        <span class="feature-icon">🤖</span>
+        <h3>أندرويد</h3>
+        <p style="color: #666; margin: 15px 0;">تطبيق Flutter أصلي مع كامل الميزات</p>
+        <div style="background: linear-gradient(135deg, #34A853, #4285F4); color: white; padding: 10px 20px; border-radius: 25px; display: inline-block;">✅ متوفر على Play Store</div>
+      </div>
+      
+      <div class="feature-card" style="text-align: center;">
+        <span class="feature-icon">🌐</span>
+        <h3>PWA / TWA</h3>
+        <p style="color: #666; margin: 15px 0;">تطبيق ويب متقدم مع إنشاء APK</p>
+        <div style="background: var(--gradient-sunset); color: white; padding: 10px 20px; border-radius: 25px; display: inline-block;">✅ تحميل APK</div>
+      </div>
+      
+      <div class="feature-card" style="text-align: center;">
+        <span class="feature-icon">🍎</span>
+        <h3>آيفون</h3>
+        <p style="color: #666; margin: 15px 0;">إضافة إلى الشاشة الرئيسية PWA</p>
+        <div style="background: var(--gradient-ocean); color: white; padding: 10px 20px; border-radius: 25px; display: inline-block;">✅ مدعوم</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Tech Stack Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>⚙️ التقنيات المستخدمة</h2>
+      <p>مبني بأحدث التقنيات الحديثة</p>
+    </div>
+    
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-icon">⚡</div>
+        <h4>Next.js 15</h4>
+        <p>إطار عمل React مع App Router و SSR</p>
+        <span class="tech-badge">إطار العمل</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">🔷</div>
+        <h4>TypeScript</h4>
+        <p>سلامة كاملة للأنواع</p>
+        <span class="tech-badge">اللغة</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">🗄️</div>
+        <h4>Supabase</h4>
+        <p>قاعدة بيانات PostgreSQL و Auth و RLS</p>
+        <span class="tech-badge">الخادم</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">🔥</div>
+        <h4>Firebase</h4>
+        <p>Cloud Messaging للإشعارات (FCM)</p>
+        <span class="tech-badge">الإشعارات</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">📱</div>
+        <h4>Flutter 3.x</h4>
+        <p>تطبيق أندرويد أصلي</p>
+        <span class="tech-badge">الهاتف</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">🚀</div>
+        <h4>Vercel</h4>
+        <p>نشر بدون خادم مع edge functions</p>
+        <span class="tech-badge">الاستضافة</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">📊</div>
+        <h4>Recharts</h4>
+        <p>رسوم بيانية تفاعلية</p>
+        <span class="tech-badge">الرسوم</span>
+      </div>
+      
+      <div class="tech-card">
+        <div class="tech-icon">⏰</div>
+        <h4>cron-job.org</h4>
+        <p>أتمتة مجدولة (عمان UTC+3)</p>
+        <span class="tech-badge">الأتمتة</span>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Database Schema Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🗄️ هيكل قاعدة البيانات</h2>
+      <p>نموذج بيانات شامل مع حماية RLS</p>
+    </div>
+    
+    <div class="callout callout-success">
+      <div class="callout-title">🔒 أمان أولاً</div>
+      <p>جميع الجداول محمية بـ <strong>Row Level Security (RLS)</strong>، مما يضمن أن كل مستخدم يمكنه الوصول لبياناته فقط.</p>
+    </div>
+    
+    <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+      <div class="feature-card" style="text-align: center; padding: 25px;">
+        <h4>📋 الجداول الأساسية</h4>
+        <ul style="text-align: right; margin-top: 15px;">
+          <li>profiles — بيانات المستخدم</li>
+          <li>transactions — المعاملات</li>
+          <li>debts — الديون</li>
+          <li>debt_payments — سجل الدفعات</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card" style="text-align: center; padding: 25px;">
+        <h4>💰 المالي</h4>
+        <ul style="text-align: right; margin-top: 15px;">
+          <li>investments — الاستثمارات</li>
+          <li>budgets — الميزانيات</li>
+          <li>savings_goals — أهداف الادخار</li>
+        </ul>
+      </div>
+      
+      <div class="feature-card" style="text-align: center; padding: 25px;">
+        <h4>🔔 النظام</h4>
+        <ul style="text-align: right; margin-top: 15px;">
+          <li>alerts — التنبيهات</li>
+          <li>push_subscriptions — الاشتراكات</li>
+          <li>user_stats — الإحصائيات</li>
+          <li>testimonials — التقييمات</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Automation Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>⏰ الأتمتة اليومية</h2>
+      <p>تشغيل ذكي عبر cron-job.org (توقيت عمان UTC+3)</p>
+    </div>
+    
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>الوقت</th>
+          <th>المهمة</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>6:00 صباحاً</strong></td>
+          <td>تنبيهات صباحية + تنبيهات ذكية</td>
+          <td><span class="status-yes">نشط</span></td>
+        </tr>
+        <tr>
+          <td><strong>8:00 صباحاً</strong></td>
+          <td>إضافة الراتب التلقائي (صامت)</td>
+          <td><span class="status-yes">نشط</span></td>
+        </tr>
+        <tr>
+          <td><strong>9:00 صباحاً</strong></td>
+          <td>خصم الأقساط التلقائي (صامت)</td>
+          <td><span class="status-yes">نشط</span></td>
+        </tr>
+        <tr>
+          <td><strong>6:00 مساءً</strong></td>
+          <td>تذكير مسائي (عند الحاجة)</td>
+          <td><span class="status-yes">نشط</span></td>
+        </tr>
+        <tr>
+          <td><strong>7:00 مساءً</strong></td>
+          <td>نصيحة بناء الثروة اليومية</td>
+          <td><span class="status-yes">نشط</span></td>
+        </tr>
+        <tr>
+          <td><strong>الجمعة</strong></td>
+          <td>تقرير المقارنة الأسبوعي</td>
+          <td><span class="status-yes">نشط</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+  
+  <!-- Gamification Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🎮 نظام الإنجازات</h2>
+      <p>حوّل إدارة المال إلى رحلة ممتعة</p>
+    </div>
+    
+    <div class="gamification-box">
+      <h3>📊 النقاط والمستويات</h3>
+      <div class="level-list">
+        <div class="level-item">
+          <div style="font-size: 2rem;">🌱</div>
+          <div style="font-weight: 600;">مبتدئ</div>
+          <div style="color: #666; font-size: 0.9rem;">0-49 نقطة</div>
+        </div>
+        <div class="level-item">
+          <div style="font-size: 2rem;">🔥</div>
+          <div style="font-weight: 600;">متتبع</div>
+          <div style="color: #666; font-size: 0.9rem;">50-149 نقطة</div>
+        </div>
+        <div class="level-item">
+          <div style="font-size: 2rem;">💪</div>
+          <div style="font-weight: 600;">مدخر</div>
+          <div style="color: #666; font-size: 0.9rem;">150-349 نقطة</div>
+        </div>
+        <div class="level-item">
+          <div style="font-size: 2rem;">📈</div>
+          <div style="font-weight: 600;">مستثمر</div>
+          <div style="color: #666; font-size: 0.9rem;">350-699 نقطة</div>
+        </div>
+        <div class="level-item">
+          <div style="font-size: 2rem;">💎</div>
+          <div style="font-weight: 600;">ثري مبتدئ</div>
+          <div style="color: #666; font-size: 0.9rem;">700-1199 نقطة</div>
+        </div>
+        <div class="level-item">
+          <div style="font-size: 2rem;">👑</div>
+          <div style="font-weight: 600;">حر مالياً</div>
+          <div style="color: #666; font-size: 0.9rem;">1200+ نقطة</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="callout callout-info">
+      <div class="callout-title">🔥 السلسلة اليومية</div>
+      <p>كل يوم تسجّل فيه معاملة تكسب نقطة وتحافظ على سلسلتك!</p>
+    </div>
+  </section>
+  
+  <!-- Quick Start Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🚀 البدء السريع</h2>
+      <p>ابدأ في أقل من 5 دقائق</p>
+    </div>
+    
+    <div class="quickstart">
+      <h3>📦 التثبيت</h3>
+      
+      <div class="code-block">
+        <code>
+          <span class="comment"># 1. استنساخ المشروع</span><br/>
+          <span class="command">git clone</span> https://github.com/Abdoocoder/financetracker.git<br/><br/>
+          <span class="comment"># 2. الانتقال للمجلد</span><br/>
+          <span class="command">cd</span> financetracker<br/><br/>
+          <span class="comment"># 3. تثبيت المكتبات</span><br/>
+          <span class="command">npm install</span><br/><br/>
+          <span class="comment"># 4. نسخ ملف البيئة</span><br/>
+          <span class="command">cp</span> .env.local.example .env.local<br/><br/>
+          <span class="comment"># 5. تشغيل الخادم</span><br/>
+          <span class="command">npm run dev</span>
+        </code>
+      </div>
+      
+      <div class="callout callout-warning">
+        <div class="callout-title">⚠️ إعداد البيئة</div>
+        <p>اضبط ملف <code>.env.local</code> بمعلومات Supabase و Firebase قبل التشغيل.</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Testing Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🧪 الاختبارات</h2>
+      <p>مجموعة اختبارات شاملة مع Jest</p>
+    </div>
+    
+    <div class="feature-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="feature-card" style="text-align: center;">
+        <span class="feature-icon">✅</span>
+        <h3>تشغيل الاختبارات</h3>
+        <div class="code-block" style="background: #1a1a2e; margin-top: 15px; direction: ltr;">
+          <code><span class="command">npm test</span></code>
+        </div>
+      </div>
+      
+      <div class="feature-card" style="text-align: center;">
+        <span class="feature-icon">👀</span>
+        <h3>وضع المراقبة</h3>
+        <div class="code-block" style="background: #1a1a2e; margin-top: 15px; direction: ltr;">
+          <code><span class="command">npm run test:watch</span></code>
+        </div>
+      </div>
+      
+      <div class="feature-card" style="text-align: center;">
+        <span class="feature-icon">📊</span>
+        <h3>التغطية</h3>
+        <div class="code-block" style="background: #1a1a2e; margin-top: 15px; direction: ltr;">
+          <code><span class="command">npm run test:coverage</span></code>
+        </div>
+      </div>
+    </div>
+    
+    <div class="callout callout-info" style="margin-top: 30px;">
+      <div class="callout-title">📈 إحصائيات التغطية</div>
+      <p><strong>lib/cache.ts:</strong> 83.33% | <strong>types/index.ts:</strong> 100% | <strong>lib/currency.ts:</strong> 30.76%</p>
+    </div>
+  </section>
+  
+  <!-- Security Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🔐 ميزات الأمان</h2>
+      <p>إجراءات أمان بمستوى المؤسسات</p>
+    </div>
+    
+    <div class="security-grid">
+      <div class="security-item">
+        <div class="security-icon">🛡️</div>
+        <h4>Row Level Security</h4>
+        <p>تحكم في الوصول على مستوى قاعدة البيانات</p>
+      </div>
+      
+      <div class="security-item">
+        <div class="security-icon">🔑</div>
+        <h4>Middleware Auth</h4>
+        <p>حماية مسارات لوحة التحكم</p>
+      </div>
+      
+      <div class="security-item">
+        <div class="security-icon">🔒</div>
+        <h4>CRON Secret</h4>
+        <p>حماية روابط API</p>
+      </div>
+      
+      <div class="security-item">
+        <div class="security-icon">🔥</div>
+        <h4>Firebase Admin</h4>
+        <p>إشعارات آمنة</p>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Roadmap Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🗺️ خارطة الطريق</h2>
+      <p>الميزات والتحسينات المخططة</p>
+    </div>
+    
+    <div class="feature-grid" style="grid-template-columns: 1fr 1fr;">
+      <div>
+        <h3 style="color: #38ef7d; margin-bottom: 20px;">✅ مكتمل</h3>
+        <div class="roadmap">
+          <div class="roadmap-item completed">
+            <h4>Auth + Onboarding + PWA</h4>
+            <p>نظام مصادقة كامل مع تطبيق ويب متقدم</p>
+          </div>
+          <div class="roadmap-item completed">
+            <h4>المعاملات + الديون + الاستثمارات</h4>
+            <p>مجموعة إدارة مالية شاملة</p>
+          </div>
+          <div class="roadmap-item completed">
+            <h4>إشعارات ذكية (iOS + Android FCM)</h4>
+            <p>إشعارات عبر المنصات</p>
+          </div>
+          <div class="roadmap-item completed">
+            <h4>الميزانية + الصحة المالية</h4>
+            <p>تتبع الميزانية وخارطة الثراء</p>
+          </div>
+          <div class="roadmap-item completed">
+            <h4>الإنجازات + الدروس الإسلامية</h4>
+            <p>محتوى تعليمي وإنجازات</p>
+          </div>
+          <div class="roadmap-item completed">
+            <h4>تطبيق Flutter للأندرويد</h4>
+            <p>APK على Google Play (54.5 MB)</p>
+          </div>
+          <div class="roadmap-item completed">
+            <h4>دومين fajrak.com</h4>
+            <p>نشر مع SSL</p>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <h3 style="color: var(--fajrak-primary); margin-bottom: 20px;">📋 قيد التطوير</h3>
+        <div class="roadmap">
+          <div class="roadmap-item">
+            <h4>تقارير PDF شهرية</h4>
+            <p>إنشاء ملخصات مالية قابلة للتحميل</p>
+          </div>
+          <div class="roadmap-item">
+            <h4>نظام الاشتراكات (Paddle)</h4>
+            <p>ميزات مدفوعة مع معالجة الدفع</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Changelog Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>📝 سجل التغييرات</h2>
+      <p>أحدث التحديثات والتحسينات</p>
+    </div>
+    
+    <div class="changelog">
+      <div class="version">
+        <div class="version-header">
+          <span class="version-number">v3.10.0</span>
+          <span class="version-date">23 مارس 2026</span>
+          <span style="background: var(--gradient-emerald); color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem;">الأحدث</span>
+        </div>
+        <ul class="version-features">
+          <li><strong>نشر Google Play</strong> — تم بناء وإرسال App bundle (.aab) للاختبار المغلق</li>
+          <li><strong>SEO والأداء</strong> — تحويل صفحة الهبوط إلى Server-Side Rendering (SSR)</li>
+          <li><strong>الترجمة والثيم</strong> — تغطية 100% للديون، خارطة الثراء، الإعدادات</li>
+          <li><strong>الأمان المحسن</strong> — تفعيل RLS على جدول app_events</li>
+          <li><strong>إعادة هيكلة الإعدادات</strong> — تقسيم إلى الملف الشخصي، الأصول، التفضيلات، الحساب</li>
+          <li><strong>إصلاحات بناء أندرويد</strong> — حل مشاكل Gradle</li>
+        </ul>
+      </div>
+      
+      <div class="version">
+        <div class="version-header">
+          <span class="version-number">v3.9.0</span>
+          <span class="version-date">22 مارس 2026</span>
+        </div>
+        <ul class="version-features">
+          <li><strong>إعادة هيكلة معمارية</strong> — مراجعة شاملة لجميع الشاشات التسع</li>
+          <li><strong>مبادرة الكود النظيف</strong> — حل 30+ مشكلة linting</li>
+          <li><strong>تدقيق المشروع</strong> — فحص صحي شامل</li>
+          <li><strong>APK للإصدار</strong> — تطبيق أندرويد مستقر 55.2 MB</li>
+        </ul>
+      </div>
+      
+      <div class="version">
+        <div class="version-header">
+          <span class="version-number">v3.8.0</span>
+          <span class="version-date">20 مارس 2026</span>
+        </div>
+        <ul class="version-features">
+          <li><strong>معالجة الأخطاء العالمية</strong> — ErrorHandler مع تسجيل Supabase</li>
+          <li><strong>خدمة التحليلات</strong> — تتبع سلوك المستخدم</li>
+          <li><strong>تحسين Onboarding</strong> — تدفق PageView متعدد الخطوات</li>
+          <li><strong>إصلاح بناء Flutter</strong> — حل جميع أخطاء Dart</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Contributing Section -->
+  <section class="section" style="margin-top: 60px;">
+    <div class="section-header">
+      <h2>🤝 المساهمة</h2>
+      <p>انضم إلينا في بناء مستقبل التمويل العربي</p>
+    </div>
+    
+    <div class="callout callout-info">
+      <div class="callout-title">💡 كيف تساهم</div>
+      <p>نرحب بالمساهمات! يرجى قراءة إرشادات المساهمة وإرسال pull requests لأي ميزات أو إصلاحات.</p>
+    </div>
+    
+    <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="feature-card">
+        <span class="feature-icon">🐛</span>
+        <h3>الإبلاغ عن الأخطاء</h3>
+        <p>وجدت خطأ؟ افتح issue مع خطوات إعادة الإنتاج.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">💡</span>
+        <h3>اقتراح ميزات</h3>
+        <p>لديك فكرة؟ نحب أن نسمع اقتراحاتك!</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">📖</span>
+        <h3>تحسين التوثيق</h3>
+        <p>ساعدنا في تحسين التوثيق للجميع.</p>
+      </div>
+    </div>
+  </section>
+  
 </div>
 
----
-
-## 🌟 الميزات / Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🏠 Dashboard
-- ملخص شهري: الدخل، المصروف، الصافي
-- **رحلة الثروة** — نقاط، مستويات، سلسلة يومية، شارات 🎮
-- **خارطة الثراء** مع نقاط الصحة المالية 🗺️
-- **بطاقة محاكي الثروة** — يحسب فائضك ويعرض نموه 📈
-- **تحديات الادخار** — 4 تحديات تتبعها تلقائياً 🏆
-- **رسوم بيانية تفاعلية** بـ Recharts مع Tooltips *(جديد)* 📊
-- مقارنة مع الشهر الماضي
-- توزيع المصاريف مع النسب المئوية *(محسّن)*
-- إضافة سريعة مع تكرار آخر معاملة ⚡
-- **Lazy Loading** للمكونات الثقيلة — تحسين الأداء بـ 94% *(جديد)*
-
-### 💸 المعاملات
-- إضافة / تعديل / حذف
-- **فئة صلة الرحم** مضافة *(جديد)*
-- بحث نصي في الوصف والفئة والمبلغ 🔍
-- فلترة بالنوع والشهر
-- Swipe للحذف على الموبايل
-- تصدير CSV 📥
-
-### 💳 الديون
-- تتبع مع شريط تقدم مرئي
-- خصم تلقائي شهري (CRON) 🤖
-- تحديد يوم الخصم لكل دين
-- سجل كامل للدفعات
-- تاريخ الديون المسددة مع إحصائية إجمالي ما سددته 💪
-- احتفال + Confetti عند سداد دين كامل 🎉
-
-</td>
-<td width="50%">
-
-### 📊 الميزانية
-- ملخص تلقائي من بيانات التطبيق
-- حساب المتاح: الدخل − الأقساط − الأهداف
-- مستشار مالي ذكي — تحليل وتوصيات فورية 🤖
-- قاعدة 50/30/20 — توزيع تلقائي مقترح
-- حدود إنفاق يدوية لكل فئة
-- تحذير 🔶 عند الاقتراب وتنبيه ⚠️ عند التجاوز
-
-### 📈 الاستثمارات
-- أسهم + عملات رقمية (15+ عملة)
-- أسعار **حية** (CoinGecko + Twelve Data)
-- دعم الاستثمار الحلال ✅
-- **صافي الثروة يستخدم السعر الحالي** وليس سعر الشراء *(إصلاح)*
-- محاكي الثروة الكامل مع sliders تفاعلية
-
-### 🎯 الأهداف
-- أهداف ادخار مع شريط تقدم
-- إضافة دفعات يدوية
-
-### 🔔 التنبيهات الذكية
-- تحليل يومي تلقائي (cron-job.org) *(محدّث)*
-- **Push Prompt UI أنيق** بدل confirm() المزعج *(جديد)*
-- إشعارات Push تعمل على Android APK *(إصلاح)*
-- تقرير أسبوعي + تذكير مسائي
-- توجيه بناء الثروة — نصيحة شخصية يومية 7م 💡
-- طلب إذن الإشعارات مرة واحدة فقط
-
-### 📚 التعلم
-- درس يومي مخصص لمرحلتك المالية
-- سلسلة يومية لتتبع الالتزام 🔥
-- خارطة رحلة من الوعي للثروة
-- دروس إسلامية كل 7 أيام
-- ثنائي اللغة عربي/إنجليزي
-
-### ⚙️ الإعدادات
-- ملف شخصي محسّن — وظيفة، هاتف، تاريخ ميلاد 👤
-- أصولي الشخصية — عقارات، مركبات، ذهب، أصول أخرى 💎
-- صافي الثروة الحقيقية يظهر في خارطة الثراء تلقائياً
-- شارك تجربتك — تقييم يظهر في Landing Page ⭐
-- Dark Mode / Light Mode *(Light Mode محسّن)*
-- أقسام Accordion قابلة للطي
-- تصدير المعاملات CSV 📥
-
-</td>
-</tr>
-</table>
-
----
-
-## 📋 Changelog
-
-### v1.5.2 — 2026-03-16
-- 🕌 إضافة بنك دروس إسلامي كامل — آيات، أحاديث، أدعية مأثورة مرتبطة بالرزق والثراء
-- 📖 17 درس إسلامي يظهر كل 7 أيام موزعة على كل مراحل الرحلة المالية
-- 🌅 Fajrak الآن يجمع بين العلم المالي الحديث والتراث الإسلامي
-
-### v1.5.1 — 2026-03-16
-- 💾 حفظ الإشعارات في صفحة التنبيهات تلقائياً
-- 🔗 إصلاح رابط الإشعار — يفتح الصفحة الصحيحة
-- ⏳ تقسيم المعاملات — قادمة ومنجزة
-- 🔢 إصلاح عرض الأرقام الكسرية في المعاملات
-- 💼 استبدال "راتب" بـ "عمل حر" في الإضافة السريعة
-- 🔔 App Badge عند وصول إشعار جديد
-
-### v3.1.0 — 2026-03-18 *(الإصدار الجديد)*
-- 📱 **Native Flutter App** — دمج مشروع Flutter رسمي بدلاً من Capacitor
-- 🔐 **تأمين البيانات** — استخدام `--dart-define` للقيم الحساسة في الموبايل
-- 🔧 **تحديث بنية الأندرويد** — الانتقال إلى v2 Embedding و Kotlin DSL
-- 🕌 **خط Cairo** — دعم كامل للخط العربي في تطبيق الموبايل
-- 🐛 **إصلاحات شاملة** — حل جميع مشاكل البناء والتوافق مع Flutter SDK الحديث
-
-### v3.0.0 — 2026-03-18
-- 🔐 **استرجاع كلمة المرور** — صفحة forgot-password + reset-password
-- 🔗 **زر المشاركة** — في الإعدادات مع رسالة تسويقية احترافية
-- 🛡️ **تحسين Privacy Policy** — قسم من يرى بياناتك؟
-- 🌅 **قسم رحلة الحرية المالية** — في Landing Page مع اقتباسات إسلامية
-- 👋 **تحية شخصية** — باسم المستخدم في Dashboard
-- 🌐 **i18n كامل** — مفاتيح ترجمة لكل الميزات الجديدة
-- 🐛 **إصلاح Auth Layout** — I18nProvider لصفحات المصادقة
-
-### v2.9.0 — 2026-03-17
-- 📱 **Install Prompt** — طلب تثبيت PWA تلقائي مع تكرار أسبوعي
-- 🌐 **i18n كامل** — مفاتيح ترجمة للـ Install Prompt وHelp وLearn وOnboarding
-- 🔄 **إصلاح Pull to Refresh** — يعمل بشكل صحيح في كل الصفحات
-- 🏦 **إصلاح صفحة الاستثمار** — لا اختفاء للبيانات عند السحب
-- 🐛 **إصلاح Hydration Error** — Welcome Modal وOnboarding Tour
-
-### v2.8.0 — 2026-03-17
-- 🐛 **إصلاح Hydration Error** — خطأ React #310 في Dashboard
-- 🔧 **إصلاح Welcome Modal** — mounted state لتجنب SSR mismatch
-- 🔧 **إصلاح Onboarding Tour** — نفس الإصلاح
-
-### v2.7.0 — 2026-03-17
-- 🌅 **Empty State** — رسالة تحفيزية للمستخدم الجديد
-- 🔄 **Pull to Refresh** — سحب لأسفل للتحديث
-- 🔢 **Micro-animations** — الأرقام تعدّ من 0 للقيمة
-- 📳 **Haptic Feedback** — اهتزاز عند الإجراءات المهمة
-- 🔔 **Smart Nudges** — إشعار ذكي للمستخدمين غير النشطين
-
-### v2.6.0 — 2026-03-17
-- 💬 **مركز المساعدة** — صفحة `/help` مع 20+ سؤال وجواب وبحث
-- 🎓 **جولة تعريفية لكل صفحة** — شرح مخصص عند أول زيارة
-- 💊 **Financial Health Score** — نقاط الصحة المالية 0-100
-- 🎓 **Onboarding Tour** محسّن — 8 صفحات كل منها جولة مستقلة
-
-### v2.5.0 — 2026-03-17
-- 🎓 **Onboarding Tour** — جولة تعريفية 8 خطوات لكل مستخدم جديد
-- 👋 **Welcome Modal** — نافذة ترحيبية تشرح التطبيق
-- 🌐 **ترجمة كاملة** — مفاتيح i18n للـ Onboarding والدروس
-
-### v2.4.0 — 2026-03-17
-- 📚 **صفحة الدروس اليومية** — درس مخصص لمرحلتك المالية
-- 🔥 **سلسلة يومية** — تتبع التزامك بالتعلم
-- 🗺️ **خارطة الرحلة** — شاهد تقدمك من الوعي للثروة
-- 🕌 **دروس إسلامية** — كل 7 أيام درس مرتبط بالرزق
-- 📖 **ثنائي اللغة** — عربي وإنجليزي
-
-### v2.3.0 — 2026-03-17
-- 🧹 **تنظيف المشروع** — حذف Capacitor والعودة لـ PWA فقط
-- 📱 **صفحة Android Coming Soon** — مع خانة تسجيل الاهتمام
-- 🔔 **إصلاح dedup التنبيهات** — نافذة 24 ساعة بدل 20
-
-### v2.2.0 — 2026-03-17
-- 📱 **Native Android App** — Capacitor + Firebase FCM حقيقي
-- 🔔 **إشعارات Native** — تصل حتى لو التطبيق مغلق كلياً
-- 🔐 **FCM Bridge** — Java ↔ JavaScript لتسجيل Token تلقائياً
-- 💾 **Session Persistence** — لا تسجيل دخول عند كل فتح
-- 📱 **Native Android APK** — بناء APK جاهز للتنزيل
-- 🛡️ **Middleware fix** — تجاوز SSR للتطبيق Native
-
-### v2.1.0 — 2026-03-17
-- 📱 **Native Android APK** — بناء تلقائي عبر GitHub Actions
-- 🔔 **إشعارات Native حقيقية** — تصل حتى لو التطبيق مغلق كلياً
-- ⚡ **تنبيه Battery Optimization** — يوجه المستخدم لإعدادات Chrome
-- 🔗 **رابط تنزيل ديناميكي** — يشير لأحدث إصدار تلقائياً
-
-### v2.0.1 — 2026-03-17
-- 🔧 إصلاح Push Notifications على Android — استبدال `navigator` بـ `self` في Service Worker
-- ⚡ تنبيه تلقائي لمستخدمي Android لتفعيل إعدادات البطارية
-- 🗑️ حذف FCM tokens المنتهية الصلاحية تلقائياً
-
-### v2.0.0 — 2026-03
-- 📱 **Fajrak v2.0 APK** — موقع بـ PWABuilder مع keystore جديد
-- 🕌 **دروس إسلامية** — آيات قرآنية وأحاديث وأدعية الرزق يومياً
-- 🔔 **Firebase FCM** — إشعارات تعمل في الخلفية على Android
-- 🔴 **App Badge** — عداد الإشعارات غير المقروءة على أيقونة التطبيق
-- 💳 **تقسيم المعاملات** — upcoming و completed بشكل منفصل
-- 🔢 **إصلاح الأرقام** — عرض الكسور العشرية بشكل صحيح
-- 🔄 **ترتيب المعاملات** — حسب التاريخ ثم وقت الإنشاء
-- 💼 **تحرير الفئات** — استبدال راتب بـ freelance في Quick Add
-- 📄 **وثيقة هوية Fajrak** — الرؤية والرسالة والقيم موثقة
-
-### v1.6.0 — 2026-03
-- 🌅 **هوية المشروع** — Tagline جديد، رؤية ورسالة واضحة، مستلهمة من الإسلام
-- 📄 **Landing Page** — قسم "لماذا بنينا هذا التطبيق"، Pro → قريباً مع عرض أول 100 مشترك
-- 🧭 **Bottom Nav** — 3 عناصر فقط (الرئيسية | المعاملات | المزيد)
-- 🔄 **RTL/LTR كامل** — كل الصفحات تتبع لغة المستخدم
-- ⚡ **أداء صفحة الاستثمارات** — Cache 5 دقائق + Parallel API calls
-- 🔄 **تحديث تلقائي للأسعار** عند الدخول للصفحة في الخلفية
-- 🌍 **ترجمة كاملة** للـ Dashboard sections
-- 🔢 **إصلاح اتجاه الأرقام** — `1 USD = 0.709 JOD` صحيح في العربي
-- ✅ **تقييمات حقيقية فقط** من قاعدة البيانات
-- 🔃 **إعادة تحميل عند تغيير اللغة** لضمان RTL/LTR صحيح
-
-### v1.5.0 — 2026-03
-- 🧠 **دروس يومية ذكية** — مخصصة لكل مستخدم حسب مرحلته المالية
-- 📚 **مبنية على أبحاث أكاديمية** — علم السلوك المالي، نوبل الاقتصاد، Vanguard
-- 🌐 **ثنائية اللغة** — الدرس يصل بلغة المستخدم (عربي/إنجليزي)
-- 🎯 **5 مسارات تعليمية** — وعي → ديون → طوارئ → استثمار → ثروة
-- 🌓 **كشف ثيم الجهاز تلقائياً** عند أول دخول
-- 🌍 **كشف لغة المتصفح تلقائياً** عند أول دخول
-- 🔗 **إصلاح زر "شاهد كيف يعمل"** — يتنقل لقسم الميزات
-- ✅ **تقييمات حقيقية فقط** — حذف التقييمات الوهمية
-- 🗄️ إضافة عمود `lang` في `profiles` لتخصيص الإشعارات
-
-### v1.4.0 — 2026-03
-- 📊 ترقية الرسوم البيانية إلى **Recharts** مع Tooltips تفاعلية
-- ⚡ **Lazy Loading** للمكونات الثقيلة — Dashboard من 120kB إلى 7.5kB (تحسين 94%)
-- 🏗️ **Refactoring** شامل — تقسيم الملفات الكبيرة إلى 9 مكونات منظمة
-- 🔧 `clearUserCache` في ملف مركزي `lib/cache.ts` — إزالة 6 نسخ مكررة
-- 🌐 **مزامنة الترجمة** — 266 مفتاح متطابق عربي/إنجليزي
-- 📱 **Bottom Nav RTL** — الرئيسية على اليمين *(إصلاح)*
-- 🔔 **Push Prompt UI** — إصلاح الإشعارات على Android APK
-- ☀️ **Light Mode محسّن** — عمق وظلال وألوان أفضل
-- 💰 **إصلاح صافي الثروة** — استخدام السعر الحالي بدل سعر الشراء
-- 🔢 **إصلاح الأرقام العشرية** — عرض أرقام نظيفة بدون .075
-- 🛡️ **نظام معالجة الأخطاء** — ErrorHandler مركزي
-- ➕ إضافة فئة **صلة الرحم** في المعاملات
-
-### v1.4.0 — 2026-03-15
-- 🔔 إصلاح الإشعارات على Android — auto-subscribe للمستخدم القديم عند إعادة التثبيت
-- 🔔 اشتراك تلقائي إذا الإذن ممنوح مسبقاً بدون popup
-- 🚫 منع تكرار الراتب في الـ onboarding
-- 🌐 نقل الدومين من vercel.app إلى fajrak.com
-- 📱 APK v1.6.0 مع GitHub Release رسمي
-
-### v1.3.0 — 2026-03
-- 🎉 احتفال + Confetti عند سداد دين كامل
-- 📜 تاريخ الديون المسددة مع إحصائية إجمالي المسدد
-- 🌙 Dark Mode افتراضي لكل المستخدمين الجدد
-- 🔔 طلب إذن الإشعارات مرة واحدة فقط للأبد
-- 🌍 إصلاح جميع النصوص لاستخدام i18n
-- 🚀 Landing Page محسّنة — Headline جديد، Trust Signals، Sticky CTA Bar
-- 💪 إحصائية "إجمالي ما سددته" في صفحة الديون
-
-### v1.2.0 — 2026-02
-- 🗺️ خارطة الثراء + نقاط الصحة المالية
-- 🎮 نظام Gamification — نقاط، مستويات، شارات، سلسلة يومية
-- 💎 الأصول الشخصية + صافي الثروة الحقيقية
-- 🏆 تحديات الادخار التلقائية
-- 📱 APK للأندرويد
-
-### v1.1.0 — 2026-01
-- 🌐 i18n عربي/English كامل (266 مفتاح)
-- 🤖 مستشار مالي ذكي + قاعدة 50/30/20
-- 📊 محاكي الثروة التفاعلي
-- 🔔 Push Notifications + تقرير أسبوعي
-- 🔍 بحث في المعاملات + تصدير CSV
-
-### v1.0.0 — 2025-12
-- 🚀 الإطلاق الأول
-- Auth + Onboarding + Dashboard
-- المعاملات، الديون، الاستثمارات، الأهداف
-- PWA + Vercel Deployment
-
----
-
-## 🗺️ خارطة الثراء / Wealth Roadmap
-
-ميزة حصرية تحلّل وضعك المالي وتعطيك **نقاط الصحة المالية** مع خطة واضحة للتحسين:
-
-- 🎯 تحديد المرحلة المالية الحالية (طوارئ → ديون → استثمار → ثروة)
-- 💪 نقاط القوة والنقاط التي تحتاج تحسين
-- 👣 الخطوة التالية الموصى بها مع تفاصيل عملية
-- 📐 نسبة الدين من الدخل + مؤشرات أخرى
-- 💎 **صافي الثروة الحقيقية** = أصول شخصية + استثمارات (بالسعر الحالي) + ادخار − ديون
-
----
-
-## 🎮 نظام الإنجازات / Gamification System
-
-نظام متكامل يحوّل إدارة المال إلى رحلة ممتعة ومحفّزة:
-
-**النقاط والمستويات:**
-```
-🌱 مبتدئ     (0-49 نقطة)
-🔥 متتبع     (50-149 نقطة)
-💪 مدخر      (150-349 نقطة)
-📈 مستثمر    (350-699 نقطة)
-💎 ثري مبتدئ (700-1199 نقطة)
-👑 حر مالياً  (1200+ نقطة)
-```
-
-**الشارات (15 شارة):** تتبع، ادخار، ديون، استثمار، ثروة
-
-**السلسلة اليومية 🔥** — كل يوم يسجّل فيه المستخدم معاملة يكسب نقطة ويحافظ على سلسلته
-
----
-
-## ⭐ نظام التقييمات / Testimonials
-
-نظام متكامل يتيح للمستخدمين مشاركة تجربتهم مباشرة من التطبيق:
-
-- المستخدم يكتب تقييمه من صفحة **الإعدادات** (اسم، دولة، وظيفة، نجوم، نص)
-- التقييم يُحفظ في Supabase بحالة `is_visible = false` بانتظار الموافقة
-- بعد موافقة المشرف يظهر تلقائياً في **Landing Page**
-- المستخدم يستطيع تحديث تقييمه في أي وقت
-
-**موافقة على تقييم** (Supabase SQL Editor):
-```sql
-UPDATE testimonials SET is_visible = true WHERE id = 'xxx';
-```
-
----
-
-## 🛠️ التقنيات / Tech Stack
-
-<div align="center">
-
-| التقنية | الاستخدام | الإصدار |
-|:-------:|:---------:|:-------:|
-| ![Next.js](https://img.shields.io/badge/Next.js-000?logo=nextdotjs&logoColor=white) | Framework + SSR | 15.5.12 |
-| ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white) | Type Safety | 5.x |
-| ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white) | Database + Auth + RLS | Latest |
-| ![Vercel](https://img.shields.io/badge/Vercel-000?logo=vercel&logoColor=white) | Hosting | Latest |
-| ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?logoColor=white) | رسوم بيانية تفاعلية | Latest |
-| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwind-css&logoColor=white) | Styling | 3.x |
-| ![cron-job.org](https://img.shields.io/badge/cron--job.org-Automation-3B7EF6?style=flat-square) | CRON Jobs | Free |
-| ![CoinGecko](https://img.shields.io/badge/CoinGecko-8DC63F?logoColor=white) | أسعار العملات الرقمية | Free API |
-| ![WebPush](https://img.shields.io/badge/Web_Push-5A0FC8?logo=pwa&logoColor=white) | Push Notifications | VAPID |
-| ![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white) | Native Mobile App | 3.x |
-
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-content">
+    <div class="footer-logo">🌅 Fajrak — فجرك</div>
+    <p><strong>مبني بـ ❤️ من الأردن للعالم العربي</strong></p>
+    <p>© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة</p>
+    
+    <div class="footer-links">
+      <a href="https://github.com/Abdoocoder" target="_blank">👨‍💻 GitHub</a>
+      <a href="https://fajrak.com" target="_blank">🌐 الموقع</a>
+      <a href="https://fajrak.com/download" target="_blank">📱 التحميل</a>
+    </div>
+  </div>
 </div>
-
----
-
-## 🗄️ Database Schema
-
-```
-┌─────────────────────────────────────────────────────┐
-│                    Supabase Tables                   │
-├──────────────────────┬──────────────────────────────┤
-│ profiles             │ بيانات المستخدم + الراتب + اللغة │
-│ transactions         │ المعاملات المالية              │
-│ debts                │ الديون + الخصم التلقائي        │
-│ debt_payments        │ سجل دفعات الديون               │
-│ investments          │ المحفظة الاستثمارية            │
-│ investment_transactions │ معاملات الاستثمار           │
-│ budgets              │ ميزانيات الفئات الشهرية        │
-│ savings_goals        │ أهداف الادخار                  │
-│ alerts               │ التنبيهات الذكية               │
-│ push_subscriptions   │ اشتراكات الإشعارات             │
-│ user_stats           │ نقاط + مستويات + شارات         │
-│ testimonials         │ تقييمات المستخدمين             │
-└──────────────────────┴──────────────────────────────┘
-```
-
-> 🔒 جميع الجداول محمية بـ **Row Level Security (RLS)** — لا يمكن لأي مستخدم الوصول لبيانات غيره.
-
----
-
-## ⚙️ CRON Jobs — الأتمتة اليومية
-
-تعمل عبر **cron-job.org** (توقيت عمان UTC+3):
-
-| الوقت | الوصف |
-|:----:|:-----------:|
-| 6:00 ص | تنبيهات صباحية + تنبيهات ذكية |
-| 8:00 ص | إضافة الراتب التلقائي (صامت) |
-| 9:00 ص | خصم الأقساط التلقائي (صامت) |
-| 6:00 م | تذكير مسائي (عند الحاجة) |
-| 7:00 م | نصيحة بناء الثروة اليومية |
-| الجمعة | تقرير المقارنة الأسبوعي |
-
-**ملاحظة:** تم تأمين جميع الروابط بـ `CRON_SECRET`.
-
----
-
-## 🚀 Quick Start
-
-```bash
-# 1. Clone
-git clone https://github.com/Abdoocoder/financetracker.git
-cd fajrak
-
-# 2. Install
-npm install
-
-# 3. Environment
-cp .env.local.example .env.local
-# عدّل متغيرات البيئة
-
-# 4. Run
-npm run dev
-```
-
-### Environment Variables
-
-```env
-# =================================================
-# APP CONFIG
-# =================================================
-NEXT_PUBLIC_APP_URL=https://fajrak.com
-
-
-# =================================================
-# SUPABASE CONFIG
-# =================================================
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-
-# =================================================
-# MARKET DATA API
-# =================================================
-TWELVE_DATA_KEY=your_twelve_data_key
-
-
-# =================================================
-# CURRENCY EXCHANGE API
-# =================================================
-NEXT_PUBLIC_EXCHANGE_RATE_KEY=your_exchange_rate_key
-
-
-# =================================================
-# PUSH NOTIFICATIONS (VAPID)
-# =================================================
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=your_vapid_public_key
-VAPID_PRIVATE_KEY=your_vapid_private_key
-VAPID_EMAIL=mailto:your@email.com
-
-
-# =================================================
-# CRON JOB SECURITY
-# =================================================
-CRON_SECRET=your_cron_secret
-```
-
----
-
-## 🗺️ Roadmap
-
-```
-✅ المرحلة الأولى — MVP
-   ├── [x] Auth + Onboarding
-   ├── [x] المعاملات الكاملة
-   ├── [x] الديون + الخصم التلقائي
-   ├── [x] الاستثمارات + أسعار حية
-   ├── [x] الأهداف والادخار
-   └── [x] Landing Page + PWA
-
-✅ المرحلة الثانية — Smart Features
-   ├── [x] التنبيهات الذكية + Push
-   ├── [x] الميزانية الذكية + مستشار مالي + قاعدة 50/30/20
-   ├── [x] الراتب التلقائي
-   ├── [x] بحث في المعاملات
-   ├── [x] Dark / Light Mode
-   ├── [x] i18n عربي/English كامل (266 مفتاح)
-   ├── [x] خارطة الثراء + نقاط الصحة المالية
-   ├── [x] Recharts — رسوم بيانية تفاعلية
-   ├── [x] تحديات الادخار التلقائية
-   ├── [x] الأصول الشخصية + صافي الثروة الحقيقية
-   ├── [x] نظام Gamification — نقاط، مستويات، شارات
-   ├── [x] CRONs عبر cron-job.org *(محدّث)*
-   ├── [x] نسيت كلمة المرور + إعادة التعيين
-   ├── [x] زر المشاركة
-   ├── [x] Firebase FCM للأندرويد
-   ├── [x] الدروس الإسلامية
-   ├── [x] تقسيم المعاملات قادمة/مكتملة
-   ├── [x] لوغو SVG
-   ├── [x] Push Notifications على Android APK
-   ├── [x] RTL كامل + Bottom Nav صحيح
-   ├── [x] Lazy Loading — أداء أفضل بـ 94%
-   ├── [x] Refactoring — كود نظيف ومنظم
-   ├── [x] نظام شهادات المستخدمين
-   ├── [x] دروس يومية ذكية مخصصة بالمرحلة المالية
-   ├── [x] مبنية على أبحاث أكاديمية موثوقة
-   ├── [x] ثنائية اللغة — عربي وإنجليزي
-   ├── [x] كشف لغة وثيم الجهاز تلقائياً
-   ├── [x] هوية المشروع — Fajrak، Tagline، رؤية إسلامية
-   ├── [x] Landing Page — قسم الرؤية + عرض أول 100 مشترك
-   ├── [x] Bottom Nav — 3 عناصر فقط
-   ├── [x] RTL/LTR كامل في كل الصفحات
-   ├── [x] تحديث تلقائي للأسعار في الخلفية
-   ├── [x] ترجمة كاملة لكل النصوص
-   └── [x] النشر على متجر Google Play (اختبار مغلق)
-
-⏳ المرحلة الثالثة — Pro Features
-   ├── [ ] تقارير PDF شهرية
-   ├── [ ] نظام اشتراكات (Stripe)
-   └── [ ] OCR للفواتير
-```
-
----
-
-## 📱 PWA + Android
-
-- 🔔 Web Push للـ iOS + Firebase FCM للأندرويد ✅ مختبر ويعمل
-- 📦 APK مباشر عبر TWA
-- 🔗 [صفحة التنزيل](https://fajrak.com/download)
-
-
-التطبيق يعمل كـ **Progressive Web App** كامل:
-
-- 📲 قابل للتثبيت على Android و iOS
-- 🔔 إشعارات Push حتى مع إغلاق التطبيق
-- ⚡ أداء سريع مع Service Worker
-- 📦 [تحميل APK مباشر للأندرويد](https://github.com/Abdoocoder/financetracker/releases/latest/download/app-debug.apk)
-
----
-
-<div align="center">
-
-## 👨‍💻 المطور / Developer
-
-**عبدالله رافع — Abdoocoder**
-
-[![GitHub](https://img.shields.io/badge/GitHub-Abdoocoder-181717?style=for-the-badge&logo=github)](https://github.com/Abdoocoder)
-
----
-
-*بُني بـ ❤️ من الأردن للعالم العربي*
-*Built with ❤️ from Jordan for the Arab world*
-
-*"كل رحلة ثراء تبدأ بخطوة"*
-
-**© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
-
-</div>
-
-
-## سجل التغييرات
-
-### v3.10.0 — 2026-03-23 *(الإصدار الحالي)*
-- 🚀 **النشر على Google Play** — بناء حزمة التطبيق (.aab) وتقديمها للاختبار المغلق (Closed Testing) بنجاح.
-- ⚡ **تحسين محركات البحث والأداء (SEO)** — تحويل صفحة الهبوط (Landing Page) لتعمل بتقنية SSR وإضافة فهارس (Indexes) لقاعدة بيانات Supabase.
-- 🌍 **الترجمة والمظهر** — ترجمة كاملة لشاشات الديون، مسار الثروة، والإعدادات. إصلاح ألوان الوضع الفاتح (Light Mode).
-- 🛡️ **أمان محسّن** — تفعيل Row Level Security (RLS) على جدول `app_events` لسد الفجوات الأمنية.
-- 🏗️ **إعادة هيكلة الإعدادات** — تقسيم شاشة الإعدادات إلى مكونات أصغر (الملف الشخصي، الأصول، التفضيلات، الحساب).
-- ⚙️ **إصلاحات بناء Android** — حل مشكلة `afterEvaluate` في Gradle وتحسين عملية البناء.
-- 📊 **جاهزية الـ SaaS** — إتمام مراجعة شاملة للمشروع تغطي كلا المنصتين والأمان والعمليات.
-
-### v3.9.0 — 2026-03-22
-- 🏗️ **إعادة هيكلة الكود (Modular Architecture)** — إعادة بناء شاملة لجميع الشاشات الـ 9 الكبرى وتقسيمها إلى مكونات (Widgets) مستقلة وقابلة لإعادة الاستخدام لضمان أقصى درجات القابلية للصيانة.
-- 💎 **مبادرة الكود النظيف (Clean Code)** — حل أكثر من 30 تنبيهاً برمجياً (Lints)، وإصلاح الفجوات الأمنية في العمليات غير المتزامنة (Async Gaps)، والقضاء على جميع الأخطاء الوظيفية.
-- 🛡️ **فحص شامل للمشروع** — تم إجراء فحص صحة كامل للمشروع (التبعيات، الأنواع، التدقيق اللغوي).
-- ⚡ **بناء نسخة APK** — بناء وتحميل النسخة المستقرة والنهائية `app-release.apk` بنجاح (بحجم 55.2 ميجابايت).
-
-### v3.8.0 — 2026-03-20 *(الإصدار الحالي)*
-- 🛡️ **نظام معالجة الأخطاء الشامل** — أداة `ErrorHandler` لالتقاط جميع الأخطاء وتنبيه المستخدم بشكل لائق مع تسجيلها في التحليلات.
-- 📊 **نظام التحليلات (Analytics)** — تتبع تلقائي لفتح الشاشات والفعاليات المهمة داخل التطبيق عبر `AnalyticsService`.
-- 🎯 **تحسين تجربة الإعداد (Onboarding)** — إعادة بناء شاشات الترحيب لتكون تفاعلية ومتعددة الخطوات (PageView).
-- 🔧 **إصلاحات بناء شاملة** — حل جميع المشاكل التقنية في شاشات الاستثمارات والأهداف ولوحة التحكم والمعاملات.
-- 🔐 **دعم تتبع الأخطاء التفصيلي** — إضافة الـ StackTrace لتقارير الأخطاء للمساعدة في التطوير المستقبلي.
-- ⚡ **نسخة APK جاهزة** — بناء وتحميل نسخة `app-release.apk` بنجاح (حجم 54.5 ميجابايت).
-
-
-### v3.7.0 — 2026-03-20 *(الإصدار الحالي)*
-- 🌍 **ثنائية لغة Flutter كاملة** — ar.json + en.json
-- 📊 **خدمة Analytics** — تتبع سلوك المستخدم
-- 🛡️ **معالج الأخطاء** — try/catch شامل في جميع الشاشات
-- 🎓 **Onboarding محسّن** — تجربة أول مستخدم كاملة
-- 💬 **بطاقة الشهادات** — قصص نجاح المستخدمين
-- 🗺️ **خارطة الثروة** — widget مسار الثروة المرئي
-- 🏅 **شبكة الشارات** — عرض الإنجازات
-- 🆘 **شاشة المساعدة** — مركز مساعدة داخل التطبيق
-- 🔑 **شاشة إعادة كلمة المرور** — تدفق كامل
-- 🔧 **سكريبتات الترجمة** — أدوات استخراج وتطبيق الترجمة
-
-
-### v3.8.0 — 2026-03-20 *(الإصدار الحالي)*
-- 🛡️ **نظام معالجة الأخطاء الشامل** — أداة `ErrorHandler` لالتقاط جميع الأخطاء وتنبيه المستخدم بشكل لائق مع تسجيلها في التحليلات.
-- 📊 **نظام التحليلات (Analytics)** — تتبع تلقائي لفتح الشاشات والفعاليات المهمة داخل التطبيق عبر `AnalyticsService`.
-- 🎯 **تحسين تجربة الإعداد (Onboarding)** — إعادة بناء شاشات الترحيب لتكون تفاعلية ومتعددة الخطوات (PageView).
-- 🔧 **إصلاحات بناء شاملة** — حل جميع المشاكل التقنية في شاشات الاستثمارات والأهداف ولوحة التحكم والمعاملات.
-- 🔐 **دعم تتبع الأخطاء التفصيلي** — إضافة الـ StackTrace لتقارير الأخطاء للمساعدة في التطوير المستقبلي.
-- ⚡ **نسخة APK جاهزة** — بناء وتحميل نسخة `app-release.apk` بنجاح (حجم 54.5 ميجابايت).
-
-
-### v3.7.0 — 2026-03-20
-- 🌟 **تطابق 100% بين الموبايل والويب** — تحقيق تطابق شامل بين تطبيق Flutter الأندرويد الأصلي وتطبيق الويب.
-- 🛠️ **تحسينات لوحة التحكم (Dashboard)** — إضافة شبكة الأوسمة والإنجازات وبطاقات مقارنة الشهر الماضي.
-- 💸 **تصدير تقارير CSV** — دعم كامل لإنشاء ومشاركة تقارير المعاملات (UTF-8) من داخل الموبايل مباشرة.
-- 🎓 **خارطة طريق التعلم** — دمج الخريطة المرئية للمراحل المالية الخمسة داخل شاشة التعلم.
-- 🤖 **مستشار الادخار الذكي** — ربط المستشار المالي (Budget Advisor) بتتبع نسبة إنجاز أهداف الادخار وتشجيع المستخدم.
-- ⚙️ **التفضيلات الشخصية** — دعم تبديل الوضع الليلي/النهاري وتحويل العملات (JOD/USD) بشكل سلس ولحظي.
-
-
-### v3.6.0 — 2026-03-20
-- 🎯 **تحديات ذكية** — محسوبة تلقائياً من بيانات المستخدم الحقيقية، مطابقة لمنطق الويب
-- 📊 **بطاقة الرسوم البيانية** — رسوم بيانية حقيقية للـ 6 أشهر من Supabase
-- 💼 **بطاقة تقدم الميزانية** — تتبع الميزانية الحقيقية مع أشرطة التقدم
-- 🏆 **بطاقة الإنجازات** — مستويات ونقاط ديناميكية من نقاط الصحة المالية
-- 🔗 **روابط سريعة** — مجاميع حقيقية للديون والاستثمارات والمدخرات
-- 🚀 **محاكي الثروة** — حساب فوري للقيمة المستقبلية
-- 🗄️ **جدول saving_challenges** — تم إنشاؤه في Supabase مع RLS
-- 📱 **Dashboard مطابق 100%** — Flutter يطابق الويب بالكامل
-- ⚡ **95% بيانات حقيقية** — جميع البطاقات تستخدم بيانات Supabase مباشرة
-
-
-### v3.5.1 — 2026-03-20 *(الإصدار الحالي)*
-- 📈 **شاشة الاستثمارات كاملة** — ملخص المحفظة، محاكي الثروة، شارة الحلال، نموذج إضافة
-- 📊 **شاشة الميزانية كاملة** — قاعدة 50/30/20، حدود الميزانية لكل فئة، تفصيل الإنفاق
-- 🎯 **شاشة الأهداف كاملة** — زر إضافة مبلغ، تتبع التقدم، الموعد النهائي، شريط التقدم الكلي
-- 🎨 **أيقونة فجرك** — أيقونة مخصصة لجميع كثافات Android
-- 🔧 **إصلاح بناء Flutter** — خطأ const expression في شاشة الاستثمارات
-
-
-### v3.5.0 — 2026-03-20 *(الإصدار الحالي)*
-- 💳 **دين مستلم كدخل** — checkbox لإضافة القرض المستلم كمعاملة دخل تلقائياً
-- 💎 **صافي الثروة الكامل** — رصيد نقدي + مدخرات + استثمارات + أصول - ديون
-- 📱 **مراجعة Flutter كاملة** — ثيم داكن + AppBar موحد لجميع الشاشات
-- 🔑 **شاشة نسيان كلمة المرور** — Flutter forgot password flow
-- 🏆 **شاشات الدروس والإنجازات** — دروس يومية + شارات في Flutter
-- 📊 **Dashboard Flutter محسّن** — نقاط الصحة + إضافة سريعة + المرحلة المالية
-- 🎨 **أيقونة فجرك** — استبدال أيقونة Flutter الافتراضية بأيقونة فجرك
-- ✅ **بناء Flutter ناجح** — حل جميع تعارضات المكتبات
-- 🏪 **حساب Google Play** — إنشاء حساب مطور SamaCode
-
-
-### v3.4.0 — 2026-03-19 *(الإصدار الحالي)*
-- 📚 **اختيار الدروس الذكي** — الدروس تُختار بناءً على بيانات المستخدم الحقيقية
-- 🧠 **25 درس علمي جديد** — علم السلوك المالي، الأعصاب، استراتيجيات مثبتة لكل مرحلة
-- 🕌 **دروس المال الحرام** — 8 أحاديث مرتبطة بمرحلة الاستثمار
-- 📊 **تقرير أسبوعي محسّن** — يشمل المرحلة، الخطوة التالية، السلسلة، أكثر فئة إنفاق
-- 📋 **تنبيه أسبوعي مفصّل** — يُضاف داخل التطبيق كل جمعة بملخص مالي كامل
-
-
-### v3.3.0 — 2026-03-19 *(الإصدار الحالي)*
-- 📖 **بنك الدروس الإسلامية** — تحذيرات من المال الحرام + دروس الديون مرتبطة بالمراحل
-- 🎓 **سلسلة الدروس في Supabase** — محفوظة دائماً ومتزامنة بين الأجهزة
-- 🏆 **شارات الدروس** — lesson_3 وlesson_7 وlesson_30 في نظام الإنجازات
-- 🔔 **تنقل التنبيهات** — الضغط على تنبيه يحول للصفحة المعنية
-- 🔄 **المعاملات المتكررة في Cron** — تُشغَّل يومياً الساعة 9 ص
-- 💳 **واجهة نوع الدفع المتكرر** — تلقائي من البنك أو تذكير يدوي
-- 🔐 **استمرارية الجلسة** — autoRefreshToken + persistSession
-- 🏦 **Push للخصم التلقائي** — إشعار فوري عند كل خصم
-
-
-### v3.2.0 — 2026-03-18 *(الإصدار الحالي)*
-- 🏦 **اختيار نوع الدفع المتكرر** — تلقائي من البنك أو تذكير يدوي
-- 🔔 **Push للمعاملات التلقائية** — إشعار فوري عند كل تسجيل تلقائي
-- 🔄 **تحسين التحقق من التكرار** — منع التكرار بدقة أعلى
-- 🔐 **استمرارية الجلسة** — autoRefreshToken + persistSession
-- 💳 **Push للخصم التلقائي** — إشعار فوري عند كل خصم دين
-
-
-### v3.1.0 — 2026-03-18 *(الإصدار الحالي)*
-- 🔄 المعاملات المتكررة التلقائية
-- 💳 نظام الديون المحسّن
-- 🔔 Push للخصم التلقائي
-- 🔐 إصلاح Password Reset
