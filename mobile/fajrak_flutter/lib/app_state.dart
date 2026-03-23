@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AppState extends ChangeNotifier {
   bool _isDarkMode = true;
@@ -25,6 +26,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _updateBadge() async {
+    if (kIsWeb) return;
     if (await FlutterAppBadger.isAppBadgeSupported()) {
       if (_unreadAlerts > 0) {
         FlutterAppBadger.updateBadgeCount(_unreadAlerts);

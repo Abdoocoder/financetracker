@@ -604,5 +604,17 @@
   "duration": "Duration",
   "annualReturn": "Annual Return",
   "youInvested": "You invested",
-  "compoundNote": "Based on compound interest. Actual returns may vary."
+  "compoundNote": "Based on compound interest. Actual returns may vary.",
+  "dash_my_budgets": "My Budgets",
+  "dash_spending_by_category": "Spending by Category",
+  "dash_rule_503020": "50/30/20 Rule",
+  "dash_rule_apply": "Apply Rule",
+  "dash_rule_necessities": "Necessities",
+  "dash_rule_wants": "Wants",
+  "dash_rule_savings": "Savings & Investments",
+  "health_score": "Financial Health Score",
+  "quick_add_title": "Quick Add",
+  "wealth_title": "Wealth Simulator",
+  "wealth_monthly_investment": "Monthly Investment",
+  "wealth_expected_years": "Expected Years"
 }
