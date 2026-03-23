@@ -57,15 +57,20 @@ android/app/google-services.json
 
 > ⚠️ **ملاحظة:** هذا الملف مُدرج في `.gitignore` ولن يُرفع على GitHub
 
-### 4. متغيرات البيئة (اختياري)
+### 4. متغيرات البيئة (Environment Variables)
 
-بشكل افتراضي يستخدم التطبيق قيم Supabase المضمّنة. لتخصيصها:
+يعتمد التطبيق الآن بشكل كامل على ملف `.env` لإدارة الإعدادات الحساسة. قم بنسخ `.env.example` وتعبئته:
 
 ```bash
-flutter run \
-  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=your_anon_key
+cp .env.example .env
 ```
+
+تأكد من تعبئة القيم التالية:
+- `SUPABASE_URL` و `SUPABASE_ANON_KEY`
+- `FLUTTER_FIREBASE_API_KEY` (لنسخة الويب)
+- `TWELVE_DATA_KEY` (لتحديث أسعار الأسهم)
+
+> 🔐 **تنبيه أمني:** تم تشفير وإزالة جميع المفاتيح البرمجية (Hardcoded) من الكود المصدري لضمان أعلى مستويات الأمان.
 
 ---
 
@@ -145,6 +150,7 @@ lib/
 | **Budgets & Alerts** | تحليل تلقائي، AI Advisor | ✅ 100% |
 | **Core Systems** | ErrorHandler، AnalyticsService | ✅ 100% |
 | **Onboarding** | 4 خطوات تفاعلية (PageView) | ✅ 100% |
+| **Modern UI** | تصميم عصري مع تدرجات لونية (Gradients) | ✅ جديد |
 
 ---
 
