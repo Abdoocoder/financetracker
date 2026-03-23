@@ -184,10 +184,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       final file = File('${dir.path}/fajrak_transactions_$ts.csv');
       await file.writeAsString('\u{feff}${buffer.toString()}', encoding: utf8);
 
-      await Share.shareXFiles(
-        [XFile(file.path, mimeType: 'text/csv')],
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(file.path, mimeType: 'text/csv')],
         subject: 'trans_title'.tr(),
-      );
+      ));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

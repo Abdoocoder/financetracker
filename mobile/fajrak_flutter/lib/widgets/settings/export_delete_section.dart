@@ -62,13 +62,13 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
         '${directory.path}/fajrak_export_${DateTime.now().millisecondsSinceEpoch}.csv');
     await file.writeAsString('\uFEFF${buffer.toString()}');
 
-    await Share.shareXFiles([XFile(file.path)], subject: 'settings_export_msg'.tr());
+    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], subject: 'settings_export_msg'.tr()));
     if (mounted) setState(() => _loading = false);
   }
 
   void _shareApp() {
     final text = 'settings_share_msg'.tr();
-    Share.share(text);
+    SharePlus.instance.share(ShareParams(text: text));
   }
 
   Future<void> _deleteAccount() async {
@@ -190,9 +190,8 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                       : () async {
                           setState(() => _loggingOut = true);
                           await Supabase.instance.client.auth.signOut();
-                          if (mounted) {
-                            Navigator.pushReplacementNamed(context, '/login');
-                          }
+                          if (!context.mounted) return;
+                          Navigator.pushReplacementNamed(context, '/login');
                         },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFEF4444),

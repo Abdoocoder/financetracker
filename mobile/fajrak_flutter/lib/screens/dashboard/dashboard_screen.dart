@@ -16,7 +16,6 @@ import '../../widgets/dashboard/dashboard_health_score.dart';
 import '../../widgets/dashboard/dashboard_quick_add.dart';
 import '../../widgets/dashboard/dashboard_stage_card.dart';
 import '../../widgets/dashboard/recent_transactions_list.dart';
-import '../../services/currency_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

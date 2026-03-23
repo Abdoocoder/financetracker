@@ -251,8 +251,9 @@ class _LearnScreenState extends State<LearnScreen> {
         _streak = newStreak;
       });
 
+      if (!mounted) return;
       final cs = Theme.of(context).colorScheme;
-      if (mounted && newStreak % 7 == 0) {
+      if (newStreak % 7 == 0) {
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
