@@ -604,5 +604,17 @@
   "duration": "المدة",
   "annualReturn": "العائد السنوي",
   "youInvested": "استثمرت أنت",
-  "compoundNote": "بناءً على الفائدة المركبة. العوائد الحقيقية قد تختلف."
+  "compoundNote": "بناءً على الفائدة المركبة. العوائد الحقيقية قد تختلف.",
+  "dash_my_budgets": "ميزانياتي",
+  "dash_spending_by_category": "الإنفاق حسب الفئة",
+  "dash_rule_503020": "قاعدة 50/30/20",
+  "dash_rule_apply": "تطبيق القاعدة",
+  "dash_rule_necessities": "الضروريات",
+  "dash_rule_wants": "الرغبات",
+  "dash_rule_savings": "الادخار والاستثمار",
+  "health_score": "درجة الصحة المالية",
+  "quick_add_title": "إضافة سريعة",
+  "wealth_title": "محاكي الثروة",
+  "wealth_monthly_investment": "الاستثمار الشهري",
+  "wealth_expected_years": "السنوات المتوقعة"
 }
