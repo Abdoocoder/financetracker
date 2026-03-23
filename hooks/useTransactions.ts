@@ -1,5 +1,5 @@
 'use client'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
@@ -62,7 +62,13 @@ export function useTransactions() {
 
   const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
+
+  function parseNumber(value: string | number | undefined, fallback = 0): number {
+    if (value === undefined || value === null || value === '') return fallback;
+    if (typeof value === 'number') return value;
+    return parseFloat(value.toString().replace(",", ".")) || fallback
+  }
 
   // جلب سعر الصرف تلقائياً
   useEffect(() => {
@@ -82,8 +88,8 @@ export function useTransactions() {
 
   // تحديث المبلغ المعادل (Amount) تلقائياً
   useEffect(() => {
-    const orig = parseFloat(form.original_amount.replace(",", ".")) || 0
-    const rate = parseFloat(form.exchange_rate.replace(",", ".")) || 1
+    const orig = parseNumber(form.original_amount)
+    const rate = parseNumber(form.exchange_rate, 1)
     const baseAmount = (orig * rate).toFixed(2)
     setForm(f => ({ ...f, amount: baseAmount }))
   }, [form.original_amount, form.exchange_rate])
@@ -145,14 +151,14 @@ export function useTransactions() {
     setErrors({})
     setSaving(true)
     const user = currentUser
-    if (!user) return
+    if (!user) { setSaving(false); return }
     if (editingId) {
       const { error } = await supabase.from('transactions').update({
         type: form.type, 
-        amount: parseFloat(form.amount.replace(",", ".")),
-        original_amount: parseFloat(form.original_amount.replace(",", ".")),
+        amount: parseNumber(form.amount),
+        original_amount: parseNumber(form.original_amount),
         original_currency: form.original_currency,
-        exchange_rate: parseFloat(form.exchange_rate.replace(",", ".")),
+        exchange_rate: parseNumber(form.exchange_rate, 1),
         category: form.category, description: form.description,
         transaction_date: form.transaction_date,
       }).eq('id', editingId)
@@ -161,10 +167,10 @@ export function useTransactions() {
     } else {
       const { error } = await supabase.from('transactions').insert({
         user_id: user.id, type: form.type, 
-        amount: parseFloat(form.amount.replace(",", ".")),
-        original_amount: parseFloat(form.original_amount.replace(",", ".")),
+        amount: parseNumber(form.amount),
+        original_amount: parseNumber(form.original_amount),
         original_currency: form.original_currency,
-        exchange_rate: parseFloat(form.exchange_rate.replace(",", ".")),
+        exchange_rate: parseNumber(form.exchange_rate, 1),
         category: form.category, description: form.description,
         transaction_date: form.transaction_date,
       })
@@ -228,17 +234,19 @@ export function useTransactions() {
     URL.revokeObjectURL(url)
   }
 
-  const searched = search.trim()
-    ? transactions.filter(t =>
-        t.description?.toLowerCase().includes(search.toLowerCase()) ||
-        t.category?.toLowerCase().includes(search.toLowerCase()) ||
-        String(t.amount).includes(search))
-    : transactions
+  const searched = useMemo(() => {
+    return search.trim()
+      ? transactions.filter(t =>
+          t.description?.toLowerCase().includes(search.toLowerCase()) ||
+          t.category?.toLowerCase().includes(search.toLowerCase()) ||
+          String(t.amount).includes(search))
+      : transactions
+  }, [transactions, search])
 
-  const filtered = searched.filter(tx => filter === 'all' || tx.type === filter)
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-  const net = totalIncome - totalExpense
+  const filtered = useMemo(() => searched.filter(tx => filter === 'all' || tx.type === filter), [searched, filter])
+  const totalIncome = useMemo(() => transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), [transactions])
+  const totalExpense = useMemo(() => transactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0), [transactions])
+  const net = useMemo(() => totalIncome - totalExpense, [totalIncome, totalExpense])
 
   return {
     transactions, filtered, loading, saving, deletingId,

@@ -13,12 +13,15 @@ class AppState extends ChangeNotifier {
   Locale get locale => _locale;
   int get unreadAlerts => _unreadAlerts;
 
+  SharedPreferences? _prefs;
+  Future<SharedPreferences> get _sharedPrefs async => _prefs ??= await SharedPreferences.getInstance();
+
   AppState() {
     _loadPrefs();
   }
 
   Future<void> _loadPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _sharedPrefs;
     _isDarkMode = prefs.getBool('darkMode') ?? true;
     final lang = prefs.getString('language_code') ?? 'ar';
     _locale = Locale(lang);
@@ -45,7 +48,7 @@ class AppState extends ChangeNotifier {
           .select('id')
           .eq('user_id', user.id)
           .eq('is_read', false);
-      _unreadAlerts = (res as List).length;
+      _unreadAlerts = res.length;
       _updateBadge();
       notifyListeners();
     } catch (_) {}
@@ -68,14 +71,14 @@ class AppState extends ChangeNotifier {
   Future<void> setTheme(bool isDark) async {
     _isDarkMode = isDark;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _sharedPrefs;
     await prefs.setBool('darkMode', isDark);
   }
 
   Future<void> setLocale(Locale locale) async {
     _locale = locale;
     notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
+    final prefs = await _sharedPrefs;
     await prefs.setString('language_code', locale.languageCode);
   }
 }
