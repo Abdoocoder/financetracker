@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n'
+import type { Transaction } from '@/types'
 
 export function MonthCompareCard({ income, expenses, prevIncome, prevExpenses }: { income: number; expenses: number; prevIncome: number; prevExpenses: number }) {
   const { t, lang } = useI18n()
@@ -26,7 +27,7 @@ export function MonthCompareCard({ income, expenses, prevIncome, prevExpenses }:
   )
 }
 
-export function BudgetProgressCard({ income, expenses, net }: { income: number; expenses: number; net: number }) {
+export function BudgetProgressCard({ income, expenses, net, currency = 'JOD' }: { income: number; expenses: number; net: number; currency?: string }) {
   const { lang } = useI18n()
   if (!income) return null
   const spendPct = Math.min((expenses / income) * 100, 100)
@@ -41,8 +42,8 @@ export function BudgetProgressCard({ income, expenses, net }: { income: number; 
         <div style={{ height: '100%', width: `${spendPct}%`, borderRadius: 4, background: spendColor, transition: 'width 0.5s ease' }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Income' : 'الدخل'}: {income.toFixed(0)} JOD</span>
-        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: {Math.max(0, net).toFixed(0)} JOD</span>
+        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Income' : 'الدخل'}: {income.toFixed(0)} {currency}</span>
+        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: {Math.max(0, net).toFixed(0)} {currency}</span>
       </div>
     </div>
   )
@@ -106,7 +107,7 @@ export function WealthSimulatorCard({ net, lang }: { net: number; lang: string }
   )
 }
 
-export function RecentTransactionsCard({ transactions, lang }: { transactions: any[]; lang: string }) {
+export function RecentTransactionsCard({ transactions, lang }: { transactions: Pick<Transaction, 'id' | 'type' | 'amount' | 'category' | 'description' | 'transaction_date'>[]; lang: string }) {
   const { t } = useI18n()
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>

@@ -17,7 +17,6 @@ import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
 import 'services/notification_service.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -48,11 +47,11 @@ void main() async {
   if (kIsWeb) {
     // Web configuration
     await Firebase.initializeApp(
-      options: const FirebaseOptions(
-        apiKey: 'AIzaSyBPk_y0RKpYsWe31u_oksx6G6woOhj3Ypw',
-        appId: '1:621650342599:web:48c4fa949ef940c4b844e2',
-        messagingSenderId: '621650342599',
-        projectId: 'fajrak-f7df1',
+      options: FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_WEB_API_KEY'] ?? 'AIzaSyBPk_y0RKpYsWe31u_oksx6G6woOhj3Ypw',
+        appId: dotenv.env['FIREBASE_WEB_APP_ID'] ?? '1:621650342599:web:48c4fa949ef940c4b844e2',
+        messagingSenderId: dotenv.env['FIREBASE_SENDER_ID'] ?? '621650342599',
+        projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1',
       ),
     );
   } else {
@@ -118,7 +117,7 @@ class FajrakApp extends StatelessWidget {
     return MaterialApp(
       title: 'فجرك',
       debugShowCheckedModeBanner: false,
-      theme: appState.isDarkMode ? _buildDarkTheme() : _buildLightTheme(),
+      theme: _buildTheme(appState.isDarkMode ? Brightness.dark : Brightness.light),
       locale: context.locale, // Use context.locale from EasyLocalization
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,
@@ -135,134 +134,79 @@ class FajrakApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildDarkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF070B14),
-      colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF3B7EF6),
-        secondary: Color(0xFF10B981),
-        surface: Color(0xFF0F1629),
-        onSurface: Colors.white,
-        onSurfaceVariant: Color(0xFF94A3B8),
-        outlineVariant: Color(0xFF1E293B),
-        error: Color(0xFFEF4444),
-      ),
-      dividerColor: const Color(0xFF1E293B),
-      fontFamily: 'Cairo',
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF070B14),
-        elevation: 0,
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Cairo',
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-        ),
-      ),
-      cardTheme: CardThemeData(
-        color: const Color(0xFF0F1629),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFF1E293B)),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFF0F1629),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF1E293B)),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF1E293B)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3B7EF6)),
-        ),
-        labelStyle: const TextStyle(color: Color(0xFF94A3B8)),
-        hintStyle: const TextStyle(color: Color(0xFF475569)),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF3B7EF6),
-          foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 52),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          textStyle: const TextStyle(
-            fontFamily: 'Cairo',
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
+  ThemeData _buildTheme(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
+    
+    final primary = const Color(0xFF3B7EF6);
+    final secondary = const Color(0xFF10B981);
+    final error = const Color(0xFFEF4444);
+    
+    final scaffoldBg = isDark ? const Color(0xFF070B14) : const Color(0xFFF8FAFC);
+    final surface = isDark ? const Color(0xFF0F1629) : Colors.white;
+    final onSurface = isDark ? Colors.white : const Color(0xFF0F172A);
+    final onSurfaceVariant = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final outlineVariant = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
 
-  ThemeData _buildLightTheme() {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF8FAFC),
-      colorScheme: const ColorScheme.light(
-        primary: Color(0xFF3B7EF6),
-        secondary: Color(0xFF10B981),
-        surface: Colors.white,
-        onSurface: Color(0xFF0F172A),
-        onSurfaceVariant: Color(0xFF64748B),
-        outlineVariant: Color(0xFFE2E8F0),
-        error: Color(0xFFEF4444),
+      brightness: brightness,
+      scaffoldBackgroundColor: scaffoldBg,
+      colorScheme: ColorScheme(
+        brightness: brightness,
+        primary: primary,
+        onPrimary: Colors.white,
+        secondary: secondary,
+        onSecondary: Colors.white,
+        error: error,
+        onError: Colors.white,
+        surface: surface,
+        onSurface: onSurface,
+        onSurfaceVariant: onSurfaceVariant,
+        outlineVariant: outlineVariant,
       ),
-      dividerColor: const Color(0xFFE2E8F0),
+      dividerColor: outlineVariant,
       fontFamily: 'Cairo',
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFF8FAFC),
+      appBarTheme: AppBarTheme(
+        backgroundColor: scaffoldBg,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: Color(0xFF0F172A)),
+        iconTheme: IconThemeData(color: onSurface),
         titleTextStyle: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF0F172A),
+          color: onSurface,
         ),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Color(0xFFE2E8F0)),
+          side: BorderSide(color: outlineVariant),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3B7EF6)),
+          borderSide: BorderSide(color: primary),
         ),
-        labelStyle: const TextStyle(color: Color(0xFF64748B)),
-        hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+        labelStyle: TextStyle(color: onSurfaceVariant),
+        hintStyle: TextStyle(color: isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF3B7EF6),
+          backgroundColor: primary,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 52),
           shape: RoundedRectangleBorder(

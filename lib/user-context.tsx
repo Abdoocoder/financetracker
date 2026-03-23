@@ -19,12 +19,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const supabase = createClient()
 
   useEffect(() => {
+    async function fetchProfile(userId: string) {
+      const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+      setProfile(data)
+    }
+
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
       if (user) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        setProfile(data)
+        await fetchProfile(user.id)
       }
       setLoading(false)
     }
@@ -34,8 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const newUser = session?.user ?? null
       setUser(newUser)
       if (newUser) {
-        const { data } = await supabase.from('profiles').select('*').eq('id', newUser.id).single()
-        setProfile(data)
+        await fetchProfile(newUser.id)
       } else {
         setProfile(null)
       }

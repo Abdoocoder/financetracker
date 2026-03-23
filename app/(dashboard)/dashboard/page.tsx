@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link                           from 'next/link'
 import { createClient }               from '@/lib/supabase/client'
 import { useUser }                    from '@/lib/user-context'
@@ -104,13 +104,41 @@ function DashSkeleton() {
 }
 
 // ── useDashboardData ──────────────────────────────────────────────
+const CACHE_TTL_MS = 2 * 60 * 1000
+
+export interface DashboardData {
+  income: number
+  expenses: number
+  months6: Array<{ month: string; income: number; expense: number }>
+  categories: [string, number][]
+  net: number
+  prevIncome: number
+  prevExpenses: number
+  totalDebt: number
+  invValue: number
+  goalsSaved: number
+  goalsTarget: number
+  unreadAlerts: number
+  txCount: number
+  name: string
+}
+
+function computeHealthScore(data: DashboardData | null, income: number, expenses: number): number {
+  if (!data) return 0;
+  const metrics = (income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) 
+    + (data.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data.totalDebt / Math.max(income * 12, 1)) * 25))) 
+    + Math.min(20, Math.round((data.goalsSaved / Math.max(income * 3, 1)) * 20)) 
+    + (data.invValue > 0 ? 15 : 0) 
+    + Math.min(10, data.txCount);
+  return Math.min(100, Math.round(metrics));
+}
+
 function useDashboardData() {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<DashboardData | null>(null)
   const [recentTx, setRecentTx] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const { user: currentUser } = useUser()
-  const supabase = createClient()
-  const CACHE_TTL = 2 * 60 * 1000
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     if (!currentUser) return
@@ -120,7 +148,7 @@ function useDashboardData() {
       const cached = sessionStorage.getItem(CACHE_KEY)
       if (cached) {
         const { data: cd, recentTx: cr, ts } = JSON.parse(cached)
-        if (Date.now() - ts < CACHE_TTL) { setData(cd); setRecentTx(cr); setLoading(false); return }
+        if (Date.now() - ts < CACHE_TTL_MS) { setData(cd); setRecentTx(cr); setLoading(false); return }
       }
     } catch {}
 
@@ -144,12 +172,12 @@ function useDashboardData() {
       txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
       const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
 
-      setData({ income, expenses, categories, net: income - expenses, prevIncome: 0, prevExpenses: 0, months6: [], totalDebt: 0, invValue: 0, goalsSaved: 0, goalsTarget: 0, unreadAlerts: alertRes.count ?? 0, name: profileName })
+      setData({ income, expenses, categories, net: income - expenses, prevIncome: 0, prevExpenses: 0, months6: [], totalDebt: 0, invValue: 0, goalsSaved: 0, goalsTarget: 0, unreadAlerts: alertRes.count ?? 0, name: profileName, txCount: 0 })
       setLoading(false)
-      fetchPhase2(income, expenses, categories, alertRes.count ?? 0)
+      fetchPhase2(income, expenses, categories, alertRes.count ?? 0, profileName)
     }
 
-    async function fetchPhase2(income: number, expenses: number, categories: [string, number][], unreadAlerts: number) {
+    async function fetchPhase2(income: number, expenses: number, categories: [string, number][], unreadAlerts: number, name: string) {
       const [debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
         supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
@@ -174,13 +202,14 @@ function useDashboardData() {
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts,
         txCount: (chartRes.data ?? []).length,
+        name,
       }
       setData(newData); setRecentTx(recentRes.data ?? [])
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch {}
     }
 
     fetchPhase1()
-  }, [currentUser, CACHE_TTL, supabase])
+  }, [currentUser, supabase])
 
   return { data, setData, recentTx, loading, supabase }
 }
@@ -213,7 +242,7 @@ export default function DashboardPage() {
         </div>
         {(data?.unreadAlerts ?? 0) > 0 && (
           <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
-            🔔 {data.unreadAlerts}
+            🔔 {data?.unreadAlerts}
           </Link>
         )}
       </div>
@@ -237,7 +266,7 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
-      <Section id="health" icon="💊" title={lang === 'en' ? `Financial Health Score — ${Math.min(100, Math.round(((income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) + (data?.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data?.totalDebt / Math.max(income * 12, 1)) * 25))) + Math.min(20, Math.round(((data?.goalsSaved ?? 0) / Math.max(income * 3, 1)) * 20)) + ((data?.invValue ?? 0) > 0 ? 15 : 0) + Math.min(10, data?.txCount ?? 0))))}%` : `نقاط الصحة المالية — ${Math.min(100, Math.round(((income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) + (data?.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data?.totalDebt / Math.max(income * 12, 1)) * 25))) + Math.min(20, Math.round(((data?.goalsSaved ?? 0) / Math.max(income * 3, 1)) * 20)) + ((data?.invValue ?? 0) > 0 ? 15 : 0) + Math.min(10, data?.txCount ?? 0))))}%`}>
+      <Section id="health" icon="💊" title={`${lang === 'en' ? 'Financial Health Score' : 'نقاط الصحة المالية'} — ${computeHealthScore(data, income, expenses)}%`}>
         <div style={{ padding: '12px 0 8px' }}>
           <FinancialHealthCombined
             income={income}
@@ -262,7 +291,7 @@ export default function DashboardPage() {
         const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
         const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
         try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch {}
-        setData((prev: any) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
+        setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
       }} />
 
       {/* الميزانية الشهرية — دائماً ظاهرة */}
@@ -284,10 +313,10 @@ export default function DashboardPage() {
       <Section id="charts" icon="📊" title={lang === 'en' ? 'Charts & Expense Breakdown' : 'الرسوم البيانية وتوزيع المصاريف'}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
           <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
-          {data?.months6?.some((m: any) => m.income > 0 || m.expense > 0) && (
+          {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && (
             <MiniBarChart data={data.months6} lang={lang} />
           )}
-          {data?.categories?.length > 0 && (
+          {data && data.categories.length > 0 && (
             <CategoryBars categories={data.categories} lang={lang} />
           )}
         </div>
