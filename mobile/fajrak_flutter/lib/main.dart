@@ -48,10 +48,10 @@ void main() async {
     // Web configuration
     await Firebase.initializeApp(
       options: FirebaseOptions(
-        apiKey: dotenv.env['FIREBASE_WEB_API_KEY'] ?? 'AIzaSyBPk_y0RKpYsWe31u_oksx6G6woOhj3Ypw',
-        appId: dotenv.env['FIREBASE_WEB_APP_ID'] ?? '1:621650342599:web:48c4fa949ef940c4b844e2',
-        messagingSenderId: dotenv.env['FIREBASE_SENDER_ID'] ?? '621650342599',
-        projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1',
+        apiKey: dotenv.env['FLUTTER_FIREBASE_API_KEY'] ?? '',
+        appId: dotenv.env['FLUTTER_FIREBASE_APP_ID'] ?? '',
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+        projectId: dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? '',
       ),
     );
   } else {
@@ -75,8 +75,8 @@ void main() async {
   }
 
   await Supabase.initialize(
-    url: supabaseUrl.isNotEmpty ? supabaseUrl : 'https://placeholder.supabase.co',
-    anonKey: supabaseAnonKey.isNotEmpty ? supabaseAnonKey : 'placeholder-key',
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   await NotificationService.initialize();
