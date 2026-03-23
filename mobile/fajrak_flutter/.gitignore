@@ -48,3 +48,8 @@ app.*.map.json
 *.jks
 *.keystore
 key.properties
+
+# Environment variables (DO NOT COMMIT SECRETS)
+.env
+.env.local
+.env.*.local

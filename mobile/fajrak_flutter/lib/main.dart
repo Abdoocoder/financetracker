@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'utils/error_handler.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
@@ -31,19 +32,30 @@ void main() async {
     statusBarIconBrightness: Brightness.light,
   ));
 
+  // Load environment variables from .env file
+  await dotenv.load(fileName: '.env');
+
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
+  // Get Supabase credentials from environment variables
+  final supabaseUrl = dotenv.env['SUPABASE_URL'];
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'];
+
+  if (supabaseUrl == null || supabaseAnonKey == null) {
+    // In development, you can set fallback values for local testing
+    // In production, these should always be set via environment variables
+    if (kDebugMode) {
+      throw Exception(
+        'Missing Supabase credentials. Please create a .env file based on .env.example',
+      );
+    }
+    rethrow;
+  }
+
   await Supabase.initialize(
-    url: const String.fromEnvironment(
-      'SUPABASE_URL',
-      defaultValue: 'https://ujwcvtpwsaidljecqbaa.supabase.co',
-    ),
-    anonKey: const String.fromEnvironment(
-      'SUPABASE_ANON_KEY',
-      defaultValue:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd2N2dHB3c2FpZGxqZWNxYmFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5OTUxNTQsImV4cCI6MjA4ODU3MTE1NH0.AgwLNG0i3srUCixr_b47of6ur7RlCZuUio7DivPzlCw',
-    ),
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
 
   await NotificationService.initialize();
