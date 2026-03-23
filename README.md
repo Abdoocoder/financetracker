@@ -192,9 +192,9 @@ npm run dev
 - [x] fajrak.com custom domain
 - [x] Global Error Handling + Analytics Service
 - [x] Improved Onboarding Experience (Multi-step PageView)
+- [x] Google Play Store Publishing (Closed Testing ✅)
 - [ ] Monthly PDF Reports
 - [ ] Subscription System (Paddle)
-- [ ] Google Play Store Publishing 🔄
 
 ---
 
@@ -224,6 +224,15 @@ npm run dev
 </div>
 
 ## Changelog
+
+### v3.10.0 — 2026-03-23 *(Latest)*
+- 🚀 **Google Play Publishing** — App bundle (.aab) successfully built and submitted for closed testing.
+- ⚡ **SEO & Performance** — Converted Next.js landing page to Server-Side Rendering (SSR) and implemented Supabase database indexes.
+- 🌍 **Localization & Theming** — 100% translation coverage for Debt, Roadmap, and Settings. Fixed Light Mode color schemes.
+- 🛡️ **Enhanced Security** — Enabled Row Level Security (RLS) on `public.app_events` telemetry table.
+- 🏗️ **Settings Refactoring** — Modularized the Settings screen into Profile, Assets, Preferences, and Account components.
+- ⚙️ **Android Build Fixes** — Resolved Gradle `afterEvaluate` evaluation issues and optimized the release pipeline.
+- 📊 **SaaS Readiness** — Completed a comprehensive project review covering Next.js, Flutter, Supabase, Security, and Operations.
 
 ### v3.9.0 — 2026-03-22
 - 🏗️ **Modular Architecture Refactoring** — Full overhaul of all 9 major screens into specialized, reusable widgets for maximum maintainability.
