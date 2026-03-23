@@ -109,232 +109,374 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    final theme = Theme.of(context);
+    
+    return Container(
       padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
           left: 20,
           right: 20,
-          top: 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
+          top: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
               child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(2)))),
-          const SizedBox(height: 16),
-          Center(
-              child: Text(
-                  widget.existing != null ? 'trans_edit'.tr() : 'trans_new'.tr(),
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      fontFamily: 'Cairo'))),
-          const SizedBox(height: 20),
-          ValueListenableBuilder<String>(
-            valueListenable: _typeController,
-            builder: (_, type, __) => Row(
-              children: [
-                Expanded(
-                    child: GestureDetector(
-                  onTap: () => _typeController.value = 'income',
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: type == 'income'
-                          ? const Color(0xFF10B981).withValues(alpha: 0.2)
-                          : const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: type == 'income'
-                              ? const Color(0xFF10B981)
-                              : Colors.transparent),
-                    ),
-                    child: Center(
-                        child: Text('trans_income'.tr(),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Cairo',
-                                fontWeight: FontWeight.w700))),
-                  ),
-                )),
-                const SizedBox(width: 8),
-                Expanded(
-                    child: GestureDetector(
-                  onTap: () => _typeController.value = 'expense',
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      color: type == 'expense'
-                          ? const Color(0xFFEF4444).withValues(alpha: 0.2)
-                          : const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                          color: type == 'expense'
-                              ? const Color(0xFFEF4444)
-                              : Colors.transparent),
-                    ),
-                    child: Center(
-                        child: Text('trans_expense'.tr(),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'Cairo',
-                                fontWeight: FontWeight.w700))),
-                  ),
-                )),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          ValueListenableBuilder<DateTime>(
-            valueListenable: _dateController,
-            builder: (_, date, __) => GestureDetector(
-              onTap: () async {
-                final picked = await showDatePicker(
-                    context: context,
-                    initialDate: date,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100));
-                if (picked != null) _dateController.value = picked;
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                width: 40,
+                height: 5,
                 decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(10)),
+                  color: theme.colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Center(
+              child: Text(
+                widget.existing != null ? 'trans_edit'.tr() : 'trans_new'.tr(),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  fontFamily: 'Cairo',
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            
+            // Toggle Type
+            ValueListenableBuilder<String>(
+              valueListenable: _typeController,
+              builder: (_, type, __) => Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today,
-                        color: Color(0xFF94A3B8), size: 18),
-                    const SizedBox(width: 12),
-                    Text(date.toIso8601String().split('T')[0],
-                        style: const TextStyle(
-                            color: Colors.white, fontFamily: 'Cairo')),
+                    _buildTypeToggle(
+                      label: 'trans_income'.tr(),
+                      isSelected: type == 'income',
+                      activeColor: const Color(0xFF10B981),
+                      onTap: () => _typeController.value = 'income',
+                    ),
+                    _buildTypeToggle(
+                      label: 'trans_expense'.tr(),
+                      isSelected: type == 'expense',
+                      activeColor: const Color(0xFFEF4444),
+                      onTap: () => _typeController.value = 'expense',
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: TextFormField(
-                  controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                  decoration: InputDecoration(labelText: 'trans_amount'.tr()),
+            const SizedBox(height: 24),
+
+            // Date Picker Field
+            _buildLabel('trans_date'.tr()),
+            ValueListenableBuilder<DateTime>(
+              valueListenable: _dateController,
+              builder: (_, date, __) => GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: date,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    builder: (context, child) => Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: theme.colorScheme.copyWith(
+                          primary: const Color(0xFF3B7EF6),
+                        ),
+                      ),
+                      child: child!,
+                    ),
+                  );
+                  if (picked != null) _dateController.value = picked;
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: theme.colorScheme.outlineVariant),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_month_rounded,
+                          color: Color(0xFF3B7EF6), size: 20),
+                      const SizedBox(width: 12),
+                      Text(
+                        DateFormat('yyyy-MM-dd').format(date),
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontFamily: 'Cairo',
+                          fontSize: 16,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.arrow_forward_ios_rounded, 
+                          color: Color(0xFF475569), size: 14),
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedCurrency,
-                      dropdownColor: const Color(0xFF1E293B),
-                      style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-                      items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                      onChanged: (v) {
-                        if (v != null) {
-                          setState(() => _selectedCurrency = v);
-                          _fetchRate();
-                        }
-                      },
+            ),
+            const SizedBox(height: 20),
+
+            // Amount & Currency
+            _buildLabel('trans_amount'.tr()),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: TextFormField(
+                    controller: _amountController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    style: const TextStyle(
+                      color: Colors.white, 
+                      fontFamily: 'Cairo', 
+                      fontSize: 18, 
+                      fontWeight: FontWeight.bold
+                    ),
+                    decoration: InputDecoration(
+                      hintText: '0.00',
+                      hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                      fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
                   ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 58,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: theme.colorScheme.outlineVariant),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedCurrency,
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
+                        dropdownColor: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        isExpanded: true,
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontFamily: 'Cairo', 
+                          fontWeight: FontWeight.bold
+                        ),
+                        items: ['JOD','USD','SAR','AED','EGP','TRY','EUR']
+                            .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                            .toList(),
+                        onChanged: (v) {
+                          if (v != null) {
+                            setState(() => _selectedCurrency = v);
+                            _fetchRate();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            if (_selectedCurrency != widget.baseCurrency) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                      theme.colorScheme.outlineVariant.withValues(alpha: 0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _exchangeRateController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            style: const TextStyle(color: Colors.white, fontSize: 14, fontFamily: 'Cairo'),
+                            decoration: InputDecoration(
+                              labelText: 'trans_exchange_rate'.tr(),
+                              labelStyle: const TextStyle(fontSize: 12),
+                              isDense: true,
+                              fillColor: Colors.transparent,
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                            ),
+                            onChanged: (v) => _isRateManual = true,
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 30,
+                          color: theme.colorScheme.outlineVariant,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('trans_equivalent'.tr(), 
+                                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${((double.tryParse(_amountController.text) ?? 0) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
+                                style: TextStyle(
+                                  color: theme.colorScheme.secondary, 
+                                  fontWeight: FontWeight.bold, 
+                                  fontSize: 16,
+                                  fontFamily: 'Cairo'
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-          if (_selectedCurrency != widget.baseCurrency) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1E293B).withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFF334155), width: 1),
+            const SizedBox(height: 20),
+
+            _buildLabel('trans_category'.tr()),
+            TextFormField(
+              controller: _catController,
+              style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+              decoration: InputDecoration(
+                hintText: 'e.g., Food, Transport...',
+                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _exchangeRateController,
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo'),
-                          decoration: InputDecoration(
-                            labelText: 'trans_exchange_rate'.tr(),
-                            labelStyle: const TextStyle(fontSize: 12),
-                            isDense: true,
-                          ),
-                          onChanged: (v) => _isRateManual = true,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('trans_equivalent'.tr(), style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10, fontFamily: 'Cairo')),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${((double.tryParse(_amountController.text) ?? 0) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
-                              style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+            ),
+            const SizedBox(height: 20),
+
+            _buildLabel('trans_description'.tr()),
+            TextFormField(
+              controller: _descController,
+              maxLines: 2,
+              style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+              decoration: InputDecoration(
+                hintText: 'Add a note (optional)',
+                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Save Button with Gradient
+            Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF3B7EF6), Color(0xFF06B6D4)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF3B7EF6).withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-            ),
-          ],
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _catController,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-            decoration: InputDecoration(labelText: 'trans_category'.tr()),
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _descController,
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
-            decoration: InputDecoration(labelText: 'trans_description'.tr()),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _save,
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B7EF6),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+              child: ElevatedButton(
+                onPressed: _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10))),
-              child: Text(widget.existing != null ? 'trans_save_edit'.tr() : 'trans_save'.tr(),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  widget.existing != null ? 'trans_save_edit'.tr() : 'trans_save'.tr(),
                   style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Cairo',
-                      color: Colors.white)),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: 'Cairo',
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8, right: 4),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: Color(0xFF94A3B8),
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Cairo',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeToggle({
+    required String label,
+    required bool isSelected,
+    required Color activeColor,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? activeColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: isSelected 
+              ? [BoxShadow(color: activeColor.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 2))]
+              : null,
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : const Color(0xFF94A3B8),
+                fontFamily: 'Cairo',
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                fontSize: 16,
+              ),
             ),
           ),
-          const SizedBox(height: 12),
-        ],
+        ),
       ),
     );
   }
