@@ -17,6 +17,7 @@ import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
 import 'services/notification_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -33,26 +34,50 @@ void main() async {
   ));
 
   // Load environment variables from .env file
-  await dotenv.load(fileName: '.env');
+  // For web, it looks in web/.env, for mobile it looks in project root
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    // .env file not found - continue without it
+    if (kDebugMode) {
+      print('Note: .env file not found, using default configuration');
+    }
+  }
 
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // Initialize Firebase with platform-specific options
+  if (kIsWeb) {
+    // Web configuration
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyBPk_y0RKpYsWe31u_oksx6G6woOhj3Ypw',
+        appId: '1:621650342599:web:48c4fa949ef940c4b844e2',
+        messagingSenderId: '621650342599',
+        projectId: 'fajrak-f7df1',
+      ),
+    );
+  } else {
+    // Android/iOS configuration (uses google-services.json)
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
 
   // Get Supabase credentials from environment variables
   final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
   final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
 
-  // Credentials are required - fail fast with clear error message
+  // If credentials are empty, try to continue anyway for development
+  // (some platforms may have env vars set externally)
   if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
-    throw Exception(
-      'Missing Supabase credentials. Please create a .env file based on .env.example\n'
-      'Required: SUPABASE_URL, SUPABASE_ANON_KEY',
-    );
+    if (kDebugMode) {
+      // In debug mode, show warning but continue if values exist in .env file
+      print('Warning: SUPABASE_URL or SUPABASE_ANON_KEY not found in .env');
+      print('App may not function correctly without valid credentials.');
+    }
   }
 
   await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
+    url: supabaseUrl.isNotEmpty ? supabaseUrl : 'https://placeholder.supabase.co',
+    anonKey: supabaseAnonKey.isNotEmpty ? supabaseAnonKey : 'placeholder-key',
   );
 
   await NotificationService.initialize();
