@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../config/secrets.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class InvestmentsService {
   static const Map<String, String> _cryptoIds = {
@@ -53,7 +53,7 @@ class InvestmentsService {
   static Future<double?> _getStockPrice(String symbol) async {
     try {
       final res = await http.get(Uri.parse(
-          'https://api.twelvedata.com/price?symbol=$symbol&apikey=${Secrets.twelveDataKey}'));
+          'https://api.twelvedata.com/price?symbol=$symbol&apikey=${dotenv.env['TWELVE_DATA_KEY']}'));
       if (res.statusCode == 200) {
         final data = json.decode(res.body);
         if (data['price'] != null) {
