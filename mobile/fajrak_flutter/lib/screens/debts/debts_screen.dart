@@ -32,7 +32,6 @@ class _DebtsScreenState extends State<DebtsScreen> {
   String _currency = 'JOD';
   double _totalPaidAmount = 0;
 
-  final List<String> _priorityLabels = [];
 
   @override
   void initState() {
