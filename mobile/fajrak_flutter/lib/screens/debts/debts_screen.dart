@@ -122,6 +122,13 @@ class _DebtsScreenState extends State<DebtsScreen> {
   }
 
   void _showAddDialog({Map<String, dynamic>? existing, List<String>? labels}) {
+    final defaultLabels = [
+      'priority_very_high'.tr(),
+      'priority_high'.tr(),
+      'priority_medium'.tr(),
+      'priority_low'.tr(),
+      'priority_deferred'.tr(),
+    ];
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -132,7 +139,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         existing: existing,
         onSaved: _load,
         priorityColors: _priorityColors,
-        priorityLabels: labels ?? _priorityLabels,
+        priorityLabels: labels ?? defaultLabels,
         baseCurrency: _currency,
       ),
     );
@@ -165,7 +172,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         actions: [
           IconButton(
               icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)),
-              onPressed: () => _showAddDialog())
+              onPressed: () => _showAddDialog(labels: priorityLabels))
         ],
       ),
       body: _loading
