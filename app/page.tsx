@@ -57,10 +57,9 @@ export default async function LandingPage() {
         </div>
         <div style={{ marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>🇯🇴🇸🇦🇦🇪🇪🇬🇲🇦🇰🇼🇶🇦🇧🇭 مصمم للعالم العربي</div>
 
-        {/* زر تنزيل Android */}
         <div style={{ marginTop: 28 }}>
-          <Link href="/download" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
-            📱 تطبيق Android — قريباً
+          <Link href="/download" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, background: 'rgba(59,126,246,0.08)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+            📱 تحميل تطبيق Android — متاح الآن ✨
           </Link>
         </div>
       </section>
