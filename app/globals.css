@@ -1,33 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════
-   FINANCE TRACKER — DARK LUXURY DESIGN SYSTEM v2
-   ═══════════════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
+/* ===================================================
+   FINANCE TRACKER - DARK LUXURY DESIGN SYSTEM v2
+   =================================================== */
 
 @layer base {
   :root {
-    /* ── Backgrounds ── */
+    /* --- Backgrounds --- */
     --bg-primary: #070B14;
     --bg-secondary: #0D1221;
     --bg-card: #111827;
     --bg-elevated: #162032;
     --bg-glass: rgba(17, 24, 39, 0.85);
 
-    /* ── Borders ── */
+    /* --- Borders --- */
     --border: rgba(255, 255, 255, 0.07);
     --border-light: rgba(255, 255, 255, 0.12);
     --border-hover: rgba(255, 255, 255, 0.15);
 
-    /* ── Text ── */
+    /* --- Text --- */
     --text-primary: #F0F4FF;
     --text-secondary: #8B9CC8;
     --text-muted: #4A5568;
 
-    /* ── Accent Colors ── */
+    /* --- Accent Colors --- */
     --accent-blue: #3B7EF6;
     --accent-blue-light: #6BA3FF;
     --accent-blue-glow: rgba(59, 126, 246, 0.25);
@@ -53,24 +53,24 @@
     --accent-purple-glow: rgba(139, 92, 246, 0.2);
     --accent-purple-dim: rgba(139, 92, 246, 0.1);
 
-    /* ── legacy aliases (backward compat) ── */
+    /* --- legacy aliases (backward compat) --- */
     --accent-yellow: #F59E0B;
     --accent-yellow-light: #FCD34D;
 
-    /* ── Radius ── */
+    /* --- Radius --- */
     --r-sm: 10px;
     --r-md: 16px;
     --r-lg: 20px;
     --r-xl: 28px;
 
-    /* ── Shadows ── */
+    /* --- Shadows --- */
     --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
     --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 }
 
 
-/* ═══ LIGHT MODE ═══════════════════════════════════ */
+/* === LIGHT MODE =================================== */
 [data-theme="light"] {
   --bg-primary: #F0F4FF;
   --bg-secondary: #E8EDF8;
@@ -115,7 +115,7 @@
   --shadow-elevated: 0 4px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* ═══ BASE RESET ═══════════════════════════════════ */
+/* === BASE RESET =================================== */
 @layer base {
 
   *,
@@ -140,7 +140,7 @@
     min-height: 100vh;
   }
 
-  /* ── Scrollbar ── */
+  /* --- Scrollbar --- */
   ::-webkit-scrollbar {
     width: 5px;
     height: 5px;
@@ -159,17 +159,17 @@
     background: var(--accent-blue);
   }
 
-  /* ── Selection ── */
+  /* --- Selection --- */
   ::selection {
     background: rgba(59, 126, 246, 0.35);
     color: white;
   }
 }
 
-/* ═══ COMPONENT CLASSES ════════════════════════════ */
+/* === COMPONENT CLASSES ============================ */
 @layer components {
 
-  /* ── Card ── */
+  /* --- Card --- */
   .card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -189,7 +189,7 @@
     border-radius: var(--r-lg);
   }
 
-  /* ── Gradients ── */
+  /* --- Gradients --- */
   .gradient-blue {
     background: linear-gradient(135deg, #3B7EF6 0%, #6366F1 100%);
   }
@@ -214,7 +214,7 @@
     background: linear-gradient(135deg, #3B7EF6 0%, #8B5CF6 50%, #EC4899 100%);
   }
 
-  /* ── Glow Effects ── */
+  /* --- Glow Effects --- */
   .glow-blue {
     box-shadow: 0 4px 20px var(--accent-blue-glow);
   }
@@ -235,7 +235,7 @@
     box-shadow: 0 4px 20px var(--accent-purple-glow);
   }
 
-  /* ── Badges ── */
+  /* --- Badges --- */
   .badge-blue {
     background: var(--accent-blue-dim);
     color: var(--accent-blue-light);
@@ -266,7 +266,7 @@
     border: 1px solid rgba(139, 92, 246, 0.2);
   }
 
-  /* ── Progress Bar ── */
+  /* --- Progress Bar --- */
   .progress-track {
     background: rgba(255, 255, 255, 0.06);
     border-radius: 999px;
@@ -288,7 +288,7 @@
     box-shadow: 0 0 12px rgba(59, 126, 246, 0.4);
   }
 
-  /* ── Icon Box ── */
+  /* --- Icon Box --- */
   .icon-box {
     display: flex;
     align-items: center;
@@ -322,7 +322,7 @@
     border: 1px solid rgba(139, 92, 246, 0.2);
   }
 
-  /* ── Stat Number ── */
+  /* --- Stat Number --- */
   .stat-value {
     font-size: 1rem;
     font-weight: 900;
@@ -331,7 +331,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* ── Input ── */
+  /* --- Input --- */
   .input-field {
     width: 100%;
     background: var(--bg-secondary);
@@ -348,14 +348,14 @@
     box-shadow: 0 0 0 3px var(--accent-blue-dim);
   }
 
-  /* ── Divider ── */
+  /* --- Divider --- */
   .divider {
     border: none;
     border-top: 1px solid var(--border);
   }
 }
 
-/* ═══ ANIMATIONS ════════════════════════════════════ */
+/* === ANIMATIONS =================================== */
 @layer utilities {
 
   /* Fade In */
@@ -429,7 +429,7 @@
   }
 }
 
-/* ═══ KEYFRAMES ═════════════════════════════════════ */
+/* === KEYFRAMES ==================================== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -542,7 +542,7 @@
   }
 }
 
-/* ═══ LEGACY ALIASES (backward compatibility) ══════ */
+/* === LEGACY ALIASES (backward compatibility) ====== */
 .bg-primary {
   background-color: var(--bg-primary) !important;
 }
@@ -598,7 +598,7 @@
   animation: countUp 0.4s ease;
 }
 
-/* ═══ LIGHT MODE ENHANCEMENTS ══════════════════════ */
+/* === LIGHT MODE ENHANCEMENTS ====================== */
 [data-theme="light"] body {
   background-image:
     radial-gradient(ellipse 80% 40% at 50% -10%,
