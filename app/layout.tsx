@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   title: 'فجرك — إدارة شؤونك المالية',
   description: 'تتبع دخلك، مصاريفك، ديونك واستثماراتك في مكان واحد',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/icon-512.png' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
