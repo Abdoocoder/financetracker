@@ -117,7 +117,7 @@
 
 | Platform | Type | Status |
 |:--------:|:----:|:------:|
-| 🤖 Android | Native Flutter App | ✅ Available |
+| 🤖 Android | Native Flutter App | [**Download APK**](https://fajrak.com/download) |
 | 🤖 Android | PWA / TWA APK | ✅ Available |
 | 🍎 iOS | PWA (Add to Home Screen) | ✅ Available |
 
@@ -245,7 +245,7 @@ npm run test:coverage
 |:-------|:------------|
 | 💎 **UI Modernization** | Premium redesign with gradients, glassmorphism, and high-visibility typography |
 | 🛡️ **Security Alignment** | Migrated all hardcoded secrets to `.env` and decommissioned `secrets.dart` |
-| 🎨 **Theme Fixes** | Corrected primary color and visibility issues in Light Mode |
+| 🎨 **Theme & Hydration** | Corrected primary color and fixed Next.js hydration mismatches |
 | ⚙️ **Config Alignment** | Synchronized Firebase credentials across Web and Android environments |
 
 ### v3.10.0 — 2026-03-23
