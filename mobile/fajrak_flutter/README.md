@@ -7,6 +7,7 @@
 [![100% Feature Parity](https://img.shields.io/badge/✅-100%25_Feature_Parity-38ef7d?style=for-the-badge)](https://fajrak.com)
 [![APK Size](https://img.shields.io/badge/📦-54.5_MB_APK-FF6B35?style=for-the-badge)](https://github.com/Abdoocoder/financetracker/releases)
 [![Google Play](https://img.shields.io/badge/🎯-Google_Play_Ready-4285F4?style=for-the-badge)](https://fajrak.com/download)
+[![Direct Download](https://img.shields.io/badge/⬇️-Direct_Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 
 ---
