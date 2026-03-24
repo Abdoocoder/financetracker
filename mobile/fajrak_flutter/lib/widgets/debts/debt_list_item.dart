@@ -135,18 +135,23 @@ class _DebtListItemState extends State<DebtListItem> {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(15),
-        border: Border(
-          left: BorderSide(color: prioColor, width: 3),
-          top: BorderSide(color: cs.outlineVariant),
-          right: BorderSide(color: cs.outlineVariant),
-          bottom: BorderSide(color: cs.outlineVariant),
-        ),
+        border: Border.all(color: cs.outlineVariant),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      child: Stack(
+        children: [
+          PositionedDirectional(
+            start: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 4, color: prioColor),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Container(
             width: 32,
@@ -365,7 +370,10 @@ class _DebtListItemState extends State<DebtListItem> {
                           fontFamily: 'Cairo'))),
             ),
           ),
-      ]),
+            ]),
+          ),
+        ],
+      ),
     );
   }
 }
