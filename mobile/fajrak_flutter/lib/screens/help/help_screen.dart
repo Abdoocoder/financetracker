@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});
@@ -161,46 +162,63 @@ class _HelpScreenState extends State<HelpScreen> {
             const SizedBox(height: 20),
 
             // Contact Card
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                  color: const Color(0xFF3B7EF6).withValues(alpha: 0.05),
-                  border: Border.all(
-                      color: const Color(0xFF3B7EF6).withValues(alpha: 0.2)),
-                  borderRadius: BorderRadius.circular(16)),
-              child: Row(
-                children: [
-                  Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                          color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12)),
-                      child: const Center(
-                          child: Icon(Icons.support_agent,
-                              color: Color(0xFF3B7EF6)))),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('help_contact_title'.tr(),
-                            style: TextStyle(
-                                color: cs.onSurface,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: 'Cairo',
-                                fontSize: 13)),
-                        Text('help_contact_subtitle'.tr(),
-                            style: TextStyle(
-                                color: cs.onSurfaceVariant,
-                                fontFamily: 'Cairo',
-                                fontSize: 11)),
-                      ],
+            GestureDetector(
+              onTap: () async {
+                final Uri emailUri = Uri(
+                  scheme: 'mailto',
+                  path: 'support@fajrak.com', 
+                  query: "subject=${Uri.encodeComponent('طلب مساعدة - تطبيق فجرك')}",
+                );
+                if (await canLaunchUrl(emailUri)) {
+                  await launchUrl(emailUri);
+                } else {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('عذراً، لا يمكن فتح تطبيق البريد الإلكتروني. يرجى مراسلتنا على support@fajrak.com')),
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                    color: const Color(0xFF3B7EF6).withValues(alpha: 0.05),
+                    border: Border.all(
+                        color: const Color(0xFF3B7EF6).withValues(alpha: 0.2)),
+                    borderRadius: BorderRadius.circular(16)),
+                child: Row(
+                  children: [
+                    Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                            color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: const Center(
+                            child: Icon(Icons.support_agent,
+                                color: Color(0xFF3B7EF6)))),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('help_contact_title'.tr(),
+                              style: TextStyle(
+                                  color: cs.onSurface,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'Cairo',
+                                  fontSize: 13)),
+                          Text('help_contact_subtitle'.tr(),
+                              style: TextStyle(
+                                  color: cs.onSurfaceVariant,
+                                  fontFamily: 'Cairo',
+                                  fontSize: 11)),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.arrow_forward_ios,
-                      color: Color(0xFF64748B), size: 14),
-                ],
+                    const Icon(Icons.arrow_forward_ios,
+                        color: Color(0xFF64748B), size: 14),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 24),
