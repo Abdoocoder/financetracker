@@ -1,7 +1,20 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../main.dart';
 
 class NotificationService {
+  static final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+
+  static const AndroidNotificationChannel _androidChannel = AndroidNotificationChannel(
+    'fajrak_notifications', // ID
+    'Fajrak Notifications', // Name
+    description: 'إشعارات تطبيق فجرك المالية',
+    importance: Importance.high,
+    playSound: true,
+    enableVibration: true,
+  );
+
   static Future<void> initialize() async {
     final messaging = FirebaseMessaging.instance;
 
@@ -18,6 +31,26 @@ class NotificationService {
       await saveToken();
     }
 
+    // تهيئة الإشعارات المحلية (للعرض في المقدمة)
+    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosInit = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
+
+    await _localNotifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (details) {
+        if (details.payload != null) {
+          final message = RemoteMessage(data: {'url': details.payload!});
+          handleMessage(message);
+        }
+      },
+    );
+
+    // إنشاء القناة على أندرويد
+    await _localNotifications
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_androidChannel);
+
     // التعاقد مع تحديث الرمز (FCM Token Refresh)
     messaging.onTokenRefresh.listen((token) async {
       await saveToken(newToken: token);
@@ -25,8 +58,35 @@ class NotificationService {
 
     // التعامل مع الإشعارات عندما يكون التطبيق في المقدمة (Foreground)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      // هنا يمكن عرض تنبيه داخلي أو استخدام flutter_local_notifications
+      final notification = message.notification;
+      if (notification == null) return;
+
+      _localNotifications.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _androidChannel.id,
+            _androidChannel.name,
+            channelDescription: _androidChannel.description,
+            icon: '@mipmap/ic_launcher',
+          ),
+        ),
+        payload: message.data['url'],
+      );
     });
+  }
+
+  static void handleMessage(RemoteMessage message) {
+    final url = message.data['url'];
+    if (url == null) return;
+
+    // التنقل إلى الصفحة المطلوبة
+    // مثال: /dashboard/alerts -> نتحقق من المسار ونحول للمسار المناسب في فلاتر
+    if (url.contains('/dashboard/alerts')) {
+      FajrakApp.navigatorKey.currentState?.pushNamed('/main');
+    }
   }
 
   static Future<void> saveToken({String? newToken}) async {

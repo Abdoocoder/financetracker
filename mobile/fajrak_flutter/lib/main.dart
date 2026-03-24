@@ -21,6 +21,7 @@ import 'services/notification_service.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
+  // NotificationService handles the local display logic if needed
   await NotificationService.showNotification(message);
 }
 
@@ -80,6 +81,19 @@ void main() async {
   );
 
   await NotificationService.initialize();
+  
+  // Handle background clicks (when app is in background but not terminated)
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    NotificationService.handleMessage(message);
+  });
+
+  // Handle terminated state clicks (when app is launched from notification)
+  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+    if (message != null) {
+      NotificationService.handleMessage(message);
+    }
+  });
+
   await EasyLocalization.ensureInitialized();
 
   // Global Error Handling
@@ -109,6 +123,7 @@ void main() async {
 }
 
 class FajrakApp extends StatelessWidget {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   const FajrakApp({super.key});
 
   @override
@@ -116,6 +131,7 @@ class FajrakApp extends StatelessWidget {
     final appState = context.watch<AppState>();
     return MaterialApp(
       title: 'فجرك',
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(appState.isDarkMode ? Brightness.dark : Brightness.light),
       locale: context.locale, // Use context.locale from EasyLocalization
