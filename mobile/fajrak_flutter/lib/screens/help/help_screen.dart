@@ -167,11 +167,13 @@ class _HelpScreenState extends State<HelpScreen> {
                 final Uri emailUri = Uri(
                   scheme: 'mailto',
                   path: 'support@fajrak.com', 
-                  query: "subject=${Uri.encodeComponent('طلب مساعدة - تطبيق فجرك')}",
+                  queryParameters: {
+                    'subject': 'طلب مساعدة - تطبيق فجرك',
+                  },
                 );
-                if (await canLaunchUrl(emailUri)) {
+                try {
                   await launchUrl(emailUri);
-                } else {
+                } catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('عذراً، لا يمكن فتح تطبيق البريد الإلكتروني. يرجى مراسلتنا على support@fajrak.com')),
