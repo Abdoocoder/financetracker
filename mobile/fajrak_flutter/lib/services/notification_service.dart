@@ -37,11 +37,17 @@ class NotificationService {
       final token = newToken ?? await FirebaseMessaging.instance.getToken();
       if (token == null) return;
 
-      // حفظ الرمز في جدول البروفايل الخاص بالمستخدم
+      final endpoint = 'fcm:$token';
+
+      // حفظ الرمز في جدول push_subscriptions ليتوافق مع نظام تطبيق الويب
       await Supabase.instance.client
-          .from('profiles')
-          .update({'fcm_token': token})
-          .eq('id', user.id);
+          .from('push_subscriptions')
+          .upsert({
+            'user_id': user.id,
+            'endpoint': endpoint,
+            'p256dh': 'fcm',
+            'auth': 'fcm',
+          }, onConflict: 'user_id,endpoint');
           
     } catch (e) {
       // تفادي تعطيل التطبيق في حال فشل حفظ الرمز
