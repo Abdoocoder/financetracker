@@ -38,6 +38,25 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _amountController = TextEditingController(text: widget.existing?['amount']?.toString() ?? '');
     _descController = TextEditingController(text: widget.existing?['description'] ?? '');
     _catController = TextEditingController(text: widget.existing?['category'] ?? '');
+    
+    final initialCategories = _typeController.value == 'income' 
+        ? ['راتب','عمل حر','استثمار','هدية','أخرى']
+        : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى'];
+    if (!initialCategories.contains(_catController.text)) {
+      _catController.text = initialCategories.first;
+    }
+
+    _typeController.addListener(() {
+      final categories = _typeController.value == 'income' 
+          ? ['راتب','عمل حر','استثمار','هدية','أخرى']
+          : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى'];
+      if (!categories.contains(_catController.text)) {
+        setState(() => _catController.text = categories.first);
+      } else {
+        setState(() {}); // trigger rebuild for dropdown options update
+      }
+    });
+
     _dateController = ValueNotifier<DateTime>(widget.existing != null
         ? DateTime.parse(widget.existing!['transaction_date'])
         : DateTime.now());
@@ -372,20 +391,41 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             const SizedBox(height: 20),
 
             _buildLabel('trans_category'.tr()),
-            TextFormField(
-              controller: _catController,
-              style: TextStyle(
-                color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
-                fontFamily: 'Cairo', 
-                fontWeight: FontWeight.bold
-              ),
-              decoration: InputDecoration(
-                hintText: 'e.g., Food, Transport...',
-                hintStyle: TextStyle(
-                  color: isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.35) : const Color(0xFF0F172A).withValues(alpha: 0.35)
-                ),
-                fillColor: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.7),
-              ),
+            ValueListenableBuilder<String>(
+              valueListenable: _typeController,
+              builder: (ctx, type, _) {
+                final categories = type == 'income' 
+                    ? ['راتب','عمل حر','استثمار','هدية','أخرى']
+                    : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى'];
+                
+                return Container(
+                  height: 56,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.7),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: categories.contains(_catController.text) ? _catController.text : categories.first,
+                      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
+                      dropdownColor: theme.colorScheme.surface,
+                      isExpanded: true,
+                      style: TextStyle(
+                        color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
+                        fontFamily: 'Cairo', 
+                        fontWeight: FontWeight.bold
+                      ),
+                      items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                      onChanged: (v) {
+                        if (v != null) {
+                          setState(() => _catController.text = v);
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 20),
 
