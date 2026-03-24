@@ -8,7 +8,7 @@
 [![Download APK](https://img.shields.io/badge/📱_Download-APK-38ef7d?style=for-the-badge)](https://fajrak.com/download)
 [![GitHub](https://img.shields.io/badge/💻_Source_Code-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/Abdoocoder/financetracker)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
@@ -127,7 +127,7 @@
 
 | Technology | Usage | Version |
 |:----------:|:-----:|:-------:|
-| ⚡ Next.js | Framework + SSR | 15.5.12 |
+| ⚡ Next.js | Framework + SSR | 16.2.1 |
 | 🔷 TypeScript | Type Safety | 5.x |
 | 🗄️ Supabase | Database + Auth + RLS | Latest |
 | 🔥 Firebase | Push Notifications FCM | Latest |
@@ -239,7 +239,15 @@ npm run test:coverage
 
 ## 📝 Changelog
 
-### v3.11.0 — 2026-03-24 *(Latest)*
+### v3.12.0 — 2026-03-24 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🚀 **Next.js 16 Upgrade** | Full migration to Next.js 16.2.1 with Turbopack for improved build speeds |
+| ⚙️ **Proxy Convention** | Migrated from `middleware.ts` to the new `proxy.ts` convention required by Next.js 16 |
+| 🛡️ **Deployment Fix** | Resolved Vercel deployment metadata and committer association issues |
+
+### v3.11.0 — 2026-03-24
 
 | Change | Description |
 |:-------|:------------|
