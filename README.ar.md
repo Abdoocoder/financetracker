@@ -21,7 +21,7 @@
 > 🌅 **كلنا نحلم بالثراء — هنا تبدأ الرحلة**
 > *We all dream of wealth — here the journey begins*
 
-🇸🇦 العربية | 🇬🇧 [English](./README.md)
+JO العربية | 🇬🇧 [English](./README.md)
 
 ---
 
@@ -207,6 +207,111 @@ npm run test:coverage
 | lib/cache.ts | 83.33% |
 | types/index.ts | 100% |
 | lib/currency.ts | 30.76% |
+
+---
+
+## 🌍 الترجمة والتوطين (i18n)
+
+يدعم **فجرك** ترجمة كاملة للغتين **الإنجليزية** و**العربية** عبر تطبيق الويب (Next.js) وتطبيق الهاتف (Flutter).
+
+### 🌐 اللغات المدعومة
+
+| اللغة | الرمز | الاتجاه |
+|:-----|:-----:|:-------:|
+| 🇬🇧 الإنجليزية | `en` | من اليسار لليمين |
+| 🇸🇦 العربية | `ar` | من اليمين لليسار |
+
+### 📱 تطبيق الويب (Next.js)
+
+يستخدم التطبيق نظام ترجمة مخصص في [`lib/i18n.tsx`](lib/i18n.tsx).
+
+#### كيف يعمل
+
+```typescript
+import { useTranslation } from '@/lib/i18n';
+
+// في مكونك
+const { t, lang } = useTranslation();
+
+// استخدم الدالة t() لترجمة المفاتيح
+<span>{t('dashboard_title')}</span>
+
+// الوصول للغة الحالية
+<span>{lang === 'en' ? 'Hello' : 'مرحبا'}</span>
+```
+
+#### إضافة الترجمات
+
+1. افتح [`lib/i18n.tsx`](lib/i18n.tsx)
+2. أضف المفتاح لكلا الكائنين `en` و `ar`:
+
+```typescript
+export const en = {
+  // ... المفاتيح الموجودة
+  your_new_key: 'النص بالإنجليزية هنا',
+};
+
+export const ar = {
+  // ... المفاتيح الموجودة
+  your_new_key: 'النص بالعربية هنا',
+};
+```
+
+#### أفضل الممارسات
+
+- استخدم مفاتيح وصفية مع مساحة أسماء (مثل: `dashboard_welcome`, `settings_profile`)
+- تجنب النصوص الثابتة — استخدم دائماً `t('key')`
+- للمحتوى الديناميكي، استخدم interpolation: `` `مرحبا ${name}` ``
+
+### 📲 تطبيق Flutter للهاتف
+
+يستخدم تطبيق Flutter حزمة `easy_localization` مع ملفات ترجمة JSON.
+
+#### ملفات الترجمة
+
+| الملف | الوصف |
+|:-----|:------|
+| `mobile/fajrak_flutter/assets/i18n/en.json` | ترجمة إنجليزية |
+| `mobile/fajrak_flutter/assets/i18n/ar.json` | ترجمة عربية |
+
+#### كيف يعمل
+
+```dart
+// استيراد التوطين
+import 'package:easy_localization/easy_localization.dart';
+
+// ترجمة المفاتيح باستخدام .tr()
+Text('trans_add_note_hint'.tr())
+
+// الحصول على اللغة الحالية
+context.locale
+```
+
+#### إضافة الترجمات
+
+1. افتح ملف JSON المناسب
+2. أضف زوج المفتاح-القيمة:
+
+```json
+{
+  "your_new_key": "النص بالعربية هنا"
+}
+```
+
+### 🔑 مفاتيح الترجمة الشائعة
+
+| المفتاح | الإنجليزية | العربية |
+|:-------|:-----------|:--------|
+| `app_name` | Fajrak | فجرك |
+| `dashboard_title` | Dashboard | لوحة التحكم |
+| `transactions` | Transactions | المعاملات |
+| `add_transaction` | Add Transaction | إضافة معاملة |
+| `save` | Save | حفظ |
+| `cancel` | Cancel | إلغاء |
+| `delete` | Delete | حذف |
+| `edit` | Edit | تعديل |
+| `settings` | Settings | الإعدادات |
+| `help` | Help | المساعدة |
 
 ---
 

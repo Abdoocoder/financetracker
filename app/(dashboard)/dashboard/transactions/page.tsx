@@ -1,18 +1,18 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { PageHeader }             from '@/components/ui/page-header'
-import { AddButton }              from '@/components/ui/add-button'
-import { StatBar }                from '@/components/ui/stat-bar'
-import { EmptyState }             from '@/components/ui/empty-state'
-import { ConfirmDialog }          from '@/components/ui/confirm-dialog'
+import { PageHeader } from '@/components/ui/page-header'
+import { AddButton } from '@/components/ui/add-button'
+import { StatBar } from '@/components/ui/stat-bar'
+import { EmptyState } from '@/components/ui/empty-state'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
-import { usePullToRefresh }       from '@/lib/use-pull-to-refresh'
-import { useI18n }                from '@/lib/i18n'
-import { useTransactions }        from '@/hooks/useTransactions'
-import { TransactionItem }        from '@/components/transactions/TransactionItem'
-import { TransactionFilters }     from '@/components/transactions/TransactionFilters'
-import { TransactionFormModal }   from '@/components/transactions/TransactionFormModal'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { useI18n } from '@/lib/i18n'
+import { useTransactions } from '@/hooks/useTransactions'
+import { TransactionItem } from '@/components/transactions/TransactionItem'
+import { TransactionFilters } from '@/components/transactions/TransactionFilters'
+import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
 
 export default function TransactionsPage() {
   const { t, lang } = useI18n()
@@ -24,11 +24,11 @@ export default function TransactionsPage() {
 
   // تقسيم المعاملات
   const completed = tx.filtered.filter(item => item.transaction_date <= today)
-  const upcoming  = tx.filtered.filter(item => item.transaction_date > today)
+  const upcoming = tx.filtered.filter(item => item.transaction_date > today)
 
   if (tx.loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {[0,1,2,3,4].map(i => <div key={i} className="skeleton" style={{ height: 72, borderRadius: 16 }} />)}
+      {[0, 1, 2, 3, 4].map(i => <div key={i} className="skeleton" style={{ height: 72, borderRadius: 16 }} />)}
     </div>
   )
 
@@ -37,7 +37,7 @@ export default function TransactionsPage() {
       <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
         title={t('trans_title')}
-        subtitle={`${tx.transactions.length} ${lang === 'en' ? 'transactions' : 'معاملة'}`}
+        subtitle={`${tx.transactions.length} ${t('trans_count')}`}
         action={
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={tx.exportCSV} style={{ padding: '8px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -48,9 +48,9 @@ export default function TransactionsPage() {
         }
       />
       <StatBar stats={[
-        { label: t('dash_income'),   value: `${tx.totalIncome.toFixed(0)}+`,  color: 'var(--accent-green-light)' },
-        { label: t('dash_expenses'), value: `${tx.totalExpense.toFixed(0)}`,  color: 'var(--accent-red-light)'   },
-        { label: t('dash_net'),      value: `${tx.net >= 0 ? '+' : ''}${tx.net.toFixed(0)}`, color: tx.net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+        { label: t('dash_income'), value: `${tx.totalIncome.toFixed(0)}+`, color: 'var(--accent-green-light)' },
+        { label: t('dash_expenses'), value: `${tx.totalExpense.toFixed(0)}`, color: 'var(--accent-red-light)' },
+        { label: t('dash_net'), value: `${tx.net >= 0 ? '+' : ''}${tx.net.toFixed(0)}`, color: tx.net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
       ]} />
       <TransactionFilters
         search={tx.search}

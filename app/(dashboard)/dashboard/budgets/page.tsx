@@ -9,14 +9,14 @@ import { Modal } from '@/components/ui/modal'
 import { toast } from '@/components/ui/toast'
 
 const CATEGORIES = [
-  { key: 'طعام',     ar: 'طعام',     en: 'Food',          icon: '🍔' },
-  { key: 'مواصلات', ar: 'مواصلات', en: 'Transport',      icon: '🚗' },
-  { key: 'فواتير',  ar: 'فواتير',  en: 'Bills',          icon: '💡' },
-  { key: 'صحة',     ar: 'صحة',     en: 'Health',         icon: '💊' },
-  { key: 'ملابس',   ar: 'ملابس',   en: 'Clothes',        icon: '👕' },
-  { key: 'ترفيه',   ar: 'ترفيه',   en: 'Entertainment',  icon: '🎮' },
-  { key: 'تعليم',   ar: 'تعليم',   en: 'Education',      icon: '📚' },
-  { key: 'أخرى',    ar: 'أخرى',    en: 'Other',          icon: '📝' },
+  { key: 'طعام', ar: 'طعام', en: 'Food', icon: '🍔' },
+  { key: 'مواصلات', ar: 'مواصلات', en: 'Transport', icon: '🚗' },
+  { key: 'فواتير', ar: 'فواتير', en: 'Bills', icon: '💡' },
+  { key: 'صحة', ar: 'صحة', en: 'Health', icon: '💊' },
+  { key: 'ملابس', ar: 'ملابس', en: 'Clothes', icon: '👕' },
+  { key: 'ترفيه', ar: 'ترفيه', en: 'Entertainment', icon: '🎮' },
+  { key: 'تعليم', ar: 'تعليم', en: 'Education', icon: '📚' },
+  { key: 'أخرى', ar: 'أخرى', en: 'Other', icon: '📝' },
 ]
 
 
@@ -68,10 +68,10 @@ function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted,
   if (insights.length === 0) return null
 
   const colors = {
-    danger:  { bg: 'rgba(239,68,68,0.08)',   border: 'rgba(239,68,68,0.2)',   color: '#F87171' },
-    warning: { bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.2)',  color: '#FCD34D' },
-    success: { bg: 'rgba(16,185,129,0.08)',  border: 'rgba(16,185,129,0.2)',  color: '#34D399' },
-    info:    { bg: 'rgba(59,126,246,0.08)',  border: 'rgba(59,126,246,0.2)',  color: '#6BA3FF' },
+    danger: { bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.2)', color: '#F87171' },
+    warning: { bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)', color: '#FCD34D' },
+    success: { bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)', color: '#34D399' },
+    info: { bg: 'rgba(59,126,246,0.08)', border: 'rgba(59,126,246,0.2)', color: '#6BA3FF' },
   }
 
   return (
@@ -108,17 +108,17 @@ function Rule502030({ income, totalDebtPayments, totalGoalSavings, ar, onApply }
   if (income <= 0) return null
 
   const available = income - totalDebtPayments - totalGoalSavings
-  const needs    = Math.round(available * 0.50)
-  const wants    = Math.round(available * 0.30)
-  const savings  = Math.round(available * 0.20)
+  const needs = Math.round(available * 0.50)
+  const wants = Math.round(available * 0.30)
+  const savings = Math.round(available * 0.20)
 
   const suggestions = [
-    { category: 'فواتير',  limit: Math.round(needs * 0.4) },
-    { category: 'طعام',    limit: Math.round(needs * 0.35) },
+    { category: 'فواتير', limit: Math.round(needs * 0.4) },
+    { category: 'طعام', limit: Math.round(needs * 0.35) },
     { category: 'مواصلات', limit: Math.round(needs * 0.25) },
-    { category: 'ترفيه',   limit: Math.round(wants * 0.5) },
-    { category: 'ملابس',   limit: Math.round(wants * 0.3) },
-    { category: 'صحة',     limit: Math.round(wants * 0.2) },
+    { category: 'ترفيه', limit: Math.round(wants * 0.5) },
+    { category: 'ملابس', limit: Math.round(wants * 0.3) },
+    { category: 'صحة', limit: Math.round(wants * 0.2) },
   ]
 
   return (
@@ -138,9 +138,9 @@ function Rule502030({ income, totalDebtPayments, totalGoalSavings, ar, onApply }
           <div style={{ padding: '0 16px 16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
               {[
-                { label: ar ? '🏠 ضروريات' : '🏠 Needs',   value: needs,   pct: '50%', color: 'var(--accent-blue-light)', bg: 'var(--accent-blue-dim)' },
-                { label: ar ? '🎯 رغبات'   : '🎯 Wants',   value: wants,   pct: '30%', color: 'var(--accent-purple-light)', bg: 'var(--accent-purple-dim)' },
-                { label: ar ? '💰 ادخار'   : '💰 Savings', value: savings, pct: '20%', color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)' },
+                { label: ar ? '🏠 ضروريات' : '🏠 Needs', value: needs, pct: '50%', color: 'var(--accent-blue-light)', bg: 'var(--accent-blue-dim)' },
+                { label: ar ? '🎯 رغبات' : '🎯 Wants', value: wants, pct: '30%', color: 'var(--accent-purple-light)', bg: 'var(--accent-purple-dim)' },
+                { label: ar ? '💰 ادخار' : '💰 Savings', value: savings, pct: '20%', color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)' },
               ].map((item, i) => (
                 <div key={i} style={{ background: item.bg, borderRadius: 14, padding: '12px 10px', textAlign: 'center' }}>
                   <div style={{ fontSize: 16, fontWeight: 900, color: item.color, fontFamily: 'monospace' }}>{item.pct}</div>
@@ -182,7 +182,7 @@ export default function BudgetsPage() {
     const user = currentUser
     if (!user) return
     setLoading(true)
-    const firstDay = `${year}-${String(month).padStart(2,'0')}-01`
+    const firstDay = `${year}-${String(month).padStart(2, '0')}-01`
     const lastDay = new Date(year, month, 0).toISOString().split('T')[0]
     const [budgetRes, txRes, profileRes, debtRes, goalRes] = await Promise.all([
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', month).eq('year', year),
@@ -193,9 +193,9 @@ export default function BudgetsPage() {
     ])
     setBudgets(budgetRes.data ?? [])
     const spendMap: Record<string, number> = {}
-    ;(txRes.data ?? []).forEach((tx: any) => {
-      if (tx.type === 'expense') spendMap[tx.category] = (spendMap[tx.category] ?? 0) + Number(tx.amount)
-    })
+      ; (txRes.data ?? []).forEach((tx: any) => {
+        if (tx.type === 'expense') spendMap[tx.category] = (spendMap[tx.category] ?? 0) + Number(tx.amount)
+      })
     setSpending(spendMap)
     const actualIncome = (txRes.data ?? []).filter((t: any) => t.type === 'income').reduce((a: number, t: any) => a + Number(t.amount), 0)
     setMonthlyIncome(actualIncome || (profileRes.data?.monthly_income ?? 0))
@@ -260,14 +260,14 @@ export default function BudgetsPage() {
   const totalBudgeted = budgets.reduce((a, b) => a + Number(b.monthly_limit), 0)
   const totalSpent = budgets.reduce((a, b) => a + (spending[b.category] ?? 0), 0)
   const months = ar
-    ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']
-    : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
   return (
     <div className="animate-fade-in" style={{ padding: '0 0 100px' }}>
       <PageHeader
         title={ar ? 'الميزانية' : 'Budget'}
-        subtitle={ar ? 'خطط مالياً كالمحترفين' : 'Plan your finances like a pro'}
+        subtitle={t('budget_plan_pro')}
         action={<button onClick={openAdd} style={{ padding: '10px 18px', borderRadius: 12, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>+ {t('add')}</button>}
       />
 
@@ -332,7 +332,7 @@ export default function BudgetsPage() {
       {/* قائمة الفئات */}
       <div style={{ padding: '12px 16px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {loading ? (
-          [1,2,3].map(i => <div key={i} style={{ height: 100, borderRadius: 20, background: 'var(--bg-card)', animation: 'pulse 1.5s infinite' }} />)
+          [1, 2, 3].map(i => <div key={i} style={{ height: 100, borderRadius: 20, background: 'var(--bg-card)', animation: 'pulse 1.5s infinite' }} />)
         ) : budgets.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
