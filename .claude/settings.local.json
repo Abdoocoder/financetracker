@@ -7,7 +7,9 @@
       "Bash(git push:*)",
       "Bash(xargs grep:*)",
       "Bash(flutter clean:*)",
-      "Bash(flutter pub:*)"
+      "Bash(flutter pub:*)",
+      "Bash(find /c/Users/skyli/Documents/financetracker/mobile/fajrak_flutter/test -type f -name *.dart)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

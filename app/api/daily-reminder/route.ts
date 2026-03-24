@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendPushToUser } from '@/lib/push-send'
+import { verifyCronAuth } from '@/lib/cron-auth'
 
 // ⚠️  هذا المسار موجود للاختبار اليدوي فقط.
 // المنطق الفعلي ينفّذه المنظّم الرئيسي /api/smart-notifications عند hour === 6.
@@ -80,10 +81,7 @@ async function sendDailyReminders() {
 }
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  const isVercelCron = request.headers.get('x-vercel-cron') === '1'
-  const isManual = authHeader === `Bearer ${process.env.CRON_SECRET}`
-  if (!isVercelCron && !isManual) {
+  if (!verifyCronAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const sent = await sendDailyReminders()
