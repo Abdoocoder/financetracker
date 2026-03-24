@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendPushToUser } from '@/lib/push-send'
 
+// ⚠️  هذا المسار موجود للاختبار اليدوي فقط.
+// المنطق الفعلي ينفّذه المنظّم الرئيسي /api/smart-notifications عند hour === 6.
+// تأكد من عدم تشغيل cron-job.org لهذا المسار تلقائياً لتجنب الإشعارات المكررة.
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
