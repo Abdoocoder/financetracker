@@ -8,7 +8,8 @@ const supabase = createClient(
 )
 
 async function sendEveningReminders() {
-  const today = new Date().toISOString().split('T')[0]
+  // استخدام توقيت UTC+3 (الأردن/الخليج) لتجنب خطأ اليوم
+  const today = new Date(new Date().getTime() + 3 * 60 * 60 * 1000).toISOString().split('T')[0]
 
   const { data: profiles } = await supabase
     .from('profiles')

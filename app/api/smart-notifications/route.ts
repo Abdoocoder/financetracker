@@ -395,6 +395,12 @@ export async function GET(request: NextRequest) {
     tasks.push('evening-if-needed')
   }
 
+  // 12 ظ — تنبيه إعادة تفاعل (مستخدمون غير نشطين 3 أيام)
+  if (hour === 12) {
+    await smartNudge()
+    tasks.push('nudge-inactive')
+  }
+
   // 7 م — توجيه بناء الثروة
   if (hour === 19) {
     await wealthGuidanceAlert()

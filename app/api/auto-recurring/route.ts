@@ -9,8 +9,9 @@ const supabase = createClient(
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
+  const isVercelCron = request.headers.get('x-vercel-cron') === '1'
   const isManual = authHeader === `Bearer ${process.env.CRON_SECRET}`
-  if (!isManual) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!isVercelCron && !isManual) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const now = new Date()
   const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
