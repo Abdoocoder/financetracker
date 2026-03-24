@@ -1,41 +1,69 @@
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+import java.util.Properties
+
+plugins {
+    id("com.android.application")
+    id("kotlin-android")
+    id("com.google.gms.google-services")
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("dev.flutter.flutter-gradle-plugin")
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+android {
+    val keystorePropertiesFile = rootProject.file("key.properties")
+    val keystoreProperties = Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { stream ->
+            keystoreProperties.load(stream)
+        }
+    } else {
+        println("Warning: key.properties not found at ${keystorePropertiesFile.absolutePath}")
+    }
 
-subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(name)
-    layout.buildDirectory.value(newSubprojectBuildDir)
+    ndkVersion = "27.0.12077973"
+    namespace = "com.fajrak.app"
+    compileSdk = flutter.compileSdkVersion
 
-    if (name != "app") {
-        afterEvaluate {
-            if (plugins.hasPlugin("com.android.library") || plugins.hasPlugin("com.android.application")) {
-                val android = extensions.findByName("android") as? com.android.build.gradle.BaseExtension
-                android?.apply {
-                    compileSdkVersion(36)
-                    if (namespace == null) {
-                        namespace = if (name == "flutter_app_badger") {
-                            "fr.g123k.flutterappbadge.flutterappbadger"
-                        } else {
-                            "com.fajrak.app.plugins.${name.replace("-", "_")}"
-                        }
-                    }
-                }
-            }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "com.fajrak.app"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+    }
+
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+            storeFile = keystoreProperties.getProperty("storeFile")?.let { path -> file(path) }
+            storePassword = keystoreProperties.getProperty("storePassword")
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
 
-// Removed circular evaluation dependency on :app
+flutter {
+    source = "../.."
+}
 
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
