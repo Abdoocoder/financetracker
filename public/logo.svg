@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <defs>
+    <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </radialGradient>
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- الشمس -->
+  <circle cx="20" cy="18" r="7" fill="url(#sunGrad)" />
+  <!-- أشعة الشمس -->
+  <line x1="20" y1="4" x2="20" y2="8" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="20" y1="28" x2="20" y2="32" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="6" y1="18" x2="10" y2="18" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="30" y1="18" x2="34" y2="18" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="8" x2="13" y2="11" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="27" y1="25" x2="30" y2="28" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="30" y1="8" x2="27" y2="11" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <line x1="10" y1="28" x2="13" y2="25" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <!-- السهم الصاعد -->
+  <polyline points="8,34 16,26 22,30 32,18" stroke="url(#arrowGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <polygon points="32,18 28,19 31,23" fill="#10B981"/>
+</svg>
