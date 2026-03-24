@@ -10,10 +10,10 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { PageHeader } from '@/components/ui/page-header'
 
 const ALERT_CONFIG: Record<string, { icon: string; accent: string; bg: string; border: string }> = {
-  warning:     { icon: '⚠️', accent: '#F87171', bg: 'rgba(239,68,68,0.06)',    border: 'rgba(239,68,68,0.2)'   },
-  motivation:  { icon: '💪', accent: '#60A5FA', bg: 'rgba(59,130,246,0.06)',   border: 'rgba(59,130,246,0.2)'  },
-  reminder:    { icon: '⏰', accent: '#FCD34D', bg: 'rgba(245,158,11,0.06)',   border: 'rgba(245,158,11,0.2)'  },
-  achievement: { icon: '🏆', accent: '#34D399', bg: 'rgba(16,185,129,0.06)',   border: 'rgba(16,185,129,0.2)'  },
+  warning: { icon: '⚠️', accent: '#F87171', bg: 'rgba(239,68,68,0.06)', border: 'rgba(239,68,68,0.2)' },
+  motivation: { icon: '💪', accent: '#60A5FA', bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.2)' },
+  reminder: { icon: '⏰', accent: '#FCD34D', bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.2)' },
+  achievement: { icon: '🏆', accent: '#34D399', bg: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.2)' },
 }
 
 function AlertCard({ alert, onRead, onDelete, onNavigate }: { alert: any; onRead: (id: string) => void; onDelete: (id: string) => void; onNavigate: (alert: any) => void }) {
@@ -181,16 +181,16 @@ export default function AlertsPage() {
 
   const unreadCount = alerts.filter(a => !a.is_read).length
   const filtered = alerts.filter(a => {
-    if (filter === 'unread')      return !a.is_read
-    if (filter === 'warning')     return a.type === 'warning'
+    if (filter === 'unread') return !a.is_read
+    if (filter === 'warning') return a.type === 'warning'
     if (filter === 'achievement') return a.type === 'achievement'
     return true
   })
 
   const filterTabs = [
-    { key: 'all',         label: lang === 'en' ? `All (${alerts.length})` : `الكل (${alerts.length})` },
-    { key: 'unread',      label: lang === 'en' ? `Unread (${unreadCount})` : `غير مقروء (${unreadCount})` },
-    { key: 'warning',     label: lang === 'en' ? '⚠️ Warnings' : '⚠️ تحذيرات' },
+    { key: 'all', label: lang === 'en' ? `All (${alerts.length})` : `الكل (${alerts.length})` },
+    { key: 'unread', label: lang === 'en' ? `Unread (${unreadCount})` : `غير مقروء (${unreadCount})` },
+    { key: 'warning', label: lang === 'en' ? '⚠️ Warnings' : '⚠️ تحذيرات' },
     { key: 'achievement', label: lang === 'en' ? '🏆 Achievements' : '🏆 إنجازات' },
   ]
 
@@ -251,7 +251,7 @@ export default function AlertsPage() {
         <button onClick={generateNow} disabled={generating}
           className="w-full py-3 rounded-xl text-white font-black text-sm disabled:opacity-50 transition-all"
           style={{ background: generating ? 'var(--bg-elevated)' : 'linear-gradient(135deg, #3B7EF6 0%, #8B5CF6 100%)', fontFamily: 'inherit', boxShadow: generating ? 'none' : '0 4px 20px rgba(59,126,246,0.35)' }}>
-          {generating ? (lang === 'en' ? '⏳ Analyzing...' : '⏳ جاري التحليل...') : `✨ ${t('alerts_generate')}`}
+          {generating ? t('alerts_generating') : `✨ ${t('alerts_generate')}`}
         </button>
         <p className="text-xs text-center mt-2" style={{ color: 'var(--text-muted)' }}>{t('alerts_auto')}</p>
       </div>

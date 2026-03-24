@@ -91,7 +91,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.locale.languageCode == 'en' ? 'Review submitted successfully!' : 'تم إرسال التقييم بنجاح!',
+              'testimonial_success'.tr(),
               style: const TextStyle(fontFamily: 'Cairo'),
             ),
             backgroundColor: const Color(0xFF10B981),
@@ -103,7 +103,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.locale.languageCode == 'en' ? 'Error submitting review.' : 'حدث خطأ أثناء الإرسال.',
+              'testimonial_error'.tr(),
               style: const TextStyle(fontFamily: 'Cairo'),
             ),
             backgroundColor: const Color(0xFFEF4444),
@@ -142,7 +142,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           const SizedBox(width: 14),
           Expanded(
             child: Text(
-              isEn ? 'Share Your Experience' : 'شارك تجربتك',
+              'testimonial_share_title'.tr(),
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontFamily: 'Cairo',
@@ -158,7 +158,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              isEn ? 'New' : 'جديد',
+              'testimonial_new'.tr(),
               style: TextStyle(
                 color: colorScheme.primary,
                 fontSize: 10,
@@ -192,7 +192,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           const Text('🎉', style: TextStyle(fontSize: 32)),
           const SizedBox(height: 8),
           Text(
-            isEn ? 'Thank you! Under review.' : 'شكراً! تحت المراجعة.',
+            'testimonial_thankyou'.tr(),
             style: const TextStyle(
               color: Color(0xFF10B981),
               fontWeight: FontWeight.w800,
@@ -210,9 +210,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isEn
-              ? 'Your review will appear on our landing page after approval.'
-              : 'رأيك سيظهر في صفحتنا الرئيسية بعد المراجعة.',
+          'testimonial_approval_notice'.tr(),
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
             fontFamily: 'Cairo',
@@ -224,7 +222,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
         
         // Stars
         Text(
-          isEn ? 'Rating' : 'التقييم',
+          'testimonial_rating'.tr(),
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
@@ -262,7 +260,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isEn ? 'Name' : 'الاسم',
+                    'testimonial_name'.tr(),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
@@ -271,7 +269,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  _inputField(_nameCtrl, isEn ? 'Your name' : 'اسمك', colorScheme),
+                  _inputField(_nameCtrl, 'testimonial_name_hint'.tr(), colorScheme),
                 ],
               ),
             ),
@@ -282,7 +280,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isEn ? 'Country' : 'الدولة',
+                    'testimonial_country'.tr(),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
@@ -323,7 +321,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
 
         // Role
         Text(
-          isEn ? 'Job Title (optional)' : 'الوظيفة (اختياري)',
+          'testimonial_job_title'.tr(),
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
@@ -332,7 +330,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           ),
         ),
         const SizedBox(height: 6),
-        _inputField(_roleCtrl, isEn ? 'e.g. Software Engineer' : 'مثال: مهندس برمجيات', colorScheme),
+        _inputField(_roleCtrl, 'testimonial_job_hint'.tr(), colorScheme),
         const SizedBox(height: 16),
 
         // Text
@@ -340,7 +338,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              isEn ? 'Your Review' : 'رأيك بالتطبيق',
+              'testimonial_your_review'.tr(),
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.bold,
@@ -365,7 +363,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           maxLines: 4,
           style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 13),
           decoration: InputDecoration(
-            hintText: isEn ? 'What do you like most about Fajrak?' : 'ما الذي أعجبك في التطبيق؟',
+            hintText: 'testimonial_review_hint'.tr(),
             hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 13),
             filled: true,
             fillColor: colorScheme.outlineVariant,
@@ -396,9 +394,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
             child: _saving
                 ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimary))
                 : Text(
-                    _existing
-                        ? (isEn ? 'Update Review ⭐' : 'تحديث التقييم ⭐')
-                        : (isEn ? 'Submit Review ⭐' : 'إرسال التقييم ⭐'),
+                    _existing ? 'testimonial_update_btn'.tr() : 'testimonial_submit_btn'.tr(),
                     style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontWeight: FontWeight.w800,
@@ -412,7 +408,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           const SizedBox(height: 12),
           Center(
             child: Text(
-              isEn ? '✓ You have a pending/approved review' : '✓ لديك تقييم قيد المراجعة أو موافق عليه',
+              'testimonial_existing_notice'.tr(),
               style: const TextStyle(
                 color: Color(0xFFF59E0B),
                 fontFamily: 'Cairo',

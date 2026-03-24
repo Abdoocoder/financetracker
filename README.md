@@ -210,6 +210,111 @@ npm run test:coverage
 
 ---
 
+## 🌍 Internationalization (i18n)
+
+**Fajrak** supports full localization for **English** and **Arabic** across both the web application (Next.js) and mobile app (Flutter).
+
+### 🌐 Supported Languages
+
+| Language | Code | Direction |
+|:---------|:----:|:---------:|
+| 🇬🇧 English | `en` | LTR |
+| 🇸🇦 Arabic | `ar` | RTL |
+
+### 📱 Next.js Web Application
+
+The web app uses a custom translation system in [`lib/i18n.tsx`](lib/i18n.tsx).
+
+#### How It Works
+
+```typescript
+import { useTranslation } from '@/lib/i18n';
+
+// In your component
+const { t, lang } = useTranslation();
+
+// Use the t() function to translate keys
+<span>{t('dashboard_title')}</span>
+
+// Access current language
+<span>{lang === 'en' ? 'Hello' : 'مرحبا'}</span>
+```
+
+#### Adding Translations
+
+1. Open [`lib/i18n.tsx`](lib/i18n.tsx)
+2. Add your key to both `en` and `ar` objects:
+
+```typescript
+export const en = {
+  // ... existing keys
+  your_new_key: 'Your English text here',
+};
+
+export const ar = {
+  // ... existing keys
+  your_new_key: 'النص بالعربية هنا',
+};
+```
+
+#### Best Practices
+
+- Use descriptive, namespaced keys (e.g., `dashboard_welcome`, `settings_profile`)
+- Avoid hardcoding strings — always use `t('key')`
+- For dynamic content, use string interpolation: `` `Hello ${name}` ``
+
+### 📲 Flutter Mobile Application
+
+The Flutter app uses the `easy_localization` package with JSON translation files.
+
+#### Translation Files
+
+| File | Description |
+|:-----|:------------|
+| `mobile/fajrak_flutter/assets/i18n/en.json` | English translations |
+| `mobile/fajrak_flutter/assets/i18n/ar.json` | Arabic translations |
+
+#### How It Works
+
+```dart
+// Import localization
+import 'package:easy_localization/easy_localization.dart';
+
+// Translate keys using .tr() extension
+Text('trans_add_note_hint'.tr())
+
+// Get current locale
+context.locale
+```
+
+#### Adding Translations
+
+1. Open the appropriate JSON file
+2. Add your key-value pair:
+
+```json
+{
+  "your_new_key": "Your English text here"
+}
+```
+
+### 🔑 Common Translation Keys
+
+| Key | English | Arabic |
+|:----|:--------|:-------|
+| `app_name` | Fajrak | فجرك |
+| `dashboard_title` | Dashboard | لوحة التحكم |
+| `transactions` | Transactions | المعاملات |
+| `add_transaction` | Add Transaction | إضافة معاملة |
+| `save` | Save | حفظ |
+| `cancel` | Cancel | إلغاء |
+| `delete` | Delete | حذف |
+| `edit` | Edit | تعديل |
+| `settings` | Settings | الإعدادات |
+| `help` | Help | المساعدة |
+
+---
+
 ## 🔐 Security Features
 
 | Feature | Description |

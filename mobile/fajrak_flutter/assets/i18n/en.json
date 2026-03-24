@@ -24,7 +24,6 @@
   "search_hint": "Search...",
   "jod": "JOD",
   "usd": "USD",
-
   "nav_home": "Home",
   "nav_transactions": "Transactions",
   "nav_debts": "Debts",
@@ -36,7 +35,6 @@
   "nav_budgets": "Budgets",
   "nav_learn": "Learning",
   "nav_help": "Help",
-
   "dash_title": "Dashboard",
   "dash_welcome": "Welcome, {}",
   "dash_monthly": "This Month",
@@ -70,7 +68,6 @@
   "challenge_2_title": "Save 10% of your income",
   "challenge_3_title": "Spend less than last month",
   "challenge_4_title": "Zero unnecessary expenses",
-
   "trans_title": "Transactions",
   "trans_add": "Add",
   "trans_new": "New Transaction",
@@ -81,7 +78,30 @@
   "trans_amount": "Amount",
   "trans_category": "Category",
   "trans_description": "Description",
+  "trans_add_note_hint": "Add a note (optional)",
   "trans_date": "Date",
+  "help_email_error": "Sorry, we couldn't open the email app. Please email us at support@fajrak.com",
+  "error_generic": "Something went wrong. Please try again.",
+  "error_details": "Details",
+  "error_dialog_title": "Error Details",
+  "error_close": "Close",
+  "testimonial_share_title": "Share Your Experience",
+  "testimonial_new": "New",
+  "testimonial_success": "Review submitted successfully!",
+  "testimonial_error": "Error submitting review.",
+  "testimonial_thankyou": "Thank you! Under review.",
+  "testimonial_approval_notice": "Your review will appear on our landing page after approval.",
+  "testimonial_rating": "Rating",
+  "testimonial_name": "Name",
+  "testimonial_name_hint": "Your name",
+  "testimonial_country": "Country",
+  "testimonial_job_title": "Job Title (optional)",
+  "testimonial_job_hint": "e.g. Software Engineer",
+  "testimonial_your_review": "Your Review",
+  "testimonial_review_hint": "What do you like most about Fajrak?",
+  "testimonial_update_btn": "Update Review ⭐",
+  "testimonial_submit_btn": "Submit Review ⭐",
+  "testimonial_existing_notice": "You have a pending/approved review",
   "trans_save": "Save Transaction",
   "trans_save_edit": "Save Changes",
   "error_export": "Export error: {}",
@@ -96,7 +116,6 @@
   "trans_exchange_rate": "Exchange Rate",
   "trans_equivalent": "Equivalent",
   "trans_count": "{} transactions",
-
   "debts_title": "Debts",
   "debts_add": "Add",
   "debts_new": "New Debt",
@@ -156,7 +175,6 @@
   "debts_paid_pct": "{}% paid",
   "debts_day_label": "Day {}",
   "debts_add_payment_btn": "+ Payment",
-
   "inv_title": "Portfolio",
   "inv_add": "Add",
   "inv_new": "New Investment",
@@ -184,8 +202,8 @@
   "inv_halal": "Halal ✅",
   "inv_unit": "units",
   "inv_currency_usd": "💵 USD",
-    "inv_currency_jod": "🇯🇴 JOD",
-    "inv_price": "Price",
+  "inv_currency_jod": "🇯🇴 JOD",
+  "inv_price": "Price",
   "inv_delete_title": "Delete Investment",
   "inv_tx_history_symbol": "Transaction History for {}",
   "inv_buy": "Buy",
@@ -211,7 +229,6 @@
   "inv_price_with_dollar_hint": "Price $",
   "inv_comm_hint": "Commission $",
   "inv_submit_btn": "Record",
-
   "goals_title": "Savings Goals",
   "goals_add": "Add",
   "goals_new": "New Goal",
@@ -246,7 +263,6 @@
   "goals_add_first": "Add Your First Goal",
   "goals_progress_percent": "{}% Completed",
   "goals_remaining_value": "Remaining: {} {}",
-
   "budget_new": "New Budget",
   "budget_edit": "Edit Budget",
   "budget_category": "Category",
@@ -261,7 +277,6 @@
   "budget_insight_surplus": "Surplus {} {} — Consider investing!",
   "budget_insight_deficit": "Your budget exceeds available by {} {}",
   "budget_insight_goal_near": "You are about to achieve your {} goal! ({} remaining)",
-
   "alerts_title": "Alerts",
   "alerts_count": "{} Alerts",
   "alerts_unread_count": "{} Unread",
@@ -279,7 +294,6 @@
   "alerts_generate_success": "Generation request sent successfully",
   "alerts_auto": "Runs automatically every day at 7:00 AM",
   "alerts_unread": "unread",
-
   "learn_title": "Daily Lesson",
   "learn_subtitle": "One step every day toward financial freedom",
   "learn_stage_label": "Your Stage",
@@ -355,7 +369,6 @@
   "learn_lesson_wealth_3_body": "IRS study: The average millionaire has 7 sources of income. Start with a simple second source.",
   "learn_lesson_wealth_4_title": "🎓 Human Capital",
   "learn_lesson_wealth_4_body": "Investing $1,000 in a professional skill returns 10x. Investing in yourself is the safest bet.",
-
   "settings_title": "Settings",
   "settings_subtitle": "Your account preferences",
   "settings_name": "Full Name",
@@ -403,7 +416,6 @@
   "settings_your_name": "Your Name",
   "settings_member": "Member",
   "settings_data": "Data",
-
   "auth_login_welcome": "Welcome Back",
   "auth_login_subtitle": "Sign in to track your finances",
   "auth_email": "Email Address",
@@ -434,7 +446,6 @@
   "auth_reset_password_success": "Password updated successfully! Redirecting...",
   "auth_error_passwords_dont_match": "Passwords do not match",
   "auth_error_password_too_short": "Password must be at least 6 characters",
-
   "onboarding_start": "Start Your Journey 🚀",
   "onboarding_welcome_title": "Welcome to Fajrak!",
   "onboarding_welcome_subtitle": "Your companion on the road to financial freedom. Let's set up your profile.",
@@ -444,7 +455,6 @@
   "onboarding_payday_subtitle": "When do you usually receive your income?",
   "onboarding_day_value": "Day {}",
   "onboarding_currency_subtitle": "Choose your main currency for tracking.",
-
   "help_title": "Help Center",
   "help_search_hint": "Search help...",
   "help_contact_title": "Need extra help?",
@@ -485,7 +495,6 @@
   "help_faq_investments_a1": "Supports US stocks (like SPUS, VOO) and cryptocurrencies (BTC, ETH, and over 15 others) with live prices.",
   "help_faq_investments_q2": "How does the app calculate profit and loss?",
   "help_faq_investments_a2": "It calculates the difference between the purchase price you entered and the live current price. The result appears in dollars and as a percentage.",
-
   "cat_food": "Food",
   "cat_transport": "Transport",
   "cat_bills": "Bills",
@@ -497,7 +506,6 @@
   "cat_salary": "Salary",
   "cat_freelance": "Freelance",
   "cat_others": "Others",
-
   "month_jan": "January",
   "month_feb": "February",
   "month_mar": "March",
@@ -510,7 +518,6 @@
   "month_oct": "October",
   "month_nov": "November",
   "month_dec": "December",
-
   "toast_saved": "Saved successfully ✅",
   "toast_deleted": "Deleted",
   "toast_error_save": "Failed to save",
@@ -532,7 +539,6 @@
   "toast_alerts_done": "Alerts generated ✅",
   "toast_marked_read": "All marked as read",
   "toast_all_deleted": "All alerts deleted",
-
   "gamif_journey": "Wealth Journey",
   "gamif_next_level": "Next level",
   "gamif_streak": "Day Streak",
@@ -547,7 +553,6 @@
   "gamif_rank_diamond": "Diamond",
   "gamif_max_level": "You are at the highest level, keep it up!",
   "gamif_next_level_tip": "Control your spending more to level up and unlock new badges 🏆",
-
   "health_excellent": "Excellent 🌟",
   "health_good": "Good 💪",
   "health_fair": "Fair ⚡",
@@ -558,7 +563,6 @@
   "health_investing": "Investing",
   "health_tracking": "Tracking",
   "health_tip": "Improvement Tip",
-
   "financialScore": "Financial Score",
   "financialScoreEn": "Financial Score",
   "stage": "Stage",

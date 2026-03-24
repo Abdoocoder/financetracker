@@ -439,7 +439,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 fontWeight: FontWeight.bold
               ),
               decoration: InputDecoration(
-                hintText: 'Add a note (optional)',
+                hintText: 'trans_add_note_hint'.tr(),
                 hintStyle: TextStyle(
                   color: isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.35) : const Color(0xFF0F172A).withValues(alpha: 0.35)
                 ),

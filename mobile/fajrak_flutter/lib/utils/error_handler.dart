@@ -18,8 +18,6 @@ class ErrorHandler {
     );
 
     if (context != null && context.mounted) {
-      final isEn = context.locale.languageCode == 'en';
-      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -28,7 +26,7 @@ class ErrorHandler {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  isEn ? 'Something went wrong. Please try again.' : 'حدث خطأ ما. يرجى المحاولة لاحقاً.',
+                  'error_generic'.tr(),
                   style: const TextStyle(fontFamily: 'Cairo'),
                 ),
               ),
@@ -39,10 +37,10 @@ class ErrorHandler {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           duration: const Duration(seconds: 4),
           action: SnackBarAction(
-            label: isEn ? 'Details' : 'التفاصيل',
+            label: 'error_details'.tr(),
             textColor: Colors.white,
             onPressed: () {
-              _showErrorDialog(context, errorMessage, isEn);
+              _showErrorDialog(context, errorMessage);
             },
           ),
         ),
@@ -50,12 +48,12 @@ class ErrorHandler {
     }
   }
 
-  static void _showErrorDialog(BuildContext context, String message, bool isEn) {
+  static void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E293B),
-        title: Text(isEn ? 'Error Details' : 'تفاصيل الخطأ',
+        title: Text('error_dialog_title'.tr(),
             style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
         content: SingleChildScrollView(
           child: Text(message,
@@ -64,7 +62,7 @@ class ErrorHandler {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(isEn ? 'Close' : 'إغلاق', style: const TextStyle(fontFamily: 'Cairo')),
+            child: Text('error_close'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
           ),
         ],
       ),

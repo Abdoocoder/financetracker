@@ -176,7 +176,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 } catch (e) {
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('عذراً، لا يمكن فتح تطبيق البريد الإلكتروني. يرجى مراسلتنا على support@fajrak.com')),
+                    SnackBar(content: Text('help_email_error'.tr())),
                   );
                 }
               },

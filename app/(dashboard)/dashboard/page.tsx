@@ -1,11 +1,11 @@
 'use client'
 export const dynamic = 'force-dynamic'
 import { useState, useEffect, useMemo } from 'react'
-import Link                           from 'next/link'
-import { createClient }               from '@/lib/supabase/client'
-import { useUser }                    from '@/lib/user-context'
-import { useI18n }                    from '@/lib/i18n'
-import { QuickAdd }                   from '@/components/ui/quick-add'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
+import { useUser } from '@/lib/user-context'
+import { useI18n } from '@/lib/i18n'
+import { QuickAdd } from '@/components/ui/quick-add'
 import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
@@ -14,9 +14,9 @@ import { FinancialHealthCombined } from '@/components/ui/financial-health-combin
 import { DashboardEmptyState } from '@/components/ui/empty-state'
 import nextDynamic from 'next/dynamic'
 
-const MiniBarChart     = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
-const CategoryBars     = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
-const ChallengesCard   = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
+const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
+const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
+const ChallengesCard = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
 const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
 
 // ── Collapsible Section ──────────────────────────────────────────
@@ -38,7 +38,7 @@ function Section({ id, title, icon, defaultOpen = false, children }: {
   function toggle() {
     const next = !open
     setOpen(next)
-    try { localStorage.setItem(STORAGE_KEY, String(next)) } catch {}
+    try { localStorage.setItem(STORAGE_KEY, String(next)) } catch { }
   }
 
   return (
@@ -84,13 +84,13 @@ function DashSkeleton() {
         <Bone w="140px" h="24px" /><Bone w="80px" h="18px" />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-        {[0,1,2].map(i => (
+        {[0, 1, 2].map(i => (
           <div key={i} className="card-static" style={{ padding: 14, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
             <Bone w="32px" h="32px" r="10px" /><Bone w="60px" h="20px" r="6px" /><Bone w="50px" h="12px" r="6px" />
           </div>
         ))}
       </div>
-      {[0,1,2].map(i => (
+      {[0, 1, 2].map(i => (
         <div key={i} className="card-static" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 14 }}>
           <Bone w="48px" h="48px" r="14px" />
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -125,10 +125,10 @@ export interface DashboardData {
 
 function computeHealthScore(data: DashboardData | null, income: number, expenses: number): number {
   if (!data) return 0;
-  const metrics = (income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0) 
-    + (data.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data.totalDebt / Math.max(income * 12, 1)) * 25))) 
-    + Math.min(20, Math.round((data.goalsSaved / Math.max(income * 3, 1)) * 20)) 
-    + (data.invValue > 0 ? 15 : 0) 
+  const metrics = (income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0)
+    + (data.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data.totalDebt / Math.max(income * 12, 1)) * 25)))
+    + Math.min(20, Math.round((data.goalsSaved / Math.max(income * 3, 1)) * 20))
+    + (data.invValue > 0 ? 15 : 0)
     + Math.min(10, data.txCount);
   return Math.min(100, Math.round(metrics));
 }
@@ -150,7 +150,7 @@ function useDashboardData() {
         const { data: cd, recentTx: cr, ts } = JSON.parse(cached)
         if (Date.now() - ts < CACHE_TTL_MS) { setData(cd); setRecentTx(cr); setLoading(false); return }
       }
-    } catch {}
+    } catch { }
 
     const user = currentUser
     const now = new Date()
@@ -196,16 +196,16 @@ function useDashboardData() {
       const newData = {
         income, expenses, months6, categories, net: income - expenses,
         prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
-        totalDebt:   (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
-        invValue:    (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
-        goalsSaved:  (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
+        totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
+        invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
+        goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts,
         txCount: (chartRes.data ?? []).length,
         name,
       }
       setData(newData); setRecentTx(recentRes.data ?? [])
-      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch {}
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch { }
     }
 
     fetchPhase1()
@@ -222,8 +222,8 @@ export default function DashboardPage() {
 
   if (loading) return <DashSkeleton />
 
-  const net      = data?.net ?? 0
-  const income   = data?.income ?? 0
+  const net = data?.net ?? 0
+  const income = data?.income ?? 0
   const expenses = data?.expenses ?? 0
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
@@ -255,9 +255,9 @@ export default function DashboardPage() {
       {/* Stats — دائماً ظاهرة */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
         {[
-          { label: t('dash_income'),   value: `+${fmt(income)}`,                          color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)',  border: 'rgba(16,185,129,0.15)', icon: '↑' },
-          { label: t('dash_expenses'), value: fmt(expenses),                               color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',    border: 'rgba(239,68,68,0.15)',  icon: '↓' },
-          { label: t('dash_net'),      value: `${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,        color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+          { label: t('dash_income'), value: `+${fmt(income)}`, color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑' },
+          { label: t('dash_expenses'), value: fmt(expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓' },
+          { label: t('dash_net'), value: `${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
         ].map((s, i) => (
           <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
             <div style={{ fontSize: 12, color: s.color, fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>{s.icon}</div>
@@ -290,7 +290,7 @@ export default function DashboardPage() {
         if (!txs) return
         const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
         const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-        try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch {}
+        try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch { }
         setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
       }} />
 

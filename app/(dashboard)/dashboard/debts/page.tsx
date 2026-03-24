@@ -20,10 +20,10 @@ import { CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
-  { color: '#F59E0B', ar: 'عالية',      en: 'High'      },
-  { color: '#3B7EF6', ar: 'متوسطة',    en: 'Medium'    },
-  { color: '#8B9CC8', ar: 'منخفضة',    en: 'Low'       },
-  { color: '#4A5568', ar: 'مؤجلة',     en: 'Deferred'  },
+  { color: '#F59E0B', ar: 'عالية', en: 'High' },
+  { color: '#3B7EF6', ar: 'متوسطة', en: 'Medium' },
+  { color: '#8B9CC8', ar: 'منخفضة', en: 'Low' },
+  { color: '#4A5568', ar: 'مؤجلة', en: 'Deferred' },
 ]
 
 // ── Confetti Component ──
@@ -97,17 +97,17 @@ export default function DebtsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState({ 
-    name: '', 
-    original_amount: '', 
+  const [form, setForm] = useState({
+    name: '',
+    original_amount: '',
     original_amount_foreign: '',
-    remaining_amount: '', 
-    monthly_payment: '', 
-    due_date: '', 
-    priority: '3', 
-    notes: '', 
-    payment_day: '1', 
-    auto_deduct: false, 
+    remaining_amount: '',
+    monthly_payment: '',
+    due_date: '',
+    priority: '3',
+    notes: '',
+    payment_day: '1',
+    auto_deduct: false,
     received_amount: false,
     currency: '',
     exchange_rate: '1'
@@ -117,7 +117,7 @@ export default function DebtsPage() {
   const [paymentAmount, setPaymentAmount] = useState('')
   const [paymentCurrency, setPaymentCurrency] = useState('')
   const [payingSaving, setPayingSaving] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState<string|null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [celebration, setCelebration] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const supabase = createClient()
@@ -163,17 +163,17 @@ export default function DebtsPage() {
 
   function openAdd() {
     setEditingId(null)
-    setForm({ 
-      name: '', 
-      original_amount: '', 
+    setForm({
+      name: '',
+      original_amount: '',
       original_amount_foreign: '',
-      remaining_amount: '', 
-      monthly_payment: '', 
-      due_date: '', 
-      priority: '3', 
-      notes: '', 
-      payment_day: '1', 
-      auto_deduct: false, 
+      remaining_amount: '',
+      monthly_payment: '',
+      due_date: '',
+      priority: '3',
+      notes: '',
+      payment_day: '1',
+      auto_deduct: false,
       received_amount: false,
       currency: baseCurrency,
       exchange_rate: '1'
@@ -183,17 +183,17 @@ export default function DebtsPage() {
 
   function startEdit(d: any) {
     setEditingId(d.id)
-    setForm({ 
-      name: d.name, 
-      original_amount: d.original_amount.toString(), 
+    setForm({
+      name: d.name,
+      original_amount: d.original_amount.toString(),
       original_amount_foreign: (d.original_amount_foreign || d.original_amount).toString(),
-      remaining_amount: d.remaining_amount.toString(), 
-      monthly_payment: d.monthly_payment?.toString() ?? '', 
-      due_date: d.due_date ?? '', 
-      priority: d.priority.toString(), 
-      notes: d.notes ?? '', 
-      payment_day: d.payment_day?.toString() ?? '1', 
-      auto_deduct: d.auto_deduct ?? false, 
+      remaining_amount: d.remaining_amount.toString(),
+      monthly_payment: d.monthly_payment?.toString() ?? '',
+      due_date: d.due_date ?? '',
+      priority: d.priority.toString(),
+      notes: d.notes ?? '',
+      payment_day: d.payment_day?.toString() ?? '1',
+      auto_deduct: d.auto_deduct ?? false,
       received_amount: false,
       currency: d.currency || baseCurrency,
       exchange_rate: d.exchange_rate?.toString() ?? '1'
@@ -212,31 +212,31 @@ export default function DebtsPage() {
     const origBase = isMulti ? (origForeign * rate) : parseFloat(form.original_amount.replace(",", "."))
 
     if (editingId) {
-      const { error } = await supabase.from('debts').update({ 
-        name: form.name, 
+      const { error } = await supabase.from('debts').update({
+        name: form.name,
         original_amount: origBase,
         original_amount_foreign: isMulti ? origForeign : origBase,
-        remaining_amount: isMulti ? (origForeign * rate) : parseFloat(form.remaining_amount.replace(",", ".")), 
+        remaining_amount: isMulti ? (origForeign * rate) : parseFloat(form.remaining_amount.replace(",", ".")),
         remaining_amount_foreign: isMulti ? origForeign : origBase,
         currency: form.currency,
         exchange_rate: rate,
-        monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, 
-        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct 
+        monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0,
+        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct
       }).eq('id', editingId)
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_edited'))
     } else {
-      const { error } = await supabase.from('debts').insert({ 
-        user_id: currentUser.id, 
-        name: form.name, 
+      const { error } = await supabase.from('debts').insert({
+        user_id: currentUser.id,
+        name: form.name,
         original_amount: origBase,
         original_amount_foreign: isMulti ? origForeign : origBase,
         remaining_amount: origBase,
         remaining_amount_foreign: isMulti ? origForeign : origBase,
         currency: form.currency,
         exchange_rate: rate,
-        monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, 
-        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct 
+        monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0,
+        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct
       })
       // إضافة معاملة دخل إذا استلم المبلغ
       if (!error && form.received_amount) {
@@ -292,14 +292,14 @@ export default function DebtsPage() {
     const newRemainingForeign = Math.max(0, (debt.remaining_amount_foreign || debt.remaining_amount) - amountInDebtCurrency)
     const newRemainingBase = Math.max(0, debt.remaining_amount - amountInBaseCurrency)
 
-    await supabase.from('debt_payments').insert({ 
-      debt_id: debtId, 
-      user_id: currentUser.id, 
-      amount: amountInBaseCurrency, 
+    await supabase.from('debt_payments').insert({
+      debt_id: debtId,
+      user_id: currentUser.id,
+      amount: amountInBaseCurrency,
       original_amount: payAmount,
       original_currency: paymentCurrency,
       exchange_rate: rateToBaseCurrency,
-      payment_date: new Date().toISOString().split('T')[0] 
+      payment_date: new Date().toISOString().split('T')[0]
     })
 
     // تعليم تنبيه الدين كمقروء تلقائياً
@@ -311,12 +311,12 @@ export default function DebtsPage() {
         .eq('is_read', false)
         .ilike('title', `%${paidDebt.name}%`)
     }
-    await supabase.from('debts').update({ 
-      remaining_amount: newRemainingBase, 
+    await supabase.from('debts').update({
+      remaining_amount: newRemainingBase,
       remaining_amount_foreign: newRemainingForeign,
-      is_paid: newRemainingBase <= 0.01 
+      is_paid: newRemainingBase <= 0.01
     }).eq('id', debtId)
-    
+
     if (newRemainingBase <= 0.01) {
       // ── احتفال ──
       setCelebration(debt.name)
@@ -330,13 +330,13 @@ export default function DebtsPage() {
   }
 
   const totalRemaining = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
-  const totalOriginal  = debts.reduce((a, d) => a + Number(d.original_amount), 0)
-  const totalMonthly   = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
+  const totalOriginal = debts.reduce((a, d) => a + Number(d.original_amount), 0)
+  const totalMonthly = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
   const paidPct = totalOriginal > 0 ? ((totalOriginal - totalRemaining) / totalOriginal * 100) : 0
 
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {[0,1,2,3].map(i => <div key={i} className="skeleton" style={{ height: 140, borderRadius: 16 }} />)}
+      {[0, 1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 140, borderRadius: 16 }} />)}
     </div>
   )
 
@@ -359,9 +359,9 @@ export default function DebtsPage() {
       />
 
       <StatBar stats={[
-        { label: t('debts_total'),    value: totalRemaining.toFixed(0), color: 'var(--accent-red-light)'   },
+        { label: t('debts_total'), value: totalRemaining.toFixed(0), color: 'var(--accent-red-light)' },
         { label: t('debts_paid_pct'), value: `${paidPct.toFixed(0)}%`, color: 'var(--accent-green-light)' },
-        { label: t('debts_monthly'),  value: totalMonthly.toFixed(0),  color: 'var(--accent-amber-light)'  },
+        { label: t('debts_monthly'), value: totalMonthly.toFixed(0), color: 'var(--accent-amber-light)' },
       ]} />
 
       {/* ── إحصائية المبالغ المسددة ── */}
@@ -396,7 +396,7 @@ export default function DebtsPage() {
       )}
 
       {debts.length === 0 ? (
-        <EmptyState icon="🎉" title={t('debts_empty')} subtitle="لا ديون نشطة — أحسنت!" />
+        <EmptyState icon="🎉" title={t('debts_empty')} subtitle={t('debts_empty_sub')} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {debts.map(debt => {
@@ -440,8 +440,8 @@ export default function DebtsPage() {
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{pct.toFixed(0)}% مسدد</span>
                   {paymentDebtId === debt.id ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <select 
-                        value={paymentCurrency || debt.currency || baseCurrency} 
+                      <select
+                        value={paymentCurrency || debt.currency || baseCurrency}
                         onChange={e => setPaymentCurrency(e.target.value)}
                         style={{ padding: '6px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 11, fontFamily: 'inherit', outline: 'none' }}
                       >
@@ -513,7 +513,7 @@ export default function DebtsPage() {
       {showForm && (
         <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={() => setShowForm(false)}>
           <FormField label={t('debts_name')}>
-            <Input placeholder={lang === "en" ? "e.g. Visa Card" : "مثال: بطاقة Visa"} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            <Input placeholder={t('debts_name_hint')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </FormField>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
@@ -530,12 +530,12 @@ export default function DebtsPage() {
             <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 12, marginBottom: 12, border: '1px dashed var(--border)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <FormField label={t('trans_exchange_rate') || 'سعر الصرف'}>
-                   <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => setForm(f => ({ ...f, exchange_rate: e.target.value }))} />
+                  <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => setForm(f => ({ ...f, exchange_rate: e.target.value }))} />
                 </FormField>
                 <FormField label="المعادل">
-                   <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, textAlign: 'center', fontSize: 13 }}>
-                     {(parseFloat(form.original_amount_foreign) * parseFloat(form.exchange_rate) || 0).toFixed(2)} {baseCurrency}
-                   </div>
+                  <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, textAlign: 'center', fontSize: 13 }}>
+                    {(parseFloat(form.original_amount_foreign) * parseFloat(form.exchange_rate) || 0).toFixed(2)} {baseCurrency}
+                  </div>
                 </FormField>
               </div>
             </div>
@@ -552,7 +552,7 @@ export default function DebtsPage() {
           <FormField label="الأولوية">
             <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
               {PRIORITY_CONFIG.map((p, i) => (
-                <option key={i+1} value={i+1}>{lang === 'en' ? p.en : p.ar}</option>
+                <option key={i + 1} value={i + 1}>{lang === 'en' ? p.en : p.ar}</option>
               ))}
             </Select>
           </FormField>
@@ -589,7 +589,7 @@ export default function DebtsPage() {
             </FormField>
           )}
           <FormField label={t('debts_notes')}>
-            <Input placeholder={lang === "en" ? "Optional notes" : "ملاحظات اختيارية"} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+            <Input placeholder={t('debts_notes_hint')} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
           </FormField>
           <FormField label={t('debts_payment_day')}>
             <Input type="number" placeholder="1" value={form.payment_day} onChange={e => setForm(f => ({ ...f, payment_day: e.target.value }))} />
