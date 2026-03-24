@@ -8,7 +8,7 @@
 [![تحميل APK](https://img.shields.io/badge/📱_تحميل-APK-38ef7d?style=for-the-badge)](https://fajrak.com/download)
 [![الكود المصدري](https://img.shields.io/badge/💻_الكود_المصدري-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/Abdoocoder/financetracker)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![Supabase](https://img.shields.io/badge/Supabase-قاعدة_البيانات-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
 [![Flutter](https://img.shields.io/badge/Flutter-أجهزة_محمولة-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
@@ -127,7 +127,7 @@
 
 | التقنية | الاستخدام | الإصدار |
 |:-------:|:---------:|:-------:|
-| ⚡ Next.js | إطار العمل + SSR | 15.5.12 |
+| ⚡ Next.js | إطار العمل + SSR | 16.2.1 |
 | 🔷 TypeScript | سلامة الأنواع | 5.x |
 | 🗄️ Supabase | قاعدة البيانات + Auth + RLS | Latest |
 | 🔥 Firebase | إشعارات Push FCM | Latest |
@@ -239,7 +239,15 @@ npm run test:coverage
 
 ## 📝 سجل التغييرات
 
-### v3.11.0 — 24 مارس 2026 *(الأحدث)*
+### v3.12.0 — 24 مارس 2026 *(الأحدث)*
+
+| التغيير | الوصف |
+|:-------|:------|
+| 🚀 **تحديث Next.js 16** | ترقية كاملة للإصدار 16.2.1 مع Turbopack لتحسين سرعة البناء والأداء |
+| ⚙️ **اتفاقية Proxy الجديدة** | الانتقال من `middleware.ts` إلى اتفاقية `proxy.ts` المطلوبة في Next.js 16 |
+| 🛡️ **إصلاح النشر** | حل مشكلات تواصل Commit مع حساب GitHub وحل قيود Hobby Plan في Vercel |
+
+### v3.11.0 — 24 مارس 2026
 
 | التغيير | الوصف |
 |:-------|:------|
