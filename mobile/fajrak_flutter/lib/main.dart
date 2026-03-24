@@ -151,10 +151,6 @@ class FajrakApp extends StatelessWidget {
       useMaterial3: true,
       brightness: brightness,
       scaffoldBackgroundColor: scaffoldBg,
-      textTheme: Typography.material2021().black.apply(
-        fontFamily: 'Cairo',
-        fontFamilyFallback: const ['Cairo'],
-      ),
       colorScheme: ColorScheme(
         brightness: brightness,
         primary: primary,
