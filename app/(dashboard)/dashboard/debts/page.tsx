@@ -196,7 +196,7 @@ export default function DebtsPage() {
       auto_deduct: d.auto_deduct ?? false, 
       received_amount: false,
       currency: d.currency || baseCurrency,
-      exchange_rate: '1'
+      exchange_rate: d.exchange_rate?.toString() ?? '1'
     })
     setShowForm(true)
   }
@@ -219,6 +219,7 @@ export default function DebtsPage() {
         remaining_amount: isMulti ? (origForeign * rate) : parseFloat(form.remaining_amount.replace(",", ".")), 
         remaining_amount_foreign: isMulti ? origForeign : origBase,
         currency: form.currency,
+        exchange_rate: rate,
         monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, 
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct 
       }).eq('id', editingId)
@@ -233,6 +234,7 @@ export default function DebtsPage() {
         remaining_amount: origBase,
         remaining_amount_foreign: isMulti ? origForeign : origBase,
         currency: form.currency,
+        exchange_rate: rate,
         monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0, 
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct 
       })

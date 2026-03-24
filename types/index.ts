@@ -41,6 +41,7 @@ export interface Debt {
   remaining_amount: number
   remaining_amount_foreign?: number
   currency?: string
+  exchange_rate?: number
   monthly_payment: number
   due_date: string | null
   priority: number
