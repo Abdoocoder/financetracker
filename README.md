@@ -92,7 +92,9 @@
 - Portfolio summary view
 
 ### 🔔 Smart Notifications
-- Firebase FCM for Android
+- **Firebase FCM for Android** (High-priority Channels)
+- **Interactive Foreground Notifications**
+- **Deep Link Navigation** on push click
 - Web Push for iOS
 - Morning, Evening, Weekly reports
 - Smart policy: useful only
