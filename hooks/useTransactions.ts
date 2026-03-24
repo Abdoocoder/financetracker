@@ -214,6 +214,13 @@ export function useTransactions() {
   }
 
   function exportCSV() {
+    function csvField(value: string | number | null | undefined): string {
+      const str = String(value ?? '')
+      // منع CSV injection: الحقول التي تبدأ بـ =، +، -، @ قد تُنفَّذ كصيغ في Excel
+      const safe = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str
+      // تغليف بعلامات اقتباس مع هروب علامات الاقتباس الداخلية
+      return `"${safe.replace(/"/g, '""')}"`
+    }
     const rows = [
       lang === 'en'
         ? ['Date', 'Type', 'Category', 'Description', 'Amount']
@@ -224,7 +231,7 @@ export function useTransactions() {
         tx.category, tx.description ?? '', tx.amount,
       ]),
     ]
-    const csv = rows.map(r => r.join(',')).join('\n')
+    const csv = rows.map(r => r.map(csvField).join(',')).join('\n')
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
