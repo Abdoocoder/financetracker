@@ -4,12 +4,6 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
   turbopack: {},
-  webpack: (config) => {
-    config.infrastructureLogging = {
-      level: 'error',
-    };
-    return config;
-  },
 };
 
 export default nextConfig;
