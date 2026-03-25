@@ -10,7 +10,7 @@ const supabase = createClient(
 async function addMonthlySalaries() {
   const now = new Date()
   // استخدام توقيت UTC+3 (الأردن/السعودية/الخليج)
-  const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+  const localNow = new Date(now.getTime() + (Number(process.env.TIMEZONE_OFFSET_HOURS) || 3) * 60 * 60 * 1000)
   const dayOfMonth = localNow.getUTCDate()
   const year = localNow.getUTCFullYear()
   const month = localNow.getUTCMonth() + 1
