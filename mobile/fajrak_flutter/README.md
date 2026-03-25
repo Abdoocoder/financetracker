@@ -1,37 +1,232 @@
-# Fajrak Flutter 🌅
+<div align="center">
 
-### تطبيق الأندرويد الأصلي — Native Android App
+<img src="../../public/icon-512.png" alt="Fajrak Logo" width="110" height="110" style="border-radius: 22px;" />
+
+# Fajrak Flutter
+
+**تطبيق أندرويد أصلي — Native Android App**
+
+*22 شاشة · 100% Feature Parity · Arabic-First*
 
 ---
 
-[![100% Feature Parity](https://img.shields.io/badge/✅-100%25_Feature_Parity-38ef7d?style=for-the-badge)](https://fajrak.com)
-[![APK Size](https://img.shields.io/badge/📦-54.5_MB_APK-FF6B35?style=for-the-badge)](https://github.com/Abdoocoder/financetracker/releases)
-[![Google Play](https://img.shields.io/badge/🎯-Google_Play_Ready-4285F4?style=for-the-badge)](https://fajrak.com/download)
-[![Direct Download](https://img.shields.io/badge/⬇️-Direct_Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![APK](https://img.shields.io/badge/📦_APK-54.5_MB-38ef7d?style=for-the-badge)](https://fajrak.com/download)
+[![Google Play](https://img.shields.io/badge/🎯_Google_Play-Closed_Testing-4285F4?style=for-the-badge)](https://fajrak.com/download)
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![Supabase](https://img.shields.io/badge/Supabase-Shared_Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+
+</div>
+
+---
+
+## Table of Contents
+
+- [نظرة عامة](#-نظرة-عامة)
+- [هيكل المشروع](#-هيكل-المشروع)
+- [الشاشات](#-الشاشات)
+- [التقنيات](#️-التقنيات)
+- [المتطلبات](#-المتطلبات)
+- [الإعداد والتشغيل](#️-الإعداد-والتشغيل)
+- [البيئة المشتركة مع الويب](#-البيئة-المشتركة-مع-الويب)
+- [نظام الإشعارات](#-نظام-الإشعارات)
+- [الترجمة والتوطين](#-الترجمة-والتوطين)
+- [النشر](#-النشر)
+- [سجل التغييرات](#-سجل-التغييرات)
 
 ---
 
 ## ✨ نظرة عامة
 
-تطبيق أندرويد أصلي مبني بـ **Flutter** لمنصة **Fajrak** لإدارة المالية الشخصية.
+تطبيق أندرويد أصلي مبني بـ **Flutter** لمنصة **Fajrak** لإدارة المالية الشخصية. يشارك نفس قاعدة بيانات Supabase وFirebase project مع تطبيق الويب Next.js، مما يضمن **تزامناً فورياً** بين المنصتين.
 
-> 🎉 **متوفر على Google Play** — تم بناء حزمة التطبيق `.aab` ورفعها للاختبار المغلق (Closed Testing) بنجاح!
+> 🎉 **متوفر على Google Play** — تم بناء حزمة التطبيق `.aab` ورفعها للاختبار المغلق بنجاح!
+
+**مميزات التطبيق:**
+- تطابق 100% مع ميزات تطبيق الويب
+- تصميم عربي أصيل مع دعم RTL الكامل
+- إشعارات Firebase FCM عالية الأولوية
+- Foreground notifications + Deep Linking
+- دعم اللغتين: العربية (الافتراضية) والإنجليزية
+- رسوم بيانية تفاعلية (fl_chart)
+- إيماءات نشطة (سحب للتحديث، سحب للحذف)
+
+---
+
+## 📁 هيكل المشروع
+
+```
+fajrak_flutter/
+├── lib/
+│   ├── main.dart                       ← نقطة الدخول + إعداد Theme
+│   ├── app_state.dart                  ← إدارة حالة التطبيق
+│   │
+│   ├── models/                         ← نماذج البيانات (Dart classes)
+│   │   ├── transaction.dart
+│   │   ├── debt.dart
+│   │   ├── investment.dart
+│   │   ├── budget.dart
+│   │   ├── savings_goal.dart
+│   │   └── alert.dart
+│   │
+│   ├── screens/                        ← 22 شاشة كاملة
+│   │   ├── auth/
+│   │   │   ├── login_screen.dart       ← تسجيل الدخول
+│   │   │   ├── register_screen.dart    ← إنشاء حساب
+│   │   │   ├── onboarding_screen.dart  ← إعداد أولي (4 خطوات)
+│   │   │   ├── forgot_password_screen.dart
+│   │   │   └── reset_password_screen.dart
+│   │   │
+│   │   ├── dashboard/
+│   │   │   └── dashboard_screen.dart   ← لوحة التحكم الرئيسية
+│   │   │
+│   │   ├── transactions/
+│   │   │   └── transactions_screen.dart
+│   │   │
+│   │   ├── debts/
+│   │   │   └── debts_screen.dart
+│   │   │
+│   │   ├── investments/
+│   │   │   └── investments_screen.dart
+│   │   │
+│   │   ├── goals/
+│   │   │   └── goals_screen.dart
+│   │   │
+│   │   ├── budgets/
+│   │   │   └── budgets_screen.dart
+│   │   │
+│   │   ├── alerts/
+│   │   │   └── alerts_screen.dart
+│   │   │
+│   │   ├── settings/
+│   │   │   └── settings_screen.dart
+│   │   │
+│   │   ├── learn/
+│   │   │   └── learn_screen.dart       ← الدروس الإسلامية
+│   │   │
+│   │   ├── help/
+│   │   │   └── help_screen.dart
+│   │   │
+│   │   ├── achievements/
+│   │   │   └── achievements_screen.dart ← الشارات والمستويات
+│   │   │
+│   │   ├── fire/
+│   │   │   └── fire_calculator_screen.dart ← حاسبة FIRE
+│   │   │
+│   │   ├── zakat/
+│   │   │   └── zakat_calculator_screen.dart ← حاسبة الزكاة
+│   │   │
+│   │   ├── more/
+│   │   │   └── more_screen.dart        ← شاشة المزيد
+│   │   │
+│   │   ├── splash_screen.dart          ← شاشة البداية
+│   │   └── main_screen.dart            ← هيكل التنقل الرئيسي
+│   │
+│   ├── services/
+│   │   ├── notification_service.dart   ← Firebase FCM + محلي
+│   │   ├── currency_service.dart       ← تحويل العملات
+│   │   ├── analytics_service.dart      ← تتبع الأحداث
+│   │   └── investments_service.dart    ← بيانات الاستثمارات
+│   │
+│   ├── widgets/                        ← مكونات قابلة لإعادة الاستخدام
+│   │   ├── more_menu_item.dart
+│   │   └── ...
+│   │
+│   └── utils/                          ← أدوات مساعدة
+│
+├── assets/
+│   ├── images/
+│   │   └── app_icon.png               ← شعار التطبيق
+│   ├── fonts/
+│   │   ├── Cairo-Regular.ttf
+│   │   └── Cairo-Bold.ttf
+│   └── i18n/
+│       ├── en.json                    ← ترجمة إنجليزية
+│       └── ar.json                    ← ترجمة عربية
+│
+├── android/
+│   └── app/
+│       └── google-services.json       ← (غير مُودَع — من Firebase Console)
+│
+├── pubspec.yaml                       ← تعريف الاعتمادات
+└── .env                               ← متغيرات البيئة (غير مُودَعة)
+```
+
+---
+
+## 📱 الشاشات
+
+| # | الشاشة | الوصف | الميزات الرئيسية |
+|:-:|:-------|:------|:----------------|
+| 1 | **Splash** | شاشة البداية | تحميل شعار + فحص جلسة |
+| 2 | **Login** | تسجيل الدخول | البريد + كلمة المرور، التوجيه |
+| 3 | **Register** | إنشاء حساب | تحقق، إنشاء Profile |
+| 4 | **Onboarding** | إعداد أولي | 4 خطوات تفاعلية (PageView) |
+| 5 | **ForgotPassword** | استعادة كلمة المرور | إرسال بريد إلكتروني |
+| 6 | **Dashboard** | لوحة التحكم | Health Score، المعاملات الأخيرة، المخططات |
+| 7 | **Transactions** | المعاملات | CRUD، بحث، فلترة، CSV، سحب للحذف |
+| 8 | **Debts** | الديون | تقدم، أقساط، Confetti عند السداد |
+| 9 | **Budgets** | الميزانية | حدود الفئات، التقدم الفوري |
+| 10 | **Goals** | أهداف الادخار | تتبع التقدم، Emoji picker |
+| 11 | **Investments** | الاستثمارات | أسعار حية، P&L، الحلال، الحول |
+| 12 | **Alerts** | التنبيهات | مركز الإشعارات، تصنيف بالنوع |
+| 13 | **Settings** | الإعدادات | الملف الشخصي، العملة، اللغة، الثيم |
+| 14 | **Learn** | الدروس | محتوى إسلامي يومي، تتبع الاستمرارية |
+| 15 | **Help** | المساعدة | FAQ، معلومات التواصل |
+| 16 | **Achievements** | الإنجازات | 20+ شارة، 6 مستويات |
+| 17 | **FIRE Calculator** | حاسبة FIRE | Lean/Full/Fat، متزلجات تفاعلية |
+| 18 | **Zakat Calculator** | حاسبة الزكاة | ملء تلقائي، عداد الحول، تاريخ |
+| 19 | **More** | المزيد | قائمة تنقل إضافية |
+| 20 | **Main** | الهيكل الرئيسي | Bottom navigation bar (4 تبويبات) |
+
+---
+
+## 🛠️ التقنيات
+
+### الاعتمادات الأساسية
+
+| الحزمة | الإصدار | الغرض |
+|:-------|:-------:|:------|
+| `supabase_flutter` | 2.3.4 | قاعدة البيانات + Auth + Real-time |
+| `firebase_core` | 4.5.0 | تهيئة Firebase |
+| `firebase_messaging` | 16.1.2 | Cloud Messaging (FCM) |
+| `flutter_local_notifications` | 21.0.0 | إشعارات Foreground |
+| `fl_chart` | 1.1.0 | رسوم بيانية (خطية، دائرية، شريطية، Sparkline) |
+| `easy_localization` | 3.0.3 | التوطين AR/EN |
+| `provider` | 6.1.1 | إدارة الحالة |
+| `shimmer` | 3.0.0 | تأثيرات التحميل |
+| `cached_network_image` | 3.3.1 | تخزين مؤقت للصور |
+| `flutter_dotenv` | 6.0.0 | متغيرات البيئة |
+| `intl` | 0.20.2 | تنسيق التواريخ والعملات |
+| `shared_preferences` | 2.2.2 | التخزين المحلي |
+| `url_launcher` | 6.2.4 | روابط خارجية |
+| `http` | 1.2.1 | طلبات HTTP |
+
+### اللغة والإطار
+
+| | |
+|:--|:--|
+| **اللغة** | Dart 3.x |
+| **الإطار** | Flutter 3.x |
+| **إدارة الحالة** | Provider 6 |
+| **التنقل** | Navigator 2.0 |
+| **الخط** | Cairo (Arabic + Latin) |
 
 ---
 
 ## 📋 المتطلبات
 
-| المتطلب | الوصف |
-|:--------|:------|
-| 🦋 Flutter SDK | `>=3.0.0 <4.0.0` |
-| 🔵 Android Studio | أو VS Code مع Flutter extension |
-| 🔥 Firebase | حساب مرتبط للمشروع |
-| 🔐 google-services.json | ملف من Firebase Console |
+| المتطلب | الإصدار |
+|:--------|:-------:|
+| Flutter SDK | `>=3.0.0 <4.0.0` |
+| Dart SDK | `>=3.0.0` |
+| Android SDK | API 21+ (Android 5.0+) |
+| Android Studio | أو VS Code + Flutter extension |
+| Firebase Project | مرتبط بالمشروع |
 
 ---
 
-## ⚙️ الإعداد
+## ⚙️ الإعداد والتشغيل
 
 ### 1. تثبيت الاعتمادات
 
@@ -39,140 +234,233 @@
 flutter pub get
 ```
 
-### 2. إضافة خط Cairo
+### 2. إضافة أصول خط Cairo
 
 حمّل خط Cairo من [Google Fonts](https://fonts.google.com/specimen/Cairo) وضع الملفات في:
 
 ```
 assets/fonts/Cairo-Regular.ttf
 assets/fonts/Cairo-Bold.ttf
+assets/fonts/Cairo-SemiBold.ttf
+assets/fonts/Cairo-Bold.ttf
 ```
 
-### 3. إضافة google-services.json
+### 3. إعداد Firebase
 
-من [Firebase Console](https://console.firebase.google.com) → مشروعك → إعدادات التطبيق → حمّل `google-services.json` وضعه في:
+من [Firebase Console](https://console.firebase.google.com):
+1. اختر مشروعك
+2. اذهب إلى **Project Settings → Your Apps**
+3. حمّل `google-services.json`
+4. ضعه في: `android/app/google-services.json`
 
-```
-android/app/google-services.json
-```
+> ⚠️ هذا الملف مُدرج في `.gitignore` ولن يُرفع على GitHub
 
-> ⚠️ **ملاحظة:** هذا الملف مُدرج في `.gitignore` ولن يُرفع على GitHub
-
-### 4. متغيرات البيئة (Environment Variables)
-
-يعتمد التطبيق الآن بشكل كامل على ملف `.env` لإدارة الإعدادات الحساسة. قم بنسخ `.env.example` وتعبئته:
+### 4. متغيرات البيئة
 
 ```bash
 cp .env.example .env
 ```
 
-تأكد من تعبئة القيم التالية:
-- `SUPABASE_URL` و `SUPABASE_ANON_KEY`
-- `FLUTTER_FIREBASE_API_KEY` (لنسخة الويب)
-- `TWELVE_DATA_KEY` (لتحديث أسعار الأسهم)
+```env
+SUPABASE_URL=https://xxxx.supabase.co
+SUPABASE_ANON_KEY=eyJ...
+FLUTTER_FIREBASE_API_KEY=AIza...
+TWELVE_DATA_KEY=xxxx
+```
 
-> 🔐 **تنبيه أمني:** تم تشفير وإزالة جميع المفاتيح البرمجية (Hardcoded) من الكود المصدري لضمان أعلى مستويات الأمان.
-
----
-
-## 🚀 التشغيل والبناء
+### 5. تشغيل التطبيق
 
 ```bash
-# تشغيل في وضع التطوير
+# التشغيل على جهاز/محاكي
 flutter run
 
-# بناء APK للتوزيع
+# التشغيل مع تحديد الجهاز
+flutter run -d <device_id>
+
+# عرض الأجهزة المتاحة
+flutter devices
+```
+
+### 6. بناء APK للإصدار
+
+```bash
+# APK للتوزيع المباشر
 flutter build apk --release
+
+# AAB لـ Google Play
+flutter build appbundle --release
 ```
 
-> 📦 **موقع الـ APK:** `build/app/outputs/flutter-apk/app-release.apk`
+| الملف | المسار |
+|:------|:-------|
+| APK | `build/app/outputs/flutter-apk/app-release.apk` |
+| AAB | `build/app/outputs/bundle/release/app-release.aab` |
 
 ---
 
-## 📁 هيكل المشروع
+## 🔗 البيئة المشتركة مع الويب
 
+التطبيق يشارك نفس البنية التحتية مع تطبيق الويب Next.js:
+
+| المورد | الحالة |
+|:-------|:------:|
+| قاعدة بيانات Supabase PostgreSQL | ✅ مشترك |
+| المصادقة Supabase Auth | ✅ مشترك |
+| Firebase Project + FCM | ✅ مشترك |
+| تسجيل الدخول بنفس الحساب | ✅ مدعوم |
+| مزامنة فورية عبر المنصتين | ✅ فوري |
+
+**أي بيانات تُضاف على الويب تظهر فوراً على الهاتف والعكس.**
+
+---
+
+## 🔔 نظام الإشعارات
+
+### Firebase Cloud Messaging (FCM)
+
+```dart
+// تهيئة في notification_service.dart
+FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  // عرض إشعار Foreground
+});
+
+FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+  // Deep Linking عند الضغط
+});
 ```
-lib/
-├── main.dart                      ← نقطة الدخول + إعداد Theme
-├── screens/
-│   ├── auth/                      ← تسجيل الدخول، التسجيل، الإعداد
-│   ├── dashboard/                 ← الصفحة الرئيسية
-│   ├── transactions/              ← المعاملات المالية
-│   ├── debts/                     ← الديون
-│   ├── investments/               ← الاستثمارات
-│   ├── goals/                     ← أهداف الادخار
-│   ├── budgets/                   ← الميزانية
-│   ├── alerts/                    ← التنبيهات
-│   ├── settings/                  ← الإعدادات
-│   └── more/                      ← صفحات إضافية
-├── services/
-│   └── notification_service.dart  ← Firebase FCM
-├── models/                        ← نماذج البيانات
-└── widgets/                        ← مكونات مشتركة
+
+**أنواع الإشعارات:**
+
+| النوع | الوصف |
+|:------|:------|
+| تذكير صباحي | إشعار يومي الساعة 6:00 ص |
+| تذكير مسائي | تذكير عند الحاجة 6:00 م |
+| تقرير أسبوعي | ملخص الجمعة |
+| تذكير الزكاة | قبل 30، 7، 0 يوم من الحول |
+| تنبيهات ذكية | تحذيرات وتحفيز سياقي |
+
+### Local Notifications
+
+للإشعارات في وضع Foreground (التطبيق مفتوح):
+
+```dart
+FlutterLocalNotificationsPlugin().show(
+  id, title, body,
+  NotificationDetails(android: AndroidNotificationDetails(
+    channelId, channelName,
+    importance: Importance.high,
+    priority: Priority.high,
+  )),
+);
 ```
 
 ---
 
-## 🛠️ التقنيات المستخدمة
+## 🌍 الترجمة والتوطين
 
-| التقنية | الاستخدام |
-|:--------|:----------|
-| 🦋 Flutter 3.x | إطار العمل |
-| 🔷 Dart | لغة البرمجة |
-| 🗄️ Supabase | قاعدة البيانات + Auth |
-| 🔥 Firebase FCM | الإشعارات |
-| 📊 fl_chart | الرسوم البيانية |
-| 🌐 share_plus | مشاركة الملفات |
+يستخدم التطبيق `easy_localization` مع ملفات JSON:
+
+### ملفات الترجمة
+
+| الملف | اللغة | الاتجاه |
+|:------|:-----:|:-------:|
+| `assets/i18n/ar.json` | العربية | RTL |
+| `assets/i18n/en.json` | الإنجليزية | LTR |
+
+### الاستخدام
+
+```dart
+// في أي widget
+import 'package:easy_localization/easy_localization.dart';
+
+Text('nav_dashboard'.tr())
+Text('greeting'.tr(args: ['اسم المستخدم']))
+```
+
+### إضافة ترجمة جديدة
+
+```json
+// ar.json
+{
+  "your_key": "النص بالعربية"
+}
+
+// en.json
+{
+  "your_key": "Your text in English"
+}
+```
+
+### المفاتيح الشائعة
+
+| المفتاح | العربية | الإنجليزية |
+|:--------|:-------:|:----------:|
+| `app_name` | فجرك | Fajrak |
+| `nav_dashboard` | لوحة التحكم | Dashboard |
+| `nav_transactions` | المعاملات | Transactions |
+| `nav_debts` | الديون | Debts |
+| `nav_investments` | الاستثمارات | Investments |
+| `nav_settings` | الإعدادات | Settings |
+| `fire_title` | حاسبة FIRE | FIRE Calculator |
+| `zakat_title` | حاسبة الزكاة | Zakat Calculator |
 
 ---
 
-## 🔗 Backend مشترك
+## 🚀 النشر
 
-التطبيق يشارك نفس **Supabase** و **Firebase** project مع تطبيق الويب Next.js:
+### Google Play Store
 
-| الميزة | الحالة |
-|:-------|:------|
-| ✅ نفس قاعدة البيانات والجداول | نشط |
-| ✅ نفس المصادقة (Auth) | نشط |
-| ✅ نفس Firebase FCM للإشعارات | نشط |
-| ✅ تسجيل الدخول بنفس الحساب | نشط |
+```bash
+# 1. بناء AAB
+flutter build appbundle --release
+
+# 2. التحقق من الحزمة
+flutter build appbundle --release --analyze-size
+
+# 3. الرفع
+# Google Play Console → Production → Closed Testing
+```
+
+**متطلبات المتجر المكتملة:**
+- [x] شعار التطبيق (512×512)
+- [x] Feature Graphic (1024×500)
+- [x] Screenshots (هاتف + تابلت)
+- [x] وصف التطبيق (عربي + إنجليزي)
+- [x] سياسة الخصوصية
+- [x] Content Rating
+- [x] Target API Level 34+
+
+### التوزيع المباشر (APK)
+
+```bash
+flutter build apk --release --split-per-abi
+```
+
+الملف النهائي: `build/app/outputs/flutter-apk/app-release.apk` (~54.5 MB)
 
 ---
 
-## 📊 حالة التطابق — 100% Feature Parity
+## 📊 Feature Parity — 100%
 
-| الميزة | الوصف | الحالة |
-|:-------|:------|:------:|
-| **Dashboard** | التحليلات، Health Score، Gamification | ✅ 100% |
-| **Transactions** | إضافة المعاملات، CSV، المشاركة | ✅ 100% |
-| **Investments** | مبدل العملات، تحديث الأسعار، المحاكي | ✅ 100% |
-| **Debts & Goals** | تواريخ الاستحقاق، Emoji Picker، Confetti | ✅ 100% |
-| **Settings & Learn** | اللغة/الثيم الداخلي، Financial Roadmap | ✅ 100% |
-| **Budgets & Alerts** | تحليل تلقائي، AI Advisor | ✅ 100% |
-| **Core Systems** | ErrorHandler، AnalyticsService | ✅ 100% |
-| **Onboarding** | 4 خطوات تفاعلية (PageView) | ✅ 100% |
-| **Modern UI** | تصميم عصري مع تدرجات لونية (Gradients) | ✅ 100% |
-| **FIRE Calculator** | محاكاة الحرية المالية + ملء تلقائي + محاكي فائدة مركبة | ✅ جديد |
-| **Zakat Calculator** | ملء تلقائي + عداد الحول ملوّن + تذكيرات Push | ✅ جديد |
-| **Health Score History** | رسم sparkline لتطور النقاط (30 يوماً) | ✅ جديد |
-
----
-
-## 🎯 الميزات الرئيسية
-
-| | |
-|:---|:---|
-| 💳 **إدارة المعاملات** | إضافة/تعديل/حذف مع دعم CSV |
-| 💰 **الميزانية الذكية** | تحليل تلقائي + AI Advisor |
-| 📈 **الاستثمارات** | أسعار حية للأسهم والعملات الرقمية |
-| 💎 **أهداف الادخار** | تتبع التقدم مع تأثيرات احتفالية |
-| 🔔 **إشعارات ذكية** | Firebase FCM، عرض في المقدمة (Foreground)، وتوجيه ذكي (Deep Linking) |
-| 🎮 **Gamification** | نقاط، مستويات، شارات |
-| 🌅 **دروس يومية** | محتوى تعليمي مخصص لمرحلتك |
-| 🕌 **محتوى إسلامي** | آيات قرآنية وأحاديث نبوية |
-| 🔥 **حاسبة FIRE** | محاكاة الحرية المالية مع ملء تلقائي من بيانات الاستثمار والادخار |
-| 🌙 **حاسبة الزكاة** | ملء تلقائي + عداد حول ملوّن + إشعارات تذكير عند اقتراب الموعد |
-| 📊 **تاريخ الصحة المالية** | رسم بياني sparkline يعرض تطور نقاط صحتك المالية خلال 30 يوماً |
+| الميزة | الويب | الهاتف |
+|:-------|:-----:|:------:|
+| لوحة التحكم الكاملة | ✅ | ✅ |
+| المعاملات + CSV + بحث | ✅ | ✅ |
+| الديون + Confetti | ✅ | ✅ |
+| الميزانية + 50/30/20 | ✅ | ✅ |
+| أهداف الادخار | ✅ | ✅ |
+| الاستثمارات + أسعار حية | ✅ | ✅ |
+| التنبيهات الذكية | ✅ | ✅ |
+| حاسبة FIRE | ✅ | ✅ |
+| حاسبة الزكاة + حول | ✅ | ✅ |
+| تاريخ الصحة المالية | ✅ | ✅ |
+| تقارير PDF | ✅ | — |
+| Gamification + شارات | ✅ | ✅ |
+| الدروس الإسلامية | ✅ | ✅ |
+| إشعارات FCM | ✅ | ✅ |
+| دعم AR/EN + RTL | ✅ | ✅ |
+| متعدد العملات | ✅ | ✅ |
+| Onboarding (4 خطوات) | ✅ | ✅ |
 
 ---
 
@@ -182,23 +470,33 @@ lib/
 
 | التغيير | الوصف |
 |:-------|:------|
-| 🖼️ **شعار Splash Screen** | استبدال حرف "ف" بشعار التطبيق الحقيقي (`assets/images/app_icon.png`) مع تأثير `ClipRRect` و`BoxShadow` |
-| 🖼️ **شعار Login Screen** | استبدال حرف "ف" بشعار التطبيق الحقيقي بنفس الأسلوب البصري |
-| 📜 **إعادة هيكلة More Screen** | تحويل الشاشة من `Scaffold → SingleChildScrollView → Container` إلى `ListView` مباشر — أبسط وأسرع، مع إضافة عنوان "المزيد" في الأعلى |
+| 🖼️ **شعار Splash Screen** | استبدال حرف "ف" بشعار التطبيق الحقيقي (`assets/images/app_icon.png`) مع `ClipRRect` ر`BoxShadow` |
+| 🖼️ **شعار Login Screen** | نفس التغيير — الشعار الحقيقي بدل حرف "ف" مع تأثير إضاءة `BoxShadow` |
+| 📜 **إعادة هيكلة More Screen** | تحويل من `Scaffold → SingleChildScrollView → Container` إلى `ListView` مباشر — أخف وأبسط، مع إضافة عنوان القسم |
 
 ### v3.13.0 — 25 مارس 2026
 
 | التغيير | الوصف |
 |:-------|:------|
-| 🔥 **حاسبة FIRE** | محاكاة الحرية المالية بأوضاع Lean/Full/Fat FIRE مع ملء تلقائي ومتزلجات تفاعلية |
-| 🌙 **حاسبة الزكاة** | ملء تلقائي من البيانات + عداد حول لكل استثمار + إشعارات تذكير |
-| 📈 **تاريخ الصحة المالية** | رسم sparkline (fl_chart) يعرض تطور النقاط خلال 30 يوماً |
+| 🔥 **حاسبة FIRE** | `FIRECalculatorScreen` كاملة: Lean/Full/Fat FIRE، ملء تلقائي من البيانات، محاكاة الفائدة المركبة، متزلجات تفاعلية |
+| 🌙 **حاسبة الزكاة** | `ZakatCalculatorScreen`: ملء تلقائي من مدخرات/ديون/استثمارات، عداد حول لكل استثمار بترميز لوني |
+| 📈 **تاريخ الصحة** | Sparkline بـ fl_chart داخل بطاقة Health Score لعرض تطور آخر 30 يوماً |
 
----
+### v3.12.0 — 24 مارس 2026
 
-## 🚀 النشر على Google Play
+| التغيير | الوصف |
+|:-------|:------|
+| 💎 **تحديث الواجهة** | إعادة تصميم شاملة: تدرجات لونية، خط Cairo عالي الدقة |
+| 🛡️ **الأمان** | إزالة جميع المفاتيح المُضمَّنة؛ الانتقال الكامل لـ `.env` |
+| 🎨 **الثيم** | إصلاح مشكلة "الأبيض على الأبيض" في الوضع الفاتح |
 
-تم بناء حزمة التطبيق `.aab` ورفعها للاختبار المغلق (Closed Testing) على متجر Google Play بنجاح، مع استكمال جميع متطلبات التقييم والمحتوى.
+### v3.10.0 — 23 مارس 2026
+
+| التغيير | الوصف |
+|:-------|:------|
+| 🚀 **Google Play** | رفع حزمة .aab للاختبار المغلق |
+| ⚙️ **إصلاحات Gradle** | حل مشاكل بناء Android |
+| 🌍 **الترجمة** | تغطية 100% لجميع الشاشات |
 
 ---
 
@@ -208,12 +506,10 @@ lib/
 
 **مبني بـ ❤️ من الأردن للعالم العربي**
 
-© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة
-
----
-
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Abdoocoder)
+[![GitHub](https://img.shields.io/badge/GitHub-Abdoocoder-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Abdoocoder)
 [![Website](https://img.shields.io/badge/Website-fajrak.com-FF6B35?style=for-the-badge)](https://fajrak.com)
-[![Download](https://img.shields.io/badge/Download-APK-38ef7d?style=for-the-badge)](https://fajrak.com/download)
+[![Download](https://img.shields.io/badge/APK-Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
+
+**© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
 
 </div>
