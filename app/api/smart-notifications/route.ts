@@ -367,8 +367,7 @@ export async function GET(request: NextRequest) {
 
   // 6 ص — صباحي + تنبيهات ذكية معاً (تنبيه واحد فقط)
   if (hour === 6) {
-    await dailyMorningReminder()
-    await smartAlerts()
+    await Promise.all([dailyMorningReminder(), smartAlerts()])
     tasks.push('morning+alerts')
     tasks.push('nudge')
   }
@@ -381,8 +380,7 @@ export async function GET(request: NextRequest) {
 
   // 9 ص — ديون ومعاملات متكررة
   if (hour === 9) {
-    await autoDebt()
-    await autoRecurring()
+    await Promise.all([autoDebt(), autoRecurring()])
     tasks.push('debt-silent')
     tasks.push('auto-recurring')
   }
