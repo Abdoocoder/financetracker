@@ -40,7 +40,7 @@ export default function PDFReportPage() {
     const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1])
 
     setData({
-      profile: (profileRes as any).data,
+      profile: profileRes.data,
       transactions: txs,
       income,
       expenses,

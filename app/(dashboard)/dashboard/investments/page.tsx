@@ -15,7 +15,7 @@ import { useI18n } from '@/lib/i18n'
 
 // مسح cache المستخدم بعد أي تعديل
 
-function WealthSimulator({ lang }: { lang: string }) {
+function WealthSimulator({ lang, currency }: { lang: string; currency: string }) {
   const ar = lang === 'ar'
   const [monthly, setMonthly] = useState(50)
   const [years, setYears] = useState(10)
@@ -70,7 +70,7 @@ function WealthSimulator({ lang }: { lang: string }) {
               {ar ? 'الاستثمار الشهري' : 'Monthly Investment'}
             </span>
             <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
-              ${monthly}
+              {monthly} {currency}
             </span>
           </div>
           <input type="range" min={10} max={1000} step={10} value={monthly}
@@ -78,7 +78,7 @@ function WealthSimulator({ lang }: { lang: string }) {
             style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-            <span>$10</span><span>$1,000</span>
+            <span>10 {currency}</span><span>1,000 {currency}</span>
           </div>
         </div>
 
@@ -137,25 +137,25 @@ function WealthSimulator({ lang }: { lang: string }) {
           background: 'linear-gradient(135deg, var(--accent-blue-light), var(--accent-green-light))',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
         }}>
-          ${future >= 1000000
+          {future >= 1000000
             ? (future / 1000000).toFixed(2) + 'M'
             : future >= 1000
             ? (future / 1000).toFixed(1) + 'K'
             : future.toFixed(0)
-          }
+          } {currency}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12 }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'ما دفعته' : 'You invested'}</div>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
-              ${(invested/1000).toFixed(1)}K
+              {(invested/1000).toFixed(1)}K {currency}
             </div>
           </div>
           <div style={{ width: 1, background: 'var(--border)' }} />
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'الربح' : 'Profit'}</div>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
-              +${profit >= 1000 ? (profit/1000).toFixed(1) + 'K' : profit.toFixed(0)}
+              +{profit >= 1000 ? (profit/1000).toFixed(1) + 'K' : profit.toFixed(0)} {currency}
             </div>
           </div>
           <div style={{ width: 1, background: 'var(--border)' }} />
@@ -198,7 +198,7 @@ function WealthSimulator({ lang }: { lang: string }) {
                 </span>
                 <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
                   <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: y === years ? 'var(--accent-blue-light)' : 'var(--text-primary)' }}>
-                    ${val >= 1000 ? (val/1000).toFixed(1) + 'K' : val.toFixed(0)}
+                    {val >= 1000 ? (val/1000).toFixed(1) + 'K' : val.toFixed(0)} {currency}
                   </div>
                   <div style={{ fontSize: 10, color: 'var(--accent-green-light)' }}>+{pct.toFixed(0)}%</div>
                 </div>
@@ -237,6 +237,7 @@ export default function InvestmentsPage() {
   const [usdToJod, setUsdToJod] = useState<number | null>(null)
   const [showJod, setShowJod] = useState(false)
   const [priceStatus, setPriceStatus] = useState<Record<string, 'live' | 'manual'>>({})
+  const [userCurrency, setUserCurrency] = useState('JOD')
   const { t, lang } = useI18n()
   const supabase = createClient()
 
@@ -261,6 +262,13 @@ export default function InvestmentsPage() {
       if (data.conversion_rate) setUsdToJod(data.conversion_rate)
     } catch {}
   }, [])
+
+  useEffect(() => {
+    if (currentUser) {
+      supabase.from('profiles').select('currency').eq('id', currentUser.id).single()
+        .then(({ data }) => { if (data?.currency) setUserCurrency(data.currency) })
+    }
+  }, [currentUser, supabase])
 
   useEffect(() => {
     load()
@@ -593,7 +601,7 @@ export default function InvestmentsPage() {
 
 
       {/* ── محاكي الثروة ── */}
-      <WealthSimulator lang={lang} />
+      <WealthSimulator lang={lang} currency={userCurrency} />
       {editingInv && (
         <Modal title={`تعديل ${editingInv.symbol}`} onClose={() => setEditingInv(null)}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

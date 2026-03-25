@@ -607,6 +607,7 @@
   "recurringNoteEn": "✅ Will auto-execute every month",
   "wealthSimulator": "Wealth Simulator",
   "wealthSimulatorDesc": "See how your investment grows over time",
+  "inv_sim_after_years": "After {} years",
   "monthlyInvestment": "Monthly Investment",
   "duration": "Duration",
   "annualReturn": "Annual Return",

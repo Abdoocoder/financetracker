@@ -84,6 +84,13 @@ const translations = {
     learn_completed: 'مكتمل',
     learn_did_you_know: 'هل تعلم؟',
 
+    // Header
+    greeting_morning: 'صباح الخير',
+    greeting_afternoon: 'مساء الخير',
+    greeting_evening: 'مساء النور',
+    greeting_fallback: 'أهلاً',
+    header_salary: 'الراتب الشهري',
+
     // Nav
     nav_home: 'الرئيسية',
     nav_transactions: 'المعاملات',
@@ -487,6 +494,13 @@ const translations = {
     learn_done: 'Done',
     learn_completed: 'Completed',
     learn_did_you_know: 'Did you know?',
+
+    // Header
+    greeting_morning: 'Good morning',
+    greeting_afternoon: 'Good afternoon',
+    greeting_evening: 'Good evening',
+    greeting_fallback: 'Hello',
+    header_salary: 'Monthly Salary',
 
     // Nav
     nav_home: 'Home',
