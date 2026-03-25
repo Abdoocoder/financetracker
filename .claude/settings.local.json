@@ -20,7 +20,8 @@
       "Bash(find c:/Users/skyli/Project/financetracker -type f -name *sidebar* -o -name *nav-bar* -o -name *navigation*)",
       "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")",
       "Bash(find c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/assets -type f -name *.json)",
-      "Bash(grep -rn clearUserCache c:/Users/skyli/Project/financetracker/lib/ --include=*.ts)"
+      "Bash(grep -rn clearUserCache c:/Users/skyli/Project/financetracker/lib/ --include=*.ts)",
+      "Bash(ls -la /c/Users/skyli/Project/financetracker/app/\\\\\\(auth\\\\\\)/)"
     ]
   }
 }

@@ -45,6 +45,8 @@ function Section({ id, title, icon, defaultOpen = false, children }: {
     <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--border)' }}>
       <button
         onClick={toggle}
+        aria-expanded={open}
+        aria-controls={`section-${id}`}
         style={{
           width: '100%', padding: '12px 16px',
           background: open ? 'var(--bg-elevated)' : 'var(--bg-card)',
@@ -64,7 +66,7 @@ function Section({ id, title, icon, defaultOpen = false, children }: {
         }}>▼</span>
       </button>
       {open && (
-        <div style={{ padding: '0 0 4px 0', background: 'var(--bg-primary)' }}>
+        <div id={`section-${id}`} style={{ padding: '0 0 4px 0', background: 'var(--bg-primary)' }}>
           {children}
         </div>
       )}
@@ -217,7 +219,7 @@ function useDashboardData() {
 // ── Page ──────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const { t, lang } = useI18n()
-  const { user: currentUser } = useUser()
+  const { user: currentUser, profile } = useUser()
   const { data, setData, recentTx, loading, supabase } = useDashboardData()
 
   if (loading) return <DashSkeleton />
@@ -295,11 +297,11 @@ export default function DashboardPage() {
       }} />
 
       {/* الميزانية الشهرية — دائماً ظاهرة */}
-      <BudgetProgressCard income={income} expenses={expenses} net={net} />
+      <BudgetProgressCard income={income} expenses={expenses} net={net} currency={profile?.currency ?? 'JOD'} />
 
 
       {/* روابط سريعة — دائماً ظاهرة */}
-      <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} />
+      <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} currency={profile?.currency ?? 'JOD'} />
 
       {/* ── قابلة للطي — مطوية افتراضياً ── */}
 

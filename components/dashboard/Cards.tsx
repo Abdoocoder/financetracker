@@ -49,12 +49,12 @@ export function BudgetProgressCard({ income, expenses, net, currency = 'JOD' }: 
   )
 }
 
-export function QuickLinksCards({ totalDebt, invValue, goalsSaved, goalsTarget }: { totalDebt: number; invValue: number; goalsSaved: number; goalsTarget: number }) {
+export function QuickLinksCards({ totalDebt, invValue, goalsSaved, goalsTarget, currency = 'JOD' }: { totalDebt: number; invValue: number; goalsSaved: number; goalsTarget: number; currency?: string }) {
   const { t } = useI18n()
   const cards = [
-    { label: t('dash_debts'),       value: `${totalDebt.toFixed(0)} JOD`,                           color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',   border: 'rgba(239,68,68,0.15)',  icon: '◈', href: '/dashboard/debts'       },
+    { label: t('dash_debts'),       value: `${totalDebt.toFixed(0)} ${currency}`,                           color: 'var(--accent-red-light)',   bg: 'var(--accent-red-dim)',   border: 'rgba(239,68,68,0.15)',  icon: '◈', href: '/dashboard/debts'       },
     { label: t('dash_investments'), value: `$${invValue.toFixed(0)}`,                                color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '◎', href: '/dashboard/investments' },
-    { label: t('dash_goals'),       value: `${goalsSaved.toFixed(0)}/${goalsTarget.toFixed(0)} JOD`, color: 'var(--accent-blue-light)',  bg: 'var(--accent-blue-dim)',  border: 'rgba(59,126,246,0.15)', icon: '◉', href: '/dashboard/goals'       },
+    { label: t('dash_goals'),       value: `${goalsSaved.toFixed(0)}/${goalsTarget.toFixed(0)} ${currency}`, color: 'var(--accent-blue-light)',  bg: 'var(--accent-blue-dim)',  border: 'rgba(59,126,246,0.15)', icon: '◉', href: '/dashboard/goals'       },
   ]
   return (
     <>
