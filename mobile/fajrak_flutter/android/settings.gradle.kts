@@ -1,3 +1,5 @@
+rootProject.name = "fajrak_android"
+
 pluginManagement {
     val flutterSdkPath =
         run {
