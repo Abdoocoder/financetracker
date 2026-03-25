@@ -24,6 +24,7 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
   bool _saving = false;
   bool _fetchingPrice = false;
   String? _editingId;
+  DateTime? _purchaseDate;
 
   @override
   void initState() {
@@ -39,6 +40,8 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
     _isHalal = widget.existing?['is_halal'] as bool? ?? false;
     _editingId = widget.existing?['id']?.toString();
     if (widget.existing == null) _isHalal = true;
+    final pd = widget.existing?['purchase_date'];
+    if (pd != null) _purchaseDate = DateTime.tryParse(pd.toString());
   }
 
   @override
@@ -79,6 +82,9 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
     HapticFeedback.mediumImpact();
 
     try {
+      final purchaseDateStr = _purchaseDate != null
+          ? '${_purchaseDate!.year}-${_purchaseDate!.month.toString().padLeft(2, '0')}-${_purchaseDate!.day.toString().padLeft(2, '0')}'
+          : null;
       if (_editingId != null) {
         await Supabase.instance.client.from('investments').update({
           'symbol': _symbolCtrl.text.toUpperCase(),
@@ -89,6 +95,7 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
           'avg_buy_price': double.tryParse(_avgPriceCtrl.text) ?? 0,
           'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
           'is_halal': _isHalal,
+          if (purchaseDateStr != null) 'purchase_date': purchaseDateStr,
         }).eq('id', _editingId!);
       } else {
         await Supabase.instance.client.from('investments').insert({
@@ -102,7 +109,8 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
           'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
           'is_halal': _isHalal,
           'type': 'etf',
-          'currency': 'USD', // DB value should be standard
+          'currency': 'USD',
+          if (purchaseDateStr != null) 'purchase_date': purchaseDateStr,
         });
       }
     } finally {
@@ -184,6 +192,46 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
         const SizedBox(height: 10),
         _field(_currentPriceCtrl, 'inv_current_price_hint'.tr(),
             const TextInputType.numberWithOptions(decimal: true)),
+        const SizedBox(height: 10),
+        GestureDetector(
+          onTap: () async {
+            final picked = await showDatePicker(
+              context: context,
+              initialDate: _purchaseDate ?? DateTime.now(),
+              firstDate: DateTime(2000),
+              lastDate: DateTime.now(),
+              helpText: 'inv_purchase_date'.tr(),
+            );
+            if (picked != null) setState(() => _purchaseDate = picked);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(children: [
+              Icon(Icons.calendar_today, size: 18, color: Theme.of(context).colorScheme.primary),
+              const SizedBox(width: 10),
+              Expanded(child: Text(
+                _purchaseDate != null
+                    ? '${_purchaseDate!.day}/${_purchaseDate!.month}/${_purchaseDate!.year}'
+                    : 'inv_purchase_date_hint'.tr(),
+                style: TextStyle(
+                  color: _purchaseDate != null
+                      ? Theme.of(context).colorScheme.onSurface
+                      : Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontFamily: 'Cairo',
+                ),
+              )),
+              if (_purchaseDate != null)
+                GestureDetector(
+                  onTap: () => setState(() => _purchaseDate = null),
+                  child: Icon(Icons.close, size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+            ]),
+          ),
+        ),
         const SizedBox(height: 12),
         GestureDetector(
           onTap: () => setState(() => _isHalal = !_isHalal),
