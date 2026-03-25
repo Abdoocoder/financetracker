@@ -607,6 +607,7 @@
   "recurringNoteEn": "✅ Will auto-execute every month",
   "wealthSimulator": "محاكي الثروة",
   "wealthSimulatorDesc": "شاهد كيف ينمو استثمارك مع الزمن",
+  "inv_sim_after_years": "بعد {} سنة",
   "monthlyInvestment": "الاستثمار الشهري",
   "duration": "المدة",
   "annualReturn": "العائد السنوي",

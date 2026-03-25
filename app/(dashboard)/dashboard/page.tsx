@@ -166,8 +166,9 @@ function useDashboardData() {
       ])
       const txs = txRes.data ?? []
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-      const profileIncome = Number((profileRes as any)?.data?.monthly_income ?? 0)
-      const profileName = (profileRes as any)?.data?.full_name ?? ''
+      const profileData = profileRes.data as { monthly_income: number; full_name: string | null } | null
+      const profileIncome = Number(profileData?.monthly_income ?? 0)
+      const profileName = profileData?.full_name ?? ''
       const income = txIncome > 0 ? txIncome : profileIncome
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
       const catMap: Record<string, number> = {}

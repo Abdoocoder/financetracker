@@ -54,15 +54,15 @@ export default function ZakatPage() {
       supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
     ])
 
-    const invList = (invRes.data ?? []) as any[]
-    const invValue = invList.reduce((a: number, i: any) => a + Number(i.shares) * Number(i.current_price), 0)
-    const goalsSaved = (goalRes.data ?? []).reduce((a: number, g: any) => a + Number(g.current_amount), 0)
-    const totalDebt = (debtRes.data ?? []).reduce((a: number, d: any) => a + Number(d.remaining_amount), 0)
+    const invList = invRes.data ?? []
+    const invValue = invList.reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
+    const goalsSaved = (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
+    const totalDebt = (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
 
     setInvestments(Math.round(invValue))
     setCash(Math.round(goalsSaved))
     setDebtsOwed(Math.round(totalDebt))
-    setCurrency((profileRes as any).data?.currency ?? 'JOD')
+    setCurrency(profileRes.data?.currency ?? 'JOD')
     setHistory(histRes.data ?? [])
     setInvItems(invList)
   }

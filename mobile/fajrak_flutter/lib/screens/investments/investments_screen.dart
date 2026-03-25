@@ -22,6 +22,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   bool _loading = true;
   bool _showInUsd = true;
   static const _jodRate = 0.709;
+  String _currency = 'JOD';
 
   @override
   void initState() {
@@ -35,10 +36,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     if (user == null) return;
 
     try {
-      final data = await Supabase.instance.client
-          .from('investments')
-          .select('*')
-          .eq('user_id', user.id);
+      final results = await Future.wait([
+        Supabase.instance.client.from('investments').select('*').eq('user_id', user.id),
+        Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single(),
+      ]);
+      final data = results[0] as List;
+      final profile = results[1] as Map<String, dynamic>;
+      if (mounted) setState(() => _currency = profile['currency'] as String? ?? 'JOD');
       
       var investments = List<Map<String, dynamic>>.from(data);
 
@@ -208,7 +212,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     totalValue: _totalValue,
                   ),
                   const SizedBox(height: 16),
-                  const WealthSimulatorCard(),
+                  WealthSimulatorCard(currency: _currency),
                   const SizedBox(height: 16),
                   if (_investments.isEmpty)
                     Container(

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class WealthSimulatorCard extends StatefulWidget {
-  const WealthSimulatorCard({super.key});
+  final String currency;
+
+  const WealthSimulatorCard({super.key, required this.currency});
 
   @override
   State<WealthSimulatorCard> createState() => _WealthSimulatorCardState();
@@ -18,7 +20,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
     if (rate == 0) return monthly * years * 12;
     final r = rate / 100 / 12;
     final n = years * 12;
-    return monthly * ((((1 + r) * ((1 + r) * n - 1)) / r));
+    return monthly * (((1 + r) * ((1 + r) * n - 1)) / r);
   }
 
   @override
@@ -69,7 +71,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             child: Column(children: [
               _slider(
                   'monthlyInvestment'.tr(),
-                  '\$${_monthly.toStringAsFixed(0)}',
+                  '${_monthly.toStringAsFixed(0)} ${widget.currency}',
                   _monthly,
                   10,
                   1000,
@@ -92,19 +94,19 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                     border: Border.all(
                         color: colorScheme.secondary.withValues(alpha: 0.3))),
                 child: Column(children: [
-                  Text('بعد $_years سنة',
+                  Text('inv_sim_after_years'.tr(args: [_years.toString()]),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontFamily: 'Cairo',
                           fontSize: 12)),
-                  Text('\$${fv.toStringAsFixed(0)}',
+                  Text('${fv.toStringAsFixed(0)} ${widget.currency}',
                       style: TextStyle(
                           color: colorScheme.secondary,
                           fontWeight: FontWeight.w900,
                           fontSize: 28,
                           fontFamily: 'Cairo')),
                   Text(
-                      'استثمرت: \$${totalInvested.toStringAsFixed(0)} | ربح: \$${(fv - totalInvested).toStringAsFixed(0)}',
+                      '${'youInvested'.tr()}: ${totalInvested.toStringAsFixed(0)} ${widget.currency} | ${'inv_profit'.tr()}: ${(fv - totalInvested).toStringAsFixed(0)} ${widget.currency}',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 11,

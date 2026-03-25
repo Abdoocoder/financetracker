@@ -43,9 +43,10 @@ export default function FIREPage() {
       const invValue = (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
       const goalsSaved = (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
       const totalDebt = (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
-      const income = Number((profileRes as any).data?.monthly_income ?? 0)
+      const profileData = profileRes.data as { monthly_income: number; currency: string } | null
+      const income = Number(profileData?.monthly_income ?? 0)
       setCurrentNetWorth(Math.max(0, invValue + goalsSaved - totalDebt))
-      setCurrency((profileRes as any).data?.currency ?? 'JOD')
+      setCurrency(profileData?.currency ?? 'JOD')
       if (income > 0) setMonthlyExpenses(Math.round(income * 0.7))
       setLoading(false)
     }
