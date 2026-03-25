@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface Props {
   income: number
@@ -60,7 +61,8 @@ export function FinancialHealthCombined(props: Props) {
   const ar = lang === 'ar'
   const [roadmap, setRoadmap] = useState<RoadmapData | null>(null)
   const [expanded, setExpanded] = useState(false)
-  const [tab, setTab] = useState<'score' | 'roadmap'>('score')
+  const [tab, setTab] = useState<'score' | 'roadmap' | 'history'>('score')
+  const [scoreHistory, setScoreHistory] = useState<{recorded_at: string; score: number}[]>([])
   const supabase = createClient()
 
   const score = calcHealthScore(props)
@@ -155,6 +157,20 @@ export function FinancialHealthCombined(props: Props) {
     loadRoadmap()
   }, [loadRoadmap])
 
+  async function loadHistory() {
+    if (!user) return
+    const { data } = await supabase.from('health_score_history')
+      .select('recorded_at, score')
+      .eq('user_id', user.id)
+      .order('recorded_at', { ascending: true })
+      .limit(30)
+    setScoreHistory(data ?? [])
+  }
+
+  useEffect(() => {
+    if (tab === 'history') loadHistory()
+  }, [tab])
+
   // ── الألوان ──
   const scoreColor = score >= 75 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444'
   const scoreLabel = score >= 80
@@ -189,7 +205,7 @@ export function FinancialHealthCombined(props: Props) {
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
-        {(['score', 'roadmap'] as const).map(t => (
+        {(['score', 'roadmap', 'history'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{
             flex: 1, padding: '12px', background: 'none', border: 'none',
             borderBottom: tab === t ? `2px solid ${scoreColor}` : '2px solid transparent',
@@ -197,7 +213,9 @@ export function FinancialHealthCombined(props: Props) {
             fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit',
             transition: 'all 0.2s',
           }}>
-            {t === 'score' ? (ar ? '💊 الصحة المالية' : '💊 Health Score') : (ar ? '🗺️ خارطة الثراء' : '🗺️ Wealth Roadmap')}
+            {t === 'score' ? (ar ? '💊 الصحة' : '💊 Score')
+            : t === 'roadmap' ? (ar ? '🗺️ الخريطة' : '🗺️ Roadmap')
+            : (ar ? '📈 التاريخ' : '📈 History')}
           </button>
         ))}
       </div>
@@ -346,6 +364,50 @@ export function FinancialHealthCombined(props: Props) {
         <div style={{ padding: 40, textAlign: 'center' }}>
           <div className="skeleton" style={{ height: 20, borderRadius: 10, width: '60%', margin: '0 auto 12px' }} />
           <div className="skeleton" style={{ height: 60, borderRadius: 10 }} />
+        </div>
+      )}
+
+      {tab === 'history' && (
+        <div style={{ padding: '20px' }}>
+          {scoreHistory.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+              {ar ? 'لا يوجد سجل بعد — سيُضاف كل يوم تلقائياً' : 'No history yet — recorded daily automatically'}
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 16 }}>
+                {ar ? `آخر ${scoreHistory.length} يوم` : `Last ${scoreHistory.length} days`}
+              </div>
+              <ResponsiveContainer width="100%" height={180}>
+                <LineChart data={scoreHistory} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+                  <XAxis dataKey="recorded_at" tick={{ fontSize: 9, fill: 'var(--text-muted)' }}
+                    tickFormatter={(v: string) => v.slice(5)} tickLine={false} axisLine={false} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 9, fill: 'var(--text-muted)' }} tickLine={false} axisLine={false} />
+                  <Tooltip
+                    contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 10, fontSize: 12 }}
+                    formatter={(v: any) => [`${v}/100`, ar ? 'الصحة المالية' : 'Health Score']}
+                    labelFormatter={(l: any) => l}
+                  />
+                  <Line type="monotone" dataKey="score" stroke={scoreColor} strokeWidth={2.5}
+                    dot={false} activeDot={{ r: 5, fill: scoreColor }} />
+                </LineChart>
+              </ResponsiveContainer>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, padding: '10px 14px', background: 'var(--bg-elevated)', borderRadius: 12 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{ar ? 'الأدنى' : 'Min'}</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#EF4444' }}>{Math.min(...scoreHistory.map(h => h.score))}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{ar ? 'المتوسط' : 'Avg'}</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#F59E0B' }}>{Math.round(scoreHistory.reduce((a, h) => a + h.score, 0) / scoreHistory.length)}</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{ar ? 'الأعلى' : 'Max'}</div>
+                  <div style={{ fontSize: 16, fontWeight: 900, color: '#10B981' }}>{Math.max(...scoreHistory.map(h => h.score))}</div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

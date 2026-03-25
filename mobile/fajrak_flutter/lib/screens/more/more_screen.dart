@@ -11,6 +11,8 @@ import '../learn/learn_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../settings/settings_screen.dart';
 import '../help/help_screen.dart';
+import 'fire_calculator_screen.dart';
+import 'zakat_calculator_screen.dart';
 
 import '../../widgets/more/more_menu_item.dart';
 
@@ -86,6 +88,16 @@ class _MoreScreenState extends State<MoreScreen> {
                     icon: Icons.trending_up,
                     title: 'nav_investments'.tr(),
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InvestmentsScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.local_fire_department_outlined,
+                    title: 'fire_title'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FIRECalculatorScreen())),
+                    colorScheme: colorScheme),
+                MoreMenuItem(
+                    icon: Icons.cruelty_free_outlined,
+                    title: 'zakat_title'.tr(),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ZakatCalculatorScreen())),
                     colorScheme: colorScheme),
                 MoreMenuItem(
                     icon: Icons.menu_book_outlined,

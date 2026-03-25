@@ -393,6 +393,21 @@ const translations = {
     recurringDayEn: 'Repeat day each month',
     recurringNote: '✅ سيتم التنفيذ تلقائياً كل شهر',
     recurringNoteEn: '✅ Will auto-execute every month',
+    // FIRE Calculator
+    fire_title: 'حاسبة FIRE',
+    fire_subtitle: 'اعرف متى تصل للحرية المالية',
+    // Zakat Calculator
+    zakat_title: 'حاسبة الزكاة',
+    zakat_subtitle: 'احسب زكاتك السنوية',
+    // PDF Report
+    pdf_title: 'التقرير الشهري',
+    pdf_subtitle: 'احفظ أو اطبع تقريرك المالي',
+    // Health History
+    health_history: '📈 التاريخ',
+    health_history_empty: 'لا يوجد سجل بعد — سيُضاف كل يوم تلقائياً',
+    nav_fire: 'حاسبة FIRE',
+    nav_zakat: 'الزكاة',
+    nav_pdf: 'تقرير PDF',
   },
   en: {
     // Forgot Password
@@ -774,6 +789,21 @@ const translations = {
     recurringDayEn: 'Repeat day each month',
     recurringNote: '✅ Will be executed automatically every month',
     recurringNoteEn: '✅ Will auto-execute every month',
+    // FIRE Calculator
+    fire_title: 'FIRE Calculator',
+    fire_subtitle: 'Calculate your path to financial independence',
+    // Zakat Calculator
+    zakat_title: 'Zakat Calculator',
+    zakat_subtitle: 'Calculate your annual zakat',
+    // PDF Report
+    pdf_title: 'Monthly Report',
+    pdf_subtitle: 'Print or save your financial report',
+    // Health History
+    health_history: '📈 History',
+    health_history_empty: 'No history yet — recorded daily automatically',
+    nav_fire: 'FIRE Calculator',
+    nav_zakat: 'Zakat',
+    nav_pdf: 'PDF Report',
   }
 
 } as const
