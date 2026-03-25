@@ -166,17 +166,30 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         return;
       }
 
+      String csvField(dynamic value) {
+        final str = (value ?? '').toString().replaceAll('\n', ' ');
+        final safe = RegExp(r'^[=+\-@\t\r]').hasMatch(str) ? "'$str" : str;
+        return '"${safe.replaceAll('"', '""')}"';
+      }
+
       final buffer = StringBuffer();
-      buffer.writeln('${'trans_date'.tr()},${'inv_type'.tr()},${'trans_amount'.tr()} ($_currency),${'trans_category'.tr()},${'trans_description'.tr()}');
+      buffer.writeln([
+        csvField('trans_date'.tr()),
+        csvField('inv_type'.tr()),
+        csvField('${'trans_amount'.tr()} ($_currency)'),
+        csvField('trans_category'.tr()),
+        csvField('trans_description'.tr()),
+      ].join(','));
       for (final tx in list) {
         final type = tx['type'] == 'income' ? 'trans_income'.tr() : 'trans_expense'.tr();
         final amount = (tx['amount'] as num? ?? 0).toStringAsFixed(2);
-        final cat = (tx['category'] ?? '').toString().replaceAll(',', '،');
-        final desc = (tx['description'] ?? '')
-            .toString()
-            .replaceAll(',', '،')
-            .replaceAll('\n', ' ');
-        buffer.writeln('${tx['transaction_date']},$type,$amount,$cat,$desc');
+        buffer.writeln([
+          csvField(tx['transaction_date']),
+          csvField(type),
+          csvField(amount),
+          csvField(tx['category']),
+          csvField(tx['description']),
+        ].join(','));
       }
 
       final dir = await getTemporaryDirectory();

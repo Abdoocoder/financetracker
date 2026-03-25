@@ -4,6 +4,22 @@ import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+String _friendlyAuthError(dynamic e) {
+  if (e is AuthException) {
+    final msg = e.message.toLowerCase();
+    if (msg.contains('invalid login credentials') || msg.contains('invalid credentials')) {
+      return 'auth_error_invalid_credentials'.tr();
+    }
+    if (msg.contains('email not confirmed')) {
+      return 'auth_error_email_not_confirmed'.tr();
+    }
+    if (msg.contains('too many requests') || msg.contains('rate limit')) {
+      return 'auth_error_too_many_requests'.tr();
+    }
+  }
+  return 'error_generic'.tr();
+}
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -39,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         ErrorHandler.handle(e, context: context, developerMessage: 'Login Action');
         setState(() {
-          _error = e.toString(); // Display a generic error message or parse 'e' if it's an AuthException
+          _error = _friendlyAuthError(e);
         });
       }
     } finally {
