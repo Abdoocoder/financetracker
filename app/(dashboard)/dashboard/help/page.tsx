@@ -101,6 +101,44 @@ const faqs = [
         ar: { q: 'كيف يحسب التطبيق الربح والخسارة؟', a: 'يحسب الفرق بين سعر الشراء الذي أدخلته وبين السعر الحالي الحي. تظهر النتيجة بالدولار وبالنسبة المئوية.' },
         en: { q: 'How does the app calculate profit and loss?', a: 'It calculates the difference between the purchase price you entered and the current live price. The result shows in dollars and percentage.' },
       },
+      {
+        ar: { q: 'ما هو تاريخ الشراء وما علاقته بالزكاة؟', a: 'تاريخ شراء الأصل يُستخدم لحساب الحول في صفحة الزكاة (354 يوماً هجرياً). أدخله عند تعديل الاستثمار للحصول على تنبيهات دقيقة بموعد وجوب الزكاة.' },
+        en: { q: 'What is the purchase date and how does it relate to Zakat?', a: 'The asset purchase date is used to calculate the haul (354 lunar days) in the Zakat page. Enter it when editing an investment to get accurate alerts about when Zakat is due.' },
+      },
+    ],
+  },
+  {
+    section: { ar: '🕌 حاسبة الزكاة', en: '🕌 Zakat Calculator' },
+    items: [
+      {
+        ar: { q: 'ما هي حاسبة الزكاة؟', a: 'أداة تحسب تلقائياً زكاة مالك وفق النصاب الشرعي. تجلب قيم استثماراتك وأهداف ادخارك وديونك مباشرةً من بياناتك، وتحتسب زكاة الذهب والفضة والنقد.' },
+        en: { q: 'What is the Zakat Calculator?', a: 'A tool that automatically calculates your Zakat based on the Islamic nisab threshold. It fetches your investments, savings goals, and debts directly from your data.' },
+      },
+      {
+        ar: { q: 'كيف يُحسب الحول؟', a: 'الحول يُحسب من تاريخ شراء الاستثمار إن وُجد، وإلا من تاريخ إدخاله في التطبيق (354 يوماً هجرياً). ستظهر تنبيهات ملونة قرب موعد الاستحقاق.' },
+        en: { q: 'How is the haul calculated?', a: 'The haul is calculated from the investment purchase date if available, otherwise from the date it was added to the app (354 lunar days). Color-coded alerts appear as the due date approaches.' },
+      },
+      {
+        ar: { q: 'هل أسعار الذهب والفضة حية؟', a: 'نعم، اضغط "أسعار حية" في الحاسبة وسيحضر التطبيق سعر الذهب والفضة الآني من السوق العالمي ويحوّله تلقائياً إلى عملتك.' },
+        en: { q: 'Are gold and silver prices live?', a: "Yes — tap 'Live Prices' in the calculator and the app will retrieve the current global gold and silver prices and automatically convert them to your currency." },
+      },
+    ],
+  },
+  {
+    section: { ar: '🔥 حاسبة FIRE', en: '🔥 FIRE Calculator' },
+    items: [
+      {
+        ar: { q: 'ما هي حاسبة FIRE؟', a: 'FIRE اختصار (الاستقلال المالي والتقاعد المبكر). الحاسبة تحسب مقدار الثروة اللازمة للتقاعد بناءً على نفقاتك الشهرية ومعدل العائد السنوي المتوقع.' },
+        en: { q: 'What is the FIRE Calculator?', a: 'FIRE stands for Financial Independence, Retire Early. The calculator determines how much wealth you need to retire based on your monthly expenses and expected annual return.' },
+      },
+      {
+        ar: { q: 'ما هو معدل السحب؟', a: 'هو النسبة السنوية التي تسحبها من ثروتك بعد التقاعد. القاعدة الذهبية 4% تعني أن ثروتك تكفي 25 سنة على الأقل إحصائياً دون نفاد.' },
+        en: { q: 'What is the withdrawal rate?', a: "The annual percentage you withdraw from your wealth after retirement. The 4% rule means your wealth will last at least 25 years statistically without running out." },
+      },
+      {
+        ar: { q: 'ما الفرق بين أوضاع Lean وFat وNormal؟', a: 'Lean يعني تقاعد بنمط حياة اقتصادي (70% من نفقاتك)، Normal بنفس نمط حياتك الحالي، وFat بنمط حياة مريح (150% من نفقاتك).' },
+        en: { q: 'What is the difference between Lean, Normal, and Fat modes?', a: 'Lean means retiring with a frugal lifestyle (70% of expenses), Normal means the same lifestyle as today, and Fat means a comfortable lifestyle (150% of expenses).' },
+      },
     ],
   },
   {

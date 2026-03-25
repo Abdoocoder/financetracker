@@ -229,7 +229,7 @@ export default function InvestmentsPage() {
   const [txLoading, setTxLoading] = useState(false)
   const [editingInv, setEditingInv] = useState<Investment | null>(null)
   const [form, setForm] = useState({ symbol: '', name: '', type: 'etf', currency: 'USD', is_halal: true })
-  const [editForm, setEditForm] = useState({ symbol: '', name: '', type: 'etf', shares: '', avg_buy_price: '', current_price: '', is_halal: true, notes: '' })
+  const [editForm, setEditForm] = useState({ symbol: '', name: '', type: 'etf', shares: '', avg_buy_price: '', current_price: '', is_halal: true, notes: '', purchase_date: '' })
   const [buyForm, setBuyForm] = useState({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -291,13 +291,13 @@ export default function InvestmentsPage() {
 
   function startEditInv(inv: Investment) {
     setEditingInv(inv)
-    setEditForm({ symbol: inv.symbol, name: inv.name, type: inv.type, shares: inv.shares.toString(), avg_buy_price: inv.avg_buy_price.toString(), current_price: inv.current_price.toString(), is_halal: inv.is_halal, notes: inv.notes ?? '' })
+    setEditForm({ symbol: inv.symbol, name: inv.name, type: inv.type, shares: inv.shares.toString(), avg_buy_price: inv.avg_buy_price.toString(), current_price: inv.current_price.toString(), is_halal: inv.is_halal, notes: inv.notes ?? '', purchase_date: (inv as any).purchase_date ?? '' })
   }
 
   async function saveEditInv() {
     if (!editingInv) return
     setSaving(true)
-    await supabase.from('investments').update({ symbol: editForm.symbol.toUpperCase(), name: editForm.name, type: editForm.type, shares: parseFloat(editForm.shares) || 0, avg_buy_price: parseFloat(editForm.avg_buy_price) || 0, current_price: parseFloat(editForm.current_price) || 0, is_halal: editForm.is_halal, notes: editForm.notes || null }).eq('id', editingInv.id)
+    await supabase.from('investments').update({ symbol: editForm.symbol.toUpperCase(), name: editForm.name, type: editForm.type, shares: parseFloat(editForm.shares) || 0, avg_buy_price: parseFloat(editForm.avg_buy_price) || 0, current_price: parseFloat(editForm.current_price) || 0, is_halal: editForm.is_halal, notes: editForm.notes || null, ...(editForm.purchase_date ? { purchase_date: editForm.purchase_date } : {}) }).eq('id', editingInv.id)
     clearUserCache(currentUser?.id ?? '')
     setEditingInv(null); setSaving(false); load()
   }
@@ -608,6 +608,9 @@ export default function InvestmentsPage() {
               </Select>
             </FormField>
           </div>
+          <FormField label={lang === 'en' ? 'Purchase Date' : 'تاريخ الشراء'}>
+            <Input type="date" value={editForm.purchase_date} max={new Date().toISOString().split('T')[0]} onChange={e => setEditForm(f => ({ ...f, purchase_date: e.target.value }))} />
+          </FormField>
           <FormField label={lang === 'en' ? 'Notes' : 'ملاحظات'}><Input placeholder={lang === "en" ? "Optional" : "اختياري"} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
             <input type="checkbox" checked={editForm.is_halal} onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
