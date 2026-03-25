@@ -37,7 +37,7 @@ export default async function LandingPage() {
       <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: 'clamp(60px, 10vw, 100px) 20px clamp(40px, 8vw, 80px)', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(59,126,246,0.08)', border: '1px solid rgba(59,126,246,0.2)', marginBottom: 28 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-blue)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>أول أداة مالية عربية ذكية 🇯🇴🇸🇦🇦🇪</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>✨ جديد: حاسبة FIRE + حاسبة الزكاة + تقارير PDF 🇯🇴🇸🇦🇦🇪</span>
         </div>
         <h1 style={{ fontSize: 'clamp(28px, 6vw, 64px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 20px', letterSpacing: '-0.03em' }}>
           كلنا نحلم بالثراء<br />
@@ -225,6 +225,10 @@ export default async function LandingPage() {
             { icon: '🎓', title: 'دروس يومية ذكية', desc: 'درس مالي يومي مخصص لمرحلتك — مبني على أبحاث علم السلوك المالي. من الوعي حتى الحرية المالية.', badge: 'جديد', badgeColor: '#8B5CF6' },
             { icon: '🔔', title: 'تنبيهات ذكية', desc: 'تقرير أسبوعي، تذكير مسائي، وتوجيه يومي — مع سياسة ذكية تمنع الإشعارات المزعجة.' },
             { icon: '🌐', title: 'عربي + English', desc: 'واجهة كاملة باللغتين العربية والإنجليزية مع دعم RTL احترافي.' },
+            { icon: '🔥', title: 'حاسبة FIRE', desc: 'احسب متى تحقق حريتك المالية — أوضاع Lean/Full/Fat FIRE مع محاكاة الفائدة المركبة ومتزلجات تفاعلية.', badge: 'جديد', badgeColor: '#EF4444' },
+            { icon: '🌙', title: 'حاسبة الزكاة', desc: 'ملء تلقائي من بياناتك الحقيقية. عداد حول لكل استثمار مع تذكيرات Push قبل 30 و7 و0 يوم.', badge: 'جديد', badgeColor: '#10B981' },
+            { icon: '📊', title: 'تاريخ الصحة المالية', desc: 'رسم بياني لتطور نقاط صحتك المالية خلال 30 يوماً — اكتشف الاتجاه الصاعد في رحلتك.', badge: 'جديد', badgeColor: '#8B5CF6' },
+            { icon: '📄', title: 'تقرير PDF الشهري', desc: 'طباعة ملخص مالي شهري شامل: الدخل، المصاريف، الفئات، الديون، والأهداف — جاهز للطباعة بلحظة.', badge: 'جديد', badgeColor: '#F59E0B' },
           ].map((f, i) => (
             <div key={i} style={{ padding: 24, borderRadius: 16, background: 'var(--bg-card)', border: '1px solid var(--border)', position: 'relative' }}>
               {f.badge && (
@@ -308,7 +312,7 @@ export default async function LandingPage() {
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>مجاني</div>
             <div style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>$0</div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>للأبد</div>
-            {['المعاملات الأساسية', 'تتبع الديون', 'أهداف الادخار', 'خارطة الثراء 🗺️', 'رحلة الثروة 🎮', 'مستشار مالي 🤖', 'الأصول الشخصية 💎', 'تحديات الادخار 🏆', 'توجيه يومي 💡', 'تنبيهات ذكية 🔔', 'راتب تلقائي'].map((f, i) => (
+            {['المعاملات الأساسية', 'تتبع الديون', 'أهداف الادخار', 'خارطة الثراء 🗺️', 'رحلة الثروة 🎮', 'مستشار مالي 🤖', 'الأصول الشخصية 💎', 'تحديات الادخار 🏆', 'توجيه يومي 💡', 'تنبيهات ذكية 🔔', 'راتب تلقائي', 'حاسبة FIRE 🔥', 'حاسبة الزكاة 🌙', 'تاريخ الصحة المالية 📊', 'تقرير PDF الشهري 📄'].map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <span style={{ color: '#10B981', fontSize: 14 }}>✓</span>
                 <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{f}</span>
@@ -322,11 +326,11 @@ export default async function LandingPage() {
             <div style={{ fontSize: 36, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>قريباً</div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>نعمل عليها الآن</div>
             {[
-              '📄 تصدير تقارير PDF شهرية',
               '🤖 مستشار مالي بالذكاء الاصطناعي',
               '📸 OCR — مسح الفواتير تلقائياً',
               '📊 تقارير متقدمة ورسوم تفصيلية',
               '🔔 إشعارات Push مخصصة',
+              '🔗 ربط حسابات بنكية',
               '⭐ دعم أولوية',
             ].map((f, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
@@ -356,6 +360,8 @@ export default async function LandingPage() {
             { q: 'كيف تعمل خارطة الثراء؟', a: 'تحلّل خارطة الثراء وضعك المالي تلقائياً وتعطيك نقاط صحة مالية من 100 مع تحديد مرحلتك وأولويات خطواتك القادمة.' },
             { q: 'ما هو نظام رحلة الثروة؟', a: 'نظام نقاط وشارات ومستويات يحوّل إدارة مالك إلى رحلة ممتعة — كل معاملة تسجّلها تكسبك نقاطاً وتقربك من الحرية المالية.' },
             { q: 'كيف يعمل الراتب التلقائي؟', a: 'تحدد راتبك ويوم استلامه في الإعدادات، وسيُضاف تلقائياً كمعاملة دخل كل شهر.' },
+            { q: 'كيف تعمل حاسبة الزكاة؟', a: 'تجلب حاسبة الزكاة بياناتك الفعلية تلقائياً: مدخراتك كنقد، استثماراتك بالسعر الحالي، وديونك كخصوم. كما تعرض عداد حول لكل استثمار وترسل إشعارات قبل 30 و7 و0 يوم من موعد الزكاة.' },
+            { q: 'ما هي حاسبة FIRE؟', a: 'FIRE اختصار لـ Financial Independence, Retire Early. الحاسبة تحسب رقم الحرية المالية الخاص بك بناءً على مصاريفك، وتمحي لك الوقت المتبقي للوصول إليه مع محاكاة الفائدة المركبة.' },
           ].map((item, i) => (
             <div key={i} style={{ padding: '18px 20px', borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
               <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 8 }}>{item.q}</div>

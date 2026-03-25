@@ -100,6 +100,33 @@
 - Smart policy: useful only
 - Push subscription management
 
+### 🔥 FIRE Calculator
+- Lean / Full / Fat FIRE modes
+- Auto-fetches investments, savings goals, and debts for net worth
+- Compound interest projection (years to financial independence)
+- Interactive sliders for return rate, monthly savings, annual expenses
+- Available on both web + Flutter
+
+### 🌙 Zakat Calculator
+- **Auto-fill** from real user data: savings goals → cash, debts → liabilities, investments → assets
+- Current market price used (`shares × current_price`) — correct Islamic standard
+- **Haul countdown** per investment — color-coded (overdue / <30d / <60d / far)
+- **Push notifications** at 30, 7, and 0 days before haul date
+- Manual override for gold/silver price and Nisab
+- Available on both web + Flutter
+
+### 📈 Health Score History
+- 30-day trend chart using Recharts (web) and fl_chart sparkline (Flutter)
+- Daily snapshots stored in `health_score_history` table
+- Shows min / avg / max stats below chart
+- Cron job captures snapshot nightly at 11:50 PM
+
+### 📄 PDF Monthly Reports
+- Print-ready financial report at `/dashboard/pdf-report`
+- Month + year selector
+- Sections: income/expense summary, category breakdown, transaction table, debts, savings goals
+- Print CSS hides controls; optimized for A4
+
 ### 📖 Islamic Daily Lessons
 - Quran verses on provision
 - Hadiths on financial ethics
@@ -149,7 +176,8 @@ All tables are protected with **Row Level Security (RLS)**:
 | profiles | investments | alerts |
 | transactions | budgets | push_subscriptions |
 | debts | savings_goals | user_stats |
-| debt_payments | | testimonials |
+| debt_payments | zakat_history | testimonials |
+| | health_score_history | |
 
 ---
 
@@ -162,8 +190,10 @@ Powered by **cron-job.org** (Amman timezone UTC+3):
 | 6:00 AM | Morning reminders + smart alerts | ✅ Active |
 | 8:00 AM | Auto salary detection (silent) | ✅ Active |
 | 9:00 AM | Auto debt deduction (silent) | ✅ Active |
+| 10:00 AM | Zakat haul countdown check | ✅ Active |
 | 6:00 PM | Evening reminder (if needed) | ✅ Active |
 | 7:00 PM | Daily wealth tip | ✅ Active |
+| 11:50 PM | Health score history snapshot | ✅ Active |
 | Friday | Weekly comparison report | ✅ Active |
 
 ---
@@ -337,16 +367,31 @@ context.locale
 - [x] Native Flutter Android App (54.5 MB Release APK)
 - [x] fajrak.com custom domain
 - [x] Global Error Handling + Analytics Service
+- [x] **FIRE Calculator** — Financial Independence simulation with Lean/Full/Fat FIRE modes
+- [x] **Zakat Calculator** — Auto-fill from real data + haul countdown + push notifications
+- [x] **Health Score History** — 30-day trend chart on web and Flutter
+- [x] **Monthly PDF Reports** — Print-ready financial summary (web)
 
 ### 📋 In Progress
-- [ ] Monthly PDF Reports
 - [ ] Subscription System (Paddle)
+- [ ] AI Financial Advisor (GPT integration)
 
 ---
 
 ## 📝 Changelog
 
-### v3.12.0 — 2026-03-24 *(Latest)*
+### v3.13.0 — 2026-03-25 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔥 **FIRE Calculator** | Financial Independence calculator with Lean/Full/Fat FIRE modes, auto-fills net worth from investments + savings + debts, compound interest projection with interactive sliders — web + Flutter |
+| 🌙 **Zakat Calculator** | Enhanced with auto-fill from real user data (savings → cash, debts → liabilities, investments → assets). Added haul countdown per investment (color-coded: overdue/30d/60d/far) |
+| 🔔 **Zakat Push Reminders** | New cron endpoint `/api/zakat-reminder` sends push notifications at 30, 7, and 0 days before haul date for each investment |
+| 📈 **Health Score History** | 30-day trend LineChart added to Financial Health widget (web Recharts + Flutter fl_chart sparkline). New `health_score_history` DB table with daily snapshots |
+| 📄 **PDF Monthly Reports** | Print-ready financial report page at `/dashboard/pdf-report` with month selector, transaction table, category breakdown, debts, and goals summary |
+| 🗄️ **DB Migrations** | Added `zakat_history` (migration 006) and `health_score_history` (migration 007) tables with full RLS |
+
+### v3.12.0 — 2026-03-24
 
 | Change | Description |
 |:-------|:------------|
