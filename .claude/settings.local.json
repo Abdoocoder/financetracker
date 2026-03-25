@@ -11,7 +11,10 @@
       "Bash(find /c/Users/skyli/Documents/financetracker/mobile/fajrak_flutter/test -type f -name *.dart)",
       "Bash(npx tsc:*)",
       "Bash(ls -la \"/c/Users/skyli/Documents/financetracker/app/\\(dashboard\\)/dashboard/\")",
-      "Bash(flutter analyze:*)"
+      "Bash(flutter analyze:*)",
+      "Bash(git -C c:/Users/skyli/Project/financetracker log --all --oneline --diff-filter=A -- mobile/tmp_app/**)",
+      "Bash(git -C \"c:/Users/skyli/Project/financetracker\" show e37c3a04 --stat)",
+      "Bash(grep -E \"^\\\\-.*\\\\s+\\(build_log|ts_errors|financetracker@|next$|structure\\\\.md|store-listing|supabase_push|\\\\.vercel-rebuild\\)\")"
     ]
   }
 }
