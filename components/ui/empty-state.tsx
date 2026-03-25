@@ -49,7 +49,7 @@ export function DashboardEmptyState() {
               <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>
                 {step[lang as 'ar' | 'en']}
               </span>
-              <span style={{ marginRight: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>←</span>
+              <span style={{ marginInlineStart: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>{lang === 'ar' ? '←' : '→'}</span>
             </div>
           </Link>
         ))}

@@ -164,6 +164,22 @@
     background: rgba(59, 126, 246, 0.35);
     color: white;
   }
+
+  /* --- Keyboard Focus (accessibility) --- */
+  :focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+  }
+
+  button, [role="button"], a, [tabindex]:not([tabindex="-1"]) {
+    cursor: pointer;
+  }
+
+  button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 /* === COMPONENT CLASSES ============================ */

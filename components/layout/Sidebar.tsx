@@ -6,7 +6,7 @@ import { useState } from 'react'
 import {
   LayoutDashboard, ArrowUpDown, CreditCard,
   TrendingUp, Target, Bell, Settings, Globe,
-  ChevronLeft, MoreHorizontal, PieChart, BookOpen, HelpCircle,
+  ChevronLeft, ChevronRight, MoreHorizontal, PieChart, BookOpen, HelpCircle,
   Flame, Star, FileText
 } from 'lucide-react'
 
@@ -28,8 +28,6 @@ const MORE_NAV = [
   { href: '/dashboard/settings',    Icon: Settings,   ar: 'الإعدادات',  en: 'Settings'    },
   { href: '/dashboard/help',          Icon: HelpCircle, ar: 'المساعدة',   en: 'Help'        },
 ]
-
-const ALL_NAV = [...MAIN_NAV, ...MORE_NAV]
 
 export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
   const pathname = usePathname()
@@ -55,9 +53,26 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
             </div>
           </div>
         </div>
-        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {ALL_NAV.map(({ href, Icon, ar, en }) => {
+        <nav aria-label={lang === 'ar' ? 'القائمة الرئيسية' : 'Main navigation'} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Core */}
+          {MAIN_NAV.map(({ href, Icon, ar, en }) => {
             const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
+            return (
+              <Link key={href} href={href} style={{ textDecoration: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
+                  {isActive && <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: '0 2px 2px 0', background: 'var(--accent-blue)', boxShadow: '0 0 8px var(--accent-blue)' }} />}
+                  <Icon size={18} opacity={isActive ? 1 : 0.5} />
+                  <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
+                </div>
+              </Link>
+            )
+          })}
+          {/* Separator + Tools group */}
+          <div style={{ margin: '8px 4px 4px', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '0 8px' }}>
+            {lang === 'ar' ? 'الأدوات' : 'Tools'}
+          </div>
+          {[MORE_NAV[0], MORE_NAV[1], MORE_NAV[2], MORE_NAV[3], MORE_NAV[4], MORE_NAV[5], MORE_NAV[6], MORE_NAV[7]].map(({ href, Icon, ar, en }) => {
+            const isActive = pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
@@ -71,16 +86,32 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
               </Link>
             )
           })}
+          {/* Separator + Account group */}
+          <div style={{ margin: '8px 4px 4px', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '0 8px' }}>
+            {lang === 'ar' ? 'الحساب' : 'Account'}
+          </div>
+          {[MORE_NAV[8], MORE_NAV[9], MORE_NAV[10]].map(({ href, Icon, ar, en }) => {
+            const isActive = pathname.startsWith(href)
+            return (
+              <Link key={href} href={href} style={{ textDecoration: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
+                  {isActive && <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: '0 2px 2px 0', background: 'var(--accent-blue)', boxShadow: '0 0 8px var(--accent-blue)' }} />}
+                  <Icon size={18} opacity={isActive ? 1 : 0.5} />
+                  <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
+                </div>
+              </Link>
+            )
+          })}
         </nav>
         <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setTimeout(() => window.location.reload(), 100) }} style={{ width: '100%', padding: '8px 12px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setTimeout(() => window.location.reload(), 100) }} aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'} style={{ width: '100%', padding: '8px 12px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
             <Globe size={14} /> {lang === 'ar' ? 'English' : 'العربية'}
           </button>
         </div>
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav style={{
+      <nav aria-label={lang === 'ar' ? 'التنقل السريع' : 'Quick navigation'} style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
         background: 'rgba(7,11,20,0.98)',
         backdropFilter: 'blur(24px)',
@@ -132,7 +163,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         })}
 
         {/* More button */}
-        <button onClick={() => setShowMore(true)} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+        <button onClick={() => setShowMore(true)} aria-label={lang === 'ar' ? 'عرض المزيد' : 'Show more'} aria-expanded={showMore} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '2px 4px', position: 'relative' }}>
             {isMoreActive && (
               <div style={{
@@ -222,7 +253,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                       <span style={{ fontSize: 15, fontWeight: isActive ? 800 : 600, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-primary)', flex: 1 }}>
                         {lang === 'en' ? en : ar}
                       </span>
-                      <ChevronLeft size={18} color="var(--text-muted)" />
+                      {lang === 'ar' ? <ChevronLeft size={18} color="var(--text-muted)" /> : <ChevronRight size={18} color="var(--text-muted)" />}
                     </div>
                   </Link>
                 )
