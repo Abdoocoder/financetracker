@@ -46,7 +46,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
       }} className="desktop-sidebar">
         <div style={{ padding: '0 8px 20px', borderBottom: '1px solid var(--border)', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: 'white', fontSize: 16, boxShadow: '0 4px 16px var(--accent-blue-glow)' }}>₣</div>
+            <img src="/icon-512.png" alt="فجرك" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover', boxShadow: '0 4px 16px var(--accent-blue-glow)' }} />
             <div>
               <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>فجرك</div>
               <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Smart Finance Manager' : 'إدارة مالية ذكية'}</div>
