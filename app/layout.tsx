@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import { Cairo } from 'next/font/google'
 import './globals.css'
+import { ThemeProvider } from '@/lib/theme-context'
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -28,6 +29,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ar" dir="rtl">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;document.documentElement.setAttribute('data-theme',t||(d?'dark':'light'));})()` }} />
+      </head>
       <body suppressHydrationWarning className={`${cairo.variable} font-cairo antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {
@@ -39,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             });
           }
         ` }} />
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )
