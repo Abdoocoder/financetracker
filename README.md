@@ -380,7 +380,20 @@ context.locale
 
 ## 📝 Changelog
 
-### v3.13.0 — 2026-03-25 *(Latest)*
+### v3.14.0 — 2026-03-25 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🖼️ **Sidebar Logo** | Replaced placeholder "₣" letter with the actual Fajrak app icon (`/icon-512.png`) in the web sidebar |
+| 📜 **Mobile Nav Scrollable** | Fixed mobile bottom-sheet nav to be scrollable (`maxHeight: 85dvh`, `overflowY: auto`) — prevents overflow on small screens |
+| ⚡ **Font Optimization** | Removed manual Google Fonts `@import` from `globals.css`; changed font `display` from `swap` to `optional` to eliminate layout shift (CLS) |
+| 🔥 **Firebase SW Optimization** | Firebase messaging service worker now registers only on Android — eliminates unnecessary registration on iOS/desktop |
+| 🔧 **useFinancialSummary Fix** | Memoized Supabase client with `useMemo` to prevent unnecessary client re-creation on every render |
+| ⚙️ **Next.js Config** | Added `serverExternalPackages: ['firebase-admin']` for correct server-side bundle handling |
+| 🔷 **TypeScript ES2022** | Upgraded compiler target from `ES2017` → `ES2022` for modern JavaScript output |
+| 📱 **Mobile Screens Polish** | Improved login screen, splash screen, and "More" screen layouts in Flutter app |
+
+### v3.13.0 — 2026-03-25
 
 | Change | Description |
 |:-------|:------------|
