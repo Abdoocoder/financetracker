@@ -44,7 +44,7 @@ export async function sendPushToUser(
     // FCM token
     if (sub.endpoint?.startsWith('fcm:')) {
       const fcmToken = sub.endpoint.replace('fcm:', '')
-      const ok = await sendFCM(fcmToken, title, message, `https://fajrak.com${url}`)
+      const ok = await sendFCM(fcmToken, title, message, url)
       if (ok) sent++
       continue
     }
