@@ -9,7 +9,9 @@
       "Bash(flutter clean:*)",
       "Bash(flutter pub:*)",
       "Bash(find /c/Users/skyli/Documents/financetracker/mobile/fajrak_flutter/test -type f -name *.dart)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls -la \"/c/Users/skyli/Documents/financetracker/app/\\(dashboard\\)/dashboard/\")",
+      "Bash(flutter analyze:*)"
     ]
   }
 }
