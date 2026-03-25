@@ -669,5 +669,14 @@
   "zakat_note": "تجب الزكاة بعد مرور حول هجري على بلوغ النصاب. الحساب تقريبي — استشر عالماً.",
   "health_history_trend": "آخر 30 يوم",
   "nav_fire": "حاسبة FIRE",
-  "nav_zakat": "الزكاة"
+  "nav_zakat": "الزكاة",
+  "zakat_haul_title": "🗓️ حول استثماراتك",
+  "zakat_haul_due": "موعد الحول: {date}",
+  "zakat_haul_note": "الحول يُحسب من تاريخ إضافة الاستثمار (354 يوماً هجرياً)",
+  "zakat_overdue": "متأخر",
+  "zakat_days": "يوم",
+  "zakat_cash_label": "نقد + أهداف الادخار",
+  "zakat_cash_label_hint": "✅ أهداف الادخار محسوبة تلقائياً",
+  "zakat_debts_label": "ديون عليك",
+  "zakat_debts_label_hint": "✅ محسوب من ديونك تلقائياً"
 }

@@ -19,9 +19,24 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
 
   String _currency = 'JOD';
   List<Map<String, dynamic>> _history = [];
+  List<Map<String, dynamic>> _invItems = [];
   bool _saving = false;
   bool _saved = false;
   final int _currentYear = DateTime.now().year;
+
+  static const int _haulDays = 354;
+
+  int _daysLeft(String createdAt) {
+    final start = DateTime.parse(createdAt);
+    final haulDate = start.add(const Duration(days: _haulDays));
+    return haulDate.difference(DateTime.now()).inDays;
+  }
+
+  String _haulDueDate(String createdAt) {
+    final start = DateTime.parse(createdAt);
+    final haulDate = start.add(const Duration(days: _haulDays));
+    return '${haulDate.day}/${haulDate.month}/${haulDate.year}';
+  }
 
   @override
   void initState() {
@@ -41,18 +56,29 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
     final results = await Future.wait<dynamic>([
-      Supabase.instance.client.from('investments').select('shares,current_price').eq('user_id', user.id),
+      Supabase.instance.client.from('investments').select('id,name,symbol,shares,current_price,created_at').eq('user_id', user.id),
       Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single(),
       Supabase.instance.client.from('zakat_history').select('*').eq('user_id', user.id).order('year', ascending: false),
+      Supabase.instance.client.from('savings_goals').select('current_amount').eq('user_id', user.id),
+      Supabase.instance.client.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
     ]);
-    final investments = results[0] as List;
+    final invList = results[0] as List;
     final profile = results[1] as Map<String, dynamic>;
     final history = results[2] as List;
-    final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
+    final goals = results[3] as List;
+    final debts = results[4] as List;
+
+    final invValue = invList.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
+    final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+    final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+
     if (mounted) setState(() {
       _currency = profile['currency'] as String? ?? 'JOD';
       _investmentsCtrl.text = invValue.toStringAsFixed(0);
+      _cashCtrl.text = goalsSaved.toStringAsFixed(0);
+      _debtsCtrl.text = totalDebt.toStringAsFixed(0);
       _history = history.cast<Map<String, dynamic>>();
+      _invItems = invList.cast<Map<String, dynamic>>();
     });
   }
 
@@ -137,6 +163,49 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
+          // Haul Countdown Section
+          if (_invItems.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('zakat_haul_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                const SizedBox(height: 12),
+                ..._invItems.where((i) => i['created_at'] != null).map((inv) {
+                  final days = _daysLeft(inv['created_at'] as String);
+                  final due = _haulDueDate(inv['created_at'] as String);
+                  final invValue = (inv['shares'] as num).toDouble() * (inv['current_price'] as num).toDouble();
+                  final overdue = days < 0;
+                  final urgent = !overdue && days <= 30;
+                  final soon = !overdue && days > 30 && days <= 60;
+                  final color = overdue ? const Color(0xFFEF4444) : urgent ? const Color(0xFFF59E0B) : soon ? cs.primary : const Color(0xFF10B981);
+                  final bgColor = overdue ? const Color(0xFFEF4444).withValues(alpha: 0.06) : urgent ? const Color(0xFFF59E0B).withValues(alpha: 0.06) : cs.surfaceContainerHighest;
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.25))),
+                    child: Row(children: [
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(inv['symbol'] as String? ?? inv['name'] as String? ?? 'استثمار',
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                        Text('${_fmt(invValue)} $_currency · ${'zakat_haul_due'.tr(namedArgs: {'date': due})}',
+                          style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant)),
+                      ])),
+                      Column(children: [
+                        Text(overdue ? 'zakat_overdue'.tr() : '$days',
+                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 20, color: color)),
+                        if (!overdue) Text('zakat_days'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: color, fontWeight: FontWeight.w700)),
+                      ]),
+                    ]),
+                  );
+                }),
+                const SizedBox(height: 4),
+                Text('zakat_haul_note'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant)),
+              ]),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // Result Card
           Container(
             width: double.infinity, padding: const EdgeInsets.all(20),

@@ -669,5 +669,14 @@
   "zakat_note": "Zakat is due after one lunar year on wealth above nisab. This is an estimate — consult a scholar.",
   "health_history_trend": "Last 30 days",
   "nav_fire": "FIRE Calculator",
-  "nav_zakat": "Zakat"
+  "nav_zakat": "Zakat",
+  "zakat_haul_title": "🗓️ Investment Haul Dates",
+  "zakat_haul_due": "Haul due: {date}",
+  "zakat_haul_note": "Haul calculated from investment creation date (354 lunar days)",
+  "zakat_overdue": "Overdue",
+  "zakat_days": "days",
+  "zakat_cash_label": "Cash + Savings Goals",
+  "zakat_cash_label_hint": "✅ Savings goals auto-included",
+  "zakat_debts_label": "Debts You Owe",
+  "zakat_debts_label_hint": "✅ Auto-fetched from your debts"
 }

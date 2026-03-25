@@ -387,6 +387,15 @@ export async function GET(request: NextRequest) {
     tasks.push('auto-recurring')
   }
 
+  // 10 ص — تذكير حول الزكاة (يومياً — يُرسل فقط إذا كان هناك حول قريب)
+  if (hour === 10) {
+    const zakatUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/zakat-reminder`
+    await fetch(zakatUrl, {
+      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` }
+    })
+    tasks.push('zakat-haul-check')
+  }
+
   // 6 م — مسائي فقط إذا لم يسجل المستخدم اليوم
   if (hour === 18) {
     await eveningReminder()
