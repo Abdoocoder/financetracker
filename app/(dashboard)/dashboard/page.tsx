@@ -186,7 +186,7 @@ function useDashboardData() {
         supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
-        supabase.from('transactions').select('id,type,amount,category,description,transaction_date').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
+        supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
         supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
       ])
       const months6 = Array.from({ length: 6 }, (_, i) => {
