@@ -100,6 +100,44 @@ class _HelpScreenState extends State<HelpScreen> {
           'q': 'help_faq_investments_q2'.tr(),
           'a': 'help_faq_investments_a2'.tr()
         },
+        {
+          'q': 'help_faq_investments_q3'.tr(),
+          'a': 'help_faq_investments_a3'.tr()
+        },
+      ],
+    },
+    {
+      'section': 'help_faq_zakat_title'.tr(),
+      'items': [
+        {
+          'q': 'help_faq_zakat_q1'.tr(),
+          'a': 'help_faq_zakat_a1'.tr()
+        },
+        {
+          'q': 'help_faq_zakat_q2'.tr(),
+          'a': 'help_faq_zakat_a2'.tr()
+        },
+        {
+          'q': 'help_faq_zakat_q3'.tr(),
+          'a': 'help_faq_zakat_a3'.tr()
+        },
+      ],
+    },
+    {
+      'section': 'help_faq_fire_title'.tr(),
+      'items': [
+        {
+          'q': 'help_faq_fire_q1'.tr(),
+          'a': 'help_faq_fire_a1'.tr()
+        },
+        {
+          'q': 'help_faq_fire_q2'.tr(),
+          'a': 'help_faq_fire_a2'.tr()
+        },
+        {
+          'q': 'help_faq_fire_q3'.tr(),
+          'a': 'help_faq_fire_a3'.tr()
+        },
       ],
     },
   ];

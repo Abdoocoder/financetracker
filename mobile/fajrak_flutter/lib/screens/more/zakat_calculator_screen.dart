@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ZakatCalculatorScreen extends StatefulWidget {
@@ -22,20 +24,80 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
   List<Map<String, dynamic>> _invItems = [];
   bool _saving = false;
   bool _saved = false;
+  bool _fetchingPrices = false;
   final int _currentYear = DateTime.now().year;
 
   static const int _haulDays = 354;
+  static const double _troyOzToGram = 31.1035;
 
-  int _daysLeft(String createdAt) {
-    final start = DateTime.parse(createdAt);
-    final haulDate = start.add(const Duration(days: _haulDays));
+  // Uses purchase_date if available, falls back to created_at
+  DateTime _haulStart(Map<String, dynamic> inv) {
+    final pd = inv['purchase_date'];
+    if (pd != null) return DateTime.parse(pd.toString());
+    return DateTime.parse(inv['created_at'] as String);
+  }
+
+  int _daysLeft(Map<String, dynamic> inv) {
+    final haulDate = _haulStart(inv).add(const Duration(days: _haulDays));
     return haulDate.difference(DateTime.now()).inDays;
   }
 
-  String _haulDueDate(String createdAt) {
-    final start = DateTime.parse(createdAt);
-    final haulDate = start.add(const Duration(days: _haulDays));
+  String _haulDueDate(Map<String, dynamic> inv) {
+    final haulDate = _haulStart(inv).add(const Duration(days: _haulDays));
     return '${haulDate.day}/${haulDate.month}/${haulDate.year}';
+  }
+
+  Future<void> _fetchLivePrices() async {
+    if (_fetchingPrices) return;
+    setState(() => _fetchingPrices = true);
+    try {
+      // Fetch gold (GC=F) and silver (SI=F) from Yahoo Finance
+      final results = await Future.wait([
+        _fetchYahooPrice('GC=F'),
+        _fetchYahooPrice('SI=F'),
+        _fetchUsdRate(_currency),
+      ]);
+      final goldUsdOz = results[0];
+      final silverUsdOz = results[1];
+      final usdRate = results[2] ?? 1.0;
+      if (goldUsdOz != null && mounted) {
+        _goldPriceCtrl.text = (goldUsdOz / _troyOzToGram * usdRate).toStringAsFixed(2);
+      }
+      if (silverUsdOz != null && mounted) {
+        _silverPriceCtrl.text = (silverUsdOz / _troyOzToGram * usdRate).toStringAsFixed(2);
+      }
+      if (mounted) setState(() {});
+    } finally {
+      if (mounted) setState(() => _fetchingPrices = false);
+    }
+  }
+
+  Future<double?> _fetchYahooPrice(String symbol) async {
+    try {
+      final res = await http.get(
+        Uri.parse('https://query1.finance.yahoo.com/v8/finance/chart/$symbol?interval=1d&range=1d'),
+        headers: {'User-Agent': 'Mozilla/5.0'},
+      );
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        return (data['chart']?['result']?[0]?['meta']?['regularMarketPrice'] as num?)?.toDouble();
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<double?> _fetchUsdRate(String targetCurrency) async {
+    if (targetCurrency == 'USD') return 1.0;
+    try {
+      final res = await http.get(Uri.parse('https://open.er-api.com/v6/latest/USD'));
+      if (res.statusCode == 200) {
+        final data = json.decode(res.body);
+        return (data['rates']?[targetCurrency] as num?)?.toDouble();
+      }
+    } catch (_) {}
+    // Fallback rates
+    const fallback = {'JOD': 0.709, 'SAR': 3.75, 'AED': 3.67, 'KWD': 0.307, 'EGP': 48.5};
+    return fallback[targetCurrency];
   }
 
   @override
@@ -56,7 +118,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
     final results = await Future.wait<dynamic>([
-      Supabase.instance.client.from('investments').select('id,name,symbol,shares,current_price,created_at').eq('user_id', user.id),
+      Supabase.instance.client.from('investments').select('id,name,symbol,shares,current_price,created_at,purchase_date').eq('user_id', user.id),
       Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single(),
       Supabase.instance.client.from('zakat_history').select('*').eq('user_id', user.id).order('year', ascending: false),
       Supabase.instance.client.from('savings_goals').select('current_amount').eq('user_id', user.id),
@@ -173,9 +235,9 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('zakat_haul_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
                 const SizedBox(height: 12),
-                ..._invItems.where((i) => i['created_at'] != null).map((inv) {
-                  final days = _daysLeft(inv['created_at'] as String);
-                  final due = _haulDueDate(inv['created_at'] as String);
+                ..._invItems.where((i) => i['created_at'] != null || i['purchase_date'] != null).map((inv) {
+                  final days = _daysLeft(inv);
+                  final due = _haulDueDate(inv);
                   final invValue = (inv['shares'] as num).toDouble() * (inv['current_price'] as num).toDouble();
                   final overdue = days < 0;
                   final urgent = !overdue && days <= 30;
@@ -243,7 +305,17 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('zakat_enter_assets'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text('zakat_enter_assets'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                TextButton.icon(
+                  onPressed: _fetchingPrices ? null : _fetchLivePrices,
+                  icon: _fetchingPrices
+                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: cs.primary))
+                      : Icon(Icons.refresh, size: 16, color: cs.primary),
+                  label: Text('zakat_fetch_prices'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700, color: cs.primary)),
+                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
+                ),
+              ]),
               const SizedBox(height: 16),
               _inputField('zakat_gold_price'.tr(), _goldPriceCtrl),
               _inputField('zakat_gold_gram'.tr(), _goldGramCtrl),
