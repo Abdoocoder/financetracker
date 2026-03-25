@@ -6,16 +6,20 @@ import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 
 const HAUL_DAYS = 354 // حول هجري
+const TROY_OZ_TO_GRAM = 31.1035
 
-function haulDaysLeft(createdAt: string): number {
-  const start = new Date(createdAt)
-  const haulDate = new Date(start.getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
+function haulStart(inv: any): Date {
+  if (inv.purchase_date) return new Date(inv.purchase_date)
+  return new Date(inv.created_at)
+}
+
+function haulDaysLeft(inv: any): number {
+  const haulDate = new Date(haulStart(inv).getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
   return Math.ceil((haulDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
 }
 
-function haulDueDate(createdAt: string): string {
-  const start = new Date(createdAt)
-  const haulDate = new Date(start.getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
+function haulDueDate(inv: any): string {
+  const haulDate = new Date(haulStart(inv).getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
   return haulDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
@@ -37,19 +41,20 @@ export default function ZakatPage() {
   const [invItems, setInvItems] = useState<any[]>([])
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [fetchingPrices, setFetchingPrices] = useState(false)
   const currentYear = new Date().getFullYear()
 
   async function loadData() {
     if (!user) return
     const [invRes, profileRes, histRes, goalRes, debtRes] = await Promise.all([
-      supabase.from('investments').select('id,name,symbol,shares,current_price,created_at').eq('user_id', user.id),
+      supabase.from('investments').select('id,name,symbol,shares,current_price,created_at,purchase_date').eq('user_id', user.id),
       supabase.from('profiles').select('currency').eq('id', user.id).single(),
       supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false }),
       supabase.from('savings_goals').select('current_amount,name').eq('user_id', user.id),
       supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
     ])
 
-    const invList = invRes.data ?? []
+    const invList = (invRes.data ?? []) as any[]
     const invValue = invList.reduce((a: number, i: any) => a + Number(i.shares) * Number(i.current_price), 0)
     const goalsSaved = (goalRes.data ?? []).reduce((a: number, g: any) => a + Number(g.current_amount), 0)
     const totalDebt = (debtRes.data ?? []).reduce((a: number, d: any) => a + Number(d.remaining_amount), 0)
@@ -74,10 +79,36 @@ export default function ZakatPage() {
 
   const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
 
+  async function fetchLivePrices() {
+    setFetchingPrices(true)
+    try {
+      const [goldRes, silverRes, rateRes] = await Promise.all([
+        fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d', { headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null),
+        fetch('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d', { headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null),
+        currency !== 'USD' ? fetch(`https://open.er-api.com/v6/latest/USD`).catch(() => null) : Promise.resolve(null),
+      ])
+      const usdRate = currency !== 'USD' && rateRes?.ok
+        ? ((await rateRes.json()).rates?.[currency] ?? 1)
+        : 1
+      if (goldRes?.ok) {
+        const d = await goldRes.json()
+        const priceOz: number = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
+        if (priceOz > 0) setGoldPrice(parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2)))
+      }
+      if (silverRes?.ok) {
+        const d = await silverRes.json()
+        const priceOz: number = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
+        if (priceOz > 0) setSilverPrice(parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2)))
+      }
+    } finally {
+      setFetchingPrices(false)
+    }
+  }
+
   // استثمارات تقترب حولها (أقل من 60 يوم)
   const urgentInv = invItems
-    .filter(i => i.created_at)
-    .map(i => ({ ...i, daysLeft: haulDaysLeft(i.created_at), dueDate: haulDueDate(i.created_at) }))
+    .filter(i => i.created_at || i.purchase_date)
+    .map(i => ({ ...i, daysLeft: haulDaysLeft(i), dueDate: haulDueDate(i) }))
     .sort((a, b) => a.daysLeft - b.daysLeft)
 
   async function handleSave() {
@@ -148,7 +179,7 @@ export default function ZakatPage() {
             })}
           </div>
           <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)', padding: '8px 10px', borderRadius: 10, background: 'var(--bg-elevated)' }}>
-            💡 {ar ? 'الحول يُحسب من تاريخ إضافة الاستثمار للتطبيق (354 يوماً هجرياً)' : 'Haul calculated from investment creation date (354 lunar days)'}
+            💡 {ar ? 'الحول يُحسب من تاريخ الشراء إن وُجد، وإلا من تاريخ الإضافة (354 يوماً هجرياً)' : 'Haul calculated from purchase date if set, otherwise from creation date (354 lunar days)'}
           </div>
         </div>
       )}
@@ -180,8 +211,18 @@ export default function ZakatPage() {
 
       {/* ── الأصول (مع تلقائي) ── */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>
-          📊 {ar ? 'أصولك' : 'Your Assets'}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
+            📊 {ar ? 'أصولك' : 'Your Assets'}
+          </div>
+          <button onClick={fetchLivePrices} disabled={fetchingPrices} style={{
+            padding: '5px 12px', borderRadius: 10, border: '1px solid rgba(59,126,246,0.3)',
+            background: 'var(--accent-blue-dim)', color: 'var(--accent-blue-light)',
+            fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            opacity: fetchingPrices ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 5,
+          }}>
+            {fetchingPrices ? '⏳' : '🔄'} {ar ? 'أسعار حية' : 'Live Prices'}
+          </button>
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 16 }}>
           {ar ? '✅ محسوب تلقائياً: الاستثمارات + أهداف الادخار + الديون' : '✅ Auto-filled: investments, savings goals, debts'}
