@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import type { Budget } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
 import { Modal } from '@/components/ui/modal'
 import { toast } from '@/components/ui/toast'
@@ -22,7 +23,7 @@ const CATEGORIES = [
 
 // ── المستشار المالي الذكي ─────────────────────────────
 function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted, totalSpent, ar }: {
-  budgets: any[]; spending: Record<string, number>; income: number
+  budgets: Budget[]; spending: Record<string, number>; income: number
   available: number; totalBudgeted: number; totalSpent: number; ar: boolean
 }) {
   const insights: { icon: string; text: string; type: 'warning' | 'success' | 'info' | 'danger' }[] = []
@@ -166,7 +167,7 @@ export default function BudgetsPage() {
   const now = new Date()
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [year] = useState(now.getFullYear())
-  const [budgets, setBudgets] = useState<any[]>([])
+  const [budgets, setBudgets] = useState<Budget[]>([])
   const [spending, setSpending] = useState<Record<string, number>>({})
   const [monthlyIncome, setMonthlyIncome] = useState(0)
   const [totalDebtPayments, setTotalDebtPayments] = useState(0)

@@ -4,21 +4,22 @@ import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import type { Investment, ZakatHistory } from '@/types'
 
 const HAUL_DAYS = 354 // حول هجري
 const TROY_OZ_TO_GRAM = 31.1035
 
-function haulStart(inv: any): Date {
+function haulStart(inv: Investment): Date {
   if (inv.purchase_date) return new Date(inv.purchase_date)
   return new Date(inv.created_at)
 }
 
-function haulDaysLeft(inv: any): number {
+function haulDaysLeft(inv: Investment): number {
   const haulDate = new Date(haulStart(inv).getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
   return Math.ceil((haulDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
 }
 
-function haulDueDate(inv: any): string {
+function haulDueDate(inv: Investment): string {
   const haulDate = new Date(haulStart(inv).getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
   return haulDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })
 }
@@ -37,8 +38,8 @@ export default function ZakatPage() {
   const [investments, setInvestments] = useState(0)
   const [debtsOwed, setDebtsOwed] = useState(0)
   const [currency, setCurrency] = useState('JOD')
-  const [history, setHistory] = useState<any[]>([])
-  const [invItems, setInvItems] = useState<any[]>([])
+  const [history, setHistory] = useState<ZakatHistory[]>([])
+  const [invItems, setInvItems] = useState<Investment[]>([])
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [fetchingPrices, setFetchingPrices] = useState(false)

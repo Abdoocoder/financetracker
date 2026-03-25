@@ -104,6 +104,8 @@ const translations = {
     app_subtitle: 'إدارة مالية ذكية',
 
     // Dashboard
+    dash_greeting: '👋 أهلاً',
+    dash_subtitle: 'فجرك المالي يبدأ اليوم 🌅',
     dash_title: 'لوحة التحكم',
     dash_monthly: 'ملخص هذا الشهر',
     dash_income: 'الدخل',
@@ -515,6 +517,8 @@ const translations = {
     app_subtitle: 'Smart Finance',
 
     // Dashboard
+    dash_greeting: '👋 Hey',
+    dash_subtitle: 'Your financial dawn starts today 🌅',
     dash_title: 'Dashboard',
     dash_monthly: 'This Month',
     dash_income: 'Income',
