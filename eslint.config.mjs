@@ -2,7 +2,7 @@ import nextPlugin from "@next/eslint-plugin-next";
 
 const eslintConfig = [
   {
-    ignores: [".next/**", "coverage/**"],
+    ignores: [".next/**", "coverage/**", "mobile/**"],
   },
   {
     plugins: {

@@ -48,7 +48,7 @@ export default function ZakatPage() {
   async function loadData() {
     if (!user) return
     const [invRes, profileRes, histRes, goalRes, debtRes] = await Promise.all([
-      supabase.from('investments').select('id,name,symbol,shares,current_price,created_at,purchase_date').eq('user_id', user.id),
+      supabase.from('investments').select('id,user_id,name,symbol,type,shares,avg_buy_price,current_price,currency,is_halal,notes,purchase_date,created_at,updated_at').eq('user_id', user.id),
       supabase.from('profiles').select('currency').eq('id', user.id).single(),
       supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false }),
       supabase.from('savings_goals').select('current_amount,name').eq('user_id', user.id),
