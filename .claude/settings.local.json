@@ -27,7 +27,11 @@
       "Bash(grep -r \"firebase-admin\\\\|firebase/app\\\\|initializeApp\" /c/Users/skyli/Project/financetracker/app/ /c/Users/skyli/Project/financetracker/lib/ --include=*.ts --include=*.tsx -n)",
       "Bash(find /c/Users/skyli/Project/financetracker/lib -name *.ts)",
       "Bash(grep -r createClient\\\\\\(\\\\\\) /c/Users/skyli/Project/financetracker/hooks/ /c/Users/skyli/Project/financetracker/components/ --include=*.ts --include=*.tsx -l)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebFetch(domain:pagespeed.web.dev)",
+      "WebFetch(domain:www.googleapis.com)",
+      "Bash(curl -s \"https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https://fajrak.com&strategy=mobile\")",
+      "WebSearch"
     ]
   }
 }
