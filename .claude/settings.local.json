@@ -15,7 +15,10 @@
       "Bash(git -C c:/Users/skyli/Project/financetracker log --all --oneline --diff-filter=A -- mobile/tmp_app/**)",
       "Bash(git -C \"c:/Users/skyli/Project/financetracker\" show e37c3a04 --stat)",
       "Bash(grep -E \"^\\\\-.*\\\\s+\\(build_log|ts_errors|financetracker@|next$|structure\\\\.md|store-listing|supabase_push|\\\\.vercel-rebuild\\)\")",
-      "Bash(grep -r push_subscriptions c:/Users/skyli/Project/financetracker --include=*.sql --include=*.ts -l)"
+      "Bash(grep -r push_subscriptions c:/Users/skyli/Project/financetracker --include=*.sql --include=*.ts -l)",
+      "Bash(find c:/Users/skyli/Project/financetracker/components -type f \\\\\\(-name *sidebar* -o -name *nav* -o -name *header* -o -name *menu* \\\\\\))",
+      "Bash(find c:/Users/skyli/Project/financetracker -type f -name *sidebar* -o -name *nav-bar* -o -name *navigation*)",
+      "Bash(grep -E \"\\\\.\\(tsx|ts|jsx|js\\)$\")"
     ]
   }
 }

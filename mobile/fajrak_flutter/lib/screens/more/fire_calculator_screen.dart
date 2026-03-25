@@ -53,12 +53,14 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
     final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
     final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
     final income = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
-    if (mounted) setState(() {
-      _currentNetWorth = (invValue + goalsSaved - totalDebt).clamp(0, double.infinity);
-      _currency = profile['currency'] as String? ?? 'JOD';
-      if (income > 0) _monthlyExpenses = (income * 0.7).roundToDouble();
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _currentNetWorth = (invValue + goalsSaved - totalDebt).clamp(0, double.infinity);
+        _currency = profile['currency'] as String? ?? 'JOD';
+        if (income > 0) { _monthlyExpenses = (income * 0.7).roundToDouble(); }
+        _loading = false;
+      });
+    }
   }
 
   @override
@@ -75,10 +77,12 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
 
     String fmt(double n) => NumberFormat('#,##0', 'en').format(n);
 
-    if (_loading) return Scaffold(
-      appBar: AppBar(title: Text('fire_title'.tr()), backgroundColor: cs.surface),
-      body: Center(child: CircularProgressIndicator(color: cs.primary)),
-    );
+    if (_loading) {
+      return Scaffold(
+        appBar: AppBar(title: Text('fire_title'.tr()), backgroundColor: cs.surface),
+        body: Center(child: CircularProgressIndicator(color: cs.primary)),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
