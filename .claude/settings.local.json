@@ -35,7 +35,8 @@
       "Bash(grep -r \"assets/images\\\\|Image\\\\.\\\\|app_icon\" c:UsersskyliProjectfinancetrackermobilefajrak_flutter/lib --include=*.dart)",
       "Bash(ls -la c:/Users/skyli/Project/financetracker/*.md)",
       "Bash(ls -la /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/)",
-      "Bash(ls /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)"
+      "Bash(ls /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)",
+      "Bash(git fetch:*)"
     ]
   }
 }
