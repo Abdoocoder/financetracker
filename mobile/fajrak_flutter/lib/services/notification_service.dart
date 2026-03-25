@@ -78,15 +78,18 @@ class NotificationService {
     });
   }
 
+  // Tab indices in MainScreen: 0=More, 1=Budgets, 2=Debts, 3=Transactions, 4=Dashboard
   static void handleMessage(RemoteMessage message) {
-    final url = message.data['url'];
+    final url = message.data['url'] as String?;
     if (url == null) return;
 
-    // التنقل إلى الصفحة المطلوبة
-    // مثال: /dashboard/alerts -> نتحقق من المسار ونحول للمسار المناسب في فلاتر
-    if (url.contains('/dashboard/alerts')) {
-      FajrakApp.navigatorKey.currentState?.pushNamed('/main');
-    }
+    final nav = FajrakApp.navigatorKey.currentState;
+    if (nav == null) return;
+
+    int tab = 4; // default: Dashboard
+    if (url.contains('/dashboard/transactions')) tab = 3;
+
+    nav.pushNamed('/main', arguments: {'tab': tab});
   }
 
   static Future<void> saveToken({String? newToken}) async {

@@ -28,6 +28,15 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is Map && args['tab'] is int) {
+      _currentIndex = args['tab'] as int;
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -38,7 +38,7 @@ export async function sendFCMNotification(
           title,
           body,
           icon: 'ic_notification',
-          clickAction: url,
+          clickAction: 'FLUTTER_NOTIFICATION_CLICK',
           channelId: 'fajrak_notifications',
         },
       },
