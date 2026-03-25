@@ -37,11 +37,13 @@ class _DashboardHealthScoreState extends State<DashboardHealthScore> {
         .limit(30);
     final list = data as List;
     if (list.isEmpty) return;
-    if (mounted) setState(() {
-      _spots = list.asMap().entries.map((e) =>
-        FlSpot(e.key.toDouble(), (e.value['score'] as num).toDouble())
-      ).toList();
-    });
+    if (mounted) {
+      setState(() {
+        _spots = list.asMap().entries.map((e) =>
+          FlSpot(e.key.toDouble(), (e.value['score'] as num).toDouble())
+        ).toList();
+      });
+    }
   }
 
   @override

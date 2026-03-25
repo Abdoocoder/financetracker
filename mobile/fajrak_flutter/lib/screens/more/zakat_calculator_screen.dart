@@ -72,14 +72,16 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
     final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
     final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
 
-    if (mounted) setState(() {
-      _currency = profile['currency'] as String? ?? 'JOD';
-      _investmentsCtrl.text = invValue.toStringAsFixed(0);
-      _cashCtrl.text = goalsSaved.toStringAsFixed(0);
-      _debtsCtrl.text = totalDebt.toStringAsFixed(0);
-      _history = history.cast<Map<String, dynamic>>();
-      _invItems = invList.cast<Map<String, dynamic>>();
-    });
+    if (mounted) {
+      setState(() {
+        _currency = profile['currency'] as String? ?? 'JOD';
+        _investmentsCtrl.text = invValue.toStringAsFixed(0);
+        _cashCtrl.text = goalsSaved.toStringAsFixed(0);
+        _debtsCtrl.text = totalDebt.toStringAsFixed(0);
+        _history = history.cast<Map<String, dynamic>>();
+        _invItems = invList.cast<Map<String, dynamic>>();
+      });
+    }
   }
 
   double get _goldGram => double.tryParse(_goldGramCtrl.text) ?? 0;
