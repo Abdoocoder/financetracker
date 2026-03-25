@@ -8,13 +8,12 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-async function sendEveningReminders() {
+async function sendEveningReminders(userId?: string) {
   // استخدام توقيت UTC+3 (الأردن/الخليج) لتجنب خطأ اليوم
   const today = new Date(new Date().getTime() + 3 * 60 * 60 * 1000).toISOString().split('T')[0]
 
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, full_name')
+  const query = supabase.from('profiles').select('id, full_name')
+  const { data: profiles } = userId ? await query.eq('id', userId) : await query
 
   if (!profiles?.length) return 0
 
@@ -52,6 +51,7 @@ export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const sent = await sendEveningReminders()
+  const userId = request.nextUrl.searchParams.get('userId') ?? undefined
+  const sent = await sendEveningReminders(userId)
   return NextResponse.json({ ok: true, sent })
 }
