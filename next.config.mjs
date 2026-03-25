@@ -3,6 +3,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
+  serverExternalPackages: ['firebase-admin'],
   turbopack: {},
 };
 

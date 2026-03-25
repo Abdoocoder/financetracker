@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface FinancialSummary {
@@ -13,7 +13,7 @@ export function useFinancialSummary(userId: string | undefined): FinancialSummar
   const [summary, setSummary] = useState<FinancialSummary>({
     income: 0, expenses: 0, debtPayments: 0, net: 0, loading: true
   })
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     if (!userId) return

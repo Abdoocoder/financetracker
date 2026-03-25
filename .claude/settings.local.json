@@ -22,7 +22,12 @@
       "Bash(find c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/assets -type f -name *.json)",
       "Bash(grep -rn clearUserCache c:/Users/skyli/Project/financetracker/lib/ --include=*.ts)",
       "Bash(ls -la /c/Users/skyli/Project/financetracker/app/\\\\\\(auth\\\\\\)/)",
-      "Bash(ls -la /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)"
+      "Bash(ls -la /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''''deps:'''', list\\(d.get\\(''''dependencies'''',{}\\).keys\\(\\)\\)\\); print\\(''''scripts:'''', list\\(d.get\\(''''scripts'''',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(grep -r \"firebase-admin\\\\|firebase/app\\\\|initializeApp\" /c/Users/skyli/Project/financetracker/app/ /c/Users/skyli/Project/financetracker/lib/ --include=*.ts --include=*.tsx -n)",
+      "Bash(find /c/Users/skyli/Project/financetracker/lib -name *.ts)",
+      "Bash(grep -r createClient\\\\\\(\\\\\\) /c/Users/skyli/Project/financetracker/hooks/ /c/Users/skyli/Project/financetracker/components/ --include=*.ts --include=*.tsx -l)",
+      "Bash(npm run:*)"
     ]
   }
 }
