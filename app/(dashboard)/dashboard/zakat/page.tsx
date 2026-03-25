@@ -5,6 +5,20 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 
+const HAUL_DAYS = 354 // حول هجري
+
+function haulDaysLeft(createdAt: string): number {
+  const start = new Date(createdAt)
+  const haulDate = new Date(start.getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
+  return Math.ceil((haulDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+}
+
+function haulDueDate(createdAt: string): string {
+  const start = new Date(createdAt)
+  const haulDate = new Date(start.getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
+  return haulDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 export default function ZakatPage() {
   const { lang } = useI18n()
   const ar = lang === 'ar'
@@ -20,51 +34,60 @@ export default function ZakatPage() {
   const [debtsOwed, setDebtsOwed] = useState(0)
   const [currency, setCurrency] = useState('JOD')
   const [history, setHistory] = useState<any[]>([])
+  const [invItems, setInvItems] = useState<any[]>([])
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const currentYear = new Date().getFullYear()
 
-  useEffect(() => {
+  async function loadData() {
     if (!user) return
-    async function load() {
-      const [invRes, profileRes, histRes] = await Promise.all([
-        supabase.from('investments').select('shares,current_price').eq('user_id', user!.id),
-        supabase.from('profiles').select('currency').eq('id', user!.id).single(),
-        supabase.from('zakat_history').select('*').eq('user_id', user!.id).order('year', { ascending: false }),
-      ])
-      const invValue = (invRes.data ?? []).reduce((a: number, i: any) => a + Number(i.shares) * Number(i.current_price), 0)
-      setInvestments(Math.round(invValue))
-      setCurrency((profileRes as any).data?.currency ?? 'JOD')
-      setHistory(histRes.data ?? [])
-    }
-    load()
-  }, [user, supabase])
+    const [invRes, profileRes, histRes, goalRes, debtRes] = await Promise.all([
+      supabase.from('investments').select('id,name,symbol,shares,current_price,created_at').eq('user_id', user.id),
+      supabase.from('profiles').select('currency').eq('id', user.id).single(),
+      supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false }),
+      supabase.from('savings_goals').select('current_amount,name').eq('user_id', user.id),
+      supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
+    ])
 
-  // Nisab calculation
+    const invList = invRes.data ?? []
+    const invValue = invList.reduce((a: number, i: any) => a + Number(i.shares) * Number(i.current_price), 0)
+    const goalsSaved = (goalRes.data ?? []).reduce((a: number, g: any) => a + Number(g.current_amount), 0)
+    const totalDebt = (debtRes.data ?? []).reduce((a: number, d: any) => a + Number(d.remaining_amount), 0)
+
+    setInvestments(Math.round(invValue))
+    setCash(Math.round(goalsSaved))
+    setDebtsOwed(Math.round(totalDebt))
+    setCurrency((profileRes as any).data?.currency ?? 'JOD')
+    setHistory(histRes.data ?? [])
+    setInvItems(invList)
+  }
+
+  useEffect(() => { loadData() }, [user])
+
   const nisabGold = 85 * goldPrice
   const nisabSilver = 595 * silverPrice
   const nisab = Math.min(nisabGold, nisabSilver)
-
   const totalAssets = goldGram * goldPrice + silverGram * silverPrice + cash + investments
   const totalZakatable = Math.max(0, totalAssets - debtsOwed)
   const zakatDue = totalZakatable >= nisab ? totalZakatable * 0.025 : 0
+  const eligible = totalZakatable >= nisab
 
   const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
+
+  // استثمارات تقترب حولها (أقل من 60 يوم)
+  const urgentInv = invItems
+    .filter(i => i.created_at)
+    .map(i => ({ ...i, daysLeft: haulDaysLeft(i.created_at), dueDate: haulDueDate(i.created_at) }))
+    .sort((a, b) => a.daysLeft - b.daysLeft)
 
   async function handleSave() {
     if (!user) return
     setSaving(true)
     await supabase.from('zakat_history').upsert({
-      user_id: user.id,
-      year: currentYear,
-      gold_gram: goldGram,
-      silver_gram: silverGram,
-      cash,
-      investments,
-      debts_owed: debtsOwed,
-      total_zakatable: totalZakatable,
-      zakat_due: zakatDue,
-      is_paid: false,
+      user_id: user.id, year: currentYear,
+      gold_gram: goldGram, silver_gram: silverGram,
+      cash, investments, debts_owed: debtsOwed,
+      total_zakatable: totalZakatable, zakat_due: zakatDue, is_paid: false,
     }, { onConflict: 'user_id,year' })
     const { data } = await supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false })
     setHistory(data ?? [])
@@ -78,8 +101,6 @@ export default function ZakatPage() {
     setHistory(h => h.map(r => r.id === id ? { ...r, is_paid: !isPaid } : r))
   }
 
-  const eligible = totalZakatable >= nisab
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
@@ -91,7 +112,48 @@ export default function ZakatPage() {
         </p>
       </div>
 
-      {/* Result Card */}
+      {/* ── حول الاستثمارات ── */}
+      {urgentInv.length > 0 && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 14 }}>
+            🗓️ {ar ? 'حول استثماراتك' : 'Investment Haul Dates'}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {urgentInv.map(inv => {
+              const overdue = inv.daysLeft < 0
+              const urgent = inv.daysLeft >= 0 && inv.daysLeft <= 30
+              const soon = inv.daysLeft > 30 && inv.daysLeft <= 60
+              const color = overdue ? '#EF4444' : urgent ? '#F59E0B' : soon ? '#3B7EF6' : '#10B981'
+              const bg = overdue ? 'rgba(239,68,68,0.06)' : urgent ? 'rgba(245,158,11,0.06)' : soon ? 'rgba(59,126,246,0.04)' : 'var(--bg-elevated)'
+              const border = overdue ? 'rgba(239,68,68,0.2)' : urgent ? 'rgba(245,158,11,0.2)' : soon ? 'rgba(59,126,246,0.15)' : 'var(--border)'
+              const invValue = Number(inv.shares) * Number(inv.current_price)
+              return (
+                <div key={inv.id} style={{ padding: '12px 14px', borderRadius: 14, background: bg, border: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
+                      {inv.symbol ?? inv.name ?? ar ? 'استثمار' : 'Investment'}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                      {fmt(invValue)} {currency} · {ar ? `موعد الحول: ${inv.dueDate}` : `Haul due: ${inv.dueDate}`}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: 18, fontWeight: 900, color, fontFamily: 'monospace' }}>
+                      {overdue ? ar ? 'متأخر' : 'Overdue' : `${inv.daysLeft}`}
+                    </div>
+                    {!overdue && <div style={{ fontSize: 10, color, fontWeight: 700 }}>{ar ? 'يوم' : 'days'}</div>}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)', padding: '8px 10px', borderRadius: 10, background: 'var(--bg-elevated)' }}>
+            💡 {ar ? 'الحول يُحسب من تاريخ إضافة الاستثمار للتطبيق (354 يوماً هجرياً)' : 'Haul calculated from investment creation date (354 lunar days)'}
+          </div>
+        </div>
+      )}
+
+      {/* ── نتيجة الحساب ── */}
       <div style={{
         background: eligible ? 'rgba(16,185,129,0.06)' : 'var(--bg-card)',
         border: `1px solid ${eligible ? 'rgba(16,185,129,0.25)' : 'var(--border)'}`,
@@ -116,33 +178,34 @@ export default function ZakatPage() {
         </div>
       </div>
 
-      {/* Input Fields */}
+      {/* ── الأصول (مع تلقائي) ── */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 16 }}>
-          📊 {ar ? 'أدخل أصولك' : 'Enter Your Assets'}
+        <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>
+          📊 {ar ? 'أصولك' : 'Your Assets'}
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 16 }}>
+          {ar ? '✅ محسوب تلقائياً: الاستثمارات + أهداف الادخار + الديون' : '✅ Auto-filled: investments, savings goals, debts'}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
-            { label: ar ? `سعر غرام الذهب (${currency})` : `Gold Price/gram (${currency})`, val: goldPrice, set: setGoldPrice, hint: ar ? 'السعر الحالي في السوق' : 'Current market price' },
-            { label: ar ? 'ذهب (غرام)' : 'Gold (grams)', val: goldGram, set: setGoldGram, hint: ar ? 'المصاغ والسبائك' : 'Jewelry and bars' },
-            { label: ar ? `سعر غرام الفضة (${currency})` : `Silver Price/gram (${currency})`, val: silverPrice, set: setSilverPrice, hint: '' },
-            { label: ar ? 'فضة (غرام)' : 'Silver (grams)', val: silverGram, set: setSilverGram, hint: '' },
-            { label: ar ? `نقد وأرصدة بنكية (${currency})` : `Cash & Bank Balances (${currency})`, val: cash, set: setCash, hint: ar ? 'ما مكث عندك حول' : 'Held for 1 lunar year' },
-            { label: ar ? `استثمارات (${currency})` : `Investments (${currency})`, val: investments, set: setInvestments, hint: ar ? 'محسوب من محفظتك تلقائياً' : 'Auto-fetched from your portfolio' },
-            { label: ar ? `ديون عليك (${currency})` : `Debts You Owe (${currency})`, val: debtsOwed, set: setDebtsOwed, hint: ar ? 'تُطرح من المال الزكوي' : 'Deducted from zakatable amount' },
-          ].map(({ label, val, set, hint }) => (
+            { label: ar ? `سعر غرام الذهب (${currency})` : `Gold Price/gram (${currency})`, val: goldPrice, set: setGoldPrice, hint: ar ? 'السعر الحالي في السوق' : 'Current market price', auto: false },
+            { label: ar ? 'ذهب (غرام)' : 'Gold (grams)', val: goldGram, set: setGoldGram, hint: ar ? 'المصاغ والسبائك' : 'Jewelry & bars', auto: false },
+            { label: ar ? `سعر غرام الفضة (${currency})` : `Silver Price/gram (${currency})`, val: silverPrice, set: setSilverPrice, hint: '', auto: false },
+            { label: ar ? 'فضة (غرام)' : 'Silver (grams)', val: silverGram, set: setSilverGram, hint: '', auto: false },
+            { label: ar ? `نقد + أهداف الادخار (${currency})` : `Cash + Savings Goals (${currency})`, val: cash, set: setCash, hint: ar ? '✅ أهداف الادخار محسوبة تلقائياً' : '✅ Auto-includes savings goals', auto: true },
+            { label: ar ? `استثمارات (${currency})` : `Investments (${currency})`, val: investments, set: setInvestments, hint: ar ? '✅ محسوب من محفظتك تلقائياً' : '✅ Auto-fetched from portfolio', auto: true },
+            { label: ar ? `ديون عليك (${currency})` : `Debts You Owe (${currency})`, val: debtsOwed, set: setDebtsOwed, hint: ar ? '✅ محسوب من ديونك تلقائياً' : '✅ Auto-fetched from your debts', auto: true },
+          ].map(({ label, val, set, hint, auto }) => (
             <div key={label}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{label}</span>
-                {hint && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{hint}</span>}
+                <span style={{ fontSize: 12, fontWeight: 700, color: auto ? '#10B981' : 'var(--text-secondary)' }}>{label}</span>
+                {hint && <span style={{ fontSize: 10, color: auto ? '#10B981' : 'var(--text-muted)' }}>{hint}</span>}
               </div>
-              <input
-                type="number"
-                value={val}
-                onChange={e => set(Number(e.target.value))}
+              <input type="number" value={val} onChange={e => set(Number(e.target.value))}
                 style={{
                   width: '100%', padding: '10px 14px', borderRadius: 12,
-                  background: 'var(--bg-elevated)', border: '1px solid var(--border)',
+                  background: auto ? 'rgba(16,185,129,0.04)' : 'var(--bg-elevated)',
+                  border: `1px solid ${auto ? 'rgba(16,185,129,0.2)' : 'var(--border)'}`,
                   color: 'var(--text-primary)', fontSize: 15, fontFamily: 'inherit',
                   boxSizing: 'border-box',
                 }}
@@ -160,7 +223,7 @@ export default function ZakatPage() {
         </button>
       </div>
 
-      {/* History */}
+      {/* ── السجل ── */}
       {history.length > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 14 }}>
@@ -196,7 +259,7 @@ export default function ZakatPage() {
         </div>
       )}
 
-      {/* Note */}
+      {/* ── تنبيه شرعي ── */}
       <div style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 16, padding: 16 }}>
         <div style={{ fontSize: 12, color: '#F59E0B', fontWeight: 800, marginBottom: 6 }}>📌 {ar ? 'تنبيه شرعي' : 'Note'}</div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
