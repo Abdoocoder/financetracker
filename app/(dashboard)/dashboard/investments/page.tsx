@@ -291,7 +291,7 @@ export default function InvestmentsPage() {
 
   function startEditInv(inv: Investment) {
     setEditingInv(inv)
-    setEditForm({ symbol: inv.symbol, name: inv.name, type: inv.type, shares: inv.shares.toString(), avg_buy_price: inv.avg_buy_price.toString(), current_price: inv.current_price.toString(), is_halal: inv.is_halal, notes: inv.notes ?? '', purchase_date: (inv as any).purchase_date ?? '' })
+    setEditForm({ symbol: inv.symbol, name: inv.name, type: inv.type, shares: inv.shares.toString(), avg_buy_price: inv.avg_buy_price.toString(), current_price: inv.current_price.toString(), is_halal: inv.is_halal, notes: inv.notes ?? '', purchase_date: inv.purchase_date ?? '' })
   }
 
   async function saveEditInv() {

@@ -76,6 +76,7 @@ export interface Investment {
   currency: string
   is_halal: boolean
   notes: string | null
+  purchase_date: string | null
   created_at: string
   updated_at: string
 }
