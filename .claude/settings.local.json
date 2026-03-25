@@ -36,7 +36,8 @@
       "Bash(ls -la c:/Users/skyli/Project/financetracker/*.md)",
       "Bash(ls -la /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/)",
       "Bash(ls /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(find /c/Users/skyli/Documents/financetracker/public -type f -name *.apk)"
     ]
   }
 }
