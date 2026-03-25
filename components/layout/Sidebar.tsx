@@ -219,12 +219,13 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
             background: 'var(--bg-secondary)',
             borderTop: '1px solid var(--border)',
             borderRadius: '28px 28px 0 0',
-            padding: '0 20px',
-            paddingBottom: 'max(32px, env(safe-area-inset-bottom))',
+            maxHeight: '85dvh',
+            display: 'flex', flexDirection: 'column',
             animation: 'slideUp 0.25s ease',
           }} className="mobile-nav">
             {/* Handle */}
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '14px auto 20px' }} />
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '14px auto 16px', flexShrink: 0 }} />
+            <div style={{ overflowY: 'auto', flex: 1, padding: '0 20px', paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
               {MORE_NAV.map(({ href, Icon, ar, en }) => {
                 const isActive = pathname.startsWith(href)
@@ -262,6 +263,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
             <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setShowMore(false); setTimeout(() => window.location.reload(), 100) }} style={{ width: '100%', padding: '13px', borderRadius: 14, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <Globe size={16} /> {lang === 'ar' ? 'English' : 'العربية'}
             </button>
+            </div>
           </div>
         </>
       )}
