@@ -32,7 +32,8 @@
       "WebFetch(domain:www.googleapis.com)",
       "Bash(curl -s \"https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=https://fajrak.com&strategy=mobile\")",
       "WebSearch",
-      "Bash(grep -r \"assets/images\\\\|Image\\\\.\\\\|app_icon\" c:UsersskyliProjectfinancetrackermobilefajrak_flutter/lib --include=*.dart)"
+      "Bash(grep -r \"assets/images\\\\|Image\\\\.\\\\|app_icon\" c:UsersskyliProjectfinancetrackermobilefajrak_flutter/lib --include=*.dart)",
+      "Bash(ls -la c:/Users/skyli/Project/financetracker/*.md)"
     ]
   }
 }
