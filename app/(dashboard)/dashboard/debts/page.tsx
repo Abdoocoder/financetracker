@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import type { Debt } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
 import { AddButton } from '@/components/ui/add-button'
 import { StatBar } from '@/components/ui/stat-bar'
@@ -90,8 +91,8 @@ function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: ()
 }
 
 export default function DebtsPage() {
-  const [debts, setDebts] = useState<any[]>([])
-  const [paidDebts, setPaidDebts] = useState<any[]>([])
+  const [debts, setDebts] = useState<Debt[]>([])
+  const [paidDebts, setPaidDebts] = useState<Debt[]>([])
   const [showPaid, setShowPaid] = useState(false)
   const [totalPaidAmount, setTotalPaidAmount] = useState(0)
   const [loading, setLoading] = useState(true)

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import type { Transaction } from '@/types'
 import { QuickAdd } from '@/components/ui/quick-add'
 import {
   MonthCompareCard, BudgetProgressCard,
@@ -137,7 +138,7 @@ function computeHealthScore(data: DashboardData | null, income: number, expenses
 
 function useDashboardData() {
   const [data, setData] = useState<DashboardData | null>(null)
-  const [recentTx, setRecentTx] = useState<any[]>([])
+  const [recentTx, setRecentTx] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
   const { user: currentUser } = useUser()
   const supabase = useMemo(() => createClient(), [])
@@ -237,10 +238,10 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
-            {(() => { const name = data?.name || currentUser?.user_metadata?.full_name || ''; const first = name.split(' ')[0]; return first ? (lang === 'ar' ? `👋 أهلاً ${first}` : `👋 Hey ${first}`) : t('dash_title') })()}
+            {(() => { const name = data?.name || currentUser?.user_metadata?.full_name || ''; const first = name.split(' ')[0]; return first ? `${t('dash_greeting')} ${first}` : t('dash_title') })()}
           </h1>
           <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
-            {lang === 'ar' ? 'فجرك المالي يبدأ اليوم 🌅' : 'Your financial dawn starts today 🌅'}
+            {t('dash_subtitle')}
           </p>
         </div>
         {(data?.unreadAlerts ?? 0) > 0 && (

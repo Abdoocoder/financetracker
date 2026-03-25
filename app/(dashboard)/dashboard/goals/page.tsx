@@ -6,11 +6,12 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import type { SavingsGoal } from '@/types'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 export default function GoalsPage() {
-  const [goals, setGoals] = useState<any[]>([])
+  const [goals, setGoals] = useState<SavingsGoal[]>([])
   const { user: currentUser } = useUser()
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)

@@ -131,6 +131,21 @@ export interface SavingsGoal {
   updated_at: string
 }
 
+export interface ZakatHistory {
+  id: string
+  user_id: string
+  year: number
+  gold_gram: number
+  silver_gram: number
+  cash: number
+  investments: number
+  debts_owed: number
+  total_zakatable: number
+  zakat_due: number
+  is_paid: boolean
+  created_at?: string
+}
+
 export interface MonthlySummary {
   user_id: string
   year: number

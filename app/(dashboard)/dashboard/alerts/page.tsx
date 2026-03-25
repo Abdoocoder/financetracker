@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import type { Alert } from '@/types'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { PageHeader } from '@/components/ui/page-header'
@@ -99,7 +100,7 @@ function AlertCard({ alert, onRead, onDelete, onNavigate }: { alert: any; onRead
 }
 
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState<any[]>([])
+  const [alerts, setAlerts] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [filter, setFilter] = useState<'all' | 'unread' | 'warning' | 'achievement'>('all')
@@ -187,7 +188,7 @@ export default function AlertsPage() {
     return true
   })
 
-  const filterTabs = [
+  const filterTabs: { key: 'all' | 'unread' | 'warning' | 'achievement'; label: string }[] = [
     { key: 'all', label: lang === 'en' ? `All (${alerts.length})` : `الكل (${alerts.length})` },
     { key: 'unread', label: lang === 'en' ? `Unread (${unreadCount})` : `غير مقروء (${unreadCount})` },
     { key: 'warning', label: lang === 'en' ? '⚠️ Warnings' : '⚠️ تحذيرات' },
@@ -261,7 +262,7 @@ export default function AlertsPage() {
         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
           {filterTabs.map(tab => (
             <button key={tab.key}
-              onClick={() => setFilter(tab.key as any)}
+              onClick={() => setFilter(tab.key)}
               className="flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all"
               style={{
                 background: filter === tab.key ? 'var(--accent-blue)' : 'var(--bg-card)',
