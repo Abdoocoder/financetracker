@@ -146,8 +146,17 @@ export default function ZakatPage() {
       {/* ── حول الاستثمارات ── */}
       {urgentInv.length > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 14 }}>
-            🗓️ {ar ? 'حول استثماراتك' : 'Investment Haul Dates'}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
+              🗓️ {ar ? 'حول استثماراتك' : 'Investment Haul Dates'}
+            </div>
+            <button onClick={loadData} style={{
+              padding: '4px 10px', borderRadius: 8, border: '1px solid var(--border)',
+              background: 'var(--bg-elevated)', color: 'var(--text-muted)',
+              fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              🔄 {ar ? 'تحديث' : 'Refresh'}
+            </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {urgentInv.map(inv => {
@@ -179,7 +188,10 @@ export default function ZakatPage() {
             })}
           </div>
           <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)', padding: '8px 10px', borderRadius: 10, background: 'var(--bg-elevated)' }}>
-            💡 {ar ? 'الحول يُحسب من تاريخ الشراء إن وُجد، وإلا من تاريخ الإضافة (354 يوماً هجرياً)' : 'Haul calculated from purchase date if set, otherwise from creation date (354 lunar days)'}
+            {ar ? 'الحول يُحسب من تاريخ الشراء إن وُجد، وإلا من تاريخ الإضافة (354 يوماً هجرياً)' : 'Haul calculated from purchase date if set, otherwise from creation date (354 lunar days)'}
+          </div>
+          <div style={{ marginTop: 8, fontSize: 11, padding: '8px 10px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B' }}>
+            💡 {ar ? 'لم يتغير تاريخ الحول؟ عدّل الاستثمار في صفحة الاستثمارات وأدخل تاريخ الشراء، ثم اضغط تحديث.' : "Haul date not updated? Edit the investment in the Investments page, enter the purchase date, then click Refresh."}
           </div>
         </div>
       )}

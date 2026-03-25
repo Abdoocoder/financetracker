@@ -10,7 +10,7 @@ class ZakatCalculatorScreen extends StatefulWidget {
   State<ZakatCalculatorScreen> createState() => _ZakatCalculatorScreenState();
 }
 
-class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
+class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with WidgetsBindingObserver {
   final _goldGramCtrl = TextEditingController(text: '0');
   final _goldPriceCtrl = TextEditingController(text: '30');
   final _silverGramCtrl = TextEditingController(text: '0');
@@ -103,11 +103,18 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _load();
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     for (final c in [_goldGramCtrl, _goldPriceCtrl, _silverGramCtrl, _silverPriceCtrl, _cashCtrl, _investmentsCtrl, _debtsCtrl]) {
       c.dispose();
     }
@@ -233,7 +240,21 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('zakat_haul_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  Text('zakat_haul_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                  GestureDetector(
+                    onTap: _load,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8)),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.refresh, size: 14, color: cs.onSurfaceVariant),
+                        const SizedBox(width: 4),
+                        Text('zakat_refresh'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w700, color: cs.onSurfaceVariant)),
+                      ]),
+                    ),
+                  ),
+                ]),
                 const SizedBox(height: 12),
                 ..._invItems.where((i) => i['created_at'] != null || i['purchase_date'] != null).map((inv) {
                   final days = _daysLeft(inv);
@@ -263,8 +284,16 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> {
                     ]),
                   );
                 }),
-                const SizedBox(height: 4),
-                Text('zakat_haul_note'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(color: const Color(0xFFF59E0B).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25))),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('💡', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 6),
+                    Expanded(child: Text('zakat_haul_purchase_tip'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant, height: 1.5))),
+                  ]),
+                ),
               ]),
             ),
             const SizedBox(height: 16),

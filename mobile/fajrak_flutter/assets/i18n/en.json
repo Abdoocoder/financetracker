@@ -682,6 +682,8 @@
   "inv_purchase_date": "Purchase Date",
   "inv_purchase_date_hint": "Select asset purchase date (optional)",
   "zakat_fetch_prices": "Fetch Live Prices",
+  "zakat_refresh": "Refresh",
+  "zakat_haul_purchase_tip": "💡 Haul date not updated? Make sure to enter the purchase date in Investments, then tap Refresh.",
   "help_faq_investments_q3": "What is the purchase date and how does it relate to Zakat?",
   "help_faq_investments_a3": "The asset purchase date is used to calculate the haul (354 lunar days) in the Zakat page. Enter it when adding an investment to get accurate alerts about when Zakat is due.",
   "help_faq_zakat_title": "🕌 Zakat Calculator",
