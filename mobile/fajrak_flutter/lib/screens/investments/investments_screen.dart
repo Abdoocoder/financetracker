@@ -36,7 +36,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     if (user == null) return;
 
     try {
-      final results = await Future.wait([
+      final results = await Future.wait(<Future<dynamic>>[
         Supabase.instance.client.from('investments').select('*').eq('user_id', user.id),
         Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single(),
       ]);
