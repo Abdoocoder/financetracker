@@ -351,15 +351,22 @@ class _LearnScreenState extends State<LearnScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.08),
+                  color: (_completed || _streak == 0)
+                      ? const Color(0xFFF59E0B).withValues(alpha: 0.08)
+                      : const Color(0xFF9CA3AF).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.25))),
+                      color: (_completed || _streak == 0)
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
+                          : const Color(0xFF9CA3AF).withValues(alpha: 0.25))),
               child: Column(children: [
-                const Text('🔥', style: TextStyle(fontSize: 22)),
+                Text((!_completed && _streak > 0) ? '❄️' : '🔥',
+                    style: const TextStyle(fontSize: 22)),
                 Text('$_streak',
                     style: TextStyle(
-                        color: cs.primary,
+                        color: (!_completed && _streak > 0)
+                            ? const Color(0xFF9CA3AF)
+                            : cs.primary,
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
                         fontFamily: 'Cairo')),
