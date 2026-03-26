@@ -307,7 +307,7 @@ export default function DashboardPage() {
       {/* ── قابلة للطي — مطوية افتراضياً ── */}
 
 
-      <Section id="gamification" icon="🏆" title={lang === 'en' ? 'Achievements' : 'نظام الإنجازات'}>
+      <Section id="gamification" defaultOpen={true} icon="🏆" title={lang === 'en' ? 'Achievements' : 'نظام الإنجازات'}>
         <div style={{ padding: '12px 0 8px' }}>
           <GamificationCard />
         </div>
