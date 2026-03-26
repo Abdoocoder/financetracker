@@ -1,7 +1,8 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { createClient } from '@/lib/supabase/client'
 
 const BADGE_INFO: Record<string, { icon: string; ar: string; en: string }> = {
   first_tx:    { icon: '⚡', ar: 'الخطوة الأولى',    en: 'First Step' },
@@ -30,12 +31,18 @@ export function GamificationCard() {
   const { user } = useUser()
   const { lang } = useI18n()
   const ar = lang === 'ar'
+  const supabase = useMemo(() => createClient(), [])
   const [data, setData] = useState<any>(null)
+  const [loggedToday, setLoggedToday] = useState(true)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
 
   useEffect(() => {
     if (!user) return
+    const today = new Date().toISOString().split('T')[0]
+    supabase.from('transactions').select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id).eq('transaction_date', today)
+      .then(({ count }) => setLoggedToday((count ?? 0) > 0))
     // جلب البيانات الحالية
     fetch(`/api/gamification?user_id=${user.id}`)
       .then(r => r.json())
@@ -111,9 +118,9 @@ export function GamificationCard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: 'var(--border)' }}>
         <div style={{ background: 'var(--bg-card)', padding: '12px 16px', textAlign: 'center' }}>
           <div style={{ fontSize: 22, marginBottom: 2 }}>
-            {streak >= 7 ? '🔥' : streak >= 3 ? '💪' : '⚡'}
+            {!loggedToday && streak > 0 ? '❄️' : streak >= 7 ? '🔥' : streak >= 3 ? '💪' : '⚡'}
           </div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: streak > 0 ? '#F59E0B' : 'var(--text-muted)', fontFamily: 'monospace' }}>{streak}</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: !loggedToday && streak > 0 ? '#9CA3AF' : streak > 0 ? '#F59E0B' : 'var(--text-muted)', fontFamily: 'monospace' }}>{streak}</div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700 }}>{ar ? 'يوم متواصل' : 'Day Streak'}</div>
         </div>
         <div style={{ background: 'var(--bg-card)', padding: '12px 16px', textAlign: 'center' }}>
