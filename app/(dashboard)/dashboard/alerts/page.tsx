@@ -140,7 +140,7 @@ export default function AlertsPage() {
     try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: fresh, ts: Date.now() })) } catch {}
   }, [user, supabase])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { if (user) load() }, [load, user])
 
   function getAlertLink(alert: any): string {
     const title = alert.title?.toLowerCase() ?? ''
