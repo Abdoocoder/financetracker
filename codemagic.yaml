@@ -4,7 +4,20 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: 3.24.0
+      groups:
+        - fajrak
     scripts:
+      - name: Create .env file
+        script: |
+          cat > .env << ENVEOF
+          SUPABASE_URL=$SUPABASE_URL
+          SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+          TWELVE_DATA_KEY=$TWELVE_DATA_KEY
+          FLUTTER_FIREBASE_API_KEY=$FLUTTER_FIREBASE_API_KEY
+          FLUTTER_FIREBASE_PROJECT_ID=$FLUTTER_FIREBASE_PROJECT_ID
+          FLUTTER_FIREBASE_APP_ID=$FLUTTER_FIREBASE_APP_ID
+          FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID
+          ENVEOF
       - name: Get Flutter packages
         script: flutter pub get
       - name: Build APK
