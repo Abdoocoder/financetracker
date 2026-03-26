@@ -40,7 +40,7 @@ async function dailyMorningReminder() {
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 
-  for (const p of profiles) {
+  await Promise.all(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = p.monthly_income ?? 0
     const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
@@ -68,7 +68,7 @@ async function dailyMorningReminder() {
       : `أحسنت! ميزانيتك اليوم: ${dailySafe.toFixed(0)} JOD 💪`
 
     await sendPushToUser(p.id, title, body, '/dashboard?quick=1', 'morning')
-  }
+  }))
 }
 
 // ── 7 ص: تنبيهات ذكية ────────────────────────────────
@@ -110,7 +110,7 @@ async function eveningReminder() {
     .from('profiles').select('id, full_name')
   if (!profiles?.length) return
 
-  for (const p of profiles) {
+  await Promise.all(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const { count } = await supabase.from('transactions')
       .select('id', { count: 'exact', head: true })
@@ -125,7 +125,7 @@ async function eveningReminder() {
       : `سجّلت ${todayCount} معاملة اليوم. استمر على هذا النهج`
 
     await sendPushToUser(p.id, title, body, '/dashboard/transactions', 'evening')
-  }
+  }))
 }
 
 // ── الجمعة 8 ص: تقرير أسبوعي ────────────────────────
