@@ -257,10 +257,18 @@ export default function DashboardPage() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {streakInfo && streakInfo.streak >= 3 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 12, fontWeight: 700, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF' }}>
+            <button
+              onClick={() => {
+                if (streakInfo.loggedToday) {
+                  document.getElementById('gamification')?.scrollIntoView({ behavior: 'smooth' })
+                } else {
+                  document.getElementById('quick-add-trigger')?.click()
+                }
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 12, fontWeight: 700, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF', cursor: 'pointer' }}>
               <span>{streakInfo.loggedToday ? '🔥' : '❄️'}</span>
               <span>{streakInfo.streak}</span>
-            </div>
+            </button>
           )}
           {(data?.unreadAlerts ?? 0) > 0 && (
             <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
