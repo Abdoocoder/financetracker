@@ -9,6 +9,7 @@ workflows:
     scripts:
       - name: Create .env file
         script: |
+          cd mobile/fajrak_flutter
           cat > .env << ENVEOF
           SUPABASE_URL=$SUPABASE_URL
           SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
@@ -19,8 +20,12 @@ workflows:
           FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID
           ENVEOF
       - name: Get Flutter packages
-        script: flutter pub get
+        script: |
+          cd mobile/fajrak_flutter
+          flutter pub get
       - name: Build APK
-        script: flutter build apk --release
+        script: |
+          cd mobile/fajrak_flutter
+          flutter build apk --release
     artifacts:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - mobile/fajrak_flutter/build/app/outputs/flutter-apk/app-release.apk
