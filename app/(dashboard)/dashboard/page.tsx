@@ -222,6 +222,18 @@ export default function DashboardPage() {
   const { t, lang } = useI18n()
   const { user: currentUser, profile } = useUser()
   const { data, setData, recentTx, loading, supabase } = useDashboardData()
+  const [streakInfo, setStreakInfo] = useState<{ streak: number; loggedToday: boolean } | null>(null)
+
+  useEffect(() => {
+    if (!currentUser) return
+    const today = new Date().toISOString().split('T')[0]
+    Promise.all([
+      supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('transaction_date', today),
+      fetch(`/api/gamification?user_id=${currentUser.id}`).then(r => r.json()),
+    ]).then(([txRes, gam]) => {
+      setStreakInfo({ streak: gam?.streak_days ?? 0, loggedToday: (txRes.count ?? 0) > 0 })
+    }).catch(() => {})
+  }, [currentUser, supabase])
 
   if (loading) return <DashSkeleton />
 
@@ -243,11 +255,19 @@ export default function DashboardPage() {
             {t('dash_subtitle')}
           </p>
         </div>
-        {(data?.unreadAlerts ?? 0) > 0 && (
-          <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
-            🔔 {data?.unreadAlerts}
-          </Link>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {streakInfo && streakInfo.streak >= 3 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 12, fontWeight: 700, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF' }}>
+              <span>{streakInfo.loggedToday ? '🔥' : '❄️'}</span>
+              <span>{streakInfo.streak}</span>
+            </div>
+          )}
+          {(data?.unreadAlerts ?? 0) > 0 && (
+            <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
+              🔔 {data?.unreadAlerts}
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Empty State للمستخدم الجديد */}
