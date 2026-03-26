@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
+import { useUser } from '@/lib/user-context'
 import type { Alert } from '@/types'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
@@ -105,21 +106,39 @@ export default function AlertsPage() {
   const [generating, setGenerating] = useState(false)
   const [filter, setFilter] = useState<'all' | 'unread' | 'warning' | 'achievement'>('all')
   const supabase = createClient()
+  const { user } = useUser()
   const { t, lang } = useI18n()
   const router = useRouter()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+    const CACHE_KEY = `alerts_${user.id}`
+
+    // عرض البيانات المخزنة فوراً
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY)
+      if (cached) {
+        const { data: cd, ts } = JSON.parse(cached)
+        if (Date.now() - ts < 2 * 60 * 1000) {
+          setAlerts(cd)
+          setLoading(false)
+        }
+      }
+    } catch {}
+
+    // جلب بيانات جديدة في الخلفية
     const { data } = await supabase
       .from('alerts').select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50)
-    setAlerts(data ?? [])
+
+    const fresh = data ?? []
+    setAlerts(fresh)
     setLoading(false)
-  }, [supabase])
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: fresh, ts: Date.now() })) } catch {}
+  }, [user, supabase])
 
   useEffect(() => { load() }, [load])
 
@@ -160,7 +179,6 @@ export default function AlertsPage() {
   }
 
   async function markAllRead() {
-    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     await supabase.from('alerts').update({ is_read: true }).eq('user_id', user.id).eq('is_read', false)
     setAlerts(prev => prev.map(a => ({ ...a, is_read: true })))
@@ -173,7 +191,6 @@ export default function AlertsPage() {
   }
 
   async function deleteAll() {
-    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     await supabase.from('alerts').delete().eq('user_id', user.id)
     setAlerts([])
