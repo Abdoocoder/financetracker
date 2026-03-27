@@ -21,13 +21,9 @@ export async function GET(request: NextRequest) {
     )
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    if (!error && data.session?.access_token) {
       const redirectUrl = new URL(next, request.url)
-      // Pass access_token as query param so reset-password works in
-      // in-app browsers (Gmail/email apps) that don't preserve cookies across redirects
-      if (data.session?.access_token && next.startsWith('/reset-password')) {
-        redirectUrl.searchParams.set('t', data.session.access_token)
-      }
+      redirectUrl.searchParams.set('t', data.session.access_token)
       const response = NextResponse.redirect(redirectUrl)
       cookiesToSet.forEach(({ name, value, options }) =>
         response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2])
@@ -36,5 +32,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL('/login?error=auth', request.url))
+  // No code (Supabase implicit flow) OR PKCE exchange failed.
+  // The access_token may be in the URL hash (#access_token=...) which the server cannot read.
+  // Serve a tiny HTML page that reads the hash client-side and redirects with it preserved.
+  const nextEncoded = encodeURIComponent(next)
+  return new Response(
+    `<!DOCTYPE html><html><head><meta charset="utf-8"><script>var h=window.location.hash,n=decodeURIComponent('${nextEncoded}');if(h&&h.indexOf('access_token')!==-1){window.location.replace(n+h)}else{window.location.replace('/login?error=auth')}</script></head><body></body></html>`,
+    { headers: { 'Content-Type': 'text/html', 'Cache-Control': 'no-store' } }
+  )
 }
