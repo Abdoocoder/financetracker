@@ -1,12 +1,14 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useI18n } from '@/lib/i18n'
 import { updatePassword } from './actions'
 
 export default function ResetPasswordPage() {
   const { t } = useI18n()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const token = searchParams.get('t') ?? ''
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,9 +19,9 @@ export default function ResetPasswordPage() {
     e.preventDefault()
     if (password !== confirm) { setError(t('reset_mismatch')); return }
     setLoading(true); setError('')
-    const result = await updatePassword(password)
+    const result = await updatePassword(password, token)
     if (result.error) {
-      setError(result.error.includes('reauthentication') || result.error.includes('session')
+      setError(result.error === 'session'
         ? 'انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق'
         : result.error)
       setLoading(false)
