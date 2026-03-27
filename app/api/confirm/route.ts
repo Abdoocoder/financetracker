@@ -20,9 +20,14 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       const redirectUrl = new URL(next, request.url)
+      // Pass access_token as query param so reset-password works in
+      // in-app browsers (Gmail/email apps) that don't preserve cookies across redirects
+      if (data.session?.access_token && next.startsWith('/reset-password')) {
+        redirectUrl.searchParams.set('t', data.session.access_token)
+      }
       const response = NextResponse.redirect(redirectUrl)
       cookiesToSet.forEach(({ name, value, options }) =>
         response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2])
