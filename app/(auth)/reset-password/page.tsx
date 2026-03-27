@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useI18n } from '@/lib/i18n'
 import { updatePassword } from './actions'
@@ -8,12 +8,49 @@ function ResetPasswordForm() {
   const { t } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const token = searchParams.get('t') ?? ''
+
+  // Token sources:
+  // 1. ?t= query param  → PKCE flow via /api/confirm
+  // 2. #access_token=   → Supabase implicit flow (token in URL hash, client-side only)
+  const [token, setToken] = useState(searchParams.get('t') ?? '')
+  const [tokenReady, setTokenReady] = useState(!!searchParams.get('t'))
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    if (tokenReady) return
+    // Try to read access_token from URL hash (implicit flow)
+    // e.g. /reset-password#access_token=XXX&type=recovery
+    const hash = window.location.hash.slice(1)
+    const params = new URLSearchParams(hash)
+    const accessToken = params.get('access_token')
+    const type = params.get('type')
+    if (accessToken && type === 'recovery') {
+      setToken(accessToken)
+      // Remove hash from URL bar for security
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+    setTokenReady(true)
+  }, [tokenReady])
+
+  if (!tokenReady) {
+    return (
+      <div className="p-8 rounded-2xl border text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+        <div className="animate-pulse rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: 'var(--accent-blue)' }}></div>
+      </div>
+    )
+  }
+
+  if (!token) {
+    return (
+      <div className="p-8 rounded-2xl border text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+        <p className="text-sm" style={{ color: '#EF4444' }}>انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق</p>
+      </div>
+    )
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -29,14 +66,6 @@ function ResetPasswordForm() {
     }
     setSuccess(true)
     setTimeout(() => router.push('/login'), 2000)
-  }
-
-  if (!token) {
-    return (
-      <div className="p-8 rounded-2xl border text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-        <p className="text-sm" style={{ color: '#EF4444' }}>انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق</p>
-      </div>
-    )
   }
 
   return (
