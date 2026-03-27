@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       {
         cookies: {
           getAll() { return request.cookies.getAll() },
-          setAll(c) { cookiesToSet.push(...c) },
+          setAll(c: { name: string; value: string; options?: Record<string, unknown> }[]) { cookiesToSet.push(...c) },
         },
       }
     )
