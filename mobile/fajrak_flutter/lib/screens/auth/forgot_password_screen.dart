@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -14,6 +15,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailCtrl = TextEditingController();
   bool _loading = false;
   bool _sent = false;
+  int _cooldown = 0;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -21,7 +24,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     AnalyticsService.logScreenView('ForgotPassword');
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startCooldown(int seconds) {
+    setState(() => _cooldown = seconds);
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) { t.cancel(); return; }
+      setState(() => _cooldown--);
+      if (_cooldown <= 0) t.cancel();
+    });
+  }
+
   Future<void> _send() async {
+    if (_cooldown > 0) return;
     setState(() => _loading = true);
     try {
       await Supabase.instance.client.auth.resetPasswordForEmail(
@@ -33,6 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _loading = false;
       });
     } catch (e) {
+      _startCooldown(60);
       if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'ForgotPassword Action');
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -96,14 +116,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: _loading ? null : _send,
+                  onPressed: (_loading || _cooldown > 0) ? null : _send,
                   child: _loading
                       ? CircularProgressIndicator(
                           color: colorScheme.onPrimary, strokeWidth: 2)
-                      :  Text('auth_send_reset_link'.tr(),
-                          style: const TextStyle(
-                              fontFamily: 'Cairo',
-                              fontWeight: FontWeight.w900)),
+                      : _cooldown > 0
+                          ? Text('انتظر $_cooldown ث',
+                              style: const TextStyle(fontFamily: 'Cairo'))
+                          : Text('auth_send_reset_link'.tr(),
+                              style: const TextStyle(
+                                  fontFamily: 'Cairo',
+                                  fontWeight: FontWeight.w900)),
                 ),
               ]),
       ),
