@@ -10,7 +10,7 @@ const supabase = createClient(
 
 async function sendEveningReminders(userId?: string) {
   // استخدام توقيت UTC+3 (الأردن/الخليج) لتجنب خطأ اليوم
-  const today = new Date(new Date().getTime() + 3 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const today = new Date(new Date().getTime() + (Number(process.env.TIMEZONE_OFFSET_HOURS) || 3) * 60 * 60 * 1000).toISOString().split('T')[0]
 
   const query = supabase.from('profiles').select('id, full_name')
   const { data: profiles } = userId ? await query.eq('id', userId) : await query
