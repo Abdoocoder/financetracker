@@ -17,16 +17,27 @@ export default function ResetPasswordPage() {
   useEffect(() => {
     const supabase = createClient()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' || session) {
-        setReady(true)
+    // tokens passed via hash from server-side PKCE exchange
+    const hash = window.location.hash.substring(1)
+    if (hash) {
+      const params = new URLSearchParams(hash)
+      const accessToken = params.get('access_token')
+      const refreshToken = params.get('refresh_token')
+      if (accessToken && refreshToken) {
+        window.history.replaceState(null, '', window.location.pathname)
+        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
+          .then(({ data }) => { if (data.session) setReady(true) })
+        return
       }
-    })
+    }
 
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || session) setReady(true)
+    })
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true)
     })
-
     return () => subscription.unsubscribe()
   }, [])
 
