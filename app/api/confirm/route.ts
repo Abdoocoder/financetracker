@@ -1,5 +1,4 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -8,28 +7,32 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/dashboard'
 
   if (code) {
-    const cookieStore = await cookies()
+    const cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[] = []
+
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
-          getAll() { return cookieStore.getAll() },
-          setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options as Parameters<typeof cookieStore.set>[2])
-            )
-          },
+          getAll() { return request.cookies.getAll() },
+          setAll(c: { name: string; value: string; options?: Record<string, unknown> }[]) { cookiesToSet.push(...c) },
         },
       }
     )
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       const redirectUrl = new URL(next, request.url)
-      if (next === '/reset-password') {
-        redirectUrl.searchParams.set('verified', '1')
+      // Pass access_token as query param so reset-password works in
+      // in-app browsers (Gmail/email apps) that don't preserve cookies across redirects
+      if (data.session?.access_token && next.startsWith('/reset-password')) {
+        redirectUrl.searchParams.set('t', data.session.access_token)
       }
-      return NextResponse.redirect(redirectUrl)
+      const response = NextResponse.redirect(redirectUrl)
+      cookiesToSet.forEach(({ name, value, options }) =>
+        response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2])
+      )
+      return response
     }
   }
 
