@@ -14,7 +14,7 @@ webpush.setVapidDetails(
 
 async function sendFCM(fcmToken: string, title: string, message: string, url: string) {
   const { sendFCMNotification } = await import('./firebase-admin')
-  return sendFCMNotification(fcmToken, title, message, `https://fajrak.com${url}`)
+  return sendFCMNotification(fcmToken, title, message, `${process.env.NEXT_PUBLIC_APP_URL}${url}`)
 }
 
 export async function sendPushToUser(
