@@ -97,6 +97,17 @@ export function useTransactions() {
   const load = useCallback(async () => {
     const user = currentUser
     if (!user) return
+    const CACHE_KEY = `transactions_${user.id}`
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY)
+      if (cached) {
+        const { data: cd, ts } = JSON.parse(cached)
+        if (Date.now() - ts < 2 * 60 * 1000) {
+          setTransactions(cd)
+          setLoading(false)
+        }
+      }
+    } catch {}
     const { data } = await supabase
       .from('transactions')
       .select('*')
@@ -104,8 +115,10 @@ export function useTransactions() {
       .order('transaction_date', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(100)
-    setTransactions((data as Transaction[]) ?? [])
+    const fresh = (data as Transaction[]) ?? []
+    setTransactions(fresh)
     setLoading(false)
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: fresh, ts: Date.now() })) } catch {}
   }, [currentUser, supabase])
 
   useEffect(() => { load() }, [load])
@@ -178,6 +191,7 @@ export function useTransactions() {
       toast.success(form.type === 'income' ? t('toast_income_added') : t('toast_expense_added'))
     }
     clearUserCache(user.id)
+    try { sessionStorage.removeItem(`transactions_${user.id}`) } catch {}
     closeForm()
     setSaving(false)
     load()
@@ -208,7 +222,7 @@ export function useTransactions() {
     setDeletingId(id)
     await supabase.from('transactions').delete().eq('id', id)
     setTransactions(prev => prev.filter(t => t.id !== id))
-    if (user) clearUserCache(user.id)
+    if (user) { clearUserCache(user.id); try { sessionStorage.removeItem(`transactions_${user.id}`) } catch {} }
     toast.success(t('toast_deleted'))
     setDeletingId(null)
   }
