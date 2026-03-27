@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
         },
       }
     )
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       const redirectUrl = new URL(next, request.url)
-      if (next === '/reset-password') {
-        redirectUrl.searchParams.set('verified', '1')
+      if (next === '/reset-password' && session) {
+        redirectUrl.hash = `access_token=${session.access_token}&refresh_token=${session.refresh_token}&type=recovery`
       }
       return NextResponse.redirect(redirectUrl)
     }
