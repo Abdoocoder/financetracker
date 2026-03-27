@@ -20,17 +20,18 @@ function ResetPasswordForm() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  const [diagInfo, setDiagInfo] = useState('')
+
   useEffect(() => {
     if (tokenReady) return
-    // Try to read access_token from URL hash (implicit flow)
-    // e.g. /reset-password#access_token=XXX&type=recovery
     const hash = window.location.hash.slice(1)
     const params = new URLSearchParams(hash)
     const accessToken = params.get('access_token')
     const type = params.get('type')
+    // Diagnostic: capture URL info before modifying
+    setDiagInfo(`search:${window.location.search}|hash:${hash.slice(0,30)||'EMPTY'}|type:${type||'none'}`)
     if (accessToken && type === 'recovery') {
       setToken(accessToken)
-      // Remove hash from URL bar for security
       window.history.replaceState(null, '', window.location.pathname + window.location.search)
     }
     setTokenReady(true)
@@ -46,8 +47,9 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="p-8 rounded-2xl border text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <div className="p-8 rounded-2xl border text-center space-y-2" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
         <p className="text-sm" style={{ color: '#EF4444' }}>انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق</p>
+        <p className="text-xs break-all" style={{ color: 'var(--text-secondary)' }}>{diagInfo}</p>
       </div>
     )
   }
