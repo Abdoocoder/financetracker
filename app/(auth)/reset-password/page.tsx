@@ -2,16 +2,13 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useI18n } from '@/lib/i18n'
-import { updatePassword } from './actions'
+import { updatePassword, exchangeCode } from './actions'
 
 function ResetPasswordForm() {
   const { t } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Token sources:
-  // 1. ?t= query param  → PKCE flow via /api/confirm
-  // 2. #access_token=   → Supabase implicit flow (token in URL hash, client-side only)
   const [token, setToken] = useState(searchParams.get('t') ?? '')
   const [tokenReady, setTokenReady] = useState(!!searchParams.get('t'))
   const [password, setPassword] = useState('')
@@ -20,21 +17,31 @@ function ResetPasswordForm() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  const [diagInfo, setDiagInfo] = useState('')
-
   useEffect(() => {
     if (tokenReady) return
-    const hash = window.location.hash.slice(1)
-    const params = new URLSearchParams(hash)
-    const accessToken = params.get('access_token')
-    const type = params.get('type')
-    // Diagnostic: capture URL info before modifying
-    setDiagInfo(`search:${window.location.search}|hash:${hash.slice(0,30)||'EMPTY'}|type:${type||'none'}`)
-    if (accessToken && type === 'recovery') {
-      setToken(accessToken)
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    async function resolve() {
+      // 1. Check URL hash: #access_token=XXX&type=recovery (implicit flow)
+      const hash = window.location.hash.slice(1)
+      const hashParams = new URLSearchParams(hash)
+      const hashToken = hashParams.get('access_token')
+      if (hashToken && hashParams.get('type') === 'recovery') {
+        setToken(hashToken)
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        setTokenReady(true)
+        return
+      }
+      // 2. Check for PKCE code: ?code=XXX — exchange server-side
+      const code = new URLSearchParams(window.location.search).get('code')
+      if (code) {
+        const result = await exchangeCode(code)
+        if (result.token) {
+          setToken(result.token)
+          window.history.replaceState(null, '', window.location.pathname)
+        }
+      }
+      setTokenReady(true)
     }
-    setTokenReady(true)
+    resolve()
   }, [tokenReady])
 
   if (!tokenReady) {
@@ -47,9 +54,8 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="p-8 rounded-2xl border text-center space-y-2" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+      <div className="p-8 rounded-2xl border text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
         <p className="text-sm" style={{ color: '#EF4444' }}>انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق</p>
-        <p className="text-xs break-all" style={{ color: 'var(--text-secondary)' }}>{diagInfo}</p>
       </div>
     )
   }
