@@ -1,8 +1,8 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n'
+import { updatePassword } from './actions'
 
 export default function ResetPasswordPage() {
   const { t } = useI18n()
@@ -12,44 +12,21 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    const supabase = createClient()
-
-    // tokens passed via hash from server-side PKCE exchange
-    const hash = window.location.hash.substring(1)
-    if (hash) {
-      const params = new URLSearchParams(hash)
-      const accessToken = params.get('access_token')
-      const refreshToken = params.get('refresh_token')
-      if (accessToken && refreshToken) {
-        window.history.replaceState(null, '', window.location.pathname)
-        supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken })
-          .then(({ data }) => { if (data.session) setReady(true) })
-        return
-      }
-    }
-
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY' || session) setReady(true)
-    })
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true)
-    })
-    return () => subscription.unsubscribe()
-  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password !== confirm) { setError(t('reset_mismatch')); return }
     setLoading(true); setError('')
-    const supabase = createClient()
-    const { error } = await supabase.auth.updateUser({ password })
-    if (error) { setError(error.message); setLoading(false); return }
+    const result = await updatePassword(password)
+    if (result.error) {
+      setError(result.error.includes('reauthentication') || result.error.includes('session')
+        ? 'انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق'
+        : result.error)
+      setLoading(false)
+      return
+    }
     setSuccess(true)
-    setTimeout(() => router.push('/dashboard'), 2000)
+    setTimeout(() => router.push('/login'), 2000)
   }
 
   return (
@@ -60,33 +37,26 @@ export default function ResetPasswordPage() {
           <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('reset_title')}</h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>{t('reset_subtitle')}</p>
         </div>
-        {!ready ? (
-          <div className="p-8 rounded-2xl border text-center space-y-4" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>جاري مصادقة الجلسة، يرجى الانتظار...</p>
-            <div className="animate-pulse rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: 'var(--accent-blue)' }}></div>
+        <form onSubmit={handleSubmit} className="p-8 rounded-2xl border space-y-5" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+          {success && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>{t('reset_success')}</div>}
+          {error && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>{error}</div>}
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('reset_new')}</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="p-8 rounded-2xl border space-y-5" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-            {success && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(16,185,129,0.1)', color: '#10B981' }}>{t('reset_success')}</div>}
-            {error && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>{error}</div>}
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('reset_new')}</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('reset_confirm')}</label>
-              <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={6}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
-            </div>
-            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl font-bold text-white"
-              style={{ background: 'var(--accent-blue)', opacity: loading ? 0.7 : 1 }}>
-              {loading ? t('reset_saving') : t('reset_btn')}
-            </button>
-          </form>
-        )}
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('reset_confirm')}</label>
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={6}
+              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
+              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
+          </div>
+          <button type="submit" disabled={loading || success} className="w-full py-3 rounded-xl font-bold text-white"
+            style={{ background: 'var(--accent-blue)', opacity: (loading || success) ? 0.7 : 1 }}>
+            {loading ? t('reset_saving') : t('reset_btn')}
+          </button>
+        </form>
       </div>
     </div>
   )
