@@ -15,17 +15,7 @@ export default function ResetPasswordPage() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const verified = params.get('verified')
     const supabase = createClient()
-
-    if (verified === '1') {
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session) setReady(true)
-        else setReady(false)
-      })
-      return
-    }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY' || session) {
