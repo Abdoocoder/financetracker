@@ -734,6 +734,22 @@ export default function SettingsPage() {
 
   const handleLogout = async () => {
     setLoading('logout', true)
+    try {
+      // حذف اشتراك الإشعارات عند تسجيل الخروج
+      const reg = await navigator.serviceWorker?.ready
+      const sub = await reg?.pushManager?.getSubscription()
+      if (sub) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          await fetch('/api/push-subscribe', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+            body: JSON.stringify({ endpoint: sub.endpoint })
+          })
+        }
+        await sub.unsubscribe()
+      }
+    } catch {}
     await supabase.auth.signOut()
     router.push('/login')
   }
