@@ -323,6 +323,7 @@ context.locale
 | 🔑 Middleware Auth | Protected dashboard routes |
 | 🔒 CRON Secret | API endpoint protection |
 | 🔥 Firebase Admin | Secure push notifications |
+| 🐛 Sentry | Real-time error monitoring with source maps |
 
 ---
 
@@ -337,6 +338,8 @@ context.locale
 - [x] Native Flutter Android App (54.5 MB Release APK)
 - [x] fajrak.com custom domain
 - [x] Global Error Handling + Analytics Service
+- [x] Sentry real-time monitoring + source maps
+- [x] Android password reset via Flutter deep link (fajrak:// scheme)
 
 ### 📋 In Progress
 - [ ] Monthly PDF Reports
@@ -346,7 +349,15 @@ context.locale
 
 ## 📝 Changelog
 
-### v3.12.0 — 2026-03-24 *(Latest)*
+### v3.13.0 — 2026-03-28 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔗 **Android Deep Link** | Password reset now intercepted natively via `fajrak://` custom URL scheme — bypasses Chrome Custom Tab and solves the PKCE `code_verifier` issue on Android |
+| 🐛 **Sentry Monitoring** | Integrated Sentry error tracking with source maps uploaded on every Vercel deployment |
+| 🔐 **Password Reset Flow** | Multi-layer reset support: PKCE code exchange for web, hash fragment for implicit flow, and native deep link for Android Flutter |
+
+### v3.12.0 — 2026-03-24
 
 | Change | Description |
 |:-------|:------------|
