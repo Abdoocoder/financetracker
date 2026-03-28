@@ -12,7 +12,8 @@
       "Bash(npx tsc:*)",
       "Bash(where java:*)",
       "Bash(find /c/Users/skyli/Project/financetracker/mobile/tmp_app -name *.json -o -name local.properties -o -name *.xml)",
-      "Bash(xargs cat:*)"
+      "Bash(xargs cat:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

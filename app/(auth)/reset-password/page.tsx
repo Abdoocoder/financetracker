@@ -1,11 +1,11 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useI18n } from '@/lib/i18n'
 import { updatePassword } from './actions'
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const { t } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -72,5 +72,13 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }
