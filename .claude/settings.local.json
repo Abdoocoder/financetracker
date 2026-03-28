@@ -10,7 +10,9 @@
       "Bash(flutter pub:*)",
       "Bash(find /c/Users/skyli/Documents/financetracker/mobile/fajrak_flutter/test -type f -name *.dart)",
       "Bash(npx tsc:*)",
-      "Bash(where java:*)"
+      "Bash(where java:*)",
+      "Bash(find /c/Users/skyli/Project/financetracker/mobile/tmp_app -name *.json -o -name local.properties -o -name *.xml)",
+      "Bash(xargs cat:*)"
     ]
   }
 }
