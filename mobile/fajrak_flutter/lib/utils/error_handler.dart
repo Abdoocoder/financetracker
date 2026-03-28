@@ -49,6 +49,7 @@ class ErrorHandler {
   }
 
   static void _showErrorDialog(BuildContext context, String message) {
+    if (!context.mounted) return;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
