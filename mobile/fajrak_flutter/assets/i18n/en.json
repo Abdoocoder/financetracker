@@ -449,6 +449,8 @@
   "auth_error_invalid_credentials": "Incorrect email or password",
   "auth_error_email_not_confirmed": "Please confirm your email address first",
   "auth_error_too_many_requests": "Too many attempts, please wait a moment and try again",
+  "continue": "Continue",
+  "back": "Back",
   "onboarding_start": "Start Your Journey 🚀",
   "onboarding_welcome_title": "Welcome to Fajrak!",
   "onboarding_welcome_subtitle": "Your companion on the road to financial freedom. Let's set up your profile.",

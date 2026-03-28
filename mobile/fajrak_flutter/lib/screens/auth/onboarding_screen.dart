@@ -38,7 +38,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _save() async {
     setState(() => _loading = true);
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        return;
+      }
       final income = double.tryParse(_incomeController.text) ?? 0;
 
       await Supabase.instance.client.from('profiles').upsert({

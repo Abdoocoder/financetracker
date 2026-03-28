@@ -452,6 +452,8 @@
   "auth_error_invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
   "auth_error_email_not_confirmed": "يرجى تأكيد بريدك الإلكتروني أولاً",
   "auth_error_too_many_requests": "محاولات كثيرة جداً، يرجى الانتظار قليلاً ثم المحاولة مجدداً",
+  "continue": "متابعة",
+  "back": "رجوع",
   "onboarding_start": "ابدأ رحلتك 🚀",
   "onboarding_welcome_title": "مرحباً بك في فجرك!",
   "onboarding_welcome_subtitle": "رفيقك في طريق الحرية المالية. لنقم بإعداد ملفك الشخصي.",
