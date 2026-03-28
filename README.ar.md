@@ -134,9 +134,10 @@ JO العربية | 🇬🇧 [English](./README.md)
 | 🗄️ Supabase | قاعدة البيانات + Auth + RLS | Latest |
 | 🔥 Firebase | إشعارات Push FCM | Latest |
 | 📱 Flutter | تطبيق أندرويد أصلي | 3.x |
-| 🚀 Vercel | الاستضافة | Latest |
+| 🚀 Vercel | الاستضافة + CI/CD | Latest |
 | 📊 Recharts | رسوم بيانية تفاعلية | Latest |
 | ⏰ cron-job.org | CRON Jobs | Free |
+| 🐛 Sentry | مراقبة الأخطاء + Source Maps | ^10.46.0 |
 
 ---
 
@@ -185,7 +186,7 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-> ⚠️ **إعداد البيئة:** اضبط ملف `.env.local` بمعلومات Supabase و Firebase قبل التشغيل.
+> ⚠️ **إعداد البيئة:** اضبط ملف `.env.local` بمعلومات Supabase و Firebase و Sentry (`NEXT_PUBLIC_SENTRY_DSN`) قبل التشغيل. لرفع Source Maps على Vercel، أضف `SENTRY_AUTH_TOKEN` كمتغير بيئة في Vercel.
 
 ---
 

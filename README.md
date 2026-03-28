@@ -134,9 +134,10 @@
 | 🗄️ Supabase | Database + Auth + RLS | Latest |
 | 🔥 Firebase | Push Notifications FCM | Latest |
 | 📱 Flutter | Native Android App | 3.x |
-| 🚀 Vercel | Hosting | Latest |
+| 🚀 Vercel | Hosting + CI/CD | Latest |
 | 📊 Recharts | Interactive Charts | Latest |
 | ⏰ cron-job.org | CRON Jobs | Free |
+| 🐛 Sentry | Error Monitoring + Source Maps | ^10.46.0 |
 
 ---
 
@@ -185,7 +186,7 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-> ⚠️ **Environment Setup:** Configure your `.env.local` with Supabase and Firebase credentials before running.
+> ⚠️ **Environment Setup:** Configure your `.env.local` with Supabase, Firebase, and Sentry (`NEXT_PUBLIC_SENTRY_DSN`) credentials before running. For source map uploads on Vercel, add `SENTRY_AUTH_TOKEN` as a Vercel environment variable.
 
 ---
 
