@@ -12,7 +12,6 @@ export default function PrivacyPage() {
       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 32, color: "#94a3b8" }}>سياسة الخصوصية</h2>
       <p style={{ color: "#64748b", marginBottom: 32 }}>Last updated: March 2026</p>
 
-
       <section style={{ marginBottom: 32, padding: '24px', borderRadius: 16, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.2)' }}>
         <h3 style={{ fontSize: 18, fontWeight: 800, color: "#10B981", marginBottom: 12 }}>🔐 من يرى بياناتك؟ / Who Can See Your Data?</h3>
         <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
@@ -59,7 +58,45 @@ export default function PrivacyPage() {
       </section>
 
       <section style={{ marginBottom: 32 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>4. Delete Your Data / حذف بياناتك</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>4. Third-Party Services / الخدمات الخارجية</h3>
+        <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
+          Fajrak uses the following third-party services to provide its features:
+          <br/><br/>
+          يستخدم فجرك الخدمات الخارجية التالية لتوفير ميزاته:
+        </p>
+        <ul style={{ lineHeight: 2, color: "#94a3b8", paddingRight: 20, marginTop: 12 }}>
+          <li>🔹 <strong style={{ color: '#cbd5e1' }}>Supabase</strong> — قاعدة البيانات والمصادقة / Database & Authentication</li>
+          <li>🔹 <strong style={{ color: '#cbd5e1' }}>Firebase (Google)</strong> — إشعارات Push على Android / Push Notifications on Android</li>
+          <li>🔹 <strong style={{ color: '#cbd5e1' }}>Vercel</strong> — استضافة التطبيق / App Hosting</li>
+          <li>🔹 <strong style={{ color: '#cbd5e1' }}>CoinGecko</strong> — أسعار العملات الرقمية / Crypto prices (no personal data shared)</li>
+        </ul>
+        <p style={{ lineHeight: 1.8, color: "#94a3b8", marginTop: 12 }}>
+          These services have their own privacy policies. No personal financial data is shared with any third party.
+          <br/>
+          هذه الخدمات لها سياسات خصوصية خاصة بها. لا تتم مشاركة أي بيانات مالية شخصية مع أي طرف ثالث.
+        </p>
+      </section>
+
+      <section style={{ marginBottom: 32 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>5. Push Notifications / الإشعارات</h3>
+        <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
+          Fajrak may send push notifications to remind you of financial goals, daily summaries, and Islamic lessons related to wealth. You can disable notifications at any time from your device settings.
+          <br/><br/>
+          قد يرسل فجرك إشعارات للتذكير بالأهداف المالية والملخصات اليومية والدروس الإسلامية المتعلقة بالثروة. يمكنك تعطيل الإشعارات في أي وقت من إعدادات جهازك.
+        </p>
+      </section>
+
+      <section style={{ marginBottom: 32 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>6. Children's Privacy / خصوصية الأطفال</h3>
+        <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
+          Fajrak is intended for users aged 13 and above. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us immediately.
+          <br/><br/>
+          فجرك مخصص للمستخدمين الذين تبلغ أعمارهم 13 عامًا فما فوق. لا نجمع معلومات شخصية عن قصد من الأطفال دون سن 13. إذا كنت تعتقد أن طفلاً قدّم لنا معلومات شخصية، يرجى التواصل معنا فورًا.
+        </p>
+      </section>
+
+      <section style={{ marginBottom: 32 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>7. Delete Your Data / حذف بياناتك</h3>
         <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
           You can delete your account and all associated data at any time from Settings → Delete Account.
           <br/><br/>
@@ -68,7 +105,7 @@ export default function PrivacyPage() {
       </section>
 
       <section style={{ marginBottom: 32 }}>
-        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>5. Contact / التواصل</h3>
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>8. Contact / التواصل</h3>
         <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
           For any privacy concerns, contact us at: <a href="mailto:support@fajrak.com" style={{ color: "#3B7EF6" }}>support@fajrak.com</a>
         </p>
