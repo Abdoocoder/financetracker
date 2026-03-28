@@ -11,12 +11,7 @@ const nextConfig = {
 export default withSentryConfig(nextConfig, {
   org: 'abdoocoder-m2',
   project: 'javascript-nextjs',
+  authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: !process.env.CI,
-  widenClientFileUpload: true,
-  webpack: {
-    treeshake: {
-      removeDebugLogging: true,
-    },
-    automaticVercelMonitors: true,
-  },
+  tunnelRoute: '/monitoring',
 })
