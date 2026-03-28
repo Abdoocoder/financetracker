@@ -26,7 +26,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await Supabase.instance.client.auth.resetPasswordForEmail(
         _emailCtrl.text.trim(),
-        redirectTo: 'https://fajrak.com/api/confirm?next=/reset-password',
+        redirectTo: 'fajrak://reset-password',
       );
       setState(() {
         _sent = true;

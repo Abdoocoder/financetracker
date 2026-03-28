@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:app_links/app_links.dart';
 import 'utils/error_handler.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
@@ -122,16 +124,73 @@ void main() async {
   );
 }
 
-class FajrakApp extends StatelessWidget {
+class FajrakApp extends StatefulWidget {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   const FajrakApp({super.key});
+
+  @override
+  State<FajrakApp> createState() => _FajrakAppState();
+}
+
+class _FajrakAppState extends State<FajrakApp> {
+  StreamSubscription<Uri>? _linkSub;
+  StreamSubscription<AuthState>? _authSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinks();
+    _initAuthListener();
+  }
+
+  Future<void> _initDeepLinks() async {
+    final appLinks = AppLinks();
+
+    // App already running: listen for new links
+    _linkSub = appLinks.uriLinkStream.listen(
+      _handleDeepLink,
+      onError: (e) => ErrorHandler.handle(e, developerMessage: 'AppLinks stream error'),
+    );
+
+    // App launched fresh from a link
+    final initialUri = await appLinks.getInitialLink();
+    if (initialUri != null) {
+      _handleDeepLink(initialUri);
+    }
+  }
+
+  Future<void> _handleDeepLink(Uri uri) async {
+    final code = uri.queryParameters['code'];
+    if (code == null) return;
+    try {
+      await Supabase.instance.client.auth.exchangeCodeForSession(code);
+      // onAuthStateChange will fire passwordRecovery and navigate
+    } catch (e) {
+      ErrorHandler.handle(e, developerMessage: 'DeepLink exchangeCodeForSession');
+    }
+  }
+
+  void _initAuthListener() {
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.passwordRecovery) {
+        FajrakApp.navigatorKey.currentState?.pushReplacementNamed('/reset-password');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    _authSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     return MaterialApp(
       title: 'فجرك',
-      navigatorKey: navigatorKey,
+      navigatorKey: FajrakApp.navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(appState.isDarkMode ? Brightness.dark : Brightness.light),
       locale: context.locale, // Use context.locale from EasyLocalization
