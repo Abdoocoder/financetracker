@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -34,8 +35,9 @@ class InvestmentsService {
     final stockPrice = await _getStockPrice(s);
     if (stockPrice != null) return stockPrice;
 
-    // 3. Try Yahoo Finance (Fallback)
-    return await _getStockPriceYahoo(s);
+    // 3. Try Yahoo Finance (Fallback) — skip on web due to CORS
+    if (!kIsWeb) return await _getStockPriceYahoo(s);
+    return null;
   }
 
   static Future<double?> _getCryptoPrice(String id) async {

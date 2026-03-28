@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
+import '../../services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -50,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      await NotificationService.saveToken();
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
     } catch (e) {
       if (mounted) {

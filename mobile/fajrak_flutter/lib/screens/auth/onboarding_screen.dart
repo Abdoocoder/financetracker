@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
+import '../../services/notification_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -70,6 +71,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         'salary_day': _salaryDay,
       });
 
+      await NotificationService.saveToken();
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
     } catch (e) {
       if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Onboarding Save');
