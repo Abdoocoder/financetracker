@@ -154,10 +154,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 40),
                   Center(
                     child: Text(
-                      'فجرك 🌅 — v3.4.0',
+                      'فجرك 🌄 — v3.11.0',
                       style: TextStyle(
-                        color: colorScheme.outlineVariant,
+                        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                         fontSize: 12,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'Cairo',
                       ),
                     ),

@@ -42,7 +42,11 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
     if (mounted) setState(() => _exchangeRate = rate ?? 1.0);
   }
 
-  final _categories = ['طعام','مواصلات','فواتير','صحة','ترفيه','تسوق','راتب','عمل حر','أخرى'];
+  final _incomeCategories = ['راتب', 'عمل حر', 'استثمار', 'مكافأة', 'أخرى'];
+  final _expenseCategories = ['طعام', 'مواصلات', 'فواتير', 'صحة', 'ترفيه', 'تسوق', 'إيجار', 'اشتراكات', 'عناية', 'سفر', 'دين', 'أخرى'];
+
+  List<String> get _currentCategories => 
+      _txType == 'income' ? _incomeCategories : _expenseCategories;
 
   String _getCategoryName(String key) {
     switch (key) {
@@ -54,6 +58,13 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
       case 'تسوق': return 'cat_shopping'.tr();
       case 'راتب': return 'cat_salary'.tr();
       case 'عمل حر': return 'cat_freelance'.tr();
+      case 'استثمار': return 'cat_investments'.tr();
+      case 'مكافأة': return 'cat_gifts'.tr();
+      case 'إيجار': return 'cat_rent'.tr();
+      case 'اشتراكات': return 'cat_subs'.tr();
+      case 'عناية': return 'cat_personal'.tr();
+      case 'سفر': return 'cat_travel'.tr();
+      case 'دين': return 'cat_debt_pay'.tr();
       default: return 'cat_others'.tr();
     }
   }
@@ -66,6 +77,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
 
   @override
   Widget build(BuildContext context) {
+    final categories = _currentCategories;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: widget.colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: widget.colorScheme.outlineVariant)),
@@ -73,19 +85,33 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
         Text('quick_add_title'.tr(), style: TextStyle(color: widget.colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
         const SizedBox(height: 12),
         Row(children: [
-          Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'income'),
+          Expanded(child: GestureDetector(onTap: () {
+            setState(() {
+              _txType = 'income';
+              if (!_incomeCategories.contains(_selectedCategory)) {
+                _selectedCategory = 'راتب';
+              }
+            });
+          },
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : widget.colorScheme.outlineVariant)),
               child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
           const SizedBox(width: 8),
-          Expanded(child: GestureDetector(onTap: () => setState(() => _txType = 'expense'),
+          Expanded(child: GestureDetector(onTap: () {
+            setState(() {
+              _txType = 'expense';
+              if (!_expenseCategories.contains(_selectedCategory)) {
+                _selectedCategory = 'طعام';
+              }
+            });
+          },
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : widget.colorScheme.outlineVariant)),
               child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
         ]),
         const SizedBox(height: 12),
-        SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: _categories.length,
-          itemBuilder: (_, i) { final cat = _categories[i]; final selected = cat == _selectedCategory;
+        SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: categories.length,
+          itemBuilder: (_, i) { final cat = categories[i]; final selected = cat == _selectedCategory;
             return GestureDetector(onTap: () => setState(() => _selectedCategory = cat),
               child: Container(margin: const EdgeInsets.only(left: 8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(color: selected ? widget.colorScheme.primary.withValues(alpha: 0.2) : widget.colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? widget.colorScheme.primary : widget.colorScheme.outlineVariant)),

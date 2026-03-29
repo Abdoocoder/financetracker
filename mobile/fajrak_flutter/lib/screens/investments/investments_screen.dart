@@ -71,10 +71,11 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _loading = false);
         ErrorHandler.handle(e,
             context: context, developerMessage: 'Investments Load');
       }
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 

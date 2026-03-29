@@ -26,6 +26,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Map<String, dynamic>> _transactions = [];
   List<Map<String, dynamic>> _allTransactions = [];
   bool _loading = true;
+  bool _loadingMore = false;
   int _limit = 20;
   bool _hasMore = true;
 
@@ -35,11 +36,28 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   int? _filterMonth;
   int? _filterYear;
 
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     AnalyticsService.logScreenView('Transactions');
     _load();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      if (!_loading && !_loadingMore && _hasMore) {
+        _load(reset: false);
+      }
+    }
   }
 
   Future<void> _load({bool reset = true}) async {
@@ -48,10 +66,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         setState(() {
           _limit = 20;
           _loading = true;
+          _transactions = [];
         });
       }
     } else {
-      // No-op for now as _loadingMore is removed
+      if (mounted) setState(() => _loadingMore = true);
     }
 
     final user = Supabase.instance.client.auth.currentUser;
@@ -68,11 +87,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           .single();
       if (mounted) _currency = profile['currency'] as String? ?? 'JOD';
 
-      final baseQ = Supabase.instance.client
+      PostgrestFilterBuilder<List<Map<String, dynamic>>> baseQ = Supabase.instance.client
           .from('transactions')
           .select('*')
           .eq('user_id', user.id);
       
+      if (_filter != 'all') {
+        baseQ = baseQ.eq('type', _filter);
+      }
+
       List data;
       if (_filterMonth != null && _filterYear != null) {
         final start = DateTime(_filterYear!, _filterMonth!, 1)
@@ -85,11 +108,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             .gte('transaction_date', start)
             .lte('transaction_date', end)
             .order('transaction_date', ascending: false)
-            .limit(_limit);
+            .range(reset ? 0 : _transactions.length, (reset ? 0 : _transactions.length) + _limit - 1);
       } else {
         data = await baseQ
             .order('transaction_date', ascending: false)
-            .limit(_limit);
+            .range(reset ? 0 : _transactions.length, (reset ? 0 : _transactions.length) + _limit - 1);
       }
 
       // Fetch totals for summary
@@ -131,6 +154,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (mounted) {
         setState(() {
           _loading = false;
+          _loadingMore = false;
         });
       }
     }
@@ -211,14 +235,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   List<Map<String, dynamic>> get _filtered {
+    if (_search.isEmpty) return _transactions;
     return _transactions.where((tx) {
-      if (_filter != 'all' && tx['type'] != _filter) return false;
-      if (_search.isNotEmpty) {
-        final desc = (tx['description'] ?? '').toString().toLowerCase();
-        final cat = (tx['category'] ?? '').toString().toLowerCase();
-        if (!desc.contains(_search) && !cat.contains(_search)) return false;
-      }
-      return true;
+      final desc = (tx['description'] ?? '').toString().toLowerCase();
+      final cat = (tx['category'] ?? '').toString().toLowerCase();
+      return desc.contains(_search) || cat.contains(_search);
     }).toList();
   }
 
@@ -313,8 +334,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           TransactionFilters(
             currentFilter: _filter,
             currentSearch: _search,
-            onSearchChanged: (v) => setState(() => _search = v.toLowerCase()),
-            onFilterChanged: (v) => setState(() => _filter = v),
+            onSearchChanged: (v) {
+              setState(() => _search = v.toLowerCase());
+            },
+            onFilterChanged: (v) {
+              setState(() {
+                _filter = v;
+                _transactions = [];
+                _loading = true;
+              });
+              _load(reset: true);
+            },
             onShowDatePicker: _showMonthYearPicker,
             colorScheme: colorScheme,
           ),
@@ -338,12 +368,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         ),
                       )
                     : RefreshIndicator(
-                        onRefresh: () async {
-                          await _load(reset: true);
-                        },
+                        onRefresh: () => _load(reset: true),
                         child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: filtered.length + (_hasMore ? 1 : 0),
+                          controller: _scrollController,
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                          itemCount: filtered.length + (_hasMore && _loadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index == filtered.length) {
                               return Center(
