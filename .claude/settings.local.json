@@ -38,7 +38,9 @@
       "Bash(ls /c/Users/skyli/Project/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)",
       "Bash(git fetch:*)",
       "Bash(find /c/Users/skyli/Documents/financetracker/public -type f -name *.apk)",
-      "WebFetch(domain:fajrak.com)"
+      "WebFetch(domain:fajrak.com)",
+      "Bash(head -30 grep -n \"user_id\\\\|\\\\.id\\\\b\\\\|insert\\\\|upsert\\\\|select\\\\|eq\\(\" c:/Users/skyli/Documents/financetracker/app/api/testimonials/route.ts)",
+      "Bash(grep -rn saving_challenges c:/Users/skyli/Documents/financetracker/ --include=*.ts --include=*.tsx)"
     ]
   }
 }
