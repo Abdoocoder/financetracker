@@ -20,3 +20,4 @@ mobile/**/*.keystore
 mobile/**/.idea/
 mobile/**/local.properties
 
+tsconfig.tsbuildinfo
