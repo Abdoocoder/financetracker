@@ -42,7 +42,7 @@ export default function DownloadPage() {
             download
             style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 16, background: 'var(--accent-blue)', color: 'white', fontSize: 18, fontWeight: 900, textDecoration: 'none', boxShadow: '0 10px 30px rgba(59,126,246,0.3)' }}
           >
-            تحميل APK مباشر (45MB) ↓
+            تحميل APK مباشر (56MB) ↓
           </a>
           <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
              {[

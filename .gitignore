@@ -24,3 +24,8 @@ tsconfig.tsbuildinfo
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Android App Builds
+public/*.apk
+*.apk
+*.aab
