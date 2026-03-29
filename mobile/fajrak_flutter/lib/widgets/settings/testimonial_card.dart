@@ -124,33 +124,41 @@ class _TestimonialCardState extends State<TestimonialCard> {
     final isEn = context.locale.languageCode == 'en';
     final canSubmit = _nameCtrl.text.isNotEmpty && _textCtrl.text.length >= 20;
 
-    return Theme(
-      data: theme.copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        iconColor: colorScheme.onSurfaceVariant,
-        collapsedIconColor: colorScheme.onSurfaceVariant,
-        title: Row(children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: colorScheme.outlineVariant,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Text('⭐', style: TextStyle(fontSize: 18)),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Text(
-              'testimonial_share_title'.tr(),
-              style: TextStyle(
-                color: colorScheme.onSurface,
-                fontFamily: 'Cairo',
-                fontWeight: FontWeight.w900,
-                fontSize: 15,
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          iconColor: colorScheme.onSurfaceVariant,
+          collapsedIconColor: colorScheme.onSurfaceVariant,
+          title: Row(children: [
+            Text('⭐', style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                'testimonial_share_title'.tr(),
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.w900,
+                  fontSize: 13,
+                ),
               ),
             ),
-          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
@@ -167,14 +175,16 @@ class _TestimonialCardState extends State<TestimonialCard> {
               ),
             ),
           ),
-        ]),
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            child: _submitted && !_existing ? _buildSuccess(isEn, colorScheme) : _buildForm(isEn, canSubmit, colorScheme),
+          ],
           ),
-        ],
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              child: _submitted && !_existing ? _buildSuccess(isEn, colorScheme) : _buildForm(isEn, canSubmit, colorScheme),
+            ),
+          ],
+        ),
       ),
     );
   }
