@@ -33,7 +33,9 @@ export default function PDFReportPage() {
     ])
 
     const txs = txRes.data ?? []
-    const income = txs.filter((t: any) => t.type === 'income').reduce((a: number, t: any) => a + Number(t.amount), 0)
+    const txIncome = txs.filter((t: any) => t.type === 'income').reduce((a: number, t: any) => a + Number(t.amount), 0)
+    const monthlyIncome = Number(profileRes.data?.monthly_income ?? 0)
+    const income = txIncome + monthlyIncome
     const expenses = txs.filter((t: any) => t.type === 'expense').reduce((a: number, t: any) => a + Number(t.amount), 0)
     const catMap: Record<string, number> = {}
     txs.filter((t: any) => t.type === 'expense').forEach((t: any) => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
