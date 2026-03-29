@@ -639,7 +639,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.14.0 — 2026-03-25 *(Latest)*
+### v3.15.0+6 — 2026-03-30 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔄 **Infinite Spinner Fix** | Resolved issues with endless loading states across all screens (Transactions, Alerts, FIRE) |
+| 📊 **Category Filtering** | Implemented smart category filtering based on transaction type (Income vs Expense) |
+| 🌄 **Branding Update** | Refined app branding with the new sunrise icon `🌄` and updated versioning to v3.15.0 |
+
+### v3.14.0 — 2026-03-25
 
 | Change | Description |
 |:-------|:------------|
