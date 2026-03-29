@@ -639,47 +639,33 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.15.0+6 — 2026-03-30 *(Latest)*
+### الإصدار 6 (v3.15.0) — 30 مارس 2026 *(الأحدث)*
 
-| Change | Description |
-|:-------|:------------|
-| 🔄 **Infinite Spinner Fix** | Resolved issues with endless loading states across all screens (Transactions, Alerts, FIRE) |
-| 📊 **Category Filtering** | Implemented smart category filtering based on transaction type (Income vs Expense) |
-| 🌄 **Branding Update** | Refined app branding with the new sunrise icon `🌄` and updated versioning to v3.15.0 |
+| التغيير | الوصف |
+|:-------|:------|
+| 🔄 **إصلاحات تقنية** | حل مشكلة علامة التحميل (Spinner) في جميع الشاشات وتحسين استقرار التطبيق |
+| 📊 **تصنيفات ذكية** | فصل تصنيفات الدخل عن المصاريف وإضافة 7 تصنيفات مالية جديدة |
+| 🌄 **هوية موحدة** | توحيد رقم الإصدار مع جوجل بلاي (Build 6) وتحديث الشعار لشعار الشروق |
 
-### v3.14.0 — 2026-03-25
+### الإصدار 5 (v1.0.2) — 28 مارس 2026
 
-| Change | Description |
-|:-------|:------------|
-| 🖼️ **Real App Icon** | Replaced placeholder "₣" letter with the actual app icon across web sidebar, Flutter login screen, and splash screen |
-| 📜 **Mobile Nav Scrollable** | Fixed mobile bottom-sheet nav (`maxHeight: 85dvh`, `overflowY: auto`) — prevents overflow on small screens |
-| 📜 **More Screen Refactor** | Simplified Flutter More screen from nested `Scaffold → SingleChildScrollView → Container` to a flat `ListView` with a section title |
-| ⚡ **Font Optimization** | Removed manual Google Fonts `@import`; changed font `display` to `optional` to eliminate CLS |
-| 🔥 **Firebase SW on Android Only** | Firebase messaging service worker now registers only on Android, avoiding unnecessary overhead on iOS/desktop |
-| 🔧 **useFinancialSummary Fix** | Memoized Supabase client with `useMemo` to prevent unnecessary re-creation on every render |
-| ⚙️ **next.config.mjs** | Added `serverExternalPackages: ['firebase-admin']` for correct server-bundle handling |
-| 🔷 **TypeScript ES2022** | Upgraded compiler target from `ES2017` → `ES2022` |
+| التغيير | الوصف |
+|:-------|:------|
+| 🚀 **تحديث المتجر** | أول نسخة مستقرة تم رفعها للاختبار المغلق في جوجل بلاي |
 
-### v3.13.0 — 2026-03-25
+### الإصدار 3 (v1.0.1) — 28 مارس 2026
 
-| Change | Description |
-|:-------|:------------|
-| 🔥 **FIRE Calculator** | Financial Independence simulation: Lean/Full/Fat FIRE modes, auto-fills net worth, compound interest projection with interactive sliders — web + Flutter |
-| 🌙 **Zakat Calculator** | Auto-fill from real user data; haul countdown per investment with color coding (overdue / 30d / 60d / far) |
-| 🔔 **Zakat Push Reminders** | New `/api/zakat-reminder` endpoint — push notifications at 30, 7, and 0 days before haul date |
-| 📈 **Health Score History** | 30-day LineChart in Financial Health widget (Recharts web + fl_chart Flutter); new `health_score_history` table |
-| 📄 **PDF Monthly Reports** | Print-ready report at `/dashboard/pdf-report` with month selector, category breakdown, transaction table |
-| 🗄️ **DB Migrations** | `zakat_history` (006) and `health_score_history` (007) tables with full RLS |
+| التغيير | الوصف |
+|:-------|:------|
+| 🔧 **إصلاحات عامة** | تحسينات في واجهة المستخدم ومعالجة بعض الأخطاء البرمجية |
 
-### v3.12.0 — 2026-03-24
+### الإصدار 2 (v1.0.0) — 23 مارس 2026
 
-| Change | Description |
-|:-------|:------------|
-| 🚀 **Next.js 16** | Upgraded to 16.2.1 with Turbopack |
-| ⚙️ **proxy.ts Convention** | Migrated from `middleware.ts` to `proxy.ts` (Next.js 16 requirement) |
-| 🛡️ **Deployment Fix** | Resolved Vercel deployment and committer association issues |
+| التغيير | الوصف |
+|:-------|:------|
+| 🎉 **الإطلاق التجريبي** | النسخة الأولى من فجرك (Beta Launch) |
 
-### v3.11.0 — 2026-03-24
+---
 
 | Change | Description |
 |:-------|:------------|
