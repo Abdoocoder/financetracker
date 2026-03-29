@@ -38,28 +38,63 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
 
   Future<void> _load() async {
     final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) { if (mounted) setState(() => _loading = false); return; }
-    final results = await Future.wait<dynamic>([
-      Supabase.instance.client.from('investments').select('shares,current_price').eq('user_id', user.id),
-      Supabase.instance.client.from('savings_goals').select('current_amount').eq('user_id', user.id),
-      Supabase.instance.client.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
-      Supabase.instance.client.from('profiles').select('currency,monthly_income').eq('id', user.id).single(),
-    ]);
-    final investments = results[0] as List;
-    final goals = results[1] as List;
-    final debts = results[2] as List;
-    final profile = results[3] as Map<String, dynamic>;
-    final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
-    final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
-    final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
-    final income = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
-    if (mounted) {
-      setState(() {
-        _currentNetWorth = (invValue + goalsSaved - totalDebt).clamp(0, double.infinity);
-        _currency = profile['currency'] as String? ?? 'JOD';
-        if (income > 0) { _monthlyExpenses = (income * 0.7).roundToDouble(); }
-        _loading = false;
-      });
+    if (user == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+    try {
+      final results = await Future.wait<dynamic>([
+        Supabase.instance.client
+            .from('investments')
+            .select('shares,current_price')
+            .eq('user_id', user.id),
+        Supabase.instance.client
+            .from('savings_goals')
+            .select('current_amount')
+            .eq('user_id', user.id),
+        Supabase.instance.client
+            .from('debts')
+            .select('remaining_amount')
+            .eq('user_id', user.id)
+            .eq('is_paid', false),
+        Supabase.instance.client
+            .from('profiles')
+            .select('currency,monthly_income')
+            .eq('id', user.id)
+            .single(),
+      ]);
+      final investments = results[0] as List;
+      final goals = results[1] as List;
+      final debts = results[2] as List;
+      final profile = results[3] as Map<String, dynamic>;
+      final invValue = investments.fold(
+          0.0,
+          (a, i) =>
+              a +
+              (i['shares'] as num).toDouble() *
+                  (i['current_price'] as num).toDouble());
+      final goalsSaved = goals.fold(
+          0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+      final totalDebt = debts.fold(
+          0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+      final income = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
+      if (mounted) {
+        setState(() {
+          _currentNetWorth =
+              (invValue + goalsSaved - totalDebt).clamp(0, double.infinity);
+          _currency = profile['currency'] as String? ?? 'JOD';
+          if (income > 0) {
+            _monthlyExpenses = (income * 0.7).roundToDouble();
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ErrorHandler.handle(e,
+            context: context, developerMessage: 'FIRE Calc Load');
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 

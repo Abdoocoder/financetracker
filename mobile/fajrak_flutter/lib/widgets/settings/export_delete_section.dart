@@ -134,7 +134,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
           title: 'share_title'.tr(),
           child: Column(
             children: [
-              const Text('🌅', style: TextStyle(fontSize: 40)),
+              const Text('🌄', style: TextStyle(fontSize: 40)),
               const SizedBox(height: 10),
               Text(
                 'share_subtitle'.tr(),

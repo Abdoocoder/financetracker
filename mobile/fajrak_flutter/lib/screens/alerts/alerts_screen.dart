@@ -50,6 +50,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
       }
     } catch (e, st) {
       if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Load Alerts');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 

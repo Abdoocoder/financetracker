@@ -40,16 +40,16 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _catController = TextEditingController(text: widget.existing?['category'] ?? '');
     
     final initialCategories = _typeController.value == 'income' 
-        ? ['راتب','عمل حر','استثمار','هدية','أخرى']
-        : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى'];
+        ? ['راتب','عمل حر','استثمار','مكافأة','أخرى']
+        : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','إيجار','اشتراكات','عناية','سفر','دين','أخرى'];
     if (!initialCategories.contains(_catController.text)) {
       _catController.text = initialCategories.first;
     }
 
     _typeController.addListener(() {
       final categories = _typeController.value == 'income' 
-          ? ['راتب','عمل حر','استثمار','هدية','أخرى']
-          : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى'];
+          ? ['راتب','عمل حر','استثمار','مكافأة','أخرى']
+          : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','إيجار','اشتراكات','عناية','سفر','دين','أخرى'];
       if (!categories.contains(_catController.text)) {
         setState(() => _catController.text = categories.first);
       } else {
