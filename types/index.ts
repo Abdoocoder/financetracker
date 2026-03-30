@@ -47,6 +47,7 @@ export interface Debt {
   priority: number
   notes: string | null
   is_paid: boolean
+  debt_type: 'owed' | 'receivable'
   created_at: string
   updated_at: string
 }

@@ -146,6 +146,12 @@ const translations = {
 
     // Debts
     debts_title: 'إدارة الديون',
+    debts_tab_owed: 'ديون عليّ',
+    debts_tab_receivable: 'ديون لي',
+    debts_type_owed: 'دين عليّ',
+    debts_type_receivable: 'دين لي',
+    debts_receive_btn: 'استلمت الدين',
+    debts_received_msg: 'تم استلام دينك! 🎉',
     debts_add: 'إضافة',
     debts_new: 'إضافة دين جديد',
     debts_edit: 'تعديل الدين',
@@ -559,6 +565,12 @@ const translations = {
 
     // Debts
     debts_title: 'Debt Manager',
+    debts_tab_owed: 'My Debts',
+    debts_tab_receivable: 'Owed to Me',
+    debts_type_owed: 'I owe this',
+    debts_type_receivable: 'Owed to me',
+    debts_receive_btn: 'Mark as Received',
+    debts_received_msg: 'Payment received! 🎉',
     debts_add: 'Add',
     debts_new: 'Add New Debt',
     debts_edit: 'Edit Debt',
