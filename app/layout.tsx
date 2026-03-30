@@ -36,9 +36,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js', { scope: '/' });
+              navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function(err) {
+                console.error('Service worker registration failed:', err);
+              });
               if (/android/i.test(navigator.userAgent)) {
-                navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+                navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' }).catch(function(err) {
+                  console.error('Firebase SW registration failed:', err);
+                });
               }
             });
           }
