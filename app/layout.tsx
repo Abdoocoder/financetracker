@@ -36,9 +36,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js');
+              navigator.serviceWorker.register('/sw.js', { scope: '/' });
               if (/android/i.test(navigator.userAgent)) {
-                navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
               }
             });
           }
