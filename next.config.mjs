@@ -7,6 +7,28 @@ const nextConfig = {
   },
   serverExternalPackages: ['firebase-admin'],
   turbopack: {},
+  async headers() {
+    return [
+      {
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/'
+          }
+        ]
+      },
+      {
+        source: '/firebase-messaging-sw.js',
+        headers: [
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/'
+          }
+        ]
+      }
+    ]
+  },
 }
 
 export default withSentryConfig(nextConfig, {
