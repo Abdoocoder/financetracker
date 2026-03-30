@@ -91,6 +91,7 @@ function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: ()
 }
 
 export default function DebtsPage() {
+  const [activeTab, setActiveTab] = useState<'owed' | 'receivable'>('owed')
   const [debts, setDebts] = useState<Debt[]>([])
   const [paidDebts, setPaidDebts] = useState<Debt[]>([])
   const [showPaid, setShowPaid] = useState(false)
@@ -111,7 +112,8 @@ export default function DebtsPage() {
     auto_deduct: false,
     received_amount: false,
     currency: '',
-    exchange_rate: '1'
+    exchange_rate: '1',
+    debt_type: 'owed' as 'owed' | 'receivable'
   })
   const [saving, setSaving] = useState(false)
   const [paymentDebtId, setPaymentDebtId] = useState<string | null>(null)
@@ -177,7 +179,8 @@ export default function DebtsPage() {
       auto_deduct: false,
       received_amount: false,
       currency: baseCurrency,
-      exchange_rate: '1'
+      exchange_rate: '1',
+      debt_type: 'owed' as 'owed' | 'receivable',
     })
     setShowForm(true)
   }
@@ -197,7 +200,8 @@ export default function DebtsPage() {
       auto_deduct: d.auto_deduct ?? false,
       received_amount: false,
       currency: d.currency || baseCurrency,
-      exchange_rate: d.exchange_rate?.toString() ?? '1'
+      exchange_rate: d.exchange_rate?.toString() ?? '1',
+      debt_type: (d.debt_type ?? 'owed') as 'owed' | 'receivable',
     })
     setShowForm(true)
   }
@@ -400,7 +404,7 @@ export default function DebtsPage() {
         <EmptyState icon="🎉" title={t('debts_empty')} subtitle={t('debts_empty_sub')} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {debts.map(debt => {
+          {debts.filter(d => (d.debt_type ?? 'owed') === activeTab).map(debt => {
             const pct = Number(debt.original_amount) > 0
               ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
               : 0
@@ -513,6 +517,21 @@ export default function DebtsPage() {
 
       {showForm && (
         <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={() => setShowForm(false)}>
+          {/* نوع الدين */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <button onClick={() => setForm(f => ({ ...f, debt_type: 'owed' }))}
+              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
+                background: form.debt_type === 'owed' ? 'rgba(239,68,68,0.15)' : 'var(--bg-secondary)',
+                color: form.debt_type === 'owed' ? '#EF4444' : 'var(--text-muted)' }}>
+              💳 {t('debts_type_owed')}
+            </button>
+            <button onClick={() => setForm(f => ({ ...f, debt_type: 'receivable' }))}
+              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
+                background: form.debt_type === 'receivable' ? 'rgba(16,185,129,0.15)' : 'var(--bg-secondary)',
+                color: form.debt_type === 'receivable' ? '#10B981' : 'var(--text-muted)' }}>
+              💰 {t('debts_type_receivable')}
+            </button>
+          </div>
           <FormField label={t('debts_name')}>
             <Input placeholder={t('debts_name_hint')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
           </FormField>

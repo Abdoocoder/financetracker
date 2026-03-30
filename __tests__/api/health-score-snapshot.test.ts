@@ -12,7 +12,7 @@ jest.mock('@supabase/supabase-js', () => ({
 }))
 
 import { GET } from '@/app/api/health-score-snapshot/route'
-import { calcScore } from '@/app/api/health-score-snapshot/route'
+import { calcScore } from '@/app/api/health-score-snapshot/calc'
 
 // ── Environment ───────────────────────────────────────────────────────────────
 const SECRET = 'test-secret'
