@@ -323,7 +323,7 @@ class _DebtListItemState extends State<DebtListItem> {
                   child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(8)),
-                      child: _payingSaving 
+                      child: _payingSaving
                           ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : const Icon(Icons.check, color: Colors.white, size: 14)),
                 ),
