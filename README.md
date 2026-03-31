@@ -249,13 +249,12 @@ A fully automated Islamic obligatory charity calculator.
 
 ---
 
-### 📖 Islamic Daily Lessons
+### 📖 Daily Financial Lessons
 
-- Quran verses on provision and wealth
-- Hadiths on financial ethics
-- Daily supplications
-- Personalized by financial stage
+- Educational financial insights tailored to your current stage
+- Islamic lessons on provision and wealth
 - Lesson streak tracking
+- **Share Lessons 📤:** Dynamically generate beautifully styled images to share with one tap
 
 ---
 
@@ -543,6 +542,7 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 | Change | Description |
 |:-------|:------------|
+| 📤 **Share Lessons** | Generate and share beautiful daily lesson cards natively generated via Canvas API |
 | 💳 **Receivable Debts** | Two-way debt tracking — debts owed to you with collapsible sections |
 | 🔔 **Due Date Alerts** | Push notification before receivable debt due dates |
 | 🗃️ **DB Migration** | Added `debt_type` field to debts table |
