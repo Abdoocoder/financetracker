@@ -289,7 +289,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(color: const Color(0xFFF59E0B).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25))),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('💡', style: TextStyle(fontSize: 12)),
+                    const Icon(Icons.lightbulb_outline, size: 14, color: Color(0xFFF59E0B)),
                     const SizedBox(width: 6),
                     Expanded(child: Text('zakat_haul_purchase_tip'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant, height: 1.5))),
                   ]),

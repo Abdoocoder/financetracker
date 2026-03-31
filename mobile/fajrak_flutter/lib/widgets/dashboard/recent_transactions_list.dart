@@ -48,7 +48,7 @@ class RecentTransactionsList extends StatelessWidget {
           ),
           child: Row(children: [
             Container(width: 38, height: 38, decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
-              child: Center(child: Text(isIncome ? '💰' : '💸', style: const TextStyle(fontSize: 16)))),
+              child: Center(child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward, size: 16, color: color))),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(tx['description'] ?? _getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),

@@ -179,7 +179,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
-                        const Text('🎯', style: TextStyle(fontSize: 48)),
+                        Icon(Icons.track_changes, size: 48, color: colorScheme.onSurfaceVariant),
                         const SizedBox(height: 12),
                         Text('goals_empty'.tr(),
                             style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 15)),

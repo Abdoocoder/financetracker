@@ -261,19 +261,20 @@ class _DebtListItemState extends State<DebtListItem> {
             ],
             if (widget.debt['due_date'] != null) ...[
               const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6)),
-                child: Text(
-                    '📅 ${(widget.debt['due_date'] as String).substring(0, 10)}',
-                    style: const TextStyle(
-                        color: Color(0xFFF59E0B),
-                        fontSize: 10,
-                        fontFamily: 'Cairo',
-                        fontWeight: FontWeight.w700)),
-              ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.calendar_today, size: 10, color: Color(0xFFF59E0B)),
+                    const SizedBox(width: 4),
+                    Text(
+                        (widget.debt['due_date'] as String).substring(0, 10),
+                        style: const TextStyle(
+                            color: Color(0xFFF59E0B),
+                            fontSize: 10,
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w700)),
+                  ],
+                ),
             ],
           ]),
         ]),
@@ -317,21 +318,16 @@ class _DebtListItemState extends State<DebtListItem> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: _payingSaving ? null : _makePayment,
-                  child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(8)),
-                      child: Text(_payingSaving ? '⏳' : '✓',
-                          style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Cairo'))),
-                ),
+                      child: _payingSaving 
+                          ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Icon(Icons.check, color: Colors.white, size: 14)),
                 const SizedBox(width: 4),
                 GestureDetector(
                   onTap: () { setState(() { _isPaying = false; _paymentCtrl.clear(); }); },
                   child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       decoration: BoxDecoration(color: cs.surfaceContainerHigh, borderRadius: BorderRadius.circular(8)),
-                      child: Text('✕', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 13))),
+                      child: Icon(Icons.close, color: cs.onSurfaceVariant, size: 14)),
                 ),
               ]),
               if (_paymentCurrency != widget.currency)

@@ -26,7 +26,7 @@ class FinancialAdvisorCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(14),
           child: Row(children: [
-            const Text('🤖', style: TextStyle(fontSize: 18)),
+            Icon(Icons.smart_toy_outlined, size: 18, color: colorScheme.primary),
             const SizedBox(width: 8),
             Text('dash_financial_advisor'.tr(),
                 style: TextStyle(
