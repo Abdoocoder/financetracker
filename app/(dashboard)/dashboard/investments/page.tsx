@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { clearUserCache } from '@/lib/cache'
 import type { Investment, InvestmentTransaction } from '@/types'
+import { fetchExchangeRate as fetchRate } from '@/lib/currency'
 import { PageHeader } from '@/components/ui/page-header'
 import { StatBar } from '@/components/ui/stat-bar'
 import { Modal } from '@/components/ui/modal'
@@ -224,6 +225,15 @@ export default function InvestmentsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [showBuyForm, setShowBuyForm] = useState<string | null>(null)
+  const [showSellForm, setShowSellForm] = useState<string | null>(null)
+  const [sellForm, setSellForm] = useState({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
+  const [sellConfirm, setSellConfirm] = useState<{ inv: Investment; shares: number; price: number; commission: number; proceeds: number; realizedPnl: number } | null>(null)
+  const [cashBalance, setCashBalance] = useState(0)
+  const [cashCurrency, setCashCurrency] = useState('USD')
+  const [showTransferModal, setShowTransferModal] = useState(false)
+  const [transferAmount, setTransferAmount] = useState('')
+  const [transferRate, setTransferRate] = useState<number | null>(null)
+  const [loadingRate, setLoadingRate] = useState(false)
   const [showTxHistory, setShowTxHistory] = useState<string | null>(null)
   const [txHistory, setTxHistory] = useState<InvestmentTransaction[]>([])
   const [txLoading, setTxLoading] = useState(false)
@@ -254,6 +264,18 @@ export default function InvestmentsPage() {
     try { sessionStorage.setItem(cacheKey, JSON.stringify({ d: result, ts: Date.now() })) } catch {}
   }, [currentUser, supabase])
 
+  const loadCashBalance = useCallback(async () => {
+    const user = currentUser
+    if (!user) return
+    const { data } = await supabase.from('investment_cash').select('*').eq('user_id', user.id)
+    if (data && data.length > 0) {
+      setCashBalance(Number(data[0].balance))
+      setCashCurrency(data[0].currency ?? 'USD')
+    } else {
+      setCashBalance(0)
+    }
+  }, [currentUser, supabase])
+
   const fetchExchangeRate = useCallback(async () => {
     try {
       const key = process.env.NEXT_PUBLIC_EXCHANGE_RATE_KEY
@@ -272,6 +294,7 @@ export default function InvestmentsPage() {
 
   useEffect(() => {
     load()
+    loadCashBalance()
     fetchExchangeRate()
     // تحديث تلقائي للأسعار في الخلفية بعد عرض البيانات المحفوظة
     const autoRefresh = async () => {
@@ -295,7 +318,7 @@ export default function InvestmentsPage() {
       load()
     }
     autoRefresh()
-  }, [load, fetchExchangeRate, currentUser, supabase])
+  }, [load, loadCashBalance, fetchExchangeRate, currentUser, supabase])
 
   function startEditInv(inv: Investment) {
     setEditingInv(inv)
@@ -381,6 +404,79 @@ export default function InvestmentsPage() {
     setShowBuyForm(null)
     setBuyForm({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
     setSaving(false); load()
+  }
+
+  function openSellConfirm(inv: Investment) {
+    const shares = parseFloat(sellForm.shares)
+    const price = parseFloat(sellForm.price)
+    const commission = parseFloat(sellForm.commission) || 0
+    if (!shares || shares <= 0 || !price || price <= 0) return
+    if (shares > inv.shares) return
+    const proceeds = shares * price - commission
+    const realizedPnl = proceeds - shares * inv.avg_buy_price
+    setSellConfirm({ inv, shares, price, commission, proceeds, realizedPnl })
+  }
+
+  async function confirmSell() {
+    if (!sellConfirm || !currentUser) return
+    const { inv, shares, price, commission, proceeds } = sellConfirm
+    setSaving(true)
+    await supabase.from('investment_transactions').insert({
+      investment_id: inv.id, user_id: currentUser.id,
+      type: 'sell', shares, price, commission,
+      transaction_date: sellForm.date,
+    })
+    const newShares = inv.shares - shares
+    await supabase.from('investments').update({ shares: newShares }).eq('id', inv.id)
+    await supabase.rpc('upsert_investment_cash', {
+      p_user_id: currentUser.id,
+      p_currency: inv.currency ?? 'USD',
+      p_amount: proceeds,
+    })
+    clearUserCache(currentUser.id)
+    setSellConfirm(null)
+    setShowSellForm(null)
+    setSellForm({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
+    setSaving(false)
+    load()
+    loadCashBalance()
+  }
+
+  async function openTransferModal() {
+    setTransferAmount(cashBalance.toFixed(2))
+    setShowTransferModal(true)
+    if (cashCurrency !== userCurrency) {
+      setLoadingRate(true)
+      const rate = await fetchRate(cashCurrency, userCurrency)
+      setTransferRate(rate)
+      setLoadingRate(false)
+    } else {
+      setTransferRate(1)
+    }
+  }
+
+  async function confirmTransfer() {
+    const amount = parseFloat(transferAmount)
+    if (!amount || amount <= 0 || amount > cashBalance || !currentUser) return
+    setSaving(true)
+    const convertedAmount = transferRate ? amount * transferRate : amount
+    await supabase.from('transactions').insert({
+      user_id: currentUser.id,
+      type: 'income',
+      category: 'استثمار',
+      amount: convertedAmount,
+      description: `تحويل من المحفظة الاستثمارية (${amount.toFixed(2)} ${cashCurrency}${cashCurrency !== userCurrency && transferRate ? ` ← ${convertedAmount.toFixed(2)} ${userCurrency}` : ''})`,
+      transaction_date: new Date().toISOString().split('T')[0],
+    })
+    await supabase.rpc('upsert_investment_cash', {
+      p_user_id: currentUser.id,
+      p_currency: cashCurrency,
+      p_amount: -amount,
+    })
+    clearUserCache(currentUser.id)
+    setShowTransferModal(false)
+    setSaving(false)
+    loadCashBalance()
   }
 
   const totalValueUSD = investments.reduce((a, i) => a + i.shares * i.current_price, 0)
@@ -505,7 +601,37 @@ export default function InvestmentsPage() {
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => setShowBuyForm(inv.id)} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? '+ Record Buy' : '+ تسجيل شراء'}</button>
+                  <button onClick={() => { setShowBuyForm(inv.id); setShowSellForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? '+ Record Buy' : '+ تسجيل شراء'}</button>
+                )}
+
+                {showSellForm === inv.id ? (
+                  <div style={{ marginTop: 8 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+                      {[
+                        { label: lang === 'en' ? 'Units to sell' : 'الوحدات للبيع', key: 'shares', placeholder: '0.5', type: 'number' },
+                        { label: lang === 'en' ? 'Sale Price $' : 'سعر البيع $', key: 'price', placeholder: '50', type: 'number' },
+                        { label: lang === 'en' ? 'Commission $' : 'العمولة $', key: 'commission', placeholder: '0.5', type: 'number' },
+                        { label: lang === 'en' ? 'Date' : 'التاريخ', key: 'date', placeholder: '', type: 'date' },
+                      ].map(f => (
+                        <div key={f.key}>
+                          <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>{f.label}</label>
+                          <input type={f.type} value={(sellForm as any)[f.key]} onChange={e => setSellForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder}
+                            style={{ width: '100%', padding: '9px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+                      {lang === 'en' ? `Max: ${inv.shares.toFixed(4)} units` : `الحد الأقصى: ${inv.shares.toFixed(4)} وحدة`}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => openSellConfirm(inv)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>
+                        {lang === 'en' ? 'Review Sale' : 'مراجعة البيع'}
+                      </button>
+                      <button onClick={() => setShowSellForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button onClick={() => { setShowSellForm(inv.id); setShowBuyForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, marginTop: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? '- Record Sell' : '- تسجيل بيع'}</button>
                 )}
               </div>
             )
@@ -599,6 +725,94 @@ export default function InvestmentsPage() {
         </Modal>
       )}
 
+
+      {/* ── كاش المحفظة الاستثمارية ── */}
+      <div style={{ background: 'var(--bg-card)', border: `1px solid ${cashBalance > 0 ? 'rgba(16,185,129,0.3)' : 'var(--border)'}`, borderRadius: 20, padding: 16, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: cashBalance > 0 ? 12 : 0 }}>
+          <span style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>💵 {lang === 'en' ? 'Portfolio Cash' : 'كاش المحفظة'}</span>
+          {cashBalance > 0 && <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)' }}>{cashCurrency}</span>}
+        </div>
+        {cashBalance <= 0 ? (
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{lang === 'en' ? 'No cash yet — will appear after selling investments' : 'لا يوجد كاش بعد — سيظهر هنا بعد بيع استثماراتك'}</div>
+        ) : (
+          <>
+            <div style={{ fontSize: 30, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace', marginBottom: 12 }}>{cashBalance.toFixed(2)} {cashCurrency}</div>
+            <button onClick={openTransferModal} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              {lang === 'en' ? '→ Transfer to Main Wallet' : '→ نقل للمحفظة الرئيسية'}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* مودال تأكيد البيع */}
+      {sellConfirm && (
+        <Modal title={lang === 'en' ? 'Confirm Sale' : 'تأكيد البيع'} onClose={() => setSellConfirm(null)}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+            {[
+              { label: lang === 'en' ? 'Avg. Buy Price' : 'متوسط سعر الشراء', value: `$${sellConfirm.inv.avg_buy_price.toFixed(2)}`, color: 'var(--text-muted)' },
+              { label: lang === 'en' ? 'Sale Price' : 'سعر البيع', value: `$${sellConfirm.price.toFixed(2)}`, color: 'var(--text-muted)' },
+              { label: lang === 'en' ? 'Net Proceeds' : 'العائد الصافي', value: `$${sellConfirm.proceeds.toFixed(2)}`, color: 'var(--text-primary)' },
+            ].map((r, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{r.label}</span>
+                <span style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: r.color }}>{r.value}</span>
+              </div>
+            ))}
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', borderRadius: 10, background: sellConfirm.realizedPnl >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: `1px solid ${sellConfirm.realizedPnl >= 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{sellConfirm.realizedPnl >= 0 ? (lang === 'en' ? 'Realized Gain' : 'الربح المحقق') : (lang === 'en' ? 'Realized Loss' : 'الخسارة المحققة')}</span>
+              <span style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: sellConfirm.realizedPnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+                {sellConfirm.realizedPnl >= 0 ? '+' : ''}${sellConfirm.realizedPnl.toFixed(2)}
+              </span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={confirmSell} disabled={saving} style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#EF4444', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>
+              {saving ? '⏳' : (lang === 'en' ? 'Confirm Sale' : 'تأكيد البيع')}
+            </button>
+            <button onClick={() => setSellConfirm(null)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+          </div>
+        </Modal>
+      )}
+
+      {/* مودال التحويل للمحفظة الرئيسية */}
+      {showTransferModal && (
+        <Modal title={lang === 'en' ? 'Transfer to Main Wallet' : 'نقل للمحفظة الرئيسية'} onClose={() => setShowTransferModal(false)}>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+              {lang === 'en' ? `Available: ${cashBalance.toFixed(2)} ${cashCurrency}` : `المتاح: ${cashBalance.toFixed(2)} ${cashCurrency}`}
+            </div>
+            <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>{lang === 'en' ? `Amount (${cashCurrency})` : `المبلغ (${cashCurrency})`}</label>
+            <input type="number" value={transferAmount} onChange={e => setTransferAmount(e.target.value)}
+              style={{ width: '100%', padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 18, fontWeight: 900, fontFamily: 'monospace', outline: 'none', boxSizing: 'border-box', textAlign: 'center' }} />
+            {cashCurrency !== userCurrency && (
+              <div style={{ marginTop: 12, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+                {loadingRate ? (
+                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>⏳ {lang === 'en' ? 'Fetching live rate...' : 'جاري جلب سعر الصرف...'}</div>
+                ) : transferRate ? (
+                  <>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Exchange Rate' : 'سعر الصرف'}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>1 {cashCurrency} = {transferRate.toFixed(4)} {userCurrency}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{lang === 'en' ? "You'll receive" : 'ستستلم'}</span>
+                      <span style={{ fontSize: 14, fontWeight: 900, fontFamily: 'monospace', color: 'var(--accent-green-light)' }}>{((parseFloat(transferAmount) || 0) * transferRate).toFixed(2)} {userCurrency}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--accent-red-light)', fontSize: 12 }}>❌ {lang === 'en' ? 'Could not fetch rate' : 'تعذر جلب سعر الصرف'}</div>
+                )}
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={confirmTransfer} disabled={saving || loadingRate} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: (saving || loadingRate) ? 0.5 : 1 }}>
+              {saving ? '⏳' : (lang === 'en' ? 'Confirm Transfer' : 'تأكيد النقل')}
+            </button>
+            <button onClick={() => setShowTransferModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+          </div>
+        </Modal>
+      )}
 
       {/* ── محاكي الثروة ── */}
       <WealthSimulator lang={lang} currency={userCurrency} />
