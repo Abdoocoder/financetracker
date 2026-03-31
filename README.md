@@ -538,7 +538,7 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.16.0 — 2026-03-31 *(Latest)*
+### v3.16.1 — 2026-03-31 *(Latest)*
 
 | Change | Description |
 |:-------|:------------|
