@@ -133,7 +133,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         title: Text('debts_receive_btn'.tr(),
             style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
         content: Text(
-            '\${'debts_tab_receivable'.tr()}: \${debt['name']}\n\${(debt['remaining_amount'] as num).toStringAsFixed(0)} \${_currency}',
+            '${'debts_tab_receivable'.tr()}: ${debt['name']}\n${(debt['remaining_amount'] as num).toStringAsFixed(0)} $_currency',
             style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
         actions: [
           TextButton(
@@ -157,7 +157,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
       'type': 'income',
       'amount': debt['remaining_amount'],
       'category': 'دين مستلم',
-      'description': 'استلام دين: \${debt['name']}',
+      'description': 'استلام دين: ${debt['name']}',
       'transaction_date': DateTime.now().toIso8601String().split('T')[0],
     });
 
@@ -404,7 +404,7 @@ class _ReceivableDebtCard extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(child: Text(debt['name'] ?? '',
             style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 15))),
-          Text('\$amount \$currency',
+          Text('$amount $currency',
             style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
         ]),
         if (debt['notes'] != null && (debt['notes'] as String).isNotEmpty) ...[
@@ -413,7 +413,7 @@ class _ReceivableDebtCard extends StatelessWidget {
         ],
         if (dueDate != null) ...[
           const SizedBox(height: 6),
-          Text('📅 \${'debts_due_date'.tr()}: \$dueDate',
+          Text("📅 ${'debts_due_date'.tr()}: $dueDate",
             style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
         ],
         const SizedBox(height: 12),
