@@ -44,7 +44,7 @@ class GoalListItem extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           if ((goal['icon'] as String?) != null)
-            Icon(IconData(int.tryParse(goal['icon'] as String) ?? Icons.track_changes.codePoint, fontFamily: 'MaterialIcons'), size: 22, color: color),
+            Icon(_getIconData(goal['icon'] as String), size: 22, color: color),
           if ((goal['icon'] as String?) != null) const SizedBox(width: 8),
           Expanded(
               child: Text(goal['name'] ?? '',
@@ -122,5 +122,21 @@ class GoalListItem extends StatelessWidget {
         ],
       ]),
     );
+  }
+
+  IconData _getIconData(String? iconString) {
+    final codePoint = int.tryParse(iconString ?? '') ?? Icons.track_changes.codePoint;
+    const icons = [
+      Icons.track_changes, Icons.directions_car, Icons.home, Icons.diamond, Icons.diamond_outlined,
+      Icons.flight, Icons.laptop, Icons.phone_android, Icons.school, Icons.workspace_premium,
+      Icons.public, Icons.cast_for_education, Icons.work, Icons.fitness_center, Icons.favorite,
+      Icons.eco, Icons.rocket_launch, Icons.star, Icons.energy_savings_leaf, Icons.bar_chart,
+      Icons.calendar_today, Icons.savings, Icons.card_giftcard, Icons.shield, Icons.bolt,
+      Icons.local_fire_department, Icons.lightbulb, Icons.inventory_2, Icons.attach_money, Icons.beach_access,
+    ];
+    for (final icon in icons) {
+      if (icon.codePoint == codePoint) return icon;
+    }
+    return Icons.track_changes;
   }
 }
