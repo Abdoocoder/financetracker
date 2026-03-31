@@ -14,28 +14,28 @@ class GamificationCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     String rank;
-    String icon;
+    IconData icon;
     Color color;
     double progress;
 
     if (score < 40) {
       rank = 'gamif_rank_bronze'.tr();
-      icon = '🥉';
+      icon = Icons.military_tech;
       color = const Color(0xFFCD7F32);
       progress = score / 40;
     } else if (score < 60) {
       rank = 'gamif_rank_silver'.tr();
-      icon = '🥈';
+      icon = Icons.workspace_premium;
       color = const Color(0xFFC0C0C0);
       progress = (score - 40) / 20;
     } else if (score < 80) {
       rank = 'gamif_rank_gold'.tr();
-      icon = '🥇';
+      icon = Icons.emoji_events;
       color = const Color(0xFFFFD700);
       progress = (score - 60) / 20;
     } else {
       rank = 'gamif_rank_diamond'.tr();
-      icon = '💎';
+      icon = Icons.diamond;
       color = colorScheme.primary;
       progress = score >= 100 ? 1.0 : (score - 80) / 20;
     }
@@ -59,7 +59,7 @@ class GamificationCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child:
-                Center(child: Text(icon, style: const TextStyle(fontSize: 24))),
+                Center(child: Icon(icon, size: 24, color: color)),
           ),
           const SizedBox(width: 16),
           Expanded(

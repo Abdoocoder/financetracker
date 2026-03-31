@@ -55,8 +55,8 @@ class TransactionListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
-                    child: Text(isIncome ? '💰' : '💸',
-                        style: const TextStyle(fontSize: 18))),
+                    child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+                        size: 18, color: color)),
               ),
               const SizedBox(width: 12),
               Expanded(

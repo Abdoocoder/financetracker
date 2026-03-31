@@ -79,7 +79,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         padding: const EdgeInsets.all(24),
         child: _sent
             ? Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Text('📧', style: TextStyle(fontSize: 64)),
+                Icon(Icons.mark_email_read_outlined, size: 64, color: colorScheme.primary),
                 const SizedBox(height: 20),
                 Text('auth_sent_title'.tr(),
                     style: TextStyle(

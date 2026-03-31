@@ -48,7 +48,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
         children: [
           Row(
             children: [
-              const Text('💰', style: TextStyle(fontSize: 18)),
+              Icon(Icons.attach_money, size: 18, color: colorScheme.primary),
               const SizedBox(width: 8),
               Text('wealth_title'.tr(),
                   style: TextStyle(

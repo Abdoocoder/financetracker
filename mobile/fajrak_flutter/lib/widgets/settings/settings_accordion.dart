@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SettingsAccordion extends StatelessWidget {
-  final String icon;
+  final IconData icon;
   final String title;
   final String? badge;
   final Widget child;
@@ -44,7 +44,7 @@ class SettingsAccordion extends StatelessWidget {
           iconColor: colorScheme.onSurfaceVariant,
           collapsedIconColor: colorScheme.onSurfaceVariant,
           title: Row(children: [
-            Text(icon, style: const TextStyle(fontSize: 18)),
+            Icon(icon, size: 18, color: colorScheme.primary),
             const SizedBox(width: 10),
             Text(
               title,

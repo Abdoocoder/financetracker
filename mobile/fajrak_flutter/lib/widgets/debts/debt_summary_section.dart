@@ -64,7 +64,7 @@ class DebtSummarySection extends StatelessWidget {
                 border: Border.all(
                     color: const Color(0xFF10B981).withValues(alpha: 0.2))),
             child: Row(children: [
-              const Text('💪', style: TextStyle(fontSize: 28)),
+              const Icon(Icons.fitness_center, size: 28, color: Color(0xFF10B981)),
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('debts_total_paid_life'.tr(),
@@ -86,12 +86,15 @@ class DebtSummarySection extends StatelessWidget {
                         color: cs.onSurfaceVariant,
                         fontSize: 11,
                         fontFamily: 'Cairo')),
-                Text('$paidCount 🎯',
-                    style: const TextStyle(
-                        color: Color(0xFF6EE7B7),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo')),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('$paidCount ',
+                      style: const TextStyle(
+                          color: Color(0xFF6EE7B7),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'Cairo')),
+                  const Icon(Icons.track_changes, size: 16, color: Color(0xFF6EE7B7)),
+                ]),
               ]),
             ]),
           ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class FinancialAdvisorCard extends StatelessWidget {
-  final List<Map<String, String>> insights;
+  final List<Map<String, dynamic>> insights;
   final ColorScheme colorScheme;
   final Color Function(String) getInsightColor;
 
@@ -26,7 +26,7 @@ class FinancialAdvisorCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(14),
           child: Row(children: [
-            const Text('🤖', style: TextStyle(fontSize: 18)),
+            Icon(Icons.smart_toy_outlined, size: 18, color: colorScheme.primary),
             const SizedBox(width: 8),
             Text('dash_financial_advisor'.tr(),
                 style: TextStyle(
@@ -50,7 +50,7 @@ class FinancialAdvisorCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: color.withValues(alpha: 0.2))),
               child: Row(children: [
-                Text(ins['icon']!, style: const TextStyle(fontSize: 16)),
+                Icon(ins['icon'] as IconData, size: 16, color: color),
                 const SizedBox(width: 10),
                 Expanded(
                     child: Text(ins['text']!,

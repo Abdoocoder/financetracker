@@ -21,10 +21,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
   bool _loading = true;
   String _currency = 'JOD';
 
-  static const _goalIcons = [
-    '🎯', '🚗', '🏠', '💍', '💎', '✈️', '💻', '📱', '📚', '👑',
-    '🌍', '🎓', '💼', '🏋️', '🤌', '💚', '🚀', '⭐', '🌱', '📊',
-    '📅', '💰', '🎁', '🛡️', '⚡', '🔥', '💡', '📦', '🪙', '🏝️',
+  static final _goalIcons = [
+    Icons.track_changes, Icons.directions_car, Icons.home, Icons.diamond, Icons.diamond_outlined,
+    Icons.flight, Icons.laptop, Icons.phone_android, Icons.school, Icons.workspace_premium,
+    Icons.public, Icons.cast_for_education, Icons.work, Icons.fitness_center, Icons.favorite,
+    Icons.eco, Icons.rocket_launch, Icons.star, Icons.energy_savings_leaf, Icons.bar_chart,
+    Icons.calendar_today, Icons.savings, Icons.card_giftcard, Icons.shield, Icons.bolt,
+    Icons.local_fire_department, Icons.lightbulb, Icons.inventory_2, Icons.attach_money, Icons.beach_access,
   ];
 
   @override
@@ -179,7 +182,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
-                        const Text('🎯', style: TextStyle(fontSize: 48)),
+                        Icon(Icons.track_changes, size: 48, color: colorScheme.onSurfaceVariant),
                         const SizedBox(height: 12),
                         Text('goals_empty'.tr(),
                             style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 15)),

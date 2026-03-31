@@ -25,11 +25,11 @@ class _LearnScreenState extends State<LearnScreen> {
   bool _sharing = false;
 
   final _stageInfo = {
-    'awareness': ('🌱', 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
-    'debt': ('💳', 'learn_stage_debt'.tr(), const Color(0xFFEF4444)),
-    'emergency': ('🛡️', 'learn_stage_emergency'.tr(), const Color(0xFFF59E0B)),
-    'investing': ('📈', 'learn_stage_investing'.tr(), const Color(0xFF10B981)),
-    'wealth': ('👑', 'learn_stage_wealth'.tr(), const Color(0xFF3B7EF6)),
+    'awareness': (Icons.eco, 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
+    'debt': (Icons.credit_card, 'learn_stage_debt'.tr(), const Color(0xFFEF4444)),
+    'emergency': (Icons.shield, 'learn_stage_emergency'.tr(), const Color(0xFFF59E0B)),
+    'investing': (Icons.trending_up, 'learn_stage_investing'.tr(), const Color(0xFF10B981)),
+    'wealth': (Icons.workspace_premium, 'learn_stage_wealth'.tr(), const Color(0xFF3B7EF6)),
   };
 
   final _lessons = {
@@ -266,7 +266,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                   content: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Text('🔥', style: TextStyle(fontSize: 56)),
+                    const Icon(Icons.local_fire_department, size: 56, color: Color(0xFFF59E0B)),
                     const SizedBox(height: 12),
                     Text('learn_streak_consecutive'.tr(args: [newStreak.toString()]),
                         style: TextStyle(
@@ -503,7 +503,7 @@ class _LearnScreenState extends State<LearnScreen> {
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: info.$3.withValues(alpha: 0.25))),
               child: Row(children: [
-                Text(info.$1, style: const TextStyle(fontSize: 22)),
+                Icon(info.$1, size: 22, color: info.$3),
                 const SizedBox(width: 10),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('learn_stage_label'.tr(),
@@ -533,8 +533,8 @@ class _LearnScreenState extends State<LearnScreen> {
                           ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
                           : const Color(0xFF9CA3AF).withValues(alpha: 0.25))),
               child: Column(children: [
-                Text((!_completed && _streak > 0) ? '❄️' : '🔥',
-                    style: const TextStyle(fontSize: 22)),
+                Icon((!_completed && _streak > 0) ? Icons.ac_unit : Icons.local_fire_department,
+                    size: 22, color: (!_completed && _streak > 0) ? const Color(0xFF9CA3AF) : const Color(0xFFF59E0B)),
                 Text('$_streak',
                     style: TextStyle(
                         color: (!_completed && _streak > 0)
@@ -644,7 +644,7 @@ class _LearnScreenState extends State<LearnScreen> {
                               child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                   color: Color(0xFFF59E0B)))
-                          : const Text('📤', style: TextStyle(fontSize: 18)),
+                          : const Icon(Icons.file_upload_outlined, size: 18, color: Color(0xFFF59E0B)),
                     ),
                   )
                 ],

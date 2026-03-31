@@ -146,7 +146,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           iconColor: colorScheme.onSurfaceVariant,
           collapsedIconColor: colorScheme.onSurfaceVariant,
           title: Row(children: [
-            Text('⭐', style: const TextStyle(fontSize: 18)),
+            Icon(Icons.star, size: 18, color: Colors.amber),
             const SizedBox(width: 14),
             Expanded(
               child: Text(
@@ -199,7 +199,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
       ),
       child: Column(
         children: [
-          const Text('🎉', style: TextStyle(fontSize: 32)),
+          const Icon(Icons.celebration, size: 32, color: Color(0xFF10B981)),
           const SizedBox(height: 8),
           Text(
             'testimonial_thankyou'.tr(),

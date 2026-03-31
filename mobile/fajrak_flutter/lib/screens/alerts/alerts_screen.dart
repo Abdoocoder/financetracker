@@ -271,15 +271,15 @@ class _AlertsScreenState extends State<AlertsScreen> {
                             child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 40),
                           child: Column(children: [
-                            Text(
+                            Icon(
                                 _filter == 'all'
-                                    ? '🔔'
+                                    ? Icons.notifications_none
                                     : _filter == 'warning'
-                                        ? '⚠️'
+                                        ? Icons.warning_amber_outlined
                                         : _filter == 'achievement'
-                                            ? '🏆'
-                                            : '💡',
-                                style: const TextStyle(fontSize: 40)),
+                                            ? Icons.emoji_events_outlined
+                                            : Icons.lightbulb_outline,
+                                size: 40, color: colorScheme.onSurfaceVariant),
                             const SizedBox(height: 12),
                             Text('alerts_empty'.tr(),
                                 style: TextStyle(

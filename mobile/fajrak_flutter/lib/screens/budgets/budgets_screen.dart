@@ -29,14 +29,14 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   final int _year = DateTime.now().year;
 
   final List<Map<String, dynamic>> _localizedCategories = [
-    {'key': 'طعام', 'icon': '🍔', 'label': 'cat_food'.tr()},
-    {'key': 'مواصلات', 'icon': '🚗', 'label': 'cat_transport'.tr()},
-    {'key': 'فواتير', 'icon': '💡', 'label': 'cat_bills'.tr()},
-    {'key': 'صحة', 'icon': '💊', 'label': 'cat_health'.tr()},
-    {'key': 'ملابس', 'icon': '👕', 'label': 'cat_clothes'.tr()},
-    {'key': 'ترفيه', 'icon': '🎮', 'label': 'cat_entertainment'.tr()},
-    {'key': 'تعليم', 'icon': '📚', 'label': 'cat_education'.tr()},
-    {'key': 'أخرى', 'icon': '📝', 'label': 'cat_others'.tr()},
+    {'key': 'طعام', 'icon': Icons.restaurant, 'label': 'cat_food'.tr()},
+    {'key': 'مواصلات', 'icon': Icons.directions_car, 'label': 'cat_transport'.tr()},
+    {'key': 'فواتير', 'icon': Icons.receipt_long, 'label': 'cat_bills'.tr()},
+    {'key': 'صحة', 'icon': Icons.health_and_safety, 'label': 'cat_health'.tr()},
+    {'key': 'ملابس', 'icon': Icons.checkroom, 'label': 'cat_clothes'.tr()},
+    {'key': 'ترفيه', 'icon': Icons.sports_esports, 'label': 'cat_entertainment'.tr()},
+    {'key': 'تعليم', 'icon': Icons.school, 'label': 'cat_education'.tr()},
+    {'key': 'أخرى', 'icon': Icons.more_horiz, 'label': 'cat_others'.tr()},
   ];
 
   final List<String> _monthLabels = [
@@ -195,8 +195,8 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     );
   }
 
-  List<Map<String, String>> _getAdvisorInsights() {
-    final insights = <Map<String, String>>[];
+  List<Map<String, dynamic>> _getAdvisorInsights() {
+    final insights = <Map<String, dynamic>>[];
     final available = _income - _totalDebtPayments;
     final totalBudgeted = _budgets.fold(
         0.0, (a, b) => a + (b['monthly_limit'] as num).toDouble());
@@ -213,13 +213,13 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       final limit = (b['monthly_limit'] as num).toDouble();
       if (spent > limit) {
         insights.add({
-          'icon': '🔴',
+          'icon': Icons.cancel,
           'type': 'danger',
           'text': 'budget_insight_over'.tr(args: [getCatName(b['category']), (spent - limit).toStringAsFixed(0), _currency])
         });
       } else if (limit > 0 && (spent / limit) > 0.8) {
         insights.add({
-          'icon': '🔶',
+          'icon': Icons.warning_amber_rounded,
           'type': 'warning',
           'text': 'budget_insight_near'.tr(args: [getCatName(b['category']), (limit - spent).toStringAsFixed(0), _currency])
         });
@@ -229,25 +229,25 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     if (_income > 0 && totalSpent > 0) {
       final ratio = totalSpent / _income * 100;
       if (ratio > 90) {
-        insights.add({'icon': '🚨', 'type': 'danger', 'text': 'budget_insight_ratio_danger'.tr(args: [ratio.toStringAsFixed(0)])});
+        insights.add({'icon': Icons.dangerous, 'type': 'danger', 'text': 'budget_insight_ratio_danger'.tr(args: [ratio.toStringAsFixed(0)])});
       } else if (ratio < 70) {
-        insights.add({'icon': '✅', 'type': 'success', 'text': 'budget_insight_ratio_success'.tr(args: [ratio.toStringAsFixed(0)])});
+        insights.add({'icon': Icons.check_circle_outline, 'type': 'success', 'text': 'budget_insight_ratio_success'.tr(args: [ratio.toStringAsFixed(0)])});
       }
     }
 
     if (_budgets.isEmpty) {
-      insights.add({'icon': '💡', 'type': 'info', 'text': 'budget_insight_empty'.tr()});
+      insights.add({'icon': Icons.info_outline, 'type': 'info', 'text': 'budget_insight_empty'.tr()});
     } else if (available > totalBudgeted) {
-      insights.add({'icon': '💰', 'type': 'success', 'text': 'budget_insight_surplus'.tr(args: [available.toStringAsFixed(0), _currency])});
+      insights.add({'icon': Icons.savings, 'type': 'success', 'text': 'budget_insight_surplus'.tr(args: [available.toStringAsFixed(0), _currency])});
     } else if (available < totalBudgeted) {
-      insights.add({'icon': '📉', 'type': 'danger', 'text': 'budget_insight_deficit'.tr(args: [(totalBudgeted - available).toStringAsFixed(0), _currency])});
+      insights.add({'icon': Icons.trending_down, 'type': 'danger', 'text': 'budget_insight_deficit'.tr(args: [(totalBudgeted - available).toStringAsFixed(0), _currency])});
     }
 
     for (final g in _goals) {
       final current = (g['current_amount'] as num).toDouble();
       final target = (g['target_amount'] as num).toDouble();
       if (target > 0 && current < target && (current / target) > 0.9) {
-        insights.add({'icon': '🎯', 'type': 'success', 'text': 'budget_insight_goal_near'.tr(args: [g['title'] ?? '', (target - current).toStringAsFixed(0)])});
+        insights.add({'icon': Icons.track_changes, 'type': 'success', 'text': 'budget_insight_goal_near'.tr(args: [g['title'] ?? '', (target - current).toStringAsFixed(0)])});
       }
     }
 
@@ -348,7 +348,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                           style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
                                       actions: [
                                         TextButton(onPressed: () => Navigator.pop(context, false), child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-                                        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('✨ تطبيق', style: TextStyle(color: colorScheme.primary, fontFamily: 'Cairo'))),
+                                        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('تطبيق', style: TextStyle(color: colorScheme.primary, fontFamily: 'Cairo'))),
                                       ],
                                     ));
                             if (confirm == true) await _apply502030();

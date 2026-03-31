@@ -30,7 +30,7 @@ class DebtCelebrationDialog extends StatelessWidget {
                   spreadRadius: 5)
             ],
           ),
-          child: const Center(child: Text('🎉', style: TextStyle(fontSize: 40))),
+          child: const Center(child: Icon(Icons.celebration, size: 40, color: Color(0xFF10B981))),
         ),
         const SizedBox(height: 16),
         Text('debts_celebration_title'.tr(),

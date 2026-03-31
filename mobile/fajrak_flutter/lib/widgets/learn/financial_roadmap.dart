@@ -13,11 +13,11 @@ class FinancialRoadmap extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final stages = [
-      {'id': 'awareness', 'icon': '🌱', 'title': 'roadmap_awareness'.tr()},
-      {'id': 'debt', 'icon': '💳', 'title': 'roadmap_debt'.tr()},
-      {'id': 'emergency', 'icon': '🛡️', 'title': 'roadmap_emergency'.tr()},
-      {'id': 'investing', 'icon': '📈', 'title': 'roadmap_investing'.tr()},
-      {'id': 'wealth', 'icon': '👑', 'title': 'roadmap_wealth'.tr()},
+      {'id': 'awareness', 'icon': Icons.spa, 'title': 'roadmap_awareness'.tr()},
+      {'id': 'debt', 'icon': Icons.credit_card, 'title': 'roadmap_debt'.tr()},
+      {'id': 'emergency', 'icon': Icons.shield, 'title': 'roadmap_emergency'.tr()},
+      {'id': 'investing', 'icon': Icons.show_chart, 'title': 'roadmap_investing'.tr()},
+      {'id': 'wealth', 'icon': Icons.workspace_premium, 'title': 'roadmap_wealth'.tr()},
     ];
 
     int currentIndex = stages.indexWhere((s) => s['id'] == currentStage);
@@ -73,8 +73,7 @@ class FinancialRoadmap extends StatelessWidget {
                           : null,
                     ),
                     child: Center(
-                        child: Text(s['icon'] as String,
-                            style: const TextStyle(fontSize: 20))),
+                        child: Icon(s['icon'] as IconData, size: 20, color: color)),
                   ),
                   const SizedBox(height: 6),
                   Text(s['title'] as String,

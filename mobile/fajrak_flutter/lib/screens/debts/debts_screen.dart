@@ -253,7 +253,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           border: Border.all(color: const Color(0x33EF4444)),
                         ),
                         child: Row(children: [
-                          const Text('💳 ', style: TextStyle(fontSize: 16)),
+                          const Icon(Icons.credit_card, size: 16, color: Color(0xFFEF4444)),
+                          const SizedBox(width: 4),
                           Expanded(child: Text('debts_tab_owed'.tr(),
                             style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
                           Text('${_debts.length}', style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
@@ -291,7 +292,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           border: Border.all(color: const Color(0x3310B981)),
                         ),
                         child: Row(children: [
-                          const Text('💰 ', style: TextStyle(fontSize: 16)),
+                          const Icon(Icons.account_balance_wallet, size: 16, color: Color(0xFF10B981)),
+                          const SizedBox(width: 4),
                           Expanded(child: Text('debts_tab_receivable'.tr(),
                             style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
                           Text('${_receivableDebts.length}', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
@@ -317,7 +319,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     Container(
                       padding: const EdgeInsets.all(40),
                       child: Column(children: [
-                        const Text('🎉', style: TextStyle(fontSize: 48)),
+                        Icon(Icons.celebration, size: 48, color: const Color(0xFF10B981)),
                         const SizedBox(height: 12),
                         Text('debts_no_active'.tr(),
                           style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 15)),
@@ -413,8 +415,14 @@ class _ReceivableDebtCard extends StatelessWidget {
         ],
         if (dueDate != null) ...[
           const SizedBox(height: 6),
-          Text("📅 ${'debts_due_date'.tr()}: $dueDate",
-            style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
+          Row(
+            children: [
+              const Icon(Icons.calendar_today, size: 12, color: Color(0xFF10B981)),
+              const SizedBox(width: 4),
+              Text("${'debts_due_date'.tr()}: $dueDate",
+                style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
+            ],
+          ),
         ],
         const SizedBox(height: 12),
         Row(children: [
