@@ -12,7 +12,7 @@
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-fajrak.com-FF6B35?style=for-the-badge)](https://fajrak.com)
 [![Download APK](https://img.shields.io/badge/📱_Android_APK-Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
-[![Google Play](https://img.shields.io/badge/🎯_Google_Play-Closed_Testing-4285F4?style=for-the-badge)](https://fajrak.com/download)
+[![Google Play](https://img.shields.io/badge/🎯_Google_Play-Closed_Testing-4285F4?style=for-the-badge)](https://play.google.com/store/apps/details?id=com.fajrak.app)
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
@@ -22,6 +22,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-FCM-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat-square&logo=vercel)](https://vercel.com)
 [![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat-square)](https://fajrak.com)
+[![Sentry](https://img.shields.io/badge/Sentry-Monitored-362D59?style=flat-square&logo=sentry)](https://sentry.io)
 
 ---
 
@@ -68,6 +69,7 @@
 | Financial journey roadmap | ✅ | ❌ |
 | Native Android + PWA | ✅ | Varies |
 | Gamification & streaks | ✅ | ❌ |
+| Receivable debt tracking | ✅ | ❌ |
 | Free, no ads | ✅ | ❌ |
 
 ---
@@ -121,12 +123,15 @@ The command center of your financial life.
 
 | Feature | Description |
 |:--------|:------------|
+| **Two-way debt tracking** | Debts you owe + debts owed to you (receivable) |
+| **Collapsible sections** | Separate expandable lists for owed vs. receivable |
 | Visual progress bars | % paid per debt |
 | Auto-deduction | Monthly CRON payment processing |
 | Payment history | Full log per debt |
 | Confetti celebration | Animation on full repayment |
 | Multi-currency | Track debts in any currency |
 | Debt-as-income | Record received loans as income |
+| **Due date alerts** | Push notifications before receivable debt due dates |
 
 ---
 
@@ -268,178 +273,61 @@ A fully automated Islamic obligatory charity calculator.
 | **Mobile** | Flutter + Dart | 3.x | Native Android app |
 | **Charts** | Recharts | 3.8 | Web charts |
 | **Icons** | Lucide React | 0.577 | UI icons |
-| **CRON** | cron-job.org | Free | Automated tasks |
+| **CRON** | GitHub Actions | — | Automated tasks (free) |
 | **Hosting** | Vercel | Latest | Web deployment |
+| **Monitoring** | Sentry | Latest | Error tracking |
 | **Testing** | Jest 30 + Testing Library | — | Unit & integration tests |
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLIENT LAYER                         │
-│  ┌──────────────────────┐    ┌──────────────────────────┐   │
-│  │   Next.js Web App    │    │   Flutter Android App    │   │
-│  │  (React 19 + TypeScript) │    │   (Dart 3 + Provider)    │   │
-│  │                      │    │                          │   │
-│  │  Server Components   │    │  22 Screens              │   │
-│  │  Client Components   │    │  Real-time Sync          │   │
-│  │  PWA + Service Worker│    │  Firebase FCM            │   │
-│  └──────────┬───────────┘    └───────────┬──────────────┘   │
-└─────────────┼───────────────────────────┼────────────────────┘
-              │                           │
-              ▼                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                       BACKEND LAYER                         │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │              Next.js API Routes (16 endpoints)          │ │
-│  │  CRON Jobs  │  Push API  │  Gamification  │  Stock API │ │
-│  └──────────────────────────┬─────────────────────────────┘ │
-└─────────────────────────────┼───────────────────────────────┘
-                              │
-              ┌───────────────┼────────────────┐
-              ▼               ▼                ▼
-┌─────────────────┐  ┌──────────────┐  ┌──────────────────┐
-│    Supabase     │  │   Firebase   │  │  External APIs   │
-│  PostgreSQL DB  │  │  FCM + Auth  │  │  Stock / Forex   │
-│  Auth + RLS     │  │              │  │  Exchange Rates  │
-│  9 Migrations   │  │              │  │                  │
-└─────────────────┘  └──────────────┘  └──────────────────┘
-```
-
-**Key Patterns:**
-- Server Components for data fetching, Client Components for interactivity
-- Context API for global state (user session, theme, language)
-- Custom hooks: `useFinancialSummary`, `useTransactions`
-- CRON authentication via Vercel secret token
 
 ---
 
 ## 🗄️ Database Schema
 
-All tables protected with **Row Level Security (RLS)**.
-
-```
-profiles              transactions           debts
-─────────────         ────────────────       ──────────────
-id (uuid) PK          id (uuid) PK           id (uuid) PK
-name                  user_id (FK)           user_id (FK)
-monthly_income        type                   name
-currency              category               amount
-timezone              amount                 remaining
-plan                  original_amount        monthly_payment
-created_at            currency               priority
-                      date                   due_date
-                      recurring              exchange_rate
-                      description
-
-investments           savings_goals          budgets
-──────────────        ──────────────         ──────────
-id (uuid) PK          id (uuid) PK           id (uuid) PK
-user_id (FK)          user_id (FK)           user_id (FK)
-symbol                name                   category
-name                  target_amount          monthly_limit
-type                  current_amount         month / year
-shares                target_date
-avg_buy_price         icon / color
-current_price
-is_halal
-purchase_date
-
-zakat_history         health_score_history   push_subscriptions
-──────────────        ────────────────────   ──────────────────
-id (uuid) PK          id (uuid) PK           id (uuid) PK
-user_id (FK)          user_id (FK)           user_id (FK)
-gold_grams            score                  endpoint
-silver_grams          recorded_at            p256dh
-cash                                         auth
-total_assets
-zakat_due
-paid_at
-```
-
-**Migrations:**
-
-| Migration | Description |
-|:----------|:------------|
-| 001 | Core tables: profiles, transactions, debts, investments, budgets, goals, alerts |
-| 002 | Multi-currency: original_amount, original_currency, exchange_rate |
-| 003 | Exchange rate tracking on debts + performance indexes |
-| 004 | RLS policies on app_events |
-| 005 | Security fix: function search_path |
-| 006 | Zakat history table |
-| 007 | Health score history table |
-| 008 | Push subscriptions table |
-| 009 | Investment purchase date (Haul tracking) |
+| Table | Description |
+|:------|:------------|
+| `profiles` | User profiles extending auth.users |
+| `transactions` | Income & expense records |
+| `debts` | Debts (owed + receivable) with `debt_type` field |
+| `debt_payments` | Payment history log |
+| `investments` | Portfolio holdings |
+| `investment_transactions` | Buy/sell history |
+| `budgets` | Monthly category limits |
+| `alerts` | Smart notification records |
+| `savings_goals` | Financial targets |
+| `testimonials` | User reviews (public read) |
+| `push_subscriptions` | FCM + Web Push tokens |
+| `health_score_history` | Daily score snapshots |
 
 ---
 
-## 📡 API Reference
+## 🔄 Automated Workflows
 
-All CRON endpoints require `Authorization: Bearer <CRON_SECRET>`.
+Powered by **GitHub Actions** (free tier):
 
-| Endpoint | Method | Auth | Description |
-|:---------|:------:|:----:|:------------|
-| `/api/alerts` | POST | CRON | Generate smart financial alerts |
-| `/api/daily-reminder` | POST | CRON | Send morning push notification |
-| `/api/evening-reminder` | POST | CRON | Send evening check-in notification |
-| `/api/weekly-report` | POST | CRON | Generate and send weekly summary |
-| `/api/zakat-reminder` | POST | CRON | Zakat haul countdown notifications |
-| `/api/auto-salary` | POST | CRON | Detect and add recurring salary |
-| `/api/auto-recurring` | POST | CRON | Execute recurring transactions |
-| `/api/auto-debt` | POST | CRON | Process monthly debt payments |
-| `/api/health-score-snapshot` | POST | CRON | Record nightly health score |
-| `/api/smart-notifications` | POST | CRON | AI-driven contextual alerts |
-| `/api/gamification` | POST | User | Update badges and levels |
-| `/api/push-subscribe` | POST | User | Register push notification endpoint |
-| `/api/push-send` | POST | User | Send a push notification |
-| `/api/exchange-rate` | GET | User | Fetch live exchange rates |
-| `/api/stock-price` | GET | User | Fetch live stock/crypto prices |
-| `/api/testimonials` | GET | Public | Fetch user testimonials |
-
----
-
-## ⏰ Automated Workflows
-
-Powered by **cron-job.org** (Amman timezone, UTC+3):
-
-| Time | Task | Endpoint |
-|:----:|:-----|:---------|
-| 6:00 AM | Morning reminders + smart alerts | `/api/daily-reminder` + `/api/alerts` |
-| 8:00 AM | Auto salary detection | `/api/auto-salary` |
-| 9:00 AM | Auto debt deduction | `/api/auto-debt` |
-| 10:00 AM | Zakat haul check | `/api/zakat-reminder` |
-| 6:00 PM | Evening reminder | `/api/evening-reminder` |
-| 7:00 PM | Smart notifications | `/api/smart-notifications` |
-| 11:50 PM | Health score snapshot | `/api/health-score-snapshot` |
-| Friday 9:00 AM | Weekly report | `/api/weekly-report` |
+| Workflow | Schedule | Description |
+|:---------|:--------:|:------------|
+| `smart-notifications.yml` | 6AM, 8AM, 9AM, 6PM (UTC+3) | Push notifications |
+| `auto-salary.yml` | 8AM daily | Auto salary injection |
+| `auto-debt.yml` | 9AM daily | Auto debt deduction |
 
 ---
 
 ## 📱 Mobile App
 
-The Flutter app shares the same Supabase + Firebase backend as the web app.
+Native Android app built with Flutter, available on Google Play (Closed Testing).
 
-| Platform | Distribution | Status |
-|:--------:|:------------:|:------:|
-| 🤖 Android | Native APK | [**Download**](https://fajrak.com/download) |
-| 🤖 Android | Google Play (Closed Testing) | ✅ Submitted |
-| 🤖 Android | PWA / TWA | ✅ Available |
-| 🍎 iOS | PWA (Add to Home Screen) | ✅ Available |
+[![Google Play](https://img.shields.io/badge/Google_Play-Closed_Testing-4285F4?style=for-the-badge&logo=googleplay&logoColor=white)](https://play.google.com/store/apps/details?id=com.fajrak.app)
 
-**Flutter Tech:**
+**Flutter packages:**
 
-| Package | Purpose |
-|:--------|:--------|
-| `supabase_flutter` 2.3 | Database + Auth |
-| `firebase_messaging` 16.1 | Push notifications (FCM) |
-| `flutter_local_notifications` 21 | Foreground notifications |
-| `fl_chart` 1.1 | Charts & sparklines |
-| `easy_localization` 3.0 | Arabic/English i18n |
-| `provider` 6.1 | State management |
-| `shimmer` 3.0 | Loading animations |
-| `flutter_dotenv` 6.0 | Environment variables |
+| Package | Version | Purpose |
+|:--------|:-------:|:--------|
+| `supabase_flutter` 2.9 | — | Database + Auth |
+| `firebase_messaging` 15.x | — | Push notifications |
+| `fl_chart` 0.70 | — | Charts & graphs |
+| `easy_localization` 3.0 | — | Arabic/English i18n |
+| `provider` 6.1 | — | State management |
+| `shimmer` 3.0 | — | Loading animations |
+| `flutter_dotenv` 6.0 | — | Environment variables |
 
 **22 screens** with 100% feature parity to the web app.
 
@@ -497,6 +385,7 @@ Text('nav_dashboard'.tr())
 | **Firebase Admin** | Server-only SDK for secure push notifications |
 | **Environment Variables** | All secrets in `.env.local`, never committed |
 | **No Hardcoded Keys** | All credentials removed from source code |
+| **Error Monitoring** | Sentry for real-time error tracking |
 
 ---
 
@@ -520,7 +409,7 @@ npm install
 
 # 3. Configure environment
 cp .env.local.example .env.local
-# Fill in your Supabase and Firebase credentials
+# Fill in your Supabase, Firebase, and Sentry credentials
 
 # 4. Run database migrations
 # Apply files in supabase/migrations/ in order via Supabase SQL editor
@@ -557,6 +446,10 @@ CRON_SECRET=
 
 # External APIs
 TWELVE_DATA_API_KEY=
+
+# Sentry
+SENTRY_AUTH_TOKEN=
+NEXT_PUBLIC_SENTRY_DSN=
 ```
 
 ### Flutter Setup
@@ -602,6 +495,7 @@ npm run test:coverage
 | `lib/cache.ts` | 83.33% |
 | `types/index.ts` | 100% |
 | `lib/currency.ts` | 30.76% |
+| `api/health-score-snapshot` | ✅ |
 
 Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Library.
 
@@ -614,6 +508,7 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 - [x] Auth: Login, Register, Onboarding, Forgot Password
 - [x] Transactions: Full CRUD, Recurring, Multi-currency, CSV Export
 - [x] Debt Management: Auto-deduction, Progress, Confetti
+- [x] **Receivable Debts: Two-way tracking with collapsible sections**
 - [x] Smart Budgeting: 50/30/20 Rule, Category limits
 - [x] Investments: Live prices, Halal flag, P&L
 - [x] Savings Goals: Progress tracking, Icon/color
@@ -625,53 +520,46 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 - [x] Monthly PDF Reports: Print-ready A4
 - [x] Gamification: 20+ badges, 6 levels, streaks
 - [x] Islamic Daily Lessons
-- [x] Native Flutter Android App (54.5 MB APK)
+- [x] Native Flutter Android App
 - [x] PWA: Installable on all platforms
 - [x] Internationalization: Arabic + English, RTL support
 - [x] Google Play: Submitted for Closed Testing
+- [x] Sentry: Error monitoring
+- [x] Dynamic Testimonials: Supabase-backed reviews
+- [x] Download Page: Professional APK distribution page
+- [x] GitHub Actions CRON: Replaced Vercel CRON (free tier)
 
 ### 📋 In Progress
 
-- [ ] Subscription System (Paddle)
+- [ ] Subscription System (Paddle/Stripe)
 - [ ] AI Financial Advisor (GPT integration)
+- [ ] Receivable debt due date push notifications
 
 ---
 
 ## 📝 Changelog
 
-### الإصدار 6 (v3.15.0) — 30 مارس 2026 *(الأحدث)*
-
-| التغيير | الوصف |
-|:-------|:------|
-| 🔄 **إصلاحات تقنية** | حل مشكلة علامة التحميل (Spinner) في جميع الشاشات وتحسين استقرار التطبيق |
-| 📊 **تصنيفات ذكية** | فصل تصنيفات الدخل عن المصاريف وإضافة 7 تصنيفات مالية جديدة |
-| 🌄 **هوية موحدة** | توحيد رقم الإصدار مع جوجل بلاي (Build 6) وتحديث الشعار لشعار الشروق |
-
-### الإصدار 5 (v1.0.2) — 28 مارس 2026
-
-| التغيير | الوصف |
-|:-------|:------|
-| 🚀 **تحديث المتجر** | أول نسخة مستقرة تم رفعها للاختبار المغلق في جوجل بلاي |
-
-### الإصدار 3 (v1.0.1) — 28 مارس 2026
-
-| التغيير | الوصف |
-|:-------|:------|
-| 🔧 **إصلاحات عامة** | تحسينات في واجهة المستخدم ومعالجة بعض الأخطاء البرمجية |
-
-### الإصدار 2 (v1.0.0) — 23 مارس 2026
-
-| التغيير | الوصف |
-|:-------|:------|
-| 🎉 **الإطلاق التجريبي** | النسخة الأولى من فجرك (Beta Launch) |
-
----
+### v3.16.0 — 2026-03-31 *(Latest)*
 
 | Change | Description |
 |:-------|:------------|
-| 💎 **UI Modernization** | Premium redesign: gradients, glassmorphism, Cairo typography |
-| 🛡️ **Security Alignment** | All secrets migrated to `.env`; `secrets.dart` decommissioned |
-| 🎨 **Theme & Hydration** | Fixed primary color and Next.js hydration mismatches |
+| 💳 **Receivable Debts** | Two-way debt tracking — debts owed to you with collapsible sections |
+| 🔔 **Due Date Alerts** | Push notification before receivable debt due dates |
+| 🗃️ **DB Migration** | Added `debt_type` field to debts table |
+| 🌐 **i18n** | Full Arabic/English translations for new debt features |
+| 🐛 **Bug Fixes** | Fixed TypeScript errors in health-score API and debts page |
+
+### v3.15.0 — 2026-03-30
+
+| Change | Description |
+|:-------|:------------|
+| 🔄 **Technical Fixes** | Resolved spinner issues across all screens |
+| 📊 **Smart Categories** | Separated income/expense categories, added 7 new financial categories |
+| 🌄 **Unified Identity** | Synced version with Google Play (Build 6), updated to sunrise logo |
+| 📱 **Download Page** | Professional APK download page at `/download` |
+| 🌐 **Landing Page** | Dynamic testimonials from Supabase, improved CTAs |
+| 🔍 **Monitoring** | Added Sentry error tracking |
+| ⚙️ **CRON Optimization** | GitHub Actions runs at specific hours only (720 → 120 runs/month) |
 
 ### v3.10.0 — 2026-03-23
 
@@ -681,6 +569,12 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 | ⚡ **SEO & Performance** | SSR conversion + database indexes |
 | 🌍 **Localization** | 100% translation coverage |
 | 🏗️ **Settings Refactor** | Modularized settings components |
+
+### v1.0.0 — 2026-03-23
+
+| Change | Description |
+|:-------|:------------|
+| 🎉 **Beta Launch** | First version of Fajrak |
 
 ---
 
