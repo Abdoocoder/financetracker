@@ -16,29 +16,29 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   bool _loading = true;
   int _points = 0;
   int _level = 1;
-  String _levelTitle = '🌱 مبتدئ';
+  String _levelTitle = 'مبتدئ';
   int _nextLevel = 50;
   List<String> _badges = [];
 
   final _badgeInfo = {
-    'first_tx': ('⚡', 'الخطوة الأولى', '10 نقاط'),
-    'streak_3': ('🔥', '3 أيام متواصلة', '20 نقطة'),
-    'streak_7': ('💪', 'أسبوع كامل', '50 نقطة'),
-    'streak_30': ('🏆', 'شهر بدون توقف', '200 نقطة'),
-    'tx_50': ('📝', 'مسجّل نشيط', '30 نقطة'),
-    'tx_100': ('📊', 'محترف التتبع', '75 نقطة'),
-    'saver_10': ('💰', 'مدخر مبتدئ', '25 نقطة'),
-    'saver_20': ('💎', 'مدخر ذكي', '75 نقطة'),
-    'saver_30': ('👑', 'مدخر محترف', '150 نقطة'),
-    'debt_paid': ('🎉', 'محارب الديون', '100 نقطة'),
-    'debt_free': ('🦅', 'حر من الديون', '500 نقطة'),
-    'investor': ('📈', 'مستثمر مبتدئ', '100 نقطة'),
-    'inv_profit': ('🚀', 'استثمار رابح', '150 نقطة'),
-    'emergency': ('🛡️', 'صندوق الطوارئ', '200 نقطة'),
-    'net_positive': ('✨', 'صافي إيجابي', '50 نقطة'),
-    'lesson_3': ('📖', '3 دروس متواصلة', '15 نقطة'),
-    'lesson_7': ('🎓', 'أسبوع تعلم', '40 نقطة'),
-    'lesson_30': ('🧠', 'شهر من التعلم', '150 نقطة'),
+    'first_tx': (Icons.bolt, 'الخطوة الأولى', '10 نقاط'),
+    'streak_3': (Icons.local_fire_department, '3 أيام متواصلة', '20 نقطة'),
+    'streak_7': (Icons.fitness_center, 'أسبوع كامل', '50 نقطة'),
+    'streak_30': (Icons.emoji_events, 'شهر بدون توقف', '200 نقطة'),
+    'tx_50': (Icons.edit_note, 'مسجّل نشيط', '30 نقطة'),
+    'tx_100': (Icons.bar_chart, 'محترف التتبع', '75 نقطة'),
+    'saver_10': (Icons.savings, 'مدخر مبتدئ', '25 نقطة'),
+    'saver_20': (Icons.diamond, 'مدخر ذكي', '75 نقطة'),
+    'saver_30': (Icons.workspace_premium, 'مدخر محترف', '150 نقطة'),
+    'debt_paid': (Icons.celebration, 'محارب الديون', '100 نقطة'),
+    'debt_free': (Icons.flight_takeoff, 'حر من الديون', '500 نقطة'),
+    'investor': (Icons.show_chart, 'مستثمر مبتدئ', '100 نقطة'),
+    'inv_profit': (Icons.rocket_launch, 'استثمار رابح', '150 نقطة'),
+    'emergency': (Icons.shield, 'صندوق الطوارئ', '200 نقطة'),
+    'net_positive': (Icons.trending_up, 'صافي إيجابي', '50 نقطة'),
+    'lesson_3': (Icons.menu_book, '3 دروس متواصلة', '15 نقطة'),
+    'lesson_7': (Icons.school, 'أسبوع تعلم', '40 نقطة'),
+    'lesson_30': (Icons.psychology, 'شهر من التعلم', '150 نقطة'),
   };
 
   @override
@@ -73,28 +73,28 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         final points = (stats['points'] as num?)?.toInt() ?? 0;
         final badges = (stats['badges'] as List?)?.cast<String>() ?? [];
 
-        String levelTitle = '🌱 مبتدئ';
+        String levelTitle = 'مبتدئ';
         int level = 1;
         int nextLevel = 50;
         if (points >= 1200) {
           level = 6;
-          levelTitle = '👑 حر مالياً';
+          levelTitle = 'حر مالياً';
           nextLevel = 9999;
         } else if (points >= 700) {
           level = 5;
-          levelTitle = '💎 ثري مبتدئ';
+          levelTitle = 'ثري مبتدئ';
           nextLevel = 1200;
         } else if (points >= 350) {
           level = 4;
-          levelTitle = '📈 مستثمر';
+          levelTitle = 'مستثمر';
           nextLevel = 700;
         } else if (points >= 150) {
           level = 3;
-          levelTitle = '💪 مدخر';
+          levelTitle = 'مدخر';
           nextLevel = 350;
         } else if (points >= 50) {
           level = 2;
-          levelTitle = '🔥 متتبع';
+          levelTitle = 'متتبع';
           nextLevel = 150;
         }
 

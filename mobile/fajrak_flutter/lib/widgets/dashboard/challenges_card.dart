@@ -53,10 +53,10 @@ class _ChallengesCardState extends State<ChallengesCard> {
   }
 
   final _challenges = [
-    {'id': 1, 'icon': '🍔', 'title': 'challenge_1_title'.tr(), 'days': 7},
-    {'id': 2, 'icon': '💰', 'title': 'challenge_2_title'.tr(), 'days': 30},
-    {'id': 3, 'icon': '📉', 'title': 'challenge_3_title'.tr(), 'days': 30},
-    {'id': 4, 'icon': '🎯', 'title': 'challenge_4_title'.tr(), 'days': 14},
+    {'id': 1, 'icon': Icons.restaurant, 'title': 'challenge_1_title'.tr(), 'days': 7},
+    {'id': 2, 'icon': Icons.savings, 'title': 'challenge_2_title'.tr(), 'days': 30},
+    {'id': 3, 'icon': Icons.trending_down, 'title': 'challenge_3_title'.tr(), 'days': 30},
+    {'id': 4, 'icon': Icons.track_changes, 'title': 'challenge_4_title'.tr(), 'days': 14},
   ];
 
   @override
@@ -109,7 +109,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
         children: [
-          Text(active['icon'] as String, style: const TextStyle(fontSize: 36)),
+          Icon(active['icon'] as IconData, size: 36, color: colorScheme.primary),
           const SizedBox(height: 8),
           Text(active['title'] as String,
               style: TextStyle(
@@ -171,7 +171,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(c['icon'] as String, style: const TextStyle(fontSize: 22)),
+                Icon(c['icon'] as IconData, size: 22, color: color),
                 const SizedBox(height: 6),
                 Expanded(
                   child: Text(
@@ -196,7 +196,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${isCompleted ? '✅ ' : ''}${pct.toStringAsFixed(0)}%',
+                  '${isCompleted ? '✓ ' : ''}${pct.toStringAsFixed(0)}%',
                   style: TextStyle(
                       color: isCompleted
                           ? (isDark ? const Color(0xFF6EE7B7) : colorScheme.primary)

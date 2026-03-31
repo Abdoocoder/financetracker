@@ -22,21 +22,21 @@ class QuickLinksCards extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-            child: _buildCard(context, 'nav_debts'.tr(), '💳', totalDebt,
+            child: _buildCard(context, 'nav_debts'.tr(), Icons.credit_card, totalDebt,
                 const Color(0xFFEF4444), '/debts')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'nav_investments'.tr(), '📈', invValue,
+            child: _buildCard(context, 'nav_investments'.tr(), Icons.show_chart, invValue,
                 const Color(0xFF10B981), '/investments')),
         const SizedBox(width: 8),
         Expanded(
-            child: _buildCard(context, 'nav_goals'.tr(), '🛡️', goalsSaved,
+            child: _buildCard(context, 'nav_goals'.tr(), Icons.track_changes, goalsSaved,
                 const Color(0xFF3B7EF6), '/goals')),
       ],
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String icon,
+  Widget _buildCard(BuildContext context, String title, IconData icon,
       double value, Color color, String route) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
@@ -53,7 +53,7 @@ class QuickLinksCards extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(icon, style: const TextStyle(fontSize: 18)),
+            Icon(icon, size: 18, color: color),
             const SizedBox(height: 6),
             FittedBox(
               child: Text(

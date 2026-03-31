@@ -292,7 +292,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           border: Border.all(color: const Color(0x3310B981)),
                         ),
                         child: Row(children: [
-                          const Icon(Icons.savings, size: 16, color: Color(0xFF10B981)),
+                          const Icon(Icons.account_balance_wallet, size: 16, color: Color(0xFF10B981)),
                           const SizedBox(width: 4),
                           Expanded(child: Text('debts_tab_receivable'.tr(),
                             style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),

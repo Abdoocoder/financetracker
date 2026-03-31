@@ -6,7 +6,7 @@ import '../../utils/error_handler.dart';
 
 class AddGoalDialog extends StatefulWidget {
   final Map<String, dynamic>? existing;
-  final List<String> goalIcons;
+  final List<IconData> goalIcons;
   final VoidCallback onSaved;
 
   const AddGoalDialog({
@@ -24,7 +24,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _targetCtrl;
   late final TextEditingController _currentCtrl;
-  late String _selectedIcon;
+  late int _selectedIcon;
   late String _deadlineDate;
 
   @override
@@ -33,7 +33,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
     _nameCtrl = TextEditingController(text: widget.existing?['name'] ?? '');
     _targetCtrl = TextEditingController(text: widget.existing?['target_amount']?.toString() ?? '');
     _currentCtrl = TextEditingController(text: widget.existing?['current_amount']?.toString() ?? '0');
-    _selectedIcon = widget.existing?['icon'] as String? ?? '🎯';
+    _selectedIcon = int.tryParse(widget.existing?['icon']?.toString() ?? '') ?? Icons.track_changes.codePoint;
     _deadlineDate = widget.existing?['deadline'] as String? ?? '';
   }
 
@@ -51,7 +51,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
     final data = {
       'user_id': user.id,
       'name': _nameCtrl.text,
-      'icon': _selectedIcon,
+      'icon': _selectedIcon.toString(),
       'target_amount': double.tryParse(_targetCtrl.text) ?? 0,
       'current_amount': double.tryParse(_currentCtrl.text) ?? 0,
       'deadline': _deadlineDate.isEmpty ? null : _deadlineDate,
@@ -114,9 +114,9 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
             itemCount: widget.goalIcons.length,
             itemBuilder: (_, i) {
               final icon = widget.goalIcons[i];
-              final selected = icon == _selectedIcon;
+              final selected = icon.codePoint == _selectedIcon;
               return GestureDetector(
-                onTap: () => setState(() => _selectedIcon = icon),
+                onTap: () => setState(() => _selectedIcon = icon.codePoint),
                 child: Container(
                   decoration: BoxDecoration(
                     color: selected
@@ -127,7 +127,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                         color: selected ? colorScheme.primary : Colors.transparent),
                   ),
                   child: Center(
-                      child: Text(icon, style: const TextStyle(fontSize: 18))),
+                      child: Icon(icon, size: 18, color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant)),
                 ),
               );
             },

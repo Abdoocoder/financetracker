@@ -213,7 +213,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                   border: Border.all(color: _debtType == 'owed' ? const Color(0xFFEF4444) : Colors.transparent),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.credit_card, size: 16, color: Color(0xFFEF4444)),
                     const SizedBox(width: 6),
@@ -237,9 +237,9 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                   border: Border.all(color: _debtType == 'receivable' ? const Color(0xFF10B981) : Colors.transparent),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.savings, size: 16, color: Color(0xFF10B981)),
+                    const Icon(Icons.account_balance_wallet, size: 16, color: Color(0xFF10B981)),
                     const SizedBox(width: 6),
                     Text('debts_tab_receivable'.tr(),
                       style: TextStyle(color: _debtType == 'receivable' ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
