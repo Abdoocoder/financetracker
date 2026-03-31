@@ -21,20 +21,20 @@ class GoalSummaryCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(children: [
       Expanded(
-          child: _statCard('🎯', '$totalGoals', 'goals_count_label'.tr(),
+          child: _statCard(Icons.track_changes, '$totalGoals', 'goals_count_label'.tr(),
               colorScheme.primary)),
       const SizedBox(width: 8),
       Expanded(
-          child: _statCard('✅', '$completedGoals', 'goals_completed_label'.tr(),
+          child: _statCard(Icons.check_circle_outline, '$completedGoals', 'goals_completed_label'.tr(),
               const Color(0xFF10B981))),
       const SizedBox(width: 8),
       Expanded(
-          child: _statCard('💰', totalSaved.toStringAsFixed(0),
+          child: _statCard(Icons.savings, totalSaved.toStringAsFixed(0),
               'goals_saved_label'.tr(), colorScheme.secondary)),
     ]);
   }
 
-  Widget _statCard(String icon, String value, String label, Color color) {
+  Widget _statCard(IconData icon, String value, String label, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -42,7 +42,7 @@ class GoalSummaryCards extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withValues(alpha: 0.2))),
       child: Column(children: [
-        Text(icon, style: const TextStyle(fontSize: 20)),
+        Icon(icon, size: 20, color: color),
         const SizedBox(height: 4),
         Text(value,
             style: TextStyle(

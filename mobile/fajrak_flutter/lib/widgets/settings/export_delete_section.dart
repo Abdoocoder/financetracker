@@ -91,7 +91,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
       children: [
         // Export
         SettingsAccordion(
-          icon: '📥',
+          icon: Icons.file_download_outlined,
           title: 'settings_export'.tr(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,11 +130,11 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
         
         // Share
         SettingsAccordion(
-          icon: '🔗',
+          icon: Icons.share_outlined,
           title: 'share_title'.tr(),
           child: Column(
             children: [
-              const Text('🌄', style: TextStyle(fontSize: 40)),
+              Icon(Icons.landscape_outlined, size: 40, color: colorScheme.primary),
               const SizedBox(height: 10),
               Text(
                 'share_subtitle'.tr(),
@@ -178,7 +178,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
 
         // Danger Zone
         SettingsAccordion(
-          icon: '⚠️',
+          icon: Icons.warning_amber,
           title: 'settings_account_danger_zone'.tr(),
           child: Column(
             children: [
@@ -200,7 +200,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
-                    _loggingOut ? '⏳...' : 'settings_logout'.tr(),
+                    _loggingOut ? '...' : 'settings_logout'.tr(),
                     style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
                   ),
                 ),

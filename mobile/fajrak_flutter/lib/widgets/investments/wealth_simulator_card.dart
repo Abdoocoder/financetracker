@@ -43,7 +43,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                   color: colorScheme.secondary.withValues(alpha: 0.3)),
             ),
             child: Row(children: [
-              const Text('🚀', style: TextStyle(fontSize: 20)),
+              const Icon(Icons.rocket_launch, size: 20, color: Color(0xFF3B7EF6)),
               const SizedBox(width: 10),
               Expanded(
                   child: Text('wealthSimulator'.tr(),

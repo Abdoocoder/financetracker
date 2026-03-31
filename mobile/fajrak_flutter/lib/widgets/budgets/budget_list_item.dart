@@ -24,7 +24,7 @@ class BudgetListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final cat = localizedCategories.firstWhere(
         (c) => c['key'] == budget['category'],
-        orElse: () => {'key': budget['category'], 'icon': '📝'});
+        orElse: () => {'key': budget['category'], 'icon': Icons.edit_note});
     final limit = (budget['monthly_limit'] as num).toDouble();
     final pct = limit > 0 ? (spent / limit).clamp(0.0, 1.0) : 0.0;
     final over = spent > limit;
@@ -57,8 +57,8 @@ class BudgetListItem extends StatelessWidget {
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12)),
               child: Center(
-                  child: Text(cat['icon'] as String,
-                      style: const TextStyle(fontSize: 22)))),
+                  child: Icon(cat['icon'] as IconData,
+                      size: 22, color: color))),
           const SizedBox(width: 12),
           Expanded(
               child: Column(
@@ -71,7 +71,7 @@ class BudgetListItem extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         fontSize: 14)),
                 Text(
-                    '${spent.toStringAsFixed(0)} / ${limit.toStringAsFixed(0)} $currency${over ? ' ⚠️ تجاوزت!' : warn ? ' 🔶 اقتربت' : ''}',
+                    '${spent.toStringAsFixed(0)} / ${limit.toStringAsFixed(0)} $currency${over ? ' ⚠ تجاوزت!' : warn ? ' ◼ اقتربت' : ''}',
                     style: TextStyle(
                         color: color,
                         fontFamily: 'Cairo',

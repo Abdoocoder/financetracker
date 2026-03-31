@@ -52,13 +52,12 @@ class BadgeGrid extends StatelessWidget {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(info.$1,
-                      style: TextStyle(
-                          fontSize: 28,
-                          color: earned
-                              ? null
-                              : colorScheme.outlineVariant
-                                  .withValues(alpha: 0.5))),
+                  Icon(info.$1 as IconData,
+                      size: 28,
+                      color: earned
+                          ? colorScheme.primary
+                          : colorScheme.outlineVariant
+                              .withValues(alpha: 0.5)),
                   const SizedBox(height: 6),
                   Text(info.$2,
                       style: TextStyle(

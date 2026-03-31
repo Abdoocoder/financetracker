@@ -38,7 +38,7 @@ class AIGeneratorCard extends StatelessWidget {
                         color: colorScheme.primary.withValues(alpha: 0.4),
                         blurRadius: 16)
                   ]),
-              child: const Center(child: Text('🤖', style: TextStyle(fontSize: 20)))),
+              child: const Center(child: Icon(Icons.smart_toy, size: 20, color: Colors.white))),
           const SizedBox(width: 12),
           Expanded(
               child: Column(

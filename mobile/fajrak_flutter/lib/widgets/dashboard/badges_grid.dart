@@ -23,42 +23,42 @@ class BadgesGrid extends StatelessWidget {
     final badges = [
       {
         'id': 'first_step',
-        'icon': '🎯',
+        'icon': Icons.flag,
         'title': 'الخطوة الأولى',
         'desc': 'أول معاملة',
         'done': txCount >= 1
       },
       {
         'id': 'saver',
-        'icon': '💰',
+        'icon': Icons.savings,
         'title': 'المدخر المثابر',
         'desc': '5 معاملات',
         'done': txCount >= 5
       },
       {
         'id': 'debt_crusher',
-        'icon': '⚒️',
+        'icon': Icons.gavel,
         'title': 'قاهر الديون',
         'desc': 'سداد أول دين',
         'done': paidDebts >= 1
       },
       {
         'id': 'investor',
-        'icon': '📈',
+        'icon': Icons.show_chart,
         'title': 'المستثمر الذكي',
         'desc': 'أول استثمار',
         'done': hasInvestments
       },
       {
         'id': 'goal_reacher',
-        'icon': '🏆',
+        'icon': Icons.emoji_events,
         'title': 'محقق الأحلام',
         'desc': 'تحقيق أول هدف',
         'done': reachedGoals >= 1
       },
       {
         'id': 'scholar',
-        'icon': '📚',
+        'icon': Icons.menu_book,
         'title': 'المتعلم المواظب',
         'desc': '7 أيام متتالية',
         'done': streak >= 7
@@ -104,8 +104,9 @@ class BadgesGrid extends StatelessWidget {
                 children: [
                   Opacity(
                     opacity: isDone ? 1.0 : 0.2,
-                    child: Text(b['icon'] as String,
-                        style: const TextStyle(fontSize: 28)),
+                    child: Icon(b['icon'] as IconData,
+                        size: 28,
+                        color: isDone ? const Color(0xFF10B981) : const Color(0xFF64748B)),
                   ),
                   const SizedBox(height: 6),
                   Text(b['title'] as String,

@@ -36,7 +36,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     final colorScheme = theme.colorScheme;
 
     return SettingsAccordion(
-      icon: '⚙️',
+      icon: Icons.settings,
       title: 'settings_preferences'.tr(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

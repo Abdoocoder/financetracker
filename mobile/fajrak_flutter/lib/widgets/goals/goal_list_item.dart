@@ -44,7 +44,7 @@ class GoalListItem extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           if ((goal['icon'] as String?) != null)
-            Text(goal['icon'] as String, style: const TextStyle(fontSize: 22)),
+            Icon(IconData(int.tryParse(goal['icon'] as String) ?? Icons.track_changes.codePoint, fontFamily: 'MaterialIcons'), size: 22, color: color),
           if ((goal['icon'] as String?) != null) const SizedBox(width: 8),
           Expanded(
               child: Text(goal['name'] ?? '',
@@ -53,7 +53,7 @@ class GoalListItem extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Cairo',
                       fontSize: 15))),
-          if (isDone) const Text('✅', style: TextStyle(fontSize: 18)),
+          if (isDone) Icon(Icons.check_circle_outline, size: 18, color: color),
           const SizedBox(width: 8),
           GestureDetector(
               onTap: () => onEdit(goal),

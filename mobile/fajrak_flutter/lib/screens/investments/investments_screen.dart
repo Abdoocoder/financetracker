@@ -225,7 +225,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                           border:
                               Border.all(color: colorScheme.outlineVariant)),
                       child: Column(children: [
-                        const Text('📈', style: TextStyle(fontSize: 48)),
+                        Icon(Icons.show_chart, size: 48, color: colorScheme.onSurfaceVariant),
                         const SizedBox(height: 12),
                         Text('inv_empty'.tr(),
                             style: TextStyle(
@@ -266,7 +266,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                             color: const Color(0xFF10B981)
                                 .withValues(alpha: 0.15))),
                     child: Row(children: [
-                      const Text('🕌', style: TextStyle(fontSize: 18)),
+                      Icon(Icons.mosque, size: 18, color: const Color(0xFF10B981)),
                       const SizedBox(width: 10),
                       Expanded(
                           child: Text(
