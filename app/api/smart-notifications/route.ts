@@ -323,6 +323,59 @@ async function wealthGuidanceAlert() {
   }
 }
 
+// ── 6 ص: تذكير موعد الديون التي لك ─────────────────
+async function receivableDebtReminder() {
+  const todayStr = today()
+  const tomorrow = new Date(new Date().getTime() + 3 * 60 * 60 * 1000 + 86400000)
+    .toISOString().split('T')[0]
+
+  const { data: profiles } = await supabase
+    .from('profiles').select('id, full_name, lang')
+  if (!profiles?.length) return
+
+  await Promise.all(profiles.map(async (p) => {
+    const name = p.full_name?.split(' ')[0] ?? 'أخي'
+    const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
+
+    const { data: debts } = await supabase.from('debts')
+      .select('id, name, remaining_amount, currency, due_date')
+      .eq('user_id', p.id)
+      .eq('is_paid', false)
+      .eq('debt_type', 'receivable')
+      .not('due_date', 'is', null)
+
+    if (!debts?.length) return
+
+    for (const debt of debts) {
+      const dueDate = debt.due_date
+      const amount = Number(debt.remaining_amount).toFixed(0)
+      const currency = debt.currency || 'JOD'
+
+      // إشعار قبل يوم
+      if (dueDate === tomorrow) {
+        const title = userLang === 'ar'
+          ? `💰 غداً موعد استلام دينك`
+          : `💰 Debt due tomorrow`
+        const body = userLang === 'ar'
+          ? `غداً موعد استلام ${amount} ${currency} من "${debt.name}" — هل تواصلت معه؟`
+          : `${amount} ${currency} from "${debt.name}" is due tomorrow — did you reach out?`
+        await sendPushToUser(p.id, title, body, '/dashboard/debts', 'receivable-debt')
+      }
+
+      // إشعار في نفس اليوم
+      if (dueDate === todayStr) {
+        const title = userLang === 'ar'
+          ? `💰 اليوم موعد استلام دينك!`
+          : `💰 Debt due today!`
+        const body = userLang === 'ar'
+          ? `اليوم موعد استلام ${amount} ${currency} من "${debt.name}" — هل استلمته؟`
+          : `${amount} ${currency} from "${debt.name}" is due today — did you receive it?`
+        await sendPushToUser(p.id, title, body, '/dashboard/debts', 'receivable-debt')
+      }
+    }
+  }))
+}
+
 // ── Main handler ──────────────────────────────────────
 
 // ── Smart Nudge: مستخدمين غير نشطين 3 أيام ─────────
@@ -367,7 +420,7 @@ export async function GET(request: NextRequest) {
 
   // 6 ص — صباحي + تنبيهات ذكية معاً (تنبيه واحد فقط)
   if (hour === 6) {
-    await Promise.all([dailyMorningReminder(), smartAlerts()])
+    await Promise.all([dailyMorningReminder(), smartAlerts(), receivableDebtReminder()])
     tasks.push('morning+alerts')
     tasks.push('nudge')
   }
