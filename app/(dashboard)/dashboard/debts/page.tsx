@@ -207,6 +207,24 @@ export default function DebtsPage() {
     setShowForm(true)
   }
 
+  async function receiveDebt(debt: Debt) {
+    if (!currentUser) return
+    const { error } = await supabase.from('debts').update({ is_paid: true }).eq('id', debt.id)
+    if (error) { toast.error(t('toast_error_save')); return }
+    await supabase.from('transactions').insert({
+      user_id: currentUser.id,
+      type: 'income',
+      amount: Number(debt.remaining_amount),
+      category: lang === 'ar' ? 'دين مستلم' : 'Debt Received',
+      description: lang === 'ar' ? `استلام دين: ${debt.name}` : `Debt Received: ${debt.name}`,
+      transaction_date: new Date().toISOString().split('T')[0],
+    })
+    toast.success(t('debts_received_msg'))
+    setCelebration(debt.name)
+    setShowConfetti(true)
+    await load(true)
+  }
+
   async function saveDebt() {
     if (!form.name || (!form.original_amount && !form.original_amount_foreign)) { toast.warning(t('toast_fill_required')); return }
     setSaving(true)
@@ -513,9 +531,13 @@ export default function DebtsPage() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                      <button onClick={() => receiveDebt(debt)}
+                        style={{ flex: 1, padding: '7px 14px', borderRadius: 8, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10B981', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        ✅ {t('debts_receive_btn')}
+                      </button>
                       <button onClick={() => startEdit(debt)}
                         style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
-                        ✏️ تعديل
+                        ✏️
                       </button>
                       <button onClick={() => setConfirmDelete(debt.id)}
                         style={{ padding: '7px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
