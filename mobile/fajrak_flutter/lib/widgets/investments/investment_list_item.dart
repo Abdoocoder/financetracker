@@ -261,7 +261,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
-            child: Text('inv_tx_history'.tr().replaceAll('📋 ', ''),
+            child: Text('inv_tx_history'.tr(),
                 style: TextStyle(
                     fontFamily: 'Cairo',
                     fontSize: 11,

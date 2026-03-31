@@ -261,7 +261,7 @@ class _DebtListItemState extends State<DebtListItem> {
             ],
             if (widget.debt['due_date'] != null) ...[
               const SizedBox(width: 6),
-                child: Row(
+                Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.calendar_today, size: 10, color: Color(0xFFF59E0B)),
@@ -318,9 +318,15 @@ class _DebtListItemState extends State<DebtListItem> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                      child: _payingSaving 
+                GestureDetector(
+                  onTap: _payingSaving ? null : _makePayment,
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(8)),
+                      child: _payingSaving
                           ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                           : const Icon(Icons.check, color: Colors.white, size: 14)),
+                ),
                 const SizedBox(width: 4),
                 GestureDetector(
                   onTap: () { setState(() { _isPaying = false; _paymentCtrl.clear(); }); },

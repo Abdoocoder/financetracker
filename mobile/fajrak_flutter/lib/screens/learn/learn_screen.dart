@@ -25,7 +25,7 @@ class _LearnScreenState extends State<LearnScreen> {
   bool _sharing = false;
 
   final _stageInfo = {
-    'awareness': (Icons.sprout, 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
+    'awareness': (Icons.eco, 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
     'debt': (Icons.credit_card, 'learn_stage_debt'.tr(), const Color(0xFFEF4444)),
     'emergency': (Icons.shield, 'learn_stage_emergency'.tr(), const Color(0xFFF59E0B)),
     'investing': (Icons.trending_up, 'learn_stage_investing'.tr(), const Color(0xFF10B981)),
