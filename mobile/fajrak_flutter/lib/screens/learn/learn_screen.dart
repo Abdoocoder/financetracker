@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/learn/financial_roadmap.dart';
+import 'dart:ui' as ui;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class LearnScreen extends StatefulWidget {
   const LearnScreen({super.key});
@@ -18,6 +22,7 @@ class _LearnScreenState extends State<LearnScreen> {
   int _streak = 0;
   String _stage = 'awareness';
   Map<String, String> _lesson = {'title': '', 'body': '', 'url': ''};
+  bool _sharing = false;
 
   final _stageInfo = {
     'awareness': ('🌱', 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
@@ -294,6 +299,174 @@ class _LearnScreenState extends State<LearnScreen> {
     }
   }
 
+  Future<void> _shareLesson() async {
+    if (_lesson['title']?.isEmpty ?? true) return;
+    if (_sharing) return;
+
+    setState(() => _sharing = true);
+    HapticFeedback.lightImpact();
+
+    try {
+      const double W = 1080;
+      const double H = 1350;
+
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, W, H));
+
+      // 1. Background
+      final Rect bgRect = Rect.fromLTWH(0, 0, W, H);
+      final Paint bgPaint = Paint()
+        ..shader = ui.Gradient.linear(
+          const Offset(0, 0),
+          const Offset(0, H),
+          [const Color(0xFF0A1628), const Color(0xFF162440)],
+        );
+      canvas.drawRect(bgRect, bgPaint);
+
+      // 2. Glow
+      final Paint glowPaint = Paint()
+        ..shader = ui.Gradient.radial(
+          const Offset(W / 2, 160),
+          400,
+          [
+            const Color(0xFFF59E0B).withValues(alpha: 0.12),
+            const Color(0xFFF59E0B).withValues(alpha: 0)
+          ],
+        );
+      canvas.drawRect(bgRect, glowPaint);
+
+      // 3. Logo
+      final ByteData data = await rootBundle.load('assets/images/app_icon.png');
+      final ui.Codec codec = await ui.instantiateImageCodec(
+          data.buffer.asUint8List(),
+          targetWidth: 120,
+          targetHeight: 120);
+      final ui.FrameInfo fi = await codec.getNextFrame();
+      final ui.Image logo = fi.image;
+
+      const double logoSize = 120;
+      const double logoX = (W - logoSize) / 2;
+      const double logoY = 50;
+
+      canvas.save();
+      canvas.clipRRect(RRect.fromRectAndRadius(
+          Rect.fromLTWH(logoX, logoY, logoSize, logoSize),
+          const Radius.circular(24)));
+      canvas.drawImage(logo, const Offset(logoX, logoY), Paint());
+      canvas.restore();
+
+      // 4. App Name (Fajrak)
+      final titleParagraphStyle = ui.ParagraphStyle(
+        textAlign: TextAlign.center,
+        fontFamily: 'Cairo',
+        fontSize: 52,
+        fontWeight: FontWeight.bold,
+        textDirection: ui.TextDirection.rtl,
+      );
+      final titleBuilder = ui.ParagraphBuilder(titleParagraphStyle)
+        ..pushStyle(ui.TextStyle(color: const Color(0xFFF59E0B)))
+        ..addText('فجرك');
+      final titleParagraph = titleBuilder.build()
+        ..layout(const ui.ParagraphConstraints(width: W));
+      canvas.drawParagraph(titleParagraph, const Offset(0, 225));
+
+      // 5. Separator Line
+      final Paint linePaint = Paint()
+        ..shader = ui.Gradient.linear(
+          const Offset(80, 0),
+          const Offset(W - 80, 0),
+          [
+            const Color(0x00F59E0B),
+            const Color(0xCCF59E0B),
+            const Color(0x00F59E0B)
+          ],
+          [0.0, 0.5, 1.0],
+        )
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke;
+      canvas.drawLine(
+          const Offset(80, 250), const Offset(W - 80, 250), linePaint);
+
+      // 6. Lesson Title
+      final lessonTitleStyle = ui.ParagraphStyle(
+        textAlign: TextAlign.center,
+        fontFamily: 'Cairo',
+        fontSize: 52,
+        fontWeight: FontWeight.bold,
+        textDirection: ui.TextDirection.rtl,
+      );
+      final lessonTitleBuilder = ui.ParagraphBuilder(lessonTitleStyle)
+        ..pushStyle(ui.TextStyle(color: const Color(0xFFFFFFFF)))
+        ..addText(_lesson['title'] ?? '');
+      final lessonTitleParagraph = lessonTitleBuilder.build()
+        ..layout(const ui.ParagraphConstraints(width: W - 160));
+      canvas.drawParagraph(lessonTitleParagraph, const Offset(80, 310));
+
+      final double titleHeight = lessonTitleParagraph.height;
+
+      // 7. Lesson Body
+      final lessonBodyStyle = ui.ParagraphStyle(
+        textAlign: TextAlign.center,
+        fontFamily: 'Cairo',
+        fontSize: 36,
+        textDirection: ui.TextDirection.rtl,
+      );
+      final lessonBodyBuilder = ui.ParagraphBuilder(lessonBodyStyle)
+        ..pushStyle(ui.TextStyle(color: const Color(0xFF94A3B8)))
+        ..addText(_lesson['body'] ?? '');
+      final lessonBodyParagraph = lessonBodyBuilder.build()
+        ..layout(const ui.ParagraphConstraints(width: W - 160));
+      canvas.drawParagraph(
+          lessonBodyParagraph, Offset(80, 310 + titleHeight + 20));
+
+      // 8. Bottom Line
+      canvas.drawLine(
+          const Offset(80, H - 120), const Offset(W - 80, H - 120), linePaint);
+
+      // 9. Bottom Link
+      final linkStyle = ui.ParagraphStyle(
+        textAlign: TextAlign.center,
+        fontFamily: 'Cairo',
+        fontSize: 34,
+      );
+      final linkBuilder = ui.ParagraphBuilder(linkStyle)
+        ..pushStyle(ui.TextStyle(color: const Color(0xFF64748B)))
+        ..addText('fajrak.com');
+      final linkParagraph = linkBuilder.build()
+        ..layout(const ui.ParagraphConstraints(width: W));
+      canvas.drawParagraph(linkParagraph, const Offset(0, H - 65));
+
+      // Save to Image
+      final ui.Image pic =
+          await recorder.endRecording().toImage(W.toInt(), H.toInt());
+      final ByteData? byteData =
+          await pic.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) throw Exception('Failed to encode image');
+
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/fajrak-lesson.png');
+      await file.writeAsBytes(pngBytes);
+
+      if (!mounted) return;
+      final isAr = context.locale.languageCode == 'ar';
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          text: isAr ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak",
+        ),
+      );
+    } catch (e, st) {
+      if (mounted) {
+        ErrorHandler.handle(e,
+            st: st, context: context, developerMessage: 'Share Lesson Failure');
+      }
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -411,42 +584,71 @@ class _LearnScreenState extends State<LearnScreen> {
                       fontFamily: 'Cairo',
                       height: 1.7)),
               const SizedBox(height: 20),
-              if (!_completed)
-                SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _markComplete,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+              Row(
+                children: [
+                  Expanded(
+                    child: !_completed
+                        ? ElevatedButton(
+                            onPressed: _markComplete,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF10B981),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: Text('learn_complete_lesson'.tr(),
+                                style: const TextStyle(
+                                    fontFamily: 'Cairo',
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15)),
+                          )
+                        : Container(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFF10B981)
+                                    .withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                    color: const Color(0xFF10B981)
+                                        .withValues(alpha: 0.3))),
+                            child: Center(
+                                child: Text('learn_completed_msg'.tr(),
+                                    style: const TextStyle(
+                                        color: Color(0xFF10B981),
+                                        fontFamily: 'Cairo',
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 15))),
+                          ),
+                  ),
+                  const SizedBox(width: 10),
+                  InkWell(
+                    onTap: _sharing ? null : _shareLesson,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 11),
+                      decoration: BoxDecoration(
+                        color: _sharing
+                            ? const Color(0xFFF59E0B).withValues(alpha: 0.05)
+                            : const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: const Color(0xFFF59E0B)
+                                .withValues(alpha: 0.3)),
                       ),
-                      child: Text('learn_complete_lesson'.tr(),
-                          style: const TextStyle(
-                              fontFamily: 'Cairo',
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15)),
-                    ))
-              else
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                          color:
-                              const Color(0xFF10B981).withValues(alpha: 0.3))),
-                  child: Center(
-                      child: Text('learn_completed_msg'.tr(),
-                          style: const TextStyle(
-                              color: Color(0xFF10B981),
-                              fontFamily: 'Cairo',
-                              fontWeight: FontWeight.w900,
-                              fontSize: 15))),
-                ),
+                      child: _sharing
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Color(0xFFF59E0B)))
+                          : const Text('📤', style: TextStyle(fontSize: 18)),
+                    ),
+                  )
+                ],
+              ),
             ]),
           ),
           const SizedBox(height: 16),
