@@ -9,6 +9,7 @@ import '../../widgets/investments/portfolio_chart_card.dart';
 import '../../widgets/investments/wealth_simulator_card.dart';
 import '../../widgets/investments/investment_list_item.dart';
 import '../../widgets/investments/add_investment_dialog.dart';
+import '../../widgets/investments/investment_cash_card.dart';
 import '../../services/investments_service.dart';
 
 class InvestmentsScreen extends StatefulWidget {
@@ -23,6 +24,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   bool _showInUsd = true;
   static const _jodRate = 0.709;
   String _currency = 'JOD';
+  double _cashBalance = 0;
+  String _cashCurrency = 'USD';
 
   @override
   void initState() {
@@ -39,10 +42,23 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       final results = await Future.wait(<Future<dynamic>>[
         Supabase.instance.client.from('investments').select('*').eq('user_id', user.id),
         Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single(),
+        Supabase.instance.client.from('investment_cash').select('*').eq('user_id', user.id),
       ]);
       final data = results[0] as List;
       final profile = results[1] as Map<String, dynamic>;
-      if (mounted) setState(() => _currency = profile['currency'] as String? ?? 'JOD');
+      final cashData = results[2] as List;
+
+      if (mounted) {
+        setState(() {
+          _currency = profile['currency'] as String? ?? 'JOD';
+          if (cashData.isNotEmpty) {
+            _cashBalance = (cashData[0]['balance'] as num).toDouble();
+            _cashCurrency = cashData[0]['currency'] as String? ?? 'USD';
+          } else {
+            _cashBalance = 0;
+          }
+        });
+      }
       
       var investments = List<Map<String, dynamic>>.from(data);
 
@@ -215,6 +231,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   const SizedBox(height: 16),
                   WealthSimulatorCard(currency: _currency),
                   const SizedBox(height: 16),
+                  InvestmentCashCard(
+                    balance: _cashBalance,
+                    currency: _cashCurrency,
+                    accountCurrency: _currency,
+                    onTransferred: _load,
+                  ),
                   if (_investments.isEmpty)
                     Container(
                       padding: const EdgeInsets.all(40),
