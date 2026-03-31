@@ -53,7 +53,7 @@ class GoalListItem extends StatelessWidget {
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Cairo',
                       fontSize: 15))),
-          if (isDone) const Text('✅', style: TextStyle(fontSize: 18)),
+          if (isDone) Icon(Icons.check_circle_outline, size: 18, color: color),
           const SizedBox(width: 8),
           GestureDetector(
               onTap: () => onEdit(goal),

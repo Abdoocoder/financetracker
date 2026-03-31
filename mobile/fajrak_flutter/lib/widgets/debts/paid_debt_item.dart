@@ -18,7 +18,7 @@ class PaidDebtItem extends StatelessWidget {
           border: Border.all(
               color: const Color(0xFF10B981).withValues(alpha: 0.15))),
       child: Row(children: [
-        const Text('✅', style: TextStyle(fontSize: 24)),
+        const Icon(Icons.check_circle, size: 24, color: Color(0xFF10B981)),
         const SizedBox(width: 12),
         Expanded(
             child: Column(

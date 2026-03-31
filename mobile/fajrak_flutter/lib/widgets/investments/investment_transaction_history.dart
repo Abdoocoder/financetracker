@@ -115,8 +115,8 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                               color: color.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(10)),
                           child: Center(
-                              child: Text(isBuy ? '📈' : '📉',
-                                  style: const TextStyle(fontSize: 16)))),
+                              child: Icon(isBuy ? Icons.trending_up : Icons.trending_down,
+                                  size: 16, color: color))),
                       const SizedBox(width: 12),
                       Expanded(
                           child: Column(

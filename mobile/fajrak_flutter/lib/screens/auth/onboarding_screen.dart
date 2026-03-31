@@ -187,7 +187,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Text('✨', style: TextStyle(fontSize: 80)),
+            child: Icon(Icons.auto_awesome, size: 80, color: colorScheme.primary),
           ),
           const SizedBox(height: 40),
           Text(
@@ -209,7 +209,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _slideIncome(ColorScheme colorScheme) {
     return _slideBase(
       colorScheme: colorScheme,
-      icon: '💰',
+      icon: Icons.account_balance_wallet_outlined,
       title: 'settings_income'.tr(),
       subtitle: 'onboarding_income_subtitle'.tr(),
       child: TextFormField(
@@ -232,7 +232,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _slideSalaryDay(ColorScheme colorScheme) {
     return _slideBase(
       colorScheme: colorScheme,
-      icon: '📅',
+      icon: Icons.calendar_today_outlined,
       title: 'onboarding_payday_title'.tr(),
       subtitle: 'onboarding_payday_subtitle'.tr(),
       child: Column(
@@ -267,7 +267,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget _slideSummary(ColorScheme colorScheme) {
     return _slideBase(
       colorScheme: colorScheme,
-      icon: '🌍',
+      icon: Icons.public,
       title: 'settings_currency'.tr(),
       subtitle: 'onboarding_currency_subtitle'.tr(),
       child: Wrap(
@@ -299,13 +299,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slideBase({required ColorScheme colorScheme, required String icon, required String title, required String subtitle, required Widget child}) {
+  Widget _slideBase({required ColorScheme colorScheme, required IconData icon, required String title, required String subtitle, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 50)),
+          Icon(icon, size: 50, color: colorScheme.primary),
           const SizedBox(height: 20),
           Text(title, style: TextStyle(color: colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
           const SizedBox(height: 8),

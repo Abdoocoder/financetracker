@@ -356,7 +356,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text('💸', style: TextStyle(fontSize: 48)),
+                            Icon(Icons.payments_outlined, size: 48, color: colorScheme.onSurfaceVariant),
                             const SizedBox(height: 16),
                             Text('trans_empty'.tr(),
                                 style: TextStyle(

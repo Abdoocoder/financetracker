@@ -187,7 +187,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                           fontSize: 14)),
                   if (isHalal) ...[
                     const SizedBox(width: 6),
-                    const Text('🕌', style: TextStyle(fontSize: 12))
+                    Icon(Icons.mosque, size: 12, color: colorScheme.onSurfaceVariant)
                   ],
                 ]),
                 Text(

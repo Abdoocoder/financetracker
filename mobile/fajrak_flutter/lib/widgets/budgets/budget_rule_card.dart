@@ -30,7 +30,7 @@ class BudgetRuleCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(14),
           child: Row(children: [
-            const Text('⚖️', style: TextStyle(fontSize: 18)),
+            Icon(Icons.balance, size: 18, color: colorScheme.primary),
             const SizedBox(width: 8),
             Expanded(
                 child: Text('dash_rule_503020'.tr(),

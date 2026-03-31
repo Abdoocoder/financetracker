@@ -83,7 +83,7 @@ class _ProfileFormState extends State<ProfileForm> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return SettingsAccordion(
-      icon: '👤',
+      icon: Icons.person_outline,
       title: 'settings_profile_info'.tr(),
       initiallyExpanded: true,
       child: Column(

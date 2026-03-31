@@ -87,7 +87,7 @@ class _AssetsFormState extends State<AssetsForm> {
     final displayedNetWorth = widget.cashBalance + widget.savings + widget.investments + totalDynamicAssets - widget.totalDebt;
 
     return SettingsAccordion(
-      icon: '💎',
+      icon: Icons.diamond_outlined,
       title: 'settings_assets_title'.tr(),
       badge: 'settings_net_worth'.tr(),
       child: Column(
