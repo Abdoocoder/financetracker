@@ -40,7 +40,9 @@
       "Bash(find /c/Users/skyli/Documents/financetracker/public -type f -name *.apk)",
       "WebFetch(domain:fajrak.com)",
       "Bash(head -30 grep -n \"user_id\\\\|\\\\.id\\\\b\\\\|insert\\\\|upsert\\\\|select\\\\|eq\\(\" c:/Users/skyli/Documents/financetracker/app/api/testimonials/route.ts)",
-      "Bash(grep -rn saving_challenges c:/Users/skyli/Documents/financetracker/ --include=*.ts --include=*.tsx)"
+      "Bash(grep -rn saving_challenges c:/Users/skyli/Documents/financetracker/ --include=*.ts --include=*.tsx)",
+      "Bash(find /c/Users/skyli/Documents/financetracker/lib -type f -name *.ts)",
+      "Bash(ls -la /c/Users/skyli/Documents/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)"
     ]
   }
 }

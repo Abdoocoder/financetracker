@@ -7,6 +7,23 @@ import { haptic } from '@/lib/haptic'
 import { getLessonForStage, determineStage, type FinancialStage, type DailyLesson } from '@/lib/daily-lessons'
 import { PageHeader } from '@/components/ui/page-header'
 
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let current = ''
+  for (const word of words) {
+    const test = current ? current + ' ' + word : word
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current)
+      current = word
+    } else {
+      current = test
+    }
+  }
+  if (current) lines.push(current)
+  return lines
+}
+
 const stageInfo = {
   awareness:  { ar: 'مرحلة الوعي',      en: 'Awareness Stage',      icon: '🌱', color: '#8B5CF6' },
   debt:       { ar: 'مرحلة سداد الديون', en: 'Debt Freedom Stage',   icon: '💳', color: '#EF4444' },
@@ -26,6 +43,7 @@ export default function LearnPage() {
   const [loading, setLoading] = useState(true)
   const [completed, setCompleted] = useState(false)
   const [streak, setStreak] = useState(0)
+  const [sharing, setSharing] = useState(false)
 
   const loadLesson = useCallback(async () => {
     if (!user) return
@@ -128,6 +146,119 @@ export default function LearnPage() {
     })
   }
 
+  async function shareLesson() {
+    if (!lesson || sharing) return
+    setSharing(true)
+    haptic(50)
+    try {
+      const W = 1080, H = 1350
+      const canvas = document.createElement('canvas')
+      canvas.width = W
+      canvas.height = H
+      const ctx = canvas.getContext('2d')!
+
+      // انتظار تحميل الخطوط
+      await document.fonts.ready
+
+      // خلفية متدرجة كحلية
+      const bg = ctx.createLinearGradient(0, 0, 0, H)
+      bg.addColorStop(0, '#0A1628')
+      bg.addColorStop(1, '#162440')
+      ctx.fillStyle = bg
+      ctx.fillRect(0, 0, W, H)
+
+      // لمعة ذهبية في الزاوية
+      const glow = ctx.createRadialGradient(W / 2, 160, 0, W / 2, 160, 400)
+      glow.addColorStop(0, 'rgba(245,158,11,0.12)')
+      glow.addColorStop(1, 'rgba(245,158,11,0)')
+      ctx.fillStyle = glow
+      ctx.fillRect(0, 0, W, H)
+
+      // شعار التطبيق
+      const logo = new Image()
+      logo.src = '/icon-512.png'
+      await new Promise<void>(res => { logo.onload = () => res(); logo.onerror = () => res() })
+      ctx.save()
+      ctx.beginPath()
+      ctx.roundRect(W / 2 - 60, 50, 120, 120, 24)
+      ctx.clip()
+      ctx.drawImage(logo, W / 2 - 60, 50, 120, 120)
+      ctx.restore()
+
+      // اسم التطبيق
+      ctx.direction = 'rtl'
+      ctx.textAlign = 'center'
+      ctx.font = 'bold 52px Cairo, Arial'
+      ctx.fillStyle = '#F59E0B'
+      ctx.fillText('فجرك', W / 2, 225)
+
+      // خط فاصل ذهبي
+      const lineGrad = ctx.createLinearGradient(80, 0, W - 80, 0)
+      lineGrad.addColorStop(0, 'rgba(245,158,11,0)')
+      lineGrad.addColorStop(0.5, 'rgba(245,158,11,0.8)')
+      lineGrad.addColorStop(1, 'rgba(245,158,11,0)')
+      ctx.strokeStyle = lineGrad
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(80, 250)
+      ctx.lineTo(W - 80, 250)
+      ctx.stroke()
+
+      // عنوان الدرس
+      ctx.font = 'bold 52px Cairo, Arial'
+      ctx.fillStyle = '#FFFFFF'
+      const titleLines = wrapText(ctx, lesson.title, W - 160)
+      let y = 330
+      for (const line of titleLines) {
+        ctx.fillText(line, W / 2, y)
+        y += 68
+      }
+
+      y += 20
+
+      // نص الدرس
+      ctx.font = '36px Cairo, Arial'
+      ctx.fillStyle = '#94A3B8'
+      const bodyLines = wrapText(ctx, lesson.body, W - 160)
+      for (const line of bodyLines.slice(0, 10)) {
+        ctx.fillText(line, W / 2, y)
+        y += 54
+      }
+
+      // خط سفلي
+      ctx.strokeStyle = lineGrad
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.moveTo(80, H - 120)
+      ctx.lineTo(W - 80, H - 120)
+      ctx.stroke()
+
+      // رابط الموقع
+      ctx.font = '34px Cairo, Arial'
+      ctx.fillStyle = '#64748B'
+      ctx.fillText('fajrak.com', W / 2, H - 65)
+
+      // مشاركة الصورة
+      canvas.toBlob(async blob => {
+        if (!blob) return
+        const file = new File([blob], 'fajrak-lesson.png', { type: 'image/png' })
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: lang === 'ar' ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak" })
+        } else {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'fajrak-lesson.png'
+          a.click()
+          URL.revokeObjectURL(url)
+        }
+        setSharing(false)
+      }, 'image/png')
+    } catch {
+      setSharing(false)
+    }
+  }
+
   const info = stageInfo[stage]
   const stageIdx = stageOrder.indexOf(stage)
 
@@ -219,6 +350,21 @@ export default function LearnPage() {
                 ✅ {lang === 'ar' ? 'مكتمل' : 'Completed'}
               </div>
             )}
+            <button
+              onClick={shareLesson}
+              disabled={sharing}
+              title={lang === 'ar' ? 'شارك الدرس' : 'Share lesson'}
+              style={{
+                padding: '12px 14px', borderRadius: 12,
+                background: sharing ? 'rgba(245,158,11,0.05)' : 'rgba(245,158,11,0.1)',
+                border: '1px solid rgba(245,158,11,0.3)',
+                color: '#F59E0B', fontSize: 18, cursor: sharing ? 'default' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'opacity 0.2s', opacity: sharing ? 0.5 : 1,
+              }}
+            >
+              {sharing ? '⏳' : '📤'}
+            </button>
           </div>
         </div>
       )}
