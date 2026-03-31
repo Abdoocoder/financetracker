@@ -91,7 +91,8 @@ function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: ()
 }
 
 export default function DebtsPage() {
-  const [activeTab, setActiveTab] = useState<'owed' | 'receivable'>('owed')
+  const [showOwed, setShowOwed] = useState(true)
+  const [showReceivable, setShowReceivable] = useState(true)
   const [debts, setDebts] = useState<Debt[]>([])
   const [paidDebts, setPaidDebts] = useState<Debt[]>([])
   const [showPaid, setShowPaid] = useState(false)
@@ -404,7 +405,7 @@ export default function DebtsPage() {
         <EmptyState icon="🎉" title={t('debts_empty')} subtitle={t('debts_empty_sub')} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {debts.filter(d => (d.debt_type ?? 'owed') === activeTab).map(debt => {
+          {showOwed && debts.filter(d => (d.debt_type ?? 'owed') === 'owed' && !d.is_paid).map(debt => {
             const pct = Number(debt.original_amount) > 0
               ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
               : 0
@@ -472,6 +473,60 @@ export default function DebtsPage() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* ── قسم ديون لي ── */}
+      {debts.some(d => d.debt_type === 'receivable' && !d.is_paid) && (
+        <div style={{ marginTop: 16 }}>
+          <button onClick={() => setShowReceivable(p => !p)}
+            style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>💰 {t('debts_tab_receivable')} ({debts.filter(d => d.debt_type === 'receivable' && !d.is_paid).length})</span>
+            <span style={{ fontSize: 16 }}>{showReceivable ? '▲' : '▼'}</span>
+          </button>
+          {showReceivable && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+              {debts.filter(d => d.debt_type === 'receivable' && !d.is_paid).map(debt => {
+                const pri = PRIORITY_CONFIG[(debt.priority ?? 3) - 1] ?? PRIORITY_CONFIG[2]
+                return (
+                  <div key={debt.id} style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 18, padding: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981', flexShrink: 0, marginTop: 4 }} />
+                        <div>
+                          <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{debt.name}</div>
+                          {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{debt.notes}</div>}
+                          {debt.due_date && (
+                            <div style={{ fontSize: 11, color: '#10B981', marginTop: 4, fontWeight: 600 }}>
+                              📅 موعد الاستلام: {new Date(debt.due_date).toLocaleDateString('ar-EG')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontSize: 16, fontWeight: 900, color: '#10B981', fontFamily: 'monospace' }}>
+                          {Number(debt.remaining_amount).toFixed(0)} {debt.currency || 'JOD'}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                          الأصل: {Number(debt.original_amount).toFixed(0)}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                      <button onClick={() => startEdit(debt)}
+                        style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        ✏️ تعديل
+                      </button>
+                      <button onClick={() => setConfirmDelete(debt.id)}
+                        style={{ padding: '7px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
 
