@@ -33,6 +33,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   late int _priority;
   bool _receivedAmount = false;
   late bool _autoDeduct;
+  String _debtType = 'owed';
   late String _dueDate;
 
   String _selectedCurrency = '';
@@ -54,6 +55,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         text: widget.existing?['payment_day']?.toString() ?? '');
     _priority = (widget.existing?['priority'] as int?) ?? 3;
     _autoDeduct = widget.existing?['auto_deduct'] as bool? ?? true;
+    _debtType = widget.existing?['debt_type'] as String? ?? 'owed';
     _dueDate = widget.existing?['due_date'] as String? ?? '';
     
     _selectedCurrency = widget.existing?['currency'] ?? widget.baseCurrency;
@@ -123,6 +125,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
       'priority': _priority,
       'is_paid': false,
       'auto_deduct': _autoDeduct,
+      'debt_type': _debtType,
     };
 
     if (widget.existing != null) {
@@ -196,6 +199,43 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                 fontWeight: FontWeight.w900,
                 color: cs.onSurface,
                 fontFamily: 'Cairo')),
+        const SizedBox(height: 20),
+        // نوع الدين
+        Row(children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _debtType = 'owed'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _debtType == 'owed' ? const Color(0x1AEF4444) : cs.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _debtType == 'owed' ? const Color(0xFFEF4444) : Colors.transparent),
+                ),
+                child: Center(child: Text('💳 debts_tab_owed'.tr(),
+                  style: TextStyle(color: _debtType == 'owed' ? const Color(0xFFEF4444) : const Color(0xFF94A3B8),
+                    fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _debtType = 'receivable'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: _debtType == 'receivable' ? const Color(0x1A10B981) : cs.surfaceContainerHigh,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _debtType == 'receivable' ? const Color(0xFF10B981) : Colors.transparent),
+                ),
+                child: Center(child: Text('💰 debts_tab_receivable'.tr(),
+                  style: TextStyle(color: _debtType == 'receivable' ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                    fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
+              ),
+            ),
+          ),
+        ]),
         const SizedBox(height: 20),
         _field(_nameCtrl, 'debts_name_hint'.tr(), TextInputType.text),
         const SizedBox(height: 10),

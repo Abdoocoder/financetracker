@@ -26,9 +26,12 @@ class DebtsScreen extends StatefulWidget {
 
 class _DebtsScreenState extends State<DebtsScreen> {
   List<Map<String, dynamic>> _debts = [];
+  List<Map<String, dynamic>> _receivableDebts = [];
   List<Map<String, dynamic>> _paidDebts = [];
   bool _loading = true;
   bool _showPaid = false;
+  bool _showOwed = true;
+  bool _showReceivable = true;
   String _currency = 'JOD';
   double _totalPaidAmount = 0;
 
@@ -70,8 +73,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
           .fold(0.0, (a, d) => a + (d['original_amount'] as num).toDouble());
           
       if (mounted) {
+        final allActive = List<Map<String, dynamic>>.from(active);
         setState(() {
-          _debts = List<Map<String, dynamic>>.from(active);
+          _debts = allActive.where((d) => (d['debt_type'] ?? 'owed') == 'owed').toList();
+          _receivableDebts = allActive.where((d) => d['debt_type'] == 'receivable').toList();
           _paidDebts = List<Map<String, dynamic>>.from(paid);
           _totalPaidAmount = paidTotal;
           _loading = false;
@@ -116,6 +121,48 @@ class _DebtsScreenState extends State<DebtsScreen> {
     );
     if (confirm == true) {
       await Supabase.instance.client.from('debts').delete().eq('id', id);
+      await _load();
+    }
+  }
+
+  Future<void> _receiveDebt(Map<String, dynamic> debt) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF0F1629),
+        title: Text('debts_receive_btn'.tr(),
+            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
+        content: Text(
+            '\${'debts_tab_receivable'.tr()}: \${debt['name']}\n\${(debt['remaining_amount'] as num).toStringAsFixed(0)} \${_currency}',
+            style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text('debts_receive_btn'.tr(),
+                  style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo'))),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
+    await Supabase.instance.client.from('debts').update({'is_paid': true}).eq('id', debt['id']);
+    await Supabase.instance.client.from('transactions').insert({
+      'user_id': user.id,
+      'type': 'income',
+      'amount': debt['remaining_amount'],
+      'category': 'دين مستلم',
+      'description': 'استلام دين: \${debt['name']}',
+      'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+    });
+
+    if (mounted) {
+      _showCelebration(debt['name']);
       await _load();
     }
   }
@@ -194,30 +241,87 @@ class _DebtsScreenState extends State<DebtsScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  if (_debts.isEmpty)
+                  // ── ديون عليّ ──
+                  if (_debts.isNotEmpty) ...[
+                    GestureDetector(
+                      onTap: () => setState(() => _showOwed = !_showOwed),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0x1AEF4444),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0x33EF4444)),
+                        ),
+                        child: Row(children: [
+                          const Text('💳 ', style: TextStyle(fontSize: 16)),
+                          Expanded(child: Text('debts_tab_owed'.tr(),
+                            style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                          Text('${_debts.length}', style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                          const SizedBox(width: 8),
+                          Icon(_showOwed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: const Color(0xFFEF4444)),
+                        ]),
+                      ),
+                    ),
+                    if (_showOwed) ...[
+                      const SizedBox(height: 8),
+                      ..._debts.map((d) => DebtListItem(
+                        key: ValueKey(d['id']),
+                        debt: d,
+                        currency: _currency,
+                        priorityColors: _priorityColors,
+                        priorityLabels: priorityLabels,
+                        onEdit: (debt) => _showAddDialog(existing: debt, labels: priorityLabels),
+                        onDelete: _deleteDebt,
+                        onPaymentComplete: _load,
+                        onCelebration: _showCelebration,
+                      )),
+                    ],
+                    const SizedBox(height: 12),
+                  ],
+
+                  // ── ديون لي ──
+                  if (_receivableDebts.isNotEmpty) ...[
+                    GestureDetector(
+                      onTap: () => setState(() => _showReceivable = !_showReceivable),
+                      child: Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0x1A10B981),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0x3310B981)),
+                        ),
+                        child: Row(children: [
+                          const Text('💰 ', style: TextStyle(fontSize: 16)),
+                          Expanded(child: Text('debts_tab_receivable'.tr(),
+                            style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                          Text('${_receivableDebts.length}', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                          const SizedBox(width: 8),
+                          Icon(_showReceivable ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: const Color(0xFF10B981)),
+                        ]),
+                      ),
+                    ),
+                    if (_showReceivable) ...[
+                      const SizedBox(height: 8),
+                      ..._receivableDebts.map((d) => _ReceivableDebtCard(
+                        debt: d,
+                        currency: _currency,
+                        onEdit: () => _showAddDialog(existing: d, labels: priorityLabels),
+                        onDelete: () => _deleteDebt(d['id']),
+                        onReceive: () => _receiveDebt(d),
+                      )),
+                    ],
+                    const SizedBox(height: 12),
+                  ],
+
+                  if (_debts.isEmpty && _receivableDebts.isEmpty)
                     Container(
-                        padding: const EdgeInsets.all(40),
-                        child: Column(children: [
-                          const Text('🎉', style: TextStyle(fontSize: 48)),
-                          const SizedBox(height: 12),
-                          Text('debts_no_active'.tr(),
-                              style: const TextStyle(
-                                  color: Color(0xFF94A3B8),
-                                  fontFamily: 'Cairo',
-                                  fontSize: 15)),
-                        ]))
-                  else
-    ..._debts.map((d) => DebtListItem(
-                          key: ValueKey(d['id']),
-                          debt: d,
-                          currency: _currency,
-                          priorityColors: _priorityColors,
-                          priorityLabels: priorityLabels,
-                          onEdit: (debt) => _showAddDialog(existing: debt, labels: priorityLabels),
-                          onDelete: _deleteDebt,
-                          onPaymentComplete: _load,
-                          onCelebration: _showCelebration,
-                        )),
+                      padding: const EdgeInsets.all(40),
+                      child: Column(children: [
+                        const Text('🎉', style: TextStyle(fontSize: 48)),
+                        const SizedBox(height: 12),
+                        Text('debts_no_active'.tr(),
+                          style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 15)),
+                      ])),
                   const SizedBox(height: 16),
 
                   if (_paidDebts.isNotEmpty) ...[
@@ -265,3 +369,91 @@ class _DebtsScreenState extends State<DebtsScreen> {
     );
   }
 }
+
+class _ReceivableDebtCard extends StatelessWidget {
+  final Map<String, dynamic> debt;
+  final String currency;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback onReceive;
+
+  const _ReceivableDebtCard({
+    required this.debt,
+    required this.currency,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onReceive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final amount = (debt['remaining_amount'] as num).toStringAsFixed(0);
+    final dueDate = debt['due_date'] as String?;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0x0A10B981),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x2610B981)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.circle, color: Color(0xFF10B981), size: 10),
+          const SizedBox(width: 10),
+          Expanded(child: Text(debt['name'] ?? '',
+            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 15))),
+          Text('\$amount \$currency',
+            style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
+        ]),
+        if (debt['notes'] != null && (debt['notes'] as String).isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(debt['notes'], style: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 12)),
+        ],
+        if (dueDate != null) ...[
+          const SizedBox(height: 6),
+          Text('📅 \${'debts_due_date'.tr()}: \$dueDate',
+            style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
+        ],
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: onReceive,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0x2610B981),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0x4D10B981)),
+                ),
+                child: Center(child: Text('debts_receive_btn'.tr(),
+                  style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: onEdit,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.edit_outlined, color: Color(0xFF64748B), size: 18),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: onDelete,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: const Color(0x1AEF4444), borderRadius: BorderRadius.circular(10)),
+              child: const Icon(Icons.delete_outline, color: Color(0xFFEF4444), size: 18),
+            ),
+          ),
+        ]),
+      ]),
+    );
+  }
+}
+

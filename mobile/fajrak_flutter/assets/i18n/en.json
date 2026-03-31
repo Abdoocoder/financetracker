@@ -708,5 +708,9 @@
   "help_faq_fire_q2": "What is the withdrawal rate?",
   "help_faq_fire_a2": "It's the annual percentage you withdraw from your wealth after retirement. The 4% rule means your wealth will last at least 25 years statistically without running out.",
   "help_faq_fire_q3": "What is the difference between Lean, Normal, and Fat modes?",
-  "help_faq_fire_a3": "Lean means retiring with a frugal lifestyle (70% of your expenses), Normal means the same lifestyle you have now, and Fat means a comfortable and generous lifestyle (150% of your expenses)."
+  "help_faq_fire_a3": "Lean means retiring with a frugal lifestyle (70% of your expenses), Normal means the same lifestyle you have now, and Fat means a comfortable and generous lifestyle (150% of your expenses).",
+  "debts_tab_owed": "My Debts",
+  "debts_tab_receivable": "Owed to Me",
+  "debts_receive_btn": "Mark as Received",
+  "debts_received_msg": "Payment received! 🎉"
 }
