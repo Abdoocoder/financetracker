@@ -227,7 +227,7 @@ export default function DebtsPage() {
         currency: form.currency,
         exchange_rate: rate,
         monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0,
-        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct
+        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct, debt_type: form.debt_type
       }).eq('id', editingId)
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(t('toast_edited'))
@@ -242,7 +242,7 @@ export default function DebtsPage() {
         currency: form.currency,
         exchange_rate: rate,
         monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0,
-        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct
+        due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct, debt_type: form.debt_type
       })
       // إضافة معاملة دخل إذا استلم المبلغ
       if (!error && form.received_amount) {
