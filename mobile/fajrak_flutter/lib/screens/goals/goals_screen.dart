@@ -26,7 +26,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
     Icons.flight, Icons.laptop, Icons.phone_android, Icons.school, Icons.workspace_premium,
     Icons.public, Icons.cast_for_education, Icons.work, Icons.fitness_center, Icons.favorite,
     Icons.eco, Icons.rocket_launch, Icons.star, Icons.energy_savings_leaf, Icons.bar_chart,
-    Icons.calendar_today, Icons.savings, Icons.card_giftcard, Icons.shield, Icons.bolt,
+    Icons.calendar_today, Icons.account_balance_wallet, Icons.card_giftcard, Icons.shield, Icons.bolt,
     Icons.local_fire_department, Icons.lightbulb, Icons.inventory_2, Icons.attach_money, Icons.beach_access,
   ];
 

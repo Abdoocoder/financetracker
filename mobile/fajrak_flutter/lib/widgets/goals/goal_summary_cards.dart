@@ -29,7 +29,7 @@ class GoalSummaryCards extends StatelessWidget {
               const Color(0xFF10B981))),
       const SizedBox(width: 8),
       Expanded(
-          child: _statCard(Icons.savings, totalSaved.toStringAsFixed(0),
+          child: _statCard(Icons.account_balance_wallet, totalSaved.toStringAsFixed(0),
               'goals_saved_label'.tr(), colorScheme.secondary)),
     ]);
   }
