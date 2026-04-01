@@ -89,6 +89,7 @@ async function processAutoDebts() {
     // إضافة سجل الدفعة
     await supabase.from('debt_payments').insert({
       debt_id: debt.id,
+      user_id: debt.user_id,
       amount: payment,
       payment_date: dateStr,
       notes: 'دفعة تلقائية',
