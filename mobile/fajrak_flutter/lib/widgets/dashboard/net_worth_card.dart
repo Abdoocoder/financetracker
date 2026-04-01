@@ -37,10 +37,10 @@ class _NetWorthCardState extends State<NetWorthCard> {
     );
 
     final items = [
-      (label: 'net_worth_investments'.tr(), value: widget.invValue, color: const Color(0xFF3B7EF6), icon: '📈'),
-      (label: 'net_worth_goals'.tr(), value: widget.goalsSaved, color: const Color(0xFF10B981), icon: '🎯'),
-      (label: 'net_worth_receivable'.tr(), value: widget.totalReceivable, color: const Color(0xFF8B5CF6), icon: '💰'),
-      (label: 'net_worth_debts'.tr(), value: -widget.totalDebt, color: const Color(0xFFEF4444), icon: '💳'),
+      (label: 'net_worth_investments'.tr(), value: widget.invValue,      color: const Color(0xFF3B7EF6), icon: Icons.trending_up),
+      (label: 'net_worth_goals'.tr(),       value: widget.goalsSaved,    color: const Color(0xFF10B981), icon: Icons.flag_outlined),
+      (label: 'net_worth_receivable'.tr(),  value: widget.totalReceivable, color: const Color(0xFF8B5CF6), icon: Icons.account_balance_wallet_outlined),
+      (label: 'net_worth_debts'.tr(),       value: -widget.totalDebt,    color: const Color(0xFFEF4444), icon: Icons.credit_card_outlined),
     ];
 
     return Container(
@@ -54,14 +54,14 @@ class _NetWorthCardState extends State<NetWorthCard> {
         border: Border.all(color: mainColor.withOpacity(0.18)),
       ),
       child: Column(children: [
-        // ── Header (دائماً ظاهر) ──
+        // ── Header ──
         InkWell(
           onTap: () => setState(() => _expanded = !_expanded),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
             child: Row(children: [
-              Text(_expanded ? '🏦' : (isPositive ? '🏦' : '⚠️'), style: const TextStyle(fontSize: 16)),
+              Icon(isPositive ? Icons.account_balance : Icons.warning_amber_rounded, color: mainColor, size: 18),
               const SizedBox(width: 8),
               Text('net_worth_title'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w600)),
               const Spacer(),
@@ -85,7 +85,7 @@ class _NetWorthCardState extends State<NetWorthCard> {
           ),
         ),
 
-        // ── Breakdown (يظهر عند الفتح) ──
+        // ── Breakdown ──
         AnimatedSize(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeInOut,
@@ -98,7 +98,7 @@ class _NetWorthCardState extends State<NetWorthCard> {
                       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
                       decoration: BoxDecoration(color: cs.surfaceVariant, borderRadius: BorderRadius.circular(10)),
                       child: Row(children: [
-                        Text(item.icon, style: const TextStyle(fontSize: 14)),
+                        Icon(item.icon, size: 16, color: item.value >= 0 ? item.color : const Color(0xFFEF4444)),
                         const SizedBox(width: 8),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(item.label, style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 9, fontWeight: FontWeight.w600)),
