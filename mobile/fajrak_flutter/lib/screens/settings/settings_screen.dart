@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import '../../widgets/settings/testimonial_card.dart';
@@ -23,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map<String, dynamic>? _initialProfile;
   String _userEmail = '';
   String _memberSince = '';
+  String _appVersion = 'v...';
 
   String _appLang = 'ar';
   bool _isDarkMode = true;
@@ -41,6 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) return;
+      
+      final packageInfo = await PackageInfo.fromPlatform();
+      _appVersion = 'v${packageInfo.version}+${packageInfo.buildNumber}';
+
       _userEmail = user.email ?? '';
       final created = DateTime.tryParse(user.createdAt) ?? DateTime.now();
       _memberSince = '${created.month}/${created.year}';
@@ -154,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 40),
                   Center(
                     child: Text(
-                      '🌄 — v3.15.0+7',
+                      '🌄 — $_appVersion',
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                         fontSize: 11,

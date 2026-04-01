@@ -22,16 +22,25 @@ class InvestmentListItem extends StatefulWidget {
 
 class _InvestmentListItemState extends State<InvestmentListItem> {
   bool _showBuyForm = false;
+  bool _showSellForm = false;
   final _buySharesCtrl = TextEditingController();
   final _buyPriceCtrl = TextEditingController();
   final _buyCommCtrl = TextEditingController(text: '0.5');
   bool _savingBuy = false;
+
+  final _sellSharesCtrl = TextEditingController();
+  final _sellPriceCtrl = TextEditingController();
+  final _sellCommCtrl = TextEditingController(text: '0.5');
+  bool _savingSell = false;
 
   @override
   void dispose() {
     _buySharesCtrl.dispose();
     _buyPriceCtrl.dispose();
     _buyCommCtrl.dispose();
+    _sellSharesCtrl.dispose();
+    _sellPriceCtrl.dispose();
+    _sellCommCtrl.dispose();
     super.dispose();
   }
 
@@ -108,6 +117,124 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
     } catch (e) {
       if (mounted) setState(() => _savingBuy = false);
     }
+  }
+
+  Future<void> _recordSell() async {
+    final shares = double.tryParse(_sellSharesCtrl.text);
+    final price = double.tryParse(_sellPriceCtrl.text);
+    final commission = double.tryParse(_sellCommCtrl.text) ?? 0.0;
+
+    final ownedShares = (widget.inv['shares'] as num).toDouble();
+    final avgBuyPrice = (widget.inv['avg_buy_price'] as num).toDouble();
+
+    if (shares == null || shares <= 0 || price == null || price <= 0) return;
+    if (shares > ownedShares) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('inv_sell_exceeds_shares'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+      );
+      return;
+    }
+
+    final proceeds = (shares * price) - commission;
+    final costBasis = shares * avgBuyPrice;
+    final realizedPnl = proceeds - costBasis;
+    final isGain = realizedPnl >= 0;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(ctx).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('inv_sell_confirm_btn'.tr(),
+            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900,
+                color: Theme.of(ctx).colorScheme.onSurface)),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          _summaryRow(ctx, 'inv_sell_avg_buy'.tr(),
+              '\$${avgBuyPrice.toStringAsFixed(2)}',
+              Theme.of(ctx).colorScheme.onSurfaceVariant),
+          const SizedBox(height: 8),
+          _summaryRow(ctx, 'inv_price'.tr(),
+              '\$${price.toStringAsFixed(2)}',
+              Theme.of(ctx).colorScheme.onSurfaceVariant),
+          const SizedBox(height: 8),
+          _summaryRow(ctx, 'inv_sell_proceeds'.tr(),
+              '\$${proceeds.toStringAsFixed(2)}',
+              Theme.of(ctx).colorScheme.onSurface),
+          const Divider(height: 20),
+          _summaryRow(
+            ctx,
+            isGain ? 'inv_sell_realized_gain'.tr() : 'inv_sell_realized_loss'.tr(),
+            '${isGain ? '+' : ''}\$${realizedPnl.toStringAsFixed(2)}',
+            isGain ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+          ),
+        ]),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('inv_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEF4444),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+            child: Text('inv_sell_confirm_btn'.tr(),
+                style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _savingSell = true);
+    final user = Supabase.instance.client.auth.currentUser!;
+
+    try {
+      await Supabase.instance.client.from('investment_transactions').insert({
+        'investment_id': widget.inv['id'],
+        'user_id': user.id,
+        'type': 'sell',
+        'shares': shares,
+        'price': price,
+        'commission': commission,
+        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+      });
+
+      final newShares = ownedShares - shares;
+      await Supabase.instance.client.from('investments').update({
+        'shares': newShares,
+      }).eq('id', widget.inv['id']);
+
+      final currency = widget.inv['currency'] as String? ?? 'USD';
+      await Supabase.instance.client.rpc('upsert_investment_cash', params: {
+        'p_user_id': user.id,
+        'p_currency': currency,
+        'p_amount': proceeds,
+      });
+
+      _sellSharesCtrl.clear();
+      _sellPriceCtrl.clear();
+      _sellCommCtrl.text = '0.5';
+
+      setState(() {
+        _showSellForm = false;
+        _savingSell = false;
+      });
+      widget.onChanged();
+    } catch (e) {
+      if (mounted) setState(() => _savingSell = false);
+    }
+  }
+
+  Widget _summaryRow(BuildContext ctx, String label, String value, Color valueColor) {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 13,
+          color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+      Text(value, style: TextStyle(fontFamily: 'Cairo', fontSize: 13,
+          fontWeight: FontWeight.w900, color: valueColor)),
+    ]);
   }
 
   TextField _miniField(
@@ -270,7 +397,10 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
           const SizedBox(width: 8),
           Expanded(
               child: OutlinedButton(
-            onPressed: () => setState(() => _showBuyForm = !_showBuyForm),
+            onPressed: () => setState(() {
+              _showBuyForm = !_showBuyForm;
+              _showSellForm = false;
+            }),
             style: OutlinedButton.styleFrom(
                 foregroundColor: const Color(0xFF10B981),
                 side: BorderSide(
@@ -285,6 +415,28 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                     fontWeight: FontWeight.w700)),
           )),
         ]),
+        const SizedBox(height: 6),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: () => setState(() {
+              _showSellForm = !_showSellForm;
+              _showBuyForm = false;
+            }),
+            style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFEF4444),
+                side: BorderSide(
+                    color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8))),
+            child: Text('inv_record_sell'.tr(),
+                style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700)),
+          ),
+        ),
         if (_showBuyForm) ...[
           const SizedBox(height: 12),
           Container(
@@ -324,6 +476,62 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Colors.white))
                         : Text('inv_submit_btn'.tr(),
+                            style: TextStyle(
+                                fontFamily: 'Cairo',
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12)),
+                  )),
+            ]),
+          ),
+        ],
+        if (_showSellForm) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2))),
+            child: Column(children: [
+              Row(children: [
+                Expanded(
+                    child: _miniField(_sellSharesCtrl, 'inv_shares_count_hint'.tr(),
+                        const TextInputType.numberWithOptions(decimal: true))),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: _miniField(_sellPriceCtrl, 'inv_price_with_dollar_hint'.tr(),
+                        const TextInputType.numberWithOptions(decimal: true))),
+                const SizedBox(width: 8),
+                Expanded(
+                    child: _miniField(_sellCommCtrl, 'inv_comm_hint'.tr(),
+                        const TextInputType.numberWithOptions(decimal: true))),
+              ]),
+              const SizedBox(height: 8),
+              Text(
+                '${'inv_sell_max_shares'.tr()}: ${shares.toStringAsFixed(4)} ${'inv_shares_suffix'.tr()}',
+                style: TextStyle(
+                    fontFamily: 'Cairo',
+                    fontSize: 10,
+                    color: colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _savingSell ? null : _recordSell,
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8))),
+                    child: _savingSell
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white))
+                        : Text('inv_sell_confirm_btn'.tr(),
                             style: TextStyle(
                                 fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w900,

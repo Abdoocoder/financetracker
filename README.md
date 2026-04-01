@@ -1,6 +1,12 @@
 <div align="center">
 
-<img src="public/icon-512.png" alt="Fajrak Logo" width="120" height="120" style="border-radius: 24px;" />
+<img
+  src="public/icon-512.png"
+  alt="Fajrak Logo"
+  width="120"
+  height="120"
+  style="border-radius: 24px;"
+/>
 
 # Fajrak — فجرك
 
@@ -38,9 +44,7 @@
 - [Financial Journey](#-financial-journey)
 - [Features](#-features)
 - [Technology Stack](#️-technology-stack)
-- [Architecture](#️-architecture)
 - [Database Schema](#️-database-schema)
-- [API Reference](#-api-reference)
 - [Automated Workflows](#-automated-workflows)
 - [Mobile App](#-mobile-app)
 - [Internationalization](#-internationalization)
@@ -54,9 +58,13 @@
 
 ## ✨ Overview
 
-**Fajrak** (فجرك — "Your Dawn") is a full-stack Arabic-first personal finance platform that guides users from their very first transaction all the way to financial independence.
+**Fajrak** (فجرك — "Your Dawn") is a full-stack Arabic-first personal finance
+platform that guides users from their very first transaction all the way to
+financial independence.
 
-> **Mission:** Every person deserves full awareness of their financial situation and a clear plan for improvement — regardless of income or level — until they achieve **financial freedom**.
+> **Mission:** Every person deserves full awareness of their financial situation
+> and a clear plan for improvement — regardless of income or level — until they
+> achieve **financial freedom**.
 >
 > Inspired by Islamic values of **effort, work, and contentment** 🕌
 
@@ -79,10 +87,12 @@
 Fajrak walks users through 5 progressive financial stages:
 
 ```
-🌅 Awareness  ──►  💳 Debt Repayment  ──►  🛡️ Emergency Fund  ──►  📈 Investment  ──►  👑 Financial Freedom
+🌅 Awareness  ──►  💳 Debt Repayment  ──►  🛡️ Emergency Fund
+──►  📈 Investment  ──►  👑 Financial Freedom
 ```
 
-Every feature — from alerts to gamification — is designed to move users forward on this journey.
+Every feature — from alerts to gamification — is designed to move users forward
+on this journey.
 
 ---
 
@@ -94,9 +104,9 @@ The command center of your financial life.
 
 | Feature | Description |
 |:--------|:------------|
-| **Financial Health Score** | 0–100 score with 30-day history chart (Recharts) |
+| **Financial Health Score** | 0–100 score with 30-day history (Recharts) |
 | **Monthly Summary** | Income, expenses, debt payments, net balance |
-| **Wealth Simulator** | Projects surplus growth over time with compound interest |
+| **Wealth Simulator** | Projects surplus growth with compound interest |
 | **Saving Challenges** | 4 auto-tracked savings challenges |
 | **Budget Progress** | Real-time category budget tracking |
 | **Quick Add** | One-tap transaction entry with last-transaction repeat |
@@ -154,6 +164,10 @@ The command center of your financial life.
 | Live prices | Real-time market data via API |
 | Halal flag | Islamic investment certification |
 | P&L tracking | Profit/loss per holding |
+| **Record Buy** | Log buy transactions with shares, price & commission |
+| **Record Sell** | Log sell with live P&L preview before confirming |
+| **Investment Cash** | Sell proceeds stored separately as portfolio cash |
+| **Transfer to Wallet** | Move cash to main wallet with live exchange rate |
 | Wealth Simulator | Interactive sliders for return rate, monthly savings |
 | Purchase date | Track haul (Islamic year) per investment |
 
@@ -203,7 +217,8 @@ A fully automated Islamic obligatory charity calculator.
 
 - Print-ready financial report at `/dashboard/pdf-report`
 - Month + year selector
-- Sections: income/expense summary, category breakdown, transaction table, debts, savings goals
+- Sections: income/expense summary, category breakdown, transaction table,
+  debts, savings goals
 - Print CSS hides controls; optimized for A4
 
 ---
@@ -245,7 +260,8 @@ A fully automated Islamic obligatory charity calculator.
 | 5 | Wealth Builder 💎 | 700–1200 |
 | 6 | Financially Free 👑 | 1200+ |
 
-**20+ Badges** across 6 categories: Tracking, Saving, Debt, Investment, Learning, and Wealth.
+**20+ Badges** across 6 categories: Tracking, Saving, Debt, Investment,
+Learning, and Wealth.
 
 ---
 
@@ -254,7 +270,8 @@ A fully automated Islamic obligatory charity calculator.
 - Educational financial insights tailored to your current stage
 - Islamic lessons on provision and wealth
 - Lesson streak tracking
-- **Share Lessons 📤:** Dynamically generate beautifully styled images to share with one tap
+- **Share Lessons 📤:** Dynamically generate styled images to share with one
+  tap
 
 ---
 
@@ -289,6 +306,7 @@ A fully automated Islamic obligatory charity calculator.
 | `debt_payments` | Payment history log |
 | `investments` | Portfolio holdings |
 | `investment_transactions` | Buy/sell history |
+| `investment_cash` | Portfolio cash balance from sell proceeds |
 | `budgets` | Monthly category limits |
 | `alerts` | Smart notification records |
 | `savings_goals` | Financial targets |
@@ -508,6 +526,8 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 - [x] Transactions: Full CRUD, Recurring, Multi-currency, CSV Export
 - [x] Debt Management: Auto-deduction, Progress, Confetti
 - [x] **Receivable Debts: Two-way tracking with collapsible sections**
+- [x] **Investment Sell: Record sell with P&L preview (Robinhood-style)**
+- [x] **Investment Cash: Portfolio cash balance with transfer to main wallet**
 - [x] Smart Budgeting: 50/30/20 Rule, Category limits
 - [x] Investments: Live prices, Halal flag, P&L
 - [x] Savings Goals: Progress tracking, Icon/color
@@ -538,28 +558,39 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.16.1 — 2026-03-31 *(Latest)*
+### v3.17.0 — 2026-04-01 *(Latest)*
 
 | Change | Description |
 |:-------|:------------|
-| 📤 **Share Lessons** | Generate and share beautiful daily lesson cards natively generated via Canvas API |
-| 💳 **Receivable Debts** | Two-way debt tracking — debts owed to you with collapsible sections |
+| 📉 **Record Sell** | Log sell with P&L preview before confirming |
+| 💵 **Investment Cash** | Sell proceeds stored as separate portfolio cash |
+| 🔄 **Transfer Cash** | Move to main wallet with live exchange rate |
+| 🗃️ **Migration 013** | Added `investment_cash` table and upsert RPC |
+| 🌐 **i18n** | New translation keys for sell, cash and transfers |
+| ⚙️ **Settings Screen** | User profile and asset summary in Flutter |
+
+### v3.16.1 — 2026-03-31
+
+| Change | Description |
+|:-------|:------------|
+| 📤 **Share Lessons** | Generate and share beautiful daily lesson cards |
+| 💳 **Receivable** | Two-way debt tracking with collapsible sections |
 | 🔔 **Due Date Alerts** | Push notification before receivable debt due dates |
 | 🗃️ **DB Migration** | Added `debt_type` field to debts table |
 | 🌐 **i18n** | Full Arabic/English translations for new debt features |
-| 🐛 **Bug Fixes** | Fixed TypeScript errors in health-score API and debts page |
+| 🐛 **Bug Fixes** | Fixed TypeScript errors in health-score and debts page |
 
 ### v3.15.0 — 2026-03-30
 
 | Change | Description |
 |:-------|:------------|
 | 🔄 **Technical Fixes** | Resolved spinner issues across all screens |
-| 📊 **Smart Categories** | Separated income/expense categories, added 7 new financial categories |
-| 🌄 **Unified Identity** | Synced version with Google Play (Build 6), updated to sunrise logo |
+| 📊 **Smart Categories** | Separated income/expenses, added 7 new categories |
+| 🌄 **Unified Identity** | Synced version with Google Play, updated logo |
 | 📱 **Download Page** | Professional APK download page at `/download` |
 | 🌐 **Landing Page** | Dynamic testimonials from Supabase, improved CTAs |
 | 🔍 **Monitoring** | Added Sentry error tracking |
-| ⚙️ **CRON Optimization** | GitHub Actions runs at specific hours only (720 → 120 runs/month) |
+| ⚙️ **CRON Optimization** | GitHub Actions runs only at specific hours |
 
 ### v3.10.0 — 2026-03-23
 
