@@ -158,36 +158,29 @@ function useDashboardData() {
     const now = new Date()
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
 
-    async function fetchPhase1() {
-      const [txRes, profileRes, alertRes] = await Promise.all([
+    // ── كل الـ 8 queries بالتوازي بدل Phase1 ثم Phase2 (~400ms → ~200ms) ──
+    async function fetchAll() {
+      const chartFrom = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]
+      const [txRes, profileRes, alertRes, debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
         supabase.from('profiles').select('monthly_income, full_name').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
+        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
+        supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
+        supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
+        supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', chartFrom),
       ])
+
       const txs = txRes.data ?? []
-      const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const profileData = profileRes.data as { monthly_income: number; full_name: string | null } | null
-      const profileIncome = Number(profileData?.monthly_income ?? 0)
-      const profileName = profileData?.full_name ?? ''
-      const income = txIncome > 0 ? txIncome : profileIncome
+      const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+      const income = txIncome > 0 ? txIncome : Number(profileData?.monthly_income ?? 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
       const catMap: Record<string, number> = {}
       txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
       const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
 
-      setData({ income, expenses, categories, net: income - expenses, prevIncome: 0, prevExpenses: 0, months6: [], totalDebt: 0, invValue: 0, goalsSaved: 0, goalsTarget: 0, unreadAlerts: alertRes.count ?? 0, name: profileName, txCount: 0 })
-      setLoading(false)
-      fetchPhase2(income, expenses, categories, alertRes.count ?? 0, profileName)
-    }
-
-    async function fetchPhase2(income: number, expenses: number, categories: [string, number][], unreadAlerts: number, name: string) {
-      const [debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
-        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
-        supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
-        supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
-        supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
-        supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]),
-      ])
       const months6 = Array.from({ length: 6 }, (_, i) => {
         const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1)
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -203,15 +196,17 @@ function useDashboardData() {
         invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
         goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
-        unreadAlerts,
+        unreadAlerts: alertRes.count ?? 0,
         txCount: (chartRes.data ?? []).length,
-        name,
+        name: profileData?.full_name ?? '',
       }
-      setData(newData); setRecentTx(recentRes.data ?? [])
+      setData(newData)
+      setRecentTx(recentRes.data ?? [])
+      setLoading(false)
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch { }
     }
 
-    fetchPhase1()
+    fetchAll()
   }, [currentUser, supabase])
 
   return { data, setData, recentTx, loading, supabase }

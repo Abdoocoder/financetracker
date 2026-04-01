@@ -48,50 +48,36 @@ class _DebtsScreenState extends State<DebtsScreen> {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) return;
-      
-      final profile = await Supabase.instance.client
-          .from('profiles')
-          .select('currency')
-          .eq('id', user.id)
-          .maybeSingle();
-      _currency = profile?['currency'] as String? ?? 'JOD';
-      
-      final active = await Supabase.instance.client
-          .from('debts')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_paid', false)
-          .order('priority');
-          
-      final paid = await Supabase.instance.client
-          .from('debts')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_paid', true)
-          .order('updated_at', ascending: false);
-          
-      final paidTotal = (paid as List)
-          .fold(0.0, (a, d) => a + (d['original_amount'] as num).toDouble());
-          
-      final alerts = await Supabase.instance.client
-          .from('alerts')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_read', false)
-          .eq('is_active', true)
-          .or('title.ilike.%قسط%,title.ilike.%دين%,title.ilike.%سداد%')
-          .order('created_at', ascending: false)
-          .limit(5);
+      final sb = Supabase.instance.client;
+
+      // ── 4 queries بالتوازي بدل التسلسل (~800ms → ~250ms) ──
+      final results = await Future.wait([
+        sb.from('profiles').select('currency').eq('id', user.id).maybeSingle(),
+        sb.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority'),
+        sb.from('debts').select('*').eq('user_id', user.id).eq('is_paid', true).order('updated_at', ascending: false),
+        sb.from('alerts').select('*').eq('user_id', user.id).eq('is_read', false).eq('is_active', true)
+            .or('title.ilike.%قسط%,title.ilike.%دين%,title.ilike.%سداد%')
+            .order('created_at', ascending: false).limit(5),
+      ]);
+
+      final profile  = results[0] as Map<String, dynamic>?;
+      final active   = results[1] as List;
+      final paid     = results[2] as List;
+      final alerts   = results[3] as List;
+
+      final currency   = profile?['currency'] as String? ?? 'JOD';
+      final paidTotal  = paid.fold(0.0, (a, d) => a + (d['original_amount'] as num).toDouble());
+      final allActive  = List<Map<String, dynamic>>.from(active);
 
       if (mounted) {
-        final allActive = List<Map<String, dynamic>>.from(active);
         setState(() {
-          _debts = allActive.where((d) => (d['debt_type'] ?? 'owed') == 'owed').toList();
+          _currency        = currency;
+          _debts           = allActive.where((d) => (d['debt_type'] ?? 'owed') == 'owed').toList();
           _receivableDebts = allActive.where((d) => d['debt_type'] == 'receivable').toList();
-          _paidDebts = List<Map<String, dynamic>>.from(paid);
+          _paidDebts       = List<Map<String, dynamic>>.from(paid);
           _totalPaidAmount = paidTotal;
-          _debtAlerts = List<Map<String, dynamic>>.from(alerts);
-          _loading = false;
+          _debtAlerts      = List<Map<String, dynamic>>.from(alerts);
+          _loading         = false;
         });
       }
     } catch (e) {
@@ -99,6 +85,25 @@ class _DebtsScreenState extends State<DebtsScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  // تحديث محلي فوري بعد الدفع — بدل إعادة تحميل كل شيء
+  void _onDebtPaymentDone(String debtId, double newRemaining, bool isPaid) {
+    setState(() {
+      if (isPaid) {
+        final debt = _debts.firstWhere((d) => d['id'] == debtId, orElse: () => {});
+        if (debt.isNotEmpty) {
+          _debts.removeWhere((d) => d['id'] == debtId);
+          _paidDebts.insert(0, {...debt, 'is_paid': true, 'remaining_amount': 0});
+          _totalPaidAmount += (debt['original_amount'] as num).toDouble();
+        }
+      } else {
+        final idx = _debts.indexWhere((d) => d['id'] == debtId);
+        if (idx != -1) _debts[idx] = {..._debts[idx], 'remaining_amount': newRemaining};
+      }
+    });
+    // refresh خفيف في الخلفية لمزامنة البيانات
+    Future.delayed(const Duration(seconds: 2), _load);
   }
 
   Future<void> _dismissAlert(String id) async {
@@ -369,7 +374,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         priorityLabels: priorityLabels,
                         onEdit: (debt) => _showAddDialog(existing: debt, labels: priorityLabels),
                         onDelete: _deleteDebt,
-                        onPaymentComplete: _load,
+                        onPaymentDone: _onDebtPaymentDone,
                         onCelebration: _showCelebration,
                       )),
                     ],
@@ -409,6 +414,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     if (_showReceivable) ...[
                       const SizedBox(height: 8),
                       ..._receivableDebts.map((d) => _ReceivableDebtCard(
+                        key: ValueKey(d['id']),
                         debt: d,
                         currency: _currency,
                         onEdit: () => _showAddDialog(existing: d, labels: priorityLabels),

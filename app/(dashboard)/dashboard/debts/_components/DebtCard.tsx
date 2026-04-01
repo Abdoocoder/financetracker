@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import type { Debt } from '@/types'
 import { CURRENCIES } from '@/lib/currency'
 
@@ -26,7 +27,7 @@ interface Props {
   onPaymentCurrencyChange: (v: string) => void
 }
 
-export function DebtCard({
+export const DebtCard = memo(function DebtCard({
   debt, baseCurrency, lang,
   paymentDebtId, paymentAmount, paymentCurrency, payingSaving,
   onEdit, onDelete, onStartPayment, onCancelPayment, onConfirmPayment,
@@ -136,4 +137,4 @@ export function DebtCard({
       </div>
     </div>
   )
-}
+})
