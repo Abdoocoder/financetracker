@@ -740,5 +740,12 @@
   "debts_tab_owed": "My Debts",
   "debts_tab_receivable": "Owed to Me",
   "debts_receive_btn": "Mark as Received",
-  "debts_received_msg": "Payment received! 🎉"
+  "debts_received_msg": "Payment received! 🎉",
+  "debt_name_required": "Please enter the debt name",
+  "debt_amount_required": "Please enter the original amount",
+  "debt_amount_positive": "Amount must be greater than zero",
+  "debt_remaining_negative": "Remaining amount cannot be negative",
+  "debt_remaining_exceeds": "Remaining amount cannot exceed original amount",
+  "debt_payment_day_range": "Payment day must be between 1 and 28",
+  "error_not_logged_in": "You are not logged in. Please sign in again."
 }

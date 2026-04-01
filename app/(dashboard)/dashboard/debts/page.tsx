@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
@@ -178,7 +178,7 @@ export default function DebtsPage() {
     setShowForm(true)
   }
 
-  function startEdit(d: any) {
+  function startEdit(d: Debt) {
     setEditingId(d.id)
     setForm({
       name: d.name,
@@ -476,7 +476,6 @@ export default function DebtsPage() {
           {showReceivable && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
               {receivableDebts.map(debt => {
-                const pri = PRIORITY_CONFIG[(debt.priority ?? 3) - 1] ?? PRIORITY_CONFIG[2]
                 return (
                   <div key={debt.id} style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 18, padding: '16px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
