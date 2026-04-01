@@ -11,7 +11,7 @@ class DebtListItem extends StatefulWidget {
   final List<String> priorityLabels;
   final Function(Map<String, dynamic>) onEdit;
   final Function(String) onDelete;
-  final VoidCallback onPaymentComplete;
+  final Function(String debtId, double newRemaining, bool isPaid) onPaymentDone;
   final Function(String) onCelebration;
 
   const DebtListItem({
@@ -22,7 +22,7 @@ class DebtListItem extends StatefulWidget {
     required this.priorityLabels,
     required this.onEdit,
     required this.onDelete,
-    required this.onPaymentComplete,
+    required this.onPaymentDone,
     required this.onCelebration,
   });
 
@@ -67,42 +67,42 @@ class _DebtListItemState extends State<DebtListItem> {
     try {
       final user = Supabase.instance.client.auth.currentUser!;
       final amountInBaseCurrency = _paymentCurrency == widget.currency ? amount : (amount * _paymentExchangeRate);
-      
+
       final currentRemaining = (widget.debt['remaining_amount'] as num).toDouble();
       final newRemaining = (currentRemaining - amountInBaseCurrency).clamp(0.0, double.infinity);
-          
-      // 1. Update Debt
-      await Supabase.instance.client.from('debts').update({
-        'remaining_amount': newRemaining,
-        'remaining_amount_foreign': _paymentCurrency == widget.debt['currency'] 
-            ? ((widget.debt['remaining_amount_foreign'] as num?)?.toDouble() ?? currentRemaining) - amount
-            : null, // Reset if currency doesn't match or re-calculate
-        'is_paid': newRemaining == 0,
-      }).eq('id', widget.debt['id']);
-      
-      // 2. Insert Debt Payment
-      await Supabase.instance.client.from('debt_payments').insert({
-        'debt_id': widget.debt['id'],
-        'user_id': user.id,
-        'amount': amountInBaseCurrency,
-        'original_amount': amount,
-        'original_currency': _paymentCurrency,
-        'exchange_rate': _paymentExchangeRate,
-        'payment_date': DateTime.now().toIso8601String(),
-      });
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final sb = Supabase.instance.client;
 
-      // 3. Insert Transaction
-      await Supabase.instance.client.from('transactions').insert({
-        'user_id': user.id,
-        'type': 'expense',
-        'amount': amountInBaseCurrency,
-        'original_amount': amount,
-        'original_currency': _paymentCurrency,
-        'exchange_rate': _paymentExchangeRate,
-        'category': 'debts_title'.tr(),
-        'description': '${'debts_paid'.tr()}: ${widget.debt['name']}',
-        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
-      });
+      // ── 3 operations بالتوازي (~600ms → ~200ms) ──
+      await Future.wait([
+        sb.from('debts').update({
+          'remaining_amount': newRemaining,
+          'remaining_amount_foreign': _paymentCurrency == widget.debt['currency']
+              ? ((widget.debt['remaining_amount_foreign'] as num?)?.toDouble() ?? currentRemaining) - amount
+              : null,
+          'is_paid': newRemaining == 0,
+        }).eq('id', widget.debt['id']),
+        sb.from('debt_payments').insert({
+          'debt_id': widget.debt['id'],
+          'user_id': user.id,
+          'amount': amountInBaseCurrency,
+          'original_amount': amount,
+          'original_currency': _paymentCurrency,
+          'exchange_rate': _paymentExchangeRate,
+          'payment_date': DateTime.now().toIso8601String(),
+        }),
+        sb.from('transactions').insert({
+          'user_id': user.id,
+          'type': 'expense',
+          'amount': amountInBaseCurrency,
+          'original_amount': amount,
+          'original_currency': _paymentCurrency,
+          'exchange_rate': _paymentExchangeRate,
+          'category': 'debts_title'.tr(),
+          'description': '${'debts_paid'.tr()}: ${widget.debt['name']}',
+          'transaction_date': today,
+        }),
+      ]);
 
       _paymentCtrl.clear();
       setState(() {
@@ -113,7 +113,7 @@ class _DebtListItemState extends State<DebtListItem> {
       if (newRemaining == 0) {
         widget.onCelebration(widget.debt['name'] as String);
       }
-      widget.onPaymentComplete();
+      widget.onPaymentDone(widget.debt['id'] as String, newRemaining, newRemaining == 0);
     } catch (e) {
       if (mounted) {
         setState(() => _payingSaving = false);

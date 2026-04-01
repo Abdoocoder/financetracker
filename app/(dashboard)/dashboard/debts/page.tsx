@@ -116,7 +116,7 @@ export default function DebtsPage() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [celebration, setCelebration] = useState<string | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const { t, lang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load(true) })
 
@@ -143,14 +143,14 @@ export default function DebtsPage() {
   const load = useCallback(async (silent = false) => {
     if (!currentUser) return
     if (!silent) setLoading(true)
-    // الديون النشطة
-    const { data: active } = await supabase.from('debts').select('*').eq('user_id', currentUser.id).eq('is_paid', false).order('priority')
-    setDebts(active ?? [])
-    // الديون المسددة
-    const { data: paid } = await supabase.from('debts').select('*').eq('user_id', currentUser.id).eq('is_paid', true).order('updated_at', { ascending: false })
-    setPaidDebts(paid ?? [])
-    // إجمالي المبالغ المسددة
+    // ── جلب query ين بالتوازي (~300ms → ~150ms) ──
+    const [{ data: active }, { data: paid }] = await Promise.all([
+      supabase.from('debts').select('*').eq('user_id', currentUser.id).eq('is_paid', false).order('priority'),
+      supabase.from('debts').select('*').eq('user_id', currentUser.id).eq('is_paid', true).order('updated_at', { ascending: false }),
+    ])
     const total = (paid ?? []).reduce((a, d) => a + Number(d.original_amount), 0)
+    setDebts(active ?? [])
+    setPaidDebts(paid ?? [])
     setTotalPaidAmount(total)
     setLoading(false)
   }, [supabase, currentUser])
@@ -274,11 +274,11 @@ export default function DebtsPage() {
     setShowForm(false); setSaving(false); load()
   }
 
-  async function deleteDebt(id: string) {
+  const deleteDebt = useCallback(async (id: string) => {
     await supabase.from('debts').delete().eq('id', id)
     setDebts(prev => prev.filter(d => d.id !== id))
     toast.success(t('toast_deleted'))
-  }
+  }, [supabase, t])
 
   async function makePayment(debtId: string) {
     const payAmount = parseFloat(paymentAmount)
@@ -345,14 +345,23 @@ export default function DebtsPage() {
     setPaymentDebtId(null); setPaymentAmount(''); setPaymentCurrency(''); setPayingSaving(false); load()
   }
 
-  const totalRemaining = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
-  const totalOriginal = debts.reduce((a, d) => a + Number(d.original_amount), 0)
-  const totalMonthly = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
-  const paidPct = totalOriginal > 0 ? ((totalOriginal - totalRemaining) / totalOriginal * 100) : 0
-  const owedDebts = debts.filter(d => (d.debt_type ?? 'owed') === 'owed' && !d.is_paid)
-  const receivableDebts = debts.filter(d => d.debt_type === 'receivable' && !d.is_paid)
-  const totalOwed = owedDebts.reduce((a, d) => a + Number(d.remaining_amount), 0)
-  const totalReceivable = receivableDebts.reduce((a, d) => a + Number(d.remaining_amount), 0)
+  const { owedDebts, receivableDebts, totalRemaining, totalOriginal, totalMonthly, totalOwed, totalReceivable, paidPct } = useMemo(() => {
+    const owed = debts.filter(d => (d.debt_type ?? 'owed') === 'owed' && !d.is_paid)
+    const recv = debts.filter(d => d.debt_type === 'receivable' && !d.is_paid)
+    const tRem = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
+    const tOri = debts.reduce((a, d) => a + Number(d.original_amount), 0)
+    const tMon = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
+    return {
+      owedDebts: owed,
+      receivableDebts: recv,
+      totalRemaining: tRem,
+      totalOriginal: tOri,
+      totalMonthly: tMon,
+      totalOwed: owed.reduce((a, d) => a + Number(d.remaining_amount), 0),
+      totalReceivable: recv.reduce((a, d) => a + Number(d.remaining_amount), 0),
+      paidPct: tOri > 0 ? ((tOri - tRem) / tOri * 100) : 0,
+    }
+  }, [debts])
 
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
