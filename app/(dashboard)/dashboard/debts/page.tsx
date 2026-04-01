@@ -357,6 +357,10 @@ export default function DebtsPage() {
   const totalOriginal = debts.reduce((a, d) => a + Number(d.original_amount), 0)
   const totalMonthly = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
   const paidPct = totalOriginal > 0 ? ((totalOriginal - totalRemaining) / totalOriginal * 100) : 0
+  const owedDebts = debts.filter(d => (d.debt_type ?? 'owed') === 'owed' && !d.is_paid)
+  const receivableDebts = debts.filter(d => d.debt_type === 'receivable' && !d.is_paid)
+  const totalOwed = owedDebts.reduce((a, d) => a + Number(d.remaining_amount), 0)
+  const totalReceivable = receivableDebts.reduce((a, d) => a + Number(d.remaining_amount), 0)
 
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -422,8 +426,19 @@ export default function DebtsPage() {
       {debts.length === 0 ? (
         <EmptyState icon="🎉" title={t('debts_empty')} subtitle={t('debts_empty_sub')} />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {showOwed && debts.filter(d => (d.debt_type ?? 'owed') === 'owed' && !d.is_paid).map(debt => {
+        <>
+          {owedDebts.length > 0 && (
+            <button onClick={() => setShowOwed(p => !p)}
+              style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span>💳 {t('debts_tab_owed')} ({owedDebts.length})</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                {!showOwed && <span style={{ fontFamily: 'monospace', fontWeight: 900 }}>{totalOwed.toFixed(0)} {baseCurrency}</span>}
+                <span style={{ fontSize: 16 }}>{showOwed ? '▲' : '▼'}</span>
+              </div>
+            </button>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {showOwed && owedDebts.map(debt => {
             const pct = Number(debt.original_amount) > 0
               ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
               : 0
@@ -517,19 +532,23 @@ export default function DebtsPage() {
             )
           })}
         </div>
+        </>
       )}
 
       {/* ── قسم ديون لي ── */}
-      {debts.some(d => d.debt_type === 'receivable' && !d.is_paid) && (
+      {receivableDebts.length > 0 && (
         <div style={{ marginTop: 16 }}>
           <button onClick={() => setShowReceivable(p => !p)}
             style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>💰 {t('debts_tab_receivable')} ({debts.filter(d => d.debt_type === 'receivable' && !d.is_paid).length})</span>
-            <span style={{ fontSize: 16 }}>{showReceivable ? '▲' : '▼'}</span>
+            <span>💰 {t('debts_tab_receivable')} ({receivableDebts.length})</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {!showReceivable && <span style={{ fontFamily: 'monospace', fontWeight: 900 }}>{totalReceivable.toFixed(0)} {baseCurrency}</span>}
+              <span style={{ fontSize: 16 }}>{showReceivable ? '▲' : '▼'}</span>
+            </div>
           </button>
           {showReceivable && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
-              {debts.filter(d => d.debt_type === 'receivable' && !d.is_paid).map(debt => {
+              {receivableDebts.map(debt => {
                 const pri = PRIORITY_CONFIG[(debt.priority ?? 3) - 1] ?? PRIORITY_CONFIG[2]
                 return (
                   <div key={debt.id} style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 18, padding: '16px' }}>

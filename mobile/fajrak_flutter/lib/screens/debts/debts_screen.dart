@@ -210,6 +210,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
         0.0, (a, d) => a + (d['original_amount'] as num).toDouble());
     final totalMonthly = _debts.fold(
         0.0, (a, d) => a + (d['monthly_payment'] as num).toDouble());
+    final totalReceivable = _receivableDebts.fold(
+        0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -254,11 +256,19 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         ),
                         child: Row(children: [
                           const Icon(Icons.credit_card, size: 16, color: Color(0xFFEF4444)),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Expanded(child: Text('debts_tab_owed'.tr(),
                             style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
-                          Text('${_debts.length}', style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
-                          const SizedBox(width: 8),
+                          if (!_showOwed)
+                            Text('${totalRemaining.toStringAsFixed(0)} $_currency',
+                              style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                            decoration: BoxDecoration(color: const Color(0x26EF4444), borderRadius: BorderRadius.circular(6)),
+                            child: Text('${_debts.length}', style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
+                          ),
+                          const SizedBox(width: 6),
                           Icon(_showOwed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: const Color(0xFFEF4444)),
                         ]),
                       ),
@@ -293,11 +303,19 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         ),
                         child: Row(children: [
                           const Icon(Icons.account_balance_wallet, size: 16, color: Color(0xFF10B981)),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Expanded(child: Text('debts_tab_receivable'.tr(),
                             style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
-                          Text('${_receivableDebts.length}', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
-                          const SizedBox(width: 8),
+                          if (!_showReceivable)
+                            Text('${totalReceivable.toStringAsFixed(0)} $_currency',
+                              style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                            decoration: BoxDecoration(color: const Color(0x2610B981), borderRadius: BorderRadius.circular(6)),
+                            child: Text('${_receivableDebts.length}', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
+                          ),
+                          const SizedBox(width: 6),
                           Icon(_showReceivable ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: const Color(0xFF10B981)),
                         ]),
                       ),
