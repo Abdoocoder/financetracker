@@ -29,9 +29,16 @@ interface RecurringForm {
   notes: string
 }
 
+function defaultNextDate(): string {
+  const d = new Date()
+  d.setMonth(d.getMonth() + 1)
+  d.setDate(1)
+  return d.toISOString().split('T')[0]
+}
+
 const DEFAULT_FORM: RecurringForm = {
   name: '', amount: '', category: 'طعام', type: 'expense',
-  frequency: 'monthly', next_date: new Date().toISOString().split('T')[0],
+  frequency: 'monthly', next_date: defaultNextDate(),
   currency: 'JOD', notes: '',
 }
 
@@ -61,7 +68,7 @@ export function RecurringList({ baseCurrency }: { baseCurrency: string }) {
 
   function openAdd() {
     setEditingId(null)
-    setForm({ ...DEFAULT_FORM, currency: baseCurrency })
+    setForm({ ...DEFAULT_FORM, currency: baseCurrency, next_date: defaultNextDate() })
     setShowForm(true)
   }
 
