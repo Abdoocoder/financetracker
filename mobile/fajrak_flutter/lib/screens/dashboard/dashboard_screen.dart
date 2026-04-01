@@ -194,11 +194,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
               DashboardStats(income: _income, expenses: _expenses, net: _net, colorScheme: colorScheme),
               const SizedBox(height: 16),
+              DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
+              const SizedBox(height: 16),
               if (_invValue + _goalsSaved + _totalDebt > 0)
                 NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
               DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
-              const SizedBox(height: 16),
-              DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
               const SizedBox(height: 16),
               DashboardStageCard(stage: _stage),
               const SizedBox(height: 16),

@@ -37,6 +37,10 @@ const faqs = [
         ar: { q: 'هل يمكنني تصدير معاملاتي؟', a: 'نعم! اضغط على زر "تصدير CSV" في صفحة المعاملات وستحصل على ملف Excel بكل معاملاتك.' },
         en: { q: 'Can I export my transactions?', a: 'Yes! Tap the "Export CSV" button on the Transactions page and you\'ll get an Excel file with all your transactions.' },
       },
+      {
+        ar: { q: 'لماذا سُجِّلت معاملتي المتكررة في تاريخ خاطئ؟', a: 'عند إنشاء قاعدة متكررة جديدة، يكون "التاريخ القادم" محدداً بتاريخ اليوم تلقائياً. تأكد من تغييره يدوياً للتاريخ الصحيح (مثلاً: 25) قبل الحفظ. لتصحيح قاعدة موجودة: افتح تبويب "متكررة" في صفحة المعاملات، اضغط تعديل، وغيّر "التاريخ القادم" للشهر القادم.' },
+        en: { q: 'Why was my recurring transaction recorded on the wrong date?', a: 'When creating a new recurring rule, "Next Date" defaults to today. Make sure to manually change it to the correct date (e.g., the 25th) before saving. To fix an existing rule: open the "Recurring" tab in Transactions, tap Edit, and update "Next Date" to the correct future date.' },
+      },
     ],
   },
   {
@@ -61,6 +65,10 @@ const faqs = [
       {
         ar: { q: 'كيف أفعّل الخصم التلقائي لدين؟', a: 'عند إضافة أو تعديل الدين، فعّل خيار "خصم تلقائي" وحدد يوم الخصم من الشهر. سيتم الخصم تلقائياً كل شهر مع إشعار فوري.' },
         en: { q: 'How do I enable auto deduction for a debt?', a: 'When adding or editing a debt, enable the "Auto Deduct" option and set the deduction day. It will automatically deduct every month with an instant notification.' },
+      },
+      {
+        ar: { q: 'متى يتم خصم الأقساط التلقائية؟', a: 'يتم الخصم في يوم الدفع المحدد لكل دين تحديداً. إذا حددت يوم 25، سيُخصم القسط في اليوم 25 من كل شهر. إذا أضفت الدين بعد اليوم 25 في الشهر الحالي، سيبدأ الخصم من الشهر القادم تلقائياً.' },
+        en: { q: 'When are automatic installments deducted?', a: 'Deductions happen only on the specific payment day set for each debt. If you set day 25, the installment is deducted on the 25th of every month. If you added the debt after the 25th of the current month, deductions will start next month.' },
       },
     ],
   },

@@ -300,7 +300,22 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
-      {/* صافي الثروة */}
+
+      {/* إضافة سريعة — مباشرة بعد الإحصائيات */}
+      <QuickAdd onAdded={async () => {
+        const user = currentUser
+        if (!user) return
+        const now = new Date()
+        const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+        const { data: txs } = await supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', start)
+        if (!txs) return
+        const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
+        const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+        try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch { }
+        setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
+      }} />
+
+      {/* صافي الثروة — مطوي افتراضياً */}
       {(data?.invValue ?? 0) + (data?.goalsSaved ?? 0) + (data?.totalDebt ?? 0) > 0 && (
         <NetWorthCard
           netWorth={data?.netWorth ?? 0}
@@ -326,20 +341,6 @@ export default function DashboardPage() {
           />
         </div>
       </Section>
-
-      {/* إضافة سريعة — دائماً ظاهرة */}
-      <QuickAdd onAdded={async () => {
-        const user = currentUser
-        if (!user) return
-        const now = new Date()
-        const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-        const { data: txs } = await supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', start)
-        if (!txs) return
-        const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-        const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-        try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch { }
-        setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
-      }} />
 
       {/* الميزانية الشهرية — دائماً ظاهرة */}
       <BudgetProgressCard income={income} expenses={expenses} net={net} currency={profile?.currency ?? 'JOD'} />

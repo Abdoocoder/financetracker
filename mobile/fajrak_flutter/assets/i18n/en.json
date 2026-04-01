@@ -494,6 +494,8 @@
   "help_faq_transactions_a2": "Tap on the transaction to edit it, or swipe left on mobile to delete it.",
   "help_faq_transactions_q3": "Can I export my transactions?",
   "help_faq_transactions_a3": "Yes! Press the 'Export CSV' button on the transactions page and you'll get an Excel file with all your transactions.",
+  "help_faq_transactions_q4": "Why was my recurring transaction recorded on the wrong date?",
+  "help_faq_transactions_a4": "When creating a new recurring rule, 'Next Date' defaults to today. Make sure to manually change it to the correct date (e.g., the 25th) before saving. To fix an existing rule: open the 'Recurring' tab in Transactions, tap Edit, and update 'Next Date' to the correct future date.",
   "help_faq_debts_title": "💳 Debts",
   "help_faq_debts_q1": "How do I add a new debt?",
   "help_faq_debts_a1": "Go to the debts page and press 'Add Debt'. Enter the debt name, original amount, remaining amount, and monthly installment.",
