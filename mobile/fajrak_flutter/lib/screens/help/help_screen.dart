@@ -44,6 +44,10 @@ class _HelpScreenState extends State<HelpScreen> {
           'q': 'help_faq_transactions_q3'.tr(),
           'a': 'help_faq_transactions_a3'.tr()
         },
+        {
+          'q': 'help_faq_transactions_q4'.tr(),
+          'a': 'help_faq_transactions_a4'.tr()
+        },
       ],
     },
     {
@@ -60,6 +64,10 @@ class _HelpScreenState extends State<HelpScreen> {
         {
           'q': 'help_faq_debts_q3'.tr(),
           'a': 'help_faq_debts_a3'.tr()
+        },
+        {
+          'q': 'help_faq_debts_q4'.tr(),
+          'a': 'help_faq_debts_a4'.tr()
         },
       ],
     },
