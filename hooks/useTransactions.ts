@@ -59,6 +59,7 @@ export function useTransactions() {
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
   const [filterYear, setFilterYear] = useState(now.getFullYear())
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [allTotals, setAllTotals] = useState<{ type: string; amount: number }[]>([])
 
   const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
@@ -97,29 +98,35 @@ export function useTransactions() {
   const load = useCallback(async () => {
     const user = currentUser
     if (!user) return
-    const CACHE_KEY = `transactions_${user.id}`
-    try {
-      const cached = sessionStorage.getItem(CACHE_KEY)
-      if (cached) {
-        const { data: cd, ts } = JSON.parse(cached)
-        if (Date.now() - ts < 2 * 60 * 1000) {
-          setTransactions(cd)
-          setLoading(false)
-        }
-      }
-    } catch {}
-    const { data } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('transaction_date', { ascending: false })
-      .order('created_at', { ascending: false })
-      .limit(100)
+    setPage(0)
+    setHasMore(true)
+    const firstDay = `${filterYear}-${String(filterMonth).padStart(2, '0')}-01`
+    const lastDay = new Date(filterYear, filterMonth, 0).toISOString().split('T')[0]
+
+    const [{ data }, { data: totals }] = await Promise.all([
+      supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('transaction_date', firstDay)
+        .lte('transaction_date', lastDay)
+        .order('transaction_date', { ascending: false })
+        .order('created_at', { ascending: false })
+        .range(0, PAGE_SIZE - 1),
+      supabase
+        .from('transactions')
+        .select('type,amount')
+        .eq('user_id', user.id)
+        .gte('transaction_date', firstDay)
+        .lte('transaction_date', lastDay),
+    ])
     const fresh = (data as Transaction[]) ?? []
     setTransactions(fresh)
+    setHasMore(fresh.length === PAGE_SIZE)
     setLoading(false)
-    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: fresh, ts: Date.now() })) } catch {}
-  }, [currentUser, supabase])
+    // store totals separately so StatBar shows full-month numbers even when paginated
+    setAllTotals((totals ?? []) as { type: string; amount: number }[])
+  }, [currentUser, supabase, filterMonth, filterYear])
 
   useEffect(() => { load() }, [load])
 
@@ -227,19 +234,27 @@ export function useTransactions() {
     setDeletingId(null)
   }
 
-  function exportCSV() {
+  async function exportCSV() {
     function csvField(value: string | number | null | undefined): string {
       const str = String(value ?? '')
-      // منع CSV injection: الحقول التي تبدأ بـ =، +، -، @ قد تُنفَّذ كصيغ في Excel
       const safe = /^[=+\-@\t\r]/.test(str) ? `'${str}` : str
-      // تغليف بعلامات اقتباس مع هروب علامات الاقتباس الداخلية
       return `"${safe.replace(/"/g, '""')}"`
     }
+    const user = currentUser
+    if (!user) return
+    // جلب كل المعاملات للشهر (بدون pagination) للتصدير الكامل
+    const firstDay = `${filterYear}-${String(filterMonth).padStart(2, '0')}-01`
+    const lastDay = new Date(filterYear, filterMonth, 0).toISOString().split('T')[0]
+    const { data: allData } = await supabase
+      .from('transactions').select('*').eq('user_id', user.id)
+      .gte('transaction_date', firstDay).lte('transaction_date', lastDay)
+      .order('transaction_date', { ascending: false })
+    const allTx = (allData ?? []) as Transaction[]
     const rows = [
       lang === 'en'
         ? ['Date', 'Type', 'Category', 'Description', 'Amount']
         : ['التاريخ', 'النوع', 'الفئة', 'الوصف', 'المبلغ'],
-      ...transactions.map(tx => [
+      ...allTx.map(tx => [
         tx.transaction_date,
         tx.type === 'income' ? (lang === 'en' ? 'Income' : 'دخل') : (lang === 'en' ? 'Expense' : 'مصروف'),
         tx.category, tx.description ?? '', tx.amount,
@@ -250,7 +265,7 @@ export function useTransactions() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `معاملات-${new Date().toISOString().split('T')[0]}.csv`
+    a.download = `معاملات-${filterYear}-${String(filterMonth).padStart(2,'0')}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -265,8 +280,9 @@ export function useTransactions() {
   }, [transactions, search])
 
   const filtered = useMemo(() => searched.filter(tx => filter === 'all' || tx.type === filter), [searched, filter])
-  const totalIncome = useMemo(() => transactions.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), [transactions])
-  const totalExpense = useMemo(() => transactions.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0), [transactions])
+  // الإجماليات من استعلام منفصل يشمل الشهر كاملاً (غير مقيدة بالـ pagination)
+  const totalIncome = useMemo(() => allTotals.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), [allTotals])
+  const totalExpense = useMemo(() => allTotals.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0), [allTotals])
   const net = useMemo(() => totalIncome - totalExpense, [totalIncome, totalExpense])
 
   return {

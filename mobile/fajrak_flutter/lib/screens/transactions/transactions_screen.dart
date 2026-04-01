@@ -14,6 +14,7 @@ import '../../widgets/transactions/month_year_picker_dialog.dart';
 import '../../widgets/transactions/transaction_filters.dart';
 import '../../widgets/transactions/transaction_list_item.dart';
 import '../../widgets/transactions/transaction_summary.dart';
+import 'recurring_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -316,6 +317,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RecurringScreen())),
+            icon: Icon(Icons.repeat, color: colorScheme.onSurfaceVariant),
+            tooltip: 'recurring_title'.tr(),
+          ),
           IconButton(
             onPressed: _exportCSV,
             icon: Icon(Icons.download, color: colorScheme.onSurfaceVariant),

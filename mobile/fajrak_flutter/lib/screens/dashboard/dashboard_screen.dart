@@ -16,6 +16,7 @@ import '../../widgets/dashboard/dashboard_health_score.dart';
 import '../../widgets/dashboard/dashboard_quick_add.dart';
 import '../../widgets/dashboard/dashboard_stage_card.dart';
 import '../../widgets/dashboard/recent_transactions_list.dart';
+import '../../widgets/dashboard/net_worth_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -32,7 +33,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Map<String, dynamic>> _recentTx = [];
   final List<Map<String, dynamic>> _months6Data = [];
   final List<Map<String, dynamic>> _categoryData = [];
-  double _totalDebt = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
+  double _totalDebt = 0, _totalReceivable = 0, _netWorth = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
   final double _prevExpenses = 0;
   final double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
@@ -52,7 +53,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
         Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
         Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
-        Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment').eq('user_id', user.id).eq('is_paid', false),
+        Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type').eq('user_id', user.id).eq('is_paid', false),
         Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
       ]);
@@ -75,10 +76,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
       final income = txIncome > 0 ? txIncome : profileIncome;
-      final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+      final totalDebt = debts.where((d) => (d['debt_type'] ?? 'owed') == 'owed').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+      final totalReceivable = debts.where((d) => d['debt_type'] == 'receivable').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
       final totalMonthly = debts.fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
       final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
       final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+      final netWorth = invValue + goalsSaved - totalDebt + totalReceivable;
 
       int score = 0;
       final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
@@ -124,6 +127,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _healthScore = score.clamp(0, 100);
         _stage = stage;
         _totalDebt = totalDebt;
+        _totalReceivable = totalReceivable;
+        _netWorth = netWorth;
         _invValue = invValue;
         _goalsSaved = goalsSaved;
         _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
@@ -189,6 +194,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
               DashboardStats(income: _income, expenses: _expenses, net: _net, colorScheme: colorScheme),
               const SizedBox(height: 16),
+              if (_invValue + _goalsSaved + _totalDebt > 0)
+                NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
               DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
               const SizedBox(height: 16),
               DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
