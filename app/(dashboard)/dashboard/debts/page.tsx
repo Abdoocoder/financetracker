@@ -428,6 +428,15 @@ export default function DebtsPage() {
               ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
               : 0
             const pri = PRIORITY_CONFIG[(debt.priority ?? 3) - 1] ?? PRIORITY_CONFIG[2]
+            const todayDate = new Date()
+            const todayDay = todayDate.getDate()
+            const payDay = debt.payment_day ?? 0
+            const daysUntil = payDay > 0
+              ? (todayDay <= payDay
+                ? payDay - todayDay
+                : Math.ceil((new Date(todayDate.getFullYear(), todayDate.getMonth() + 1, payDay).getTime() - new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDay).getTime()) / 86400000))
+              : null
+            const isOverdue = debt.due_date ? new Date(debt.due_date) < todayDate : false
             return (
               <div key={debt.id} style={{
                 background: 'var(--bg-card)', border: '1px solid var(--border)',
@@ -441,6 +450,22 @@ export default function DebtsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>{debt.name}</div>
                     {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{debt.notes}</div>}
+                    {(debt.auto_deduct || isOverdue || daysUntil !== null) && (
+                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+                        {debt.auto_deduct && (
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(59,126,246,0.12)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>⚡ تلقائي</span>
+                        )}
+                        {isOverdue && (
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(239,68,68,0.12)', color: 'var(--accent-red-light)', fontWeight: 700 }}>🔴 متأخر</span>
+                        )}
+                        {daysUntil === 0 && (
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(245,158,11,0.15)', color: 'var(--accent-amber-light)', fontWeight: 700 }}>🔔 اليوم!</span>
+                        )}
+                        {daysUntil !== null && daysUntil > 0 && (
+                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', fontWeight: 600 }}>📅 بعد {daysUntil} يوم</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div style={{ textAlign: 'left', flexShrink: 0 }}>
                     <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace' }}>
