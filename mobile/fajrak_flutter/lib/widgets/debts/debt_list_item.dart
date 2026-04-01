@@ -130,6 +130,22 @@ class _DebtListItemState extends State<DebtListItem> {
     final priorityIndex = ((widget.debt['priority'] as int?) ?? 3) - 1;
     final prioColor = widget.priorityColors[priorityIndex.clamp(0, 4)];
 
+    final paymentDay = widget.debt['payment_day'] as int?;
+    final dueDate = widget.debt['due_date'] as String?;
+    final autoDeduct = widget.debt['auto_deduct'] == true;
+    final now = DateTime.now();
+    final dueDateParsed = dueDate != null ? DateTime.tryParse(dueDate) : null;
+    final isOverdue = dueDateParsed != null && dueDateParsed.isBefore(now);
+    int? daysUntil;
+    if (paymentDay != null) {
+      final today = now.day;
+      daysUntil = today <= paymentDay
+          ? paymentDay - today
+          : DateTime(now.year, now.month + 1, paymentDay)
+              .difference(DateTime(now.year, now.month, now.day))
+              .inDays;
+    }
+
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -190,6 +206,30 @@ class _DebtListItemState extends State<DebtListItem> {
                           fontSize: 11,
                           fontFamily: 'Cairo'),
                       overflow: TextOverflow.ellipsis),
+                if (autoDeduct || isOverdue)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Wrap(spacing: 4, children: [
+                      if (autoDeduct)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFF3B7EF6).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: const Text('⚡ تلقائي',
+                              style: TextStyle(color: Color(0xFF3B7EF6), fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                        ),
+                      if (isOverdue)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: const Text('🔴 متأخر',
+                              style: TextStyle(color: Color(0xFFEF4444), fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                        ),
+                    ]),
+                  ),
               ])),
           Text('${remaining.toStringAsFixed(0)} ${widget.currency}',
               style: const TextStyle(
@@ -258,6 +298,25 @@ class _DebtListItemState extends State<DebtListItem> {
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.w700)),
               ),
+              if (daysUntil != null) ...[
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                      color: daysUntil == 0
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                          : const Color(0xFF64748B).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6)),
+                  child: Text(
+                    daysUntil == 0 ? '🔔 اليوم!' : 'بعد $daysUntil يوم',
+                    style: TextStyle(
+                        color: daysUntil == 0 ? const Color(0xFFF59E0B) : const Color(0xFF64748B),
+                        fontSize: 10,
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
             ],
             if (widget.debt['due_date'] != null) ...[
               const SizedBox(width: 6),

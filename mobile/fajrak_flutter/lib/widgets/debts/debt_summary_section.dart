@@ -64,7 +64,7 @@ class DebtSummarySection extends StatelessWidget {
                 border: Border.all(
                     color: const Color(0xFF10B981).withValues(alpha: 0.2))),
             child: Row(children: [
-              const Icon(Icons.fitness_center, size: 28, color: Color(0xFF10B981)),
+              const Icon(Icons.emoji_events, size: 28, color: Color(0xFF10B981)),
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('debts_total_paid_life'.tr(),
@@ -93,7 +93,7 @@ class DebtSummarySection extends StatelessWidget {
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'Cairo')),
-                  const Icon(Icons.track_changes, size: 16, color: Color(0xFF6EE7B7)),
+                  const Icon(Icons.check_circle_outline, size: 16, color: Color(0xFF6EE7B7)),
                 ]),
               ]),
             ]),
