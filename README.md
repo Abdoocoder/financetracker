@@ -528,6 +528,12 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 - [x] **Receivable Debts: Two-way tracking with collapsible sections**
 - [x] **Investment Sell: Record sell with P&L preview (Robinhood-style)**
 - [x] **Investment Cash: Portfolio cash balance with transfer to main wallet**
+- [x] **Investment Dashboard: Full page with live prices, portfolio stats & wealth simulator**
+- [x] **Recurring Transactions: Automated execution with full CRUD and mobile screen**
+- [x] **Net Worth Card: Real-time total assets vs liabilities tracking (web + mobile)**
+- [x] **Budget Alerts: Overspend detection with push notifications**
+- [x] **Auto Debt Deduction: payment_day scheduling with auto_deduct flag**
+- [x] **Debt Enhancements: Auto-deduct badge, overdue indicator, days-until-payment countdown**
 - [x] Smart Budgeting: 50/30/20 Rule, Category limits
 - [x] Investments: Live prices, Halal flag, P&L
 - [x] Savings Goals: Progress tracking, Icon/color
@@ -552,7 +558,6 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 - [ ] Subscription System (Paddle/Stripe)
 - [ ] AI Financial Advisor (GPT integration)
-- [ ] Receivable debt due date push notifications
 
 ---
 
