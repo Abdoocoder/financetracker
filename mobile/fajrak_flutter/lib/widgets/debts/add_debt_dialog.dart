@@ -95,15 +95,46 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     super.dispose();
   }
 
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red.shade700, duration: const Duration(seconds: 3)),
+    );
+  }
+
   Future<void> _save() async {
-    if (_nameCtrl.text.isEmpty || _originalCtrl.text.isEmpty) {
+    if (_nameCtrl.text.trim().isEmpty) {
+      _showError('debt_name_required'.tr());
       return;
     }
-    final user = Supabase.instance.client.auth.currentUser!;
-    final payDay = int.tryParse(_paymentDayCtrl.text);
-    
+    if (_originalCtrl.text.trim().isEmpty) {
+      _showError('debt_amount_required'.tr());
+      return;
+    }
     final origForeign = double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0;
+    if (origForeign <= 0) {
+      _showError('debt_amount_positive'.tr());
+      return;
+    }
     final remForeign = double.tryParse(_remainingCtrl.text.replaceAll(',', '.')) ?? origForeign;
+    if (remForeign < 0) {
+      _showError('debt_remaining_negative'.tr());
+      return;
+    }
+    if (remForeign > origForeign) {
+      _showError('debt_remaining_exceeds'.tr());
+      return;
+    }
+    final payDay = int.tryParse(_paymentDayCtrl.text);
+    if (_paymentDayCtrl.text.isNotEmpty && (payDay == null || payDay < 1 || payDay > 28)) {
+      _showError('debt_payment_day_range'.tr());
+      return;
+    }
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _showError('error_not_logged_in'.tr());
+      return;
+    }
     final rate = double.tryParse(_exchangeRateCtrl.text) ?? 1.0;
     
     final origBase = _selectedCurrency == widget.baseCurrency ? origForeign : (origForeign * rate);

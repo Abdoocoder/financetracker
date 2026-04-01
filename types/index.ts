@@ -48,6 +48,8 @@ export interface Debt {
   notes: string | null
   is_paid: boolean
   debt_type: 'owed' | 'receivable'
+  payment_day?: number | null
+  auto_deduct?: boolean
   created_at: string
   updated_at: string
 }

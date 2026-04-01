@@ -490,6 +490,7 @@ class _ReceivableDebtCard extends StatelessWidget {
   final VoidCallback onReceive;
 
   const _ReceivableDebtCard({
+    super.key,
     required this.debt,
     required this.currency,
     required this.onEdit,

@@ -740,5 +740,12 @@
   "debts_tab_owed": "ديون عليّ",
   "debts_tab_receivable": "ديون لي",
   "debts_receive_btn": "استلمت الدين",
-  "debts_received_msg": "تم استلام دينك! 🎉"
+  "debts_received_msg": "تم استلام دينك! 🎉",
+  "debt_name_required": "الرجاء إدخال اسم الدين",
+  "debt_amount_required": "الرجاء إدخال المبلغ الأصلي",
+  "debt_amount_positive": "المبلغ يجب أن يكون أكبر من صفر",
+  "debt_remaining_negative": "المبلغ المتبقي لا يمكن أن يكون سالباً",
+  "debt_remaining_exceeds": "المبلغ المتبقي لا يمكن أن يتجاوز المبلغ الأصلي",
+  "debt_payment_day_range": "يوم الدفع يجب أن يكون بين 1 و 28",
+  "error_not_logged_in": "أنت غير مسجل الدخول. الرجاء تسجيل الدخول مجدداً."
 }

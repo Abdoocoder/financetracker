@@ -1,6 +1,7 @@
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { CURRENCIES } from '@/lib/currency'
+import type { TranslationKey } from '@/lib/i18n'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
@@ -33,7 +34,7 @@ interface Props {
   editingId: string | null
   baseCurrency: string
   lang: string
-  t: (key: string) => string
+  t: (key: TranslationKey) => string
   saving: boolean
   onSave: () => void
   onClose: () => void

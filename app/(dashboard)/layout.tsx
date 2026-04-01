@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { UserProvider, useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
@@ -17,7 +17,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const { lang } = useI18n()
   const [alertsCount, setAlertsCount] = useState(0)
   const pathname = usePathname()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const fetchCount = useCallback(async () => {
     if (!user) return
@@ -27,6 +28,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       .eq('is_read', false)
     setAlertsCount(count ?? 0)
   }, [user, supabase])
+
+  // debounced version — تمنع طلبات متعددة عند تغييرات متتالية سريعة
+  const fetchCountDebounced = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(fetchCount, 500)
+  }, [fetchCount])
 
   useEffect(() => {
     if (!user) return
@@ -38,10 +45,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         schema: 'public',
         table: 'alerts',
         filter: `user_id=eq.${user.id}`,
-      }, () => fetchCount())
+      }, fetchCountDebounced)
       .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [user, pathname, fetchCount, supabase])
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      supabase.removeChannel(channel)
+    }
+  }, [user, pathname, fetchCount, fetchCountDebounced, supabase])
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
