@@ -366,7 +366,31 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                   child:
                       Icon(Icons.close, color: colorScheme.error, size: 14))),
         ]),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '${"inv_sell_avg_buy".tr()}: \$${avgPrice.toStringAsFixed(2)}',
+              style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 10,
+                  fontFamily: 'Cairo'),
+            ),
+            Text(
+              'inv_roi_label'.tr() +
+                  ': ${gain >= 0 ? "+" : ""}\$${gain.toStringAsFixed(2)}',
+              style: TextStyle(
+                  color: gain >= 0
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFFEF4444),
+                  fontSize: 10,
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(

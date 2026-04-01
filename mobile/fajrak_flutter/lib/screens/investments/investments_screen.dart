@@ -26,6 +26,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   String _currency = 'JOD';
   double _cashBalance = 0;
   String _cashCurrency = 'USD';
+  String _sortBy = 'none'; // 'none' | 'gain' | 'loss' | 'value' | 'name'
+  String _filterType = 'all'; // 'all' | 'halal' | 'crypto' | 'stocks'
 
   @override
   void initState() {
@@ -108,6 +110,43 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           a +
           (i['shares'] as num).toDouble() *
               (i['avg_buy_price'] as num).toDouble());
+
+  double _invGainPct(Map<String, dynamic> inv) {
+    final cost = (inv['shares'] as num).toDouble() * (inv['avg_buy_price'] as num).toDouble();
+    final value = (inv['shares'] as num).toDouble() * (inv['current_price'] as num).toDouble();
+    return cost > 0 ? (value - cost) / cost * 100 : 0.0;
+  }
+
+  List<Map<String, dynamic>> get _displayedInvestments {
+    var list = List<Map<String, dynamic>>.from(_investments);
+
+    // Filter
+    if (_filterType == 'halal') {
+      list = list.where((i) => i['is_halal'] == true).toList();
+    } else if (_filterType == 'crypto') {
+      list = list.where((i) => (i['type'] as String? ?? '').toLowerCase() == 'crypto').toList();
+    } else if (_filterType == 'stocks') {
+      list = list.where((i) => (i['type'] as String? ?? '').toLowerCase() != 'crypto').toList();
+    }
+
+    // Sort
+    switch (_sortBy) {
+      case 'gain':
+        list.sort((a, b) => _invGainPct(b).compareTo(_invGainPct(a)));
+      case 'loss':
+        list.sort((a, b) => _invGainPct(a).compareTo(_invGainPct(b)));
+      case 'value':
+        list.sort((a, b) {
+          final va = (a['shares'] as num).toDouble() * (a['current_price'] as num).toDouble();
+          final vb = (b['shares'] as num).toDouble() * (b['current_price'] as num).toDouble();
+          return vb.compareTo(va);
+        });
+      case 'name':
+        list.sort((a, b) => (a['symbol'] as String? ?? '').compareTo(b['symbol'] as String? ?? ''));
+    }
+
+    return list;
+  }
 
   Future<void> _deleteInvestment(String id) async {
     final confirm = await showDialog<bool>(
@@ -262,16 +301,88 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                       ]),
                     )
                   else ...[
-                    Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('inv_portfolio_count'.tr(args: [_investments.length.toString()]),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('inv_portfolio_count'.tr(args: [_investments.length.toString()]),
                             style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
                                 fontFamily: 'Cairo',
-                                fontSize: 15))),
+                                fontSize: 15)),
+                        PopupMenuButton<String>(
+                          initialValue: _sortBy,
+                          onSelected: (v) => setState(() => _sortBy = v),
+                          color: colorScheme.surface,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _sortBy != 'none'
+                                  ? colorScheme.primary.withValues(alpha: 0.12)
+                                  : colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: colorScheme.outlineVariant),
+                            ),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.sort, size: 14, color: colorScheme.onSurfaceVariant),
+                              const SizedBox(width: 4),
+                              Text('inv_sort_by'.tr(),
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      fontFamily: 'Cairo',
+                                      color: colorScheme.onSurfaceVariant)),
+                            ]),
+                          ),
+                          itemBuilder: (_) => [
+                            PopupMenuItem(value: 'none', child: Text('inv_sort_none'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
+                            PopupMenuItem(value: 'gain', child: Text('inv_sort_gain'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
+                            PopupMenuItem(value: 'loss', child: Text('inv_sort_loss'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
+                            PopupMenuItem(value: 'value', child: Text('inv_sort_value'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
+                            PopupMenuItem(value: 'name', child: Text('inv_sort_name'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
+                          ],
+                        ),
+                      ],
+                    ),
                     const SizedBox(height: 10),
-                    ..._investments.map((inv) => InvestmentListItem(
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(children: [
+                        for (final f in ['all', 'halal', 'crypto', 'stocks'])
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: GestureDetector(
+                              onTap: () => setState(() => _filterType = f),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: _filterType == f
+                                      ? colorScheme.primary
+                                      : colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: _filterType == f
+                                        ? colorScheme.primary
+                                        : colorScheme.outlineVariant,
+                                  ),
+                                ),
+                                child: Text(
+                                  'inv_filter_$f'.tr(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: 'Cairo',
+                                    fontWeight: FontWeight.w700,
+                                    color: _filterType == f
+                                        ? colorScheme.onPrimary
+                                        : colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ]),
+                    ),
+                    const SizedBox(height: 10),
+                    ..._displayedInvestments.map((inv) => InvestmentListItem(
                           key: ValueKey(inv['id']),
                           inv: inv,
                           onDelete: _deleteInvestment,
