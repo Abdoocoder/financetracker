@@ -44,7 +44,13 @@
       "Bash(find /c/Users/skyli/Documents/financetracker/lib -type f -name *.ts)",
       "Bash(ls -la /c/Users/skyli/Documents/financetracker/app/\\\\\\(dashboard\\\\\\)/dashboard/)",
       "Bash(find c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/android -name *.gradle -o -name *.gradle.kts)",
-      "WebFetch(domain:docs.codemagic.io)"
+      "WebFetch(domain:docs.codemagic.io)",
+      "Bash(grep -n \"_recordSell\\\\|recordSell\\\\|_showSellForm\\\\|showSellForm\" /c/Users/skyli/Documents/financetracker/mobile/fajrak_flutter/lib/widgets/investments/*.dart)",
+      "Bash(xargs ls:*)",
+      "Bash(find /c/Users/skyli/Documents/financetracker/app -name *.tsx -o -name *.ts)",
+      "Bash(ls -la \"/c/Users/skyli/Documents/financetracker/app/\\(dashboard\\)/dashboard/investments/\")",
+      "Bash(grep -n \"api/exchange-rate\" /c/Users/skyli/Documents/financetracker/app/api/*/route.ts)",
+      "Bash(wc -l /c/Users/skyli/Documents/financetracker/lib/supabase/*.ts)"
     ]
   }
 }
