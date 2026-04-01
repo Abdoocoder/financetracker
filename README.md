@@ -154,6 +154,10 @@ The command center of your financial life.
 | Live prices | Real-time market data via API |
 | Halal flag | Islamic investment certification |
 | P&L tracking | Profit/loss per holding |
+| **Record Buy** | Log buy transactions with shares, price & commission |
+| **Record Sell** | Log sell transactions with live P&L preview before confirming |
+| **Investment Cash Balance** | Sell proceeds stored separately as portfolio cash |
+| **Transfer to Main Wallet** | Move cash to main wallet with live exchange rate conversion |
 | Wealth Simulator | Interactive sliders for return rate, monthly savings |
 | Purchase date | Track haul (Islamic year) per investment |
 
@@ -289,6 +293,7 @@ A fully automated Islamic obligatory charity calculator.
 | `debt_payments` | Payment history log |
 | `investments` | Portfolio holdings |
 | `investment_transactions` | Buy/sell history |
+| `investment_cash` | Portfolio cash balance from sell proceeds (per user, per currency) |
 | `budgets` | Monthly category limits |
 | `alerts` | Smart notification records |
 | `savings_goals` | Financial targets |
@@ -508,6 +513,8 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 - [x] Transactions: Full CRUD, Recurring, Multi-currency, CSV Export
 - [x] Debt Management: Auto-deduction, Progress, Confetti
 - [x] **Receivable Debts: Two-way tracking with collapsible sections**
+- [x] **Investment Sell: Record sell with P&L preview (Robinhood-style)**
+- [x] **Investment Cash: Portfolio cash balance with transfer to main wallet**
 - [x] Smart Budgeting: 50/30/20 Rule, Category limits
 - [x] Investments: Live prices, Halal flag, P&L
 - [x] Savings Goals: Progress tracking, Icon/color
@@ -538,7 +545,18 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.16.1 — 2026-03-31 *(Latest)*
+### v3.17.0 — 2026-04-01 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 📉 **Record Sell** | Log sell transactions on both web and Flutter with P&L preview before confirming (Robinhood-style) |
+| 💵 **Investment Cash Balance** | Sell proceeds are stored as portfolio cash — separate from main wallet |
+| 🔄 **Transfer to Main Wallet** | Move investment cash to the main wallet with live exchange rate for any user currency |
+| 🗃️ **DB Migration 013** | Added `investment_cash` table with `upsert_investment_cash` RPC function |
+| 🌐 **i18n** | New translation keys for sell, cash balance, and transfer flows |
+| ⚙️ **Settings Screen** | User profile, preferences, and asset summary in Flutter |
+
+### v3.16.1 — 2026-03-31
 
 | Change | Description |
 |:-------|:------------|
