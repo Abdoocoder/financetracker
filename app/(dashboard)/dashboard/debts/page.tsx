@@ -9,8 +9,6 @@ import type { Debt } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
 import { AddButton } from '@/components/ui/add-button'
 import { StatBar } from '@/components/ui/stat-bar'
-import { Modal } from '@/components/ui/modal'
-import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
@@ -18,14 +16,8 @@ import { clearUserCache } from '@/lib/cache'
 import { haptic } from '@/lib/haptic'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { CURRENCIES, fetchExchangeRate } from '@/lib/currency'
-
-const PRIORITY_CONFIG = [
-  { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
-  { color: '#F59E0B', ar: 'عالية', en: 'High' },
-  { color: '#3B7EF6', ar: 'متوسطة', en: 'Medium' },
-  { color: '#8B9CC8', ar: 'منخفضة', en: 'Low' },
-  { color: '#4A5568', ar: 'مؤجلة', en: 'Deferred' },
-]
+import { DebtCard } from './_components/DebtCard'
+import { DebtForm } from './_components/DebtForm'
 
 // ── Confetti Component ──
 function Confetti({ onDone }: { onDone: () => void }) {
@@ -438,99 +430,25 @@ export default function DebtsPage() {
             </button>
           )}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {showOwed && owedDebts.map(debt => {
-            const pct = Number(debt.original_amount) > 0
-              ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
-              : 0
-            const pri = PRIORITY_CONFIG[(debt.priority ?? 3) - 1] ?? PRIORITY_CONFIG[2]
-            const todayDate = new Date()
-            const todayDay = todayDate.getDate()
-            const payDay = debt.payment_day ?? 0
-            const daysUntil = payDay > 0
-              ? (todayDay <= payDay
-                ? payDay - todayDay
-                : Math.ceil((new Date(todayDate.getFullYear(), todayDate.getMonth() + 1, payDay).getTime() - new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDay).getTime()) / 86400000))
-              : null
-            const isOverdue = debt.due_date ? new Date(debt.due_date) < todayDate : false
-            return (
-              <div key={debt.id} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderRadius: 18, padding: '16px',
-                borderRight: `3px solid ${pri.color}`,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `${pri.color}18`, border: `1px solid ${pri.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: pri.color, boxShadow: `0 0 8px ${pri.color}` }} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>{debt.name}</div>
-                    {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{debt.notes}</div>}
-                    {(debt.auto_deduct || isOverdue || daysUntil !== null) && (
-                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
-                        {debt.auto_deduct && (
-                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(59,126,246,0.12)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>⚡ تلقائي</span>
-                        )}
-                        {isOverdue && (
-                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(239,68,68,0.12)', color: 'var(--accent-red-light)', fontWeight: 700 }}>🔴 متأخر</span>
-                        )}
-                        {daysUntil === 0 && (
-                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(245,158,11,0.15)', color: 'var(--accent-amber-light)', fontWeight: 700 }}>🔔 اليوم!</span>
-                        )}
-                        {daysUntil !== null && daysUntil > 0 && (
-                          <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', fontWeight: 600 }}>📅 بعد {daysUntil} يوم</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                    <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace' }}>
-                      {Number(debt.remaining_amount_foreign || debt.remaining_amount).toFixed(0)}
-                      <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 2 }}> {debt.currency || baseCurrency}</span>
-                    </div>
-                    {debt.currency && debt.currency !== baseCurrency && (
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>≈ {Number(debt.remaining_amount).toFixed(0)} {baseCurrency}</div>
-                    )}
-                    {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}/شهر</div>}
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    <button onClick={() => startEdit(debt)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
-                    <button onClick={() => setConfirmDelete(debt.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                  </div>
-                </div>
-                <div className="progress-track" style={{ marginBottom: 10 }}>
-                  <div className="progress-fill gradient-green" style={{ width: `${Math.min(pct, 100)}%` }} />
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{pct.toFixed(0)}% مسدد</span>
-                  {paymentDebtId === debt.id ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <select
-                        value={paymentCurrency || debt.currency || baseCurrency}
-                        onChange={e => setPaymentCurrency(e.target.value)}
-                        style={{ padding: '6px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 11, fontFamily: 'inherit', outline: 'none' }}
-                      >
-                        {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
-                      </select>
-                      <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)}
-                        placeholder={lang === "en" ? "Amount" : "المبلغ"} autoFocus onKeyDown={e => e.key === 'Enter' && makePayment(debt.id)}
-                        style={{ width: 70, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }} />
-                      <button onClick={() => makePayment(debt.id)} disabled={payingSaving}
-                        style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
-                        {payingSaving ? '⏳' : (lang === 'en' ? '✓' : '✓')}
-                      </button>
-                      <button onClick={() => { setPaymentDebtId(null); setPaymentAmount(''); setPaymentCurrency('') }}
-                        style={{ padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
-                    </div>
-                  ) : (
-                    <button onClick={() => { setPaymentDebtId(debt.id); setPaymentAmount('') }}
-                      style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                      + دفعة
-                    </button>
-                  )}
-                </div>
-              </div>
-            )
-          })}
+          {showOwed && owedDebts.map(debt => (
+            <DebtCard
+              key={debt.id}
+              debt={debt}
+              baseCurrency={baseCurrency}
+              lang={lang}
+              paymentDebtId={paymentDebtId}
+              paymentAmount={paymentAmount}
+              paymentCurrency={paymentCurrency}
+              payingSaving={payingSaving}
+              onEdit={startEdit}
+              onDelete={setConfirmDelete}
+              onStartPayment={id => { setPaymentDebtId(id); setPaymentAmount('') }}
+              onCancelPayment={() => { setPaymentDebtId(null); setPaymentAmount(''); setPaymentCurrency('') }}
+              onConfirmPayment={makePayment}
+              onPaymentAmountChange={setPaymentAmount}
+              onPaymentCurrencyChange={setPaymentCurrency}
+            />
+          ))}
         </div>
         </>
       )}
@@ -637,118 +555,17 @@ export default function DebtsPage() {
       )}
 
       {showForm && (
-        <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={() => setShowForm(false)}>
-          {/* نوع الدين */}
-          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-            <button onClick={() => setForm(f => ({ ...f, debt_type: 'owed' }))}
-              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
-                background: form.debt_type === 'owed' ? 'rgba(239,68,68,0.15)' : 'var(--bg-secondary)',
-                color: form.debt_type === 'owed' ? '#EF4444' : 'var(--text-muted)' }}>
-              💳 {t('debts_type_owed')}
-            </button>
-            <button onClick={() => setForm(f => ({ ...f, debt_type: 'receivable' }))}
-              style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
-                background: form.debt_type === 'receivable' ? 'rgba(16,185,129,0.15)' : 'var(--bg-secondary)',
-                color: form.debt_type === 'receivable' ? '#10B981' : 'var(--text-muted)' }}>
-              💰 {t('debts_type_receivable')}
-            </button>
-          </div>
-          <FormField label={t('debts_name')}>
-            <Input placeholder={t('debts_name_hint')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-          </FormField>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
-              <Input type="number" placeholder="0" value={form.currency === baseCurrency ? form.original_amount : form.original_amount_foreign} onChange={e => form.currency === baseCurrency ? setForm(f => ({ ...f, original_amount: e.target.value })) : setForm(f => ({ ...f, original_amount_foreign: e.target.value }))} />
-            </FormField>
-            <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
-              <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
-                {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
-              </Select>
-            </FormField>
-          </div>
-
-          {form.currency !== baseCurrency && (
-            <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 12, marginBottom: 12, border: '1px dashed var(--border)' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <FormField label={t('trans_exchange_rate') || 'سعر الصرف'}>
-                  <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => setForm(f => ({ ...f, exchange_rate: e.target.value }))} />
-                </FormField>
-                <FormField label="المعادل">
-                  <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, textAlign: 'center', fontSize: 13 }}>
-                    {(parseFloat(form.original_amount_foreign) * parseFloat(form.exchange_rate) || 0).toFixed(2)} {baseCurrency}
-                  </div>
-                </FormField>
-              </div>
-            </div>
-          )}
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label={t('debts_monthly')}>
-              <Input type="number" placeholder="0" value={form.monthly_payment} onChange={e => setForm(f => ({ ...f, monthly_payment: e.target.value }))} />
-            </FormField>
-            <FormField label={t('debts_due_date')}>
-              <Input type="date" value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} />
-            </FormField>
-          </div>
-          <FormField label="الأولوية">
-            <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
-              {PRIORITY_CONFIG.map((p, i) => (
-                <option key={i + 1} value={i + 1}>{lang === 'en' ? p.en : p.ar}</option>
-              ))}
-            </Select>
-          </FormField>
-          {!editingId && (
-            <FormField label={lang === 'ar' ? '💳 استلمت هذا المبلغ' : '💳 I received this amount'}>
-              <div
-                onClick={() => setForm(f => ({ ...f, received_amount: !f.received_amount }))}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                  borderRadius: 10, cursor: 'pointer',
-                  background: form.received_amount ? 'rgba(16,185,129,0.1)' : 'var(--bg-elevated)',
-                  border: `1px solid ${form.received_amount ? 'rgba(16,185,129,0.4)' : 'var(--border)'}`,
-                  transition: 'all 0.2s',
-                }}
-              >
-                <div style={{
-                  width: 20, height: 20, borderRadius: 6,
-                  background: form.received_amount ? '#10B981' : 'transparent',
-                  border: `2px solid ${form.received_amount ? '#10B981' : 'var(--border)'}`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  {form.received_amount && <span style={{ color: 'white', fontSize: 12 }}>✓</span>}
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: form.received_amount ? '#10B981' : 'var(--text-secondary)' }}>
-                    {lang === 'ar' ? 'نعم، استلمت هذا المبلغ اليوم' : 'Yes, I received this amount today'}
-                  </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                    {lang === 'ar' ? 'سيُضاف تلقائياً كدخل في معاملاتك' : 'Will be added automatically as income in your transactions'}
-                  </div>
-                </div>
-              </div>
-            </FormField>
-          )}
-          <FormField label={t('debts_notes')}>
-            <Input placeholder={t('debts_notes_hint')} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
-          </FormField>
-          <FormField label={t('debts_payment_day')}>
-            <Input type="number" placeholder="1" value={form.payment_day} onChange={e => setForm(f => ({ ...f, payment_day: e.target.value }))} />
-          </FormField>
-          <FormField label={t('debts_auto_deduct')}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
-              <button
-                onClick={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
-                style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: form.auto_deduct ? 'var(--accent-green)' : 'var(--bg-elevated)', transition: 'background 0.2s', position: 'relative', flexShrink: 0 }}>
-                <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form.auto_deduct ? 3 : 23 }} />
-              </button>
-              <span style={{ fontSize: 13, color: form.auto_deduct ? 'var(--accent-green-light)' : 'var(--text-muted)', fontWeight: 600 }}>
-                {form.auto_deduct ? t('debts_auto_on') : t('debts_auto_off')}
-              </span>
-            </div>
-          </FormField>
-          <SaveButton label={editingId ? t('debts_save_edit') : t('debts_save')} loading={saving} onClick={saveDebt} />
-        </Modal>
+        <DebtForm
+          form={form}
+          setForm={setForm}
+          editingId={editingId}
+          baseCurrency={baseCurrency}
+          lang={lang}
+          t={t}
+          saving={saving}
+          onSave={saveDebt}
+          onClose={() => setShowForm(false)}
+        />
       )}
     </div>
   )

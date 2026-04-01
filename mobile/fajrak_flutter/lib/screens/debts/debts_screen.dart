@@ -28,6 +28,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   List<Map<String, dynamic>> _debts = [];
   List<Map<String, dynamic>> _receivableDebts = [];
   List<Map<String, dynamic>> _paidDebts = [];
+  List<Map<String, dynamic>> _debtAlerts = [];
   bool _loading = true;
   bool _showPaid = false;
   bool _showOwed = true;
@@ -72,6 +73,16 @@ class _DebtsScreenState extends State<DebtsScreen> {
       final paidTotal = (paid as List)
           .fold(0.0, (a, d) => a + (d['original_amount'] as num).toDouble());
           
+      final alerts = await Supabase.instance.client
+          .from('alerts')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_read', false)
+          .eq('is_active', true)
+          .or('title.ilike.%قسط%,title.ilike.%دين%,title.ilike.%سداد%')
+          .order('created_at', ascending: false)
+          .limit(5);
+
       if (mounted) {
         final allActive = List<Map<String, dynamic>>.from(active);
         setState(() {
@@ -79,6 +90,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           _receivableDebts = allActive.where((d) => d['debt_type'] == 'receivable').toList();
           _paidDebts = List<Map<String, dynamic>>.from(paid);
           _totalPaidAmount = paidTotal;
+          _debtAlerts = List<Map<String, dynamic>>.from(alerts);
           _loading = false;
         });
       }
@@ -87,6 +99,14 @@ class _DebtsScreenState extends State<DebtsScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _dismissAlert(String id) async {
+    await Supabase.instance.client
+        .from('alerts')
+        .update({'is_read': true})
+        .eq('id', id);
+    if (mounted) setState(() => _debtAlerts.removeWhere((a) => a['id'] == id));
   }
 
   void _showCelebration(String name) {
@@ -241,6 +261,72 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     lifeTimePaid: _totalPaidAmount,
                     paidCount: _paidDebts.length,
                   ),
+
+                  // ── تنبيهات الديون ──
+                  if (_debtAlerts.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ..._debtAlerts.map((alert) {
+                      final type = alert['type'] as String? ?? 'info';
+                      final isAchievement = type == 'achievement';
+                      final isWarning = type == 'warning';
+                      final color = isAchievement
+                          ? const Color(0xFF10B981)
+                          : isWarning
+                              ? const Color(0xFFF59E0B)
+                              : const Color(0xFF3B7EF6);
+                      return Dismissible(
+                        key: ValueKey(alert['id']),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (_) => _dismissAlert(alert['id'] as String),
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(Icons.delete_outline, color: Color(0xFFEF4444), size: 20),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.07),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: color.withValues(alpha: 0.25)),
+                          ),
+                          child: Row(children: [
+                            Text(isAchievement ? '🎉' : isWarning ? '💳' : 'ℹ️',
+                                style: const TextStyle(fontSize: 18)),
+                            const SizedBox(width: 10),
+                            Expanded(child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(alert['title'] ?? '',
+                                    style: TextStyle(
+                                        color: color,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'Cairo')),
+                                if ((alert['message'] ?? '').toString().isNotEmpty)
+                                  Text(alert['message'],
+                                      style: const TextStyle(
+                                          color: Color(0xFF94A3B8),
+                                          fontSize: 11,
+                                          fontFamily: 'Cairo'),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis),
+                              ],
+                            )),
+                            GestureDetector(
+                              onTap: () => _dismissAlert(alert['id'] as String),
+                              child: Icon(Icons.close, size: 16, color: color.withValues(alpha: 0.6)),
+                            ),
+                          ]),
+                        ),
+                      );
+                    }),
+                  ],
                   const SizedBox(height: 12),
 
                   // ── ديون عليّ ──
