@@ -26,7 +26,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
-  double _income = 0, _expenses = 0, _net = 0;
+  double _income = 0, _expenses = 0, _net = 0, _monthlyDebtCommitments = 0;
   int _healthScore = 0;
   String _currency = 'JOD';
   String _name = '';
@@ -53,7 +53,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
         Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
         Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
-        Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type').eq('user_id', user.id).eq('is_paid', false),
+        Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type, auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
       ]);
@@ -79,6 +79,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final totalDebt = debts.where((d) => (d['debt_type'] ?? 'owed') == 'owed').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
       final totalReceivable = debts.where((d) => d['debt_type'] == 'receivable').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
       final totalMonthly = debts.fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
+      final monthlyDebtCommitments = debts
+          .where((d) => d['auto_deduct'] == true && (d['debt_type'] ?? 'owed') == 'owed')
+          .fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
       final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
       final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
       final netWorth = invValue + goalsSaved - totalDebt + totalReceivable;
@@ -123,6 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _income = income;
         _expenses = txExpenses;
         _net = income - txExpenses;
+        _monthlyDebtCommitments = monthlyDebtCommitments;
         _recentTx = recent.cast<Map<String, dynamic>>();
         _healthScore = score.clamp(0, 100);
         _stage = stage;
@@ -192,7 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               DashboardHeader(name: _name),
               const SizedBox(height: 16),
-              DashboardStats(income: _income, expenses: _expenses, net: _net, colorScheme: colorScheme),
+              DashboardStats(income: _income, expenses: _expenses, net: _net, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
               const SizedBox(height: 16),
               DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
               const SizedBox(height: 16),

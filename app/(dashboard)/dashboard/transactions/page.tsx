@@ -69,7 +69,8 @@ export default function TransactionsPage() {
         <>
           <StatBar stats={[
             { label: t('dash_income'), value: `${tx.totalIncome.toFixed(0)}+`, color: 'var(--accent-green-light)' },
-            { label: t('dash_expenses'), value: `${tx.totalExpense.toFixed(0)}`, color: 'var(--accent-red-light)' },
+            { label: t('dash_expenses'), value: tx.totalRealExpense.toFixed(0), color: 'var(--accent-red-light)' },
+            ...(tx.totalDebtPayments > 0 ? [{ label: t('dash_debt_payments'), value: `💳 ${tx.totalDebtPayments.toFixed(0)}`, color: 'var(--accent-blue-light)' }] : []),
             { label: t('dash_net'), value: `${tx.net >= 0 ? '+' : ''}${tx.net.toFixed(0)}`, color: tx.net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
           ]} />
           <TransactionFilters

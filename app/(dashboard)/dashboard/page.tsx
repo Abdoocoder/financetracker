@@ -112,9 +112,11 @@ const CACHE_TTL_MS = 2 * 60 * 1000
 export interface DashboardData {
   income: number
   expenses: number
+  debtPayments: number
   months6: Array<{ month: string; income: number; expense: number }>
   categories: [string, number][]
   net: number
+  monthlyDebtCommitments: number
   prevIncome: number
   prevExpenses: number
   totalDebt: number
@@ -168,7 +170,7 @@ function useDashboardData() {
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
         supabase.from('profiles').select('monthly_income, full_name').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-        supabase.from('debts').select('remaining_amount,debt_type').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('debts').select('remaining_amount,monthly_payment,debt_type,auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
@@ -177,9 +179,11 @@ function useDashboardData() {
 
       const txs = txRes.data ?? []
       const profileData = profileRes.data as { monthly_income: number; full_name: string | null } | null
+      const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const income = txIncome > 0 ? txIncome : Number(profileData?.monthly_income ?? 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+      const debtPayments = txs.filter(t => t.type === 'expense' && DEBT_CATEGORIES.includes(t.category ?? '')).reduce((a, t) => a + Number(t.amount), 0)
       const catMap: Record<string, number> = {}
       txs.filter(t => t.type === 'expense').forEach(t => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
       const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 5)
@@ -192,8 +196,12 @@ function useDashboardData() {
         return { month: label, income: mt.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), expense: mt.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0) }
       })
       const prevMonth = months6[4] ?? { income: 0, expense: 0 }
+      const monthlyDebtCommitments = (debtRes.data ?? [])
+        .filter((d: {debt_type?: string; auto_deduct?: boolean}) => d.auto_deduct === true && (d.debt_type ?? 'owed') === 'owed')
+        .reduce((a: number, d: {monthly_payment?: number}) => a + Number(d.monthly_payment ?? 0), 0)
+
       const newData = {
-        income, expenses, months6, categories, net: income - expenses,
+        income, expenses, debtPayments, months6, categories, net: income - expenses, monthlyDebtCommitments,
         prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
         totalDebt: (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
         totalReceivable: (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
@@ -243,6 +251,10 @@ export default function DashboardPage() {
   const net = data?.net ?? 0
   const income = data?.income ?? 0
   const expenses = data?.expenses ?? 0
+  const debtPayments = data?.debtPayments ?? 0
+  const realExpenses = expenses - debtPayments
+  const monthlyDebtCommitments = data?.monthlyDebtCommitments ?? 0
+  const netAfterDebts = net - monthlyDebtCommitments
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
   return (
@@ -288,17 +300,36 @@ export default function DashboardPage() {
 
       {/* Stats — دائماً ظاهرة */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-        {[
-          { label: t('dash_income'), value: `+${fmt(income)}`, color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑' },
-          { label: t('dash_expenses'), value: fmt(expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓' },
-          { label: t('dash_net'), value: `${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
-        ].map((s, i) => (
-          <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
-            <div style={{ fontSize: 12, color: s.color, fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>{s.icon}</div>
-            <div style={{ fontSize: 17, fontWeight: 900, color: s.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{s.value}</div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{s.label}</div>
-          </div>
-        ))}
+        {/* بطاقة الدخل */}
+        <div style={{ background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, color: 'var(--accent-green-light)', fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>↑</div>
+          <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{`+${fmt(income)}`}</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{t('dash_income')}</div>
+        </div>
+        {/* بطاقة المصاريف */}
+        <div style={{ background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, color: 'var(--accent-red-light)', fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>↓</div>
+          <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{fmt(realExpenses > 0 ? realExpenses : expenses)}</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{t('dash_expenses')}</div>
+          {debtPayments > 0 && (
+            <div style={{ marginTop: 5, padding: '2px 4px', borderRadius: 5, background: 'rgba(59,126,246,0.1)' }}>
+              <div style={{ fontSize: 8, color: '#3B7EF6', fontWeight: 700 }}>💳 {t('dash_debt_payments')}</div>
+              <div style={{ fontSize: 11, fontWeight: 900, color: '#3B7EF6', fontFamily: 'monospace' }}>{fmt(debtPayments)}</div>
+            </div>
+          )}
+        </div>
+        {/* بطاقة الصافي مع الالتزامات */}
+        <div style={{ background: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: `1px solid ${net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>=</div>
+          <div style={{ fontSize: 17, fontWeight: 900, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{`${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`}</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{t('dash_net')}</div>
+          {monthlyDebtCommitments > 0 && (
+            <div style={{ marginTop: 6, padding: '3px 5px', borderRadius: 6, background: netAfterDebts >= 0 ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)' }}>
+              <div style={{ fontSize: 8, color: '#3B7EF6', fontWeight: 700 }}>⚡ {t('dash_after_debts')}</div>
+              <div style={{ fontSize: 13, fontWeight: 900, color: netAfterDebts >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* إضافة سريعة — مباشرة بعد الإحصائيات */}
@@ -307,12 +338,14 @@ export default function DashboardPage() {
         if (!user) return
         const now = new Date()
         const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-        const { data: txs } = await supabase.from('transactions').select('type,amount').eq('user_id', user.id).gte('transaction_date', start)
+        const { data: txs } = await supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', start)
         if (!txs) return
+        const DEBT_CATS = ['ديون', 'debts_title', 'Debts']
         const inc = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
         const exp = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+        const dbt = txs.filter(t => t.type === 'expense' && DEBT_CATS.includes((t as any).category ?? '')).reduce((a, t) => a + Number(t.amount), 0)
         try { sessionStorage.removeItem(`dashboard_${user.id}`) } catch { }
-        setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, net: inc - exp } : prev)
+        setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, debtPayments: dbt, net: inc - exp, monthlyDebtCommitments: prev.monthlyDebtCommitments } : prev)
       }} />
 
       {/* صافي الثروة — مطوي افتراضياً */}

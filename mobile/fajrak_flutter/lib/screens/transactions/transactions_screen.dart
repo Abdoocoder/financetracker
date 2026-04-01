@@ -290,11 +290,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final colorScheme = theme.colorScheme;
     final filtered = _filtered;
 
+    const debtCategories = ['ديون', 'debts_title', 'Debts'];
     final income = _allTransactions
         .where((t) => t['type'] == 'income')
         .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
     final expenses = _allTransactions
         .where((t) => t['type'] == 'expense')
+        .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
+    final debtPayments = _allTransactions
+        .where((t) => t['type'] == 'expense' && debtCategories.contains(t['category'] as String?))
         .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
 
     return Scaffold(
@@ -334,6 +338,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           TransactionSummary(
             income: income,
             expenses: expenses,
+            debtPayments: debtPayments,
             currency: _currency,
             colorScheme: colorScheme,
           ),

@@ -42,6 +42,8 @@
   "dash_income": "Income",
   "dash_expenses": "Expenses",
   "dash_net": "Net",
+  "dash_after_debts": "After Debts",
+  "dash_debt_payments": "Debt Payments",
   "dash_debts": "Total Debts",
   "dash_investments": "Investments",
   "dash_goals": "Savings Goals",

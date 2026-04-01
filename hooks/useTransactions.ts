@@ -59,7 +59,7 @@ export function useTransactions() {
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
   const [filterYear, setFilterYear] = useState(now.getFullYear())
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
-  const [allTotals, setAllTotals] = useState<{ type: string; amount: number }[]>([])
+  const [allTotals, setAllTotals] = useState<{ type: string; amount: number; category?: string }[]>([])
 
   const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
@@ -115,7 +115,7 @@ export function useTransactions() {
         .range(0, PAGE_SIZE - 1),
       supabase
         .from('transactions')
-        .select('type,amount')
+        .select('type,amount,category')
         .eq('user_id', user.id)
         .gte('transaction_date', firstDay)
         .lte('transaction_date', lastDay),
@@ -125,7 +125,7 @@ export function useTransactions() {
     setHasMore(fresh.length === PAGE_SIZE)
     setLoading(false)
     // store totals separately so StatBar shows full-month numbers even when paginated
-    setAllTotals((totals ?? []) as { type: string; amount: number }[])
+    setAllTotals((totals ?? []) as { type: string; amount: number; category?: string }[])
   }, [currentUser, supabase, filterMonth, filterYear])
 
   useEffect(() => { load() }, [load])
@@ -281,13 +281,16 @@ export function useTransactions() {
 
   const filtered = useMemo(() => searched.filter(tx => filter === 'all' || tx.type === filter), [searched, filter])
   // الإجماليات من استعلام منفصل يشمل الشهر كاملاً (غير مقيدة بالـ pagination)
+  const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
   const totalIncome = useMemo(() => allTotals.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), [allTotals])
   const totalExpense = useMemo(() => allTotals.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0), [allTotals])
+  const totalDebtPayments = useMemo(() => allTotals.filter(t => t.type === 'expense' && DEBT_CATEGORIES.includes(t.category ?? '')).reduce((a, t) => a + Number(t.amount), 0), [allTotals])
+  const totalRealExpense = useMemo(() => totalExpense - totalDebtPayments, [totalExpense, totalDebtPayments])
   const net = useMemo(() => totalIncome - totalExpense, [totalIncome, totalExpense])
 
   return {
     transactions, filtered, loading, saving, deletingId,
-    totalIncome, totalExpense, net,
+    totalIncome, totalExpense, totalDebtPayments, totalRealExpense, net,
     hasMore, loadingMore, loadMore,
     showForm, form, setForm, editingId, errors,
     openAdd, startEdit, closeForm, saveTransaction,
