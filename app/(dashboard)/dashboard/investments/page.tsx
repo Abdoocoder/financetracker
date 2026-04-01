@@ -248,6 +248,8 @@ export default function InvestmentsPage() {
   const [showJod, setShowJod] = useState(false)
   const [priceStatus, setPriceStatus] = useState<Record<string, 'live' | 'manual'>>({})
   const [userCurrency, setUserCurrency] = useState('JOD')
+  const [sortBy, setSortBy] = useState<'none' | 'gain' | 'loss' | 'value' | 'name'>('none')
+  const [filterType, setFilterType] = useState<'all' | 'halal' | 'crypto' | 'stocks'>('all')
   const { t, lang } = useI18n()
   const supabase = createClient()
 
@@ -484,6 +486,21 @@ export default function InvestmentsPage() {
   const totalPnL = totalValueUSD - totalCostUSD
   const pnlPct   = totalCostUSD > 0 ? (totalPnL / totalCostUSD * 100).toFixed(1) : '0'
 
+  const displayedInvestments = (() => {
+    let list = [...investments]
+    if (filterType === 'halal') list = list.filter(i => i.is_halal)
+    else if (filterType === 'crypto') list = list.filter(i => i.type === 'crypto')
+    else if (filterType === 'stocks') list = list.filter(i => i.type !== 'crypto')
+    const gainPct = (i: Investment) => i.shares * i.avg_buy_price > 0
+      ? (i.shares * i.current_price - i.shares * i.avg_buy_price) / (i.shares * i.avg_buy_price)
+      : 0
+    if (sortBy === 'gain') list.sort((a, b) => gainPct(b) - gainPct(a))
+    else if (sortBy === 'loss') list.sort((a, b) => gainPct(a) - gainPct(b))
+    else if (sortBy === 'value') list.sort((a, b) => (b.shares * b.current_price) - (a.shares * a.current_price))
+    else if (sortBy === 'name') list.sort((a, b) => a.symbol.localeCompare(b.symbol))
+    return list
+  })()
+
   if (loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {[0,1].map(i => <div key={i} className="skeleton" style={{ height: 200, borderRadius: 16 }} />)}
@@ -524,7 +541,40 @@ export default function InvestmentsPage() {
         <EmptyState icon="📈" title="لا توجد استثمارات" subtitle="أضف أول أصل استثماري" />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {investments.map(inv => {
+          {/* Filter + Sort bar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', flexShrink: 1 }}>
+              {(['all', 'halal', 'crypto', 'stocks'] as const).map(f => (
+                <button key={f} onClick={() => setFilterType(f)} style={{
+                  padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+                  cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
+                  background: filterType === f ? 'var(--accent-blue)' : 'var(--bg-secondary)',
+                  color: filterType === f ? 'white' : 'var(--text-muted)',
+                  border: `1px solid ${filterType === f ? 'var(--accent-blue)' : 'var(--border)'}`,
+                }}>
+                  {f === 'all' ? (lang === 'ar' ? 'الكل' : 'All')
+                    : f === 'halal' ? (lang === 'ar' ? 'حلال' : 'Halal')
+                    : f === 'crypto' ? (lang === 'ar' ? 'كريبتو' : 'Crypto')
+                    : (lang === 'ar' ? 'أسهم' : 'Stocks')}
+                </button>
+              ))}
+            </div>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value as typeof sortBy)} style={{
+              padding: '5px 10px', borderRadius: 10, fontSize: 11, fontWeight: 700, flexShrink: 0,
+              cursor: 'pointer', fontFamily: 'inherit', background: 'var(--bg-secondary)',
+              color: sortBy !== 'none' ? 'var(--accent-blue-light)' : 'var(--text-muted)',
+              border: `1px solid ${sortBy !== 'none' ? 'rgba(59,126,246,0.4)' : 'var(--border)'}`,
+              outline: 'none',
+            }}>
+              <option value="none">{lang === 'ar' ? 'ترتيب' : 'Sort'}</option>
+              <option value="gain">{lang === 'ar' ? 'الأعلى ربحاً' : 'Top Gainers'}</option>
+              <option value="loss">{lang === 'ar' ? 'الأعلى خسارة' : 'Top Losers'}</option>
+              <option value="value">{lang === 'ar' ? 'القيمة' : 'Value'}</option>
+              <option value="name">{lang === 'ar' ? 'الاسم' : 'Name'}</option>
+            </select>
+          </div>
+
+          {displayedInvestments.map(inv => {
             const valueUSD = inv.shares * inv.current_price
             const valueJOD = usdToJod ? valueUSD * usdToJod : null
             const costUSD  = inv.shares * inv.avg_buy_price
@@ -570,6 +620,16 @@ export default function InvestmentsPage() {
                       <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600 }}>{s.label}</div>
                     </div>
                   ))}
+                </div>
+
+                {/* ROI row */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, marginBottom: 8, background: isPos ? 'var(--accent-green-dim)' : 'rgba(239,68,68,0.08)', border: `1px solid ${isPos ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}` }}>
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
+                    {lang === 'ar' ? 'التكلفة' : 'Cost'}: ${costUSD.toFixed(2)}
+                  </span>
+                  <span style={{ fontSize: 11, fontWeight: 900, fontFamily: 'monospace', color: isPos ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+                    P&L: {isPos ? '+' : ''}${pnl.toFixed(2)}
+                  </span>
                 </div>
 
                 <button
