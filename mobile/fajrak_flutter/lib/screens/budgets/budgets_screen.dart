@@ -238,7 +238,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     if (_budgets.isEmpty) {
       insights.add({'icon': Icons.info_outline, 'type': 'info', 'text': 'budget_insight_empty'.tr()});
     } else if (available > totalBudgeted) {
-      insights.add({'icon': Icons.savings, 'type': 'success', 'text': 'budget_insight_surplus'.tr(args: [available.toStringAsFixed(0), _currency])});
+      insights.add({'icon': Icons.account_balance_wallet, 'type': 'success', 'text': 'budget_insight_surplus'.tr(args: [available.toStringAsFixed(0), _currency])});
     } else if (available < totalBudgeted) {
       insights.add({'icon': Icons.trending_down, 'type': 'danger', 'text': 'budget_insight_deficit'.tr(args: [(totalBudgeted - available).toStringAsFixed(0), _currency])});
     }

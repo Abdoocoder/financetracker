@@ -30,7 +30,7 @@ class BadgesGrid extends StatelessWidget {
       },
       {
         'id': 'saver',
-        'icon': Icons.savings,
+        'icon': Icons.account_balance_wallet,
         'title': 'المدخر المثابر',
         'desc': '5 معاملات',
         'done': txCount >= 5

@@ -54,7 +54,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
 
   final _challenges = [
     {'id': 1, 'icon': Icons.restaurant, 'title': 'challenge_1_title'.tr(), 'days': 7},
-    {'id': 2, 'icon': Icons.savings, 'title': 'challenge_2_title'.tr(), 'days': 30},
+    {'id': 2, 'icon': Icons.account_balance_wallet, 'title': 'challenge_2_title'.tr(), 'days': 30},
     {'id': 3, 'icon': Icons.trending_down, 'title': 'challenge_3_title'.tr(), 'days': 30},
     {'id': 4, 'icon': Icons.track_changes, 'title': 'challenge_4_title'.tr(), 'days': 14},
   ];

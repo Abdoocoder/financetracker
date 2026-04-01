@@ -27,7 +27,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     'streak_30': (Icons.emoji_events, 'شهر بدون توقف', '200 نقطة'),
     'tx_50': (Icons.edit_note, 'مسجّل نشيط', '30 نقطة'),
     'tx_100': (Icons.bar_chart, 'محترف التتبع', '75 نقطة'),
-    'saver_10': (Icons.savings, 'مدخر مبتدئ', '25 نقطة'),
+    'saver_10': (Icons.account_balance_wallet, 'مدخر مبتدئ', '25 نقطة'),
     'saver_20': (Icons.diamond, 'مدخر ذكي', '75 نقطة'),
     'saver_30': (Icons.workspace_premium, 'مدخر محترف', '150 نقطة'),
     'debt_paid': (Icons.celebration, 'محارب الديون', '100 نقطة'),
