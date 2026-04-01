@@ -93,7 +93,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _list.isEmpty
               ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Text('🔄', style: TextStyle(fontSize: 48)),
+                  Icon(Icons.repeat, size: 48, color: cs.onSurfaceVariant),
                   const SizedBox(height: 12),
                   Text('recurring_empty'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 15), textAlign: TextAlign.center),
                 ]))
@@ -124,7 +124,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           leading: CircleAvatar(
                             backgroundColor: color.withOpacity(0.12),
-                            child: Text(isIncome ? '📈' : '📉', style: const TextStyle(fontSize: 18)),
+                            child: Icon(isIncome ? Icons.trending_up : Icons.trending_down, color: color, size: 20),
                           ),
                           title: Text(rec['name'] ?? '', style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 14)),
                           subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -301,7 +301,7 @@ class _RecurringFormState extends State<_RecurringForm> {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: selected ? color : cs.outlineVariant),
                   ),
-                  child: Text(tp == 'income' ? '↑ ${'trans_income'.tr()}' : '↓ ${'trans_expense'.tr()}',
+                  child: Text(tp == 'income' ? '\u2191 ${'trans_income'.tr()}' : '\u2193 ${'trans_expense'.tr()}',
                     style: TextStyle(color: selected ? color : cs.onSurfaceVariant, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13),
                     textAlign: TextAlign.center),
                 ),
