@@ -10,6 +10,7 @@ import {
   MonthCompareCard, BudgetProgressCard,
   QuickLinksCards, WealthSimulatorCard, RecentTransactionsCard,
 } from '@/components/dashboard/Cards'
+import { NetWorthCard } from '@/components/dashboard/NetWorthCard'
 import { FinancialHealthCombined } from '@/components/ui/financial-health-combined'
 import { DashboardEmptyState } from '@/components/ui/empty-state'
 import nextDynamic from 'next/dynamic'
@@ -117,6 +118,8 @@ export interface DashboardData {
   prevIncome: number
   prevExpenses: number
   totalDebt: number
+  totalReceivable: number
+  netWorth: number
   invValue: number
   goalsSaved: number
   goalsTarget: number
@@ -165,7 +168,7 @@ function useDashboardData() {
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
         supabase.from('profiles').select('monthly_income, full_name').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-        supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('debts').select('remaining_amount,debt_type').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
@@ -192,8 +195,13 @@ function useDashboardData() {
       const newData = {
         income, expenses, months6, categories, net: income - expenses,
         prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
-        totalDebt: (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0),
-        invValue: (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0),
+        totalDebt: (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
+        totalReceivable: (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
+        netWorth: (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0)
+          + (goalRes.data ?? []).reduce((a: number, g: {current_amount: number}) => a + Number(g.current_amount), 0)
+          - (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0)
+          + (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
+        invValue: (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0),
         goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts: alertRes.count ?? 0,
@@ -292,6 +300,19 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+      {/* صافي الثروة */}
+      {(data?.invValue ?? 0) + (data?.goalsSaved ?? 0) + (data?.totalDebt ?? 0) > 0 && (
+        <NetWorthCard
+          netWorth={data?.netWorth ?? 0}
+          invValue={data?.invValue ?? 0}
+          goalsSaved={data?.goalsSaved ?? 0}
+          totalDebt={data?.totalDebt ?? 0}
+          totalReceivable={data?.totalReceivable ?? 0}
+          currency={profile?.currency ?? 'JOD'}
+          lang={lang}
+        />
+      )}
+
       <Section id="health" icon="💊" title={`${lang === 'en' ? 'Financial Health Score' : 'نقاط الصحة المالية'} — ${computeHealthScore(data, income, expenses)}%`}>
         <div style={{ padding: '12px 0 8px' }}>
           <FinancialHealthCombined

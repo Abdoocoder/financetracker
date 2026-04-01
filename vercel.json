@@ -1,8 +1,7 @@
 {
   "crons": [
-    {
-      "path": "/api/auto-debt",
-      "schedule": "0 3 * * *"
-    }
+    { "path": "/api/auto-debt",      "schedule": "0 3 * * *" },
+    { "path": "/api/auto-recurring", "schedule": "0 3 * * *" },
+    { "path": "/api/budget-alerts",  "schedule": "0 4 * * *" }
   ]
 }

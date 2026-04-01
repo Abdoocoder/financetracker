@@ -3,6 +3,7 @@ export type TransactionType = 'income' | 'expense'
 export type InvestmentType = 'stock' | 'etf' | 'crypto' | 'other'
 export type AlertType = 'warning' | 'motivation' | 'reminder' | 'achievement'
 export type AlertFrequency = 'daily' | 'weekly' | 'monthly' | 'once'
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly'
 
 export interface Profile {
   id: string
@@ -29,7 +30,24 @@ export interface Transaction {
   is_recurring: boolean
   recurring_day: number | null
   recurring_auto: boolean | null
+  source_recurring_id?: string | null
   created_at: string
+}
+
+export interface RecurringTransaction {
+  id: string
+  user_id: string
+  name: string
+  amount: number
+  category: string
+  type: TransactionType
+  frequency: RecurringFrequency
+  next_date: string
+  currency: string
+  notes: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface Debt {
