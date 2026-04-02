@@ -27,6 +27,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  bool _accountsLoading = true;
   bool _loading = true;
   double _income = 0, _expenses = 0, _net = 0, _monthlyDebtCommitments = 0;
   double _totalAccountsBalance = 0;
@@ -46,6 +47,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
+    setState(() { _accountsLoading = true; _loading = true; });
+    await _loadPhase1();
+    await _loadPhase2();
+  }
+
+  /// Phase 1 — accounts only (fast, shows hero card immediately)
+  Future<void> _loadPhase1() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) { if (mounted) setState(() { _accountsLoading = false; }); return; }
+      final accounts = await AccountsService.fetchAccounts(user.id);
+      final totalAccountsBalance = accounts.fold(0.0, (a, acc) => a + (acc['balance'] as double? ?? 0));
+      if (mounted) setState(() {
+        _accounts = accounts;
+        _totalAccountsBalance = totalAccountsBalance;
+        _accountsLoading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _accountsLoading = false);
+    }
+  }
+
+  /// Phase 2 — all dashboard data
+  Future<void> _loadPhase2() async {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) { if (mounted) setState(() => _loading = false); return; }
@@ -60,7 +85,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type, auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
-        AccountsService.fetchAccounts(user.id),
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
@@ -69,8 +93,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final debts = results[3] as List;
       final investments = results[4] as List;
       final goals = results[5] as List;
-      final accounts = results[6] as List<Map<String, dynamic>>;
-      final totalAccountsBalance = accounts.fold(0.0, (a, acc) => a + (acc['balance'] as double? ?? 0));
 
       double txIncome = 0, txExpenses = 0;
       for (final tx in txs) {
@@ -111,15 +133,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       } else if (income > 0 && totalDebt / (income * 12) < 0.3) {
         score += 15;
       }
-      if (goalsSaved > 0) {
-        score += 20;
-      }
-      if (invValue > 0) {
-        score += 15;
-      }
-      if (txs.length >= 10) {
-        score += 10;
-      }
+      if (goalsSaved > 0) score += 20;
+      if (invValue > 0) score += 15;
+      if (txs.length >= 10) score += 10;
 
       String stage = 'awareness';
       if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
@@ -132,25 +148,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       if (mounted) {
         setState(() {
-        _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
-        _currency = profile['currency'] as String? ?? 'JOD';
-        _income = income;
-        _expenses = txExpenses;
-        _net = income - txExpenses;
-        _monthlyDebtCommitments = monthlyDebtCommitments;
-        _recentTx = recent.cast<Map<String, dynamic>>();
-        _healthScore = score.clamp(0, 100);
-        _stage = stage;
-        _totalDebt = totalDebt;
-        _totalReceivable = totalReceivable;
-        _netWorth = netWorth;
-        _invValue = invValue;
-        _goalsSaved = goalsSaved;
-        _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
-        _accounts = accounts;
-        _totalAccountsBalance = totalAccountsBalance;
-        _loading = false;
-      });
+          _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
+          _currency = currency;
+          _income = income;
+          _expenses = txExpenses;
+          _net = income - txExpenses;
+          _monthlyDebtCommitments = monthlyDebtCommitments;
+          _recentTx = recent.cast<Map<String, dynamic>>();
+          _healthScore = score.clamp(0, 100);
+          _stage = stage;
+          _totalDebt = totalDebt;
+          _totalReceivable = totalReceivable;
+          _netWorth = netWorth;
+          _invValue = invValue;
+          _goalsSaved = goalsSaved;
+          _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
+          _loading = false;
+        });
       }
     } catch (e) {
       if (mounted) setState(() => _loading = false);
@@ -191,12 +205,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    if (_loading) {
-      return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: Center(child: CircularProgressIndicator(color: colorScheme.primary)));
-    }
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: RefreshIndicator(
@@ -207,33 +215,74 @@ class _DashboardScreenState extends State<DashboardScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+              // ── 1. Header — instant ───────────────────────────────
               DashboardHeader(name: _name),
               const SizedBox(height: 16),
-              DashboardStats(income: _income, expenses: _expenses, net: _net, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
+
+              // ── 2. Hero Balance Card — after phase 1 ─────────────
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: _accountsLoading
+                    ? _SkeletonBox(key: const ValueKey('hero-skel'), height: 110, radius: 18)
+                    : _AccountsBalanceCard(key: const ValueKey('hero-card'), accounts: _accounts, totalBalance: _totalAccountsBalance, currency: _currency),
+              ),
               const SizedBox(height: 12),
-              if (_accounts.isNotEmpty) _AccountsBalanceCard(accounts: _accounts, totalBalance: _totalAccountsBalance, currency: _currency),
+
+              // ── 3. Monthly Stats — after phase 2 ─────────────────
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _loading
+                    ? Row(key: const ValueKey('stats-skel'), children: [
+                        Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                        const SizedBox(width: 8),
+                        Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                        const SizedBox(width: 8),
+                        Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                      ])
+                    : DashboardStats(key: const ValueKey('stats'), income: _income, expenses: _expenses, net: _net, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
+              ),
               const SizedBox(height: 16),
+
+              // ── 4. Quick Add — always visible ────────────────────
               DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
               const SizedBox(height: 16),
-              if (_invValue + _goalsSaved + _totalDebt > 0)
-                NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
-              DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
-              const SizedBox(height: 16),
-              DashboardStageCard(stage: _stage),
-              const SizedBox(height: 16),
-              ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
-              const SizedBox(height: 16),
-              BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
-              const SizedBox(height: 16),
-              QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
-              const SizedBox(height: 16),
-              GamificationCard(score: _healthScore),
-              const SizedBox(height: 16),
-              WealthSimulatorCard(currency: _currency),
-              const SizedBox(height: 16),
-              ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
-              const SizedBox(height: 16),
-              RecentTransactionsList(transactions: _recentTx, currency: _currency, colorScheme: colorScheme),
+
+              // ── 5. Recent Transactions skeleton or real ───────────
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _loading
+                    ? _SkeletonBox(key: const ValueKey('recent-skel'), height: 180, radius: 16)
+                    : RecentTransactionsList(key: const ValueKey('recent'), transactions: _recentTx, currency: _currency, colorScheme: colorScheme),
+              ),
+
+              // ── 6–end. Secondary sections — after phase 2 ─────────
+              if (_loading) ...[
+                const SizedBox(height: 16),
+                _SkeletonBox(height: 80, radius: 16),
+                const SizedBox(height: 12),
+                _SkeletonBox(height: 100, radius: 16),
+              ],
+              if (!_loading) ...[
+                const SizedBox(height: 16),
+                if (_invValue + _goalsSaved + _totalDebt > 0)
+                  NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
+                DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
+                const SizedBox(height: 16),
+                DashboardStageCard(stage: _stage),
+                const SizedBox(height: 16),
+                ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
+                const SizedBox(height: 16),
+                BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
+                const SizedBox(height: 16),
+                QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
+                const SizedBox(height: 16),
+                GamificationCard(score: _healthScore),
+                const SizedBox(height: 16),
+                WealthSimulatorCard(currency: _currency),
+                const SizedBox(height: 16),
+                ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
+              ],
             ]),
           ),
         ),
@@ -242,11 +291,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+// ── Skeleton shimmer box ──────────────────────────────────────────
+class _SkeletonBox extends StatefulWidget {
+  final double height;
+  final double radius;
+  const _SkeletonBox({super.key, required this.height, this.radius = 12});
+  @override
+  State<_SkeletonBox> createState() => _SkeletonBoxState();
+}
+
+class _SkeletonBoxState extends State<_SkeletonBox> with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
+    _anim = Tween<double>(begin: 0.3, end: 0.7).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+  }
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _anim,
+    builder: (_, __) => Container(
+      height: widget.height,
+      decoration: BoxDecoration(
+        color: Color.lerp(const Color(0xFF1E293B), const Color(0xFF334155), _anim.value),
+        borderRadius: BorderRadius.circular(widget.radius),
+      ),
+    ),
+  );
+}
+
 class _AccountsBalanceCard extends StatelessWidget {
   final List<Map<String, dynamic>> accounts;
   final double totalBalance;
   final String currency;
-  const _AccountsBalanceCard({required this.accounts, required this.totalBalance, required this.currency});
+  const _AccountsBalanceCard({super.key, required this.accounts, required this.totalBalance, required this.currency});
 
   String _fmt(double n) => n.abs() % 1 == 0 ? n.abs().toStringAsFixed(0) : n.abs().toStringAsFixed(2);
 
