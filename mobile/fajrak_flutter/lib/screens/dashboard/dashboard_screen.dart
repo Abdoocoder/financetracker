@@ -60,11 +60,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (user == null) { if (mounted) setState(() { _accountsLoading = false; }); return; }
       final accounts = await AccountsService.fetchAccounts(user.id);
       final totalAccountsBalance = accounts.fold(0.0, (a, acc) => a + (acc['balance'] as double? ?? 0));
-      if (mounted) setState(() {
-        _accounts = accounts;
-        _totalAccountsBalance = totalAccountsBalance;
-        _accountsLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _accounts = accounts;
+          _totalAccountsBalance = totalAccountsBalance;
+          _accountsLoading = false;
+        });
+      }
     } catch (_) {
       if (mounted) setState(() => _accountsLoading = false);
     }
@@ -344,7 +346,7 @@ class _AccountsBalanceCard extends StatelessWidget {
       blur: 15,
       opacity: 0.1,
       color: color,
-      borderColor: color.withOpacity(0.3),
+      borderColor: color.withValues(alpha: 0.3),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -75,9 +75,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: _totalBalance >= 0 ? const Color(0xFF10B981).withOpacity(0.08) : const Color(0xFFEF4444).withOpacity(0.08),
+                      color: _totalBalance >= 0 ? const Color(0xFF10B981).withValues(alpha: 0.08) : const Color(0xFFEF4444).withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _totalBalance >= 0 ? const Color(0xFF10B981).withOpacity(0.25) : const Color(0xFFEF4444).withOpacity(0.25)),
+                      border: Border.all(color: _totalBalance >= 0 ? const Color(0xFF10B981).withValues(alpha: 0.25) : const Color(0xFFEF4444).withValues(alpha: 0.25)),
                     ),
                     child: Column(children: [
                       Text('إجمالي الرصيد', style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
@@ -147,7 +147,7 @@ class _AccountCard extends StatelessWidget {
     final info = _typeInfo(acc['type'] as String? ?? 'bank');
     final bal = acc['balance'] as double? ?? 0;
     final color = Color(int.parse((acc['color'] as String? ?? '#3B7EF6').replaceFirst('#', '0xFF')));
-    final fmt = (double n) => n.abs() % 1 == 0 ? n.abs().toStringAsFixed(0) : n.abs().toStringAsFixed(2);
+    String fmt(double n) => n.abs() % 1 == 0 ? n.abs().toStringAsFixed(0) : n.abs().toStringAsFixed(2);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -155,13 +155,13 @@ class _AccountCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: cs.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(children: [
         Container(
           width: 46, height: 46, decoration: BoxDecoration(
-            color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(13),
-            border: Border.all(color: color.withOpacity(0.3)),
+            color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(13),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
           ),
           child: Center(child: Text(acc['icon'] as String? ?? '🏦', style: const TextStyle(fontSize: 22))),
         ),
@@ -173,7 +173,7 @@ class _AccountCard extends StatelessWidget {
               const SizedBox(width: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(100), border: Border.all(color: color.withOpacity(0.3))),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(100), border: Border.all(color: color.withValues(alpha: 0.3))),
                 child: Text('افتراضي', style: TextStyle(color: color, fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
               ),
             ]
@@ -191,14 +191,14 @@ class _AccountCard extends StatelessWidget {
         Column(children: [
           GestureDetector(onTap: onEdit, child: Container(
             padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(color: cs.surfaceVariant, borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(8)),
             child: Icon(Icons.edit_outlined, size: 16, color: cs.onSurfaceVariant),
           )),
           if (onDelete != null) ...[
             const SizedBox(height: 4),
             GestureDetector(onTap: onDelete, child: Container(
               padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(color: const Color(0xFFEF4444).withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: const Color(0xFFEF4444).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
               child: const Icon(Icons.archive_outlined, size: 16, color: Color(0xFFEF4444)),
             )),
           ],
@@ -242,7 +242,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
     if (_nameCtrl.text.trim().isEmpty) return;
     setState(() => _saving = true);
     final user = Supabase.instance.client.auth.currentUser!;
-    final colorHex = '#${_color.value.toRadixString(16).substring(2).toUpperCase()}';
+    final colorHex = '#${_color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
     if (widget.account == null) {
       await AccountsService.createAccount(
         userId: user.id, name: _nameCtrl.text.trim(), type: _type,
@@ -279,7 +279,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
             onTap: () => setState(() { _type = t['type'] as String; _color = tColor; _icon = t['icon'] as String; }),
             child: Container(
               decoration: BoxDecoration(
-                color: selected ? tColor.withOpacity(0.12) : cs.surfaceVariant,
+                color: selected ? tColor.withValues(alpha: 0.12) : cs.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: selected ? tColor : Colors.transparent),
               ),
@@ -348,7 +348,7 @@ class _TransferSheetState extends State<_TransferSheet> {
   late String _toId;
   final _amountCtrl = TextEditingController();
   final _noteCtrl   = TextEditingController();
-  String _date = DateTime.now().toIso8601String().split('T')[0];
+  final _date = DateTime.now().toIso8601String().split('T')[0];
   bool _saving = false;
 
   @override
@@ -391,13 +391,13 @@ class _TransferSheetState extends State<_TransferSheet> {
         Text('🔄 تحويل بين الحسابات', style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 17)),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: _fromId, decoration: inputDec('من'),
+          initialValue: _fromId, decoration: inputDec('من'),
           items: widget.accounts.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle(fontFamily: 'Cairo')))).toList(),
           onChanged: (v) => setState(() { _fromId = v!; if (_toId == _fromId) _toId = widget.accounts.firstWhere((a) => a['id'] != _fromId)['id'] as String; }),
         ),
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
-          value: avail.any((a) => a['id'] == _toId) ? _toId : avail.first['id'] as String,
+          initialValue: avail.any((a) => a['id'] == _toId) ? _toId : avail.first['id'] as String,
           decoration: inputDec('إلى'),
           items: avail.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle(fontFamily: 'Cairo')))).toList(),
           onChanged: (v) => setState(() => _toId = v!),
