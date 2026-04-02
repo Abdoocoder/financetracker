@@ -1,5 +1,23 @@
 export type Plan = 'free' | 'pro'
-export type TransactionType = 'income' | 'expense'
+export type TransactionType = 'income' | 'expense' | 'transfer'
+export type AccountType = 'cash' | 'bank' | 'savings' | 'credit_card'
+
+export interface Account {
+  id: string
+  user_id: string
+  name: string
+  type: AccountType
+  opening_balance: number
+  currency: string
+  color: string
+  icon: string
+  is_default: boolean
+  is_archived: boolean
+  created_at: string
+  updated_at: string
+  // computed client-side
+  balance?: number
+}
 export type InvestmentType = 'stock' | 'etf' | 'crypto' | 'other'
 export type AlertType = 'warning' | 'motivation' | 'reminder' | 'achievement'
 export type AlertFrequency = 'daily' | 'weekly' | 'monthly' | 'once'
@@ -32,6 +50,9 @@ export interface Transaction {
   recurring_day: number | null
   recurring_auto: boolean | null
   source_recurring_id?: string | null
+  account_id?: string | null
+  transfer_to_account_id?: string | null
+  transfer_pair_id?: string | null
   created_at: string
 }
 

@@ -7,13 +7,13 @@ import {
   LayoutDashboard, ArrowUpDown, CreditCard,
   TrendingUp, Target, Bell, Settings, Globe,
   ChevronLeft, ChevronRight, MoreHorizontal, PieChart, BookOpen, HelpCircle,
-  Flame, Star, FileText
+  Flame, Star, FileText, Wallet
 } from 'lucide-react'
 
 const MAIN_NAV = [
   { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
   { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
-  { href: '/dashboard/goals',        Icon: Target,          ar: 'الأهداف',   en: 'Goals'        },
+  { href: '/dashboard/accounts',     Icon: Wallet,          ar: 'الحسابات',  en: 'Accounts'     },
   { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
 ]
 
