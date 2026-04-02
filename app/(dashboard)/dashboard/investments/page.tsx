@@ -244,7 +244,7 @@ export default function InvestmentsPage() {
   const [editForm, setEditForm] = useState({ symbol: '', name: '', type: 'etf', shares: '', avg_buy_price: '', current_price: '', is_halal: true, notes: '', purchase_date: '' })
   const [buyForm, setBuyForm] = useState({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
+  const [pricesRefreshing, setPricesRefreshing] = useState(false)
   const [refreshMsg, setRefreshMsg] = useState('')
   const [usdToJod, setUsdToJod] = useState<number | null>(null)
   const [showJod, setShowJod] = useState(false)
@@ -348,7 +348,7 @@ export default function InvestmentsPage() {
   }
 
   async function refreshPrices() {
-    setRefreshing(true); setRefreshMsg('')
+    setPricesRefreshing(true); setRefreshMsg('')
     const newStatus: Record<string, 'live' | 'manual'> = {}
     let updated = 0; const failed: string[] = []
     try {
@@ -363,7 +363,7 @@ export default function InvestmentsPage() {
       fetchRate('USD', userCurrency).then(r => { if (r) setUsdToJod(r) }); await load(); setPriceStatus(newStatus)
       setRefreshMsg(updated === investments.length ? (lang === 'en' ? '✅ All prices updated' : '✅ تم تحديث جميع الأسعار') : updated > 0 ? (lang === 'en' ? `⚠️ Updated ${updated} — Failed: ${failed.join(', ')}` : `⚠️ تم ${updated} — تعذّر: ${failed.join(', ')}`) : (lang === 'en' ? '❌ Update failed' : '❌ تعذّر التحديث'))
     } catch { setRefreshMsg(lang === 'en' ? '❌ Error' : '❌ خطأ') }
-    setRefreshing(false)
+    setPricesRefreshing(false)
     setTimeout(() => setRefreshMsg(''), 5000)
   }
 
@@ -519,8 +519,8 @@ export default function InvestmentsPage() {
                 {showJod ? '$ USD' : userCurrency}
               </button>
             )}
-            <button onClick={refreshPrices} disabled={refreshing} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 16, cursor: refreshing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: refreshing ? 0.5 : 1 }}>
-              {refreshing ? '⏳' : '⟳'}
+            <button onClick={refreshPrices} disabled={pricesRefreshing} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 16, cursor: pricesRefreshing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: pricesRefreshing ? 0.5 : 1 }}>
+              {pricesRefreshing ? '⏳' : '⟳'}
             </button>
             <button onClick={() => setShowForm(true)} style={{ padding: '9px 16px', borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', color: 'white', fontSize: 18, fontWeight: 900, border: 'none', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px var(--accent-blue-glow)' }}>+</button>
           </div>
