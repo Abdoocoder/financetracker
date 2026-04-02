@@ -281,7 +281,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceVariant,
+            color: colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
           ),
