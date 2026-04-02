@@ -278,15 +278,6 @@ export default function InvestmentsPage() {
     }
   }, [currentUser, supabase])
 
-  const fetchExchangeRate = useCallback(async () => {
-    try {
-      const key = process.env.NEXT_PUBLIC_EXCHANGE_RATE_KEY
-      const res = await fetch(`https://v6.exchangerate-api.com/v6/${key}/pair/USD/JOD`)
-      const data = await res.json()
-      if (data.conversion_rate) setUsdToJod(data.conversion_rate)
-    } catch {}
-  }, [])
-
   useEffect(() => {
     if (currentUser) {
       supabase.from('profiles').select('currency').eq('id', currentUser.id).single()
@@ -295,9 +286,13 @@ export default function InvestmentsPage() {
   }, [currentUser, supabase])
 
   useEffect(() => {
+    if (userCurrency === 'USD') { setUsdToJod(1); return }
+    fetchRate('USD', userCurrency).then(rate => { if (rate) setUsdToJod(rate) })
+  }, [userCurrency])
+
+  useEffect(() => {
     load()
     loadCashBalance()
-    fetchExchangeRate()
     // تحديث تلقائي للأسعار في الخلفية بعد عرض البيانات المحفوظة
     const autoRefresh = async () => {
       if (!currentUser) return
@@ -320,7 +315,7 @@ export default function InvestmentsPage() {
       load()
     }
     autoRefresh()
-  }, [load, loadCashBalance, fetchExchangeRate, currentUser, supabase])
+  }, [load, loadCashBalance, currentUser, supabase])
 
   function startEditInv(inv: Investment) {
     setEditingInv(inv)
@@ -361,7 +356,7 @@ export default function InvestmentsPage() {
           else { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
         } catch { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
       }
-      await fetchExchangeRate(); await load(); setPriceStatus(newStatus)
+      fetchRate('USD', userCurrency).then(r => { if (r) setUsdToJod(r) }); await load(); setPriceStatus(newStatus)
       setRefreshMsg(updated === investments.length ? (lang === 'en' ? '✅ All prices updated' : '✅ تم تحديث جميع الأسعار') : updated > 0 ? (lang === 'en' ? `⚠️ Updated ${updated} — Failed: ${failed.join(', ')}` : `⚠️ تم ${updated} — تعذّر: ${failed.join(', ')}`) : (lang === 'en' ? '❌ Update failed' : '❌ تعذّر التحديث'))
     } catch { setRefreshMsg(lang === 'en' ? '❌ Error' : '❌ خطأ') }
     setRefreshing(false)
@@ -511,12 +506,12 @@ export default function InvestmentsPage() {
     <div className="animate-fade-in">
       <PageHeader
         title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
-        subtitle={usdToJod ? `1 USD = ${usdToJod.toFixed(3)} JOD` : undefined}
+        subtitle={usdToJod && userCurrency !== 'USD' ? `1 USD = ${usdToJod.toFixed(3)} ${userCurrency}` : undefined}
         action={
           <div style={{ display: 'flex', gap: 8 }}>
             {usdToJod !== null && (
               <button onClick={() => setShowJod(!showJod)} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                {showJod ? '$ USD' : (lang === 'en' ? 'JOD' : 'JOD د.أ')}
+                {showJod ? '$ USD' : userCurrency}
               </button>
             )}
             <button onClick={refreshPrices} disabled={refreshing} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 16, cursor: refreshing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: refreshing ? 0.5 : 1 }}>
@@ -532,8 +527,8 @@ export default function InvestmentsPage() {
       )}
 
       <StatBar stats={[
-        { label: lang === 'en' ? 'Value' : 'القيمة', value: showJod && usdToJod ? `${(totalValueUSD * usdToJod).toFixed(0)} JD` : `$${totalValueUSD.toFixed(0)}`, color: 'var(--accent-blue-light)' },
-        { label: lang === 'en' ? 'Profit' : 'الربح',  value: showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)} JD` : `${totalPnL >= 0 ? '+$' : '-$'}${Math.abs(totalPnL).toFixed(0)}`, color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+        { label: lang === 'en' ? 'Value' : 'القيمة', value: showJod && usdToJod ? `${(totalValueUSD * usdToJod).toFixed(0)} ${userCurrency}` : `$${totalValueUSD.toFixed(0)}`, color: 'var(--accent-blue-light)' },
+        { label: lang === 'en' ? 'Profit' : 'الربح',  value: showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)} ${userCurrency}` : `${totalPnL >= 0 ? '+$' : '-$'}${Math.abs(totalPnL).toFixed(0)}`, color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
         { label: lang === 'en' ? 'Return' : 'العائد', value: `${parseFloat(pnlPct) >= 0 ? '+' : ''}${pnlPct}%`, color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
       ]} />
 
