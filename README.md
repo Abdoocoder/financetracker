@@ -563,7 +563,19 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.20.0 — 2026-04-02 *(Latest)*
+### v3.21.0 — 2026-04-02 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🏦 **Accounts System** | Multi-account support: bank, cash, savings, credit card — each with its own balance |
+| 💰 **Total Balance Card** | Dashboard hero card showing real-time total balance across all accounts |
+| 🔄 **Account Transfers** | Transfer money between accounts with full history tracking |
+| 📋 **Accounts Page** | Dedicated page to create, edit, and manage accounts (web + Flutter) |
+| 🧾 **Transaction Account** | Every transaction is now linked to a specific account |
+| 🗃️ **DB Migration 019** | New `accounts` table, `account_id` on transactions, transfer support, default account trigger |
+| 📱 **Flutter Accounts** | Full accounts screen + transfer dialog in Flutter app |
+
+### v3.20.0 — 2026-04-02
 
 | Change | Description |
 |:-------|:------------|
