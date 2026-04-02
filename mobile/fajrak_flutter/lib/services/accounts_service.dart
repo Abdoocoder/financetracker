@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../utils/finance_utils.dart';
 
 class AccountsService {
   static SupabaseClient get _db => Supabase.instance.client;
@@ -20,22 +21,14 @@ class AccountsService {
 
     return accounts.map<Map<String, dynamic>>((acc) {
       final id = acc['id'] as String;
-      double income  = 0, expense = 0, xferIn = 0, xferOut = 0;
-      for (final tx in txs) {
-        final amt = (tx['amount'] as num).toDouble();
-        if (tx['account_id'] == id) {
-          if (tx['type'] == 'income')   income  += amt;
-          if (tx['type'] == 'expense')  expense += amt;
-          if (tx['type'] == 'transfer') xferOut += amt;
-        }
-        if (tx['transfer_to_account_id'] == id && tx['type'] == 'transfer') {
-          xferIn += amt;
-        }
-      }
-      final openingBalance = (acc['opening_balance'] as num? ?? 0).toDouble();
+      final balance = FinanceUtils.calculateAccountBalance(
+        accountId: id,
+        openingBalance: (acc['opening_balance'] as num? ?? 0).toDouble(),
+        transactions: (txs as List).cast<Map<String, dynamic>>(),
+      );
       return {
         ...acc,
-        'balance': openingBalance + income - expense + xferIn - xferOut,
+        'balance': balance,
       };
     }).toList();
   }

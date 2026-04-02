@@ -12,6 +12,7 @@ import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/dashboard_header.dart';
+import '../../widgets/common/glass_panel.dart';
 
 import '../../widgets/dashboard/dashboard_stats.dart';
 import '../../widgets/dashboard/dashboard_health_score.dart';
@@ -337,13 +338,13 @@ class _AccountsBalanceCard extends StatelessWidget {
     final isPositive = totalBalance >= 0;
     final color = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
 
-    return Container(
+    return GlassPanel(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.07),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
+      borderRadius: 18,
+      blur: 15,
+      opacity: 0.1,
+      color: color,
+      borderColor: color.withOpacity(0.3),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

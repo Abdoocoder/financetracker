@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../app_state.dart';
 import '../../screens/alerts/alerts_screen.dart';
+import '../common/glass_panel.dart';
 
 class DashboardHeader extends StatelessWidget {
   final String name;
@@ -52,13 +53,13 @@ class DashboardHeader extends StatelessWidget {
                   context.read<AppState>().setLocale(newLocale);
                 }
               },
-              child: Container(
+              child: GlassPanel(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  border: Border.all(color: colorScheme.outlineVariant),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                borderRadius: 12,
+                blur: 8,
+                opacity: 0.1,
+                color: colorScheme.surface,
+                borderColor: colorScheme.outlineVariant.withOpacity(0.3),
                 child: Text(
                   isAr ? 'EN' : 'AR',
                   style: TextStyle(
@@ -81,15 +82,17 @@ class DashboardHeader extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: colorScheme.surface,
-                      border: Border.all(color: colorScheme.outlineVariant),
-                      borderRadius: BorderRadius.circular(12),
+                  GlassPanel(
+                    borderRadius: 12,
+                    blur: 8,
+                    opacity: 0.1,
+                    color: colorScheme.surface,
+                    borderColor: colorScheme.outlineVariant.withOpacity(0.3),
+                    child: SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Icon(Icons.notifications_none, color: colorScheme.onSurface),
                     ),
-                    child: Icon(Icons.notifications_none, color: colorScheme.onSurface),
                   ),
                   if (unreadCount > 0)
                     Positioned(
