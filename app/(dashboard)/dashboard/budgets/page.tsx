@@ -8,6 +8,8 @@ import type { Budget } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
 import { Modal } from '@/components/ui/modal'
 import { toast } from '@/components/ui/toast'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 const CATEGORIES = [
   { key: 'طعام', ar: 'طعام', en: 'Food', icon: '🍔' },
@@ -211,6 +213,8 @@ export default function BudgetsPage() {
 
   useEffect(() => { load() }, [load])
 
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
+
   function openAdd() { setForm({ category: 'طعام', monthly_limit: '' }); setEditingId(null); setShowForm(true) }
   function openEdit(b: any) { setForm({ category: b.category, monthly_limit: String(b.monthly_limit) }); setEditingId(b.id); setShowForm(true) }
 
@@ -265,7 +269,8 @@ export default function BudgetsPage() {
     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
   return (
-    <div className="animate-fade-in" style={{ padding: '0 0 100px' }}>
+    <div ref={pageRef} className="animate-fade-in" style={{ padding: '0 0 100px' }}>
+      <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
         title={ar ? 'الميزانية' : 'Budget'}
         subtitle={t('budget_plan_pro')}
@@ -333,7 +338,7 @@ export default function BudgetsPage() {
       {/* قائمة الفئات */}
       <div style={{ padding: '12px 16px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {loading ? (
-          [1, 2, 3].map(i => <div key={i} style={{ height: 100, borderRadius: 20, background: 'var(--bg-card)', animation: 'pulse 1.5s infinite' }} />)
+          [1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 100, borderRadius: 20 }} />)
         ) : budgets.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>

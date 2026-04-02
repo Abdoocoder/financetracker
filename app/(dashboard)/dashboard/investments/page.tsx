@@ -12,6 +12,8 @@ import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useI18n } from '@/lib/i18n'
+import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
+import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 
 // مسح cache المستخدم بعد أي تعديل
@@ -290,6 +292,8 @@ export default function InvestmentsPage() {
     fetchRate('USD', userCurrency).then(rate => { if (rate) setUsdToJod(rate) })
   }, [userCurrency])
 
+  const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load(); await loadCashBalance() })
+
   useEffect(() => {
     load()
     loadCashBalance()
@@ -503,7 +507,8 @@ export default function InvestmentsPage() {
   )
 
   return (
-    <div className="animate-fade-in">
+    <div ref={pageRef} className="animate-fade-in">
+      <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
         title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
         subtitle={usdToJod && userCurrency !== 'USD' ? `1 USD = ${usdToJod.toFixed(3)} ${userCurrency}` : undefined}
