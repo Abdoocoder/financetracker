@@ -121,35 +121,46 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
   }
 
   Future<void> _load() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    final client = Supabase.instance.client;
+    final user = client.auth.currentUser;
     if (user == null) return;
-    final results = await Future.wait<dynamic>([
-      Supabase.instance.client.from('investments').select('id,name,symbol,shares,current_price,created_at,purchase_date').eq('user_id', user.id),
-      Supabase.instance.client.from('profiles').select('currency').eq('id', user.id).single(),
-      Supabase.instance.client.from('zakat_history').select('*').eq('user_id', user.id).order('year', ascending: false),
-      Supabase.instance.client.from('savings_goals').select('current_amount').eq('user_id', user.id),
-      Supabase.instance.client.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
-    ]);
-    final invList = results[0] as List;
-    final profile = results[1] as Map<String, dynamic>;
-    final history = results[2] as List;
-    final goals = results[3] as List;
-    final debts = results[4] as List;
 
-    final invValue = invList.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
-    final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
-    final totalDebt = debts.fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+    try {
+      final results = await Future.wait<dynamic>([
+        client.from('investments').select('id,name,symbol,shares,current_price,created_at,purchase_date').eq('user_id', user.id),
+        client.from('profiles').select('currency').eq('id', user.id).single(),
+        client.from('zakat_history').select('*').eq('user_id', user.id).order('year', ascending: false),
+        CurrencyService.fetchExchangeRate('USD', 'JOD'), // Temporary for rate calc
+      ]);
 
-    if (mounted) {
-      setState(() {
-        _currency = profile['currency'] as String? ?? 'JOD';
-        _investmentsCtrl.text = invValue.toStringAsFixed(0);
-        _cashCtrl.text = goalsSaved.toStringAsFixed(0);
-        _debtsCtrl.text = totalDebt.toStringAsFixed(0);
-        _history = history.cast<Map<String, dynamic>>();
-        _invItems = invList.cast<Map<String, dynamic>>();
+      final invList = results[0] as List;
+      final profile = results[1] as Map<String, dynamic>;
+      final history = results[2] as List;
+      final String currencyCode = profile['currency'] as String? ?? 'JOD';
+      
+      final double usdRate = await CurrencyService.fetchExchangeRate('USD', currencyCode) ?? 1.0;
+
+      // جلب البيانات المالية الموحدة للملء التلقائي عبر RPC
+      final dashRes = await client.rpc('get_financial_dashboard', params: {
+        'p_user_id': user.id,
+        'p_usd_to_local_rate': usdRate,
       });
-      _fetchLivePrices();
+
+      if (mounted) {
+        setState(() {
+          _currency = currencyCode;
+          if (dashRes != null) {
+            _cashCtrl.text = ((dashRes['total_accounts_balance'] ?? 0) + (dashRes['goals_saved'] ?? 0)).toStringAsFixed(0);
+            _investmentsCtrl.text = ((dashRes['investments_value_local'] ?? 0) + (dashRes['investment_cash_local'] ?? 0)).toStringAsFixed(0);
+            _debtsCtrl.text = (dashRes['total_debt_owed'] ?? 0).toStringAsFixed(0);
+          }
+          _history = history.cast<Map<String, dynamic>>();
+          _invItems = invList.cast<Map<String, dynamic>>();
+        });
+        _fetchLivePrices();
+      }
+    } catch (e, s) {
+      debugPrint('Error loading zakat data: $e $s');
     }
   }
 

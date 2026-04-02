@@ -55,13 +55,26 @@ export default function ZakatPage() {
       supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false }),
     ])
 
-    const invList = invRes.data ?? []
-    setCurrency(profileRes.data?.currency ?? 'JOD')
+    const currencyCode = profileRes.data?.currency ?? 'JOD'
+    setCurrency(currencyCode)
     setHistory(histRes.data ?? [])
-    setInvItems(invList)
+    setInvItems(invRes.data ?? [])
 
-    const usdToLocal = (profileRes.data?.currency ?? 'JOD') !== 'USD' ? (await fetchExchangeRate('USD', profileRes.data?.currency ?? 'JOD') ?? 1) : 1
+    const usdToLocal = currencyCode !== 'USD' ? (await fetchExchangeRate('USD', currencyCode) ?? 1) : 1
     
+    // جلب البيانات المالية الموحدة للملء التلقائي
+    const { data: dash } = await supabase.rpc('get_financial_dashboard', {
+      p_user_id: user.id,
+      p_usd_to_local_rate: usdToLocal
+    })
+
+    if (dash) {
+      // ملء تلقائي للمدخلات
+      setCash((dash.total_accounts_balance ?? 0) + (dash.goals_saved ?? 0))
+      setInvestments((dash.investments_value_local ?? 0) + (dash.investment_cash_local ?? 0))
+      setDebtsOwed(dash.total_debt_owed ?? 0)
+    }
+
     const { data: zakat } = await supabase.rpc('get_zakat_summary', {
       p_user_id: user.id,
       p_gold_price_per_gram: goldPrice,
