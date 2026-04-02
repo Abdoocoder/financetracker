@@ -5,11 +5,15 @@
 // ── Mock Supabase before any imports ──────────────────────────────────────────
 import { createMockSupabase, makeRequest } from '../helpers/supabase-mock'
 
-let mockSupabase = createMockSupabase()
+var mockSupabase: ReturnType<typeof createMockSupabase>;
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => mockSupabase),
-}))
+jest.mock('@supabase/supabase-js', () => {
+  const { createMockSupabase } = require('../helpers/supabase-mock');
+  mockSupabase = createMockSupabase();
+  return {
+    createClient: jest.fn(() => mockSupabase),
+  }
+})
 
 import { GET } from '@/app/api/health-score-snapshot/route'
 import { calcScore } from '@/app/api/health-score-snapshot/calc'
@@ -50,23 +54,23 @@ describe('GET /api/health-score-snapshot — auth', () => {
 describe('calcScore', () => {
   // ── savings rate (30 pts max) ──
   it('gives 30 pts for savings rate ≥ 20%', () => {
-    // income=1000, expenses=800 → rate=20%
-    expect(calcScore(1000, 800, 0, 0, 0, 0)).toBe(30)
+    // income=1000, expenses=800 → rate=20%, debt=8000 (0 pt)
+    expect(calcScore(1000, 800, 8000, 0, 0, 0)).toBe(30)
   })
 
   it('gives 20 pts for savings rate 10–19%', () => {
-    // income=1000, expenses=900 → rate=10%
-    expect(calcScore(1000, 900, 0, 0, 0, 0)).toBe(20)
+    // income=1000, expenses=900 → rate=10%, debt=8000 (0 pt)
+    expect(calcScore(1000, 900, 8000, 0, 0, 0)).toBe(20)
   })
 
   it('gives 10 pts for savings rate 1–9%', () => {
-    // income=1000, expenses=950 → rate=5%
-    expect(calcScore(1000, 950, 0, 0, 0, 0)).toBe(10)
+    // income=1000, expenses=950 → rate=5%, debt=8000 (0 pt)
+    expect(calcScore(1000, 950, 8000, 0, 0, 0)).toBe(10)
   })
 
   it('gives 0 savings pts when expenses ≥ income', () => {
-    expect(calcScore(1000, 1000, 0, 0, 0, 0)).toBe(0)
-    expect(calcScore(1000, 1100, 0, 0, 0, 0)).toBe(0)
+    expect(calcScore(1000, 1000, 8000, 0, 0, 0)).toBe(0)
+    expect(calcScore(1000, 1100, 8000, 0, 0, 0)).toBe(0)
   })
 
   // ── debt ratio (25 pts max) ──
