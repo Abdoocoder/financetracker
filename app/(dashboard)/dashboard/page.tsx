@@ -134,6 +134,7 @@ export interface DashboardData {
   unreadAlerts: number
   txCount: number
   name: string
+  lastUpdated?: string
 }
 
 function computeHealthScore(data: DashboardData | null, income: number, expenses: number): number {
@@ -172,7 +173,7 @@ function useDashboardData() {
     // ── كل الـ 8 queries بالتوازي بدل Phase1 ثم Phase2 (~400ms → ~200ms) ──
     async function fetchAll() {
       const chartFrom = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]
-      const [txRes, profileRes, alertRes, debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
+      const [txRes, profileRes, alertRes, debtRes, invRes, goalRes, recentRes, chartRes, accountsResQuery] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
         supabase.from('profiles').select('monthly_income, full_name, currency').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
@@ -180,7 +181,8 @@ function useDashboardData() {
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
-        supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', chartFrom),
+        supabase.from('transactions').select('type,amount,transaction_date,account_id,transfer_to_account_id').eq('user_id', user.id).gte('transaction_date', chartFrom),
+        supabase.from('accounts').select('id,opening_balance').eq('user_id', user.id).eq('is_archived', false),
       ])
 
       const txs = txRes.data ?? []
@@ -210,13 +212,26 @@ function useDashboardData() {
       const invValueUSD = (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0)
       const usdToLocal = userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? 1) : 1
       const invValueLocal = invValueUSD * usdToLocal
+      
+      // FIX: Calculate total account balance for net worth (Audit Report Fix)
+      // Note: We used to rely on useAccounts, but for netWorth we need it inside this state.
+      const accountsRes = accountsResQuery?.data as { id: string; opening_balance: number }[] ?? []
+      const allTxs = chartRes.data ?? []
+      const accountsBalance = accountsRes.reduce((accTotal, acc) => {
+        const income   = allTxs.filter(t => t.account_id === acc.id && t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0)
+        const expense  = allTxs.filter(t => t.account_id === acc.id && t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0)
+        const xferIn   = allTxs.filter(t => t.transfer_to_account_id === acc.id && t.type === 'transfer').reduce((sum, t) => sum + Number(t.amount), 0)
+        const xferOut  = allTxs.filter(t => t.account_id === acc.id && t.type === 'transfer').reduce((sum, t) => sum + Number(t.amount), 0)
+        return accTotal + Number(acc.opening_balance) + income - expense + xferIn - xferOut
+      }, 0)
 
       const newData = {
         income, expenses, debtPayments, months6, categories, net: income - expenses, monthlyDebtCommitments,
         prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
         totalDebt: (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
         totalReceivable: (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
-        netWorth: invValueLocal
+        netWorth: accountsBalance
+          + invValueLocal
           + (goalRes.data ?? []).reduce((a: number, g: {current_amount: number}) => a + Number(g.current_amount), 0)
           - (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0)
           + (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
@@ -226,6 +241,7 @@ function useDashboardData() {
         unreadAlerts: alertRes.count ?? 0,
         txCount: (chartRes.data ?? []).length,
         name: profileData?.full_name ?? '',
+        lastUpdated: new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
       }
       setData(newData)
       setRecentTx(recentRes.data ?? [])
@@ -284,6 +300,11 @@ export default function DashboardPage() {
           </h1>
           <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
             {new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {data?.lastUpdated && (
+              <span style={{ margin: '0 8px', opacity: 0.5 }}>
+                • {lang === 'en' ? 'Updated' : 'تم التحديث'} {data.lastUpdated}
+              </span>
+            )}
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
