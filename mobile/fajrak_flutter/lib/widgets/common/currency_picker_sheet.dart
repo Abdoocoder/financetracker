@@ -95,7 +95,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                     hintStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 14),
                     prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant, size: 20),
                     filled: true,
-                    fillColor: cs.surfaceVariant,
+                    fillColor: cs.surfaceContainerHighest,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -191,7 +191,7 @@ class _CurrencyTile extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: cs.surfaceVariant,
+            color: cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
