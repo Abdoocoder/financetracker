@@ -40,74 +40,89 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
   return (
     <>
       {/* ── Desktop Sidebar ── */}
+      {/* ── Desktop Sidebar ── */}
       <aside style={{
-        display: 'none', width: 220, flexShrink: 0,
-        background: 'var(--bg-secondary)', borderLeft: '1px solid var(--border)',
+        display: 'none', width: 240, flexShrink: 0,
         height: '100vh', position: 'sticky', top: 0,
-        flexDirection: 'column', padding: '20px 12px',
-      }} className="desktop-sidebar">
-        <div style={{ padding: '0 8px 20px', borderBottom: '1px solid var(--border)', marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/icon-512.png" alt="فجرك" style={{ width: 36, height: 36, borderRadius: 10, objectFit: 'cover', boxShadow: '0 4px 16px var(--accent-blue-glow)' }} />
+        flexDirection: 'column', padding: '24px 16px',
+        zIndex: 50,
+      }} className="desktop-sidebar glass-sidebar">
+        <div style={{ padding: '0 8px 24px', marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="glow-avatar" style={{ width: 42, height: 42, borderRadius: 12, overflow: 'hidden', flexShrink: 0 }}>
+              <img src="/icon-512.png" alt="فجرك" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>فجرك</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Smart Finance Manager' : 'إدارة مالية ذكية'}</div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>فجرك</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{lang === 'en' ? 'Smart Finance' : 'إدارة مالية ذكية'}</div>
             </div>
           </div>
         </div>
-        <nav aria-label={lang === 'ar' ? 'القائمة الرئيسية' : 'Main navigation'} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <nav aria-label={lang === 'ar' ? 'القائمة الرئيسية' : 'Main navigation'} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
           {/* Core */}
           {MAIN_NAV.map(({ href, Icon, ar, en }) => {
             const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
-                  {isActive && <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: '0 2px 2px 0', background: 'var(--accent-blue)', boxShadow: '0 0 8px var(--accent-blue)' }} />}
-                  <Icon size={18} opacity={isActive ? 1 : 0.5} />
+                <div className={`nav-item ${isActive ? 'nav-item-active' : ''}`} style={{ 
+                  display: 'flex', alignItems: 'center', gap: 12, 
+                  padding: '12px 14px', borderRadius: 14, 
+                  fontSize: 13, fontWeight: isActive ? 700 : 500,
+                  color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
+                }}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} opacity={isActive ? 1 : 0.6} />
                   <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
                 </div>
               </Link>
             )
           })}
           {/* Separator + Tools group */}
-          <div style={{ margin: '8px 4px 4px', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '0 8px' }}>
+          <div style={{ margin: '16px 8px 6px', fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>
             {lang === 'ar' ? 'الأدوات' : 'Tools'}
           </div>
           {[MORE_NAV[0], MORE_NAV[1], MORE_NAV[2], MORE_NAV[3], MORE_NAV[4], MORE_NAV[5], MORE_NAV[6], MORE_NAV[7]].map(({ href, Icon, ar, en }) => {
             const isActive = pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
-                  {isActive && <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: '0 2px 2px 0', background: 'var(--accent-blue)', boxShadow: '0 0 8px var(--accent-blue)' }} />}
-                  <Icon size={18} opacity={isActive ? 1 : 0.5} />
+                <div className={`nav-item ${isActive ? 'nav-item-active' : ''}`} style={{ 
+                  display: 'flex', alignItems: 'center', gap: 12, 
+                  padding: '12px 14px', borderRadius: 14, 
+                  fontSize: 13, fontWeight: isActive ? 700 : 500,
+                  color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
+                }}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} opacity={isActive ? 1 : 0.6} />
                   <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
                   {href === '/dashboard/alerts' && alertsCount > 0 && (
-                    <span style={{ minWidth: 18, height: 18, borderRadius: 9, background: 'var(--accent-red)', color: 'white', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{alertsCount}</span>
+                    <span style={{ minWidth: 20, height: 20, borderRadius: 10, background: 'var(--accent-red)', color: 'white', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(239,68,68,0.4)' }}>{alertsCount}</span>
                   )}
                 </div>
               </Link>
             )
           })}
           {/* Separator + Account group */}
-          <div style={{ margin: '8px 4px 4px', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', padding: '0 8px' }}>
+          <div style={{ margin: '16px 8px 6px', fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>
             {lang === 'ar' ? 'الحساب' : 'Account'}
           </div>
           {[MORE_NAV[8], MORE_NAV[9], MORE_NAV[10]].map(({ href, Icon, ar, en }) => {
             const isActive = pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: isActive ? 'var(--accent-blue-dim)' : 'transparent', border: `1px solid ${isActive ? 'rgba(59,126,246,0.2)' : 'transparent'}`, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)', fontSize: 13, fontWeight: isActive ? 700 : 500, transition: 'all 0.15s', position: 'relative' }}>
-                  {isActive && <div style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', width: 3, height: 18, borderRadius: '0 2px 2px 0', background: 'var(--accent-blue)', boxShadow: '0 0 8px var(--accent-blue)' }} />}
-                  <Icon size={18} opacity={isActive ? 1 : 0.5} />
+                <div className={`nav-item ${isActive ? 'nav-item-active' : ''}`} style={{ 
+                  display: 'flex', alignItems: 'center', gap: 12, 
+                  padding: '12px 14px', borderRadius: 14, 
+                  fontSize: 13, fontWeight: isActive ? 700 : 500,
+                  color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
+                }}>
+                  <Icon size={20} strokeWidth={isActive ? 2.5 : 2} opacity={isActive ? 1 : 0.6} />
                   <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
                 </div>
               </Link>
             )
           })}
         </nav>
-        <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setTimeout(() => window.location.reload(), 100) }} aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'} style={{ width: '100%', padding: '8px 12px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <Globe size={14} /> {lang === 'ar' ? 'English' : 'العربية'}
+        <div style={{ paddingTop: 16, marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setTimeout(() => window.location.reload(), 100) }} aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'} style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.15)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s' }} className="btn-press">
+            <Globe size={16} /> {lang === 'ar' ? 'English' : 'العربية'}
           </button>
         </div>
       </aside>
