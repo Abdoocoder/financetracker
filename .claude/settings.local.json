@@ -58,7 +58,8 @@
       "Bash(grep -r \"auto_deduct\\\\|payment_day\\\\|debt_type\" /c/Users/skyli/Documents/financetracker/supabase/migrations/*.sql)",
       "Bash(grep -E \"\\(layout|page\\)\\\\.tsx$\")",
       "Bash(ls c:/Users/skyli/Project/financetracker/*.md)",
-      "Bash(keytool -genkey -v -keystore \"c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/android/app/release.keystore\" -alias fajrak -keyalg RSA -keysize 2048 -validity 10000 -storepass fajrak123 -keypass fajrak123 -dname \"CN=Fajrak, OU=Mobile, O=Fajrak, L=Unknown, S=Unknown, C=SA\")"
+      "Bash(keytool -genkey -v -keystore \"c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/android/app/release.keystore\" -alias fajrak -keyalg RSA -keysize 2048 -validity 10000 -storepass fajrak123 -keypass fajrak123 -dname \"CN=Fajrak, OU=Mobile, O=Fajrak, L=Unknown, S=Unknown, C=SA\")",
+      "Bash(keytool -list -keystore \"c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/android/app/upload-keystore.jks\" -storepass password123)"
     ]
   }
 }
