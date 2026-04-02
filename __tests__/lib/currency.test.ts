@@ -1,4 +1,4 @@
-import { formatAmount, CURRENCIES } from '@/lib/currency'
+import { formatAmount, CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 
 describe('lib/currency', () => {
     describe('CURRENCIES', () => {
@@ -64,6 +64,50 @@ describe('lib/currency', () => {
         it('should handle zero', () => {
             const result = formatAmount(0, 'JOD')
             expect(result).toBe('0.000 JOD')
+        })
+    })
+
+    describe('fetchExchangeRate', () => {
+        beforeEach(() => {
+            global.fetch = jest.fn()
+        })
+
+        afterEach(() => {
+            jest.resetAllMocks()
+        })
+
+        it('should return rate when fetch is successful', async () => {
+            const mockRate = 0.708
+            ;(global.fetch as jest.Mock).mockResolvedValue({
+                ok: true,
+                json: async () => ({ base: 'USD', target: 'JOD', rate: mockRate }),
+            })
+
+            const rate = await fetchExchangeRate('USD', 'JOD')
+            expect(rate).toBe(mockRate)
+            expect(global.fetch).toHaveBeenCalledWith('/api/exchange-rate?base=USD&target=JOD')
+        })
+
+        it('should return null when fetch fails (not ok)', async () => {
+            ;(global.fetch as jest.Mock).mockResolvedValue({
+                ok: false,
+            })
+
+            const rate = await fetchExchangeRate('USD', 'JOD')
+            expect(rate).toBeNull()
+        })
+
+        it('should return null when fetch throws error', async () => {
+            ;(global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'))
+            
+            // Suppress console.error for this test
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+            const rate = await fetchExchangeRate('USD', 'JOD')
+            expect(rate).toBeNull()
+            expect(consoleSpy).toHaveBeenCalled()
+            
+            consoleSpy.mockRestore()
         })
     })
 })
