@@ -17,6 +17,7 @@ import { TestimonialSection } from "@/components/ui/testimonial-section"
 interface ProfileFormData {
   full_name: string
   monthly_income: string
+  opening_balance: string
   currency: string
   salary_day: string
   phone: string
@@ -206,6 +207,10 @@ function ProfileSection({
 
       <FormField label={lang === 'en' ? 'Monthly Salary' : 'الراتب الشهري'}>
         <Input type="number" min="0" step="0.01" placeholder="0" value={profileForm.monthly_income} onChange={e => setProfileForm(f => ({ ...f, monthly_income: e.target.value }))} />
+      </FormField>
+
+      <FormField label={lang === 'en' ? 'Opening Balance (cash you had before using the app)' : 'الرصيد الابتدائي (النقد الذي كنت تملكه قبل التطبيق)'}>
+        <Input type="number" min="0" step="0.01" placeholder="0" value={profileForm.opening_balance} onChange={e => setProfileForm(f => ({ ...f, opening_balance: e.target.value }))} />
       </FormField>
 
       <FormField label={lang === 'en' ? 'Salary Day (1-28)' : 'يوم استلام الراتب (1-28)'}>
@@ -593,7 +598,7 @@ export default function SettingsPage() {
   const { t } = useI18n()
 
   const [profileForm, setProfileForm] = useState<ProfileFormData>({
-    full_name: '', monthly_income: '', currency: 'JOD',
+    full_name: '', monthly_income: '', opening_balance: '', currency: 'JOD',
     salary_day: '1', phone: '', job_title: '', birth_date: '',
   })
   const [assetsForm, setAssetsForm] = useState<AssetsFormData>({
@@ -621,6 +626,7 @@ export default function SettingsPage() {
         setProfileForm({
           full_name: data.full_name ?? '',
           monthly_income: data.monthly_income?.toString() ?? '',
+          opening_balance: data.opening_balance?.toString() ?? '',
           currency: data.currency ?? 'JOD',
           salary_day: data.salary_day?.toString() ?? '1',
           phone: data.phone ?? '',
@@ -664,7 +670,8 @@ export default function SettingsPage() {
       const txs = txRes.data ?? []
       const income = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      const cashBalance = income - expenses
+      const { data: profileData } = await supabase.from('profiles').select('opening_balance').eq('id', currentUser!.id).single()
+      const cashBalance = Number(profileData?.opening_balance ?? 0) + income - expenses
       const savings = (goalsRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
       const investments = (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
       const totalDebt = (debtsRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
@@ -696,6 +703,7 @@ export default function SettingsPage() {
       id: user.id,
       full_name: profileForm.full_name,
       monthly_income: safeParseFloat(profileForm.monthly_income),
+      opening_balance: safeParseFloat(profileForm.opening_balance),
       currency: profileForm.currency,
       salary_day: safeParseInt(profileForm.salary_day),
       phone: profileForm.phone || null,

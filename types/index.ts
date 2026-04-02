@@ -10,6 +10,7 @@ export interface Profile {
   full_name: string | null
   currency: string
   monthly_income: number
+  opening_balance: number
   timezone: string
   plan: Plan
   created_at: string
