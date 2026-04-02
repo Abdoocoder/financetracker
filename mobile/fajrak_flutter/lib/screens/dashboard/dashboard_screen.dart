@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../services/currency_service.dart';
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
 import '../../widgets/dashboard/quick_links_card.dart';
@@ -82,8 +83,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final monthlyDebtCommitments = debts
           .where((d) => d['auto_deduct'] == true && (d['debt_type'] ?? 'owed') == 'owed')
           .fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
-      final invValue = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
+      final invValueUsd = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
       final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
+      final currency = profile['currency'] as String? ?? 'JOD';
+      final usdToLocal = currency != 'USD'
+          ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
+          : 1.0;
+      final invValue = invValueUsd * usdToLocal;
       final netWorth = invValue + goalsSaved - totalDebt + totalReceivable;
 
       int score = 0;

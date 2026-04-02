@@ -11,6 +11,7 @@ import '../../widgets/investments/investment_list_item.dart';
 import '../../widgets/investments/add_investment_dialog.dart';
 import '../../widgets/investments/investment_cash_card.dart';
 import '../../services/investments_service.dart';
+import '../../services/currency_service.dart';
 
 class InvestmentsScreen extends StatefulWidget {
   const InvestmentsScreen({super.key});
@@ -22,7 +23,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   List<Map<String, dynamic>> _investments = [];
   bool _loading = true;
   bool _showInUsd = true;
-  static const _jodRate = 0.709;
+  double _usdToLocalRate = 0.709;
   String _currency = 'JOD';
   double _cashBalance = 0;
   String _cashCurrency = 'USD';
@@ -50,9 +51,17 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       final profile = results[1] as Map<String, dynamic>;
       final cashData = results[2] as List;
 
+      final loadedCurrency = profile['currency'] as String? ?? 'JOD';
+      if (loadedCurrency != 'USD') {
+        final rate = await CurrencyService.fetchExchangeRate('USD', loadedCurrency);
+        if (rate != null && mounted) _usdToLocalRate = rate;
+      } else {
+        _usdToLocalRate = 1.0;
+      }
+
       if (mounted) {
         setState(() {
-          _currency = profile['currency'] as String? ?? 'JOD';
+          _currency = loadedCurrency;
           if (cashData.isNotEmpty) {
             _cashBalance = (cashData[0]['balance'] as num).toDouble();
             _cashCurrency = cashData[0]['currency'] as String? ?? 'USD';
@@ -222,7 +231,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 border: Border.all(color: colorScheme.outlineVariant),
               ),
               child: Text(
-                _showInUsd ? 'inv_currency_usd'.tr() : 'inv_currency_jod'.tr(),
+                _showInUsd ? 'inv_currency_usd'.tr() : _currency,
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 11,
@@ -257,7 +266,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                     totalValue: _totalValue,
                     totalCost: _totalCost,
                     showInUsd: _showInUsd,
-                    jodRate: _jodRate,
+                    jodRate: _usdToLocalRate,
                     assetsCount: _investments.length,
                     halalCount:
                         _investments.where((i) => i['is_halal'] == true).length,

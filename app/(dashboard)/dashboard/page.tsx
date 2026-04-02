@@ -13,6 +13,7 @@ import {
 import { NetWorthCard } from '@/components/dashboard/NetWorthCard'
 import { FinancialHealthCombined } from '@/components/ui/financial-health-combined'
 import { DashboardEmptyState } from '@/components/ui/empty-state'
+import { fetchExchangeRate } from '@/lib/currency'
 import nextDynamic from 'next/dynamic'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
@@ -168,7 +169,7 @@ function useDashboardData() {
       const chartFrom = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]
       const [txRes, profileRes, alertRes, debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
-        supabase.from('profiles').select('monthly_income, full_name').eq('id', user.id).single(),
+        supabase.from('profiles').select('monthly_income, full_name, currency').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
         supabase.from('debts').select('remaining_amount,monthly_payment,debt_type,auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
@@ -178,7 +179,7 @@ function useDashboardData() {
       ])
 
       const txs = txRes.data ?? []
-      const profileData = profileRes.data as { monthly_income: number; full_name: string | null } | null
+      const profileData = profileRes.data as { monthly_income: number; full_name: string | null; currency?: string } | null
       const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const income = txIncome > 0 ? txIncome : Number(profileData?.monthly_income ?? 0)
@@ -200,16 +201,21 @@ function useDashboardData() {
         .filter((d: {debt_type?: string; auto_deduct?: boolean}) => d.auto_deduct === true && (d.debt_type ?? 'owed') === 'owed')
         .reduce((a: number, d: {monthly_payment?: number}) => a + Number(d.monthly_payment ?? 0), 0)
 
+      const userCurrency = profileData?.currency ?? 'JOD'
+      const invValueUSD = (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0)
+      const usdToLocal = userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? 1) : 1
+      const invValueLocal = invValueUSD * usdToLocal
+
       const newData = {
         income, expenses, debtPayments, months6, categories, net: income - expenses, monthlyDebtCommitments,
         prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
         totalDebt: (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
         totalReceivable: (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
-        netWorth: (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0)
+        netWorth: invValueLocal
           + (goalRes.data ?? []).reduce((a: number, g: {current_amount: number}) => a + Number(g.current_amount), 0)
           - (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0)
           + (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
-        invValue: (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0),
+        invValue: invValueLocal,
         goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts: alertRes.count ?? 0,
