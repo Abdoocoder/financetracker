@@ -563,7 +563,16 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.22.0 — 2026-04-02 *(Latest)*
+### v3.23.0 — 2026-04-02 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 💎 **Premium UI** | Integrated **Glassmorphism** across Web (sidebar) and Flutter (dashboard). Added glowing effects to hero balance cards. |
+| 🧪 **Audit Milestone** | Reached **10.21%** unit test coverage on Web and **100%** on key Flutter financial services. |
+| 📱 **PWA Robustness** | Resolved `beforeinstallprompt` event warnings and optimized install prompt logic. |
+| 🛡️ **Technical Polish** | Fixed CSS linting issues and improved error handling for production stability. |
+
+### v3.22.0 — 2026-04-02
 
 | Change | Description |
 |:-------|:------------|
