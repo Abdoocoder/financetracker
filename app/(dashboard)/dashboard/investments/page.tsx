@@ -571,7 +571,7 @@ export default function InvestmentsPage() {
 
           {displayedInvestments.map(inv => {
             const valueUSD = inv.shares * inv.current_price
-            const valueJOD = usdToJod ? valueUSD * usdToJod : null
+            const valueLocal = usdToJod ? valueUSD * usdToJod : null
             const costUSD  = inv.shares * inv.avg_buy_price
             const pnl  = valueUSD - costUSD
             const pnlP = costUSD > 0 ? (pnl / costUSD * 100).toFixed(1) : '0'
@@ -595,7 +595,7 @@ export default function InvestmentsPage() {
                   </div>
                   <div style={{ textAlign: lang === 'ar' ? 'right' : 'left', flexShrink: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
-                      {showJod && valueJOD ? `${valueJOD.toFixed(0)} JD` : `$${valueUSD.toFixed(2)}`}
+                      {showJod && valueLocal ? `${valueLocal.toFixed(0)} ${userCurrency}` : `$${valueUSD.toFixed(2)}`}
                     </div>
                     <div style={{ fontSize: 12, fontWeight: 700, color: isPos ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>
                       {isPos ? '+' : ''}{pnlP}%

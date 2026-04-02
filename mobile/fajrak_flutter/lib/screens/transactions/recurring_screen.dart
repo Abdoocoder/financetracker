@@ -29,11 +29,13 @@ class _RecurringScreenState extends State<RecurringScreen> {
         .from('recurring_transactions')
         .select('*').eq('user_id', user.id)
         .order('next_date');
-    if (mounted) setState(() {
-      _currency = profile['currency'] as String? ?? 'JOD';
-      _list = List<Map<String, dynamic>>.from(data as List);
-      _loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _currency = profile['currency'] as String? ?? 'JOD';
+        _list = List<Map<String, dynamic>>.from(data as List);
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _toggleActive(Map<String, dynamic> rec) async {
@@ -123,7 +125,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           leading: CircleAvatar(
-                            backgroundColor: color.withOpacity(0.12),
+                            backgroundColor: color.withValues(alpha: 0.12),
                             child: Icon(isIncome ? Icons.trending_up : Icons.trending_down, color: color, size: 20),
                           ),
                           title: Text(rec['name'] ?? '', style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 14)),
@@ -297,7 +299,7 @@ class _RecurringFormState extends State<_RecurringForm> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   decoration: BoxDecoration(
-                    color: selected ? color.withOpacity(0.12) : Colors.transparent,
+                    color: selected ? color.withValues(alpha: 0.12) : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: selected ? color : cs.outlineVariant),
                   ),
@@ -333,7 +335,7 @@ class _RecurringFormState extends State<_RecurringForm> {
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(color: cs.surfaceVariant, borderRadius: BorderRadius.circular(10), border: Border.all(color: cs.outlineVariant)),
+                decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(10), border: Border.all(color: cs.outlineVariant)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('recurring_next'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
                   const SizedBox(height: 2),
@@ -366,7 +368,7 @@ class _RecurringFormState extends State<_RecurringForm> {
       style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 14),
       decoration: InputDecoration(
         hintText: hint, hintStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
-        filled: true, fillColor: cs.surfaceVariant,
+        filled: true, fillColor: cs.surfaceContainerHighest,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       ),
@@ -375,11 +377,11 @@ class _RecurringFormState extends State<_RecurringForm> {
 
   Widget _dropdown(String value, List<String> items, ValueChanged<String?> onChanged, ColorScheme cs, { required String label, String Function(String)? labelBuilder }) {
     return DropdownButtonFormField<String>(
-      value: items.contains(value) ? value : items.first,
+      initialValue: items.contains(value) ? value : items.first,
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label, labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11),
-        filled: true, fillColor: cs.surfaceVariant,
+        filled: true, fillColor: cs.surfaceContainerHighest,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       ),

@@ -378,8 +378,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                   fontFamily: 'Cairo'),
             ),
             Text(
-              'inv_roi_label'.tr() +
-                  ': ${gain >= 0 ? "+" : ""}\$${gain.toStringAsFixed(2)}',
+              '${'inv_roi_label'.tr()}: ${gain >= 0 ? "+" : ""}\$${gain.toStringAsFixed(2)}',
               style: TextStyle(
                   color: gain >= 0
                       ? const Color(0xFF10B981)
