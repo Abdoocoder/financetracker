@@ -563,7 +563,18 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.21.0 — 2026-04-02 *(Latest)*
+### v3.22.0 — 2026-04-02 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| ⚡ **Progressive Loading** | Dashboard renders in two phases: hero balance card appears instantly from accounts query (~100ms), secondary sections load after full data fetch |
+| 🎨 **Hero Balance Card** | 42px count-up animated balance, trend % vs last month, per-account color chips |
+| 📐 **Section Reorder** | Hero first, recent transactions promoted above charts, all heavy sections collapsed by default |
+| ✨ **Micro-animations** | Count-up with cubic ease-out (900ms), `AnimatedSwitcher` skeleton→content transitions in Flutter |
+| 🦴 **Skeleton Screens** | Pulsing skeleton boxes replace full-page spinner in both web and Flutter |
+| 📱 **Flutter Parity** | Two-phase loading (`_loadPhase1` / `_loadPhase2`) mirroring web, `_SkeletonBox` shimmer widget |
+
+### v3.21.0 — 2026-04-02
 
 | Change | Description |
 |:-------|:------------|
