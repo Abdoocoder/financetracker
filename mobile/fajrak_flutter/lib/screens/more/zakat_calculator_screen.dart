@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/currency_service.dart';
 
 class ZakatCalculatorScreen extends StatefulWidget {
   const ZakatCalculatorScreen({super.key});
@@ -48,56 +49,54 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
   }
 
   Future<void> _fetchLivePrices() async {
-    if (_fetchingPrices) return;
+    if (!mounted) return;
     setState(() => _fetchingPrices = true);
     try {
-      // Fetch gold (GC=F) and silver (SI=F) from Yahoo Finance
       final results = await Future.wait([
-        _fetchYahooPrice('GC=F'),
-        _fetchYahooPrice('SI=F'),
-        _fetchUsdRate(_currency),
-      ]);
-      final goldUsdOz = results[0];
-      final silverUsdOz = results[1];
-      final usdRate = results[2] ?? 1.0;
-      if (goldUsdOz != null && mounted) {
-        _goldPriceCtrl.text = (goldUsdOz / _troyOzToGram * usdRate).toStringAsFixed(2);
+        http.get(Uri.parse('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d'), headers: {'User-Agent': 'Mozilla/5.0'}).timeout(const Duration(seconds: 10)),
+        http.get(Uri.parse('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d'), headers: {'User-Agent': 'Mozilla/5.0'}).timeout(const Duration(seconds: 10)),
+        CurrencyService.fetchExchangeRate('USD', _currency),
+      ]).catchError((e) => [http.Response('', 404), http.Response('', 404), 1.0]);
+
+      double usdRate = results[2] as double? ?? 1.0;
+      double? goldP;
+      double? silverP;
+
+      final goldRes = results[0] as http.Response;
+      if (goldRes.statusCode == 200 && goldRes.body.isNotEmpty) {
+        final d = json.decode(goldRes.body);
+        final priceOz = (d['chart']?['result']?[0]?['meta']?['regularMarketPrice'] as num?)?.toDouble() ?? 0;
+        if (priceOz > 0) goldP = (priceOz / _troyOzToGram) * usdRate;
       }
-      if (silverUsdOz != null && mounted) {
-        _silverPriceCtrl.text = (silverUsdOz / _troyOzToGram * usdRate).toStringAsFixed(2);
+
+      final silverRes = results[1] as http.Response;
+      if (silverRes.statusCode == 200 && silverRes.body.isNotEmpty) {
+        final d = json.decode(silverRes.body);
+        final priceOz = (d['chart']?['result']?[0]?['meta']?['regularMarketPrice'] as num?)?.toDouble() ?? 0;
+        if (priceOz > 0) silverP = (priceOz / _troyOzToGram) * usdRate;
       }
-      if (mounted) setState(() {});
+
+      // Fallback Source: FreeGoldAPI
+      if (goldP == null || silverP == null) {
+        final fbRes = await http.get(Uri.parse('https://freegoldapi.com/data/latest.json')).timeout(const Duration(seconds: 5)).catchError((_) => http.Response('', 404));
+        if (fbRes.statusCode == 200 && fbRes.body.isNotEmpty) {
+          final fb = json.decode(fbRes.body);
+          if (goldP == null && fb['gold'] != null) goldP = (fb['gold'] as num).toDouble() * usdRate;
+          if (silverP == null && fb['silver'] != null) silverP = (fb['silver'] as num).toDouble() * usdRate;
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          if (goldP != null) _goldPriceCtrl.text = goldP.toStringAsFixed(2);
+          if (silverP != null) _silverPriceCtrl.text = silverP.toStringAsFixed(2);
+        });
+      }
+    } catch (e, s) {
+      debugPrint('Zakat Live Prices Error: $e $s');
     } finally {
       if (mounted) setState(() => _fetchingPrices = false);
     }
-  }
-
-  Future<double?> _fetchYahooPrice(String symbol) async {
-    try {
-      final res = await http.get(
-        Uri.parse('https://query1.finance.yahoo.com/v8/finance/chart/$symbol?interval=1d&range=1d'),
-        headers: {'User-Agent': 'Mozilla/5.0'},
-      );
-      if (res.statusCode == 200) {
-        final data = json.decode(res.body);
-        return (data['chart']?['result']?[0]?['meta']?['regularMarketPrice'] as num?)?.toDouble();
-      }
-    } catch (_) {}
-    return null;
-  }
-
-  Future<double?> _fetchUsdRate(String targetCurrency) async {
-    if (targetCurrency == 'USD') return 1.0;
-    try {
-      final res = await http.get(Uri.parse('https://open.er-api.com/v6/latest/USD'));
-      if (res.statusCode == 200) {
-        final data = json.decode(res.body);
-        return (data['rates']?[targetCurrency] as num?)?.toDouble();
-      }
-    } catch (_) {}
-    // Fallback rates
-    const fallback = {'JOD': 0.709, 'SAR': 3.75, 'AED': 3.67, 'KWD': 0.307, 'EGP': 48.5};
-    return fallback[targetCurrency];
   }
 
   @override
@@ -150,6 +149,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
         _history = history.cast<Map<String, dynamic>>();
         _invItems = invList.cast<Map<String, dynamic>>();
       });
+      _fetchLivePrices();
     }
   }
 

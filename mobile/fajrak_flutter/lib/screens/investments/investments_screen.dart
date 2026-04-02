@@ -35,6 +35,8 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
     super.initState();
     AnalyticsService.logScreenView('Investments');
     _load();
+    // Background refresh for live prices
+    Future.microtask(() => _load(refreshPrices: true));
   }
 
   Future<void> _load({bool refreshPrices = false}) async {
