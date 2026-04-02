@@ -203,46 +203,39 @@ function useDashboardData() {
         const mt = (chartRes.data ?? []).filter(t => t.transaction_date?.startsWith(key))
         return { month: label, income: mt.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), expense: mt.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0) }
       })
+
       const prevMonth = months6[4] ?? { income: 0, expense: 0 }
       const monthlyDebtCommitments = (debtRes.data ?? [])
         .filter((d: {debt_type?: string; auto_deduct?: boolean}) => d.auto_deduct === true && (d.debt_type ?? 'owed') === 'owed')
         .reduce((a: number, d: {monthly_payment?: number}) => a + Number(d.monthly_payment ?? 0), 0)
 
-      const userCurrency = profileData?.currency ?? 'JOD'
-      const invValueUSD = (invRes.data ?? []).reduce((a: number, i: {shares: number; current_price: number}) => a + Number(i.shares) * Number(i.current_price), 0)
+      const userCurrency = (profileData?.currency ?? 'JOD').toUpperCase()
       const usdToLocal = userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? 1) : 1
-      const invValueLocal = invValueUSD * usdToLocal
       
-      // FIX: Calculate total account balance for net worth (Audit Report Fix)
-      // Note: We used to rely on useAccounts, but for netWorth we need it inside this state.
-      const accountsRes = accountsResQuery?.data as { id: string; opening_balance: number }[] ?? []
-      const allTxs = chartRes.data ?? []
-      const accountsBalance = accountsRes.reduce((accTotal, acc) => {
-        const income   = allTxs.filter(t => t.account_id === acc.id && t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0)
-        const expense  = allTxs.filter(t => t.account_id === acc.id && t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0)
-        const xferIn   = allTxs.filter(t => t.transfer_to_account_id === acc.id && t.type === 'transfer').reduce((sum, t) => sum + Number(t.amount), 0)
-        const xferOut  = allTxs.filter(t => t.account_id === acc.id && t.type === 'transfer').reduce((sum, t) => sum + Number(t.amount), 0)
-        return accTotal + Number(acc.opening_balance) + income - expense + xferIn - xferOut
-      }, 0)
+      // FIX: Use Centralized RPC for Net Worth and Financial Metrics (Best Practice)
+      const { data: dash, error: dashErr } = await supabase.rpc('get_financial_dashboard', { 
+        p_user_id: user.id, 
+        p_usd_to_local_rate: usdToLocal 
+      })
+
+      if (dashErr) console.error('Dashboard RPC error:', dashErr)
 
       const newData = {
-        income, expenses, debtPayments, months6, categories, net: income - expenses, monthlyDebtCommitments,
+        income, expenses, debtPayments, months6, categories, net: income - expenses, 
+        monthlyDebtCommitments,
         prevIncome: prevMonth.income, prevExpenses: prevMonth.expense,
-        totalDebt: (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
-        totalReceivable: (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
-        netWorth: accountsBalance
-          + invValueLocal
-          + (goalRes.data ?? []).reduce((a: number, g: {current_amount: number}) => a + Number(g.current_amount), 0)
-          - (debtRes.data ?? []).filter((d: {debt_type?: string}) => (d.debt_type ?? 'owed') === 'owed').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0)
-          + (debtRes.data ?? []).filter((d: {debt_type?: string}) => d.debt_type === 'receivable').reduce((a: number, d: {remaining_amount: number}) => a + Number(d.remaining_amount), 0),
-        invValue: invValueLocal,
-        goalsSaved: (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0),
+        totalDebt: Number(dash?.total_debt_owed ?? 0),
+        totalReceivable: Number(dash?.total_receivable ?? 0),
+        netWorth: Number(dash?.net_worth ?? 0),
+        invValue: Number(dash?.investments_value_local ?? 0),
+        goalsSaved: Number(dash?.goals_saved ?? 0),
         goalsTarget: (goalRes.data ?? []).reduce((a, g) => a + Number(g.target_amount), 0),
         unreadAlerts: alertRes.count ?? 0,
         txCount: (chartRes.data ?? []).length,
         name: profileData?.full_name ?? '',
         lastUpdated: new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
       }
+
       setData(newData)
       setRecentTx(recentRes.data ?? [])
       setLoading(false)

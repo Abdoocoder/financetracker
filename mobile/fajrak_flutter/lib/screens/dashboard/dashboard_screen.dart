@@ -12,8 +12,8 @@ import '../../widgets/dashboard/gamification_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/dashboard_header.dart';
+import '../../services/finance_service.dart';
 import '../../widgets/common/glass_panel.dart';
-import '../../utils/finance_utils.dart';
 
 import '../../widgets/dashboard/dashboard_stats.dart';
 import '../../widgets/dashboard/dashboard_health_score.dart';
@@ -96,7 +96,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final txs = results[1] as List;
       final recent = results[2] as List;
       final debts = results[3] as List;
-      final investments = results[4] as List;
+      // investments is now handled via FinanceService.fetchFinancialDashboard
       final goals = results[5] as List;
 
       double txIncome = 0, txExpenses = 0;
@@ -109,28 +109,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
       final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
       final income = txIncome > 0 ? txIncome : profileIncome;
-      final totalDebt = debts.where((d) => (d['debt_type'] ?? 'owed') == 'owed').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
-      final totalReceivable = debts.where((d) => d['debt_type'] == 'receivable').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
+      
+      final currency = (profile['currency'] as String? ?? 'JOD').toUpperCase();
+      final usdToLocal = currency != 'USD'
+          ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
+          : 1.0;
+
+      // FIX: Use Centralized RPC for Net Worth components (Best Practice)
+      final dash = await FinanceService.fetchFinancialDashboard(user.id, usdToLocal);
+      
+      final netWorth = (dash['net_worth'] as num).toDouble();
+      final totalDebt = (dash['total_debt_owed'] as num).toDouble();
+      final totalReceivable = (dash['total_receivable'] as num).toDouble();
+      final invValue = (dash['investments_value_local'] as num).toDouble();
+      final goalsSaved = (dash['goals_saved'] as num).toDouble();
+
       final totalMonthly = debts.fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
       final monthlyDebtCommitments = debts
           .where((d) => d['auto_deduct'] == true && (d['debt_type'] ?? 'owed') == 'owed')
           .fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
-      final invValueUsd = investments.fold(0.0, (a, i) => a + (i['shares'] as num).toDouble() * (i['current_price'] as num).toDouble());
-      final goalsSaved = goals.fold(0.0, (a, g) => a + (g['current_amount'] as num).toDouble());
-      final currency = profile['currency'] as String? ?? 'JOD';
-      final usdToLocal = currency != 'USD'
-          ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
-          : 1.0;
-      final invValue = invValueUsd * usdToLocal;
-      
-      // FIX: Include _totalAccountsBalance in Net Worth calculation (Audit Report Fix)
-      final netWorth = FinanceUtils.calculateNetWorth(
-        totalAccountBalances: _totalAccountsBalance,
-        totalDebt: totalDebt,
-        totalReceivable: totalReceivable,
-        investmentValue: invValue,
-        savingsGoalsValue: goalsSaved,
-      );
 
       int score = 0;
       final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
