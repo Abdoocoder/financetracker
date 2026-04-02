@@ -30,12 +30,15 @@ function Section({ id, title, icon, defaultOpen = false, children }: {
   children: React.ReactNode
 }) {
   const STORAGE_KEY = `dash_section_${id}`
-  const [open, setOpen] = useState(() => {
+  const [open, setOpen] = useState(defaultOpen)
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      return saved !== null ? saved === 'true' : defaultOpen
-    } catch { return defaultOpen }
-  })
+      if (saved !== null) setOpen(saved === 'true')
+    } catch { }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function toggle() {
     const next = !open

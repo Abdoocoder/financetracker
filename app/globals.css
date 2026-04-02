@@ -64,6 +64,33 @@
     /* --- Shadows --- */
     --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
     --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+    /* --- Spacing Scale --- */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* --- Typography Scale --- */
+    --fs-xs:   10px;
+    --fs-sm:   11px;
+    --fs-base: 13px;
+    --fs-md:   14px;
+    --fs-lg:   16px;
+    --fs-xl:   18px;
+    --fs-2xl:  22px;
+
+    --fw-normal: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --fw-black: 900;
+
+    --lh-tight: 1.3;
+    --lh-normal: 1.5;
+    --lh-relaxed: 1.7;
   }
 }
 

@@ -11,6 +11,7 @@ import { PushPrompt } from '@/components/ui/push-prompt'
 import { InstallPrompt } from '@/components/ui/install-prompt'
 import { WelcomeModal } from '@/components/ui/welcome-modal'
 import { OnboardingTour } from '@/components/ui/onboarding-tour'
+import { GlobalFAB } from '@/components/ui/fab'
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
@@ -71,6 +72,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <OnboardingTour />
       {children}
       </main>
+      <GlobalFAB />
+
     </div>
   )
 }

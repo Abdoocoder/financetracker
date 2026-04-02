@@ -13,6 +13,8 @@ import {
 const MAIN_NAV = [
   { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
   { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
+  { href: '/dashboard/goals',        Icon: Target,          ar: 'الأهداف',   en: 'Goals'        },
+  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
 ]
 
 const MORE_NAV = [
