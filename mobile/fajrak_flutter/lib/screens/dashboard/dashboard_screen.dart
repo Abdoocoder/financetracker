@@ -40,6 +40,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Map<String, dynamic>> _months6Data = [];
   final List<Map<String, dynamic>> _categoryData = [];
   double _totalDebt = 0, _totalReceivable = 0, _netWorth = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
+  DateTime? _lastUpdated;
   final double _prevExpenses = 0;
   final double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
@@ -120,7 +121,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
           : 1.0;
       final invValue = invValueUsd * usdToLocal;
-      final netWorth = invValue + goalsSaved - totalDebt + totalReceivable;
+      
+      // FIX: Include _totalAccountsBalance in Net Worth calculation (Audit Report Fix)
+      final netWorth = FinanceUtils.calculateNetWorth(
+        totalAccountBalances: _totalAccountsBalance,
+        totalDebt: totalDebt,
+        totalReceivable: totalReceivable,
+        investmentValue: invValue,
+        savingsGoalsValue: goalsSaved,
+      );
 
       int score = 0;
       final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
@@ -166,6 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _invValue = invValue;
           _goalsSaved = goalsSaved;
           _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
+          _lastUpdated = DateTime.now();
           _loading = false;
         });
       }
@@ -221,7 +231,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // ── 1. Header — instant ───────────────────────────────
               DashboardHeader(name: _name),
-              const SizedBox(height: 16),
+              if (_lastUpdated != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 12),
+                  child: Text(
+                    '${'last_updated'.tr()}: ${DateFormat('HH:mm').format(_lastUpdated!)}',
+                    style: TextStyle(fontSize: 11, color: colorScheme.onSurface.withValues(alpha: 0.5), fontWeight: FontWeight.w600),
+                  ),
+                ),
+              const SizedBox(height: 12),
 
               // ── 2. Hero Balance Card — after phase 1 ─────────────
               AnimatedSwitcher(
