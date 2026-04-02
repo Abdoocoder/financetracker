@@ -13,6 +13,11 @@ import { WelcomeModal } from '@/components/ui/welcome-modal'
 import { OnboardingTour } from '@/components/ui/onboarding-tour'
 import { GlobalFAB } from '@/components/ui/fab'
 
+function TranslatedErrorBoundary({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n()
+  return <ErrorBoundary t={t}>{children}</ErrorBoundary>
+}
+
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
   const { lang } = useI18n()
@@ -83,10 +88,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <UserProvider>
       <I18nProvider>
         <ToastProvider>
-          <ErrorBoundary>
+          <TranslatedErrorBoundary>
             <DashboardContent>
       {children}</DashboardContent>
-          </ErrorBoundary>
+          </TranslatedErrorBoundary>
         </ToastProvider>
       </I18nProvider>
     </UserProvider>

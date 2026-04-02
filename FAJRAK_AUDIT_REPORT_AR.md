@@ -264,7 +264,9 @@ npm run test:coverage # تقرير التغطية
 
 | الجانب | الحالة | ملاحظات |
 |:-------|:------:|:--------|
-| GDPR | ❌ غير مُوثّق | يحتاج إضافة |
+| Error Boundaries | ✅ مقبول | مُطبّق في لوحة التحكم ويدعم i18n |
+| Sentry/Monitoring | ✅ موجود | مُعدّ لجمع الأخطاء في الإنتاج |
+| Business Continuity Plan | ✅ موجود | مُوثّق في `BCP.ar.md` |
 | Privacy Policy | ✅ موجود | متاح في `/privacy` |
 | Terms of Service | ✅ موجود | متاح في `/terms` |
 | Data Processing Agreement | ❌ غير موجود | يحتاج مراجعة |
