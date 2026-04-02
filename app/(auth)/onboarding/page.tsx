@@ -5,9 +5,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n'
+import { detectCurrency, type DetectionResult } from '@/lib/detectCurrency'
+import { CurrencyButton } from '@/components/ui/currency-picker'
 
 type Step = 1 | 2 | 3
-interface Profile { fullName: string; monthlyIncome: string; currency: 'JOD'|'USD'|'SAR'|'AED' }
+interface Profile { fullName: string; monthlyIncome: string; currency: string }
 interface FirstTransaction { type: 'income'|'expense'; amount: string; category: string; description: string }
 
 const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى']
@@ -86,12 +88,13 @@ function BudgetPreview({ income, lang }: { income: number; lang: string }) {
 }
 
 // ── Step 1: الملف الشخصي ─────────────────────────────
-function Step1({ profile, setProfile, onNext, loading, lang }: {
+function Step1({ profile, setProfile, onNext, loading, lang, detectedInfo }: {
   profile: Profile
   setProfile: React.Dispatch<React.SetStateAction<Profile>>
   onNext: () => void
   loading: boolean
   lang: string
+  detectedInfo: DetectionResult | null
 }) {
   const ar = lang === 'ar'
   if (loading) return (
@@ -131,12 +134,12 @@ function Step1({ profile, setProfile, onNext, loading, lang }: {
       </Field>
 
       <Field label={ar ? 'العملة' : 'Currency'}>
-        <StyledSelect value={profile.currency} onChange={e => setProfile(p => ({ ...p, currency: e.target.value as Profile['currency'] }))}>
-          <option value="JOD">🇯🇴 {ar ? 'دينار أردني (JOD)' : 'Jordanian Dinar (JOD)'}</option>
-          <option value="SAR">🇸🇦 {ar ? 'ريال سعودي (SAR)' : 'Saudi Riyal (SAR)'}</option>
-          <option value="AED">🇦🇪 {ar ? 'درهم إماراتي (AED)' : 'UAE Dirham (AED)'}</option>
-          <option value="USD">🇺🇸 {ar ? 'دولار أمريكي (USD)' : 'US Dollar (USD)'}</option>
-        </StyledSelect>
+        <CurrencyButton
+          value={profile.currency}
+          onChange={code => setProfile(p => ({ ...p, currency: code }))}
+          lang={lang}
+          detectedCountry={detectedInfo?.confidence === 'high' ? detectedInfo.countryName : undefined}
+        />
       </Field>
 
       <button
@@ -311,6 +314,7 @@ export default function OnboardingPage() {
   const [loadingProfile, setLoadingProfile] = useState(true)
   const [profile, setProfile] = useState<Profile>({ fullName: '', monthlyIncome: '', currency: 'JOD' })
   const [tx, setTx] = useState<FirstTransaction>({ type: 'expense', amount: '', category: '', description: '' })
+  const [detectedInfo, setDetectedInfo] = useState<DetectionResult | null>(null)
   const ar = lang === 'ar'
 
   useEffect(() => {
@@ -319,10 +323,14 @@ export default function OnboardingPage() {
       if (!user) { setLoadingProfile(false); return }
       const meta = user.user_metadata
       const { data } = await supabase.from('profiles').select('full_name,monthly_income,currency').eq('id', user.id).single()
+      // اكتشاف العملة تلقائياً للمستخدمين الجدد فقط
+      const detected = detectCurrency()
+      const savedCurrency = data?.currency
+      setDetectedInfo(detected)
       setProfile({
         fullName: data?.full_name ?? meta?.full_name ?? '',
         monthlyIncome: data?.monthly_income?.toString() ?? meta?.monthly_income?.toString() ?? '',
-        currency: (data?.currency ?? 'JOD') as Profile['currency'],
+        currency: savedCurrency ?? detected.currency,
       })
       setLoadingProfile(false)
     }
@@ -416,7 +424,7 @@ export default function OnboardingPage() {
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: '28px 24px', boxShadow: '0 8px 40px rgba(0,0,0,0.25)' }}>
           <ProgressBar step={step} />
           <StepDots current={step} />
-          {step === 1 && <Step1 profile={profile} setProfile={setProfile} onNext={handleStep1} loading={loadingProfile} lang={lang} />}
+          {step === 1 && <Step1 profile={profile} setProfile={setProfile} onNext={handleStep1} loading={loadingProfile} lang={lang} detectedInfo={detectedInfo} />}
           {step === 2 && <Step2 tx={tx} setTx={setTx} onNext={handleStep2} onBack={() => setStep(1)} saving={saving} lang={lang} />}
           {step === 3 && <Step3 onGo={handleDone} lang={lang} name={profile.fullName} />}
         </div>

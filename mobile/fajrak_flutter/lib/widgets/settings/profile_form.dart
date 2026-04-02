@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'settings_accordion.dart';
+import '../../services/currency_service.dart';
+import '../common/currency_picker_sheet.dart';
 
 class ProfileForm extends StatefulWidget {
   final Map<String, dynamic>? initialProfile;
@@ -38,7 +40,9 @@ class _ProfileFormState extends State<ProfileForm> {
     _incomeCtrl = TextEditingController(text: p['monthly_income']?.toString() ?? '');
     _jobTitleCtrl = TextEditingController(text: p['job_title']?.toString() ?? '');
     _phoneCtrl = TextEditingController(text: p['phone']?.toString() ?? '');
-    _currency = p['currency']?.toString() ?? 'JOD';
+    // تنظيف legacy data: 'دولار' كانت bug قديم، نحوّلها إلى 'USD'
+    final raw = p['currency']?.toString() ?? 'JOD';
+    _currency = CurrencyService.findByCode(raw) != null ? raw : 'JOD';
     _birthDate = p['birth_date']?.toString() ?? '';
     _salaryDay = p['salary_day']?.toString() ?? '1';
   }
@@ -231,35 +235,40 @@ class _ProfileFormState extends State<ProfileForm> {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: ['JOD', 'دولار', 'SAR', 'AED', 'KWD'].map((c) {
-              return Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: GestureDetector(
-                    onTap: () => setState(() => _currency = c),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: _currency == c ? colorScheme.primary : colorScheme.surface,
-                        borderRadius: BorderRadius.circular(9),
-                        border: Border.all(color: _currency == c ? colorScheme.primary : colorScheme.outlineVariant),
-                      ),
-                      child: Text(
-                        c,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: _currency == c ? Colors.white : colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+          GestureDetector(
+            onTap: () async {
+              await showCurrencyPickerSheet(
+                context: context,
+                selectedCode: _currency,
+                onSelected: (code) => setState(() => _currency = code),
               );
-            }).toList(),
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colorScheme.outlineVariant),
+              ),
+              child: Row(children: [
+                Text(
+                  CurrencyService.findByCode(_currency)?['flag'] as String? ?? '🌐',
+                  style: const TextStyle(fontSize: 22),
+                ),
+                const SizedBox(width: 10),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(
+                    CurrencyService.findByCode(_currency)?['labelAr'] as String? ?? _currency,
+                    style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    _currency,
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'monospace', fontSize: 11),
+                  ),
+                ])),
+                Icon(Icons.arrow_drop_down, color: colorScheme.onSurfaceVariant),
+              ]),
+            ),
           ),
           const SizedBox(height: 24),
           SizedBox(

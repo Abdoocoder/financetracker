@@ -1,15 +1,8 @@
 'use client'
 
-export const CURRENCIES = [
-  { value: 'JOD', label: 'دينار أردني (JOD)', icon: '🇯🇴' },
-  { value: 'USD', label: 'دولار أمريكي (USD)', icon: '💵' },
-  { value: 'EUR', label: 'يورو (EUR)', icon: '🇪🇺' },
-  { value: 'SAR', label: 'ريال سعودي (SAR)', icon: '🇸🇦' },
-  { value: 'AED', label: 'درهم إماراتي (AED)', icon: '🇦🇪' },
-  { value: 'KWD', label: 'دينار كويتي (KWD)', icon: '🇰🇼' },
-  { value: 'TRY', label: 'ليرة تركية (TRY)', icon: '🇹🇷' },
-  { value: 'GBP', label: 'جنيه إسترليني (GBP)', icon: '🇬🇧' },
-]
+export { CURRENCIES, CURRENCIES_BY_GROUP, CURRENCY_MAP, getCurrencyDecimals } from './currencies'
+export type { CurrencyInfo, CurrencyGroup, GroupedCurrency } from './currencies'
+import { getCurrencyDecimals } from './currencies'
 
 export interface ExchangeRateResponse {
   base: string
@@ -30,9 +23,10 @@ export async function fetchExchangeRate(base: string, target: string): Promise<n
 }
 
 export function formatAmount(amount: number, currency: string) {
+  const decimals = getCurrencyDecimals(currency)
   return new Intl.NumberFormat('en-US', {
     style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
   }).format(amount) + ' ' + currency
 }
