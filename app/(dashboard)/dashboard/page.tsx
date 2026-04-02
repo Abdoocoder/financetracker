@@ -370,7 +370,7 @@ export default function DashboardPage() {
         />
       )}
 
-      <Section id="health" icon="💊" title={`${lang === 'en' ? 'Financial Health Score' : 'نقاط الصحة المالية'} — ${computeHealthScore(data, income, expenses)}%`}>
+      <Section id="health" defaultOpen={true} icon="💊" title={`${lang === 'en' ? 'Financial Health Score' : 'نقاط الصحة المالية'} — ${computeHealthScore(data, income, expenses)}%`}>
         <div style={{ padding: '12px 0 8px' }}>
           <FinancialHealthCombined
             income={income}
@@ -400,7 +400,7 @@ export default function DashboardPage() {
         </div>
       </Section>
 
-      <Section id="charts" icon="📊" title={lang === 'en' ? 'Charts & Expense Breakdown' : 'الرسوم البيانية وتوزيع المصاريف'}>
+      <Section id="charts" defaultOpen={true} icon="📊" title={lang === 'en' ? 'Charts & Expense Breakdown' : 'الرسوم البيانية وتوزيع المصاريف'}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
           <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
           {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && (
