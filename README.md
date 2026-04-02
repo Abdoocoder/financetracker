@@ -563,7 +563,19 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.17.0 — 2026-04-01 *(Latest)*
+### v3.20.0 — 2026-04-02 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🌍 **35 Currencies** | Full Arabic, Islamic & global currency support — single source of truth in `lib/currencies.ts` |
+| 🔍 **Smart Detection** | Auto-detect user currency from device Timezone/Locale on first login — no API needed |
+| 🎯 **Currency Picker** | Searchable grouped modal (web) and bottom sheet (Flutter) replacing hardcoded dropdowns |
+| 💱 **Correct Net Worth** | Fixed currency mismatch bug — investments (USD) now converted to user currency before summing |
+| 📐 **Decimal Precision** | Correct decimal places per currency (KWD/JOD = 3, JPY = 0, others = 2) |
+| 🐛 **Legacy Fix** | Sanitized old `'دولار'` string stored in profiles — now maps correctly to `USD` |
+| 🌐 **Investments Screen** | Web currency toggle now uses user's actual currency instead of hardcoded JOD |
+
+### v3.17.0 — 2026-04-01
 
 | Change | Description |
 |:-------|:------------|
