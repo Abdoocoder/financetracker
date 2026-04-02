@@ -100,42 +100,14 @@ export default function ZakatPage() {
   async function fetchLivePrices() {
     setFetchingPrices(true)
     try {
-      // المصدر الأول: Yahoo Finance
-      const [goldRes, silverRes, rateRes] = await Promise.all([
-        fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d', { headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null),
-        fetch('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d', { headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null),
-        currency !== 'USD' ? fetch(`https://open.er-api.com/v6/latest/USD`).catch(() => null) : Promise.resolve(null),
-      ])
-      
-      let finalGold = 0, finalSilver = 0
-      const usdRate = currency !== 'USD' && rateRes?.ok ? ((await rateRes.json()).rates?.[currency] ?? 1) : 1
-
-      if (goldRes?.ok) {
-        const d = await goldRes.json()
-        const priceOz = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
-        if (priceOz > 0) finalGold = parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2))
+      const res = await fetch(`/api/zakat/prices?currency=${currency}`).catch(() => null)
+      if (res?.ok) {
+        const data = await res.json()
+        if (data.gold > 0) setGoldPrice(data.gold)
+        if (data.silver > 0) setSilverPrice(data.silver)
       }
-
-      if (silverRes?.ok) {
-        const d = await silverRes.json()
-        const priceOz = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
-        if (priceOz > 0) finalSilver = parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2))
-      }
-
-      // المصدر البديل (Fallback): FreeGoldAPI إذا فشل Yahoo
-      if (finalGold === 0 || finalSilver === 0) {
-        try {
-          const fallbackRes = await fetch('https://freegoldapi.com/data/latest.json').catch(() => null)
-          if (fallbackRes?.ok) {
-            const fb = await fallbackRes.json()
-            if (finalGold === 0 && fb.gold) finalGold = parseFloat((fb.gold * usdRate).toFixed(2))
-            if (finalSilver === 0 && fb.silver) finalSilver = parseFloat((fb.silver * usdRate).toFixed(2))
-          }
-        } catch {}
-      }
-
-      if (finalGold > 0) setGoldPrice(finalGold)
-      if (finalSilver > 0) setSilverPrice(finalSilver)
+    } catch {
+      // If our proxy fails, let's keep current values
     } finally {
       setFetchingPrices(false)
     }
