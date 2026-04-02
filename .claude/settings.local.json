@@ -55,7 +55,8 @@
       "Bash(wc -l /c/Users/skyli/Project/financetracker/lib/*.ts /c/Users/skyli/Project/financetracker/lib/*.tsx)",
       "Bash(grep -l \"investment\" /c/Users/skyli/Project/financetracker/mobile/fajrak_flutter/lib/*.dart /c/Users/skyli/Project/financetracker/mobile/fajrak_flutter/lib/**/*.dart)",
       "Bash(grep -E \"\\\\.\\(dart\\)$\")",
-      "Bash(grep -r \"auto_deduct\\\\|payment_day\\\\|debt_type\" /c/Users/skyli/Documents/financetracker/supabase/migrations/*.sql)"
+      "Bash(grep -r \"auto_deduct\\\\|payment_day\\\\|debt_type\" /c/Users/skyli/Documents/financetracker/supabase/migrations/*.sql)",
+      "Bash(grep -E \"\\(layout|page\\)\\\\.tsx$\")"
     ]
   }
 }

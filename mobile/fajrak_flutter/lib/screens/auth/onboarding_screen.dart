@@ -2,7 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
+import '../../utils/detect_currency.dart';
 import '../../services/analytics_service.dart';
+import '../../services/currency_service.dart';
+import '../../widgets/common/currency_picker_sheet.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,13 +22,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _salaryDay = 25;
   String _currency = 'JOD';
   bool _loading = false;
-
-  final List<String> _currencies = ['JOD', 'USD', 'SAR', 'AED'];
+  DetectionResult? _detected;
 
   @override
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('Onboarding');
+    final result = DetectCurrency.detect();
+    _currency = result.currency;
+    _detected = result;
   }
 
   @override
@@ -265,37 +270,55 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _slideSummary(ColorScheme colorScheme) {
+    final info = CurrencyService.findByCode(_currency);
     return _slideBase(
       colorScheme: colorScheme,
       icon: Icons.public,
       title: 'settings_currency'.tr(),
       subtitle: 'onboarding_currency_subtitle'.tr(),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        alignment: WrapAlignment.center,
-        children: _currencies.map((c) => _buildCurrencyToken(c, colorScheme)).toList(),
-      ),
-    );
-  }
-
-  Widget _buildCurrencyToken(String c, ColorScheme colorScheme) {
-    final isSelected = _currency == c;
-    return GestureDetector(
-      onTap: () => setState(() => _currency = c),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? colorScheme.primary : colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? colorScheme.primary : colorScheme.outlineVariant, width: 2),
+      child: Column(children: [
+        // عرض العملة المكتشفة
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceVariant,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: colorScheme.primary.withValues(alpha: 0.3)),
+          ),
+          child: Row(children: [
+            Text(info?['flag'] as String? ?? '🌐', style: const TextStyle(fontSize: 28)),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                info?['labelAr'] as String? ?? _currency,
+                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+              Text(
+                _currency,
+                style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'monospace', fontSize: 12),
+              ),
+            ])),
+            TextButton(
+              onPressed: () async {
+                await showCurrencyPickerSheet(
+                  context: context,
+                  selectedCode: _currency,
+                  onSelected: (code) => setState(() => _currency = code),
+                );
+              },
+              child: Text('تغيير', style: TextStyle(color: colorScheme.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+            ),
+          ]),
         ),
-        child: Text(
-          c,
-          style: TextStyle(color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-      ),
+        if (_detected?.confidence == 'high' && _detected!.countryName.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Text(
+            '📍 اكتشفنا أنك في ${_detected!.countryName}',
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ]),
     );
   }
 

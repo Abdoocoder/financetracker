@@ -10,6 +10,7 @@ import { useI18n } from "@/lib/i18n"
 import { useTheme } from "@/lib/theme-context"
 import { PageHeader } from "@/components/ui/page-header"
 import { FormField, Input, Select, SaveButton } from "@/components/ui/form-field"
+import { CURRENCIES_BY_GROUP } from "@/lib/currencies"
 import { PushToggle } from "@/components/ui/push-toggle"
 import { TestimonialSection } from "@/components/ui/testimonial-section"
 
@@ -213,12 +214,13 @@ function ProfileSection({
 
       <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
         <Select value={profileForm.currency} onChange={e => setProfileForm(f => ({ ...f, currency: e.target.value }))}>
-          <option value="JOD">{lang === 'en' ? 'Jordanian Dinar (JOD)' : 'دينار أردني (JOD)'}</option>
-          <option value="USD">{lang === 'en' ? 'US Dollar (USD)' : 'دولار أمريكي (USD)'}</option>
-          <option value="EUR">{lang === 'en' ? 'Euro (EUR)' : 'يورو (EUR)'}</option>
-          <option value="SAR">{lang === 'en' ? 'Saudi Riyal (SAR)' : 'ريال سعودي (SAR)'}</option>
-          <option value="AED">{lang === 'en' ? 'UAE Dirham (AED)' : 'درهم إماراتي (AED)'}</option>
-          <option value="KWD">{lang === 'en' ? 'Kuwaiti Dinar (KWD)' : 'دينار كويتي (KWD)'}</option>
+          {(['arabic', 'islamic', 'global'] as const).map(g => (
+            <optgroup key={g} label={g === 'arabic' ? (lang === 'en' ? 'Arabic' : 'العربية') : g === 'islamic' ? (lang === 'en' ? 'Islamic' : 'الإسلامية') : (lang === 'en' ? 'Global' : 'العالمية')}>
+              {CURRENCIES_BY_GROUP[g].map(c => (
+                <option key={c.value} value={c.value}>{c.flag} {lang === 'en' ? c.labelEn : c.labelAr} ({c.value})</option>
+              ))}
+            </optgroup>
+          ))}
         </Select>
       </FormField>
 
