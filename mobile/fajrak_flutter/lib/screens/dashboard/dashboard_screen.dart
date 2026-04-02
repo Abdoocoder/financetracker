@@ -13,6 +13,7 @@ import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/dashboard_header.dart';
 import '../../widgets/common/glass_panel.dart';
+import '../../utils/finance_utils.dart';
 
 import '../../widgets/dashboard/dashboard_stats.dart';
 import '../../widgets/dashboard/dashboard_health_score.dart';
