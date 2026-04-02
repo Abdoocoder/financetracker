@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { fetchExchangeRate } from '@/lib/currency'
 import type { Investment, ZakatHistory } from '@/types'
 
 const HAUL_DAYS = 354 // حول هجري
@@ -43,40 +44,56 @@ export default function ZakatPage() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [fetchingPrices, setFetchingPrices] = useState(false)
+  const [zakatSummary, setZakatSummary] = useState<any>(null)
   const currentYear = new Date().getFullYear()
 
   async function loadData() {
     if (!user) return
-    const [invRes, profileRes, histRes, goalRes, debtRes] = await Promise.all([
-      supabase.from('investments').select('id,user_id,name,symbol,type,shares,avg_buy_price,current_price,currency,is_halal,notes,purchase_date,created_at,updated_at').eq('user_id', user.id),
+    const [invRes, profileRes, histRes] = await Promise.all([
+      supabase.from('investments').select('*').eq('user_id', user.id),
       supabase.from('profiles').select('currency').eq('id', user.id).single(),
       supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false }),
-      supabase.from('savings_goals').select('current_amount,name').eq('user_id', user.id),
-      supabase.from('debts').select('remaining_amount').eq('user_id', user.id).eq('is_paid', false),
     ])
 
     const invList = invRes.data ?? []
-    const invValue = invList.reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
-    const goalsSaved = (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
-    const totalDebt = (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
-
-    setInvestments(Math.round(invValue))
-    setCash(Math.round(goalsSaved))
-    setDebtsOwed(Math.round(totalDebt))
     setCurrency(profileRes.data?.currency ?? 'JOD')
     setHistory(histRes.data ?? [])
     setInvItems(invList)
+
+    const usdToLocal = (profileRes.data?.currency ?? 'JOD') !== 'USD' ? (await fetchExchangeRate('USD', profileRes.data?.currency ?? 'JOD') ?? 1) : 1
+    
+    const { data: zakat } = await supabase.rpc('get_zakat_summary', {
+      p_user_id: user.id,
+      p_gold_price_per_gram: goldPrice,
+      p_silver_price_per_gram: silverPrice,
+      p_usd_to_local_rate: usdToLocal
+    })
+    setZakatSummary(zakat)
   }
 
   useEffect(() => { loadData() }, [user])
 
-  const nisabGold = 85 * goldPrice
-  const nisabSilver = 595 * silverPrice
-  const nisab = Math.min(nisabGold, nisabSilver)
-  const totalAssets = goldGram * goldPrice + silverGram * silverPrice + cash + investments
-  const totalZakatable = Math.max(0, totalAssets - debtsOwed)
+  useEffect(() => {
+    async function updateZakat() {
+      if (!user) return
+      const usdToLocal = currency !== 'USD' ? (await fetchExchangeRate('USD', currency) ?? 1) : 1
+      const { data: zakat } = await supabase.rpc('get_zakat_summary', {
+        p_user_id: user.id,
+        p_gold_price_per_gram: goldPrice,
+        p_silver_price_per_gram: silverPrice,
+        p_usd_to_local_rate: usdToLocal
+      })
+      setZakatSummary(zakat)
+    }
+    const timer = setTimeout(updateZakat, 500)
+    return () => clearTimeout(timer)
+  }, [goldPrice, silverPrice, goldGram, silverGram, cash, investments, debtsOwed])
+
+  const nisab = zakatSummary?.nisab_effective ?? 0
+  const totalZakatable = (zakatSummary?.zakatable_assets ?? 0) + (goldGram * goldPrice) + (silverGram * silverPrice)
   const zakatDue = totalZakatable >= nisab ? totalZakatable * 0.025 : 0
   const eligible = totalZakatable >= nisab
+  const nisabGold = zakatSummary?.nisab_gold ?? 0
 
   const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
 

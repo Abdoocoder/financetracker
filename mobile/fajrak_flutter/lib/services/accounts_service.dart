@@ -1,11 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../utils/finance_utils.dart';
 
 class AccountsService {
   static SupabaseClient get _db => Supabase.instance.client;
 
-  /// جلب الحسابات مع حساب الرصيد لكل حساب
+  /// جلب الحسابات مع حساب الرصيد باستخدام RPC المركزية
   static Future<List<Map<String, dynamic>>> fetchAccounts(String userId) async {
+    // جلب بيانات الحسابات الأساسية
     final accounts = await _db
         .from('accounts')
         .select('*')
@@ -14,21 +14,18 @@ class AccountsService {
         .order('is_default', ascending: false)
         .order('created_at');
 
-    final txs = await _db
-        .from('transactions')
-        .select('account_id, transfer_to_account_id, type, amount')
-        .eq('user_id', userId);
+    // جلب الأرصدة المحسوبة من القاعدة مباشرة (Best Practice)
+    final List<dynamic> balancesData = await _db.rpc('get_account_balances', params: {'p_user_id': userId});
+    
+    final Map<String, double> balanceMap = {
+      for (var b in balancesData) b['account_id'] as String: (b['current_balance'] as num).toDouble()
+    };
 
-    return accounts.map<Map<String, dynamic>>((acc) {
+    return (accounts as List).map<Map<String, dynamic>>((acc) {
       final id = acc['id'] as String;
-      final balance = FinanceUtils.calculateAccountBalance(
-        accountId: id,
-        openingBalance: (acc['opening_balance'] as num? ?? 0).toDouble(),
-        transactions: (txs as List).cast<Map<String, dynamic>>(),
-      );
       return {
         ...acc,
-        'balance': balance,
+        'balance': balanceMap[id] ?? (acc['opening_balance'] as num? ?? 0).toDouble(),
       };
     }).toList();
   }
