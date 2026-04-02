@@ -19,9 +19,9 @@ android {
         println("Warning: key.properties not found at ${keystorePropertiesFile.absolutePath}")
     }
 
-    ndkVersion = "28.2.13676358"
+    ndkVersion = "27.0.12077973"
     namespace = "com.fajrak.app"
-    compileSdk = 36
+    compileSdk = flutter.compileSdkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -55,10 +55,7 @@ android {
 
     buildTypes {
         release {
-            // Only use release signing if the storeFile is configured
-            if (signingConfigs.getByName("release").storeFile != null) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
