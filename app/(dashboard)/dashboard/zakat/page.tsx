@@ -100,28 +100,48 @@ export default function ZakatPage() {
   async function fetchLivePrices() {
     setFetchingPrices(true)
     try {
+      // المصدر الأول: Yahoo Finance
       const [goldRes, silverRes, rateRes] = await Promise.all([
         fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d', { headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null),
         fetch('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d', { headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null),
         currency !== 'USD' ? fetch(`https://open.er-api.com/v6/latest/USD`).catch(() => null) : Promise.resolve(null),
       ])
-      const usdRate = currency !== 'USD' && rateRes?.ok
-        ? ((await rateRes.json()).rates?.[currency] ?? 1)
-        : 1
+      
+      let finalGold = 0, finalSilver = 0
+      const usdRate = currency !== 'USD' && rateRes?.ok ? ((await rateRes.json()).rates?.[currency] ?? 1) : 1
+
       if (goldRes?.ok) {
         const d = await goldRes.json()
-        const priceOz: number = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
-        if (priceOz > 0) setGoldPrice(parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2)))
+        const priceOz = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
+        if (priceOz > 0) finalGold = parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2))
       }
+
       if (silverRes?.ok) {
         const d = await silverRes.json()
-        const priceOz: number = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
-        if (priceOz > 0) setSilverPrice(parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2)))
+        const priceOz = d.chart?.result?.[0]?.meta?.regularMarketPrice ?? 0
+        if (priceOz > 0) finalSilver = parseFloat((priceOz / TROY_OZ_TO_GRAM * usdRate).toFixed(2))
       }
+
+      // المصدر البديل (Fallback): FreeGoldAPI إذا فشل Yahoo
+      if (finalGold === 0 || finalSilver === 0) {
+        try {
+          const fallbackRes = await fetch('https://freegoldapi.com/data/latest.json').catch(() => null)
+          if (fallbackRes?.ok) {
+            const fb = await fallbackRes.json()
+            if (finalGold === 0 && fb.gold) finalGold = parseFloat((fb.gold * usdRate).toFixed(2))
+            if (finalSilver === 0 && fb.silver) finalSilver = parseFloat((fb.silver * usdRate).toFixed(2))
+          }
+        } catch {}
+      }
+
+      if (finalGold > 0) setGoldPrice(finalGold)
+      if (finalSilver > 0) setSilverPrice(finalSilver)
     } finally {
       setFetchingPrices(false)
     }
   }
+
+  useEffect(() => { fetchLivePrices() }, [user])
 
   // استثمارات تقترب حولها (أقل من 60 يوم)
   const urgentInv = invItems
@@ -189,7 +209,7 @@ export default function ZakatPage() {
                 <div key={inv.id} style={{ padding: '12px 14px', borderRadius: 14, background: bg, border: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
-                      {inv.symbol ?? inv.name ?? ar ? 'استثمار' : 'Investment'}
+                      {inv.symbol ?? inv.name ?? (ar ? 'استثمار' : 'Investment')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                       {fmt(invValue)} {currency} · {ar ? `موعد الحول: ${inv.dueDate}` : `Haul due: ${inv.dueDate}`}
@@ -197,7 +217,7 @@ export default function ZakatPage() {
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 18, fontWeight: 900, color, fontFamily: 'monospace' }}>
-                      {overdue ? ar ? 'متأخر' : 'Overdue' : `${inv.daysLeft}`}
+                      {overdue ? (ar ? 'متأخر' : 'Overdue') : `${inv.daysLeft}`}
                     </div>
                     {!overdue && <div style={{ fontSize: 10, color, fontWeight: 700 }}>{ar ? 'يوم' : 'days'}</div>}
                   </div>

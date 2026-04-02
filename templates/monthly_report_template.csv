@@ -1,0 +1,4 @@
+UserID,Month,Year,Income_Salary,Income_Freelance,Income_Investment,Income_Other,Total_Income,Expense_Rent,Expense_Food,Expense_Transport,Expense_Utilities,Expense_Entertainment,Expense_Shopping,Expense_Health,Expense_Education,Expense_Other,Total_Expenses,Net_Income,Savings_Rate,Debt_Total,Investment_Value,Goals_Saved,Net_Worth,Notes
+UUID,1,2026,1000,200,0,0,1200,400,150,100,80,100,50,30,20,70,1000,200,0.167,500,2500,500,3700,Month with additional freelance income
+UUID,2,2026,1000,0,50,0,1050,400,180,100,90,80,60,30,20,90,1050,0,0.000,450,2600,550,3800,Higher food expenses due to guests
+UUID,3,2026,1200,200,0,0,1400,400,150,100,80,120,40,30,20,60,1000,400,0.286,400,2700,600,4100,Best month with salary increase
