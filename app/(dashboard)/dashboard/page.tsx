@@ -15,6 +15,7 @@ import { FinancialHealthCombined } from '@/components/ui/financial-health-combin
 import { DashboardEmptyState } from '@/components/ui/empty-state'
 import { fetchExchangeRate } from '@/lib/currency'
 import { useAccounts } from '@/hooks/useAccounts'
+import { useCountUp } from '@/lib/use-count-up'
 import nextDynamic from 'next/dynamic'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
@@ -243,7 +244,7 @@ export default function DashboardPage() {
   const { t, lang } = useI18n()
   const { user: currentUser, profile } = useUser()
   const { data, setData, recentTx, loading, supabase } = useDashboardData()
-  const { accounts, totalBalance: accountsTotalBalance } = useAccounts(currentUser?.id)
+  const { accounts, totalBalance: accountsTotalBalance, loading: accountsLoading } = useAccounts(currentUser?.id)
   const [streakInfo, setStreakInfo] = useState<{ streak: number; loggedToday: boolean } | null>(null)
 
   useEffect(() => {
@@ -257,8 +258,6 @@ export default function DashboardPage() {
     }).catch(() => {})
   }, [currentUser, supabase])
 
-  if (loading) return <DashSkeleton />
-
   const net = data?.net ?? 0
   const income = data?.income ?? 0
   const expenses = data?.expenses ?? 0
@@ -267,122 +266,96 @@ export default function DashboardPage() {
   const monthlyDebtCommitments = data?.monthlyDebtCommitments ?? 0
   const netAfterDebts = net - monthlyDebtCommitments
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
+  const currency = profile?.currency ?? 'JOD'
+  const heroBalance = accounts.length > 0 ? accountsTotalBalance : net
+  const isHeroPositive = heroBalance >= 0
+  const heroColor = isHeroPositive ? 'var(--accent-green-light)' : 'var(--accent-red-light)'
+  const name = data?.name || currentUser?.user_metadata?.full_name || ''
+  const firstName = name.split(' ')[0]
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      {/* ── 1. HEADER ──────────────────────────────────── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>
-            {(() => { const name = data?.name || currentUser?.user_metadata?.full_name || ''; const first = name.split(' ')[0]; return first ? `${t('dash_greeting')} ${first}` : t('dash_title') })()}
+          <h1 style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
+            {firstName ? `${t('dash_greeting')} ${firstName}` : t('dash_title')}
           </h1>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
-            {t('dash_subtitle')}
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+            {new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {streakInfo && streakInfo.streak >= 3 && (
-            <button
-              onClick={() => {
-                if (streakInfo.loggedToday) {
-                  document.getElementById('gamification')?.scrollIntoView({ behavior: 'smooth' })
-                } else {
-                  document.getElementById('quick-add-trigger')?.click()
-                }
-              }}
-              style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 12, fontWeight: 700, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF', cursor: 'pointer' }}>
-              <span>{streakInfo.loggedToday ? '🔥' : '❄️'}</span>
-              <span>{streakInfo.streak}</span>
+            <button onClick={() => streakInfo.loggedToday ? document.getElementById('gamification')?.scrollIntoView({ behavior: 'smooth' }) : document.getElementById('quick-add-trigger')?.click()}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 13, fontWeight: 800, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF', cursor: 'pointer' }}>
+              {streakInfo.loggedToday ? '🔥' : '❄️'} {streakInfo.streak}
             </button>
           )}
           {(data?.unreadAlerts ?? 0) > 0 && (
-            <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, textDecoration: 'none', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>
+            <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 10, textDecoration: 'none', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 13, fontWeight: 800 }}>
               🔔 {data?.unreadAlerts}
             </Link>
           )}
         </div>
       </div>
 
-      {/* Empty State للمستخدم الجديد */}
-      {income === 0 && expenses === 0 && (recentTx?.length ?? 0) === 0 && (
-        <DashboardEmptyState />
-      )}
+      {/* ── 2. HERO BALANCE CARD ───────────────────────── */}
+      {accountsLoading
+        ? <div className="skeleton" style={{ height: 128, borderRadius: 24 }} />
+        : <HeroBalanceCard
+            balance={heroBalance}
+            currency={currency}
+            lang={lang}
+            accounts={accounts}
+            monthlyNet={net}
+            prevMonthNet={(data?.prevIncome ?? 0) - (data?.prevExpenses ?? 0)}
+          />
+      }
 
-      {/* Stats — دائماً ظاهرة */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-        {/* بطاقة الدخل */}
-        <div style={{ background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
-          <div style={{ fontSize: 12, color: 'var(--accent-green-light)', fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>↑</div>
-          <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{`+${fmt(income)}`}</div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{t('dash_income')}</div>
+      {/* ── 3. MONTHLY STATS — compact ────────────────── */}
+      {loading && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {[0, 1, 2].map(i => <div key={i} className="skeleton" style={{ height: 70, borderRadius: 14 }} />)}
         </div>
-        {/* بطاقة المصاريف */}
-        <div style={{ background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
-          <div style={{ fontSize: 12, color: 'var(--accent-red-light)', fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>↓</div>
-          <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{fmt(realExpenses > 0 ? realExpenses : expenses)}</div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{t('dash_expenses')}</div>
+      )}
+      {!loading && <>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {[
+            { label: t('dash_income'),   value: `+${fmt(income)}`,   color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑' },
+            { label: t('dash_expenses'), value: fmt(realExpenses > 0 ? realExpenses : expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓' },
+            { label: t('dash_net'),      value: `${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+          ].map(s => (
+            <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: '10px 6px', textAlign: 'center' }}>
+              <div style={{ fontSize: 10, color: s.color, fontWeight: 900, opacity: 0.6, marginBottom: 2 }}>{s.icon}</div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: s.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{s.value}</div>
+              <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2, fontWeight: 700 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      {(monthlyDebtCommitments > 0 || debtPayments > 0) && (
+        <div style={{ display: 'flex', gap: 8 }}>
           {debtPayments > 0 && (
-            <div style={{ marginTop: 5, padding: '2px 4px', borderRadius: 5, background: 'rgba(59,126,246,0.1)' }}>
-              <div style={{ fontSize: 8, color: '#3B7EF6', fontWeight: 700 }}>💳 {t('dash_debt_payments')}</div>
-              <div style={{ fontSize: 11, fontWeight: 900, color: '#3B7EF6', fontFamily: 'monospace' }}>{fmt(debtPayments)}</div>
+            <div style={{ flex: 1, padding: '8px 12px', borderRadius: 10, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, color: '#3B7EF6', fontWeight: 700 }}>💳 {t('dash_debt_payments')}</span>
+              <span style={{ fontSize: 13, fontWeight: 900, color: '#3B7EF6', fontFamily: 'monospace' }}>{fmt(debtPayments)}</span>
             </div>
           )}
-        </div>
-        {/* بطاقة الصافي مع الالتزامات */}
-        <div style={{ background: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: `1px solid ${net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}`, borderRadius: 16, padding: '12px 8px', textAlign: 'center' }}>
-          <div style={{ fontSize: 12, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontWeight: 900, marginBottom: 2, opacity: 0.7 }}>=</div>
-          <div style={{ fontSize: 17, fontWeight: 900, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{`${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`}</div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, fontWeight: 600 }}>{t('dash_net')}</div>
           {monthlyDebtCommitments > 0 && (
-            <div style={{ marginTop: 6, padding: '3px 5px', borderRadius: 6, background: netAfterDebts >= 0 ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)' }}>
-              <div style={{ fontSize: 8, color: '#3B7EF6', fontWeight: 700 }}>⚡ {t('dash_after_debts')}</div>
-              <div style={{ fontSize: 13, fontWeight: 900, color: netAfterDebts >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* بطاقة إجمالي الرصيد من الحسابات */}
-      {accounts.length > 0 && (
-        <div style={{
-          background: accountsTotalBalance >= 0 ? 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.03))' : 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.03))',
-          border: `1px solid ${accountsTotalBalance >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-          borderRadius: 18, padding: '14px 18px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: accounts.length > 1 ? 12 : 0 }}>
-            <div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                💰 {lang === 'en' ? 'Total Balance' : 'إجمالي الرصيد'}
-              </div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>
-                {lang === 'en' ? 'Across all accounts' : 'عبر جميع الحسابات'}
-              </div>
-            </div>
-            <div style={{ textAlign: 'end' }}>
-              <div style={{ fontSize: 24, fontWeight: 900, color: accountsTotalBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>
-                {`${accountsTotalBalance >= 0 ? '+' : '-'}${fmt(Math.abs(accountsTotalBalance))}`}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600 }}>{profile?.currency ?? 'JOD'}</div>
-            </div>
-          </div>
-          {/* تفاصيل كل حساب */}
-          {accounts.length > 1 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-              {accounts.map(acc => (
-                <div key={acc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{acc.icon} {acc.name}</span>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: (acc.balance ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>
-                    {(acc.balance ?? 0) >= 0 ? '+' : '-'}{fmt(Math.abs(acc.balance ?? 0))}
-                  </span>
-                </div>
-              ))}
+            <div style={{ flex: 1, padding: '8px 12px', borderRadius: 10, background: netAfterDebts >= 0 ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', border: `1px solid ${netAfterDebts >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 11, color: '#3B7EF6', fontWeight: 700 }}>⚡ {t('dash_after_debts')}</span>
+              <span style={{ fontSize: 13, fontWeight: 900, color: netAfterDebts >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</span>
             </div>
           )}
         </div>
       )}
+      </>}
 
-      {/* إضافة سريعة — مباشرة بعد الإحصائيات */}
+      {/* ── 4. EMPTY STATE ────────────────────────────── */}
+      {!loading && income === 0 && expenses === 0 && (recentTx?.length ?? 0) === 0 && <DashboardEmptyState />}
+
+      {/* ── 5. QUICK ADD ──────────────────────────────── */}
       <QuickAdd onAdded={async () => {
         const user = currentUser
         if (!user) return
@@ -398,77 +371,128 @@ export default function DashboardPage() {
         setData((prev: DashboardData | null) => prev ? { ...prev, income: inc, expenses: exp, debtPayments: dbt, net: inc - exp, monthlyDebtCommitments: prev.monthlyDebtCommitments } : prev)
       }} />
 
-      {/* صافي الثروة — مطوي افتراضياً */}
-      {(data?.invValue ?? 0) + (data?.goalsSaved ?? 0) + (data?.totalDebt ?? 0) > 0 && (
-        <NetWorthCard
-          netWorth={data?.netWorth ?? 0}
-          invValue={data?.invValue ?? 0}
-          goalsSaved={data?.goalsSaved ?? 0}
-          totalDebt={data?.totalDebt ?? 0}
-          totalReceivable={data?.totalReceivable ?? 0}
-          currency={profile?.currency ?? 'JOD'}
-          lang={lang}
-        />
+      {/* ── 6. RECENT TRANSACTIONS ────────────────────── */}
+      {loading
+        ? <div className="skeleton" style={{ height: 200, borderRadius: 16 }} />
+        : <RecentTransactionsCard transactions={recentTx} lang={lang} />
+      }
+
+      {/* ── 7–14. Secondary sections — hidden while loading ────── */}
+      {loading && (
+        <>
+          <div className="skeleton" style={{ height: 80, borderRadius: 16 }} />
+          <div className="skeleton" style={{ height: 100, borderRadius: 16 }} />
+        </>
       )}
+      {!loading && <>
+        {/* ── 7. BUDGET PROGRESS ───────────────────────── */}
+        <BudgetProgressCard income={income} expenses={expenses} net={net} currency={currency} />
 
-      <Section id="health" defaultOpen={true} icon="💊" title={`${lang === 'en' ? 'Financial Health Score' : 'نقاط الصحة المالية'} — ${computeHealthScore(data, income, expenses)}%`}>
-        <div style={{ padding: '12px 0 8px' }}>
-          <FinancialHealthCombined
-            income={income}
-            expenses={expenses}
-            totalDebt={data?.totalDebt ?? 0}
-            invValue={data?.invValue ?? 0}
-            goalsSaved={data?.goalsSaved ?? 0}
-            goalsTarget={data?.goalsTarget ?? 0}
-            txCount={data?.txCount ?? 0}
-          />
+        {/* ── 8. QUICK LINKS ───────────────────────────── */}
+        <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} currency={currency} />
+
+        {/* ── 9. NET WORTH ─────────────────────────────── */}
+        {(data?.invValue ?? 0) + (data?.goalsSaved ?? 0) + (data?.totalDebt ?? 0) > 0 && (
+          <NetWorthCard netWorth={data?.netWorth ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} totalDebt={data?.totalDebt ?? 0} totalReceivable={data?.totalReceivable ?? 0} currency={currency} lang={lang} />
+        )}
+
+        {/* ── 10. HEALTH SCORE — مطوي ──────────────────── */}
+        <Section id="health" defaultOpen={false} icon="💊" title={`${lang === 'en' ? 'Financial Health' : 'الصحة المالية'} — ${computeHealthScore(data, income, expenses)}%`}>
+          <div style={{ padding: '12px 0 8px' }}>
+            <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
+          </div>
+        </Section>
+
+        {/* ── 11. GAMIFICATION — مطوي ──────────────────── */}
+        <Section id="gamification" defaultOpen={false} icon="🏆" title={lang === 'en' ? 'Achievements' : 'الإنجازات'}>
+          <div style={{ padding: '12px 0 8px' }}><GamificationCard /></div>
+        </Section>
+
+        {/* ── 12. CHARTS — مطوي ────────────────────────── */}
+        <Section id="charts" defaultOpen={false} icon="📊" title={lang === 'en' ? 'Charts & Analysis' : 'الرسوم البيانية'}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
+            <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
+            {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
+            {data && data.categories.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
+          </div>
+        </Section>
+
+        {/* ── 13. SIMULATOR — مطوي ─────────────────────── */}
+        <Section id="simulator" defaultOpen={false} icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
+          <div style={{ padding: '12px 0 8px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
+        </Section>
+
+        {/* ── 14. CHALLENGES — مطوي ────────────────────── */}
+        <Section id="challenges" defaultOpen={false} icon="🎯" title={lang === 'en' ? 'Challenges' : 'التحديات'}>
+          <div style={{ padding: '12px 0 8px' }}><ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} /></div>
+        </Section>
+      </>}
+
+    </div>
+  )
+}
+
+// ── Hero Balance Card ─────────────────────────────────
+function HeroBalanceCard({ balance, currency, lang, accounts, monthlyNet, prevMonthNet }: {
+  balance: number; currency: string; lang: string
+  accounts: import('@/types').Account[]
+  monthlyNet: number; prevMonthNet: number
+}) {
+  const animatedBalance = useCountUp(Math.abs(balance), 900)
+  const isPositive = balance >= 0
+  const color = isPositive ? '#10B981' : '#EF4444'
+  const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
+  const trend = prevMonthNet !== 0 ? ((monthlyNet - prevMonthNet) / Math.abs(prevMonthNet)) * 100 : 0
+  const hasTrend = prevMonthNet !== 0
+
+  return (
+    <div style={{
+      background: `linear-gradient(135deg, ${isPositive ? 'rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04)' : 'rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.04)'} 100%)`,
+      border: `1px solid ${isPositive ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
+      borderRadius: 24,
+      padding: '20px 20px 16px',
+    }}>
+      {/* Label */}
+      <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+        {accounts.length > 0
+          ? (lang === 'en' ? '💰 Total Balance' : '💰 إجمالي رصيدك')
+          : (lang === 'en' ? '💰 Net Balance' : '💰 رصيدك الآن')}
+      </div>
+
+      {/* Hero Number */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 4 }}>
+        <span style={{ fontSize: 42, fontWeight: 900, color, fontFamily: 'monospace', letterSpacing: '-0.03em', lineHeight: 1 }}>
+          {isPositive ? '+' : '-'}{fmt(animatedBalance)}
+        </span>
+        <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>{currency}</span>
+      </div>
+
+      {/* Trend + this month */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+        {hasTrend && (
+          <span style={{ fontSize: 11, fontWeight: 700, color: trend >= 0 ? '#10B981' : '#EF4444', background: trend >= 0 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: 100 }}>
+            {trend >= 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(0)}% {lang === 'en' ? 'vs last month' : 'عن الشهر الماضي'}
+          </span>
+        )}
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+          {lang === 'en' ? 'This month:' : 'هذا الشهر:'} <span style={{ fontWeight: 800, color: monthlyNet >= 0 ? '#10B981' : '#EF4444' }}>{monthlyNet >= 0 ? '+' : ''}{fmt(monthlyNet)}</span>
+        </span>
+      </div>
+
+      {/* Account chips */}
+      {accounts.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
+          {accounts.map(acc => {
+            const accColor = acc.color ?? '#3B7EF6'
+            return (
+              <div key={acc.id} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 100, background: `${accColor}14`, border: `1px solid ${accColor}30`, fontSize: 11, fontWeight: 700, color: accColor }}>
+                <span>{acc.icon}</span>
+                <span>{fmt(acc.balance ?? 0)}</span>
+              </div>
+            )
+          })}
         </div>
-      </Section>
-
-      {/* الميزانية الشهرية — دائماً ظاهرة */}
-      <BudgetProgressCard income={income} expenses={expenses} net={net} currency={profile?.currency ?? 'JOD'} />
-
-
-      {/* روابط سريعة — دائماً ظاهرة */}
-      <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} currency={profile?.currency ?? 'JOD'} />
-
-      {/* ── قابلة للطي — مطوية افتراضياً ── */}
-
-
-      <Section id="gamification" defaultOpen={true} icon="🏆" title={lang === 'en' ? 'Achievements' : 'نظام الإنجازات'}>
-        <div style={{ padding: '12px 0 8px' }}>
-          <GamificationCard />
-        </div>
-      </Section>
-
-      <Section id="charts" defaultOpen={true} icon="📊" title={lang === 'en' ? 'Charts & Expense Breakdown' : 'الرسوم البيانية وتوزيع المصاريف'}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
-          <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
-          {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && (
-            <MiniBarChart data={data.months6} lang={lang} />
-          )}
-          {data && data.categories.length > 0 && (
-            <CategoryBars categories={data.categories} lang={lang} />
-          )}
-        </div>
-      </Section>
-
-      <Section id="simulator" icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
-        <div style={{ padding: '12px 0 8px' }}>
-          <WealthSimulatorCard net={net} lang={lang} />
-        </div>
-      </Section>
-
-
-      {/* آخر المعاملات */}
-      <RecentTransactionsCard transactions={recentTx} lang={lang} />
-
-      <Section id="challenges" icon="🎯" title={lang === 'en' ? 'Saving Challenges' : 'تحديات الادخار'}>
-        <div style={{ padding: '12px 0 8px' }}>
-          <ChallengesCard lang={lang} data={data} net={net} income={income} expenses={expenses} />
-        </div>
-      </Section>
-
+      )}
     </div>
   )
 }
