@@ -4,6 +4,7 @@ import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field
 import { useI18n } from '@/lib/i18n'
 import { CURRENCIES } from '@/lib/currency'
 import { useUser } from '@/lib/user-context'
+import { useAccounts } from '@/hooks/useAccounts'
 import type { TransactionForm } from '@/hooks/useTransactions'
 
 const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
@@ -20,9 +21,10 @@ interface Props {
 
 export function TransactionFormModal({ editingId, form, saving, onClose, onSave, onChange }: Props) {
   const { t, lang } = useI18n()
-  const { profile } = useUser()
+  const { profile, user } = useUser()
   const baseCurrency = profile?.currency || 'JOD'
   const isMultiCurrency = form.original_currency && form.original_currency !== baseCurrency
+  const { accounts } = useAccounts(user?.id)
 
   return (
     <Modal title={editingId ? t('trans_edit') : `+ ${t('trans_add')}`} onClose={onClose}>
@@ -85,6 +87,18 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
       <FormField label={lang === 'en' ? 'Description' : 'الوصف'}>
         <Input placeholder={lang === 'en' ? 'Optional description' : 'وصف اختياري'} value={form.description} onChange={e => onChange({ description: e.target.value })} />
       </FormField>
+
+      {accounts.length > 0 && (
+        <FormField label={lang === 'en' ? 'Account' : 'الحساب'}>
+          <Select value={form.account_id} onChange={e => onChange({ account_id: e.target.value })}>
+            <option value="">{lang === 'en' ? 'Default account' : 'الحساب الافتراضي'}</option>
+            {accounts.map(a => (
+              <option key={a.id} value={a.id}>{a.icon} {a.name}</option>
+            ))}
+          </Select>
+        </FormField>
+      )}
+
       <FormField label={lang === 'en' ? 'Date' : 'التاريخ'}>
         <Input type="date" value={form.transaction_date} onChange={e => onChange({ transaction_date: e.target.value })} />
       </FormField>

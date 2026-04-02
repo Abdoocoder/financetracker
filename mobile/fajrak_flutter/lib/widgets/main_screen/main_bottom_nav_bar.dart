@@ -37,9 +37,9 @@ class MainBottomNavBar extends StatelessWidget {
               ),
               NavItemWidget(
                 index: 1,
-                icon: Icons.pie_chart_outline,
-                selectedIcon: Icons.pie_chart,
-                label: 'nav_budgets'.tr(),
+                icon: Icons.account_balance_wallet_outlined,
+                selectedIcon: Icons.account_balance_wallet,
+                label: 'الحسابات',
                 currentIndex: currentIndex,
                 onTap: onTabSelected,
               ),

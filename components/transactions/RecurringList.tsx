@@ -76,7 +76,7 @@ export function RecurringList({ baseCurrency }: { baseCurrency: string }) {
     setEditingId(rec.id)
     setForm({
       name: rec.name, amount: rec.amount.toString(), category: rec.category,
-      type: rec.type, frequency: rec.frequency, next_date: rec.next_date,
+      type: rec.type as 'income' | 'expense', frequency: rec.frequency, next_date: rec.next_date,
       currency: rec.currency, notes: rec.notes ?? '',
     })
     setShowForm(true)

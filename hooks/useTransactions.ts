@@ -24,6 +24,7 @@ export interface TransactionForm {
   is_recurring: boolean
   recurring_day: number
   recurring_auto: boolean
+  account_id: string
 }
 
 const DEFAULT_FORM: TransactionForm = {
@@ -38,6 +39,7 @@ const DEFAULT_FORM: TransactionForm = {
   is_recurring: false,
   recurring_day: new Date().getDate(),
   recurring_auto: true,
+  account_id: '',
 }
 
 
@@ -153,6 +155,7 @@ export function useTransactions() {
       is_recurring: tx.is_recurring ?? false,
       recurring_day: tx.recurring_day ?? new Date().getDate(),
       recurring_auto: tx.recurring_auto ?? true,
+      account_id: tx.account_id ?? '',
     })
     setShowForm(true)
   }
@@ -186,13 +189,14 @@ export function useTransactions() {
       toast.success(t('toast_edited'))
     } else {
       const { error } = await supabase.from('transactions').insert({
-        user_id: user.id, type: form.type, 
+        user_id: user.id, type: form.type,
         amount: parseNumber(form.amount),
         original_amount: parseNumber(form.original_amount),
         original_currency: form.original_currency,
         exchange_rate: parseNumber(form.exchange_rate, 1),
         category: form.category, description: form.description,
         transaction_date: form.transaction_date,
+        account_id: form.account_id || null,
       })
       if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
       toast.success(form.type === 'income' ? t('toast_income_added') : t('toast_expense_added'))

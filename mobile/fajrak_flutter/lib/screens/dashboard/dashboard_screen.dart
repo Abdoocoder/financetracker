@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../services/currency_service.dart';
+import '../../services/accounts_service.dart';
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
 import '../../widgets/dashboard/quick_links_card.dart';
@@ -28,6 +29,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   double _income = 0, _expenses = 0, _net = 0, _monthlyDebtCommitments = 0;
+  double _totalAccountsBalance = 0;
+  List<Map<String, dynamic>> _accounts = [];
   int _healthScore = 0;
   String _currency = 'JOD';
   String _name = '';
@@ -57,6 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type, auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
+        AccountsService.fetchAccounts(user.id),
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
@@ -65,6 +69,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final debts = results[3] as List;
       final investments = results[4] as List;
       final goals = results[5] as List;
+      final accounts = results[6] as List<Map<String, dynamic>>;
+      final totalAccountsBalance = accounts.fold(0.0, (a, acc) => a + (acc['balance'] as double? ?? 0));
 
       double txIncome = 0, txExpenses = 0;
       for (final tx in txs) {
@@ -74,7 +80,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           txExpenses += (tx['amount'] as num).toDouble();
         }
       }
-
       final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
       final income = txIncome > 0 ? txIncome : profileIncome;
       final totalDebt = debts.where((d) => (d['debt_type'] ?? 'owed') == 'owed').fold(0.0, (a, d) => a + (d['remaining_amount'] as num).toDouble());
@@ -142,6 +147,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _invValue = invValue;
         _goalsSaved = goalsSaved;
         _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
+        _accounts = accounts;
+        _totalAccountsBalance = totalAccountsBalance;
         _loading = false;
       });
       }
@@ -203,6 +210,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               DashboardHeader(name: _name),
               const SizedBox(height: 16),
               DashboardStats(income: _income, expenses: _expenses, net: _net, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
+              const SizedBox(height: 12),
+              if (_accounts.isNotEmpty) _AccountsBalanceCard(accounts: _accounts, totalBalance: _totalAccountsBalance, currency: _currency),
               const SizedBox(height: 16),
               DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
               const SizedBox(height: 16),
@@ -229,6 +238,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AccountsBalanceCard extends StatelessWidget {
+  final List<Map<String, dynamic>> accounts;
+  final double totalBalance;
+  final String currency;
+  const _AccountsBalanceCard({required this.accounts, required this.totalBalance, required this.currency});
+
+  String _fmt(double n) => n.abs() % 1 == 0 ? n.abs().toStringAsFixed(0) : n.abs().toStringAsFixed(2);
+
+  @override
+  Widget build(BuildContext context) {
+    final isPositive = totalBalance >= 0;
+    final color = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('💰 إجمالي الرصيد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+            const SizedBox(height: 2),
+            const Text('عبر جميع الحسابات', style: TextStyle(fontSize: 10, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+          ])),
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text('${isPositive ? '+' : '-'}${_fmt(totalBalance)}',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
+            Text(currency, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+          ]),
+        ]),
+        if (accounts.length > 1) ...[
+          const SizedBox(height: 10),
+          const Divider(height: 1, color: Color(0xFF1E293B)),
+          const SizedBox(height: 8),
+          ...accounts.map((acc) {
+            final bal = acc['balance'] as double? ?? 0;
+            final balColor = bal >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(children: [
+                Text(acc['icon'] as String? ?? '🏦', style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 6),
+                Expanded(child: Text(acc['name'] as String? ?? '', style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8), fontFamily: 'Cairo'))),
+                Text('${bal >= 0 ? '+' : '-'}${_fmt(bal)}',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: balColor, fontFamily: 'monospace')),
+              ]),
+            );
+          }),
+        ],
+      ]),
     );
   }
 }

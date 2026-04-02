@@ -14,6 +14,7 @@ import { NetWorthCard } from '@/components/dashboard/NetWorthCard'
 import { FinancialHealthCombined } from '@/components/ui/financial-health-combined'
 import { DashboardEmptyState } from '@/components/ui/empty-state'
 import { fetchExchangeRate } from '@/lib/currency'
+import { useAccounts } from '@/hooks/useAccounts'
 import nextDynamic from 'next/dynamic'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
@@ -132,7 +133,6 @@ export interface DashboardData {
   unreadAlerts: number
   txCount: number
   name: string
-  cashBalance: number
 }
 
 function computeHealthScore(data: DashboardData | null, income: number, expenses: number): number {
@@ -171,20 +171,19 @@ function useDashboardData() {
     // ── كل الـ 8 queries بالتوازي بدل Phase1 ثم Phase2 (~400ms → ~200ms) ──
     async function fetchAll() {
       const chartFrom = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0]
-      const [txRes, profileRes, alertRes, debtRes, invRes, goalRes, recentRes, chartRes, allTxRes] = await Promise.all([
+      const [txRes, profileRes, alertRes, debtRes, invRes, goalRes, recentRes, chartRes] = await Promise.all([
         supabase.from('transactions').select('type,amount,category').eq('user_id', user.id).gte('transaction_date', firstDay),
-        supabase.from('profiles').select('monthly_income, full_name, currency, opening_balance').eq('id', user.id).single(),
+        supabase.from('profiles').select('monthly_income, full_name, currency').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
         supabase.from('debts').select('remaining_amount,monthly_payment,debt_type,auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         supabase.from('investments').select('shares,current_price').eq('user_id', user.id),
         supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
         supabase.from('transactions').select('id,user_id,type,amount,category,description,transaction_date,is_recurring,recurring_day,recurring_auto,created_at').eq('user_id', user.id).order('transaction_date', { ascending: false }).limit(5),
         supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', user.id).gte('transaction_date', chartFrom),
-        supabase.from('transactions').select('type,amount').eq('user_id', user.id),
       ])
 
       const txs = txRes.data ?? []
-      const profileData = profileRes.data as { monthly_income: number; full_name: string | null; currency?: string; opening_balance?: number } | null
+      const profileData = profileRes.data as { monthly_income: number; full_name: string | null; currency?: string } | null
       const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
       const txIncome = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const income = txIncome > 0 ? txIncome : Number(profileData?.monthly_income ?? 0)
@@ -226,9 +225,6 @@ function useDashboardData() {
         unreadAlerts: alertRes.count ?? 0,
         txCount: (chartRes.data ?? []).length,
         name: profileData?.full_name ?? '',
-        cashBalance: Number(profileData?.opening_balance ?? 0)
-          + (allTxRes.data ?? []).filter((t: {type: string}) => t.type === 'income').reduce((a: number, t: {amount: number}) => a + Number(t.amount), 0)
-          - (allTxRes.data ?? []).filter((t: {type: string}) => t.type === 'expense').reduce((a: number, t: {amount: number}) => a + Number(t.amount), 0),
       }
       setData(newData)
       setRecentTx(recentRes.data ?? [])
@@ -247,6 +243,7 @@ export default function DashboardPage() {
   const { t, lang } = useI18n()
   const { user: currentUser, profile } = useUser()
   const { data, setData, recentTx, loading, supabase } = useDashboardData()
+  const { accounts, totalBalance: accountsTotalBalance } = useAccounts(currentUser?.id)
   const [streakInfo, setStreakInfo] = useState<{ streak: number; loggedToday: boolean } | null>(null)
 
   useEffect(() => {
@@ -346,31 +343,42 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* بطاقة الرصيد النقدي الفعلي */}
-      {(data?.cashBalance !== undefined) && (
+      {/* بطاقة إجمالي الرصيد من الحسابات */}
+      {accounts.length > 0 && (
         <div style={{
-          background: (data.cashBalance ?? 0) >= 0 ? 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.03))' : 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.03))',
-          border: `1px solid ${(data.cashBalance ?? 0) >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-          borderRadius: 18,
-          padding: '14px 18px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          background: accountsTotalBalance >= 0 ? 'linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.03))' : 'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.03))',
+          border: `1px solid ${accountsTotalBalance >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+          borderRadius: 18, padding: '14px 18px',
         }}>
-          <div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              💵 {lang === 'en' ? 'Actual Cash Balance' : 'رصيدك النقدي الفعلي'}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: accounts.length > 1 ? 12 : 0 }}>
+            <div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                💰 {lang === 'en' ? 'Total Balance' : 'إجمالي الرصيد'}
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>
+                {lang === 'en' ? 'Across all accounts' : 'عبر جميع الحسابات'}
+              </div>
             </div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>
-              {lang === 'en' ? 'Opening balance + all income − all expenses' : 'الرصيد الابتدائي + كل الدخل − كل المصاريف'}
+            <div style={{ textAlign: 'end' }}>
+              <div style={{ fontSize: 24, fontWeight: 900, color: accountsTotalBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>
+                {`${accountsTotalBalance >= 0 ? '+' : '-'}${fmt(Math.abs(accountsTotalBalance))}`}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600 }}>{profile?.currency ?? 'JOD'}</div>
             </div>
           </div>
-          <div style={{ textAlign: 'end' }}>
-            <div style={{ fontSize: 24, fontWeight: 900, color: (data.cashBalance ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>
-              {`${(data.cashBalance ?? 0) >= 0 ? '+' : '-'}${fmt(Math.abs(data.cashBalance ?? 0))}`}
+          {/* تفاصيل كل حساب */}
+          {accounts.length > 1 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
+              {accounts.map(acc => (
+                <div key={acc.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{acc.icon} {acc.name}</span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: (acc.balance ?? 0) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>
+                    {(acc.balance ?? 0) >= 0 ? '+' : '-'}{fmt(Math.abs(acc.balance ?? 0))}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600 }}>{profile?.currency ?? 'JOD'}</div>
-          </div>
+          )}
         </div>
       )}
 

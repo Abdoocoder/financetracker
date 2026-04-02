@@ -5,7 +5,7 @@ import '../app_state.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'transactions/transactions_screen.dart';
 import 'debts/debts_screen.dart';
-import 'budgets/budgets_screen.dart';
+import 'accounts/accounts_screen.dart';
 import 'more/more_screen.dart';
 import '../widgets/main_screen/main_bottom_nav_bar.dart';
 
@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = const [
     MoreScreen(),
-    BudgetsScreen(),
+    AccountsScreen(),
     DebtsScreen(),
     TransactionsScreen(),
     DashboardScreen(),

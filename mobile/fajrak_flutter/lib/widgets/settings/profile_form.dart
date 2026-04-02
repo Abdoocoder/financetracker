@@ -24,6 +24,7 @@ class ProfileForm extends StatefulWidget {
 class _ProfileFormState extends State<ProfileForm> {
   late TextEditingController _nameCtrl;
   late TextEditingController _incomeCtrl;
+  late TextEditingController _openingBalanceCtrl;
   late TextEditingController _jobTitleCtrl;
   late TextEditingController _phoneCtrl;
   late String _currency;
@@ -38,6 +39,7 @@ class _ProfileFormState extends State<ProfileForm> {
     final p = widget.initialProfile ?? {};
     _nameCtrl = TextEditingController(text: p['full_name']?.toString() ?? '');
     _incomeCtrl = TextEditingController(text: p['monthly_income']?.toString() ?? '');
+    _openingBalanceCtrl = TextEditingController(text: p['opening_balance']?.toString() ?? '');
     _jobTitleCtrl = TextEditingController(text: p['job_title']?.toString() ?? '');
     _phoneCtrl = TextEditingController(text: p['phone']?.toString() ?? '');
     // تنظيف legacy data: 'دولار' كانت bug قديم، نحوّلها إلى 'USD'
@@ -51,6 +53,7 @@ class _ProfileFormState extends State<ProfileForm> {
   void dispose() {
     _nameCtrl.dispose();
     _incomeCtrl.dispose();
+    _openingBalanceCtrl.dispose();
     _jobTitleCtrl.dispose();
     _phoneCtrl.dispose();
     super.dispose();
@@ -64,6 +67,7 @@ class _ProfileFormState extends State<ProfileForm> {
         'id': user.id,
         'full_name': _nameCtrl.text.trim(),
         'monthly_income': double.tryParse(_incomeCtrl.text) ?? 0,
+        'opening_balance': double.tryParse(_openingBalanceCtrl.text) ?? 0,
         'currency': _currency,
         'job_title': _jobTitleCtrl.text.isEmpty ? null : _jobTitleCtrl.text,
         'phone': _phoneCtrl.text.isEmpty ? null : _phoneCtrl.text,
@@ -225,6 +229,8 @@ class _ProfileFormState extends State<ProfileForm> {
           const SizedBox(height: 20),
           _sectionTitle('settings_financial'.tr(), colorScheme),
           _inputField(_incomeCtrl, 'settings_income'.tr(), Icons.account_balance_wallet_outlined, colorScheme, type: const TextInputType.numberWithOptions(decimal: true)),
+          const SizedBox(height: 10),
+          _inputField(_openingBalanceCtrl, 'الرصيد الابتدائي (النقد قبل التطبيق)', Icons.savings_outlined, colorScheme, type: const TextInputType.numberWithOptions(decimal: true)),
           const SizedBox(height: 12),
           Text(
             'settings_currency'.tr(),
