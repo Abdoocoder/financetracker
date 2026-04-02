@@ -20,7 +20,7 @@
 [![Download APK](https://img.shields.io/badge/📱_Android_APK-Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
 [![Google Play](https://img.shields.io/badge/🎯_Google_Play-Closed_Testing-4285F4?style=for-the-badge)](https://play.google.com/store/apps/details?id=com.fajrak.app)
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.2-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
@@ -73,6 +73,8 @@ financial independence.
 | | Fajrak | Generic Finance Apps |
 |:--|:------:|:-------------------:|
 | Arabic-first design & RTL | ✅ | ❌ |
+| Centralized Core Logic | ✅ | ❌ |
+| Dual-API Live Pricing | ✅ | ❌ |
 | Islamic tools (Zakat, FIRE) | ✅ | ❌ |
 | Financial journey roadmap | ✅ | ❌ |
 | Native Android + PWA | ✅ | Varies |
@@ -161,7 +163,7 @@ The command center of your financial life.
 | Feature | Description |
 |:--------|:------------|
 | Asset types | Stocks, ETFs, 15+ cryptocurrencies, other |
-| Live prices | Real-time market data via API |
+| **Dual-API Live Prices** | Real-time market data (Yahoo + Fallback) |
 | Halal flag | Islamic investment certification |
 | P&L tracking | Profit/loss per holding |
 | **Record Buy** | Log buy transactions with shares, price & commission |
@@ -195,7 +197,9 @@ A fully automated Islamic obligatory charity calculator.
 
 | Feature | Description |
 |:--------|:------------|
-| Auto-fill | Savings goals → cash, debts → liabilities, investments → assets |
+| **Centralized Logic** | Calculations handled by Supabase RPC (PostgreSQL) |
+| **Auto-fill** | Savings goals → cash, debts → liabilities, investments → assets |
+| **Dual-API Metals** | Real-time Gold/Silver prices (Yahoo + FreeGoldAPI) |
 | Correct standard | `shares × current_price` for investment valuation |
 | Haul countdown | Color-coded per investment (overdue / <30d / <60d / far) |
 | Push reminders | Notifications at 30, 7, and 0 days before haul date |
@@ -279,8 +283,9 @@ Learning, and Wealth.
 
 | Layer | Technology | Version | Purpose |
 |:------|:----------:|:-------:|:--------|
-| **Framework** | Next.js | 16.2.1 | SSR + API routes |
-| **UI Library** | React | 19.2 | Component-based UI |
+| **Framework** | Next.js | 15.x | SSR + API routes |
+| **UI Library** | React | 19 | Component-based UI |
+| **Logic Layer** | Supabase RPC | PL/pgSQL | Centralized Financial Logic |
 | **Language** | TypeScript | 5.x | Type safety |
 | **Styling** | Tailwind CSS | 3.4 | Utility-first CSS |
 | **Database** | Supabase (PostgreSQL) | Latest | Data + Auth + RLS |
@@ -563,7 +568,16 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.23.0 — 2026-04-02 *(Latest)*
+### v3.25.0 — 2026-04-03 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🏗️ **Core Logic** | **Centralized Financial Engine**: Migrated all core calculations (Net Worth, Zakat, Balances) to Supabase RPC (PostgreSQL) for 100% mathematical consistency across platforms. |
+| 💎 **Dual-API Prices** | **Live Pricing Standard**: Implemented "Gold Standard" pricing with automated failover (Yahoo Finance → FreeGoldAPI) for metals and background sync for investments. |
+| 🏦 **Accounts v2** | Enhanced account tracking with centralized transaction summing and real-time net worth calculation. |
+| 🛡️ **Technical Audit** | Full documentation and code audit for financial accuracy and Islamic-compliance logic. |
+
+### v3.24.0 — 2026-04-02
 
 | Change | Description |
 |:-------|:------------|
