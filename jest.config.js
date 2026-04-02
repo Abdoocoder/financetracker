@@ -19,6 +19,7 @@ const customJestConfig = {
         '<rootDir>/node_modules/',
         '<rootDir>/.next/',
         '<rootDir>/mobile/',
+        '<rootDir>/__tests__/helpers/',
     ],
     collectCoverageFrom: [
         'lib/**/*.{js,ts,tsx}',
