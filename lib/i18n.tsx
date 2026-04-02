@@ -425,6 +425,10 @@ const translations = {
     nav_fire: 'حاسبة FIRE',
     nav_zakat: 'الزكاة',
     nav_pdf: 'تقرير PDF',
+    // Error Boundary
+    error_boundary_title: 'حدث خطأ غير متوقع',
+    error_boundary_sub: 'نعتذر عن الإزعاج. حاول إعادة تحميل الصفحة.',
+    error_boundary_retry: '🔄 إعادة المحاولة',
   },
   en: {
     // Forgot Password
@@ -838,6 +842,10 @@ const translations = {
     nav_fire: 'FIRE Calculator',
     nav_zakat: 'Zakat',
     nav_pdf: 'PDF Report',
+    // Error Boundary
+    error_boundary_title: 'An unexpected error occurred',
+    error_boundary_sub: 'We apologize for the inconvenience. Please try reloading the page.',
+    error_boundary_retry: '🔄 Retry',
   }
 
 } as const
