@@ -59,7 +59,7 @@ class DashboardHeader extends StatelessWidget {
                 blur: 8,
                 opacity: 0.1,
                 color: colorScheme.surface,
-                borderColor: colorScheme.outlineVariant.withOpacity(0.3),
+                borderColor: colorScheme.outlineVariant.withValues(alpha: 0.3),
                 child: Text(
                   isAr ? 'EN' : 'AR',
                   style: TextStyle(
@@ -87,7 +87,7 @@ class DashboardHeader extends StatelessWidget {
                     blur: 8,
                     opacity: 0.1,
                     color: colorScheme.surface,
-                    borderColor: colorScheme.outlineVariant.withOpacity(0.3),
+                    borderColor: colorScheme.outlineVariant.withValues(alpha: 0.3),
                     child: SizedBox(
                       width: 44,
                       height: 44,

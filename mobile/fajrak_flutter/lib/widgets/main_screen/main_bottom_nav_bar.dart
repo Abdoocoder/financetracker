@@ -22,7 +22,7 @@ class MainBottomNavBar extends StatelessWidget {
       blur: 20,
       opacity: 0.8,
       color: colorScheme.surface,
-      borderColor: colorScheme.outlineVariant.withOpacity(0.2),
+      borderColor: colorScheme.outlineVariant.withValues(alpha: 0.2),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
