@@ -1,26 +1,31 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useI18n } from '@/lib/i18n'
 
 const INSTALL_KEY = 'fajrak_install_dismissed'
 const INSTALL_DATE_KEY = 'fajrak_install_dismissed_date'
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[]
+  readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+  prompt(): Promise<void>
+}
+
 export function InstallPrompt() {
   const { lang, t } = useI18n()
   const [show, setShow] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [isIOS, setIsIOS] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     setMounted(true)
     const dismissed = localStorage.getItem(INSTALL_KEY)
     const dismissedDate = localStorage.getItem(INSTALL_DATE_KEY)
     
-    // إذا ثبّت — لا تظهر أبداً
+    // إذا ثبّت أو رفض مؤخراً — لا تظهر أبداً ولا تعترض الحدث
     if (dismissed === 'true') return
-    
-    // إذا ضغط "لاحقاً" — تحقق هل مر أسبوع
     if (dismissed === 'dismissed' && dismissedDate) {
       const daysPassed = (Date.now() - parseInt(dismissedDate)) / (1000 * 60 * 60 * 24)
       if (daysPassed < 7) return
@@ -31,31 +36,40 @@ export function InstallPrompt() {
     const standalone = (navigator as any).standalone
     setIsIOS(ios)
 
-    // iOS — يظهر تعليمات يدوية
+    // iOS — يظهر تعليمات يدوية (لا يحتاج beforeinstallprompt)
     if (ios && !standalone) {
-      setTimeout(() => setShow(true), 3000)
+      timerRef.current = setTimeout(() => setShow(true), 4000)
       return
     }
 
     // Android/Desktop — يستخدم beforeinstallprompt
-    const handler = (e: Event) => {
+    const handler = (e: any) => {
+      // فقط إذا لم نكن بالفعل بوضع standalone
+      if (window.matchMedia('(display-mode: standalone)').matches) return
+
       e.preventDefault()
-      setDeferredPrompt(e)
-      setTimeout(() => setShow(true), 3000)
+      deferredPrompt.current = e as BeforeInstallPromptEvent
+      
+      // تأخير الظهور قليلاً لضمان عدم إزعاج المستخدم فوراً
+      if (timerRef.current) clearTimeout(timerRef.current)
+      timerRef.current = setTimeout(() => setShow(true), 3000)
     }
 
     window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [])
 
   async function handleInstall() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
+    if (deferredPrompt.current) {
+      await deferredPrompt.current.prompt()
+      const { outcome } = await deferredPrompt.current.userChoice
       if (outcome === 'accepted') {
         localStorage.setItem(INSTALL_KEY, 'true')
       }
-      setDeferredPrompt(null)
+      deferredPrompt.current = null
     }
     setShow(false)
   }
