@@ -241,23 +241,35 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
   Future<void> _save() async {
     if (_nameCtrl.text.trim().isEmpty) return;
     setState(() => _saving = true);
-    final user = Supabase.instance.client.auth.currentUser!;
-    final colorHex = '#${_color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
-    if (widget.account == null) {
-      await AccountsService.createAccount(
-        userId: user.id, name: _nameCtrl.text.trim(), type: _type,
-        openingBalance: double.tryParse(_balanceCtrl.text) ?? 0,
-        currency: 'JOD', color: colorHex, icon: _icon,
-      );
-    } else {
-      await AccountsService.updateAccount(widget.account!['id'] as String, {
-        'name': _nameCtrl.text.trim(), 'type': _type,
-        'opening_balance': double.tryParse(_balanceCtrl.text) ?? 0,
-        'color': colorHex, 'icon': _icon,
-      });
+    try {
+      final user = Supabase.instance.client.auth.currentUser!;
+      final colorHex = '#${_color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
+      if (widget.account == null) {
+        await AccountsService.createAccount(
+          userId: user.id, name: _nameCtrl.text.trim(), type: _type,
+          openingBalance: double.tryParse(_balanceCtrl.text) ?? 0,
+          currency: 'JOD', color: colorHex, icon: _icon,
+        );
+      } else {
+        await AccountsService.updateAccount(widget.account!['id'] as String, {
+          'name': _nameCtrl.text.trim(), 'type': _type,
+          'opening_balance': double.tryParse(_balanceCtrl.text) ?? 0,
+          'color': colorHex, 'icon': _icon,
+        });
+      }
+      widget.onSaved();
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('حدث خطأ: ${e.toString()}',
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
     }
-    widget.onSaved();
-    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -362,15 +374,28 @@ class _TransferSheetState extends State<_TransferSheet> {
   void dispose() { _amountCtrl.dispose(); _noteCtrl.dispose(); super.dispose(); }
 
   Future<void> _save() async {
-    if (_amountCtrl.text.isEmpty || _fromId == _toId) return;
+    final amount = double.tryParse(_amountCtrl.text);
+    if (amount == null || amount <= 0 || _fromId == _toId) return;
     setState(() => _saving = true);
-    final user = Supabase.instance.client.auth.currentUser!;
-    await AccountsService.transfer(
-      userId: user.id, fromAccountId: _fromId, toAccountId: _toId,
-      amount: double.parse(_amountCtrl.text), date: _date, note: _noteCtrl.text.isEmpty ? null : _noteCtrl.text,
-    );
-    widget.onSaved();
-    if (mounted) Navigator.pop(context);
+    try {
+      final user = Supabase.instance.client.auth.currentUser!;
+      await AccountsService.transfer(
+        userId: user.id, fromAccountId: _fromId, toAccountId: _toId,
+        amount: amount, date: _date, note: _noteCtrl.text.isEmpty ? null : _noteCtrl.text,
+      );
+      widget.onSaved();
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('حدث خطأ أثناء التحويل: ${e.toString()}',
+              style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
+    }
   }
 
   @override

@@ -30,7 +30,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;document.documentElement.setAttribute('data-theme',t||(d?'dark':'light'));})()` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){
+          var saved = localStorage.getItem('theme');
+          var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var initial = (saved === 'dark' || (saved === 'system' && systemDark) || (!saved && systemDark)) ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', initial);
+        })()` }} />
       </head>
       <body suppressHydrationWarning className={`${cairo.variable} font-cairo antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: `

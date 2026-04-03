@@ -1,7 +1,7 @@
 'use client'
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 
-export type Lang = 'ar' | 'en'
+export type Lang = 'ar' | 'en' | 'system'
 
 const translations = {
   ar: {
@@ -262,6 +262,10 @@ const translations = {
     settings_account: 'الحساب',
     settings_lang_ar: 'العربية',
     settings_lang_en: 'English',
+    settings_lang_system: 'تلقائي (حسب الجهاز)',
+    settings_theme_system: 'تلقائي',
+    settings_theme_dark: 'داكن',
+    settings_theme_light: 'فاتح',
 
     // Common
     loading: 'جاري التحميل...',
@@ -338,8 +342,6 @@ const translations = {
     inv_tx_history: '📋 سجل المعاملات',
     inv_portfolio_chart: '📊 توزيع المحفظة',
     settings_theme: 'المظهر',
-    settings_dark: '🌙 داكن',
-    settings_light: '☀️ فاتح',
     settings_export: '📥 تصدير المعاملات CSV',
     settings_exporting: '⏳ جاري التصدير...',
     settings_no_export: 'لا توجد معاملات للتصدير',
@@ -695,6 +697,10 @@ const translations = {
     settings_account: 'Account',
     settings_lang_ar: 'العربية',
     settings_lang_en: 'English',
+    settings_lang_system: 'System Default',
+    settings_theme_system: 'System',
+    settings_theme_dark: 'Dark',
+    settings_theme_light: 'Light',
 
     // Common
     loading: 'Loading...',
@@ -771,8 +777,6 @@ const translations = {
     inv_tx_history: '📋 Transaction History',
     inv_portfolio_chart: '📊 Portfolio Breakdown',
     settings_theme: 'Theme',
-    settings_dark: '🌙 Dark',
-    settings_light: '☀️ Light',
     settings_export: '📥 Export Transactions CSV',
     settings_exporting: '⏳ Exporting...',
     settings_no_export: 'No transactions to export',
@@ -870,6 +874,7 @@ export type TranslationKey = keyof typeof translations.ar
 
 interface I18nContextType {
   lang: Lang
+  currentLang: 'ar' | 'en'
   setLang: (l: Lang) => void
   t: (key: TranslationKey) => string
   isRTL: boolean
@@ -877,28 +882,24 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType>({
   lang: 'ar',
+  currentLang: 'ar',
   setLang: () => { },
   t: (key) => key,
   isRTL: true,
 })
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('ar')
+  const [lang, setLangState] = useState<Lang>('system')
 
   useEffect(() => {
-    const saved = localStorage.getItem('lang') as Lang
-    if (saved === 'ar' || saved === 'en') { setLangState(saved); return }
-    const browserLang = navigator.language || navigator.languages?.[0] || 'ar'
-    const detected: Lang = browserLang.startsWith('ar') ? 'ar' : 'en'
-    setLangState(detected)
+    const saved = localStorage.getItem('lang') as Lang | null
+    setLangState(saved || 'system')
   }, [])
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l)
     localStorage.setItem('lang', l)
-    document.documentElement.lang = l
-    document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr'
-    // حفظ اللغة في profiles عشان يستخدمها نظام الإشعارات
+    // Update profile in DB if user is logged in
     try {
       const { createClient } = require('@/lib/supabase/client')
       const supabase = createClient()
@@ -908,17 +909,25 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     } catch { }
   }, [])
 
-  useEffect(() => {
-    document.documentElement.lang = lang
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+  const currentLang = useMemo((): 'ar' | 'en' => {
+    if (lang !== 'system') return lang
+    if (typeof navigator === 'undefined') return 'ar'
+    const browserLang = navigator.language || (navigator as any).userLanguage || 'ar'
+    return browserLang.startsWith('ar') ? 'ar' : 'en'
   }, [lang])
+
+  useEffect(() => {
+    const html = document.documentElement
+    html.lang = currentLang
+    html.dir = currentLang === 'ar' ? 'rtl' : 'ltr'
+  }, [currentLang])
 
   const t = useCallback((key: TranslationKey): string => {
-    return translations[lang][key] ?? translations.ar[key] ?? key
-  }, [lang])
+    return (translations[currentLang] as any)[key] ?? (translations.ar as any)[key] ?? key
+  }, [currentLang])
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, isRTL: lang === 'ar' }}>
+    <I18nContext.Provider value={{ lang, currentLang, setLang, t, isRTL: currentLang === 'ar' }}>
       {children}
     </I18nContext.Provider>
   )

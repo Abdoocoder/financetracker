@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class AccountsService {
   static SupabaseClient get _db => Supabase.instance.client;
@@ -68,7 +69,7 @@ class AccountsService {
     required String date,
     String? note,
   }) async {
-    final pairId = DateTime.now().millisecondsSinceEpoch.toString();
+    final pairId = const Uuid().v4();
     await _db.from('transactions').insert({
       'user_id': userId,
       'type': 'transfer',
