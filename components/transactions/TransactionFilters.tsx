@@ -17,25 +17,34 @@ export function TransactionFilters({ search, onSearchChange, filter, onFilterCha
   const { lang } = useI18n()
   const months = lang === 'ar'
     ? ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر']
-    : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-  const currentYear = new Date().getFullYear()
-  const years = [currentYear - 1, currentYear, currentYear + 1]
+    : ['January','February','March','April','May','June','July','August','September','October','November','December']
+
+  const now = new Date()
+  const isCurrentMonth = filterMonth === now.getMonth() + 1 && filterYear === now.getFullYear()
+
+  function goPrev() {
+    if (filterMonth === 1) { onMonthChange(12); onYearChange(filterYear - 1) }
+    else onMonthChange(filterMonth - 1)
+  }
+  function goNext() {
+    if (isCurrentMonth) return
+    if (filterMonth === 12) { onMonthChange(1); onYearChange(filterYear + 1) }
+    else onMonthChange(filterMonth + 1)
+  }
+
   return (
     <>
-      {/* فلتر الشهر والسنة */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <select value={filterMonth} onChange={e => onMonthChange(Number(e.target.value))}
-          style={{ flex: 2, padding: '9px 12px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', cursor: 'pointer' }}>
-          {months.map((m, i) => (
-            <option key={i+1} value={i+1}>{m}</option>
-          ))}
-        </select>
-        <select value={filterYear} onChange={e => onYearChange(Number(e.target.value))}
-          style={{ flex: 1, padding: '9px 12px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', cursor: 'pointer' }}>
-          {years.map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
+      {/* ── Month Navigator ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: '4px 6px' }}>
+        <button onClick={goPrev} style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {lang === 'ar' ? '›' : '‹'}
+        </button>
+        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+          {months[filterMonth - 1]} {filterYear}
+        </span>
+        <button onClick={goNext} disabled={isCurrentMonth} style={{ width: 36, height: 36, borderRadius: 10, background: isCurrentMonth ? 'transparent' : 'var(--bg-secondary)', border: `1px solid ${isCurrentMonth ? 'transparent' : 'var(--border)'}`, color: isCurrentMonth ? 'var(--text-muted)' : 'var(--text-primary)', fontSize: 16, cursor: isCurrentMonth ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: isCurrentMonth ? 0.3 : 1 }}>
+          {lang === 'ar' ? '‹' : '›'}
+        </button>
       </div>
       <div style={{ padding: '0 0 12px', position: 'relative' }}>
         <input type="text" value={search} onChange={e => onSearchChange(e.target.value)}

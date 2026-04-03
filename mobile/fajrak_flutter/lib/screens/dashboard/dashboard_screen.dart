@@ -21,6 +21,7 @@ import '../../widgets/dashboard/dashboard_quick_add.dart';
 import '../../widgets/dashboard/dashboard_stage_card.dart';
 import '../../widgets/dashboard/recent_transactions_list.dart';
 import '../../widgets/dashboard/net_worth_card.dart';
+import '../../widgets/dashboard/month_summary_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -41,8 +42,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Map<String, dynamic>> _months6Data = [];
   final List<Map<String, dynamic>> _categoryData = [];
   double _totalDebt = 0, _totalReceivable = 0, _netWorth = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
+  double _prevIncome = 0, _prevExpenses = 0;
   DateTime? _lastUpdated;
-  final double _prevExpenses = 0;
   final double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
 
@@ -82,6 +83,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       final now = DateTime.now();
       final firstDay = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
+      final prevMonthStart = DateTime(now.year, now.month - 1, 1).toIso8601String().split('T')[0];
+      final prevMonthEnd = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
 
       final results = await Future.wait<dynamic>([
         Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
@@ -90,6 +93,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type, auto_deduct').eq('user_id', user.id).eq('is_paid', false),
         Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
+        // prev month totals for MonthSummaryCard (only fetched in first 7 days)
+        if (now.day <= 7)
+          Supabase.instance.client.from('transactions').select('type, amount')
+              .eq('user_id', user.id).gte('transaction_date', prevMonthStart).lt('transaction_date', prevMonthEnd),
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
@@ -156,6 +163,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         stage = 'investing';
       }
 
+      // ── prev month summary ──
+      double prevIncome = 0, prevExpenses = 0;
+      if (now.day <= 7 && results.length > 6) {
+        final prevTxs = results[6] as List;
+        for (final tx in prevTxs) {
+          if (tx['type'] == 'income') {
+            prevIncome += (tx['amount'] as num).toDouble();
+          } else if (tx['type'] == 'expense') {
+            prevExpenses += (tx['amount'] as num).toDouble();
+          }
+        }
+      }
       if (mounted) {
         setState(() {
           _name = (profile['full_name'] as String?)?.split(' ').first ?? '';
@@ -173,6 +192,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _invValue = invValue;
           _goalsSaved = goalsSaved;
           _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
+          _prevIncome = prevIncome;
+          _prevExpenses = prevExpenses;
           _lastUpdated = DateTime.now();
           _loading = false;
         });
@@ -239,7 +260,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               const SizedBox(height: 12),
 
-              // ── 2. Hero Balance Card — after phase 1 ─────────────
+              // ── 2. Month Summary Banner (days 1-7 of new month) ──
+              if (!_loading) Builder(builder: (ctx) {
+                const monthKeys = ['month_jan', 'month_feb', 'month_mar', 'month_apr',
+                  'month_may', 'month_jun', 'month_jul', 'month_aug', 'month_sep',
+                  'month_oct', 'month_nov', 'month_dec'];
+                final prevIdx = (DateTime.now().month - 2 + 12) % 12;
+                final prevName = monthKeys[prevIdx].tr();
+                return MonthSummaryCard(
+                  prevIncome: _prevIncome,
+                  prevExpenses: _prevExpenses,
+                  currency: _currency,
+                  prevMonthName: prevName,
+                );
+              }),
+
+              // ── 4. Hero Balance Card — after phase 1 ─────────────
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 child: _accountsLoading
@@ -248,7 +284,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 12),
 
-              // ── 3. Monthly Stats — after phase 2 ─────────────────
+              // ── 5. Monthly Stats — after phase 2 ─────────────────
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: _loading

@@ -358,6 +358,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             },
             onShowDatePicker: _showMonthYearPicker,
             colorScheme: colorScheme,
+            filterMonth: _filterMonth ?? DateTime.now().month,
+            filterYear: _filterYear ?? DateTime.now().year,
+            onMonthYearChanged: (m, y) {
+              setState(() {
+                _filterMonth = m;
+                _filterYear = y;
+              });
+              _load(reset: true);
+            },
           ),
           Expanded(
             child: _loading && _transactions.isEmpty
