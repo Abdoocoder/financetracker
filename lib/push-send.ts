@@ -12,9 +12,9 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!
 )
 
-async function sendFCM(fcmToken: string, title: string, message: string, url: string) {
+async function sendFCM(fcmToken: string, title: string, message: string, url: string, badge = 0) {
   const { sendFCMNotification } = await import('./firebase-admin')
-  return sendFCMNotification(fcmToken, title, message, `${process.env.NEXT_PUBLIC_APP_URL}${url}`)
+  return sendFCMNotification(fcmToken, title, message, `${process.env.NEXT_PUBLIC_APP_URL}${url}`, badge)
 }
 
 export async function sendPushToUser(
@@ -44,7 +44,7 @@ export async function sendPushToUser(
     // FCM token
     if (sub.endpoint?.startsWith('fcm:')) {
       const fcmToken = sub.endpoint.replace('fcm:', '')
-      const ok = await sendFCM(fcmToken, title, message, url)
+      const ok = await sendFCM(fcmToken, title, message, url, (unread ?? 0) + 1)
       if (ok) sent++
       continue
     }

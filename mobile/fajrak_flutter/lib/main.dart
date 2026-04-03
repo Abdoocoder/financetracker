@@ -82,16 +82,25 @@ void main() async {
   );
 
   await NotificationService.initialize();
-  
+
+  final appState = AppState();
+
+  // تحديث الشارة عند وصول إشعار والتطبيق مفتوح (Foreground)
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    appState.loadUnreadAlerts();
+  });
+
   // Handle background clicks (when app is in background but not terminated)
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     NotificationService.handleMessage(message);
+    appState.loadUnreadAlerts(); // تحديث الشارة عند فتح التطبيق من الخلفية
   });
 
   // Handle terminated state clicks (when app is launched from notification)
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     if (message != null) {
       NotificationService.handleMessage(message);
+      appState.loadUnreadAlerts(); // تحديث الشارة عند فتح التطبيق من الإشعار مباشرة
     }
   });
 
@@ -107,8 +116,6 @@ void main() async {
     ErrorHandler.handle(error, developerMessage: 'PlatformError');
     return true;
   };
-
-  final appState = AppState();
 
   runApp(
     EasyLocalization(
