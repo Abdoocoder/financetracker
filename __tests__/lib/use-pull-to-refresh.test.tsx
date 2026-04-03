@@ -2,7 +2,17 @@ import React from 'react'
 import { render, screen, act } from '@testing-library/react'
 import { usePullToRefresh } from '../../lib/use-pull-to-refresh'
 
-// Helper component that attaches the ref to a real DOM element
+// jsdom does not implement the Touch constructor — polyfill it
+if (typeof Touch === 'undefined') {
+  ;(global as any).Touch = class Touch {
+    identifier: number; target: EventTarget
+    clientX = 0; clientY = 0; screenX = 0; screenY = 0
+    pageX = 0; pageY = 0; radiusX = 0; radiusY = 0
+    rotationAngle = 0; force = 0
+    constructor(opts: any) { Object.assign(this, opts) }
+  }
+}
+
 function PullContainer({ onRefresh }: { onRefresh: () => Promise<void> }) {
   const { el, refreshing } = usePullToRefresh(onRefresh)
   return (
@@ -14,7 +24,6 @@ function PullContainer({ onRefresh }: { onRefresh: () => Promise<void> }) {
 
 describe('usePullToRefresh', () => {
   beforeEach(() => {
-    // scrollY is 0 by default in jsdom
     Object.defineProperty(window, 'scrollY', { value: 0, writable: true, configurable: true })
   })
 
@@ -61,7 +70,7 @@ describe('usePullToRefresh', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1)
   })
 
-  it('does not trigger refresh when scrollY > 0', async () => {
+  it('does not trigger refresh when scrollY > 0 at touchstart', async () => {
     Object.defineProperty(window, 'scrollY', { value: 50, writable: true, configurable: true })
     const onRefresh = jest.fn().mockResolvedValue(undefined)
     const { getByTestId } = render(<PullContainer onRefresh={onRefresh} />)
@@ -78,9 +87,7 @@ describe('usePullToRefresh', () => {
       }))
     })
 
-    // scrollY > 0 at touchstart, so startY stays 0; diff = 300-0=300 but scrollY still 50 at touchend
-    // The touchstart guard: only sets startY when scrollY===0
-    // In this test scrollY=50 so startY remains 0, diff=300 > 80 but scrollY!==0 at touchend
+    // scrollY !== 0 at touchstart so startY stays 0; diff=300 but scrollY > 0 at touchend guard
     expect(onRefresh).not.toHaveBeenCalled()
   })
 
