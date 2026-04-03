@@ -1,0 +1,96 @@
+PASS __tests__/lib/i18n.test.tsx
+FAIL __tests__/lib/push-send.test.ts
+  ΓùÅ sendPushToUser ΓÇ║ should return 0 if no subscriptions found
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "push_subscriptions"
+
+    Number of calls: 0
+
+      33 |     
+      34 |     expect(result).toBe(0)
+    > 35 |     expect(mockSupabase.from).toHaveBeenCalledWith('push_subscriptions')
+         |                               ^
+      36 |   })
+      37 |
+      38 |   it('should send FCM notification correctly', async () => {
+
+      at Object.toHaveBeenCalledWith (__tests__/lib/push-send.test.ts:35:31)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send FCM notification correctly
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      49 |     const result = await sendPushToUser('user-1', 'Title', 'Message')
+      50 |
+    > 51 |     expect(result).toBe(1)
+         |                    ^
+      52 |     // Verify it saved the alert to DB
+      53 |     expect(mockSupabase.from).toHaveBeenCalledWith('alerts')
+      54 |   })
+
+      at Object.toBe (__tests__/lib/push-send.test.ts:51:20)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send Web Push notification correctly
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      67 |     const result = await sendPushToUser('user-1', 'Web Title', 'Web Msg')
+      68 |
+    > 69 |     expect(result).toBe(1)
+         |                    ^
+      70 |     expect(sendSpy).toHaveBeenCalled()
+      71 |     const payload = JSON.parse(sendSpy.mock.calls[0][1] as string)
+      72 |     expect(payload.badgeCount).toBe(3) // unread (2) + 1
+
+      at Object.toBe (__tests__/lib/push-send.test.ts:69:20)
+
+  ΓùÅ sendPushToUser ΓÇ║ should clean up stale subscriptions on 410 error
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "push_subscriptions"
+
+    Number of calls: 0
+
+      85 |
+      86 |     expect(result).toBe(0)
+    > 87 |     expect(mockSupabase.from).toHaveBeenCalledWith('push_subscriptions')
+         |                               ^
+      88 |     expect(mockSupabase.delete).toHaveBeenCalled()
+      89 |   })
+      90 | })
+
+      at Object.toHaveBeenCalledWith (__tests__/lib/push-send.test.ts:87:31)
+
+PASS __tests__/lib/user-context.test.tsx
+PASS __tests__/lib/firebase-admin.test.ts
+  ΓùÅ Console
+
+    console.error
+      FCM send error: "FCM Error"
+
+      56 |     return true
+      57 |   } catch (err: any) {
+    > 58 |     console.error('FCM send error:', JSON.stringify(err?.message || err))
+         |             ^
+      59 |     return false
+      60 |   }
+      61 | }
+
+      at error (lib/firebase-admin.ts:58:13)
+      at Object.<anonymous> (__tests__/lib/firebase-admin.test.ts:47:20)
+
+
+Test Suites: 1 failed, 3 passed, 4 total
+Tests:       4 failed, 10 passed, 14 total
+Snapshots:   0 total
+Time:        5.393 s
+Ran all test suites matching __tests__/lib/push-send.test.ts|__tests__/lib/firebase-admin.test.ts|__tests__/lib/i18n.test.tsx|__tests__/lib/user-context.test.tsx.

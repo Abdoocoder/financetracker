@@ -1,10 +1,12 @@
 import webpush from 'web-push'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 webpush.setVapidDetails(
   process.env.VAPID_EMAIL!,
@@ -22,8 +24,10 @@ export async function sendPushToUser(
   title: string,
   message: string,
   url = '/dashboard/alerts',
-  tag = 'finance-alert'
+  tag = 'finance-alert',
+  supabaseClient?: any
 ) {
+  const supabase = supabaseClient || getSupabase()
   const { data: subs } = await supabase
     .from('push_subscriptions')
     .select('*')

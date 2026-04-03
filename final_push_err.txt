@@ -1,0 +1,76 @@
+FAIL __tests__/lib/push-send.test.ts (20.566 s)
+  sendPushToUser
+    ├ù should return 0 if no subscriptions found (5021 ms)
+    ├ù should send FCM notification correctly (5007 ms)
+    ├ù should send Web Push notification correctly (5012 ms)
+    ├ù should clean up stale subscriptions on 410 error (5006 ms)
+
+  ΓùÅ sendPushToUser ΓÇ║ should return 0 if no subscriptions found
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      30 |   })
+      31 |
+    > 32 |   it('should return 0 if no subscriptions found', async () => {
+         |   ^
+      33 |     mockSupabaseInstance.then.mockResolvedValueOnce({ data: [], error: null })
+      34 |     
+      35 |     const result = await sendPushToUser('user-1', 'Title', 'Message', undefined, undefined, mockSupabaseInstance)
+
+      at it (__tests__/lib/push-send.test.ts:32:3)
+      at Object.describe (__tests__/lib/push-send.test.ts:26:1)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send FCM notification correctly
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      39 |   })
+      40 |
+    > 41 |   it('should send FCM notification correctly', async () => {
+         |   ^
+      42 |     // 1. Mock subscriptions (one FCM)
+      43 |     mockSupabaseInstance.then.mockResolvedValueOnce({ 
+      44 |       data: [{ id: 1, endpoint: 'fcm:mock-token', user_id: 'user-1' }], 
+
+      at it (__tests__/lib/push-send.test.ts:41:3)
+      at Object.describe (__tests__/lib/push-send.test.ts:26:1)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send Web Push notification correctly
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      57 |   })
+      58 |
+    > 59 |   it('should send Web Push notification correctly', async () => {
+         |   ^
+      60 |     // 1. Mock subscriptions (one Web Push)
+      61 |     mockSupabaseInstance.then.mockResolvedValueOnce({ 
+      62 |       data: [{ id: 2, endpoint: 'https://push.com', p256dh: 'dh', auth: 'auth', user_id: 'user-1' }], 
+
+      at it (__tests__/lib/push-send.test.ts:59:3)
+      at Object.describe (__tests__/lib/push-send.test.ts:26:1)
+
+  ΓùÅ sendPushToUser ΓÇ║ should clean up stale subscriptions on 410 error
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      76 |   })
+      77 |
+    > 78 |   it('should clean up stale subscriptions on 410 error', async () => {
+         |   ^
+      79 |     // 1. Mock subscriptions
+      80 |     mockSupabaseInstance.then.mockResolvedValueOnce({ 
+      81 |       data: [{ id: 3, endpoint: 'https://stale.com', user_id: 'user-1' }], 
+
+      at it (__tests__/lib/push-send.test.ts:78:3)
+      at Object.describe (__tests__/lib/push-send.test.ts:26:1)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 4 total
+Snapshots:   0 total
+Time:        22.546 s
+Ran all test suites matching __tests__/lib/push-send.test.ts.

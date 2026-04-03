@@ -1,0 +1,72 @@
+FAIL __tests__/lib/push-send.test.ts
+  sendPushToUser
+    ├ù should return 0 if no subscriptions found (5 ms)
+    ├ù should send FCM notification correctly (4 ms)
+    ├ù should send Web Push notification correctly (1 ms)
+    ├ù should clean up stale subscriptions on 410 error (2 ms)
+
+  ΓùÅ sendPushToUser ΓÇ║ should return 0 if no subscriptions found
+
+    TypeError: supabase.from(...).select(...).eq is not a function
+
+      32 |     .from('push_subscriptions')
+      33 |     .select('*')
+    > 34 |     .eq('user_id', userId)
+         |      ^
+      35 |
+      36 |   if (!subs?.length) return 0
+      37 |
+
+      at eq (lib/push-send.ts:34:6)
+      at Object.<anonymous> (__tests__/lib/push-send.test.ts:34:40)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send FCM notification correctly
+
+    TypeError: supabase.from(...).select(...).eq is not a function
+
+      32 |     .from('push_subscriptions')
+      33 |     .select('*')
+    > 34 |     .eq('user_id', userId)
+         |      ^
+      35 |
+      36 |   if (!subs?.length) return 0
+      37 |
+
+      at eq (lib/push-send.ts:34:6)
+      at Object.<anonymous> (__tests__/lib/push-send.test.ts:51:40)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send Web Push notification correctly
+
+    TypeError: supabase.from(...).select(...).eq is not a function
+
+      32 |     .from('push_subscriptions')
+      33 |     .select('*')
+    > 34 |     .eq('user_id', userId)
+         |      ^
+      35 |
+      36 |   if (!subs?.length) return 0
+      37 |
+
+      at eq (lib/push-send.ts:34:6)
+      at Object.<anonymous> (__tests__/lib/push-send.test.ts:69:40)
+
+  ΓùÅ sendPushToUser ΓÇ║ should clean up stale subscriptions on 410 error
+
+    TypeError: supabase.from(...).select(...).eq is not a function
+
+      32 |     .from('push_subscriptions')
+      33 |     .select('*')
+    > 34 |     .eq('user_id', userId)
+         |      ^
+      35 |
+      36 |   if (!subs?.length) return 0
+      37 |
+
+      at eq (lib/push-send.ts:34:6)
+      at Object.<anonymous> (__tests__/lib/push-send.test.ts:86:40)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 4 total
+Snapshots:   0 total
+Time:        2.385 s
+Ran all test suites matching __tests__/lib/push-send.test.ts.

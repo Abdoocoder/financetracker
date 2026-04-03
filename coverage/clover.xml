@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1775232165913" clover="3.2.0">
-  <project timestamp="1775232165913" name="All files">
-    <metrics statements="607" coveredstatements="62" conditionals="338" coveredconditionals="24" methods="145" coveredmethods="14" elements="1090" coveredelements="100" complexity="0" loc="607" ncloc="607" packages="4" files="24" classes="24"/>
+<coverage generated="1775247378614" clover="3.2.0">
+  <project timestamp="1775247378614" name="All files">
+    <metrics statements="623" coveredstatements="125" conditionals="350" coveredconditionals="43" methods="150" coveredmethods="29" elements="1123" coveredelements="197" complexity="0" loc="623" ncloc="623" packages="4" files="24" classes="24"/>
     <package name="hooks">
       <metrics statements="190" coveredstatements="0" conditionals="141" coveredconditionals="0" methods="66" coveredmethods="0"/>
       <file name="useAccounts.ts" path="C:\Users\skyli\Documents\financetracker\hooks\useAccounts.ts">
@@ -205,7 +205,7 @@
       </file>
     </package>
     <package name="lib">
-      <metrics statements="396" coveredstatements="60" conditionals="197" coveredconditionals="24" methods="70" coveredmethods="14"/>
+      <metrics statements="412" coveredstatements="123" conditionals="209" coveredconditionals="43" methods="75" coveredmethods="29"/>
       <file name="cache.ts" path="C:\Users\skyli\Documents\financetracker\lib\cache.ts">
         <metrics statements="9" coveredstatements="9" conditionals="4" coveredconditionals="2" methods="3" coveredmethods="3"/>
         <line num="6" count="2" type="stmt"/>
@@ -339,17 +339,17 @@
         <line num="137" count="2" type="cond" truecount="2" falsecount="0"/>
       </file>
       <file name="firebase-admin.ts" path="C:\Users\skyli\Documents\financetracker\lib\firebase-admin.ts">
-        <metrics statements="10" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="4" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="48" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="49" count="0" type="stmt"/>
+        <metrics statements="10" coveredstatements="8" conditionals="5" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="4" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="5" count="3" type="stmt"/>
+        <line num="14" count="3" type="stmt"/>
+        <line num="21" count="3" type="stmt"/>
+        <line num="22" count="3" type="stmt"/>
+        <line num="56" count="3" type="stmt"/>
+        <line num="58" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="59" count="0" type="stmt"/>
       </file>
       <file name="firebase.ts" path="C:\Users\skyli\Documents\financetracker\lib\firebase.ts">
         <metrics statements="13" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="1" coveredmethods="0"/>
@@ -377,54 +377,57 @@
         <line num="15" count="5" type="stmt"/>
       </file>
       <file name="i18n.tsx" path="C:\Users\skyli\Documents\financetracker\lib\i18n.tsx">
-        <metrics statements="28" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="9" coveredmethods="0"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="878" count="0" type="stmt"/>
-        <line num="881" count="0" type="stmt"/>
-        <line num="885" count="0" type="stmt"/>
-        <line num="886" count="0" type="stmt"/>
-        <line num="888" count="0" type="stmt"/>
-        <line num="889" count="0" type="stmt"/>
-        <line num="890" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="891" count="0" type="cond" truecount="0" falsecount="3"/>
-        <line num="892" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="893" count="0" type="stmt"/>
-        <line num="896" count="0" type="stmt"/>
-        <line num="897" count="0" type="stmt"/>
-        <line num="898" count="0" type="stmt"/>
-        <line num="899" count="0" type="stmt"/>
-        <line num="900" count="0" type="cond" truecount="0" falsecount="2"/>
+        <metrics statements="31" coveredstatements="23" conditionals="18" coveredconditionals="10" methods="10" coveredmethods="6"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="883" count="1" type="stmt"/>
+        <line num="887" count="0" type="stmt"/>
+        <line num="891" count="4" type="stmt"/>
+        <line num="892" count="8" type="stmt"/>
+        <line num="893" count="8" type="stmt"/>
+        <line num="895" count="8" type="stmt"/>
+        <line num="896" count="4" type="stmt"/>
+        <line num="897" count="4" type="stmt"/>
+        <line num="898" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="901" count="8" type="stmt"/>
         <line num="902" count="0" type="stmt"/>
         <line num="903" count="0" type="stmt"/>
-        <line num="904" count="0" type="stmt"/>
         <line num="905" count="0" type="stmt"/>
-        <line num="906" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="911" count="0" type="stmt"/>
-        <line num="912" count="0" type="stmt"/>
-        <line num="913" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="916" count="0" type="stmt"/>
-        <line num="917" count="0" type="cond" truecount="0" falsecount="3"/>
-        <line num="927" count="0" type="stmt"/>
+        <line num="906" count="0" type="stmt"/>
+        <line num="907" count="0" type="stmt"/>
+        <line num="908" count="0" type="stmt"/>
+        <line num="909" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="914" count="8" type="stmt"/>
+        <line num="916" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="917" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="918" count="2" type="cond" truecount="1" falsecount="2"/>
+        <line num="919" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="922" count="8" type="stmt"/>
+        <line num="923" count="7" type="stmt"/>
+        <line num="924" count="7" type="stmt"/>
+        <line num="925" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="928" count="8" type="stmt"/>
+        <line num="929" count="8" type="cond" truecount="1" falsecount="2"/>
+        <line num="939" count="8" type="stmt"/>
       </file>
       <file name="push-send.ts" path="C:\Users\skyli\Documents\financetracker\lib\push-send.ts">
-        <metrics statements="27" coveredstatements="0" conditionals="18" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
+        <metrics statements="27" coveredstatements="7" conditionals="21" coveredconditionals="3" methods="3" coveredmethods="1"/>
+        <line num="1" count="4" type="stmt"/>
+        <line num="2" count="4" type="stmt"/>
+        <line num="4" count="4" type="stmt"/>
+        <line num="9" count="4" type="stmt"/>
         <line num="16" count="0" type="stmt"/>
         <line num="17" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="32" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="20" count="4" type="stmt"/>
+        <line num="27" count="4" type="stmt"/>
+        <line num="32" count="4" type="cond" truecount="1" falsecount="1"/>
         <line num="34" count="0" type="stmt"/>
         <line num="40" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="41" count="0" type="stmt"/>
         <line num="43" count="0" type="stmt"/>
         <line num="45" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
+        <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="48" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="49" count="0" type="stmt"/>
         <line num="53" count="0" type="stmt"/>
@@ -438,23 +441,36 @@
         <line num="79" count="0" type="stmt"/>
       </file>
       <file name="theme-context.tsx" path="C:\Users\skyli\Documents\financetracker\lib\theme-context.tsx">
-        <metrics statements="16" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="5" coveredmethods="0"/>
+        <metrics statements="29" coveredstatements="0" conditionals="14" coveredconditionals="0" methods="9" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
         <line num="11" count="0" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
         <line num="14" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
         <line num="17" count="0" type="stmt"/>
         <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="20" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
-        <line num="25" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="25" count="0" type="stmt"/>
         <line num="26" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
+        <line num="27" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="28" count="0" type="stmt"/>
+        <line num="30" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
         <line num="38" count="0" type="stmt"/>
         <line num="39" count="0" type="stmt"/>
+        <line num="40" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="41" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="50" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="53" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
       </file>
       <file name="use-cached-data.ts" path="C:\Users\skyli\Documents\financetracker\lib\use-cached-data.ts">
         <metrics statements="38" coveredstatements="0" conditionals="15" coveredconditionals="0" methods="6" coveredmethods="0"/>
@@ -628,33 +644,33 @@
         <line num="31" count="0" type="stmt"/>
       </file>
       <file name="user-context.tsx" path="C:\Users\skyli\Documents\financetracker\lib\user-context.tsx">
-        <metrics statements="26" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="7" coveredmethods="0"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="30" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="33" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="41" count="0" type="stmt"/>
+        <metrics statements="26" coveredstatements="25" conditionals="6" coveredconditionals="4" methods="7" coveredmethods="7"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="16" count="7" type="stmt"/>
+        <line num="17" count="7" type="stmt"/>
+        <line num="18" count="7" type="stmt"/>
+        <line num="19" count="7" type="stmt"/>
+        <line num="21" count="7" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="28" count="3" type="stmt"/>
+        <line num="29" count="3" type="stmt"/>
+        <line num="30" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="33" count="3" type="stmt"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="37" count="3" type="stmt"/>
+        <line num="38" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="40" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="41" count="1" type="stmt"/>
         <line num="43" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
+        <line num="46" count="3" type="stmt"/>
+        <line num="56" count="7" type="stmt"/>
+        <line num="57" count="7" type="stmt"/>
       </file>
     </package>
     <package name="lib.supabase">

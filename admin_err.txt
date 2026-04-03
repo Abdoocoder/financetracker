@@ -1,0 +1,60 @@
+FAIL __tests__/lib/firebase-admin.test.ts
+  sendFCMNotification
+    ├ù should send a notification with the correct payload structure (7 ms)
+    ├ù should return false if sending fails (3 ms)
+    ├ù should handle missing URL or badge by using defaults (1 ms)
+
+  ΓùÅ sendFCMNotification ΓÇ║ should send a notification with the correct payload structure
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: ObjectContaining {"android": ObjectContaining {"notification": ObjectContaining {"notificationCount": 10}}, "apns": ObjectContaining {"payload": {"aps": {"badge": 10, "sound": "default"}}}, "notification": {"body": "Test Body", "title": "Test Title"}, "token": "mock-fcm-token"}
+
+    Number of calls: 0
+
+      22 |
+      23 |     expect(result).toBe(true)
+    > 24 |     expect(mockSend).toHaveBeenCalledWith(expect.objectContaining({
+         |                      ^
+      25 |       token: fcmToken,
+      26 |       notification: { title, body },
+      27 |       android: expect.objectContaining({
+
+      at Object.toHaveBeenCalledWith (__tests__/lib/firebase-admin.test.ts:24:22)
+
+  ΓùÅ sendFCMNotification ΓÇ║ should return false if sending fails
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+      47 |     const result = await sendFCMNotification(fcmToken, title, body, url)
+      48 |
+    > 49 |     expect(result).toBe(false)
+         |                    ^
+      50 |     expect(mockSend).toHaveBeenCalled()
+      51 |   })
+      52 |
+
+      at Object.toBe (__tests__/lib/firebase-admin.test.ts:49:20)
+
+  ΓùÅ sendFCMNotification ΓÇ║ should handle missing URL or badge by using defaults
+
+    TypeError: Cannot read properties of undefined (reading '0')
+
+      57 |     await sendFCMNotification(fcmToken, title, body, url)
+      58 |
+    > 59 |     const payload = mockSend.mock.calls[0][0]
+         |                                           ^
+      60 |     expect(payload.android.notification.notificationCount).toBe(0)
+      61 |     expect(payload.apns.payload.aps.badge).toBe(0)
+      62 |   })
+
+      at Object.<anonymous> (__tests__/lib/firebase-admin.test.ts:59:43)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 3 total
+Snapshots:   0 total
+Time:        1.968 s
+Ran all test suites matching __tests__/lib/firebase-admin.test.ts.
