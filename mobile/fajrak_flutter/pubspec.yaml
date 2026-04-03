@@ -38,6 +38,8 @@ dependencies:
   http: ^1.2.1
   flutter_dotenv: ^6.0.0
   flutter_app_badge_control: ^0.0.2
+  pdf: ^3.10.8
+  printing: ^5.13.1
 
 dev_dependencies:
   flutter_test:
