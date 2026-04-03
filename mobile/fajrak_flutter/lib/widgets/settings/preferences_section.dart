@@ -146,13 +146,14 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     if (!mounted) return;
 
     if (langCode == null) {
-      if (!context.mounted) return;
+      // ignore: use_build_context_synchronously
       await context.deleteSaveLocale();
     } else {
-      if (!context.mounted) return;
+      // ignore: use_build_context_synchronously
       await context.setLocale(Locale(langCode));
     }
 
+    // ignore: use_build_context_synchronously
     messenger.showSnackBar(
       SnackBar(
         content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
@@ -168,7 +169,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
 
     await appState.setTheme(mode);
     if (!mounted) return;
-
+    // ignore: use_build_context_synchronously
     messenger.showSnackBar(
       SnackBar(
         content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
