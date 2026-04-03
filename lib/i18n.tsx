@@ -890,10 +890,12 @@ const I18nContext = createContext<I18nContextType>({
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>('system')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     const saved = localStorage.getItem('lang') as Lang | null
-    setLangState(saved || 'system')
+    if (saved) setLangState(saved)
   }, [])
 
   const setLang = useCallback((l: Lang) => {
@@ -910,11 +912,12 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const currentLang = useMemo((): 'ar' | 'en' => {
+    if (!mounted) return 'ar' // Prevent hydration mismatch by matching SSR fallback
     if (lang !== 'system') return lang
     if (typeof navigator === 'undefined') return 'ar'
     const browserLang = navigator.language || (navigator as any).userLanguage || 'ar'
     return browserLang.startsWith('ar') ? 'ar' : 'en'
-  }, [lang])
+  }, [mounted, lang])
 
   useEffect(() => {
     const html = document.documentElement
