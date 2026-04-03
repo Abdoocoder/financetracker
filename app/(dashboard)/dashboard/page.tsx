@@ -239,6 +239,17 @@ function useDashboardData() {
       setData(newData)
       setRecentTx(recentRes.data ?? [])
       setLoading(false)
+
+      if (typeof navigator !== 'undefined' && 'setAppBadge' in navigator) {
+        if (newData.unreadAlerts > 0) {
+          // @ts-ignore
+          navigator.setAppBadge(newData.unreadAlerts).catch(() => {})
+        } else {
+          // @ts-ignore
+          if ('clearAppBadge' in navigator) navigator.clearAppBadge().catch(() => {})
+        }
+      }
+
       try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: newData, recentTx: recentRes.data ?? [], ts: Date.now() })) } catch { }
     }
 
