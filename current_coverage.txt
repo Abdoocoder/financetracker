@@ -1,0 +1,37 @@
+
+> fajrak@3.27.0+18 test:coverage
+> jest --coverage
+
+-------------------------|---------|----------|---------|---------|-------------------
+File                     | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------------|---------|----------|---------|---------|-------------------
+All files                |   22.41 |     15.9 |   20.52 |   23.55 |                   
+ hooks                   |       0 |        0 |       0 |       0 |                   
+  useAccounts.ts         |       0 |        0 |       0 |       0 | 1-80              
+  useFinancialSummary.ts |       0 |        0 |       0 |       0 | 1-45              
+  useTransactions.ts     |       0 |        0 |       0 |       0 | 2-295             
+ lib                     |   35.05 |    26.54 |   40.78 |    35.1 |                   
+  cache.ts               |   83.33 |       50 |     100 |     100 | 9-16              
+  cron-auth.ts           |     100 |      100 |     100 |     100 |                   
+  currencies.ts          |     100 |      100 |     100 |     100 |                   
+  currency.ts            |   82.35 |      100 |     100 |     100 |                   
+  daily-lessons.ts       |       0 |        0 |       0 |       0 | 23-1012           
+  detectCurrency.ts      |     100 |    83.33 |     100 |     100 | 127,136           
+  firebase-admin.ts      |     100 |       60 |     100 |     100 | 4,58              
+  firebase.ts            |       0 |        0 |       0 |       0 | 1-30              
+  haptic.ts              |   83.33 |       80 |     100 |   83.33 | 3                 
+  i18n.tsx               |   72.97 |    55.55 |      60 |   74.19 | 887,902-909       
+  push-send.ts           |   96.77 |    65.21 |      75 |   96.42 | 5                 
+  theme-context.tsx      |       0 |        0 |       0 |       0 | 2-68              
+  use-cached-data.ts     |       0 |        0 |       0 |       0 | 2-70              
+  use-count-up.ts        |       0 |        0 |       0 |       0 | 2-26              
+  use-pull-to-refresh.ts |       0 |        0 |       0 |       0 | 2-35              
+  use-push.ts            |       0 |        0 |       0 |       0 | 2-122             
+  use-swipe-delete.ts    |       0 |        0 |       0 |       0 | 2-31              
+  user-context.tsx       |   96.29 |    66.66 |     100 |   96.15 | 43                
+ lib/supabase            |       0 |      100 |       0 |       0 |                   
+  client.ts              |       0 |      100 |       0 |       0 | 2-5               
+  server.ts              |       0 |      100 |       0 |       0 | 1-36              
+ types                   |     100 |      100 |     100 |     100 |                   
+  index.ts               |     100 |      100 |     100 |     100 |                   
+-------------------------|---------|----------|---------|---------|-------------------

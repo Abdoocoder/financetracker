@@ -8,6 +8,7 @@ const mockSupabaseInstance = {
   eq: jest.fn().mockReturnThis(),
   insert: jest.fn().mockReturnThis(),
   delete: jest.fn().mockReturnThis(),
+  then: jest.fn(),
 }
 
 // Mock Supabase locally with a factory that returns the SAME instance
@@ -27,17 +28,17 @@ describe('sendPushToUser', () => {
     jest.clearAllMocks()
     process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
     
-    // Default mock behavior for chaining
-    // Note: Since Supabase methods are thenable, we can just mock the leaf nodes as resolved promises
-    ;(mockSupabaseInstance.eq as jest.Mock).mockReturnThis()
-    ;(mockSupabaseInstance.insert as jest.Mock).mockResolvedValue({ error: null })
+    // Default mock behavior for chainable methods
+    mockSupabaseInstance.from.mockReturnThis()
+    mockSupabaseInstance.select.mockReturnThis()
+    mockSupabaseInstance.eq.mockReturnThis()
+    mockSupabaseInstance.insert.mockReturnThis()
+    mockSupabaseInstance.delete.mockReturnThis()
   })
 
   it('should return 0 if no subscriptions found', async () => {
-    // mockSupabaseInstance is thenable via its methods returning this, 
-    // but the final await needs a resolution.
-    // Instead of mocking 'then', we mock the last method in the chain to return a Promise.
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ data: [], error: null })
+    // 1. Mock subscriptions (empty)
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ data: [], error: null })))
     
     const result = await sendPushToUser('user-1', 'Title', 'Message', undefined, undefined, mockSupabaseInstance)
     
@@ -47,14 +48,14 @@ describe('sendPushToUser', () => {
 
   it('should send FCM notification correctly', async () => {
     // 1. Mock subscriptions (one FCM)
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ 
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ 
       data: [{ id: 1, endpoint: 'fcm:mock-token', user_id: 'user-1' }], 
       error: null 
-    })
+    })))
     // 2. Mock unread count
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ count: 5, error: null })
-    // 3. Mock direct insert for alert record
-    ;(mockSupabaseInstance.insert as jest.Mock).mockResolvedValueOnce({ error: null })
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ count: 5, error: null })))
+    // 3. Mock direct insert for alert record (if sent > 0)
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ error: null })))
 
     const result = await sendPushToUser('user-1', 'Title', 'Message', undefined, undefined, mockSupabaseInstance)
 
@@ -64,12 +65,14 @@ describe('sendPushToUser', () => {
 
   it('should send Web Push notification correctly', async () => {
     // 1. Mock subscriptions (one Web Push)
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ 
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ 
       data: [{ id: 2, endpoint: 'https://push.com', p256dh: 'dh', auth: 'auth', user_id: 'user-1' }], 
       error: null 
-    })
+    })))
     // 2. Mock unread count
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ count: 2, error: null })
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ count: 2, error: null })))
+    // 3. Mock insert for alert record
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ error: null })))
     
     const sendSpy = jest.spyOn(webpush, 'sendNotification').mockResolvedValue({} as any)
 
@@ -81,17 +84,18 @@ describe('sendPushToUser', () => {
 
   it('should clean up stale subscriptions on 410 error', async () => {
     // 1. Mock subscriptions
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ 
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ 
       data: [{ id: 3, endpoint: 'https://stale.com', user_id: 'user-1' }], 
       error: null 
-    })
+    })))
     // 2. Mock unread count
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ count: 0, error: null })
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ count: 0, error: null })))
     
     jest.spyOn(webpush, 'sendNotification').mockRejectedValue({ statusCode: 410 })
     
-    // 3. Mock delete call (the eq after delete)
-    ;(mockSupabaseInstance.eq as jest.Mock).mockResolvedValueOnce({ error: null })
+    // 3. Mock delete call inside catch
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ error: null })))
+    // 4. (sent is 0, so no insert call)
 
     const result = await sendPushToUser('user-1', 'Stale', 'Msg', undefined, undefined, mockSupabaseInstance)
 
