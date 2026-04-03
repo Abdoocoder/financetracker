@@ -4,8 +4,8 @@ import { usePullToRefresh } from '../../lib/use-pull-to-refresh'
 
 // jsdom does not implement the Touch constructor — polyfill it
 if (typeof Touch === 'undefined') {
-  ;(global as any).Touch = class Touch {
-    identifier: number; target: EventTarget
+  ;(global as any).Touch = class {
+    identifier = 0; target: EventTarget = document.body
     clientX = 0; clientY = 0; screenX = 0; screenY = 0
     pageX = 0; pageY = 0; radiusX = 0; radiusY = 0
     rotationAngle = 0; force = 0
