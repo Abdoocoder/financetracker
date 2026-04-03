@@ -186,6 +186,8 @@ class FajrakApp extends StatelessWidget {
       fontFamilyFallback: [
         'Cairo',
         GoogleFonts.cairo().fontFamily!,
+        GoogleFonts.notoColorEmoji().fontFamily!,
+        GoogleFonts.notoSans().fontFamily!,
         'Roboto',
         'Noto Sans Arabic',
         'sans-serif',
