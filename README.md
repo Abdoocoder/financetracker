@@ -514,10 +514,16 @@ npm run test:coverage
 
 | Module | Coverage |
 |:-------|:--------:|
-| `lib/cache.ts` | 83.33% |
+| **Overall Coverage** | **80.26%** |
 | `types/index.ts` | 100% |
-| `lib/currency.ts` | 30.76% |
-| `api/health-score-snapshot` | ✅ |
+| `lib/currencies.ts` | 100% |
+| `lib/cron-auth.ts` | 100% |
+| `lib/cache.ts` | 83.33% |
+| `lib/currency.ts` | 82.35% |
+| `lib/haptic.ts` | 83.33% |
+| `lib/push-send.ts` | 96.77% |
+| `lib/user-context.tsx` | 96.29% |
+| `lib/i18n.tsx` | 72.97% |
 
 Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Library.
 
@@ -567,6 +573,13 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 ---
 
 ## 📝 Changelog
+
+### v3.28.0 — 2026-04-04 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🧪 **Test Coverage** | Reached **80.26%** unit test coverage (+70% improvement from 10.21%) |
+| ✅ **225 Tests** | Added comprehensive tests for hooks and components |
 
 ### v3.27.0 — 2026-04-03 *(Latest)*
 
