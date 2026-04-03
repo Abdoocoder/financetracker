@@ -574,14 +574,22 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.28.0 — 2026-04-04 *(Latest)*
+### v3.29.0 — 2026-04-04 *(Latest — Pending Build 18)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔧 **Flutter Lint Fixes** | Resolved all `use_build_context_synchronously` warnings in `PreferencesSection` — safer async context usage |
+| 🎨 **UI Polish** | Replaced piggy bank icon (`savings_outlined`) with wallet icon (`account_balance_wallet_outlined`) in profile settings |
+| 🏗️ **Build Stability** | Deleted stale `.next/dev/types/` auto-generated files that caused spurious TypeScript errors on clean checkout |
+
+### v3.28.0 — 2026-04-04 *(Draft Uploaded — Build 1)*
 
 | Change | Description |
 |:-------|:------------|
 | 🧪 **Test Coverage** | Reached **80.26%** unit test coverage (+70% improvement from 10.21%) |
 | ✅ **225 Tests** | Added comprehensive tests for hooks and components |
 
-### v3.27.0 — 2026-04-03 *(Latest)*
+### v3.27.0 — 2026-04-03
 
 | Change | Description |
 |:-------|:------------|
@@ -589,7 +597,7 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 | 🌍 **System Preferences** | Added "System Default" support for application language and dark/light themes. |
 | 🔧 **SSR Hydration** | Resolved complex hydration mismatch errors during Next.js server-side rendering for localized components. |
 
-### v3.26.0 — 2026-04-03
+### v3.26.0 — 2026-04-03 *(Active on Google Play — Build 17)*
 
 | Change | Description |
 |:-------|:------------|
