@@ -1,29 +1,33 @@
-const mockGetApps = jest.fn()
-const mockInitializeApp = jest.fn(() => ({}))
-const mockGetToken = jest.fn()
-const mockGetMessaging = jest.fn(() => ({}))
-const mockOnMessage = jest.fn()
-
+// jest.mock is hoisted — cannot reference outer const variables inside factory.
+// Solution: use inline jest.fn() and access mocks via the imported module.
 jest.mock('firebase/app', () => ({
-  initializeApp: mockInitializeApp,
-  getApps: mockGetApps,
+  initializeApp: jest.fn(() => ({})),
+  getApps: jest.fn(() => []),
 }))
 
 jest.mock('firebase/messaging', () => ({
-  getMessaging: mockGetMessaging,
-  getToken: mockGetToken,
-  onMessage: mockOnMessage,
+  getMessaging: jest.fn(() => ({})),
+  getToken: jest.fn(),
+  onMessage: jest.fn(),
 }))
 
-// Mock navigator.serviceWorker for token tests
-const mockRegister = jest.fn()
-
+import { initializeApp, getApps } from 'firebase/app'
+import { getToken, getMessaging } from 'firebase/messaging'
 import { getFCMToken } from '../../lib/firebase'
+
+const mockGetApps     = getApps as jest.Mock
+const mockGetToken    = getToken as jest.Mock
+const mockGetMessaging = getMessaging as jest.Mock
+const mockInitializeApp = initializeApp as jest.Mock
+
+// Mock navigator.serviceWorker
+const mockRegister = jest.fn()
 
 describe('getFCMToken', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockGetApps.mockReturnValue([])
+    mockGetMessaging.mockReturnValue({})
     Object.defineProperty(window, 'navigator', {
       value: {
         ...window.navigator,
@@ -42,7 +46,7 @@ describe('getFCMToken', () => {
     expect(token).toBe('mock-fcm-token-123')
   })
 
-  it('returns null when getToken throws an error', async () => {
+  it('returns null when getToken throws', async () => {
     mockRegister.mockResolvedValue({})
     mockGetToken.mockRejectedValue(new Error('Messaging error'))
 
@@ -57,7 +61,7 @@ describe('getFCMToken', () => {
     expect(token).toBeNull()
   })
 
-  it('returns null when getToken returns empty string', async () => {
+  it('returns empty string when getToken returns empty string', async () => {
     mockRegister.mockResolvedValue({})
     mockGetToken.mockResolvedValue('')
 
@@ -65,15 +69,13 @@ describe('getFCMToken', () => {
     expect(token).toBe('')
   })
 
-  it('uses existing app when getApps returns a non-empty array', async () => {
-    const existingApp = { name: 'existing' }
-    mockGetApps.mockReturnValue([existingApp])
+  it('does not call initializeApp when getApps returns existing app', async () => {
+    mockGetApps.mockReturnValue([{ name: 'existing' }])
     mockRegister.mockResolvedValue({})
-    mockGetToken.mockResolvedValue('token-with-existing-app')
+    mockGetToken.mockResolvedValue('token-reuse')
 
     const token = await getFCMToken()
-    // initializeApp should NOT be called again since app already exists
     expect(mockInitializeApp).not.toHaveBeenCalled()
-    expect(token).toBe('token-with-existing-app')
+    expect(token).toBe('token-reuse')
   })
 })

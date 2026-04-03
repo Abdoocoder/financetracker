@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/21</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/18</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,68 +96,68 @@
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
-import { useRef, useState } from <span class="cstat-no" title="statement not covered" >'react'</span>
+import { useRef, useState } from 'react'
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >useSwipeToDelete(o</span></span>nDelete: () =&gt; void, threshold = <span class="branch-0 cbranch-no" title="branch not covered" >80)</span> {
-  const startX = <span class="cstat-no" title="statement not covered" >useRef(0)</span>
-  const [offset, setOffset] = <span class="cstat-no" title="statement not covered" >useState(0)</span>
-  const [swiped, setSwiped] = <span class="cstat-no" title="statement not covered" >useState(false)</span>
+export function useSwipeToDelete(onDelete: () =&gt; void, threshold = 80) {
+  const startX = useRef(0)
+  const [offset, setOffset] = useState(0)
+  const [swiped, setSwiped] = useState(false)
 &nbsp;
-  const onTouchStart = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(e</span>: React.TouchEvent) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    startX.current = e.touches[0].clientX</span>
+  const onTouchStart = (e: React.TouchEvent) =&gt; {
+    startX.current = e.touches[0].clientX
   }
 &nbsp;
-  const onTouchMove = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(e</span>: React.TouchEvent) =&gt; {</span>
-    const diff = <span class="cstat-no" title="statement not covered" >startX.current - e.touches[0].clientX</span>
-<span class="cstat-no" title="statement not covered" >    if (diff &gt; 0) <span class="cstat-no" title="statement not covered" >setOffset(Math.min(diff, 100))</span></span>
+  const onTouchMove = (e: React.TouchEvent) =&gt; {
+    const diff = startX.current - e.touches[0].clientX
+    if (diff &gt; 0) setOffset(Math.min(diff, 100))
   }
 &nbsp;
-  const onTouchEnd = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
-<span class="cstat-no" title="statement not covered" >    if (offset &gt;= threshold) {</span>
-<span class="cstat-no" title="statement not covered" >      setSwiped(true)</span>
+  const onTouchEnd = () =&gt; {
+    if (offset &gt;= threshold) {
+      setSwiped(true)
     } else {
-<span class="cstat-no" title="statement not covered" >      setOffset(0)</span>
-<span class="cstat-no" title="statement not covered" >      setSwiped(false)</span>
+      setOffset(0)
+      setSwiped(false)
     }
   }
 &nbsp;
-  const reset = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >() =&gt; { <span class="cstat-no" title="statement not covered" >s</span>etOffset(0); <span class="cstat-no" title="statement not covered" >s</span>etSwiped(false) }</span></span>
+  const reset = () =&gt; { setOffset(0); setSwiped(false) }
 &nbsp;
-  const handlers = <span class="cstat-no" title="statement not covered" >{ onTouchStart, onTouchMove, onTouchEnd }</span>
+  const handlers = { onTouchStart, onTouchMove, onTouchEnd }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return { offset, swiped, handlers, reset }</span>
+  return { offset, swiped, handlers, reset }
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -166,7 +166,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-03T21:09:30.083Z
+                at 2026-04-03T21:33:55.238Z
             </div>
         <script src="../prettify.js"></script>
         <script>

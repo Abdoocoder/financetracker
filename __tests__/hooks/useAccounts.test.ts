@@ -56,6 +56,7 @@ const mockTxs = [
 ]
 
 function setupMock(accountData = mockAccounts, txData = mockTxs) {
+  mockFrom.mockClear()
   mockFrom.mockImplementation((table: string) => {
     if (table === 'accounts') return chainProxy({ data: accountData, error: null })
     if (table === 'transactions') return chainProxy({ data: txData, error: null })
@@ -74,10 +75,11 @@ describe('useAccounts', () => {
     expect(result.current.accounts).toEqual([])
   })
 
-  it('does not fetch when userId is undefined', async () => {
+  it('keeps loading=true and empty state when userId is undefined', () => {
     const { result } = renderHook(() => useAccounts(undefined))
     expect(result.current.loading).toBe(true)
-    expect(mockFrom).not.toHaveBeenCalled()
+    expect(result.current.accounts).toEqual([])
+    expect(result.current.totalBalance).toBe(0)
   })
 
   it('loads accounts and computes balances', async () => {
