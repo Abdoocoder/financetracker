@@ -3,6 +3,8 @@ import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../app_state.dart';
 
 String _friendlyAuthError(dynamic e) {
   if (e is AuthException) {
@@ -97,7 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    'assets/images/app_icon.png',
+                    context.read<AppState>().isDarkMode(context)
+                        ? 'assets/images/app_icon.png'
+                        : 'assets/images/app_icon_light.png',
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,

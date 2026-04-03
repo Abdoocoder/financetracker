@@ -50,7 +50,7 @@ class DashboardHeader extends StatelessWidget {
                 final newLocale = isAr ? const Locale('en') : const Locale('ar');
                 await context.setLocale(newLocale);
                 if (context.mounted) {
-                  context.read<AppState>().setLocale(newLocale);
+                  context.read<AppState>().setLanguageCode(newLocale.languageCode);
                 }
               },
               child: GlassPanel(

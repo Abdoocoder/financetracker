@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/analytics_service.dart';
 import '../utils/error_handler.dart';
+import 'package:provider/provider.dart';
+import '../app_state.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -99,7 +101,9 @@ class _SplashScreenState extends State<SplashScreen>
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(28),
                     child: Image.asset(
-                      'assets/images/app_icon.png',
+                      context.read<AppState>().isDarkMode(context)
+                          ? 'assets/images/app_icon.png'
+                          : 'assets/images/app_icon_light.png',
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

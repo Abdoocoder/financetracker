@@ -134,7 +134,9 @@ class FajrakApp extends StatelessWidget {
       title: 'فجرك',
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(appState.isDarkMode ? Brightness.dark : Brightness.light),
+      theme: _buildTheme(Brightness.light),
+      darkTheme: _buildTheme(Brightness.dark),
+      themeMode: appState.themeMode,
       locale: context.locale, // Use context.locale from EasyLocalization
       supportedLocales: context.supportedLocales,
       localizationsDelegates: context.localizationDelegates,

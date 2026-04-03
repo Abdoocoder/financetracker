@@ -5,12 +5,21 @@ import 'package:flutter_app_badge_control/flutter_app_badge_control.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AppState extends ChangeNotifier {
-  bool _isDarkMode = true;
-  Locale _locale = const Locale('ar');
+  ThemeMode _themeMode = ThemeMode.system;
+  String? _languageCode; // null means follow system
   int _unreadAlerts = 0;
 
-  bool get isDarkMode => _isDarkMode;
-  Locale get locale => _locale;
+  ThemeMode get themeMode => _themeMode;
+  
+  // For legacy support or simple checks
+  bool isDarkMode(BuildContext context) {
+    if (_themeMode == ThemeMode.system) {
+      return MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    }
+    return _themeMode == ThemeMode.dark;
+  }
+
+  String? get languageCode => _languageCode;
   int get unreadAlerts => _unreadAlerts;
 
   SharedPreferences? _prefs;
@@ -22,10 +31,49 @@ class AppState extends ChangeNotifier {
 
   Future<void> _loadPrefs() async {
     final prefs = await _sharedPrefs;
-    _isDarkMode = prefs.getBool('darkMode') ?? true;
-    final lang = prefs.getString('language_code') ?? 'ar';
-    _locale = Locale(lang);
+    
+    // Load Theme
+    final themeStr = prefs.getString('themeMode') ?? 'system';
+    _themeMode = _parseThemeMode(themeStr);
+    
+    // Load Language
+    _languageCode = prefs.getString('language_code'); // null if not set
+    
     notifyListeners();
+  }
+
+  ThemeMode _parseThemeMode(String theme) {
+    switch (theme) {
+      case 'light': return ThemeMode.light;
+      case 'dark': return ThemeMode.dark;
+      default: return ThemeMode.system;
+    }
+  }
+
+  String _themeModeToString(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light: return 'light';
+      case ThemeMode.dark: return 'dark';
+      default: return 'system';
+    }
+  }
+
+  Future<void> setTheme(ThemeMode mode) async {
+    _themeMode = mode;
+    notifyListeners();
+    final prefs = await _sharedPrefs;
+    await prefs.setString('themeMode', _themeModeToString(mode));
+  }
+
+  Future<void> setLanguageCode(String? code) async {
+    _languageCode = code;
+    notifyListeners();
+    final prefs = await _sharedPrefs;
+    if (code == null) {
+      await prefs.remove('language_code');
+    } else {
+      await prefs.setString('language_code', code);
+    }
   }
 
   Future<void> _updateBadge() async {
@@ -66,19 +114,5 @@ class AppState extends ChangeNotifier {
     _unreadAlerts = 0;
     _updateBadge();
     notifyListeners();
-  }
-
-  Future<void> setTheme(bool isDark) async {
-    _isDarkMode = isDark;
-    notifyListeners();
-    final prefs = await _sharedPrefs;
-    await prefs.setBool('darkMode', isDark);
-  }
-
-  Future<void> setLocale(Locale locale) async {
-    _locale = locale;
-    notifyListeners();
-    final prefs = await _sharedPrefs;
-    await prefs.setString('language_code', locale.languageCode);
   }
 }

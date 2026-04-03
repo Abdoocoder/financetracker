@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
@@ -26,8 +25,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _memberSince = '';
   String _appVersion = 'v...';
 
-  String _appLang = 'ar';
-  bool _isDarkMode = true;
 
   double _cashBalance = 0, _savings = 0, _investments = 0, _totalDebt = 0;
   String _currency = 'JOD';
@@ -60,10 +57,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _initialProfile = profile;
       _currency = profile['currency'] as String? ?? 'JOD';
 
-      // Load preferences
-      final prefs = await SharedPreferences.getInstance();
-      _appLang = prefs.getString('lang') ?? 'ar';
-      _isDarkMode = prefs.getBool('darkMode') ?? true;
 
       // Net worth
       final txRes = await Supabase.instance.client
@@ -141,10 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     userEmail: _userEmail,
                     memberSince: _memberSince,
                   ),
-                  PreferencesSection(
-                    currentLang: _appLang,
-                    currentDarkMode: _isDarkMode,
-                  ),
+                  const PreferencesSection(),
                   AssetsForm(
                     initialProfile: _initialProfile,
                     netWorth: _cashBalance + _savings + _investments - _totalDebt,
