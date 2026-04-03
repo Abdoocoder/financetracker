@@ -198,6 +198,20 @@ export default function AlertsPage() {
   }
 
   const unreadCount = alerts.filter(a => !a.is_read).length
+
+  // Update PWA badge
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && 'setAppBadge' in navigator) {
+      if (unreadCount > 0) {
+        // @ts-ignore
+        navigator.setAppBadge(unreadCount).catch(() => {})
+      } else {
+        // @ts-ignore
+        if ('clearAppBadge' in navigator) navigator.clearAppBadge().catch(() => {})
+      }
+    }
+  }, [unreadCount])
+
   const filtered = alerts.filter(a => {
     if (filter === 'unread') return !a.is_read
     if (filter === 'warning') return a.type === 'warning'
