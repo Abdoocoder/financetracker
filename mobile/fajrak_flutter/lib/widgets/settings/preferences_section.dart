@@ -1,39 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../app_state.dart';
 import 'settings_accordion.dart';
 
 class PreferencesSection extends StatefulWidget {
-  final String currentLang;
-  final bool currentDarkMode;
-
-  const PreferencesSection({
-    super.key,
-    required this.currentLang,
-    required this.currentDarkMode,
-  });
+  const PreferencesSection({super.key});
 
   @override
   State<PreferencesSection> createState() => _PreferencesSectionState();
 }
 
 class _PreferencesSectionState extends State<PreferencesSection> {
-  late String _appLang;
-  late bool _isDarkMode;
-
-  @override
-  void initState() {
-    super.initState();
-    _appLang = widget.currentLang;
-    _isDarkMode = widget.currentDarkMode;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final appState = context.watch<AppState>();
 
     return SettingsAccordion(
       icon: Icons.settings,
@@ -41,6 +24,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // --- Language ---
           Text(
             'settings_language'.tr(),
             style: TextStyle(
@@ -53,34 +37,21 @@ class _PreferencesSectionState extends State<PreferencesSection> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeLang('ar'),
-                  child: _buildToggle(
-                    selected: _appLang == 'ar',
-                    theme: theme,
-                    label: 'settings_lang_ar'.tr(),
-                  ),
-                ),
-              ),
+              _buildLangOption(null, 'settings_lang_system', appState),
               const SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeLang('en'),
-                  child: _buildToggle(
-                    selected: _appLang == 'en',
-                    theme: theme,
-                    label: 'settings_lang_en'.tr(),
-                  ),
-                ),
-              ),
+              _buildLangOption('ar', 'settings_lang_ar', appState),
+              const SizedBox(width: 8),
+              _buildLangOption('en', 'settings_lang_en', appState),
             ],
           ),
-          const SizedBox(height: 20),
+          
+          const SizedBox(height: 24),
+
+          // --- Theme ---
           Text(
             'settings_theme'.tr(),
             style: TextStyle(
-              color: const Color(0xFF94A3B8),
+              color: colorScheme.onSurfaceVariant,
               fontSize: 13,
               fontFamily: 'Cairo',
               fontWeight: FontWeight.w700,
@@ -89,32 +60,43 @@ class _PreferencesSectionState extends State<PreferencesSection> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeTheme(true),
-                  child: _buildToggle(
-                    selected: _isDarkMode,
-                    theme: theme,
-                    label: 'settings_dark'.tr(),
-                    isThemeToggle: true,
-                  ),
-                ),
-              ),
+              _buildThemeOption(ThemeMode.system, 'settings_theme_system', appState),
               const SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeTheme(false),
-                  child: _buildToggle(
-                    selected: !_isDarkMode,
-                    theme: theme,
-                    label: 'settings_light'.tr(),
-                    isThemeToggle: true,
-                  ),
-                ),
-              ),
+              _buildThemeOption(ThemeMode.light, 'settings_theme_light', appState),
+              const SizedBox(width: 8),
+              _buildThemeOption(ThemeMode.dark, 'settings_theme_dark', appState),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLangOption(String? code, String labelKey, AppState appState) {
+    final isSelected = appState.languageCode == code;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _changeLang(context, code),
+        child: _buildToggle(
+          selected: isSelected,
+          theme: Theme.of(context),
+          label: labelKey.tr(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThemeOption(ThemeMode mode, String labelKey, AppState appState) {
+    final isSelected = appState.themeMode == mode;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _changeTheme(context, mode),
+        child: _buildToggle(
+          selected: isSelected,
+          theme: Theme.of(context),
+          label: labelKey.tr(),
+          isThemeToggle: true,
+        ),
       ),
     );
   }
@@ -135,57 +117,64 @@ class _PreferencesSectionState extends State<PreferencesSection> {
         : colorScheme.onSurfaceVariant;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: borderColor, width: isThemeToggle ? 1.5 : 1.0),
+        border: Border.all(color: borderColor, width: selected ? 1.5 : 1.0),
       ),
       child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-            color: textColor,
-            fontFamily: 'Cairo',
-            fontWeight: FontWeight.w700,
-          ),
+          child: Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          color: textColor,
+          fontFamily: 'Cairo',
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
         ),
+      )),
+    );
+  }
+
+  Future<void> _changeLang(BuildContext context, String? langCode) async {
+    final appState = context.read<AppState>();
+    final messenger = ScaffoldMessenger.of(context);
+
+    await appState.setLanguageCode(langCode);
+    if (!mounted) return;
+
+    if (langCode == null) {
+      if (!context.mounted) return;
+      await context.deleteSaveLocale();
+    } else {
+      if (!context.mounted) return;
+      await context.setLocale(Locale(langCode));
+    }
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: const Color(0xFF10B981),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  Future<void> _changeLang(String langCode) async {
-    setState(() => _appLang = langCode);
-    if (mounted) {
-      await context.setLocale(Locale(langCode));
-      if (mounted) {
-        context.read<AppState>().setLocale(Locale(langCode));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('toast_settings_saved'.tr(),
-                style: const TextStyle(fontFamily: 'Cairo')),
-            backgroundColor: const Color(0xFF10B981),
-          ),
-        );
-      }
-    }
-  }
+  Future<void> _changeTheme(BuildContext context, ThemeMode mode) async {
+    final appState = context.read<AppState>();
+    final messenger = ScaffoldMessenger.of(context);
 
-  Future<void> _changeTheme(bool isDark) async {
-    setState(() => _isDarkMode = isDark);
-    final p = await SharedPreferences.getInstance();
-    await p.setBool('darkMode', isDark);
-    if (mounted) {
-      context.read<AppState>().setTheme(isDark);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isDark ? 'settings_dark_success'.tr() : 'settings_light_success'.tr(),
-            style: const TextStyle(fontFamily: 'Cairo'),
-          ),
-          backgroundColor: const Color(0xFF10B981),
-        ),
-      );
-    }
+    await appState.setTheme(mode);
+    if (!mounted) return;
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        backgroundColor: const Color(0xFF10B981),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 }
