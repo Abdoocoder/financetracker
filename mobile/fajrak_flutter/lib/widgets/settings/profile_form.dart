@@ -230,7 +230,7 @@ class _ProfileFormState extends State<ProfileForm> {
           _sectionTitle('settings_financial'.tr(), colorScheme),
           _inputField(_incomeCtrl, 'settings_income'.tr(), Icons.account_balance_wallet_outlined, colorScheme, type: const TextInputType.numberWithOptions(decimal: true)),
           const SizedBox(height: 10),
-          _inputField(_openingBalanceCtrl, 'الرصيد الابتدائي (النقد قبل التطبيق)', Icons.savings_outlined, colorScheme, type: const TextInputType.numberWithOptions(decimal: true)),
+          _inputField(_openingBalanceCtrl, 'الرصيد الابتدائي (النقد قبل التطبيق)', Icons.account_balance_wallet_outlined, colorScheme, type: const TextInputType.numberWithOptions(decimal: true)),
           const SizedBox(height: 12),
           Text(
             'settings_currency'.tr(),
