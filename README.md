@@ -568,7 +568,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.26.0 — 2026-04-03 *(Latest)*
+### v3.27.0 — 2026-04-03 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔔 **Notification Badges** | Fixed unread alerts counter on app icons for PWA (Web/Desktop) and native mobile apps. |
+| 🌍 **System Preferences** | Added "System Default" support for application language and dark/light themes. |
+| 🔧 **SSR Hydration** | Resolved complex hydration mismatch errors during Next.js server-side rendering for localized components. |
+
+### v3.26.0 — 2026-04-03
 
 | Change | Description |
 |:-------|:------------|
