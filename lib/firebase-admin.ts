@@ -15,7 +15,8 @@ export async function sendFCMNotification(
   fcmToken: string,
   title: string,
   body: string,
-  url: string
+  url: string,
+  badge = 0
 ): Promise<boolean> {
   try {
     await getMessaging().send({
@@ -40,6 +41,15 @@ export async function sendFCMNotification(
           icon: 'ic_notification',
           clickAction: 'FLUTTER_NOTIFICATION_CLICK',
           channelId: 'fajrak_notifications',
+          notificationCount: badge,  // ← عدد الشارة على أيقونة Android
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            badge,               // ← عدد الشارة على أيقونة iOS
+            sound: 'default',
+          },
         },
       },
     })
