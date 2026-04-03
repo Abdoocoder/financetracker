@@ -568,7 +568,17 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.25.0 — 2026-04-03 *(Latest)*
+### v3.26.0 — 2026-04-03 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 📊 **Month Summary Card** | Auto-dismissable banner on days 1–7 showing previous month's income, expenses, and savings rate — web + Flutter. |
+| ← **Month Navigator** | Replaced month/year dropdowns with a clean `‹ March 2025 ›` nav bar in Transactions. Tap label to jump to any month. |
+| ⚡ **Debt Separation** | Dashboard and Transactions now separate debt repayments from regular expenses with distinct sub-badges. |
+| 🐷 **Islamic Compliance** | Replaced all `Icons.savings` (piggy bank) with `Icons.account_balance_wallet` across 7 Flutter screens. |
+| 🔧 **TypeScript Fix** | Resolved `TranslationKey` strict-union type mismatch on `MonthSummaryBanner` component. |
+
+### v3.25.0 — 2026-04-03
 
 | Change | Description |
 |:-------|:------------|
