@@ -199,13 +199,13 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function HelpPage() {
-  const { lang } = useI18n()
+  const { lang, currentLang } = useI18n()
   const [search, setSearch] = useState('')
 
   const filtered = faqs.map(section => ({
     ...section,
     items: section.items.filter(item => {
-      const { q, a } = item[lang as 'ar' | 'en']
+      const { q, a } = item[currentLang]
       return q.includes(search) || a.includes(search)
     })
   })).filter(s => s.items.length > 0)
@@ -213,21 +213,21 @@ export default function HelpPage() {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <PageHeader
-        title={lang === 'ar' ? '💬 مركز المساعدة' : '💬 Help Center'}
-        subtitle={lang === 'ar' ? 'كل ما تحتاج معرفته عن فجرك' : 'Everything you need to know about Fajrak'}
+        title={currentLang === 'ar' ? '💬 مركز المساعدة' : '💬 Help Center'}
+        subtitle={currentLang === 'ar' ? 'كل ما تحتاج معرفته عن فجرك' : 'Everything you need to know about Fajrak'}
       />
 
       {/* بحث */}
       <input
         type="text"
-        placeholder={lang === 'ar' ? '🔍 ابحث عن سؤال...' : '🔍 Search a question...'}
+        placeholder={currentLang === 'ar' ? '🔍 ابحث عن سؤال...' : '🔍 Search a question...'}
         value={search}
         onChange={e => setSearch(e.target.value)}
         style={{
           width: '100%', padding: '12px 16px', borderRadius: 14,
           background: 'var(--bg-card)', border: '1px solid var(--border)',
           color: 'var(--text-primary)', fontSize: 14, outline: 'none',
-          textAlign: lang === 'ar' ? 'right' : 'left', boxSizing: 'border-box',
+          textAlign: currentLang === 'ar' ? 'right' : 'left', boxSizing: 'border-box',
         }}
       />
 
@@ -235,10 +235,10 @@ export default function HelpPage() {
       {filtered.map((section, i) => (
         <div key={i}>
           <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-secondary)', marginBottom: 10, letterSpacing: '0.05em' }}>
-            {section.section[lang as 'ar' | 'en']}
+            {section.section[currentLang]}
           </div>
           {section.items.map((item, j) => {
-            const { q, a } = item[lang as 'ar' | 'en']
+            const { q, a } = item[currentLang]
             return <FAQItem key={j} q={q} a={a} />
           })}
         </div>
@@ -248,7 +248,7 @@ export default function HelpPage() {
         <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
           <div style={{ fontSize: 14, fontWeight: 700 }}>
-            {lang === 'ar' ? 'لا نتائج — جرب كلمة أخرى' : 'No results — try another word'}
+            {currentLang === 'ar' ? 'لا نتائج — جرب كلمة أخرى' : 'No results — try another word'}
           </div>
         </div>
       )}
@@ -257,17 +257,17 @@ export default function HelpPage() {
       <div style={{ padding: '20px', borderRadius: 16, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.15)', textAlign: 'center' }}>
         <div style={{ fontSize: 20, marginBottom: 8 }}>🤝</div>
         <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 6 }}>
-          {lang === 'ar' ? 'لم تجد إجابتك؟' : "Didn't find your answer?"}
+          {currentLang === 'ar' ? 'لم تجد إجابتك؟' : "Didn't find your answer?"}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-          {lang === 'ar' ? 'تواصل معنا مباشرة وسنساعدك' : 'Contact us directly and we\'ll help you'}
+          {currentLang === 'ar' ? 'تواصل معنا مباشرة وسنساعدك' : 'Contact us directly and we\'ll help you'}
         </div>
         <a href="mailto:abdooraf3@gmail.com" style={{
           display: 'inline-block', padding: '10px 24px', borderRadius: 12,
           background: 'var(--accent-blue)', color: 'white',
           fontSize: 13, fontWeight: 800, textDecoration: 'none',
         }}>
-          📧 {lang === 'ar' ? 'راسلنا' : 'Contact Us'}
+          📧 {currentLang === 'ar' ? 'راسلنا' : 'Contact Us'}
         </a>
       </div>
     </div>

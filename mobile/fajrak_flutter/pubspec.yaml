@@ -40,6 +40,7 @@ dependencies:
   flutter_app_badge_control: ^0.0.2
   pdf: ^3.10.8
   printing: ^5.13.1
+  uuid: ^4.5.3
 
 dev_dependencies:
   flutter_test:

@@ -103,7 +103,7 @@ function ProfileSection({
   memberSince: string
 }) {
   const { t, lang, setLang } = useI18n()
-  const { theme, toggleTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
 
   const age = useMemo(() => {
     if (!profileForm.birth_date) return null
@@ -233,42 +233,42 @@ function ProfileSection({
       <SectionTitle>{lang === 'en' ? 'Preferences' : 'التفضيلات'}</SectionTitle>
 
       <FormField label={lang === 'en' ? 'Language' : 'اللغة'}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {(['ar', 'en'] as const).map(l => (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {(['system', 'ar', 'en'] as const).map(l => (
             <button key={l} onClick={() => setLang(l)} style={{
               padding: '11px',
-              borderRadius: 10,
+              borderRadius: 12,
               background: lang === l ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)',
               border: `1px solid ${lang === l ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
               color: lang === l ? 'var(--accent-blue-light)' : 'var(--text-muted)',
-              fontSize: 13,
-              fontWeight: 700,
+              fontSize: 12,
+              fontWeight: 800,
               cursor: 'pointer',
               fontFamily: 'inherit',
               transition: 'all 0.2s',
             }}>
-              {l === 'ar' ? '🇯🇴 العربية' : '🇬🇧 English'}
+              {l === 'system' ? (lang === 'en' ? 'System' : 'تلقائي') : l === 'ar' ? '🇯🇴 AR' : '🇬🇧 EN'}
             </button>
           ))}
         </div>
       </FormField>
 
       <FormField label={t('settings_theme')}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          {(['dark', 'light'] as const).map(opt => (
-            <button key={opt} onClick={() => opt !== theme && toggleTheme()} style={{
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {(['system', 'dark', 'light'] as const).map(opt => (
+            <button key={opt} onClick={() => setTheme(opt)} style={{
               padding: '11px',
-              borderRadius: 10,
+              borderRadius: 12,
               background: theme === opt ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)',
               border: `1px solid ${theme === opt ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
               color: theme === opt ? 'var(--accent-blue-light)' : 'var(--text-muted)',
-              fontSize: 13,
-              fontWeight: 700,
+              fontSize: 12,
+              fontWeight: 800,
               cursor: 'pointer',
               fontFamily: 'inherit',
               transition: 'all 0.2s',
             }}>
-              {opt === 'dark' ? t('settings_dark') : t('settings_light')}
+              {opt === 'system' ? t('settings_theme_system') : opt === 'dark' ? t('settings_theme_dark') : t('settings_theme_light')}
             </button>
           ))}
         </div>
