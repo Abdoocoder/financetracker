@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../services/analytics_service.dart';
+import '../../services/pdf_report_service.dart';
 import '../../utils/error_handler.dart';
 import '../../widgets/transactions/add_transaction_dialog.dart';
 import '../../widgets/transactions/month_year_picker_dialog.dart';
@@ -34,6 +35,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   String _filter = 'all';
   String _search = '';
   String _currency = 'JOD';
+  String _userName = '';
+  bool _generatingPdf = false;
   int? _filterMonth;
   int? _filterYear;
 
@@ -83,10 +86,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     try {
       final profile = await Supabase.instance.client
           .from('profiles')
-          .select('currency')
+          .select('currency, full_name')
           .eq('id', user.id)
           .single();
-      if (mounted) _currency = profile['currency'] as String? ?? 'JOD';
+      if (mounted) {
+        _currency = profile['currency'] as String? ?? 'JOD';
+        _userName = (profile['full_name'] as String? ?? '').split(' ').first;
+      }
 
       PostgrestFilterBuilder<List<Map<String, dynamic>>> baseQ = Supabase.instance.client
           .from('transactions')
@@ -235,6 +241,61 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     }
   }
 
+  Future<void> _generatePdf() async {
+    if (_generatingPdf) return;
+    setState(() => _generatingPdf = true);
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+
+      final now = DateTime.now();
+      final month = _filterMonth ?? now.month;
+      final year  = _filterYear  ?? now.year;
+
+      // Fetch active debts for the report
+      final debtsRes = await Supabase.instance.client
+          .from('debts')
+          .select('name, remaining_amount, monthly_payment, auto_deduct')
+          .eq('user_id', user.id)
+          .eq('is_paid', false);
+
+      const debtCats = ['ديون', 'debts_title', 'Debts'];
+      final income = _allTransactions
+          .where((t) => t['type'] == 'income')
+          .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
+      final expenses = _allTransactions
+          .where((t) => t['type'] == 'expense')
+          .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
+      final debtPayments = _allTransactions
+          .where((t) => t['type'] == 'expense' && debtCats.contains(t['category'] as String?))
+          .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
+
+      await PdfReportService.shareMonthlyReport(
+        data: ReportData(
+          userName: _userName,
+          currency: _currency,
+          month: month,
+          year: year,
+          income: income,
+          expenses: expenses,
+          debtPayments: debtPayments,
+          transactions: _allTransactions,
+          debts: List<Map<String, dynamic>>.from(debtsRes),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('حدث خطأ أثناء إنشاء التقرير',
+              style: const TextStyle(fontFamily: 'Cairo')),
+          backgroundColor: const Color(0xFFEF4444),
+        ));
+      }
+    } finally {
+      if (mounted) setState(() => _generatingPdf = false);
+    }
+  }
+
   List<Map<String, dynamic>> get _filtered {
     if (_search.isEmpty) return _transactions;
     return _transactions.where((tx) {
@@ -329,8 +390,23 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           IconButton(
             onPressed: _exportCSV,
             icon: Icon(Icons.download, color: colorScheme.onSurfaceVariant),
+            tooltip: 'CSV',
           ),
-          const SizedBox(width: 8),
+          _generatingPdf
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: SizedBox(
+                    width: 20, height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: colorScheme.primary),
+                  ),
+                )
+              : IconButton(
+                  onPressed: _generatePdf,
+                  icon: Icon(Icons.picture_as_pdf, color: colorScheme.primary),
+                  tooltip: 'PDF',
+                ),
+          const SizedBox(width: 4),
         ],
       ),
       body: Column(
