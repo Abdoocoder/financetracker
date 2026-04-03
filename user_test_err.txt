@@ -1,0 +1,92 @@
+FAIL __tests__/lib/user-context.test.tsx
+  UserProvider
+    ΓêÜ should show guest state when no user is logged in (71 ms)
+    ├ù should load user and profile when authenticated (1031 ms)
+    ├ù should update state when onAuthStateChange fires (1049 ms)
+
+  ΓùÅ UserProvider ΓÇ║ should load user and profile when authenticated
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "test@example.com"
+    Received: "Guest"
+
+    Ignored nodes: comments, script, style
+    <html>
+      <head />
+      <body>
+        <div>
+          <div>
+            <span
+              data-testid="user"
+            >
+              Guest
+            </span>
+            <span
+              data-testid="profile"
+            >
+              No Profile
+            </span>
+          </div>
+        </div>
+      </body>
+    </html>
+
+      66 |
+      67 |     await waitFor(() => {
+    > 68 |       expect(screen.getByTestId('user').textContent).toBe('test@example.com')
+         |                                                      ^
+      69 |       expect(screen.getByTestId('profile').textContent).toBe('Test User')
+      70 |     })
+      71 |   })
+
+      at toBe (__tests__/lib/user-context.test.tsx:68:54)
+      at runWithExpensiveErrorDiagnosticsDisabled (node_modules/@testing-library/dom/dist/config.js:47:12)
+      at checkCallback (node_modules/@testing-library/dom/dist/wait-for.js:124:77)
+      at checkRealTimersCallback (node_modules/@testing-library/dom/dist/wait-for.js:118:16)
+      at Timeout.task [as _onTimeout] (node_modules/jsdom/lib/jsdom/browser/Window.js:579:19)
+
+  ΓùÅ UserProvider ΓÇ║ should update state when onAuthStateChange fires
+
+    TypeError: stateChangeCallback is not a function
+
+    Ignored nodes: comments, script, style
+    <html>
+      <head />
+      <body>
+        <div>
+          <div>
+            <span
+              data-testid="user"
+            >
+              Guest
+            </span>
+            <span
+              data-testid="profile"
+            >
+              No Profile
+            </span>
+          </div>
+        </div>
+      </body>
+    </html>
+
+      94 |     await waitFor(async () => {
+      95 |       mockSupabase.single.mockResolvedValueOnce({ data: newProfile, error: null })
+    > 96 |       stateChangeCallback('SIGNED_IN', { user: newUser })
+         |       ^
+      97 |     })
+      98 |
+      99 |     await waitFor(() => {
+
+      at stateChangeCallback (__tests__/lib/user-context.test.tsx:96:7)
+      at runWithExpensiveErrorDiagnosticsDisabled (node_modules/@testing-library/dom/dist/config.js:47:12)
+      at checkCallback (node_modules/@testing-library/dom/dist/wait-for.js:124:77)
+      at checkRealTimersCallback (node_modules/@testing-library/dom/dist/wait-for.js:118:16)
+      at Timeout.task [as _onTimeout] (node_modules/jsdom/lib/jsdom/browser/Window.js:579:19)
+
+Test Suites: 1 failed, 1 total
+Tests:       2 failed, 1 passed, 3 total
+Snapshots:   0 total
+Time:        4.228 s
+Ran all test suites matching __tests__/lib/user-context.test.tsx.

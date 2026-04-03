@@ -1,0 +1,82 @@
+FAIL __tests__/lib/push-send.test.ts
+  sendPushToUser
+    ├ù should return 0 if no subscriptions found (6 ms)
+    ├ù should send FCM notification correctly (3 ms)
+    ├ù should send Web Push notification correctly (2 ms)
+    ├ù should clean up stale subscriptions on 410 error (1 ms)
+
+  ΓùÅ sendPushToUser ΓÇ║ should return 0 if no subscriptions found
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "push_subscriptions"
+
+    Number of calls: 0
+
+      30 |     
+      31 |     expect(result).toBe(0)
+    > 32 |     expect(mockSupabase.from).toHaveBeenCalledWith('push_subscriptions')
+         |                               ^
+      33 |   })
+      34 |
+      35 |   it('should send FCM notification correctly', async () => {
+
+      at Object.toHaveBeenCalledWith (__tests__/lib/push-send.test.ts:32:31)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send FCM notification correctly
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      46 |     const result = await sendPushToUser('user-1', 'Title', 'Message')
+      47 |
+    > 48 |     expect(result).toBe(1)
+         |                    ^
+      49 |     // Verify it saved the alert to DB
+      50 |     expect(mockSupabase.from).toHaveBeenCalledWith('alerts')
+      51 |   })
+
+      at Object.toBe (__tests__/lib/push-send.test.ts:48:20)
+
+  ΓùÅ sendPushToUser ΓÇ║ should send Web Push notification correctly
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      64 |     const result = await sendPushToUser('user-1', 'Web Title', 'Web Msg')
+      65 |
+    > 66 |     expect(result).toBe(1)
+         |                    ^
+      67 |     expect(sendSpy).toHaveBeenCalled()
+      68 |     const payload = JSON.parse(sendSpy.mock.calls[0][1] as string)
+      69 |     expect(payload.badgeCount).toBe(3) // unread (2) + 1
+
+      at Object.toBe (__tests__/lib/push-send.test.ts:66:20)
+
+  ΓùÅ sendPushToUser ΓÇ║ should clean up stale subscriptions on 410 error
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "push_subscriptions"
+
+    Number of calls: 0
+
+      82 |
+      83 |     expect(result).toBe(0)
+    > 84 |     expect(mockSupabase.from).toHaveBeenCalledWith('push_subscriptions')
+         |                               ^
+      85 |     expect(mockSupabase.delete).toHaveBeenCalled()
+      86 |   })
+      87 | })
+
+      at Object.toHaveBeenCalledWith (__tests__/lib/push-send.test.ts:84:31)
+
+Test Suites: 1 failed, 1 total
+Tests:       4 failed, 4 total
+Snapshots:   0 total
+Time:        1.965 s
+Ran all test suites matching __tests__/lib/push-send.test.ts.
