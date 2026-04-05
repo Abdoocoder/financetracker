@@ -51,7 +51,7 @@ class NotificationService {
     const initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
 
     await _localNotifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (details) {
         if (details.payload != null) {
           final message = RemoteMessage(data: {'url': details.payload!});

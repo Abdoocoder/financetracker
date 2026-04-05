@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:easy_localization/easy_localization.dart';
 import '../../models/notification_settings.dart';
 import '../../utils/error_handler.dart';
 
@@ -70,12 +69,9 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'إعدادات الإشعارات',
           style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
         ),
@@ -121,8 +117,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SwitchListTile(
         secondary: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600)),
-        subtitle: Text('تلقي تنبيهات متعلقة بـ $label', style: TextStyle(fontFamily: 'Cairo', fontSize: 11)),
+        title: Text(label, style: const TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle: Text('تلقي تنبيهات متعلقة بـ $label', style: const TextStyle(fontFamily: 'Cairo', fontSize: 11)),
         value: pref.enabled,
         onChanged: (val) => _updatePreference(pref, enabled: val),
       ),
@@ -138,9 +134,9 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SwitchListTile(
-        secondary: Icon(Icons.privacy_tip, color: Colors.orange),
-        title: Text('إخفاء البيانات الحساسة', style: TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600)),
-        subtitle: Text('إخفاء المبالغ المالية من الإشعارات في شاشة القفل', style: TextStyle(fontFamily: 'Cairo', fontSize: 11)),
+        secondary: const Icon(Icons.privacy_tip, color: Colors.orange),
+        title: const Text('إخفاء البيانات الحساسة', style: TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle: const Text('إخفاء المبالغ المالية من الإشعارات في شاشة القفل', style: TextStyle(fontFamily: 'Cairo', fontSize: 11)),
         value: pref.maskSensitiveData,
         onChanged: (val) {
           for (var p in _preferences) {
@@ -175,21 +171,21 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   String _getCategoryLabel(NotificationCategory cat) {
     switch (cat) {
-      case NotificationCategory.BudgetAlert: return 'تنبيهات الميزانية';
-      case NotificationCategory.DebtReminder: return 'تذكير الديون';
-      case NotificationCategory.SavingGoal: return 'أهداف الادخار';
-      case NotificationCategory.SystemUpdate: return 'تحديثات النظام';
-      case NotificationCategory.SecurityAlert: return 'تنبيهات الأمان';
+      case NotificationCategory.budgetAlert: return 'تنبيهات الميزانية';
+      case NotificationCategory.debtReminder: return 'تذكير الديون';
+      case NotificationCategory.savingGoal: return 'أهداف الادخار';
+      case NotificationCategory.systemUpdate: return 'تحديثات النظام';
+      case NotificationCategory.securityAlert: return 'تنبيهات الأمان';
     }
   }
 
   IconData _getCategoryIcon(NotificationCategory cat) {
     switch (cat) {
-      case NotificationCategory.BudgetAlert: return Icons.account_balance_wallet;
-      case NotificationCategory.DebtReminder: return Icons.event_repeat;
-      case NotificationCategory.SavingGoal: return Icons.stars;
-      case NotificationCategory.SystemUpdate: return Icons.system_update;
-      case NotificationCategory.SecurityAlert: return Icons.security;
+      case NotificationCategory.budgetAlert: return Icons.account_balance_wallet;
+      case NotificationCategory.debtReminder: return Icons.event_repeat;
+      case NotificationCategory.savingGoal: return Icons.stars;
+      case NotificationCategory.systemUpdate: return Icons.system_update;
+      case NotificationCategory.securityAlert: return Icons.security;
     }
   }
 }
