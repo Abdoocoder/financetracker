@@ -39,7 +39,7 @@ class NotificationPreference {
 
   static NotificationCategory _parseCategory(String category) {
     return NotificationCategory.values.firstWhere(
-      (e) => e.toString().split('.').last == category,
+      (e) => e.toString().split('.').last.toLowerCase() == category.toLowerCase(),
       orElse: () => NotificationCategory.systemUpdate,
     );
   }
