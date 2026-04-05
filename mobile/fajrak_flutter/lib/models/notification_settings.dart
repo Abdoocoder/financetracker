@@ -1,9 +1,9 @@
 enum NotificationCategory {
-  BudgetAlert,
-  DebtReminder,
-  SavingGoal,
-  SystemUpdate,
-  SecurityAlert
+  budgetAlert,
+  debtReminder,
+  savingGoal,
+  systemUpdate,
+  securityAlert
 }
 
 class NotificationPreference {
@@ -33,14 +33,14 @@ class NotificationPreference {
       priority: json['priority'] ?? 'default',
       quietStart: json['quiet_start'],
       quietEnd: json['quiet_end'],
-      mask_sensitive_data: json['mask_sensitive_data'] ?? false,
+      maskSensitiveData: json['mask_sensitive_data'] ?? false,
     );
   }
 
   static NotificationCategory _parseCategory(String category) {
     return NotificationCategory.values.firstWhere(
       (e) => e.toString().split('.').last == category,
-      orElse: () => NotificationCategory.SystemUpdate,
+      orElse: () => NotificationCategory.systemUpdate,
     );
   }
 

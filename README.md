@@ -154,7 +154,8 @@ The command center of your financial life.
 | Category budgets | Monthly spending limits per category |
 | 50/30/20 Rule | Automatic allocation suggestion |
 | Budget vs. actual | Real-time progress tracking |
-| Overspend alerts | Notifications when approaching limits |
+| Overspend alerts | Notifications when approaching limits (80%, 100%) |
+| **Smart Triggers** | Automated database-level monitoring and alerting |
 
 ---
 
@@ -235,6 +236,9 @@ A fully automated Islamic obligatory charity calculator.
 | **Web Push** | iOS Safari + desktop browsers |
 | **Foreground Notifications** | In-app interactive alerts |
 | **Deep Linking** | Direct navigation on notification tap |
+| **Granular Control** | User-defined toggle for individual categories (Budget, Debt, Goal) |
+| **Privacy Masking** | Optional data masking to hide financial amounts on lock screen |
+| **Android Channels** | Native channel support for custom sounds and importance per category |
 
 **Notification schedule:**
 
@@ -574,7 +578,16 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.29.0 — 2026-04-04 *(Latest — Pending Build 18)*
+### v3.30.0 — 2026-04-05 *(Latest — Intelligent Notification System)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔔 **Smart Notifications** | **Intelligent Notification Platform**: Full-scale upgrade with multi-channel support, database-level triggers, and rich rich payloads. |
+| 🛡️ **Privacy Masking** | Added "Data Masking" toggle to hide sensitive financial amounts on lock screen notifications. |
+| ⚙️ **Granular Controls** | New **Notification Settings** screen allowing users to toggle specific alert categories (Budget, Debt, Goal). |
+| 🚀 **Edge Functions** | Implemented Supabase Edge Functions for reliable, high-performance FCM push delivery. |
+
+### v3.29.0 — 2026-04-04
 
 | Change | Description |
 |:-------|:------------|
