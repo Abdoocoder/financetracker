@@ -1,113 +1,150 @@
 // @ts-ignore: Deno types
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 // @ts-ignore: Deno types
-import admin from 'npm:firebase-admin@11.11.1';
+import { create, getNumericDate } from 'https://deno.land/x/djwt@v3.0.2/mod.ts'
 
-// إعداد Firebase ببيانات الاعتماد المخزنة في متغيرات البيئة
 // @ts-ignore: Deno global
-const serviceAccountKeyStr = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_KEY');
+const supabaseUrl       = Deno.env.get('SUPABASE_URL')!
+// @ts-ignore: Deno global
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+// @ts-ignore: Deno global
+const serviceAccountStr  = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_KEY')!
 
-if (serviceAccountKeyStr && admin.apps.length === 0) {
-  try {
-    const serviceAccountKey = JSON.parse(serviceAccountKeyStr);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountKey),
-    });
-  } catch (e) {
-    console.error("فشل في تهيئة Firebase", e);
+async function getFcmAccessToken(serviceAccount: any): Promise<string> {
+  const now = Math.floor(Date.now() / 1000)
+  const payload = {
+    iss: serviceAccount.client_email,
+    sub: serviceAccount.client_email,
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: getNumericDate(0),
+    exp: getNumericDate(3600),
+    scope: 'https://www.googleapis.com/auth/firebase.messaging',
   }
+
+  // استخراج المفتاح الخاص بصيغة PKCS8
+  const pemContents = serviceAccount.private_key
+    .replace('-----BEGIN PRIVATE KEY-----', '')
+    .replace('-----END PRIVATE KEY-----', '')
+    .replace(/\n/g, '')
+  const binaryDer = Uint8Array.from(atob(pemContents), c => c.charCodeAt(0))
+
+  // @ts-ignore: Deno crypto
+  const cryptoKey = await crypto.subtle.importKey(
+    'pkcs8',
+    binaryDer,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+
+  const jwt = await create({ alg: 'RS256', typ: 'JWT' }, payload, cryptoKey)
+
+  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
+  })
+  const tokenData = await tokenRes.json()
+  if (!tokenData.access_token) throw new Error(`OAuth error: ${JSON.stringify(tokenData)}`)
+  return tokenData.access_token
 }
 
 // @ts-ignore: Deno global
 Deno.serve(async (req: Request) => {
   try {
-    // 1. استلام الطلب من Database Webhook
-    const payload = await req.json();
+    const payload = await req.json()
 
     if (payload.type !== 'INSERT' || payload.table !== 'notification_history') {
-      return new Response(JSON.stringify({ error: 'Invalid request origin' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 })
     }
 
-    const { user_id, title, body, category, data: recordData } = payload.record;
+    if (!serviceAccountStr) {
+      console.error('[push-notification] FIREBASE_SERVICE_ACCOUNT_KEY missing')
+      return new Response(JSON.stringify({ error: 'FCM not configured' }), { status: 500 })
+    }
 
-    // 2. الاتصال بقاعدة البيانات لجلب رموز أجهزة المستخدم (FCM Tokens)
-    // @ts-ignore: Deno global
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    // @ts-ignore: Deno global
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!; 
+    const { user_id, title, body, category, data: recordData } = payload.record
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const { data: subscriptions, error } = await supabase
       .from('push_subscriptions')
       .select('endpoint')
       .eq('user_id', user_id)
-      .like('endpoint', 'fcm:%');
+      .like('endpoint', 'fcm:%')
 
-    if (error || !subscriptions || subscriptions.length === 0) {
-      console.log(`لا يوجد أجهزة مسجلة للمستخدم: ${user_id}`);
-      return new Response(JSON.stringify({ message: 'No devices registered for this user' }), { status: 200 });
+    if (error || !subscriptions?.length) {
+      console.log(`[push-notification] No FCM devices for user: ${user_id}`)
+      return new Response(JSON.stringify({ message: 'No FCM devices' }), { status: 200 })
     }
 
-    if (!serviceAccountKeyStr) {
-       console.error("متغير البيئة FIREBASE_SERVICE_ACCOUNT_KEY مفقود");
-       return new Response(JSON.stringify({ error: 'FCM Not Configured on Server' }), { status: 500 });
-    }
+    const tokens = subscriptions
+      .map((s: { endpoint: string }) => s.endpoint.replace('fcm:', ''))
+      .filter(Boolean)
 
-    // استخراج رموز الأجهزة
-    const tokens = subscriptions.map((sub: { endpoint: string }) => sub.endpoint.split('fcm:')[1]).filter(Boolean);
-    
-    if (tokens.length === 0) {
-        return new Response(JSON.stringify({ message: 'No valid FCM tokens found' }), { status: 200 });
-    }
+    const serviceAccount = JSON.parse(serviceAccountStr)
+    const accessToken = await getFcmAccessToken(serviceAccount)
+    const projectId = serviceAccount.project_id
+    const url = recordData?.url ?? '/dashboard'
 
-    // 3. ترتيب الإشعار وإرساله عبر Firebase
-    let url = '#';
-    if (recordData && typeof recordData === 'object' && recordData.url) {
-      url = recordData.url;
-    }
+    let successCount = 0
+    let failureCount = 0
+    const invalidTokens: string[] = []
 
-    const message = {
-      notification: {
-        title: title,
-        body: body,
-      },
-      data: {
-        category: category || 'default',
-        url: url,
-      },
-      tokens: tokens,
-    };
+    for (const token of tokens) {
+      const message = {
+        message: {
+          token,
+          notification: { title, body },
+          data: { category: category ?? 'default', url },
+          android: {
+            notification: {
+              sound: 'default',
+              click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            },
+          },
+        },
+      }
 
-    const response = await admin.messaging().sendMulticast(message);
-    
-    console.log(`تم الإرسال لـ ${user_id}: ناجح: ${response.successCount}, فشل: ${response.failureCount}`);
-
-    // إزالة الرموز المنتهية الصلاحية (Invalid Tokens)
-    if (response.failureCount > 0) {
-      const failedTokens: string[] = [];
-      response.responses.forEach((resp: any, idx: number) => {
-        if (!resp.success && resp.error?.code === 'messaging/registration-token-not-registered') {
-          failedTokens.push(`fcm:${tokens[idx]}`);
+      const res = await fetch(
+        `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(message),
         }
-      });
+      )
 
-      if (failedTokens.length > 0) {
-        await supabase.from('push_subscriptions').delete().in('endpoint', failedTokens);
+      if (res.ok) {
+        successCount++
+      } else {
+        const err = await res.json()
+        const errCode = err?.error?.details?.[0]?.errorCode ?? err?.error?.status
+        if (errCode === 'UNREGISTERED' || errCode === 'INVALID_ARGUMENT') {
+          invalidTokens.push(`fcm:${token}`)
+        }
+        console.error('[push-notification] FCM error:', JSON.stringify(err))
+        failureCount++
       }
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        sent: response.successCount, 
-        failed: response.failureCount 
-      }),
-      { headers: { "Content-Type": "application/json" } },
-    );
+    // حذف الرموز المنتهية الصلاحية
+    if (invalidTokens.length > 0) {
+      await supabase.from('push_subscriptions').delete().in('endpoint', invalidTokens)
+    }
 
-  } catch (error: any) {
-    console.error('خطأ غير متوقع:', error);
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    console.log(`[push-notification] user=${user_id} sent=${successCount} failed=${failureCount}`)
+
+    return new Response(
+      JSON.stringify({ success: true, sent: successCount, failed: failureCount }),
+      { headers: { 'Content-Type': 'application/json' } }
+    )
+
+  } catch (err: any) {
+    console.error('[push-notification] Unexpected error:', err.message)
+    return new Response(JSON.stringify({ error: err.message }), { status: 500 })
   }
-});
+})
