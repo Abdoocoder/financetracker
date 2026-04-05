@@ -37,6 +37,16 @@ class NotificationPreference {
     );
   }
 
+  static String _categoryToString(NotificationCategory cat) {
+    switch (cat) {
+      case NotificationCategory.budgetAlert:   return 'BudgetAlert';
+      case NotificationCategory.debtReminder:  return 'DebtReminder';
+      case NotificationCategory.savingGoal:    return 'SavingGoal';
+      case NotificationCategory.systemUpdate:  return 'SystemUpdate';
+      case NotificationCategory.securityAlert: return 'SecurityAlert';
+    }
+  }
+
   static NotificationCategory _parseCategory(String category) {
     return NotificationCategory.values.firstWhere(
       (e) => e.toString().split('.').last.toLowerCase() == category.toLowerCase(),
@@ -47,7 +57,7 @@ class NotificationPreference {
   Map<String, dynamic> toJson() {
     return {
       'user_id': userId,
-      'category': category.toString().split('.').last,
+      'category': _categoryToString(category),
       'enabled': enabled,
       'priority': priority,
       'quiet_start': quietStart,
