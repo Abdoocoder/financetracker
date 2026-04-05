@@ -139,7 +139,9 @@ class NotificationService {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) return;
 
-      final token = newToken ?? await FirebaseMessaging.instance.getToken();
+      final token = newToken ?? await FirebaseMessaging.instance.getToken(
+        vapidKey: 'BBTibDSNpqg5OYVoQYhy5_5UldLkB8qZpWE8993FTkLidCXGZ45qtVcSWHv_M1GLj4FDLVXL2X8y7qJuu1fM3ew',
+      );
       if (token == null) return;
 
       await Supabase.instance.client.from('push_subscriptions').upsert({
