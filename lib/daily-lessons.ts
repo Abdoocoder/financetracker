@@ -667,34 +667,35 @@ export function getLessonForStage(
   const savings = context?.savingsRate ?? 0
   const tx = context?.txCount ?? 0
   const streak = context?.streak ?? 0
+  const safeLang = (lang === 'ar' || lang === 'en') ? lang : 'ar'
 
   // ── اختيار ذكي بناءً على البيانات ──────────────────
 
   // المستخدم عنده ديون عالية جداً → درس إسلامي للديون فوراً
   if (stage === 'debt' && debt > 50 && dayOfMonth % 3 === 0) {
     const idx = dayOfMonth % ISLAMIC_DEBT_LESSONS.length
-    return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
+    return safeLang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
   }
 
   // المستخدم ما سجّل معاملات كثيرة → دروس تتبع وسلوك
   if (tx < 10 && dayOfMonth % 4 === 0) {
     const awareness = AWARENESS
     const idx = dayOfMonth % awareness.length
-    return awareness[idx][lang]
+    return awareness[idx][safeLang]
   }
 
   // المستخدم ادخاره منخفض → دروس ادخار عملية
   if (savings < 10 && stage !== 'debt' && dayOfMonth % 5 === 0) {
     const emergency = EMERGENCY
     const idx = dayOfMonth % emergency.length
-    return emergency[idx][lang]
+    return emergency[idx][safeLang]
   }
 
   // المستخدم ما عنده استثمارات → دروس تحفيزية للاستثمار
   if (!context?.hasInvestments && stage === 'investing' && dayOfMonth % 4 === 0) {
     const investing = INVESTING
     const idx = dayOfMonth % investing.length
-    return investing[idx][lang]
+    return investing[idx][safeLang]
   }
 
   // المستخدم سلسلته قوية (7+ أيام) → دروس متقدمة
@@ -702,22 +703,22 @@ export function getLessonForStage(
     const advanced = stage === 'wealth' ? WEALTH :
                      stage === 'investing' ? INVESTING : EMERGENCY
     const idx = dayOfMonth % advanced.length
-    return advanced[idx][lang]
+    return advanced[idx][safeLang]
   }
 
   // كل 7 أيام — درس إسلامي مرتبط بالمرحلة
   if (dayOfMonth % 7 === 0) {
     if (stage === 'debt') {
       const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_DEBT_LESSONS.length
-      return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
+      return safeLang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
     }
     if (stage === 'investing' || stage === 'wealth') {
       const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_HARAM_MONEY_LESSONS.length
-      return lang === 'ar' ? ISLAMIC_HARAM_MONEY_LESSONS[idx].ar : ISLAMIC_HARAM_MONEY_LESSONS[idx].en
+      return safeLang === 'ar' ? ISLAMIC_HARAM_MONEY_LESSONS[idx].ar : ISLAMIC_HARAM_MONEY_LESSONS[idx].en
     }
     const allIslamic = [...ISLAMIC_LESSONS, ...ISLAMIC_LESSONS_EXTENDED]
     const idx = (Math.floor(dayOfMonth / 7) - 1) % allIslamic.length
-    return allIslamic[idx][lang]
+    return allIslamic[idx][safeLang]
   }
 
   // الدرس الافتراضي حسب المرحلة
@@ -730,7 +731,7 @@ export function getLessonForStage(
   }
   const lessons = map[stage]
   const lesson = lessons[(dayOfMonth - 1) % lessons.length]
-  return lesson[lang]
+  return lesson[safeLang]
 }
 
 /**

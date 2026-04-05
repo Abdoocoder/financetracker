@@ -152,7 +152,9 @@ export function OnboardingTour() {
   if (!show || steps.length === 0) return null
 
   const current = steps[step]
-  const info = current[lang as 'ar' | 'en']
+  const info = current[lang as 'ar' | 'en'] ?? current['ar']
+
+  if (!info) return null
 
   return (
     <>
