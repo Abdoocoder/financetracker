@@ -66,7 +66,12 @@
       "Bash(Remove-Item -Recurse -Force \"c:/Users/skyli/Project/financetracker/.next\")",
       "Bash(grep -v \"style\\\\|font\\\\|setTitle\\\\|document\\\\.\\\\|//\")",
       "Bash(grep -v \"style\\\\|dash_title\\\\|//\")",
-      "Bash(grep -v \"style\\\\|font\\\\|//\")"
+      "Bash(grep -v \"style\\\\|font\\\\|//\")",
+      "Bash(flutter build:*)",
+      "Bash(./gradlew assembleRelease)",
+      "Bash(cmd //c \"gradlew.bat assembleRelease 2>&1\")",
+      "Bash(powershell.exe -Command \"./gradlew assembleRelease 2>&1\")",
+      "Bash(powershell.exe -Command \".\\\\gradlew.bat assembleRelease 2>&1\")"
     ]
   }
 }
