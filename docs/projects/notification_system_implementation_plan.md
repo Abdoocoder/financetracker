@@ -571,6 +571,6 @@ Approve  Sponsor
 
 ---
 
-*Document Version: 1.2*  
+*Document Version: 1.3*  
 *Last Updated: 2026-04-05*  
 *Next Review: April 6, 2026*
