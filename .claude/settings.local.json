@@ -63,7 +63,10 @@
       "Bash(ls c:/Users/skyli/Documents/financetracker/*.md)",
       "Bash(ls c:/Users/skyli/Documents/financetracker/README*)",
       "Bash(npm install:*)",
-      "Bash(Remove-Item -Recurse -Force \"c:/Users/skyli/Project/financetracker/.next\")"
+      "Bash(Remove-Item -Recurse -Force \"c:/Users/skyli/Project/financetracker/.next\")",
+      "Bash(grep -v \"style\\\\|font\\\\|setTitle\\\\|document\\\\.\\\\|//\")",
+      "Bash(grep -v \"style\\\\|dash_title\\\\|//\")",
+      "Bash(grep -v \"style\\\\|font\\\\|//\")"
     ]
   }
 }
