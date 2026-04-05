@@ -61,7 +61,9 @@
       "Bash(keytool -genkey -v -keystore \"c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/android/app/release.keystore\" -alias fajrak -keyalg RSA -keysize 2048 -validity 10000 -storepass fajrak123 -keypass fajrak123 -dname \"CN=Fajrak, OU=Mobile, O=Fajrak, L=Unknown, S=Unknown, C=SA\")",
       "Bash(keytool -list -keystore \"c:/Users/skyli/Project/financetracker/mobile/fajrak_flutter/android/app/upload-keystore.jks\" -storepass password123)",
       "Bash(ls c:/Users/skyli/Documents/financetracker/*.md)",
-      "Bash(ls c:/Users/skyli/Documents/financetracker/README*)"
+      "Bash(ls c:/Users/skyli/Documents/financetracker/README*)",
+      "Bash(npm install:*)",
+      "Bash(Remove-Item -Recurse -Force \"c:/Users/skyli/Project/financetracker/.next\")"
     ]
   }
 }

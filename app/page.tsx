@@ -16,38 +16,53 @@ export default async function LandingPage() {
     <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', direction: 'rtl', fontFamily: 'inherit', overflowX: 'hidden' }}>
 
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,126,246,0.07) 0%, transparent 70%)' }} />
-        <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: '40vw', height: '40vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: '40vw', height: '40vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%)' }} />
       </div>
 
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', background: 'rgba(10,12,18,0.8)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 16 }}>ف</div>
+            <img src="/icon-512.png" style={{ width: 36, height: 36, borderRadius: 10 }} alt="فجرك" />
             <span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>فجرك</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Link href="/login" style={{ padding: '8px 18px', borderRadius: 10, color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>تسجيل الدخول</Link>
-            <Link href="/register" style={{ padding: '6px 12px', borderRadius: 8, background: 'var(--accent-blue)', color: 'white', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>ابدأ ←</Link>
+            <Link href="/register" style={{ padding: '6px 12px', borderRadius: 8, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>ابدأ ←</Link>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
       <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: 'clamp(60px, 10vw, 100px) 20px clamp(40px, 8vw, 80px)', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(59,126,246,0.08)', border: '1px solid rgba(59,126,246,0.2)', marginBottom: 28 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-blue)', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-blue-light)' }}>✨ جديد: حاسبة FIRE + حاسبة الزكاة + تقارير PDF 🇯🇴🇸🇦🇦🇪</span>
+        {/* الـ badge */}
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', marginBottom: 36 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B', display: 'inline-block', animation: 'pulse 2s infinite' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#FCD34D' }}>🇯🇴🇸🇦🇦🇪 أول أداة مالية عربية بالكامل</span>
         </div>
-        <h1 style={{ fontSize: 'clamp(28px, 6vw, 64px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 20px', letterSpacing: '-0.03em' }}>
-          كلنا نحلم بالثراء<br />
-          <span style={{ background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>هنا تبدأ الرحلة</span>
+
+        {/* السطر التشويقي */}
+        <div className="hero-line-1" style={{ fontSize: 'clamp(15px, 3vw, 19px)', color: 'var(--text-muted)', fontWeight: 600, marginBottom: 12, letterSpacing: '0.01em' }}>
+          كل شهر نفس السؤال...
+        </div>
+
+        {/* العنوان الرئيسي */}
+        <h1 className="hero-line-2" style={{ fontSize: 'clamp(36px, 8vw, 76px)', fontWeight: 900, lineHeight: 1.05, margin: '0 0 6px', letterSpacing: '-0.04em' }}>
+          <span style={{ background: 'linear-gradient(135deg, #F59E0B 20%, #FBBF24 50%, #10B981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            وين راح الراتب؟
+          </span>
         </h1>
-        <p style={{ fontSize: 'clamp(14px, 4vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 28px' }}>
-          أول أداة مالية عربية تمشي معك خطوة بخطوة — من أول دينار تسجّله حتى تحقق حريتك المالية.
+
+        {/* الجواب */}
+        <div className="hero-line-3" style={{ fontSize: 'clamp(16px, 3.5vw, 22px)', color: 'var(--text-secondary)', fontWeight: 700, margin: '10px 0 28px', letterSpacing: '-0.01em' }}>
+          <span style={{ color: '#10B981' }}>فجرك</span> عنده الجواب — بالأرقام لا بالتخمين 🌅
+        </div>
+
+        <p className="hero-line-4" style={{ fontSize: 'clamp(14px, 3.5vw, 17px)', color: 'var(--text-muted)', lineHeight: 1.8, maxWidth: 480, margin: '0 auto 32px' }}>
+          اعرف أين يذهب كل دينار · خطط لسداد ديونك · راقب استثماراتك · وحقق حريتك المالية — كل ذلك في مكان واحد.
         </p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
-          <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center' as const, boxShadow: '0 0 30px rgba(59,126,246,0.35)' }}>ابدأ مجاناً ←</Link>
+        <div className="hero-cta" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
+          <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center' as const, boxShadow: '0 0 30px rgba(245,158,11,0.4)' }}>ابدأ مجاناً ←</Link>
           <a href="#features" style={{ flex: 1, minWidth: 120, padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none', textAlign: 'center' as const }}>شاهد كيف يعمل ↓</a>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
@@ -58,7 +73,7 @@ export default async function LandingPage() {
         <div style={{ marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>🇯🇴🇸🇦🇦🇪🇪🇬🇲🇦🇰🇼🇶🇦🇧🇭 مصمم للعالم العربي</div>
 
         <div style={{ marginTop: 28 }}>
-          <Link href="/download" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, background: 'rgba(59,126,246,0.08)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+          <Link href="/download" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', color: '#FCD34D', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
             📱 تحميل تطبيق Android — متاح الآن ✨
           </Link>
         </div>
@@ -97,7 +112,7 @@ export default async function LandingPage() {
             </div>
 
             {/* خارطة الثراء - Preview */}
-            <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))', border: '1px solid rgba(59,126,246,0.2)', borderRadius: 16, padding: 16 }}>
+            <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.07), rgba(16,185,129,0.05))', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 16, padding: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>🗺️ خارطة الثراء</div>
                 <div style={{ padding: '3px 10px', borderRadius: 100, background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', fontSize: 11, fontWeight: 700, color: '#F59E0B' }}>المرحلة 2: سداد الديون</div>
@@ -200,7 +215,7 @@ export default async function LandingPage() {
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <a href="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', boxShadow: '0 4px 24px rgba(59,126,246,0.35)' }}>
+          <a href="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', borderRadius: 14, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', boxShadow: '0 4px 24px rgba(245,158,11,0.4)' }}>
             ابدأ رحلتك اليوم ←
           </a>
         </div>
@@ -376,7 +391,7 @@ export default async function LandingPage() {
         <div style={{ padding: '56px 40px', borderRadius: 28, background: 'linear-gradient(135deg, rgba(59,126,246,0.1), rgba(16,185,129,0.07))', border: '1px solid rgba(59,126,246,0.2)' }}>
           <h2 style={{ fontSize: 'clamp(26px, 5vw, 38px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>وضعك المالي يستحق أكثر من Excel 💡</h2>
           <p style={{ fontSize: 16, color: 'var(--text-muted)', marginBottom: 32, lineHeight: 1.6 }}>ابدأ مجاناً الآن وشوف أين يذهب راتبك خلال دقيقتين</p>
-          <Link href="/register" style={{ display: 'inline-block', padding: '16px 44px', borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)', color: 'white', fontSize: 17, fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(59,126,246,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>جرّب مجاناً — لا بطاقة مطلوبة ✓</Link>
+          <Link href="/register" style={{ display: 'inline-block', padding: '16px 44px', borderRadius: 14, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 17, fontWeight: 900, textDecoration: 'none', boxShadow: '0 0 40px rgba(245,158,11,0.45), 0 4px 20px rgba(0,0,0,0.3)' }}>جرّب مجاناً — لا بطاقة مطلوبة ✓</Link>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
             {['✓ مجاني للأبد', '✓ بدون بطاقة', '✓ 30 ثانية للتسجيل'].map((t, i) => (
               <span key={i} style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}>{t}</span>
@@ -419,7 +434,7 @@ export default async function LandingPage() {
 
       <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--border)', padding: '32px 24px 100px', textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 13 }}>ف</div>
+          <img src="/icon-512.png" style={{ width: 28, height: 28, borderRadius: 8 }} alt="فجرك" />
           <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>فجرك</span>
         </div>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} فجرك — إدارة مالية ذكية للعالم العربي</p>
@@ -432,6 +447,19 @@ export default async function LandingPage() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
         }
+        @keyframes glow {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-line-1 { animation: fadeUp 0.6s ease both; }
+        .hero-line-2 { animation: fadeUp 0.6s ease 0.25s both; }
+        .hero-line-3 { animation: fadeUp 0.6s ease 0.5s both; }
+        .hero-line-4 { animation: fadeUp 0.6s ease 0.75s both; }
+        .hero-cta    { animation: fadeUp 0.6s ease 1s both; }
       `}</style>
     </div>
   )
