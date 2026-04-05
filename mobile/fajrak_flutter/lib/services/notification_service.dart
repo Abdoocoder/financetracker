@@ -6,38 +6,52 @@ import '../main.dart';
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
-  static const AndroidNotificationChannel _androidChannel = AndroidNotificationChannel(
-    'fajrak_notifications', // ID
-    'Fajrak Notifications', // Name
-    description: 'إشعارات تطبيق فجرك المالية',
+  // 1. القنوات المتعددة (Notification Channels)
+  static const AndroidNotificationChannel _budgetChannel = AndroidNotificationChannel(
+    'budget_alerts', // ID
+    'Budget Alerts', // Name
+    description: 'تنبيهات تجاوز الميزانية',
     importance: Importance.high,
     playSound: true,
-    enableVibration: true,
+  );
+
+  static const AndroidNotificationChannel _debtChannel = AndroidNotificationChannel(
+    'debt_reminders', // ID
+    'Debt Reminders', // Name
+    description: 'تذكير بمواعيد الأقساط والديون',
+    importance: Importance.max,
+    playSound: true,
+  );
+
+  static const AndroidNotificationChannel _goalChannel = AndroidNotificationChannel(
+    'saving_goals', // ID
+    'Saving Goals', // Name
+    description: 'إنجازات أهداف الادخار',
+    importance: Importance.defaultImportance,
+    playSound: true,
   );
 
   static Future<void> initialize() async {
     final messaging = FirebaseMessaging.instance;
 
-    // طلب أذونات الإشعارات (مهم جداً لنظام iOS و Android 13+)
+    // طلب أذونات الإشعارات
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
-      provisional: false,
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      // المستخدم وافق على الإشعارات - نقوم بحفظ الرمز
       await saveToken();
     }
 
-    // تهيئة الإشعارات المحلية (للعرض في المقدمة)
+    // تهيئة الإشعارات المحلية
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosInit = DarwinInitializationSettings();
     const initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
 
     await _localNotifications.initialize(
-      settings: initSettings,
+      initSettings,
       onDidReceiveNotificationResponse: (details) {
         if (details.payload != null) {
           final message = RemoteMessage(data: {'url': details.payload!});
@@ -46,39 +60,65 @@ class NotificationService {
       },
     );
 
-    // إنشاء القناة على أندرويد
-    await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(_androidChannel);
+    // تسجيل القنوات على أندرويد
+    final androidPlugin = _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (androidPlugin != null) {
+      await androidPlugin.createNotificationChannel(_budgetChannel);
+      await androidPlugin.createNotificationChannel(_debtChannel);
+      await androidPlugin.createNotificationChannel(_goalChannel);
+    }
 
-    // التعاقد مع تحديث الرمز (FCM Token Refresh)
+    // التعامل مع الإشعارات في المقدمة (Foreground)
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      showNotification(message);
+    });
+
     messaging.onTokenRefresh.listen((token) async {
       await saveToken(newToken: token);
     });
-
-    // التعامل مع الإشعارات عندما يكون التطبيق في المقدمة (Foreground)
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final notification = message.notification;
-      if (notification == null) return;
-
-      _localNotifications.show(
-        id: notification.hashCode,
-        title: notification.title,
-        body: notification.body,
-        notificationDetails: NotificationDetails(
-          android: AndroidNotificationDetails(
-            _androidChannel.id,
-            _androidChannel.name,
-            channelDescription: _androidChannel.description,
-            icon: '@mipmap/ic_launcher',
-          ),
-        ),
-        payload: message.data['url'],
-      );
-    });
   }
 
-  // Tab indices in MainScreen: 0=More, 1=Budgets, 2=Debts, 3=Transactions, 4=Dashboard
+  static Future<void> showNotification(RemoteMessage message) async {
+    final notification = message.notification;
+    if (notification == null) return;
+
+    final category = message.data['category'] ?? 'default';
+    
+    // تحديد القناة بناءً على الفئة
+    AndroidNotificationChannel selectedChannel;
+    switch (category) {
+      case 'BudgetAlert':
+        selectedChannel = _budgetChannel;
+        break;
+      case 'DebtReminder':
+        selectedChannel = _debtChannel;
+        break;
+      case 'SavingGoal':
+        selectedChannel = _goalChannel;
+        break;
+      default:
+        selectedChannel = const AndroidNotificationChannel('default', 'Default');
+    }
+
+    await _localNotifications.show(
+      id: notification.hashCode,
+      title: notification.title,
+      body: notification.body,
+      notificationDetails: NotificationDetails(
+        android: AndroidNotificationDetails(
+          selectedChannel.id,
+          selectedChannel.name,
+          channelDescription: selectedChannel.description,
+          importance: selectedChannel.importance,
+          priority: Priority.high,
+          styleInformation: BigTextStyleInformation(notification.body ?? ''),
+          icon: '@mipmap/ic_launcher',
+        ),
+      ),
+      payload: message.data['url'],
+    );
+  }
+
   static void handleMessage(RemoteMessage message) {
     final url = message.data['url'] as String?;
     if (url == null) return;
@@ -88,6 +128,8 @@ class NotificationService {
 
     int tab = 4; // default: Dashboard
     if (url.contains('/dashboard/transactions')) tab = 3;
+    if (url.contains('/budgets')) tab = 1;
+    if (url.contains('/debts')) tab = 2;
 
     nav.pushNamed('/main', arguments: {'tab': tab});
   }
@@ -100,25 +142,14 @@ class NotificationService {
       final token = newToken ?? await FirebaseMessaging.instance.getToken();
       if (token == null) return;
 
-      final endpoint = 'fcm:$token';
-
-      // حفظ الرمز في جدول push_subscriptions ليتوافق مع نظام تطبيق الويب
-      await Supabase.instance.client
-          .from('push_subscriptions')
-          .upsert({
-            'user_id': user.id,
-            'endpoint': endpoint,
-            'p256dh': 'fcm',
-            'auth': 'fcm',
-          }, onConflict: 'user_id,endpoint');
-          
+      await Supabase.instance.client.from('push_subscriptions').upsert({
+        'user_id': user.id,
+        'endpoint': 'fcm:$token',
+        'p256dh': 'fcm',
+        'auth': 'fcm',
+      }, onConflict: 'user_id,endpoint');
     } catch (e) {
-      // تفادي تعطيل التطبيق في حال فشل حفظ الرمز
+      // Error recovery
     }
-  }
-
-  static Future<void> showNotification(RemoteMessage message) async {
-    // Firebase يتعامل مع الإشعارات في الـ Background/Terminated تلقائياً
-    // طالما أن الـ Payload يحتوي على كائن 'notification'
   }
 }

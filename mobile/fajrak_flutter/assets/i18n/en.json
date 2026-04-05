@@ -406,6 +406,7 @@
   "settings_income": "Monthly Income",
   "settings_currency": "Currency",
   "settings_language": "Language",
+  "settings_notifications": "Notification Settings",
   "settings_save": "Save Changes",
   "settings_saving": "Saving...",
   "settings_logout": "Logout",

@@ -17,6 +17,7 @@ import 'screens/auth/onboarding_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
+import 'screens/settings/notification_settings_screen.dart';
 import 'services/notification_service.dart';
 
 @pragma('vm:entry-point')
@@ -156,6 +157,7 @@ class FajrakApp extends StatelessWidget {
         '/main': (context) => const MainScreen(),
         '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/reset-password': (context) => const ResetPasswordScreen(),
+        '/settings/notifications': (context) => const NotificationSettingsScreen(),
       },
     );
   }
