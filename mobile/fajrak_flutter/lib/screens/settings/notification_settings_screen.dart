@@ -56,7 +56,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
       await _supabase
           .from('notification_preferences')
-          .upsert(updatedPref.toJson());
+          .upsert(updatedPref.toJson(), onConflict: 'user_id,category');
 
       setState(() {
         int index = _preferences.indexWhere((p) => p.category == pref.category);
