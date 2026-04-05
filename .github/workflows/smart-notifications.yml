@@ -1,0 +1,42 @@
+name: Smart Notifications CRON
+
+# جميع الأوقات بـ UTC (المنطقة الزمنية للخادم UTC+3)
+# UTC+3 → UTC: نطرح 3 ساعات
+#
+# 6 AM UTC+3  = 3 AM UTC
+# 8 AM UTC+3  = 5 AM UTC
+# 9 AM UTC+3  = 6 AM UTC
+# 10 AM UTC+3 = 7 AM UTC
+# 12 PM UTC+3 = 9 AM UTC
+# 6 PM UTC+3  = 3 PM UTC = 15:00 UTC
+# 7 PM UTC+3  = 4 PM UTC = 16:00 UTC
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 6 ص: صباحي + تنبيهات + تذكير الديون المستحقة
+    - cron: '0 5 * * *'   # 8 ص: راتب تلقائي + تقرير أسبوعي (الجمعة فقط)
+    - cron: '0 6 * * *'   # 9 ص: خصم ديون + معاملات متكررة
+    - cron: '0 7 * * *'   # 10 ص: تذكير الزكاة
+    - cron: '0 9 * * *'   # 12 ظ: تنبيه مستخدمين غير نشطين
+    - cron: '0 15 * * *'  # 6 م: تذكير مسائي
+    - cron: '0 16 * * *'  # 7 م: توجيه بناء الثروة + درس يومي
+  workflow_dispatch:       # تشغيل يدوي للاختبار
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Smart Notifications
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://fajrak.com/api/smart-notifications)
+          body=$(echo "$response" | head -n -1)
+          status=$(echo "$response" | tail -n 1)
+          echo "Status: $status"
+          echo "Response: $body"
+          if [ "$status" != "200" ]; then
+            echo "❌ Failed with status $status"
+            exit 1
+          fi
+          echo "✅ Notifications triggered successfully"

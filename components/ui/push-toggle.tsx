@@ -1,10 +1,13 @@
 'use client'
+import { useState } from 'react'
 import { AndroidBatteryTip } from '@/components/ui/android-battery-tip'
 import { usePush } from '@/lib/use-push'
 import { toast } from '@/components/ui/toast'
+import { createClient } from '@/lib/supabase/client'
 
 export function PushToggle() {
   const { supported, subscribed, loading, subscribe, unsubscribe } = usePush()
+  const [testing, setTesting] = useState(false)
 
   if (!supported) return (
     <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -21,6 +24,31 @@ export function PushToggle() {
       if (result?.ok) toast.success('✅ Notifications enabled!')
       else if (result?.reason === 'permission_denied') toast.error('❌ Allow notifications in browser settings')
       else toast.error('Error — please try again')
+    }
+  }
+
+  async function handleTest() {
+    setTesting(true)
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { toast.error('يجب تسجيل الدخول أولاً'); return }
+
+      const res = await fetch('/api/push-test', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session.access_token}` },
+      })
+      const json = await res.json()
+
+      if (json.sent > 0) {
+        toast.success('✅ تم الإرسال! تحقق من إشعاراتك')
+      } else {
+        toast.error('❌ لم يُرسَل — تأكد أن الإشعارات مفعّلة وأن الاشتراك محفوظ')
+      }
+    } catch {
+      toast.error('خطأ في الاتصال')
+    } finally {
+      setTesting(false)
     }
   }
 
@@ -64,6 +92,25 @@ export function PushToggle() {
           }} />
         </button>
       </div>
+
+      {/* زر الاختبار — يظهر فقط عندما الإشعارات مفعّلة */}
+      {subscribed && (
+        <button
+          onClick={handleTest}
+          disabled={testing}
+          style={{
+            width: '100%', padding: '10px 16px', borderRadius: 12,
+            background: testing ? 'var(--bg-secondary)' : 'rgba(245,158,11,0.08)',
+            border: '1px solid rgba(245,158,11,0.25)',
+            color: testing ? 'var(--text-muted)' : '#F59E0B',
+            fontSize: 13, fontWeight: 700, cursor: testing ? 'wait' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            transition: 'all 0.2s',
+          }}>
+          {testing ? '⏳ جاري الإرسال...' : '🧪 إرسال إشعار تجريبي'}
+        </button>
+      )}
+
       <AndroidBatteryTip />
     </>
   )
