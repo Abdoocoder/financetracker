@@ -5,10 +5,12 @@ import 'package:flutter/foundation.dart';
 import '../main.dart';
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin _localNotifications =
+      FlutterLocalNotificationsPlugin();
 
   // 1. القنوات المتعددة (Notification Channels)
-  static const AndroidNotificationChannel _budgetChannel = AndroidNotificationChannel(
+  static const AndroidNotificationChannel _budgetChannel =
+      AndroidNotificationChannel(
     'budget_alerts', // ID
     'Budget Alerts', // Name
     description: 'تنبيهات تجاوز الميزانية',
@@ -16,7 +18,8 @@ class NotificationService {
     playSound: true,
   );
 
-  static const AndroidNotificationChannel _debtChannel = AndroidNotificationChannel(
+  static const AndroidNotificationChannel _debtChannel =
+      AndroidNotificationChannel(
     'debt_reminders', // ID
     'Debt Reminders', // Name
     description: 'تذكير بمواعيد الأقساط والديون',
@@ -24,7 +27,8 @@ class NotificationService {
     playSound: true,
   );
 
-  static const AndroidNotificationChannel _goalChannel = AndroidNotificationChannel(
+  static const AndroidNotificationChannel _goalChannel =
+      AndroidNotificationChannel(
     'saving_goals', // ID
     'Saving Goals', // Name
     description: 'إنجازات أهداف الادخار',
@@ -49,7 +53,8 @@ class NotificationService {
     // تهيئة الإشعارات المحلية
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosInit = DarwinInitializationSettings();
-    const initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
+    const initSettings =
+        InitializationSettings(android: androidInit, iOS: iosInit);
 
     await _localNotifications.initialize(
       settings: initSettings,
@@ -62,7 +67,9 @@ class NotificationService {
     );
 
     // تسجيل القنوات على أندرويد
-    final androidPlugin = _localNotifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin =
+        _localNotifications.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
     if (androidPlugin != null) {
       await androidPlugin.createNotificationChannel(_budgetChannel);
       await androidPlugin.createNotificationChannel(_debtChannel);
@@ -71,7 +78,8 @@ class NotificationService {
 
     // الاستماع لحالة تسجيل الدخول لحفظ التوكن فوراً
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.signedIn || data.event == AuthChangeEvent.tokenRefreshed) {
+      if (data.event == AuthChangeEvent.signedIn ||
+          data.event == AuthChangeEvent.tokenRefreshed) {
         saveToken();
       }
     });
@@ -91,7 +99,7 @@ class NotificationService {
     if (notification == null) return;
 
     final category = message.data['category'] ?? 'default';
-    
+
     // تحديد القناة بناءً على الفئة
     AndroidNotificationChannel selectedChannel;
     switch (category) {
@@ -105,7 +113,8 @@ class NotificationService {
         selectedChannel = _goalChannel;
         break;
       default:
-        selectedChannel = const AndroidNotificationChannel('default', 'Default');
+        selectedChannel =
+            const AndroidNotificationChannel('default', 'Default');
     }
 
     await _localNotifications.show(
@@ -146,39 +155,52 @@ class NotificationService {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
-        if (kDebugMode) print('[NotificationService] saveToken: no logged-in user');
+        if (kDebugMode) {
+          debugPrint('[NotificationService] saveToken: no logged-in user');
+        }
         return;
       }
 
       // vapidKey is only needed for Web. On Android/iOS, call getToken() with no argument.
       final String? token;
       if (kIsWeb) {
-        token = newToken ?? await FirebaseMessaging.instance.getToken(
-          vapidKey: 'BBTibDSNpqg5OYVoQYhy5_5UldLkB8qZpWE8993FTkLidCXGZ45qtVcSWHv_M1GLj4FDLVXL2X8y7qJuu1fM3ew',
-        );
+        token = newToken ??
+            await FirebaseMessaging.instance.getToken(
+              vapidKey:
+                  'BBTibDSNpqg5OYVoQYhy5_5UldLkB8qZpWE8993FTkLidCXGZ45qtVcSWHv_M1GLj4FDLVXL2X8y7qJuu1fM3ew',
+            );
       } else {
         token = newToken ?? await FirebaseMessaging.instance.getToken();
       }
 
       if (token == null) {
-        if (kDebugMode) print('[NotificationService] saveToken: FCM token is null');
+        if (kDebugMode) {
+          debugPrint('[NotificationService] saveToken: FCM token is null');
+        }
         return;
       }
 
-      if (kDebugMode) print('[NotificationService] Saving FCM token: ${token.substring(0, 20)}...');
+      if (kDebugMode) {
+        debugPrint(
+            '[NotificationService] Saving FCM token: ${token.substring(0, 20)}...');
+      }
 
-      final error = await Supabase.instance.client.from('push_subscriptions').upsert({
-        'user_id': user.id,
-        'endpoint': 'fcm:$token',
-        'p256dh': 'fcm',
-        'auth': 'fcm',
-      }, onConflict: 'user_id,endpoint').then((_) => null).catchError((e) => e);
+      final error = await Supabase.instance.client
+          .from('push_subscriptions')
+          .upsert({
+            'user_id': user.id,
+            'endpoint': 'fcm:$token',
+            'p256dh': 'fcm',
+            'auth': 'fcm',
+          }, onConflict: 'user_id,endpoint')
+          .then((_) => null)
+          .catchError((e) => e);
 
       if (error != null && kDebugMode) {
-        print('[NotificationService] Supabase upsert error: $error');
+        debugPrint('[NotificationService] Supabase upsert error: $error');
       }
     } catch (e) {
-      if (kDebugMode) print('[NotificationService] saveToken error: $e');
+      if (kDebugMode) debugPrint('[NotificationService] saveToken error: $e');
     }
   }
 }
