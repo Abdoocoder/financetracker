@@ -20,7 +20,7 @@
 [![تحميل APK](https://img.shields.io/badge/📱_أندرويد_APK-تحميل-38ef7d?style=for-the-badge)](https://fajrak.com/download)
 [![Google Play](https://img.shields.io/badge/🎯_Google_Play-اختبار_مغلق-4285F4?style=for-the-badge)](https://fajrak.com/download)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16.x-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-قاعدة_البيانات-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
@@ -278,7 +278,7 @@
 
 | الطبقة | التقنية المستخدمة | الإصدار | الغرض |
 |:------|:----------:|:-------:|:--------|
-| **الإطار البرمجي** | Next.js | 15.x | SSR + API routes |
+| **الإطار البرمجي** | Next.js | 16.x | SSR + API routes |
 | **واجهة المستخدم** | React | 19 | تطوير المكونات التفاعلية |
 | **طبقة المنطق** | Supabase RPC | PL/pgSQL | الحسابات المالية المركزية |
 | **اللغة** | TypeScript | 5.x | ضمان سلامة البيانات والأنواع |
@@ -662,7 +662,15 @@ npm run test:coverage
 
 ## 📝 سجل التغييرات
 
-### v3.30.0 — 2026-04-05 *(الأحدث — نظام الإشعارات الذكي)*
+### v3.30.1 — 2026-04-06 *(الأحدث)*
+
+| التغيير | الوصف |
+|:-------|:------------|
+| 🐛 **إصلاح الإشعارات** | حل مشكلة عدم وصول الإشعارات عبر تصحيح منطق تسجيل رمز FCM |
+| 🏗️ **استقرار البناء** | إصلاح أخطاء متغيرات البيئة في Next.js وتحديث AGP في Flutter إلى 8.9.1 |
+| 🚀 **جاهز للإطلاق** | تصحيح مسار مخرجات حزمة التطبيق (AAB) استعداداً للرفع على Google Play |
+
+### v3.30.0 — 2026-04-05 *(نظام الإشعارات الذكي)*
 
 | التغيير | الوصف |
 |:-------|:------------|
