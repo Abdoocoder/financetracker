@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/foundation.dart';
 import '../main.dart';
 
 class NotificationService {
@@ -144,21 +145,40 @@ class NotificationService {
   static Future<void> saveToken({String? newToken}) async {
     try {
       final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return;
+      if (user == null) {
+        if (kDebugMode) print('[NotificationService] saveToken: no logged-in user');
+        return;
+      }
 
-      final token = newToken ?? await FirebaseMessaging.instance.getToken(
-        vapidKey: 'BBTibDSNpqg5OYVoQYhy5_5UldLkB8qZpWE8993FTkLidCXGZ45qtVcSWHv_M1GLj4FDLVXL2X8y7qJuu1fM3ew',
-      );
-      if (token == null) return;
+      // vapidKey is only needed for Web. On Android/iOS, call getToken() with no argument.
+      final String? token;
+      if (kIsWeb) {
+        token = newToken ?? await FirebaseMessaging.instance.getToken(
+          vapidKey: 'BBTibDSNpqg5OYVoQYhy5_5UldLkB8qZpWE8993FTkLidCXGZ45qtVcSWHv_M1GLj4FDLVXL2X8y7qJuu1fM3ew',
+        );
+      } else {
+        token = newToken ?? await FirebaseMessaging.instance.getToken();
+      }
 
-      await Supabase.instance.client.from('push_subscriptions').upsert({
+      if (token == null) {
+        if (kDebugMode) print('[NotificationService] saveToken: FCM token is null');
+        return;
+      }
+
+      if (kDebugMode) print('[NotificationService] Saving FCM token: ${token.substring(0, 20)}...');
+
+      final error = await Supabase.instance.client.from('push_subscriptions').upsert({
         'user_id': user.id,
         'endpoint': 'fcm:$token',
         'p256dh': 'fcm',
         'auth': 'fcm',
-      }, onConflict: 'user_id,endpoint');
+      }, onConflict: 'user_id,endpoint').then((_) => null).catchError((e) => e);
+
+      if (error != null && kDebugMode) {
+        print('[NotificationService] Supabase upsert error: $error');
+      }
     } catch (e) {
-      // Error recovery
+      if (kDebugMode) print('[NotificationService] saveToken error: $e');
     }
   }
 }
