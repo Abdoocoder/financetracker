@@ -68,6 +68,13 @@ class NotificationService {
       await androidPlugin.createNotificationChannel(_goalChannel);
     }
 
+    // الاستماع لحالة تسجيل الدخول لحفظ التوكن فوراً
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn || data.event == AuthChangeEvent.tokenRefreshed) {
+        saveToken();
+      }
+    });
+
     // التعامل مع الإشعارات في المقدمة (Foreground)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       showNotification(message);
