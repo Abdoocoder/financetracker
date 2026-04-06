@@ -20,7 +20,7 @@
 [![Download APK](https://img.shields.io/badge/📱_Android_APK-Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
 [![Google Play](https://img.shields.io/badge/🎯_Google_Play-Closed_Testing-4285F4?style=for-the-badge)](https://play.google.com/store/apps/details?id=com.fajrak.app)
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16.x-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com)
@@ -287,7 +287,7 @@ Learning, and Wealth.
 
 | Layer | Technology | Version | Purpose |
 |:------|:----------:|:-------:|:--------|
-| **Framework** | Next.js | 15.x | SSR + API routes |
+| **Framework** | Next.js | 16.x | SSR + API routes |
 | **UI Library** | React | 19 | Component-based UI |
 | **Logic Layer** | Supabase RPC | PL/pgSQL | Centralized Financial Logic |
 | **Language** | TypeScript | 5.x | Type safety |
@@ -578,7 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.30.0 — 2026-04-05 *(Latest — Intelligent Notification System)*
+### v3.30.1 — 2026-04-06 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| 🐛 **Notification Fix** | Fixed missing Flutter push notifications by correcting FCM token registration logic |
+| 🏗️ **Build Stability** | Resolved Next.js environment variables build errors and updated Flutter AGP to 8.9.1 |
+| 🚀 **Release Ready** | Fixed Android App Bundle (AAB) generation for Google Play deployment |
+
+### v3.30.0 — 2026-04-05 *(Intelligent Notification System)*
 
 | Change | Description |
 |:-------|:------------|
