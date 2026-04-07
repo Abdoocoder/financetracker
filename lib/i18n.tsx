@@ -878,6 +878,7 @@ interface I18nContextType {
   setLang: (l: Lang) => void
   t: (key: TranslationKey) => string
   isRTL: boolean
+  hydrated: boolean
 }
 
 const I18nContext = createContext<I18nContextType>({
@@ -886,6 +887,7 @@ const I18nContext = createContext<I18nContextType>({
   setLang: () => { },
   t: (key) => key,
   isRTL: true,
+  hydrated: false,
 })
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
@@ -939,7 +941,7 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, [currentLang])
 
   return (
-    <I18nContext.Provider value={{ lang, currentLang, setLang, t, isRTL: currentLang === 'ar' }}>
+    <I18nContext.Provider value={{ lang, currentLang, setLang, t, isRTL: currentLang === 'ar', hydrated }}>
       {children}
     </I18nContext.Provider>
   )
