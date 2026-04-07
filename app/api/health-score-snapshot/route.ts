@@ -1,4 +1,3 @@
-import { calcScore } from './calc'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyCronAuth } from '@/lib/cron-auth'
@@ -33,11 +32,13 @@ async function snapshotScores(userId?: string) {
     const totalDebt = (debtRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
     const invValue = (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
     const goalsSaved = (goalRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
-    const score = calcScore(effectiveIncome, expenses, totalDebt, invValue, goalsSaved, txs.length)
+    
+    // Use the centralized database logic for the score
+    const { data: score } = await supabase.rpc('calculate_health_score', { p_user_id: uid })
 
     await supabase.from('health_score_history').upsert({
       user_id: uid,
-      score,
+      score: score || 0,
       income: effectiveIncome,
       expenses,
       total_debt: totalDebt,

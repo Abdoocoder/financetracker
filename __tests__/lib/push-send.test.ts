@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
 import webpush from 'web-push'
 
 // Global-ish mock object for this file
@@ -6,19 +5,15 @@ const mockSupabaseInstance = {
   from: jest.fn().mockReturnThis(),
   select: jest.fn().mockReturnThis(),
   eq: jest.fn().mockReturnThis(),
+  maybeSingle: jest.fn().mockReturnThis(),
   insert: jest.fn().mockReturnThis(),
   delete: jest.fn().mockReturnThis(),
   then: jest.fn(),
 }
 
-// Mock Supabase locally with a factory that returns the SAME instance
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => mockSupabaseInstance)
-}))
-
-// Mock firebase-admin
-jest.mock('../../lib/firebase-admin', () => ({
-  sendFCMNotification: jest.fn(() => Promise.resolve(true))
+// Mock Supabase admin client
+jest.mock('../../lib/supabase/admin', () => ({
+  createAdminClient: jest.fn(() => mockSupabaseInstance)
 }))
 
 import { sendPushToUser } from '../../lib/push-send'
@@ -27,11 +22,15 @@ describe('sendPushToUser', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
+    process.env.VAPID_EMAIL = 'mailto:test@example.com'
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY = 'mock_pub_key'
+    process.env.VAPID_PRIVATE_KEY = 'mock_priv_key'
     
     // Default mock behavior for chainable methods
     mockSupabaseInstance.from.mockReturnThis()
     mockSupabaseInstance.select.mockReturnThis()
     mockSupabaseInstance.eq.mockReturnThis()
+    mockSupabaseInstance.maybeSingle.mockReturnThis() // Added for fingerprint check
     mockSupabaseInstance.insert.mockReturnThis()
     mockSupabaseInstance.delete.mockReturnThis()
   })
@@ -54,12 +53,17 @@ describe('sendPushToUser', () => {
     })))
     // 2. Mock unread count
     mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ count: 5, error: null })))
-    // 3. Mock direct insert for alert record (if sent > 0)
+    // 3. Mock fingerprint check (no existing)
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ data: null, error: null })))
+    // 4. Mock notification_history insert
+    mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ error: null })))
+    // 5. Mock direct insert for alert record (if sent > 0)
     mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn({ error: null })))
 
     const result = await sendPushToUser('user-1', 'Title', 'Message', undefined, undefined, mockSupabaseInstance)
 
     expect(result).toBe(1)
+    expect(mockSupabaseInstance.from).toHaveBeenCalledWith('notification_history')
     expect(mockSupabaseInstance.from).toHaveBeenCalledWith('alerts')
   })
 

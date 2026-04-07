@@ -27,15 +27,6 @@ const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').t
 const ChallengesCard = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
 const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
 
-function computeHealthScore(data: DashboardData | null, income: number, expenses: number): number {
-  if (!data) return 0;
-  const metrics = (income > 0 ? Math.min(30, Math.round((Math.max(0, income - expenses) / income) * 150)) : 0)
-    + (data.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((data.totalDebt / Math.max(income * 12, 1)) * 25)))
-    + Math.min(20, Math.round((data.goalsSaved / Math.max(income * 3, 1)) * 20))
-    + (data.invValue > 0 ? 15 : 0)
-    + Math.min(10, data.txCount);
-  return Math.min(100, Math.round(metrics));
-}
 
 export default function DashboardPage() {
   const { t, lang } = useI18n()
@@ -194,7 +185,7 @@ export default function DashboardPage() {
         <NetWorthCard netWorth={data?.netWorth ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} totalDebt={data?.totalDebt ?? 0} totalReceivable={data?.totalReceivable ?? 0} currency={currency} lang={lang} />
       )}
 
-      <Section id="health" defaultOpen={false} icon="💊" title={`${lang === 'en' ? 'Financial Health' : 'الصحة المالية'} — ${computeHealthScore(data || null, income, expenses)}%`}>
+      <Section id="health" defaultOpen={false} icon="💊" title={`${lang === 'en' ? 'Financial Health' : 'الصحة المالية'} — ${data?.healthScore ?? 0}%`}>
         <div style={{ padding: '12px 0 8px' }}>
           <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
         </div>
