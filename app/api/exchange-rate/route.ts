@@ -1,6 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { rateLimit } from '@/lib/rate-limit'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const rl = rateLimit(request, { limit: 30, windowMs: 60_000, identifier: 'exchange-rate' })
+  if (!rl.ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429, headers: rl.headers })
+
   const { searchParams } = new URL(request.url)
   const base = searchParams.get('base') || 'JOD'
   const target = searchParams.get('target') || 'USD'

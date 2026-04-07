@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Cairo } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme-context'
+import QueryProvider from '@/components/providers/QueryProvider'
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -52,7 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             });
           }
         ` }} />
-        <ThemeProvider>{children}</ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   )

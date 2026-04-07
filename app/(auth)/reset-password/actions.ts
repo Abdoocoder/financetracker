@@ -1,5 +1,5 @@
 'use server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createServerClient } from '@supabase/ssr'
 
 // Exchange a PKCE code for an access_token (email recovery — no verifier needed)
@@ -17,10 +17,7 @@ export async function exchangeCode(code: string): Promise<{ token?: string }> {
 export async function updatePassword(password: string, token: string): Promise<{ error?: string }> {
   if (!token) return { error: 'session' }
 
-  const admin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const admin = createAdminClient()
 
   const { data: { user }, error: userError } = await admin.auth.getUser(token)
   if (userError || !user) return { error: 'session' }
