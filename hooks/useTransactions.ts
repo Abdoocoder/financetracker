@@ -61,7 +61,7 @@ export function useTransactions() {
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
   const [filterYear, setFilterYear] = useState(now.getFullYear())
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
-  const [allTotals, setAllTotals] = useState<{ type: string; amount: number; category?: string }[]>([])
+  const [allTotals, setAllTotals] = useState<{ type: string; amount: number; category?: string; transaction_date: string }[]>([])
 
   const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
@@ -117,7 +117,7 @@ export function useTransactions() {
         .range(0, PAGE_SIZE - 1),
       supabase
         .from('transactions')
-        .select('type,amount,category')
+        .select('type,amount,category,transaction_date')
         .eq('user_id', user.id)
         .gte('transaction_date', firstDay)
         .lte('transaction_date', lastDay),
@@ -127,7 +127,7 @@ export function useTransactions() {
     setHasMore(fresh.length === PAGE_SIZE)
     setLoading(false)
     // store totals separately so StatBar shows full-month numbers even when paginated
-    setAllTotals((totals ?? []) as { type: string; amount: number; category?: string }[])
+    setAllTotals((totals ?? []) as { type: string; amount: number; category?: string; transaction_date: string }[])
   }, [currentUser, supabase, filterMonth, filterYear])
 
   useEffect(() => { load() }, [load])
@@ -295,9 +295,24 @@ export function useTransactions() {
   const totalRealExpense = useMemo(() => totalExpense - totalDebtPayments, [totalExpense, totalDebtPayments])
   const net = useMemo(() => totalIncome - totalExpense, [totalIncome, totalExpense])
 
+  // Month-to-date (posted) net: only transactions up to today affect "current balance".
+  // This is used to reconcile:
+  //   balance_today = balance_month_start + net_month_to_date
+  const monthToDateNet = useMemo(() => {
+    const today = new Date().toISOString().split('T')[0]
+    const income = allTotals
+      .filter(t => t.transaction_date <= today && t.type === 'income')
+      .reduce((a, t) => a + Number(t.amount), 0)
+    const expense = allTotals
+      .filter(t => t.transaction_date <= today && t.type === 'expense')
+      .reduce((a, t) => a + Number(t.amount), 0)
+    // transfers are excluded because they don't change overall money, only move it between accounts
+    return income - expense
+  }, [allTotals])
+
   return {
     transactions, filtered, loading, saving, deletingId,
-    totalIncome, totalExpense, totalDebtPayments, totalRealExpense, net,
+    totalIncome, totalExpense, totalDebtPayments, totalRealExpense, net, monthToDateNet,
     hasMore, loadingMore, loadMore,
     showForm, form, setForm, editingId, errors,
     openAdd, startEdit, closeForm, saveTransaction,

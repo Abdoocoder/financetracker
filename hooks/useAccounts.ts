@@ -20,10 +20,15 @@ export function useAccounts(userId: string | undefined) {
     if (!data) { setLoading(false); return }
 
     // حساب الرصيد لكل حساب
+    // Important: Only include posted (non-future) transactions in balances.
+    // Future/scheduled transactions are shown elsewhere (e.g. Transactions "Upcoming")
+    // and should not affect current account balances.
+    const today = new Date().toISOString().split('T')[0]
     const { data: txs } = await supabase
       .from('transactions')
       .select('account_id, transfer_to_account_id, type, amount')
       .eq('user_id', userId)
+      .lte('transaction_date', today)
 
     const withBalance = data.map(acc => {
       const income   = (txs ?? []).filter(t => t.account_id === acc.id && t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)

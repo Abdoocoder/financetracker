@@ -12,6 +12,7 @@ import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { useI18n } from '@/lib/i18n'
 import { useUser } from '@/lib/user-context'
 import { useTransactions } from '@/hooks/useTransactions'
+import { useAccounts } from '@/hooks/useAccounts'
 import { TransactionItem } from '@/components/transactions/TransactionItem'
 import { TransactionFilters } from '@/components/transactions/TransactionFilters'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
@@ -19,8 +20,9 @@ import { RecurringList } from '@/components/transactions/RecurringList'
 
 export default function TransactionsPage() {
   const { t, lang } = useI18n()
-  const { profile } = useUser()
+  const { profile, user } = useUser()
   const tx = useTransactions()
+  const { totalBalance, loading: accountsLoading } = useAccounts(user?.id)
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await tx.load() })
   const [activeTab, setActiveTab] = useState<'all' | 'recurring'>('all')
 
@@ -28,6 +30,8 @@ export default function TransactionsPage() {
   const completed = tx.filtered.filter(item => item.transaction_date <= today)
   const upcoming = tx.filtered.filter(item => item.transaction_date > today)
   const baseCurrency = profile?.currency ?? 'JOD'
+  const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
+  const monthStartBalance = accountsLoading ? null : (totalBalance - (tx.monthToDateNet ?? 0))
 
   if (tx.loading) return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -72,6 +76,16 @@ export default function TransactionsPage() {
             { label: t('dash_expenses'), value: tx.totalRealExpense.toFixed(0), color: 'var(--accent-red-light)' },
             ...(tx.totalDebtPayments > 0 ? [{ label: t('dash_debt_payments'), value: `💳 ${tx.totalDebtPayments.toFixed(0)}`, color: 'var(--accent-blue-light)' }] : []),
             { label: t('dash_net'), value: `${tx.net >= 0 ? '+' : ''}${tx.net.toFixed(0)}`, color: tx.net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+            ...(monthStartBalance === null ? [] : [{
+              label: lang === 'en' ? 'Month start' : 'بداية الشهر',
+              value: `${monthStartBalance >= 0 ? '+' : '-'}${fmt(Math.abs(monthStartBalance))}`,
+              color: monthStartBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
+            }]),
+            ...(accountsLoading ? [] : [{
+              label: lang === 'en' ? 'Now (all accounts)' : 'الآن (كل الحسابات)',
+              value: `${totalBalance >= 0 ? '+' : '-'}${fmt(Math.abs(totalBalance))}`,
+              color: totalBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
+            }]),
           ]} />
           <TransactionFilters
             search={tx.search}

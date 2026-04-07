@@ -76,7 +76,6 @@ export default function DashboardPage() {
   const netAfterDebts = net - monthlyDebtCommitments
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
   const currency = profile?.currency ?? 'JOD'
-  const heroBalance = accounts.length > 0 ? accountsTotalBalance : net
   const name = data?.name || currentUser?.user_metadata?.full_name || ''
   const firstName = name.split(' ')[0]
 
@@ -122,11 +121,11 @@ export default function DashboardPage() {
       {accountsLoading && !accounts.length
         ? <div className="skeleton" style={{ height: 128, borderRadius: 24 }} />
         : <HeroBalanceCard
-            balance={heroBalance}
+            monthlyNet={net}
             currency={currency}
             lang={lang}
             accounts={accounts}
-            monthlyNet={net}
+            totalBalance={accountsTotalBalance}
             prevMonthNet={(data?.prevIncome ?? 0) - (data?.prevExpenses ?? 0)}
           />
       }
