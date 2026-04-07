@@ -44,8 +44,19 @@ function getLevel(points: number) {
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.slice(7))
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const { user_id } = await req.json()
-    if (!user_id) return NextResponse.json({ error: 'Missing user_id' }, { status: 400 })
+    if (!user_id || user_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
 
     const now = new Date()
     const today = now.toISOString().split('T')[0]

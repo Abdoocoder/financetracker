@@ -37,7 +37,7 @@ async function dailyMorningReminder() {
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 
-  await Promise.all(profiles.map(async (p) => {
+  await Promise.allSettled(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = p.monthly_income ?? 0
     const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
@@ -107,7 +107,7 @@ async function eveningReminder() {
     .from('profiles').select('id, full_name')
   if (!profiles?.length) return
 
-  await Promise.all(profiles.map(async (p) => {
+  await Promise.allSettled(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const { count } = await supabase.from('transactions')
       .select('id', { count: 'exact', head: true })
@@ -330,7 +330,7 @@ async function receivableDebtReminder() {
     .from('profiles').select('id, full_name, lang')
   if (!profiles?.length) return
 
-  await Promise.all(profiles.map(async (p) => {
+  await Promise.allSettled(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
 

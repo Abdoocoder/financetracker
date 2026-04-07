@@ -51,17 +51,6 @@ export async function GET(request: NextRequest) {
 
     const threshold = pct >= 100 ? 100 : 80
 
-    // هل أرسلنا تنبيه لهذه الميزانية بهذا الحد هذا الشهر؟
-    const { count: dupCount } = await supabase
-      .from('budget_alert_log')
-      .select('id', { count: 'exact', head: true })
-      .eq('budget_id', budget.id)
-      .eq('alert_month', month)
-      .eq('alert_year', year)
-      .eq('threshold_pct', threshold)
-
-    if ((dupCount ?? 0) > 0) continue
-
     const remaining = Math.max(0, limit - spent)
     const emoji = threshold >= 100 ? '🚨' : '⚠️'
     const title = threshold >= 100
@@ -71,37 +60,20 @@ export async function GET(request: NextRequest) {
       ? `أنفقت ${spent.toFixed(0)} من أصل ${limit.toFixed(0)} — تجاوزت الميزانية بـ ${(spent - limit).toFixed(0)}`
       : `أنفقت ${spent.toFixed(0)} من أصل ${limit.toFixed(0)} — تبقى ${remaining.toFixed(0)}`
 
-    // إدراج في سجل التكرار
-    await supabase.from('budget_alert_log').insert({
-      user_id: budget.user_id,
-      budget_id: budget.id,
-      alert_month: month,
-      alert_year: year,
-      threshold_pct: threshold,
-    })
-
-    // إنشاء التنبيه
-    await supabase.from('alerts').insert({
-      user_id: budget.user_id,
-      type: threshold >= 100 ? 'warning' : 'reminder',
-      title,
-      message,
-      frequency: 'once',
-      is_read: false,
-      is_active: true,
-      trigger_condition: { budget_id: budget.id, month, year, threshold },
-    })
-
-    // إشعار push
-    await sendPushToUser(
+    // نستخدم نفس fingerprint الذي يولده DB Trigger (check_budget_limits)
+    // حتى يتعرف كل منهما على عمل الآخر ويمنع الإرسال المكرر.
+    const fingerprint = `budget_${threshold}_${budget.id}_${month}_${year}`
+    const sent = await sendPushToUser(
       budget.user_id,
       title,
       message,
       '/dashboard/budgets',
-      threshold >= 100 ? 'warning' : 'info'
+      threshold >= 100 ? 'warning' : 'budget',
+      undefined,
+      fingerprint
     )
 
-    alerted++
+    if (sent > 0) alerted++
   }
 
   return NextResponse.json({ ok: true, checked, alerted })
@@ -109,8 +81,7 @@ export async function GET(request: NextRequest) {
 
 // POST: تشغيل يدوي للاختبار
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('Authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!verifyCronAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   return GET(request)

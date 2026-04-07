@@ -102,8 +102,9 @@ async function generateAlerts(userId?: string) {
       if (!exists) { toInsert.push({ user_id: uid, type: 'motivation', title: mot.title, message: mot.message, frequency: 'daily', is_read: false, is_active: true }); break }
     }
   }
+  // sendPushToUser يكتب في notification_history → Edge Function تتولى
+  // إرسال الإشعار والكتابة في alerts. لا نكتب في alerts هنا مباشرة.
   if (toInsert.length > 0) {
-    await supabase.from('alerts').insert(toInsert)
     const byUser = new Map<string, typeof toInsert>()
     for (const a of toInsert) {
       const uid = a.user_id as string

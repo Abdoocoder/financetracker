@@ -1,4 +1,3 @@
-import webpush from 'web-push'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 let _supabase: ReturnType<typeof createAdminClient> | null = null
@@ -7,127 +6,68 @@ function getSupabase() {
   return _supabase
 }
 
-// VAPID يُهيَّأ عند الاستخدام الأول فقط لتفادي الفشل الصامت عند غياب المتغيرات
-let vapidConfigured = false
-function ensureVapid() {
-  if (vapidConfigured) return
-  const email = process.env.VAPID_EMAIL
-  const pub   = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-  const priv  = process.env.VAPID_PRIVATE_KEY
-  if (!email || !pub || !priv) {
-    console.error('[push-send] VAPID env vars missing:', { email: !!email, pub: !!pub, priv: !!priv })
-    return
-  }
-  webpush.setVapidDetails(email, pub, priv)
-  vapidConfigured = true
+const TAG_TO_CATEGORY: Record<string, string> = {
+  morning:           'SystemUpdate',
+  evening:           'SystemUpdate',
+  weekly:            'SystemUpdate',
+  nudge:             'SystemUpdate',
+  lesson:            'SystemUpdate',
+  wealth:            'SystemUpdate',
+  warning:           'BudgetAlert',
+  budget:            'BudgetAlert',
+  debt:              'DebtReminder',
+  'debt-reminder':   'DebtReminder',
+  'debt-auto':       'DebtReminder',
+  'debt-paid':       'DebtReminder',
+  'receivable-debt': 'DebtReminder',
+  goal:              'SavingGoal',
+  achievement:       'SavingGoal',
+  'finance-daily':   'SystemUpdate',
+  security:          'SecurityAlert',
 }
 
-// خريطة من tag إلى notification_category (لجدول notification_history)
-const TAG_TO_CATEGORY: Record<string, string> = {
-  morning:         'SystemUpdate',
-  evening:         'SystemUpdate',
-  weekly:          'SystemUpdate',
-  nudge:           'SystemUpdate',
-  lesson:          'SystemUpdate',
-  wealth:          'SystemUpdate',
-  warning:         'BudgetAlert',
-  budget:          'BudgetAlert',
-  debt:            'DebtReminder',
-  'receivable-debt': 'DebtReminder',
-  goal:            'SavingGoal',
-  achievement:     'SavingGoal',
-  security:        'SecurityAlert',
-}
 function toCategory(tag: string): string {
   return TAG_TO_CATEGORY[tag] ?? 'SystemUpdate'
 }
 
+/**
+ * المدخل الوحيد لإرسال الإشعارات.
+ * يكتب في notification_history فقط — Edge Function تتولى الإرسال الفعلي
+ * (FCM + Web Push) والكتابة في alerts.
+ * الـ UNIQUE index على fingerprint يمنع التكرار تلقائياً.
+ *
+ * customFingerprint: اختياري — يُستخدم لمطابقة fingerprint DB Trigger
+ * (مثل تنبيهات الميزانية) لمنع إرسال مكرر بين CRON والـ trigger.
+ */
 export async function sendPushToUser(
   userId: string,
   title: string,
   message: string,
   url = '/dashboard/alerts',
   tag = 'finance-alert',
-  supabaseClient?: any
+  supabaseClient?: any,
+  customFingerprint?: string
 ) {
   const supabase = supabaseClient || getSupabase()
-  const { data: subs } = await supabase
-    .from('push_subscriptions')
-    .select('*')
-    .eq('user_id', userId)
 
-  if (!subs?.length) return 0
+  // fingerprint يومي افتراضي — أو مخصص لمطابقة DB Trigger
+  const fingerprint = customFingerprint
+    ?? `${userId}:${tag}:${new Date().toISOString().slice(0, 10)}`
 
-  const { count: unread } = await supabase
-    .from('alerts')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('is_read', false)
+  const { error } = await supabase.from('notification_history').insert({
+    user_id:     userId,
+    category:    toCategory(tag),
+    title,
+    body:        message,
+    data:        { url, tag },
+    fingerprint,
+  })
 
-  const payload = JSON.stringify({ title, message, url, tag, badgeCount: (unread ?? 0) + 1 })
-  let sent = 0
-
-  for (const sub of subs) {
-    // ── FCM (Android) ────────────────────────────────────────────
-    // بدلاً من استدعاء FCM مباشرة، نكتب في notification_history
-    // والـ Supabase Webhook يُطلق Edge Function التي ترسل الإشعار
-    if (sub.endpoint?.startsWith('fcm:')) {
-      try {
-        // fingerprint يمنع إرسال نفس الإشعار مرتين في نفس الساعة
-        const fingerprint = `${userId}:${tag}:${new Date().toISOString().slice(0, 13)}`
-        const { data: existing } = await supabase
-          .from('notification_history')
-          .select('id')
-          .eq('fingerprint', fingerprint)
-          .maybeSingle()
-        if (existing) { sent++; continue }
-
-        const { error } = await supabase.from('notification_history').insert({
-          user_id: userId,
-          category: toCategory(tag),
-          title,
-          body: message,
-          data: { url, tag },
-          fingerprint,
-        })
-        if (!error) sent++
-        else console.error('[push-send] notification_history insert error:', error.message)
-      } catch (err: any) {
-        console.error('[push-send] FCM path error:', err.message)
-      }
-      continue
-    }
-
-    // ── Web Push (Chrome / Safari / Edge) ────────────────────────
-    try {
-      ensureVapid()
-      await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        payload
-      )
-      sent++
-    } catch (err: any) {
-      if (err.statusCode === 410 || err.statusCode === 404) {
-        await supabase.from('push_subscriptions').delete().eq('id', sub.id)
-      } else {
-        console.error('[push-send] webpush error:', err.statusCode, err.message)
-      }
-    }
+  if (error) {
+    if (error.code === '23505') return 0 // مكرر — تجاهل بصمت
+    console.error('[push-send] notification_history insert error:', error.message)
+    return 0
   }
 
-  // ── حفظ في alerts (للعرض داخل التطبيق) ──────────────────────
-  if (sent > 0) {
-    try {
-      await supabase.from('alerts').insert({
-        user_id: userId,
-        title,
-        message,
-        type: ['warning','motivation','reminder','achievement'].includes(tag) ? tag : 'reminder',
-        frequency: 'once',
-        is_read: false,
-      })
-    } catch {}
-  }
-
-  return sent
+  return 1
 }
