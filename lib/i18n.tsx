@@ -890,13 +890,22 @@ const I18nContext = createContext<I18nContextType>({
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>('system')
-  const [mounted, setMounted] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    // Two-phase hydration:
+    // In React concurrent hydration, effects can run before the entire tree is fully hydrated.
+    // If we read localStorage and update language immediately, it can flip text mid-hydration
+    // and trigger "Hydration failed" warnings. We mark hydrated first, then apply preferences
+    // on a second commit.
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
     const saved = localStorage.getItem('lang') as Lang | null
     if (saved) setLangState(saved)
-  }, [])
+  }, [hydrated])
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l)
@@ -912,12 +921,12 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const currentLang = useMemo((): 'ar' | 'en' => {
-    if (!mounted) return 'ar' // Prevent hydration mismatch by matching SSR fallback
+    if (!hydrated) return 'ar' // Match SSR fallback until hydration is fully done
     if (lang !== 'system') return lang
     if (typeof navigator === 'undefined') return 'ar'
     const browserLang = navigator.language || (navigator as any).userLanguage || 'ar'
     return browserLang.startsWith('ar') ? 'ar' : 'en'
-  }, [mounted, lang])
+  }, [hydrated, lang])
 
   useEffect(() => {
     const html = document.documentElement
