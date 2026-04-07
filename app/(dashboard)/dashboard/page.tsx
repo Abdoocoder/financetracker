@@ -29,7 +29,7 @@ const GamificationCard = nextDynamic(() => import('@/components/dashboard/Gamifi
 
 
 export default function DashboardPage() {
-  const { t, lang } = useI18n()
+  const { t, lang, hydrated } = useI18n()
   const { user: currentUser, profile } = useUser()
   const queryClient = useQueryClient()
   
@@ -86,12 +86,12 @@ export default function DashboardPage() {
       {/* ── 1. HEADER ──────────────────────────────────── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <h1 style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
-            {firstName ? `${t('dash_greeting')} ${firstName}` : t('dash_title')}
+          <h1 suppressHydrationWarning style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
+            {!hydrated ? t('dash_title') : (firstName ? `${t('dash_greeting')} ${firstName}` : t('dash_title'))}
           </h1>
-          <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-            {new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
-            {data?.lastUpdated && (
+          <p suppressHydrationWarning style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+            {hydrated && new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {hydrated && data?.lastUpdated && (
               <span style={{ margin: '0 8px', opacity: 0.5 }}>
                 • {lang === 'en' ? 'Updated' : 'تم التحديث'} {data.lastUpdated}
               </span>
