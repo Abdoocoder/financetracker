@@ -578,7 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.30.1 — 2026-04-06 *(Latest)*
+### v3.30.2 — 2026-04-07 *(Latest)*
+
+| Change | Description |
+|:-------|:------------|
+| ⚙️ **Calculations Engine Parity** | Centralized financial calculations (Net Worth, Health Score) at the database layer (PostgreSQL RPC). Flutter mobile and Web dashboard now read identical synced calculations. |
+| 🛡️ **Transactions UI Fixes** | Aligned the calculation of total expected income fallback in the dashboard to match transaction list net values seamlessly. |
+| ✅ **Test Integrity** | Restored notification system test suite compatibility with security-hardened admin clients. |
+
+### v3.30.1 — 2026-04-06
 
 | Change | Description |
 |:-------|:------------|

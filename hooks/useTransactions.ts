@@ -286,7 +286,10 @@ export function useTransactions() {
   const filtered = useMemo(() => searched.filter(tx => filter === 'all' || tx.type === filter), [searched, filter])
   // الإجماليات من استعلام منفصل يشمل الشهر كاملاً (غير مقيدة بالـ pagination)
   const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
-  const totalIncome = useMemo(() => allTotals.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0), [allTotals])
+  const totalIncome = useMemo(() => {
+    const recorded = allTotals.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0);
+    return recorded > 0 ? recorded : Number(profile?.monthly_income ?? 0);
+  }, [allTotals, profile?.monthly_income])
   const totalExpense = useMemo(() => allTotals.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0), [allTotals])
   const totalDebtPayments = useMemo(() => allTotals.filter(t => t.type === 'expense' && DEBT_CATEGORIES.includes(t.category ?? '')).reduce((a, t) => a + Number(t.amount), 0), [allTotals])
   const totalRealExpense = useMemo(() => totalExpense - totalDebtPayments, [totalExpense, totalDebtPayments])

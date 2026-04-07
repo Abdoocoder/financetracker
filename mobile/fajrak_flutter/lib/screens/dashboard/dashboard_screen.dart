@@ -136,23 +136,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           .where((d) => d['auto_deduct'] == true && (d['debt_type'] ?? 'owed') == 'owed')
           .fold(0.0, (a, d) => a + ((d['monthly_payment'] as num?) ?? 0).toDouble());
 
-      int score = 0;
-      final savingsRate = income > 0 ? (income - txExpenses) / income : 0;
-      if (savingsRate >= 0.2) {
-        score += 30;
-      } else if (savingsRate >= 0.1) {
-        score += 20;
-      } else if (savingsRate > 0) {
-        score += 10;
-      }
-      if (totalDebt == 0) {
-        score += 25;
-      } else if (income > 0 && totalDebt / (income * 12) < 0.3) {
-        score += 15;
-      }
-      if (goalsSaved > 0) score += 20;
-      if (invValue > 0) score += 15;
-      if (txs.length >= 10) score += 10;
+      // Use Centralized Database RPC for Health Score
+      int score = (dash['health_score'] as num?)?.toInt() ?? 0;
 
       String stage = 'awareness';
       if (totalDebt > 0 && income > 0 && totalMonthly / income > 0.3) {
