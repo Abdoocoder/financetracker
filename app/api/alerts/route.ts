@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendPushToUser } from '@/lib/push-send'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabase = createAdminClient()
 
 async function alreadyExists(userId: string, title: string, withinHours = 24): Promise<boolean> {
   const since = new Date(Date.now() - withinHours * 60 * 60 * 1000).toISOString()

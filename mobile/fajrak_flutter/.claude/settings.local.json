@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs wc:*)"
+      "Bash(xargs wc:*)",
+      "Bash(flutter build:*)",
+      "Bash(./gradlew bundleRelease --stacktrace)",
+      "Bash(./gradlew bundleRelease)"
     ]
   }
 }

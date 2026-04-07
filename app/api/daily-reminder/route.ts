@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
@@ -7,10 +7,7 @@ import { verifyCronAuth } from '@/lib/cron-auth'
 // المنطق الفعلي ينفّذه المنظّم الرئيسي /api/smart-notifications عند hour === 6.
 // تأكد من عدم تشغيل cron-job.org لهذا المسار تلقائياً لتجنب الإشعارات المكررة.
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabase = createAdminClient()
 
 async function sendDailyReminders() {
   const now = new Date()

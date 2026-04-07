@@ -1,11 +1,10 @@
 import webpush from 'web-push'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 
+let _supabase: ReturnType<typeof createAdminClient> | null = null
 function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  if (!_supabase) _supabase = createAdminClient()
+  return _supabase
 }
 
 // VAPID يُهيَّأ عند الاستخدام الأول فقط لتفادي الفشل الصامت عند غياب المتغيرات
