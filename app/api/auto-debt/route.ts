@@ -74,8 +74,17 @@ async function processAutoDebts() {
     const newRemaining = Math.max(0, debt.remaining_amount - payment)
     const isPaid = newRemaining === 0
 
-    // إضافة سجل الدفعة — الـ UNIQUE index على (debt_id, payment_year_month)
-    // يمنع الإدراج المكرر بشكل ذري دون الحاجة لـ SELECT مسبق
+    // تحقق يدوي من وجود دفعة تلقائية لهذا الدين في نفس الشهر
+    const { count: existingAutoPayment } = await supabase
+      .from('debt_payments')
+      .select('id', { count: 'exact', head: true })
+      .eq('debt_id', debt.id)
+      .eq('notes', 'دفعة تلقائية')
+      .gte('payment_date', `${year}-${String(month).padStart(2,'0')}-01`)
+      .lt('payment_date', `${year}-${String(month + 1 > 12 ? 1 : month + 1).padStart(2,'0')}-01`)
+
+    if ((existingAutoPayment ?? 0) > 0) continue // تم الدفع التلقائي مسبقاً هذا الشهر
+
     const { error: insertError } = await supabase.from('debt_payments').insert({
       debt_id: debt.id,
       user_id: debt.user_id,
@@ -83,10 +92,7 @@ async function processAutoDebts() {
       payment_date: dateStr,
       notes: 'دفعة تلقائية',
     })
-    if (insertError) {
-      if (insertError.code === '23505') continue // تم الدفع مسبقاً هذا الشهر
-      throw insertError
-    }
+    if (insertError) throw insertError
 
     // تحديث المبلغ المتبقي
     await supabase.from('debts').update({
@@ -172,12 +178,25 @@ export async function POST(request: NextRequest) {
       const payment = Math.min(debt.monthly_payment, debt.remaining_amount)
       const newRemaining = Math.max(0, debt.remaining_amount - payment)
 
+      // تحقق يدوي من وجود دفعة تلقائية لهذا الدين في نفس الشهر
+      const now2 = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+      const y2 = now2.getUTCFullYear()
+      const m2 = now2.getUTCMonth() + 1
+      const { count: existingPay } = await supabase
+        .from('debt_payments')
+        .select('id', { count: 'exact', head: true })
+        .eq('debt_id', debt.id)
+        .eq('notes', 'دفعة تلقائية')
+        .gte('payment_date', `${y2}-${String(m2).padStart(2,'0')}-01`)
+        .lt('payment_date', `${y2}-${String(m2 + 1 > 12 ? 1 : m2 + 1).padStart(2,'0')}-01`)
+
+      if ((existingPay ?? 0) > 0) continue // تم الدفع مسبقاً
+
       const { error: insertError } = await supabase.from('debt_payments').insert({
         debt_id: debt.id, amount: payment,
         payment_date: dateStr, notes: 'دفعة تلقائية',
       })
       if (insertError) {
-        if (insertError.code === '23505') continue // تم الدفع مسبقاً
         return NextResponse.json({ error: insertError.message }, { status: 500 })
       }
 

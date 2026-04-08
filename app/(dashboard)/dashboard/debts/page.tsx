@@ -308,7 +308,7 @@ export default function DebtsPage() {
     const newRemainingForeign = Math.max(0, (debt.remaining_amount_foreign || debt.remaining_amount) - amountInDebtCurrency)
     const newRemainingBase = Math.max(0, debt.remaining_amount - amountInBaseCurrency)
 
-    await supabase.from('debt_payments').insert({
+    const { error: paymentError } = await supabase.from('debt_payments').insert({
       debt_id: debtId,
       user_id: currentUser.id,
       amount: amountInBaseCurrency,
@@ -317,6 +317,11 @@ export default function DebtsPage() {
       exchange_rate: rateToBaseCurrency,
       payment_date: new Date().toISOString().split('T')[0]
     })
+    if (paymentError) {
+      toast.error(t('toast_error_generic') || 'حدث خطأ أثناء تسجيل الدفعة، يرجى المحاولة مجدداً')
+      setPayingSaving(false)
+      return
+    }
 
     // تعليم تنبيه الدين كمقروء تلقائياً
     const paidDebt = debts.find(d => d.id === debtId)
