@@ -110,9 +110,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       for (final tx in txs) {
         if (tx['type'] == 'income') {
           txIncome += (tx['amount'] as num).toDouble();
-        } else {
+        } else if (tx['type'] == 'expense') {
           txExpenses += (tx['amount'] as num).toDouble();
         }
+        // transfers وأنواع أخرى لا تُحسب كمصاريف
       }
       final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
       final income = txIncome > 0 ? txIncome : profileIncome;
