@@ -578,7 +578,17 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.30.2 — 2026-04-07 *(Latest)*
+### v3.31.0 — 2026-04-08 *(Latest — Quality & Stability)*
+
+| Change | Description |
+|:-------|:------------|
+| 🛡️ **Double-Submit Protection** | Comprehensive guard across all 9 save buttons/dialogs — eliminates duplicate transaction risk from rapid taps |
+| 🔧 **finally on All Saves** | Added `finally` blocks to re-enable save buttons on error — previously they stayed disabled forever if DB failed |
+| 🧹 **Memory Leak Fix** | Added proper `dispose()` for `TextEditingController` in Login and Register screens |
+| ⚖️ **Balance Display Fix** | Dashboard now correctly shows total account balance from `get_account_balances` RPC instead of monthly net |
+| 🔔 **Web FCM Non-Fatal** | Flutter web FCM token failure on localhost is now a non-fatal warning instead of a crash |
+
+### v3.30.2 — 2026-04-07
 
 | Change | Description |
 |:-------|:------------|
