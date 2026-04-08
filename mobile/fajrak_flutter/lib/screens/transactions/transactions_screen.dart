@@ -37,8 +37,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   String _currency = 'JOD';
   String _userName = '';
   bool _generatingPdf = false;
-  int? _filterMonth;
-  int? _filterYear;
+  int? _filterMonth = DateTime.now().month;
+  int? _filterYear = DateTime.now().year;
 
   final ScrollController _scrollController = ScrollController();
 
