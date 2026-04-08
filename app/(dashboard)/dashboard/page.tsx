@@ -133,14 +133,23 @@ export default function DashboardPage() {
       {/* ── 4. MONTHLY STATS ── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
         {[
-          { label: t('dash_income'),   value: `+${fmt(income)}`,   color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑' },
-          { label: t('dash_expenses'), value: fmt(realExpenses > 0 ? realExpenses : expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓' },
-          { label: t('dash_net'),      value: `${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`, color: net >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', bg: net >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: net >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)', icon: '=' },
+          { label: t('dash_income'),   value: `+${fmt(income)}`,   color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑', sub: null },
+          { label: t('dash_expenses'), value: fmt(realExpenses > 0 ? realExpenses : expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓', sub: null },
+          {
+            label: t('dash_net'),
+            value: `${(accountsTotalBalance ?? net) >= 0 ? '+' : '-'}${fmt(Math.abs(accountsTotalBalance ?? net))}`,
+            color: (accountsTotalBalance ?? net) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
+            bg: (accountsTotalBalance ?? net) >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)',
+            border: (accountsTotalBalance ?? net) >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+            icon: '🏦',
+            sub: `${lang === 'en' ? 'Month' : 'الشهر'}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,
+          },
         ].map(s => (
           <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: '10px 6px', textAlign: 'center' }}>
             <div style={{ fontSize: 10, color: s.color, fontWeight: 900, opacity: 0.6, marginBottom: 2 }}>{s.icon}</div>
             <div style={{ fontSize: 15, fontWeight: 900, color: s.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{s.value}</div>
             <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2, fontWeight: 700 }}>{s.label}</div>
+            {s.sub && <div style={{ fontSize: 8, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600, opacity: 0.8 }}>{s.sub}</div>}
           </div>
         ))}
       </div>

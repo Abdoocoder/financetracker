@@ -281,7 +281,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(width: 8),
                         Expanded(child: _SkeletonBox(height: 70, radius: 14)),
                       ])
-                    : DashboardStats(key: const ValueKey('stats'), income: _income, expenses: _expenses, net: _net, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
+                    : DashboardStats(key: const ValueKey('stats'), income: _income, expenses: _expenses, net: _net, totalBalance: _totalAccountsBalance, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
               ),
               const SizedBox(height: 16),
 

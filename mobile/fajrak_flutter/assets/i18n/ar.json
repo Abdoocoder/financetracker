@@ -42,7 +42,7 @@
   "dash_monthly": "هذا الشهر",
   "dash_income": "الدخل",
   "dash_expenses": "المصاريف",
-  "dash_net": "صافي الشهر",
+  "dash_net": "إجمالي الرصيد",
   "dash_after_debts": "بعد الالتزامات",
   "dash_debt_payments": "أقساط ديون",
   "month_summary_title": "ملخص شهر {}",

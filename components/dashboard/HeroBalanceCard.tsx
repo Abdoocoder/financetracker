@@ -8,10 +8,9 @@ export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBal
   totalBalance?: number
   prevMonthNet: number
 }) {
-  // UX: Hero number should match Transactions "Net" for the current month.
-  // Account total balance is shown as secondary info when accounts exist.
-  const animatedNet = useCountUp(Math.abs(monthlyNet), 900)
-  const isPositive = monthlyNet >= 0
+  const heroValue = typeof totalBalance === 'number' ? totalBalance : monthlyNet
+  const animatedHero = useCountUp(Math.abs(heroValue), 900)
+  const isPositive = heroValue >= 0
   const color = isPositive ? '#10B981' : '#EF4444'
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
   const trend = prevMonthNet !== 0 ? ((monthlyNet - prevMonthNet) / Math.abs(prevMonthNet)) * 100 : 0
@@ -26,30 +25,28 @@ export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBal
     }}>
       {/* Label */}
       <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
-        {lang === 'en' ? '💰 Net (This Month)' : '💰 صافي هذا الشهر'}
+        {lang === 'en' ? '🏦 Total Balance' : '🏦 إجمالي الرصيد'}
       </div>
 
       {/* Hero Number */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, marginBottom: 4 }}>
         <span style={{ fontSize: 42, fontWeight: 900, color, fontFamily: 'monospace', letterSpacing: '-0.03em', lineHeight: 1 }}>
-          {isPositive ? '+' : '-'}{fmt(animatedNet)}
+          {isPositive ? '+' : '-'}{fmt(animatedHero)}
         </span>
         <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>{currency}</span>
       </div>
 
-      {/* Trend + optional total balance */}
+      {/* Monthly net + trend */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
+          {lang === 'en' ? 'This month:' : 'هذا الشهر:'}{' '}
+          <span style={{ fontWeight: 800, color: monthlyNet >= 0 ? '#10B981' : '#EF4444' }}>
+            {monthlyNet >= 0 ? '+' : '-'}{fmt(Math.abs(monthlyNet))}
+          </span>
+        </span>
         {hasTrend && (
           <span style={{ fontSize: 11, fontWeight: 700, color: trend >= 0 ? '#10B981' : '#EF4444', background: trend >= 0 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: 100 }}>
             {trend >= 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(0)}% {lang === 'en' ? 'vs last month' : 'عن الشهر الماضي'}
-          </span>
-        )}
-        {accounts.length > 0 && typeof totalBalance === 'number' && (
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-            {lang === 'en' ? 'Accounts total:' : 'إجمالي الحسابات:'}{' '}
-            <span style={{ fontWeight: 800, color: totalBalance >= 0 ? '#10B981' : '#EF4444' }}>
-              {totalBalance >= 0 ? '+' : '-'}{fmt(Math.abs(totalBalance))}
-            </span>
           </span>
         )}
       </div>

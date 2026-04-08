@@ -74,7 +74,8 @@
       "Bash(powershell.exe -Command \".\\\\gradlew.bat assembleRelease 2>&1\")",
       "Bash(grep -E \"\\\\.dart$\")",
       "Bash(where.exe flutter:*)",
-      "Read(//c/Users/user/**)"
+      "Read(//c/Users/user/**)",
+      "Bash(grep -n \"CREATE OR REPLACE FUNCTION.*get_account_balances\" /c/Users/user/Projects/financetracker/supabase/migrations/*.sql)"
     ]
   }
 }

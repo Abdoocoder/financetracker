@@ -42,7 +42,7 @@
   "dash_monthly": "This Month",
   "dash_income": "Income",
   "dash_expenses": "Expenses",
-  "dash_net": "Monthly Net",
+  "dash_net": "Total Balance",
   "dash_after_debts": "After Debts",
   "dash_debt_payments": "Debt Payments",
   "month_summary_title": "{} Summary",
