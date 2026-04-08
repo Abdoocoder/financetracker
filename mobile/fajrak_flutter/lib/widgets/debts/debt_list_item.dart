@@ -60,9 +60,11 @@ class _DebtListItemState extends State<DebtListItem> {
   }
 
   Future<void> _makePayment() async {
+    if (_payingSaving) return; // منع الضغط المزدوج قبل إعادة البناء
     final amount = double.tryParse(_paymentCtrl.text);
     if (amount == null || amount <= 0) return;
-    setState(() => _payingSaving = true);
+    _payingSaving = true; // تعيين فوري قبل أي await
+    setState(() {});
     
     try {
       final user = Supabase.instance.client.auth.currentUser!;
