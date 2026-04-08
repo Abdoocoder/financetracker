@@ -49,12 +49,15 @@ void main() async {
   // Initialize Firebase with platform-specific options
   if (kIsWeb) {
     // Web configuration
+    final projectId = dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1';
     await Firebase.initializeApp(
       options: FirebaseOptions(
         apiKey: dotenv.env['FLUTTER_FIREBASE_API_KEY'] ?? '',
         appId: dotenv.env['FLUTTER_FIREBASE_APP_ID'] ?? '',
         messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
-        projectId: dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? '',
+        projectId: projectId,
+        authDomain: '$projectId.firebaseapp.com',
+        storageBucket: '$projectId.appspot.com',
       ),
     );
   } else {

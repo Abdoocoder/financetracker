@@ -163,13 +163,19 @@ class NotificationService {
       }
 
       // vapidKey is only needed for Web. On Android/iOS, call getToken() with no argument.
+      // On Web, FCM may fail on localhost - treat as non-fatal.
       final String? token;
       if (kIsWeb) {
-        token = newToken ??
-            await FirebaseMessaging.instance.getToken(
-              vapidKey: dotenv.env['FLUTTER_FIREBASE_VAPID_KEY'] ??
-                  'BAedHFDPNJEXs2a4caJUYyqdEGWYDLgafvnwFxcNIqhoauxEzu29fJi-OcJncP3U6LITiYRwIXzwbKzIWAQxXNO',
-            );
+        try {
+          token = newToken ??
+              await FirebaseMessaging.instance.getToken(
+                vapidKey: dotenv.env['FLUTTER_FIREBASE_VAPID_KEY'] ??
+                    'BAedHFDPNJEXs2a4caJUYyqdEGWYDLgafvnwFxcNIqhoauxEzu29fJi-OcJncP3U6LITiYRwIXzwbKzIWAQxXNO',
+              );
+        } catch (webErr) {
+          if (kDebugMode) debugPrint('[NotificationService] Web FCM token failed (expected on localhost): $webErr');
+          return; // Web push handled by the Next.js PWA instead
+        }
       } else {
         token = newToken ?? await FirebaseMessaging.instance.getToken();
       }
