@@ -25,6 +25,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     AnalyticsService.logScreenView('Register');
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _register() async {
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||

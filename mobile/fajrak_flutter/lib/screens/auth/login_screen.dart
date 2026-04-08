@@ -42,6 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
     AnalyticsService.logScreenView('Login');
   }
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _login() async {
     setState(() {
       _loading = true;

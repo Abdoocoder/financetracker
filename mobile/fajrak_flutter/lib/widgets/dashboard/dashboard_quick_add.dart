@@ -135,20 +135,26 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
           ),
           const SizedBox(width: 8),
           GestureDetector(onTap: () async {
+            if (_saving) return;
             final val = double.tryParse(_amountController.text.trim());
             if (val == null || val <= 0) return;
-            setState(() => _saving = true);
-            
+            _saving = true;
+            setState(() {});
+
             final isMulti = _selectedCurrency != widget.currency;
             final baseAmount = isMulti ? (val * _exchangeRate) : val;
 
-            await widget.onAdd(_txType, baseAmount, _selectedCategory, 
-              originalAmount: val, 
-              originalCurrency: _selectedCurrency, 
-              exchangeRate: _exchangeRate);
-
-            _amountController.clear();
-            if (mounted) setState(() => _saving = false);
+            try {
+              await widget.onAdd(_txType, baseAmount, _selectedCategory,
+                originalAmount: val,
+                originalCurrency: _selectedCurrency,
+                exchangeRate: _exchangeRate);
+              _amountController.clear();
+            } catch (_) {
+              // onAdd error is handled upstream
+            } finally {
+              if (mounted) setState(() => _saving = false);
+            }
           },
             child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), decoration: BoxDecoration(color: widget.colorScheme.primary, borderRadius: BorderRadius.circular(10)),
               child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),

@@ -246,9 +246,11 @@ class _RecurringFormState extends State<_RecurringForm> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('debt_amount_positive'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.red.shade700));
       return;
     }
+    if (_saving) return;
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    setState(() => _saving = true);
+    _saving = true;
+    setState(() {});
 
     final payload = {
       'user_id': user.id,
@@ -263,15 +265,23 @@ class _RecurringFormState extends State<_RecurringForm> {
       'is_active': true,
     };
 
-    final existing = widget.existing;
-    if (existing != null) {
-      await Supabase.instance.client
-          .from('recurring_transactions').update(payload).eq('id', existing['id']);
-    } else {
-      await Supabase.instance.client
-          .from('recurring_transactions').insert(payload);
+    try {
+      final existing = widget.existing;
+      if (existing != null) {
+        await Supabase.instance.client
+            .from('recurring_transactions').update(payload).eq('id', existing['id']);
+      } else {
+        await Supabase.instance.client
+            .from('recurring_transactions').insert(payload);
+      }
+      widget.onSaved();
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-    widget.onSaved();
   }
 
   @override

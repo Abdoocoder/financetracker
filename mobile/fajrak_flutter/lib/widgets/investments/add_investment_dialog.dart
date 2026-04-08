@@ -75,10 +75,12 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
   }
 
   Future<void> _addInvestment() async {
+    if (_saving) return;
     if (_symbolCtrl.text.isEmpty || _sharesCtrl.text.isEmpty) return;
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    setState(() => _saving = true);
+    _saving = true;
+    setState(() {});
     HapticFeedback.mediumImpact();
 
     try {

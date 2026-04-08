@@ -239,8 +239,10 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
   void dispose() { _nameCtrl.dispose(); _balanceCtrl.dispose(); super.dispose(); }
 
   Future<void> _save() async {
+    if (_saving) return;
     if (_nameCtrl.text.trim().isEmpty) return;
-    setState(() => _saving = true);
+    _saving = true;
+    setState(() {});
     try {
       final user = Supabase.instance.client.auth.currentUser!;
       final colorHex = '#${_color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
@@ -374,9 +376,11 @@ class _TransferSheetState extends State<_TransferSheet> {
   void dispose() { _amountCtrl.dispose(); _noteCtrl.dispose(); super.dispose(); }
 
   Future<void> _save() async {
+    if (_saving) return;
     final amount = double.tryParse(_amountCtrl.text);
     if (amount == null || amount <= 0 || _fromId == _toId) return;
-    setState(() => _saving = true);
+    _saving = true;
+    setState(() {});
     try {
       final user = Supabase.instance.client.auth.currentUser!;
       await AccountsService.transfer(

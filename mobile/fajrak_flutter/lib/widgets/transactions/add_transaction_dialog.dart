@@ -119,17 +119,24 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       'transaction_date': _dateController.value.toIso8601String().split('T')[0],
     };
 
-    if (widget.existing != null) {
-      await Supabase.instance.client
-          .from('transactions')
-          .update(data)
-          .eq('id', widget.existing!['id']);
-    } else {
-      await Supabase.instance.client.from('transactions').insert(data);
+    try {
+      if (widget.existing != null) {
+        await Supabase.instance.client
+            .from('transactions')
+            .update(data)
+            .eq('id', widget.existing!['id']);
+      } else {
+        await Supabase.instance.client.from('transactions').insert(data);
+      }
+      widget.onSaved();
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-    if (mounted) setState(() => _saving = false);
-    widget.onSaved();
-    if (mounted) Navigator.pop(context);
   }
 
   @override

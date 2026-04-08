@@ -57,33 +57,40 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
     
     final limit = double.tryParse(_limitCtrl.text) ?? 0;
     
-    if (widget.existing != null) {
-      await Supabase.instance.client.from('budgets').update({
-        'monthly_limit': limit
-      }).eq('id', widget.existing!['id']);
-    } else {
-      final exists =
-          widget.currentBudgets.any((b) => b['category'] == _selectedCat);
-      if (exists) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('budget_category_exists'.tr(),
-                  style: const TextStyle(fontFamily: 'Cairo')),
-              backgroundColor: const Color(0xFFF59E0B)));
+    try {
+      if (widget.existing != null) {
+        await Supabase.instance.client.from('budgets').update({
+          'monthly_limit': limit
+        }).eq('id', widget.existing!['id']);
+      } else {
+        final exists =
+            widget.currentBudgets.any((b) => b['category'] == _selectedCat);
+        if (exists) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('budget_category_exists'.tr(),
+                    style: const TextStyle(fontFamily: 'Cairo')),
+                backgroundColor: const Color(0xFFF59E0B)));
+          }
+          return;
         }
-        return;
+        await Supabase.instance.client.from('budgets').insert({
+          'user_id': user.id,
+          'category': _selectedCat,
+          'monthly_limit': limit,
+          'month': widget.month,
+          'year': widget.year
+        });
       }
-      await Supabase.instance.client.from('budgets').insert({
-        'user_id': user.id,
-        'category': _selectedCat,
-        'monthly_limit': limit,
-        'month': widget.month,
-        'year': widget.year
-      });
+      widget.onSaved();
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
-    widget.onSaved();
-    if (mounted) Navigator.pop(context);
-    if (mounted) setState(() => _saving = false);
   }
 
   @override

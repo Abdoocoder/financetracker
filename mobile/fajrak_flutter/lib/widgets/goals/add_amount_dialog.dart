@@ -35,11 +35,19 @@ class _AddAmountDialogState extends State<AddAmountDialog> {
     setState(() {});
     HapticFeedback.mediumImpact();
     final current = (widget.goal['current_amount'] as num).toDouble();
-    await Supabase.instance.client
-        .from('savings_goals')
-        .update({'current_amount': current + amount}).eq('id', widget.goal['id']);
-    widget.onSaved();
-    if (mounted) Navigator.pop(context);
+    try {
+      await Supabase.instance.client
+          .from('savings_goals')
+          .update({'current_amount': current + amount}).eq('id', widget.goal['id']);
+      widget.onSaved();
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
