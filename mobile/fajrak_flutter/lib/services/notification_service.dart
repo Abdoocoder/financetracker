@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
@@ -166,8 +167,8 @@ class NotificationService {
       if (kIsWeb) {
         token = newToken ??
             await FirebaseMessaging.instance.getToken(
-              vapidKey:
-                  'BBTibDSNpqg5OYVoQYhy5_5UldLkB8qZpWE8993FTkLidCXGZ45qtVcSWHv_M1GLj4FDLVXL2X8y7qJuu1fM3ew',
+              vapidKey: dotenv.env['FLUTTER_FIREBASE_VAPID_KEY'] ??
+                  'BAedHFDPNJEXs2a4caJUYyqdEGWYDLgafvnwFxcNIqhoauxEzu29fJi-OcJncP3U6LITiYRwIXzwbKzIWAQxXNO',
             );
       } else {
         token = newToken ?? await FirebaseMessaging.instance.getToken();
