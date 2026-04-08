@@ -30,6 +30,7 @@ class AddBudgetDialog extends StatefulWidget {
 class _AddBudgetDialogState extends State<AddBudgetDialog> {
   late String _selectedCat;
   late final TextEditingController _limitCtrl;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -47,7 +48,10 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
     if (_limitCtrl.text.isEmpty) return;
+    _saving = true;
+    setState(() {});
     final user = Supabase.instance.client.auth.currentUser!;
     HapticFeedback.mediumImpact();
     
@@ -79,6 +83,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
     }
     widget.onSaved();
     if (mounted) Navigator.pop(context);
+    if (mounted) setState(() => _saving = false);
   }
 
   @override
@@ -179,7 +184,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
         SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _save,
+              onPressed: _saving ? null : _save,
               style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: Colors.white,

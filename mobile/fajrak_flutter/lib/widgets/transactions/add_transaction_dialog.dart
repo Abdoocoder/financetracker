@@ -96,7 +96,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     super.dispose();
   }
 
+  bool _saving = false;
+
   Future<void> _save() async {
+    if (_saving) return;
+    _saving = true;
+    setState(() {});
     final user = Supabase.instance.client.auth.currentUser!;
     final origAmount = double.tryParse(_amountController.text) ?? 0;
     final rate = double.tryParse(_exchangeRateController.text) ?? 1.0;
@@ -122,6 +127,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     } else {
       await Supabase.instance.client.from('transactions').insert(data);
     }
+    if (mounted) setState(() => _saving = false);
     widget.onSaved();
     if (mounted) Navigator.pop(context);
   }
@@ -468,7 +474,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 ],
               ),
               child: ElevatedButton(
-                onPressed: _save,
+                onPressed: _saving ? null : _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,

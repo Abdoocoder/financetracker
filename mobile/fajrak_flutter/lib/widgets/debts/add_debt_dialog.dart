@@ -34,6 +34,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   bool _receivedAmount = false;
   late bool _autoDeduct;
   String _debtType = 'owed';
+  bool _saving = false;
   late String _dueDate;
 
   String _selectedCurrency = '';
@@ -103,6 +104,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
     if (_nameCtrl.text.trim().isEmpty) {
       _showError('debt_name_required'.tr());
       return;
@@ -116,6 +118,8 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
       _showError('debt_amount_positive'.tr());
       return;
     }
+    _saving = true;
+    setState(() {});
     final remForeign = double.tryParse(_remainingCtrl.text.replaceAll(',', '.')) ?? origForeign;
     if (remForeign < 0) {
       _showError('debt_remaining_negative'.tr());
@@ -180,6 +184,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         });
       }
     }
+    if (mounted) setState(() => _saving = false);
     widget.onSaved();
     if (mounted) Navigator.pop(context);
   }
@@ -503,7 +508,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _save,
+              onPressed: _saving ? null : _save,
               style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3B7EF6),
                   foregroundColor: Colors.white,

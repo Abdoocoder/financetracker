@@ -26,6 +26,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
   late final TextEditingController _currentCtrl;
   late int _selectedIcon;
   late String _deadlineDate;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -46,6 +47,9 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
+    _saving = true;
+    setState(() {});
     final user = Supabase.instance.client.auth.currentUser!;
     HapticFeedback.mediumImpact();
     final data = {
@@ -69,6 +73,8 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Goals Save');
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 
@@ -186,7 +192,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
         SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _save,
+              onPressed: _saving ? null : _save,
               style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: Colors.white,

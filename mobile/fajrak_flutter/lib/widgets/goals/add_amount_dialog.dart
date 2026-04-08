@@ -19,6 +19,7 @@ class AddAmountDialog extends StatefulWidget {
 
 class _AddAmountDialogState extends State<AddAmountDialog> {
   final TextEditingController _amountCtrl = TextEditingController();
+  bool _saving = false;
 
   @override
   void dispose() {
@@ -27,8 +28,11 @@ class _AddAmountDialogState extends State<AddAmountDialog> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
     final amount = double.tryParse(_amountCtrl.text) ?? 0;
     if (amount <= 0) return;
+    _saving = true;
+    setState(() {});
     HapticFeedback.mediumImpact();
     final current = (widget.goal['current_amount'] as num).toDouble();
     await Supabase.instance.client
@@ -80,7 +84,7 @@ class _AddAmountDialogState extends State<AddAmountDialog> {
         SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _save,
+              onPressed: _saving ? null : _save,
               style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: Colors.white,
