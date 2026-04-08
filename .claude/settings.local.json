@@ -72,7 +72,9 @@
       "Bash(cmd //c \"gradlew.bat assembleRelease 2>&1\")",
       "Bash(powershell.exe -Command \"./gradlew assembleRelease 2>&1\")",
       "Bash(powershell.exe -Command \".\\\\gradlew.bat assembleRelease 2>&1\")",
-      "Bash(grep -E \"\\\\.dart$\")"
+      "Bash(grep -E \"\\\\.dart$\")",
+      "Bash(where.exe flutter:*)",
+      "Read(//c/Users/user/**)"
     ]
   }
 }
