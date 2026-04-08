@@ -276,9 +276,11 @@ class _RecurringFormState extends State<_RecurringForm> {
       }
       widget.onSaved();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+        );
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
