@@ -44,6 +44,23 @@ const faqs = [
     ],
   },
   {
+    section: { ar: '🏦 الحسابات', en: '🏦 Accounts' },
+    items: [
+      {
+        ar: { q: 'كيف أضيف حساباً بنكياً؟', a: 'اذهب لصفحة الحسابات واضغط + في الأعلى. حدد نوع الحساب (بنك / نقدي / توفير / بطاقة ائتمان)، أدخل الاسم والرصيد الافتتاحي، ثم احفظ.' },
+        en: { q: 'How do I add a bank account?', a: 'Go to the Accounts page and tap + at the top. Choose the account type (Bank / Cash / Savings / Credit Card), enter the name and opening balance, then save.' },
+      },
+      {
+        ar: { q: 'ما هو الرصيد الافتتاحي؟', a: 'هو رصيدك الفعلي في اللحظة التي أضفت فيها الحساب للتطبيق. يُضاف مرة واحدة فقط ولا يظهر كمعاملة — يُشكّل الأساس الذي تُحتسب عليه جميع أرصدتك لاحقاً.' },
+        en: { q: 'What is the opening balance?', a: 'It is your actual balance at the moment you added the account to the app. It is added only once and does not appear as a transaction — it forms the baseline for all future balance calculations.' },
+      },
+      {
+        ar: { q: 'كيف أحوّل مالاً بين الحسابات؟', a: 'في صفحة الحسابات اضغط زر "تحويل"، حدد الحساب المصدر والوجهة، أدخل المبلغ وأكد. يُسجَّل التحويل داخلياً ولا يؤثر على صافي رصيدك الكلي.' },
+        en: { q: 'How do I transfer money between accounts?', a: 'On the Accounts page tap "Transfer", select the source and destination accounts, enter the amount and confirm. It is recorded as an internal transfer and does not affect your overall net balance.' },
+      },
+    ],
+  },
+  {
     section: { ar: '💳 الديون', en: '💳 Debts' },
     items: [
       {
@@ -175,6 +192,19 @@ const faqs = [
       },
     ],
   },
+  {
+    section: { ar: '📄 تقارير PDF', en: '📄 PDF Reports' },
+    items: [
+      {
+        ar: { q: 'كيف أصدر تقريراً PDF؟', a: 'اذهب لصفحة "تقارير PDF"، حدد الفترة الزمنية والحسابات المراد تضمينها، ثم اضغط "تصدير PDF". سيتحمّل ملف جاهز للطباعة أو المشاركة.' },
+        en: { q: 'How do I export a PDF report?', a: 'Go to the "PDF Reports" page, select the time period and accounts to include, then tap "Export PDF". A print-ready file will download.' },
+      },
+      {
+        ar: { q: 'ماذا يتضمن التقرير؟', a: 'ملخص المعاملات، الميزانية، الأهداف، الديون، وبيانات الاستثمار خلال الفترة المحددة — كل شيء في ملف واحد منظّم.' },
+        en: { q: 'What does the report include?', a: 'A summary of transactions, budget, goals, debts, and investment data for the selected period — everything in one organized file.' },
+      },
+    ],
+  },
 ]
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -262,7 +292,7 @@ export default function HelpPage() {
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
           {currentLang === 'ar' ? 'تواصل معنا مباشرة وسنساعدك' : 'Contact us directly and we\'ll help you'}
         </div>
-        <a href="mailto:abdooraf3@gmail.com" style={{
+        <a href="mailto:support@fajrak.com" style={{
           display: 'inline-block', padding: '10px 24px', borderRadius: 12,
           background: 'var(--accent-blue)', color: 'white',
           fontSize: 13, fontWeight: 800, textDecoration: 'none',

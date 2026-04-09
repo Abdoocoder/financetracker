@@ -51,24 +51,22 @@ class _HelpScreenState extends State<HelpScreen> {
       ],
     },
     {
+      'section': 'help_faq_accounts_title'.tr(),
+      'items': [
+        {'q': 'help_faq_accounts_q1'.tr(), 'a': 'help_faq_accounts_a1'.tr()},
+        {'q': 'help_faq_accounts_q2'.tr(), 'a': 'help_faq_accounts_a2'.tr()},
+        {'q': 'help_faq_accounts_q3'.tr(), 'a': 'help_faq_accounts_a3'.tr()},
+      ],
+    },
+    {
       'section': 'help_faq_debts_title'.tr(),
       'items': [
-        {
-          'q': 'help_faq_debts_q1'.tr(),
-          'a': 'help_faq_debts_a1'.tr()
-        },
-        {
-          'q': 'help_faq_debts_q2'.tr(),
-          'a': 'help_faq_debts_a2'.tr()
-        },
-        {
-          'q': 'help_faq_debts_q3'.tr(),
-          'a': 'help_faq_debts_a3'.tr()
-        },
-        {
-          'q': 'help_faq_debts_q4'.tr(),
-          'a': 'help_faq_debts_a4'.tr()
-        },
+        {'q': 'help_faq_debts_q1'.tr(), 'a': 'help_faq_debts_a1'.tr()},
+        {'q': 'help_faq_debts_q2'.tr(), 'a': 'help_faq_debts_a2'.tr()},
+        {'q': 'help_faq_debts_q3'.tr(), 'a': 'help_faq_debts_a3'.tr()},
+        {'q': 'help_faq_debts_q4'.tr(), 'a': 'help_faq_debts_a4'.tr()},
+        {'q': 'help_faq_debts_q5'.tr(), 'a': 'help_faq_debts_a5'.tr()},
+        {'q': 'help_faq_debts_q6'.tr(), 'a': 'help_faq_debts_a6'.tr()},
       ],
     },
     {
@@ -134,18 +132,23 @@ class _HelpScreenState extends State<HelpScreen> {
     {
       'section': 'help_faq_fire_title'.tr(),
       'items': [
-        {
-          'q': 'help_faq_fire_q1'.tr(),
-          'a': 'help_faq_fire_a1'.tr()
-        },
-        {
-          'q': 'help_faq_fire_q2'.tr(),
-          'a': 'help_faq_fire_a2'.tr()
-        },
-        {
-          'q': 'help_faq_fire_q3'.tr(),
-          'a': 'help_faq_fire_a3'.tr()
-        },
+        {'q': 'help_faq_fire_q1'.tr(), 'a': 'help_faq_fire_a1'.tr()},
+        {'q': 'help_faq_fire_q2'.tr(), 'a': 'help_faq_fire_a2'.tr()},
+        {'q': 'help_faq_fire_q3'.tr(), 'a': 'help_faq_fire_a3'.tr()},
+      ],
+    },
+    {
+      'section': 'help_faq_learn_title'.tr(),
+      'items': [
+        {'q': 'help_faq_learn_q1'.tr(), 'a': 'help_faq_learn_a1'.tr()},
+        {'q': 'help_faq_learn_q2'.tr(), 'a': 'help_faq_learn_a2'.tr()},
+      ],
+    },
+    {
+      'section': 'help_faq_alerts_title'.tr(),
+      'items': [
+        {'q': 'help_faq_alerts_q1'.tr(), 'a': 'help_faq_alerts_a1'.tr()},
+        {'q': 'help_faq_alerts_q2'.tr(), 'a': 'help_faq_alerts_a2'.tr()},
       ],
     },
   ];
