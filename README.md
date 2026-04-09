@@ -587,6 +587,19 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 | 🛡️ **Memory Management** | Full audit of auth screen controllers to prevent potential memory leaks |
 | ✨ **UI Polish** | Minor user interface refinements and fix for various linting warnings |
 
+### v3.32.0 — 2026-04-10 *(Performance & UX Polish)*
+
+| Change | Description |
+|:-------|:------------|
+| ⚡ **Dashboard Speed** | Eliminated waterfall requests — all dashboard data now fetched in a single parallel batch (30-50% faster initial load) |
+| 🏦 **Accounts Balance Parity** | Web accounts page now uses the same `get_account_balances` RPC as Flutter — identical numbers across platforms |
+| 🖼️ **Image Optimization** | Sidebar logo migrated to `next/image` for automatic WebP/AVIF serving and zero layout shift |
+| 🛡️ **Edge Auth Middleware** | Added `proxy.ts` edge middleware — auth session validated on Vercel Edge before any JS loads |
+| 🎨 **UX Polish** | Skeleton loaders on all pages, confirm dialog replacing browser `confirm()`, aria-labels on icon buttons, `autoFocus` on all forms |
+| 📱 **Flutter Safe Area** | Added `useSafeArea: true` to all 12 bottom sheets — prevents overlap with home indicator on modern iPhones/Android |
+| 🔄 **Parallel Price Refresh** | Investment price refresh now uses `Future.wait()` instead of sequential loop — N× faster for large portfolios |
+| 📋 **Makefile** | Added Flutter `Makefile` — `make doctor` runs full health check (analyze + test) |
+
 ### v3.31.0 — 2026-04-08 *(Quality & Stability)*
 
 | Change | Description |

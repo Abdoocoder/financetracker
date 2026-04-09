@@ -65,7 +65,7 @@ make build-apk   # release APK
 ## App Info
 
 - **Support email**: `support@fajrak.com` — لا تستخدم `abdooraf3@gmail.com` أبداً
-- **Current version**: `3.31.0+22` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+- **Current version**: `3.32.0+23` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
 - **Default currency**: KWD — يتغير حسب إعدادات المستخدم في جدول `profiles`
 
 ## CSS Variables (Web)
