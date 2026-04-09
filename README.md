@@ -578,7 +578,16 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
-### v3.31.0 — 2026-04-08 *(Latest — Quality & Stability)*
+### v3.32.0 — 2026-04-09 *(Latest — Stability & Enhancements)*
+
+| Change | Description |
+|:-------|:------------|
+| 🚀 **Stability Boost** | Optimized app performance and general stability for upcoming store release |
+| ⚖️ **Balance Accuracy** | Refined financial balance calculation logic for 100% accuracy across accounts |
+| 🛡️ **Memory Management** | Full audit of auth screen controllers to prevent potential memory leaks |
+| ✨ **UI Polish** | Minor user interface refinements and fix for various linting warnings |
+
+### v3.31.0 — 2026-04-08 *(Quality & Stability)*
 
 | Change | Description |
 |:-------|:------------|
