@@ -69,10 +69,11 @@ describe('useAccounts', () => {
     setupMock()
   })
 
-  it('starts with loading=true and empty accounts', () => {
+  it('starts with loading=true and empty accounts', async () => {
     const { result } = renderHook(() => useAccounts('user1'))
     expect(result.current.loading).toBe(true)
     expect(result.current.accounts).toEqual([])
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('keeps loading=true and empty state when userId is undefined', () => {

@@ -74,32 +74,37 @@ function setupMock(txData = mockTxData) {
 describe('useTransactions — initialization', () => {
   beforeEach(() => setupMock())
 
-  it('starts with loading=true', () => {
+  it('starts with loading=true', async () => {
     const { result } = renderHook(() => useTransactions())
     expect(result.current.loading).toBe(true)
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
-  it('starts with showForm=false', () => {
+  it('starts with showForm=false', async () => {
     const { result } = renderHook(() => useTransactions())
     expect(result.current.showForm).toBe(false)
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
-  it('starts with empty errors', () => {
+  it('starts with empty errors', async () => {
     const { result } = renderHook(() => useTransactions())
     expect(result.current.errors).toEqual({})
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
-  it('starts with filter=all and empty search', () => {
+  it('starts with filter=all and empty search', async () => {
     const { result } = renderHook(() => useTransactions())
     expect(result.current.filter).toBe('all')
     expect(result.current.search).toBe('')
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
-  it('exposes current month and year', () => {
+  it('exposes current month and year', async () => {
     const { result } = renderHook(() => useTransactions())
     const now = new Date()
     expect(result.current.filterMonth).toBe(now.getMonth() + 1)
     expect(result.current.filterYear).toBe(now.getFullYear())
+    await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('loads transactions after mount', async () => {
@@ -279,6 +284,8 @@ describe('useTransactions — month/year navigation', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setFilterMonth(3))
     expect(result.current.filterMonth).toBe(3)
+    // Flush pending background load()
+    await act(async () => { await new Promise(r => setTimeout(r, 0)) })
   })
 
   it('setFilterYear updates filterYear', async () => {
@@ -286,5 +293,7 @@ describe('useTransactions — month/year navigation', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setFilterYear(2023))
     expect(result.current.filterYear).toBe(2023)
+    // Flush pending background load()
+    await act(async () => { await new Promise(r => setTimeout(r, 0)) })
   })
 })
