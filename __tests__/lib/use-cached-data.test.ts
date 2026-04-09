@@ -81,10 +81,11 @@ describe('useCachedData', () => {
     await waitFor(() => expect(result.current.data).toBe('v2'))
   })
 
-  it('refreshing=false initially', () => {
+  it('refreshing=false initially', async () => {
     const fetcher = jest.fn().mockResolvedValue(null)
     const { result } = renderHook(() => useCachedData('r-key', fetcher))
     expect(result.current.refreshing).toBe(false)
+    await act(async () => {}) // flush pending async effects
   })
 
   it('uses custom TTL', async () => {

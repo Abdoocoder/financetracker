@@ -57,13 +57,14 @@ describe('usePush', () => {
     delete (global as any).Notification
   })
 
-  it('returns initial state with required properties', () => {
+  it('returns initial state with required properties', async () => {
     const { result } = renderHook(() => usePush())
     expect(typeof result.current.supported).toBe('boolean')
     expect(typeof result.current.subscribed).toBe('boolean')
     expect(result.current.loading).toBe(false)
     expect(typeof result.current.subscribe).toBe('function')
     expect(typeof result.current.unsubscribe).toBe('function')
+    await act(async () => {}) // flush pending async effects
   })
 
   it('detects serviceWorker support', async () => {

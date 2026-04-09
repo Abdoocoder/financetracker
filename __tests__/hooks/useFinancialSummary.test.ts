@@ -5,7 +5,7 @@ jest.mock('@/lib/supabase/client', () => ({
   createClient: jest.fn(() => ({ from: mockFrom })),
 }))
 
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { useFinancialSummary } from '../../hooks/useFinancialSummary'
 
 // Proxy chain: any method call returns the same proxy; when awaited resolves to `resolveWith`
@@ -42,19 +42,21 @@ describe('useFinancialSummary', () => {
     })
   })
 
-  it('returns loading=true and zero values on initial render', () => {
+  it('returns loading=true and zero values on initial render', async () => {
     const { result } = renderHook(() => useFinancialSummary('user-1'))
     expect(result.current.loading).toBe(true)
     expect(result.current.income).toBe(0)
     expect(result.current.expenses).toBe(0)
     expect(result.current.debtPayments).toBe(0)
     expect(result.current.net).toBe(0)
+    await act(async () => {}) // flush pending async effects
   })
 
   it('stays in loading state when userId is undefined', async () => {
     const { result } = renderHook(() => useFinancialSummary(undefined))
     expect(result.current.loading).toBe(true)
     expect(result.current.income).toBe(0)
+    await act(async () => {}) // flush pending async effects
   })
 
   it('computes income correctly', async () => {
