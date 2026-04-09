@@ -77,7 +77,8 @@
       "Read(//c/Users/user/**)",
       "Bash(grep -n \"CREATE OR REPLACE FUNCTION.*get_account_balances\" /c/Users/user/Projects/financetracker/supabase/migrations/*.sql)",
       "Bash(cmd /c \"cd /d C:\\\\\\\\Users\\\\\\\\user\\\\\\\\Projects\\\\\\\\financetracker\\\\\\\\mobile\\\\\\\\fajrak_flutter && flutter analyze --no-fatal-infos\")",
-      "Bash(cmd /c \"cd /d C:\\\\\\\\Users\\\\\\\\user\\\\\\\\Projects\\\\\\\\financetracker\\\\\\\\mobile\\\\\\\\fajrak_flutter && flutter analyze --no-fatal-infos 2>&1\")"
+      "Bash(cmd /c \"cd /d C:\\\\\\\\Users\\\\\\\\user\\\\\\\\Projects\\\\\\\\financetracker\\\\\\\\mobile\\\\\\\\fajrak_flutter && flutter analyze --no-fatal-infos 2>&1\")",
+      "Bash(grep -r \"reactStrictMode\\\\|StrictMode\" c:/Users/user/Projects/financetracker/next.config*)"
     ]
   }
 }
