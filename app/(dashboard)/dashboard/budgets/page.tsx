@@ -396,7 +396,7 @@ export default function BudgetsPage() {
             {!editingId && (
               <div>
                 <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{ar ? 'الفئة' : 'Category'}</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: 8 }}>
                   {CATEGORIES.map(cat => (
                     <button key={cat.key} onClick={() => setForm(f => ({ ...f, category: cat.key }))} style={{ padding: '10px 4px', borderRadius: 12, background: form.category === cat.key ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${form.category === cat.key ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: form.category === cat.key ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                       <span style={{ fontSize: 18 }}>{cat.icon}</span>
@@ -414,7 +414,7 @@ export default function BudgetsPage() {
               )}
             </div>
             <button onClick={handleSave} disabled={saving} style={{ width: '100%', padding: 14, borderRadius: 14, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 15, fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>
-              {saving ? '...' : (editingId ? t('save') : t('add'))}
+              {saving ? '⏳ ...' : (editingId ? t('save') : t('add'))}
             </button>
           </div>
         </Modal>

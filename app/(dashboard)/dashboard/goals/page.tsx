@@ -91,7 +91,12 @@ export default function GoalsPage() {
   const totalTarget = goals.reduce((a, g) => a + g.target_amount, 0)
   const totalSaved  = goals.reduce((a, g) => a + g.current_amount, 0)
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-3xl animate-pulse-slow">⏳</div></div>
+  if (loading) return (
+    <div className="space-y-4">
+      <div className="skeleton" style={{ height: 52, borderRadius: 16 }} />
+      {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 120, borderRadius: 20 }} />)}
+    </div>
+  )
 
   return (
     <div className="space-y-4 animate-fade-in max-w-2xl lg:max-w-none mx-auto" ref={pageRef}>
@@ -157,7 +162,7 @@ export default function GoalsPage() {
             <button onClick={saveGoal} disabled={saving}
               className="flex-1 py-3 rounded-xl text-white text-sm font-black disabled:opacity-50"
               style={{ background: editingId ? '#f59e0b' : 'var(--accent-blue)', fontFamily: 'inherit' }}>
-              {saving ? '...' : editingId ? t('goals_save_edit') : t('goals_save')}
+              {saving ? '⏳ ...' : editingId ? t('goals_save_edit') : t('goals_save')}
             </button>
             <button onClick={cancelForm} className="flex-1 py-3 rounded-xl text-sm font-bold"
               style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', fontFamily: 'inherit' }}>

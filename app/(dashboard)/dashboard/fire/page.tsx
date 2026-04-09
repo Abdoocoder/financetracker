@@ -73,7 +73,13 @@ export default function FIREPage() {
   const adjustedYears = yearsToFIRE(adjustedFireNumber, currentNetWorth, monthlyContrib, annualReturn)
   const adjustedProgress = Math.min(100, (currentNetWorth / adjustedFireNumber) * 100)
 
-  if (loading) return <div style={{ padding: 32, textAlign: 'center', color: 'var(--text-muted)' }}>{ar ? 'جاري التحميل...' : 'Loading...'}</div>
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {[180, 120, 140, 100].map((h, i) => (
+        <div key={i} className="skeleton" style={{ height: h, borderRadius: 20 }} />
+      ))}
+    </div>
+  )
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

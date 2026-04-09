@@ -10,6 +10,7 @@ Future<void> showCurrencyPickerSheet({
   await showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: Colors.transparent,
     builder: (_) => _CurrencyPickerSheet(
       selectedCode: selectedCode,

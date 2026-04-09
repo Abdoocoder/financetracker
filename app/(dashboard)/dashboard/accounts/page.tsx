@@ -6,6 +6,47 @@ import { useAccounts } from '@/hooks/useAccounts'
 import type { Account, AccountType } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
 
+// ── Skeleton للتحميل ─────────────────────────────────
+function AccountsSkeleton() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div className="skeleton" style={{ height: 100, borderRadius: 20 }} />
+      <div style={{ display: 'flex', gap: 10 }}>
+        <div className="skeleton" style={{ flex: 1, height: 46, borderRadius: 14 }} />
+        <div className="skeleton" style={{ flex: 1, height: 46, borderRadius: 14 }} />
+      </div>
+      {[1, 2, 3].map(i => (
+        <div key={i} className="skeleton" style={{ height: 80, borderRadius: 18 }} />
+      ))}
+    </div>
+  )
+}
+
+// ── Dialog تأكيد الحذف ───────────────────────────────
+function ConfirmArchiveDialog({ lang, onConfirm, onCancel }: { lang: string; onConfirm: () => void; onCancel: () => void }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={onCancel}>
+      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, width: '100%', maxWidth: 360 }} onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 12 }}>📦</div>
+        <h3 style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 8px', textAlign: 'center' }}>
+          {lang === 'en' ? 'Archive Account?' : 'أرشفة الحساب؟'}
+        </h3>
+        <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', margin: '0 0 20px', lineHeight: 1.5 }}>
+          {lang === 'en' ? 'The account will be hidden but all its transactions will be preserved.' : 'سيُخفى الحساب مع الاحتفاظ بجميع معاملاته.'}
+        </p>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            {lang === 'en' ? 'Cancel' : 'إلغاء'}
+          </button>
+          <button onClick={onConfirm} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            {lang === 'en' ? 'Archive' : 'أرشفة'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── أيقونات وألوان الحسابات ──────────────────────────
 const ACCOUNT_TYPES: { type: AccountType; icon: string; labelAr: string; labelEn: string; color: string }[] = [
   { type: 'bank',        icon: '🏦', labelAr: 'بنك',           labelEn: 'Bank',         color: '#3B7EF6' },
@@ -68,11 +109,15 @@ function AccountCard({ acc, currency, lang, onEdit, onDelete }: {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-        <button onClick={() => onEdit(acc)} style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, padding: '5px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--text-secondary)' }}>
+        <button onClick={() => onEdit(acc)} aria-label={lang === 'en' ? 'Edit account' : 'تعديل الحساب'}
+          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, padding: '5px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--text-secondary)', transition: 'opacity 0.15s' }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
           ✏️
         </button>
         {!acc.is_default && (
-          <button onClick={() => onDelete(acc)} style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '5px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--accent-red-light)' }}>
+          <button onClick={() => onDelete(acc)} aria-label={lang === 'en' ? 'Archive account' : 'أرشفة الحساب'}
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '5px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--accent-red-light)', transition: 'opacity 0.15s' }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
             🗑️
           </button>
         )}
@@ -141,6 +186,7 @@ function AccountModal({ account, lang, onSave, onClose }: {
             {lang === 'en' ? 'Account Name' : 'اسم الحساب'}
           </label>
           <input
+            autoFocus
             value={name} onChange={e => setName(e.target.value)}
             placeholder={lang === 'en' ? 'e.g. Arab Bank' : 'مثال: البنك العربي'}
             style={{ width: '100%', padding: '11px 14px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
@@ -262,10 +308,11 @@ export default function AccountsPage() {
   const [showCreate, setShowCreate] = useState(false)
   const [editAccount, setEditAccount] = useState<Account | undefined>()
   const [showTransfer, setShowTransfer] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<Account | null>(null)
 
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
-  if (loading) return <div style={{ padding: 24, color: 'var(--text-muted)', textAlign: 'center' }}>...</div>
+  if (loading) return <AccountsSkeleton />
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -305,7 +352,7 @@ export default function AccountsPage() {
         {accounts.map(acc => (
           <AccountCard key={acc.id} acc={acc} currency={currency} lang={lang}
             onEdit={a => setEditAccount(a)}
-            onDelete={async a => { if (confirm(lang === 'en' ? 'Archive this account?' : 'أرشفة هذا الحساب؟')) await deleteAccount(a.id) }}
+            onDelete={a => setConfirmDeleteId(a)}
           />
         ))}
       </div>
@@ -322,6 +369,14 @@ export default function AccountsPage() {
         <TransferModal accounts={accounts} lang={lang}
           onSave={async (f, t, a, d, n) => { await transferBetween(f, t, a, d, n) }}
           onClose={() => setShowTransfer(false)}
+        />
+      )}
+
+      {confirmDeleteId && (
+        <ConfirmArchiveDialog
+          lang={lang}
+          onConfirm={async () => { await deleteAccount(confirmDeleteId.id); setConfirmDeleteId(null) }}
+          onCancel={() => setConfirmDeleteId(null)}
         />
       )}
     </div>
