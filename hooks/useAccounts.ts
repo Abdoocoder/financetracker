@@ -9,34 +9,30 @@ export function useAccounts(userId: string | undefined) {
 
   async function fetchAccounts() {
     if (!userId) return
-    const { data } = await supabase
-      .from('accounts')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_archived', false)
-      .order('is_default', { ascending: false })
-      .order('created_at')
+
+    // جلب الحسابات والأرصدة بالتوازي — نفس منطق Flutter (get_account_balances RPC)
+    const [{ data }, { data: balances }] = await Promise.all([
+      supabase
+        .from('accounts')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_archived', false)
+        .order('is_default', { ascending: false })
+        .order('created_at'),
+      supabase.rpc('get_account_balances', { p_user_id: userId }),
+    ])
 
     if (!data) { setLoading(false); return }
 
-    // حساب الرصيد لكل حساب
-    // Important: Only include posted (non-future) transactions in balances.
-    // Future/scheduled transactions are shown elsewhere (e.g. Transactions "Upcoming")
-    // and should not affect current account balances.
-    const today = new Date().toISOString().split('T')[0]
-    const { data: txs } = await supabase
-      .from('transactions')
-      .select('account_id, transfer_to_account_id, type, amount')
-      .eq('user_id', userId)
-      .lte('transaction_date', today)
+    const balanceMap: Record<string, number> = {}
+    for (const b of (balances ?? [])) {
+      balanceMap[b.account_id] = Number(b.current_balance)
+    }
 
-    const withBalance = data.map(acc => {
-      const income   = (txs ?? []).filter(t => t.account_id === acc.id && t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-      const expense  = (txs ?? []).filter(t => t.account_id === acc.id && t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      const xferIn   = (txs ?? []).filter(t => t.transfer_to_account_id === acc.id && t.type === 'transfer').reduce((a, t) => a + Number(t.amount), 0)
-      const xferOut  = (txs ?? []).filter(t => t.account_id === acc.id && t.type === 'transfer').reduce((a, t) => a + Number(t.amount), 0)
-      return { ...acc, balance: Number(acc.opening_balance) + income - expense + xferIn - xferOut }
-    })
+    const withBalance = data.map(acc => ({
+      ...acc,
+      balance: balanceMap[acc.id] ?? Number(acc.opening_balance),
+    }))
 
     setAccounts(withBalance)
     setLoading(false)
