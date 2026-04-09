@@ -23,8 +23,10 @@ import { HeroBalanceCard } from '@/components/dashboard/HeroBalanceCard'
 import { MonthSummaryBanner } from '@/components/dashboard/MonthSummaryBanner'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
-const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false })
+const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
 const ChallengesCard = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
+
+const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
 
 
@@ -74,7 +76,6 @@ export default function DashboardPage() {
   const realExpenses = expenses - debtPayments
   const monthlyDebtCommitments = data?.monthlyDebtCommitments ?? 0
   const netAfterDebts = net - monthlyDebtCommitments
-  const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
   const currency = profile?.currency ?? 'JOD'
   const name = data?.name || currentUser?.user_metadata?.full_name || ''
   const firstName = name.split(' ')[0]

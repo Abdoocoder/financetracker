@@ -76,20 +76,20 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       var investments = List<Map<String, dynamic>>.from(data);
 
       if (refreshPrices) {
-        for (var i = 0; i < investments.length; i++) {
-          final symbol = investments[i]['symbol'] as String?;
-          if (symbol != null) {
+        await Future.wait(
+          List.generate(investments.length, (i) async {
+            final symbol = investments[i]['symbol'] as String?;
+            if (symbol == null) return;
             final newPrice = await InvestmentsService.fetchPrice(symbol);
             if (newPrice != null) {
               investments[i]['current_price'] = newPrice;
-              // Update in DB
               await Supabase.instance.client
                   .from('investments')
                   .update({'current_price': newPrice})
                   .eq('id', investments[i]['id']);
             }
-          }
-        }
+          }),
+        );
       }
 
       if (mounted) {

@@ -312,7 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 16),
                 DashboardStageCard(stage: _stage),
                 const SizedBox(height: 16),
-                ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency),
+                RepaintBoundary(child: ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency)),
                 const SizedBox(height: 16),
                 BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
                 const SizedBox(height: 16),

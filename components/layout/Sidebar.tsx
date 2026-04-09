@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useI18n } from '@/lib/i18n'
 import { useState } from 'react'
@@ -50,7 +51,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         <div style={{ padding: '0 8px 24px', marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div className="glow-avatar" style={{ width: 42, height: 42, borderRadius: 12, overflow: 'hidden', flexShrink: 0 }}>
-              <img src="/icon-512.png" alt="فجرك" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <Image src="/icon-512.png" alt="فجرك" width={42} height={42} style={{ objectFit: 'cover' }} priority />
             </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>فجرك</div>
