@@ -62,6 +62,38 @@ make doctor      # flutter analyze + flutter test (zero issues required)
 make build-apk   # release APK
 ```
 
+## App Info
+
+- **Support email**: `support@fajrak.com` — لا تستخدم `abdooraf3@gmail.com` أبداً
+- **Current version**: `3.31.0+22` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+- **Default currency**: KWD — يتغير حسب إعدادات المستخدم في جدول `profiles`
+
+## CSS Variables (Web)
+
+```
+النصوص:   --text-primary  --text-secondary  --text-muted
+الخلفية:  --bg-card  --bg-elevated  --bg-secondary
+الحدود:   --border
+الألوان:  --accent-blue  --accent-blue-light  --accent-blue-dim
+          --accent-green-light  --accent-green-dim
+          --accent-red-light  --accent-red-dim
+الظل:     --shadow-card
+```
+
+## i18n Key Naming
+
+```
+dash_*          # لوحة التحكم
+tx_*            # المعاملات
+debts_*         # الديون
+budget_*        # الميزانية
+goals_*         # الأهداف
+invest_*        # الاستثمار
+alerts_*        # التنبيهات
+settings_*      # الإعدادات
+help_faq_<section>_title/q1/a1  # صفحة المساعدة
+```
+
 ## Tech Stack Details
 
 - **State (Web)**: TanStack Query v5 for server state
