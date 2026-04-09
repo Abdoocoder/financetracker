@@ -26,7 +26,12 @@ types/            # shared TypeScript types
 supabase/
   migrations/     # SQL migrations (numbered)
 mobile/fajrak_flutter/
-  lib/screens/    # accounts, dashboard, transactions, debts, investments, goals, budgets, alerts, settings, help
+  lib/
+    screens/      # accounts, dashboard, transactions, debts, investments, goals, budgets, alerts, settings, help
+    widgets/      # reusable widgets per feature (dashboard, transactions, investments, goals, budgets, debts, common)
+    services/     # AccountsService, InvestmentsService, CurrencyService, etc.
+  assets/i18n/    # ar.json, en.json
+  Makefile        # make doctor (analyze + test), make build-apk, make clean
 ```
 
 ## Commands
@@ -49,14 +54,16 @@ cd mobile/fajrak_flutter
 flutter pub get
 flutter run
 flutter test
+make doctor      # flutter analyze + flutter test (zero issues required)
+make build-apk   # release APK
 ```
 
 ## Tech Stack Details
 - **State (Web)**: TanStack Query v5 for server state
 - **State (Mobile)**: Flutter built-in + Supabase realtime
-- **Charts**: Recharts (web) 
+- **Charts**: Recharts (web), fl_chart (Flutter)
 - **Styling**: Tailwind CSS
-- **i18n**: custom i18n (`lib/i18n.tsx`) — Arabic/English support
+- **i18n**: custom i18n (`lib/i18n.tsx`) — Arabic/English support, easy_localization (Flutter)
 - **Database migrations**: `supabase/migrations/` — numbered sequentially
 
 ## Rules
@@ -69,14 +76,33 @@ flutter test
 ### Code
 - TypeScript strict mode — لا `any` إلا عند الضرورة القصوى
 - لا تعدّل ملفات `.next/` أو `coverage/`
-- الـ hooks في `lib/` وليس داخل المكونات مباشرة
+- الـ hooks في `hooks/` وليس داخل المكونات مباشرة
 - استخدم TanStack Query لكل fetch من Supabase في الـ client
+- دالة `fmt` للأرقام تُعرَّف على مستوى الـ module وليس داخل الـ component لتجنب إعادة الإنشاء في كل render
+- الصور تستخدم `<Image>` من `next/image` وليس `<img>` مباشرة
+- كل dynamic import يجب أن يحتوي على `loading:` fallback (skeleton)
 
 ### Testing
 - اختبارات الـ unit في `__tests__/`
 - اختبارات E2E في `e2e/`
 - لا تستخدم mocks لقاعدة البيانات في اختبارات التكامل
+- كل test يُنشئ async hooks يجب أن ينتهي بـ `await act(async () => {})` لتصريف الـ pending effects وتجنب act() warnings
+- استخدم `chainProxy` pattern للـ Supabase method chaining في الـ mocks (موجود في `__tests__/hooks/`)
+
+### UX
+
+- كل صفحة تحتاج loading state → استخدم skeleton (`className="skeleton"`) وليس نصاً أو spinner فقط
+- أزرار الحذف → modal تأكيد وليس `confirm()` المتصفح
+- كل زر icon-only → `aria-label` وصفي
+- كل نموذج → `autoFocus` على أول حقل إدخال
+- أزرار الحفظ أثناء التحميل → `⏳ ...` أو نص يدل على الانتظار + `disabled` + `cursor: not-allowed`
 
 ### Mobile
 - اتبع نفس منطق الـ web عند تعديل ميزة موجودة في الاثنين معاً
 - المشروع يستخدم Supabase Flutter SDK وليس REST مباشرة
+- كل نموذج (form) يجب أن يحتوي على:
+  - guard: `if (_saving) return;` كأول سطر في دالة الحفظ
+  - `_saving = true; setState(() {});` بشكل متزامن قبل أي `await`
+  - `try/catch/finally` مع `setState(() => _saving = false)` في الـ `finally`
+- كل `TextEditingController` يجب أن يُستدعى عليه `dispose()` في `dispose()`
+- كل `showModalBottomSheet` يجب أن يحتوي على `useSafeArea: true`
