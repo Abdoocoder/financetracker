@@ -13,7 +13,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
-    "doctor": "npx next info && npm audit --audit-level=high && npm run typecheck && npm run lint && npm run build"
+    "doctor": "npx next info && npm audit --audit-level=high && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.46.0",

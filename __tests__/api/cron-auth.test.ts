@@ -23,9 +23,9 @@ describe('verifyCronAuth', () => {
     process.env.CRON_SECRET = original
   })
 
-  it('returns false when CRON_SECRET is not set', () => {
+  it('throws when CRON_SECRET is not set', () => {
     delete process.env.CRON_SECRET
-    expect(verifyCronAuth(req(`Bearer ${SECRET}`))).toBe(false)
+    expect(() => verifyCronAuth(req(`Bearer ${SECRET}`))).toThrow('CRON_SECRET is not set')
   })
 
   it('returns false when authorization header is missing', () => {

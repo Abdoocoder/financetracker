@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>67/67</span>
+                <span class='fraction'>68/68</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">98.38% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>58/58</span>
+                <span class='fraction'>61/62</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>59/59</span>
+                <span class='fraction'>60/60</span>
             </div>
         
             
@@ -1226,7 +1226,8 @@
 <a name='L1161'></a><a href='#L1161'>1161</a>
 <a name='L1162'></a><a href='#L1162'>1162</a>
 <a name='L1163'></a><a href='#L1163'>1163</a>
-<a name='L1164'></a><a href='#L1164'>1164</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L1164'></a><a href='#L1164'>1164</a>
+<a name='L1165'></a><a href='#L1165'>1165</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1891,6 +1892,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">41x</span>
 <span class="cline-any cline-yes">41x</span>
 <span class="cline-any cline-yes">41x</span>
 <span class="cline-any cline-yes">41x</span>
@@ -3058,34 +3060,35 @@ export function getLessonForStage(
   const savings = context?.savingsRate ?? 0
   const tx = context?.txCount ?? 0
   const streak = context?.streak ?? 0
+  const safeLang = (lang === 'ar' || lang === 'en') ? lang : <span class="branch-1 cbranch-no" title="branch not covered" >'ar'</span>
 &nbsp;
   // ── اختيار ذكي بناءً على البيانات ──────────────────
 &nbsp;
   // المستخدم عنده ديون عالية جداً → درس إسلامي للديون فوراً
   if (stage === 'debt' &amp;&amp; debt &gt; 50 &amp;&amp; dayOfMonth % 3 === 0) {
     const idx = dayOfMonth % ISLAMIC_DEBT_LESSONS.length
-    return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
+    return safeLang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
   }
 &nbsp;
   // المستخدم ما سجّل معاملات كثيرة → دروس تتبع وسلوك
   if (tx &lt; 10 &amp;&amp; dayOfMonth % 4 === 0) {
     const awareness = AWARENESS
     const idx = dayOfMonth % awareness.length
-    return awareness[idx][lang]
+    return awareness[idx][safeLang]
   }
 &nbsp;
   // المستخدم ادخاره منخفض → دروس ادخار عملية
   if (savings &lt; 10 &amp;&amp; stage !== 'debt' &amp;&amp; dayOfMonth % 5 === 0) {
     const emergency = EMERGENCY
     const idx = dayOfMonth % emergency.length
-    return emergency[idx][lang]
+    return emergency[idx][safeLang]
   }
 &nbsp;
   // المستخدم ما عنده استثمارات → دروس تحفيزية للاستثمار
   if (!context?.hasInvestments &amp;&amp; stage === 'investing' &amp;&amp; dayOfMonth % 4 === 0) {
     const investing = INVESTING
     const idx = dayOfMonth % investing.length
-    return investing[idx][lang]
+    return investing[idx][safeLang]
   }
 &nbsp;
   // المستخدم سلسلته قوية (7+ أيام) → دروس متقدمة
@@ -3093,22 +3096,22 @@ export function getLessonForStage(
     const advanced = stage === 'wealth' ? WEALTH :
                      stage === 'investing' ? INVESTING : EMERGENCY
     const idx = dayOfMonth % advanced.length
-    return advanced[idx][lang]
+    return advanced[idx][safeLang]
   }
 &nbsp;
   // كل 7 أيام — درس إسلامي مرتبط بالمرحلة
   if (dayOfMonth % 7 === 0) {
     if (stage === 'debt') {
       const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_DEBT_LESSONS.length
-      return lang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
+      return safeLang === 'ar' ? ISLAMIC_DEBT_LESSONS[idx].ar : ISLAMIC_DEBT_LESSONS[idx].en
     }
     if (stage === 'investing' || stage === 'wealth') {
       const idx = (Math.floor(dayOfMonth / 7) - 1) % ISLAMIC_HARAM_MONEY_LESSONS.length
-      return lang === 'ar' ? ISLAMIC_HARAM_MONEY_LESSONS[idx].ar : ISLAMIC_HARAM_MONEY_LESSONS[idx].en
+      return safeLang === 'ar' ? ISLAMIC_HARAM_MONEY_LESSONS[idx].ar : ISLAMIC_HARAM_MONEY_LESSONS[idx].en
     }
     const allIslamic = [...ISLAMIC_LESSONS, ...ISLAMIC_LESSONS_EXTENDED]
     const idx = (Math.floor(dayOfMonth / 7) - 1) % allIslamic.length
-    return allIslamic[idx][lang]
+    return allIslamic[idx][safeLang]
   }
 &nbsp;
   // الدرس الافتراضي حسب المرحلة
@@ -3121,7 +3124,7 @@ export function getLessonForStage(
   }
   const lessons = map[stage]
   const lesson = lessons[(dayOfMonth - 1) % lessons.length]
-  return lesson[lang]
+  return lesson[safeLang]
 }
 &nbsp;
 /**
@@ -3559,7 +3562,7 @@ export const ISLAMIC_LESSONS_EXTENDED = [
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-03T21:42:46.343Z
+                at 2026-04-09T20:41:55.867Z
             </div>
         <script src="../prettify.js"></script>
         <script>

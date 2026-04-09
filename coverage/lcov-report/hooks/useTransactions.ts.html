@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.13% </span>
+                <span class="strong">65.97% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>118/184</span>
+                <span class='fraction'>128/194</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.61% </span>
+                <span class="strong">51.32% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>50/105</span>
+                <span class='fraction'>58/113</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.05% </span>
+                <span class="strong">84.09% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>32/39</span>
+                <span class='fraction'>37/44</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">64.28% </span>
+                <span class="strong">66.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>90/140</span>
+                <span class='fraction'>101/151</span>
             </div>
         
             
@@ -369,7 +369,25 @@
 <a name='L304'></a><a href='#L304'>304</a>
 <a name='L305'></a><a href='#L305'>305</a>
 <a name='L306'></a><a href='#L306'>306</a>
-<a name='L307'></a><a href='#L307'>307</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -658,10 +676,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-yes">96x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-yes">96x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">96x</span>
+<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">45x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">96x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -738,7 +774,7 @@ export function useTransactions() {
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
   const [filterYear, setFilterYear] = useState(now.getFullYear())
   const [confirmDelete, setConfirmDelete] = useState&lt;string | null&gt;(null)
-  const [allTotals, setAllTotals] = useState&lt;{ type: string; amount: number; category?: string }[]&gt;([])
+  const [allTotals, setAllTotals] = useState&lt;{ type: string; amount: number; category?: string; transaction_date: string }[]&gt;([])
 &nbsp;
   const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
@@ -794,7 +830,7 @@ export function useTransactions() {
         .range(0, PAGE_SIZE - 1),
       supabase
         .from('transactions')
-        .select('type,amount,category')
+        .select('type,amount,category,transaction_date')
         .eq('user_id', user.id)
         .gte('transaction_date', firstDay)
         .lte('transaction_date', lastDay),
@@ -804,7 +840,7 @@ export function useTransactions() {
     setHasMore(fresh.length === PAGE_SIZE)
     setLoading(false)
     // store totals separately so StatBar shows full-month numbers even when paginated
-    setAllTotals((totals ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span> as { type: string; amount: number; category?: string }[])
+    setAllTotals((totals ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span> as { type: string; amount: number; category?: string; transaction_date: string }[])
   }, [currentUser, supabase, filterMonth, filterYear])
 &nbsp;
   useEffect(() =&gt; { load() }, [load])
@@ -963,15 +999,33 @@ export function useTransactions() {
   const filtered = useMemo(() =&gt; searched.filter(tx =&gt; filter === 'all' || tx.type === filter), [searched, filter])
   // الإجماليات من استعلام منفصل يشمل الشهر كاملاً (غير مقيدة بالـ pagination)
   const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
-  const totalIncome = useMemo(() =&gt; allTotals.filter(t =&gt; t.type === 'income').reduce((a, t) =&gt; a + Number(t.amount), 0), [allTotals])
+  const totalIncome = useMemo(() =&gt; {
+    const recorded = allTotals.filter(t =&gt; t.type === 'income').reduce((a, t) =&gt; a + Number(t.amount), 0);
+    return recorded &gt; 0 ? recorded : Number(profile?.monthly_income ?? 0);
+  }, [allTotals, profile?.monthly_income])
   const totalExpense = useMemo(() =&gt; allTotals.filter(t =&gt; t.type === 'expense').reduce((a, t) =&gt; a + Number(t.amount), 0), [allTotals])
   const totalDebtPayments = useMemo(() =&gt; allTotals.filter(t =&gt; t.type === 'expense' &amp;&amp; DEBT_CATEGORIES.includes(t.category ?? <span class="branch-1 cbranch-no" title="branch not covered" >'')).r</span>educe((a, t) =&gt; a + Number(t.amount), 0), [allTotals])
   const totalRealExpense = useMemo(() =&gt; totalExpense - totalDebtPayments, [totalExpense, totalDebtPayments])
   const net = useMemo(() =&gt; totalIncome - totalExpense, [totalIncome, totalExpense])
 &nbsp;
+  // Month-to-date (posted) net: only transactions up to today affect "current balance".
+  // This is used to reconcile:
+  //   balance_today = balance_month_start + net_month_to_date
+  const monthToDateNet = useMemo(() =&gt; {
+    const today = new Date().toISOString().split('T')[0]
+    const income = allTotals
+      .filter(t =&gt; t.transaction_date &lt;= today &amp;&amp; t.type === 'income')
+      .reduce((a, t) =&gt; a + Number(t.amount), 0)
+    const expense = allTotals
+      .filter(t =&gt; t.transaction_date &lt;= today &amp;&amp; t.type === 'expense')
+      .reduce((a, t) =&gt; a + Number(t.amount), 0)
+    // transfers are excluded because they don't change overall money, only move it between accounts
+    return income - expense
+  }, [allTotals])
+&nbsp;
   return {
     transactions, filtered, loading, saving, deletingId,
-    totalIncome, totalExpense, totalDebtPayments, totalRealExpense, net,
+    totalIncome, totalExpense, totalDebtPayments, totalRealExpense, net, monthToDateNet,
     hasMore, loadingMore, loadMore,
     showForm, form, setForm, editingId, errors,
     openAdd, startEdit, closeForm, saveTransaction,
@@ -988,7 +1042,7 @@ export function useTransactions() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-03T21:42:46.343Z
+                at 2026-04-09T20:41:55.867Z
             </div>
         <script src="../prettify.js"></script>
         <script>
