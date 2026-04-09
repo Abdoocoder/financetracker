@@ -43,37 +43,28 @@ export function useDashboardData() {
       const chartFrom = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0];
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
 
-      // Step 1: Fetch Profile & RPC Data & Alert Count (Critical Totals)
-      // Note: We avoid manual queries for debts, investments, goals as the RPC covers them.
-      const [profileRes, alertRes, dashRpcRes, goalRes] = await Promise.all([
+      // Step 1: كل الطلبات بالتوازي في دفعة واحدة
+      const [profileRes, alertRes, goalRes, txRes, debtCommitmentsRes, exchangeRate] = await Promise.all([
         supabase.from('profiles').select('monthly_income, full_name, currency').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-        supabase.rpc('get_financial_dashboard', { p_user_id: user.id, p_usd_to_local_rate: 1.0 }), // We'll re-scale if needed
         supabase.from('savings_goals').select('target_amount').eq('user_id', user.id),
+        supabase.from('transactions').select('*').eq('user_id', user.id).gte('transaction_date', chartFrom).order('transaction_date', { ascending: false }),
+        supabase.from('debts').select('monthly_payment').eq('user_id', user.id).eq('is_paid', false).eq('auto_deduct', true).eq('debt_type', 'owed'),
+        fetchExchangeRate('USD', 'KWD'), // pre-fetch — يُستبدل بالعملة الفعلية أدناه
       ]);
 
       const profileData = profileRes.data;
       const userCurrency = (profileData?.currency ?? 'JOD').toUpperCase();
-      const usdToLocal = userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? 1) : 1;
 
-      // Re-fetch RPC with correct exchange rate if it's not 1.0
-      const dash = usdToLocal !== 1.0 
-        ? (await supabase.rpc('get_financial_dashboard', { p_user_id: user.id, p_usd_to_local_rate: usdToLocal })).data 
-        : dashRpcRes.data;
+      // Step 2: RPC مع سعر الصرف الصحيح (طلب واحد فقط)
+      const usdToLocal = userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? exchangeRate ?? 1) : 1;
+      const { data: dash } = await supabase.rpc('get_financial_dashboard', { p_user_id: user.id, p_usd_to_local_rate: usdToLocal ?? 1 });
 
-      // Step 2: Fetch Transactions (Consolidated)
-      // We fetch all transactions from the start of the 6-month chart window until today.
-      const { data: allTx } = await supabase.from('transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('transaction_date', chartFrom)
-        .order('transaction_date', { ascending: false });
-
-      const txs = allTx ?? [];
+      const txs = txRes.data ?? [];
       const currentMonthTxs = txs.filter(t => t.transaction_date >= firstDay);
-      
+
       const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts'];
-      
+
       const income = currentMonthTxs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0) || Number(profileData?.monthly_income ?? 0);
       const expenses = currentMonthTxs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0);
       const debtPayments = currentMonthTxs.filter(t => t.type === 'expense' && DEBT_CATEGORIES.includes(t.category ?? '')).reduce((a, t) => a + Number(t.amount), 0);
@@ -95,16 +86,8 @@ export function useDashboardData() {
       });
 
       const prevMonth = months6[4] ?? { income: 0, expense: 0 };
-      
-      // Fetch debt commitments separately as they require a complex filter
-      const { data: debtCommitments } = await supabase.from('debts')
-        .select('monthly_payment')
-        .eq('user_id', user.id)
-        .eq('is_paid', false)
-        .eq('auto_deduct', true)
-        .eq('debt_type', 'owed');
-      
-      const monthlyDebtCommitments = (debtCommitments ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0);
+
+      const monthlyDebtCommitments = (debtCommitmentsRes.data ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0);
 
       const recentTx = txs.slice(0, 5);
 
