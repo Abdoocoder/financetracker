@@ -65,7 +65,22 @@ make build-apk   # release APK
 ## App Info
 
 - **Support email**: `support@fajrak.com` — لا تستخدم `abdooraf3@gmail.com` أبداً
-- **Current version**: `3.32.0+23` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+- **Current version**: `3.32.0+24` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+
+## Version Update Checklist
+
+عند تحديث رقم الإصدار يجب تعديل **جميع** هذه الملفات:
+
+| الملف | ما يتغير |
+|-------|----------|
+| `mobile/fajrak_flutter/pubspec.yaml` | `version: X.Y.Z+N` |
+| `package.json` | `"version": "X.Y.Z"` |
+| `README.md` | إضافة قسم `### vX.Y.Z` في الـ changelog |
+| `README.ar.md` | نفس القسم بالعربية |
+| `mobile/fajrak_flutter/README.md` | نفس القسم |
+| `app/download/page.tsx` | رقم الإصدار في الـ badge + رابط الـ APK + نص الزر |
+| `CLAUDE.md` | تحديث سطر **Current version** أعلاه |
+
 - **Default currency**: KWD — يتغير حسب إعدادات المستخدم في جدول `profiles`
 
 ## CSS Variables (Web)
