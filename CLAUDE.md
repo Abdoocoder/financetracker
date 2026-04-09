@@ -1,6 +1,7 @@
 # Claude Instructions — FinanceTracker (Fajrak)
 
 ## Project Overview
+
 تطبيق مالي شخصي يتكون من:
 - **Web**: Next.js 16 + React 19 + TypeScript (App Router)
 - **Mobile**: Flutter (`mobile/fajrak_flutter/`) — اسم التطبيق: Fajrak
@@ -10,6 +11,7 @@
 - **Monitoring**: Sentry
 
 ## Project Structure
+
 ```
 app/
   (auth)/         # login, register
@@ -37,6 +39,7 @@ mobile/fajrak_flutter/
 ## Commands
 
 ### Web
+
 ```bash
 npm run dev           # development server
 npm run build         # production build
@@ -49,6 +52,7 @@ npm run doctor        # full health check (lint + typecheck + coverage + build)
 ```
 
 ### Mobile (Flutter)
+
 ```bash
 cd mobile/fajrak_flutter
 flutter pub get
@@ -59,6 +63,7 @@ make build-apk   # release APK
 ```
 
 ## Tech Stack Details
+
 - **State (Web)**: TanStack Query v5 for server state
 - **State (Mobile)**: Flutter built-in + Supabase realtime
 - **Charts**: Recharts (web), fl_chart (Flutter)
@@ -69,11 +74,13 @@ make build-apk   # release APK
 ## Rules
 
 ### Database
+
 - كل جداول قاعدة البيانات تستخدم RLS — لا تعطّل هذا أبداً
 - الـ migrations مرقّمة تسلسلياً — أضف migration جديد بدلاً من تعديل الموجودة
 - استخدم `lib/supabase/server.ts` في Server Components و `lib/supabase/client.ts` في Client Components
 
 ### Code
+
 - TypeScript strict mode — لا `any` إلا عند الضرورة القصوى
 - لا تعدّل ملفات `.next/` أو `coverage/`
 - الـ hooks في `hooks/` وليس داخل المكونات مباشرة
@@ -83,6 +90,7 @@ make build-apk   # release APK
 - كل dynamic import يجب أن يحتوي على `loading:` fallback (skeleton)
 
 ### Testing
+
 - اختبارات الـ unit في `__tests__/`
 - اختبارات E2E في `e2e/`
 - لا تستخدم mocks لقاعدة البيانات في اختبارات التكامل
@@ -98,6 +106,7 @@ make build-apk   # release APK
 - أزرار الحفظ أثناء التحميل → `⏳ ...` أو نص يدل على الانتظار + `disabled` + `cursor: not-allowed`
 
 ### Mobile
+
 - اتبع نفس منطق الـ web عند تعديل ميزة موجودة في الاثنين معاً
 - المشروع يستخدم Supabase Flutter SDK وليس REST مباشرة
 - كل نموذج (form) يجب أن يحتوي على:
