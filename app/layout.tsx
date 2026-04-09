@@ -4,6 +4,7 @@ import { Cairo } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme-context'
 import QueryProvider from '@/components/providers/QueryProvider'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -31,7 +32,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){
+        <script dangerouslySetInnerHTML={{
+          __html: `(function(){
           var saved = localStorage.getItem('theme');
           var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var initial = (saved === 'dark' || (saved === 'system' && systemDark) || (!saved && systemDark)) ? 'dark' : 'light';
@@ -39,7 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         })()` }} />
       </head>
       <body suppressHydrationWarning className={`${cairo.variable} font-cairo antialiased`}>
-        <script dangerouslySetInnerHTML={{ __html: `
+        <script dangerouslySetInnerHTML={{
+          __html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
               navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function(err) {
@@ -56,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <QueryProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </QueryProvider>
+        <SpeedInsights />
       </body>
     </html>
   )

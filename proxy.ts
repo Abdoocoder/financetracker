@@ -1,8 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PUBLIC_PATHS = [
+  '/login', '/register', '/forgot-password', '/reset-password',
+  '/api/auth/callback', '/api/confirm',
+]
+
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,27 +25,31 @@ export async function proxy(request: NextRequest) {
       },
     }
   )
+
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
-  
-  // تجاوز الحماية للتطبيق Native
-  if (pathname === '/reset-password') return supabaseResponse
-  if (pathname.startsWith('/api/auth/callback')) return supabaseResponse
-  if (pathname.startsWith('/api/confirm')) return supabaseResponse
-  if (pathname.startsWith('/dashboard') && !user) {
+
+  const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p))
+
+  // مستخدم غير مسجّل يحاول الوصول لصفحة محمية
+  if (!user && !isPublic) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
-  if ((pathname === '/login' || pathname === '/register') && user) {
+
+  // مستخدم مسجّل يحاول الوصول لصفحة auth
+  if (user && (pathname === '/login' || pathname === '/register')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
+
   // تمرير user id في header لتجنب استدعاء getUser() في كل صفحة
   if (user) {
     supabaseResponse.headers.set('x-user-id', user.id)
     supabaseResponse.headers.set('x-user-email', user.email ?? '')
   }
+
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/cron).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon\\.ico|icon-.*\\.png|manifest\\.json|sw\\.js|api/cron).*)'],
 }
