@@ -18,6 +18,18 @@ import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 
 // مسح cache المستخدم بعد أي تعديل
 
+async function fetchStockPrice(symbol: string): Promise<number | null> {
+  const { data: { session } } = await createClient().auth.getSession()
+  if (!session?.access_token) return null
+  try {
+    const res = await fetch(`/api/stock-price?symbol=${symbol}`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    const data = await res.json()
+    return data.price ?? null
+  } catch { return null }
+}
+
 function WealthSimulator({ lang, currency }: { lang: string; currency: string }) {
   const ar = lang === 'ar'
   const [monthly, setMonthly] = useState(50)
@@ -308,9 +320,8 @@ export default function InvestmentsPage() {
       await Promise.allSettled(
         invs.map(async (inv) => {
           try {
-            const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
-            const data = await res.json()
-            if (data.price) await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id)
+            const price = await fetchStockPrice(inv.symbol)
+            if (price) await supabase.from('investments').update({ current_price: price }).eq('id', inv.id)
           } catch {}
         })
       )
@@ -354,9 +365,8 @@ export default function InvestmentsPage() {
     try {
       for (const inv of investments) {
         try {
-          const res = await fetch(`/api/stock-price?symbol=${inv.symbol}`)
-          const data = await res.json()
-          if (data.price) { await supabase.from('investments').update({ current_price: data.price }).eq('id', inv.id); newStatus[inv.id] = 'live'; updated++ }
+          const price = await fetchStockPrice(inv.symbol)
+          if (price) { await supabase.from('investments').update({ current_price: price }).eq('id', inv.id); newStatus[inv.id] = 'live'; updated++ }
           else { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
         } catch { failed.push(inv.symbol); newStatus[inv.id] = 'manual' }
       }
@@ -378,9 +388,7 @@ export default function InvestmentsPage() {
         const data = await res.json()
         initialPrice = data?.bitcoin?.usd ?? 0
       } else {
-        const res = await fetch(`/api/stock-price?symbol=${form.symbol.toUpperCase()}`)
-        const data = await res.json()
-        initialPrice = data?.price ?? 0
+        initialPrice = (await fetchStockPrice(form.symbol.toUpperCase())) ?? 0
       }
     } catch {}
     await supabase.from('investments').insert({ user_id: user.id, ...form, symbol: form.symbol.toUpperCase(), shares: 0, avg_buy_price: 0, current_price: initialPrice })

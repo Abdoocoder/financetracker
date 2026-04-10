@@ -113,7 +113,9 @@ export default function ZakatPage() {
   async function fetchLivePrices() {
     setFetchingPrices(true)
     try {
-      const res = await fetch(`/api/zakat/prices?currency=${currency}`).catch(() => null)
+      const { data: { session } } = await createClient().auth.getSession()
+      const headers: HeadersInit = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}
+      const res = await fetch(`/api/zakat/prices?currency=${currency}`, { headers }).catch(() => null)
       if (res?.ok) {
         const data = await res.json()
         if (data.gold > 0) setGoldPrice(data.gold)

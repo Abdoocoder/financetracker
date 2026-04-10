@@ -47,24 +47,28 @@ export default function DashboardPage() {
     
     // Using simple fetch for gamification to avoid creating too many high-level hooks for now
     // but ultimately these should also be useQueryified.
-    fetch(`/api/gamification?user_id=${currentUser.id}`)
-      .then(r => r.json())
-      .then(gam => {
-        // Check if there are transactions today for streak
-        queryClient.fetchQuery({
-            queryKey: ['transactions-today', currentUser.id],
-            queryFn: async () => {
-                const { count } = await (await import('@/lib/supabase/client')).createClient()
-                    .from('transactions')
-                    .select('id', { count: 'exact', head: true })
-                    .eq('user_id', currentUser.id)
-                    .eq('transaction_date', today);
-                return count ?? 0;
-            }
-        }).then(count => {
-            setStreakInfo({ streak: gam?.streak_days ?? 0, loggedToday: count > 0 })
+    ;(async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const { data: { session } } = await createClient().auth.getSession()
+        if (!session?.access_token) return
+        const gam = await fetch('/api/gamification', {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        }).then(r => r.json()).catch(() => null)
+        const count = await queryClient.fetchQuery({
+          queryKey: ['transactions-today', currentUser.id],
+          queryFn: async () => {
+            const { count } = await createClient()
+              .from('transactions')
+              .select('id', { count: 'exact', head: true })
+              .eq('user_id', currentUser.id)
+              .eq('transaction_date', today)
+            return count ?? 0
+          }
         })
-      }).catch(() => {})
+        setStreakInfo({ streak: gam?.streak_days ?? 0, loggedToday: count > 0 })
+      } catch { /* ignore */ }
+    })()
   }, [currentUser, queryClient])
 
   if (isLoading && !data) return <DashSkeleton />

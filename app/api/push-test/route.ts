@@ -15,13 +15,22 @@ export async function POST(request: NextRequest) {
   }
 
   const token = authHeader.replace('Bearer ', '')
-  const { data: { user }, error } = await supabase.auth.getUser(token)
-  if (error || !user) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+  let userId: string
+
+  // قبول CRON_SECRET + user_id في الـ body (للاختبار من الـ terminal)
+  const cronSecret = process.env.CRON_SECRET
+  if (cronSecret && token === cronSecret) {
+    const body = await request.json().catch(() => ({}))
+    if (!body.user_id) return NextResponse.json({ error: 'user_id required' }, { status: 400 })
+    userId = body.user_id
+  } else {
+    const { data: { user }, error } = await supabase.auth.getUser(token)
+    if (error || !user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    userId = user.id
   }
 
   const sent = await sendPushToUser(
-    user.id,
+    userId,
     '🔔 إشعار تجريبي من فجرك',
     'النظام يعمل بشكل صحيح! ستصلك التنبيهات اليومية في أوقاتها 🌅',
     '/dashboard/alerts',

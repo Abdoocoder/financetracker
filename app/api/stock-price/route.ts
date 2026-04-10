@@ -1,4 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+
+const supabase = createAdminClient()
 
 // خريطة العملات الرقمية الشائعة
 const CRYPTO_IDS: Record<string, string> = {
@@ -57,7 +60,14 @@ async function getStockPriceYahoo(symbol: string): Promise<number | null> {
   } catch { return null }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const { data: { user }, error } = await supabase.auth.getUser(authHeader.slice(7))
+  if (error || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { searchParams } = new URL(request.url)
   const symbol = (searchParams.get('symbol') ?? '').toUpperCase()
   if (!symbol) return NextResponse.json({ error: 'symbol required' }, { status: 400 })

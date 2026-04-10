@@ -395,11 +395,14 @@ export default function OnboardingPage() {
       await supabase.from('profiles').update({ onboarding_done: true }).eq('id', user.id)
       // تهيئة الـ gamification
       try {
-        await fetch('/api/gamification', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id }),
-        })
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.access_token) {
+          await fetch('/api/gamification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+            body: JSON.stringify({ user_id: user.id }),
+          })
+        }
       } catch {}
     }
     try {

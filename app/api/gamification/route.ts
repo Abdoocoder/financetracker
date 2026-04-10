@@ -179,11 +179,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url)
-  const user_id = searchParams.get('user_id')
-  if (!user_id) return NextResponse.json(null)
+  const authHeader = req.headers.get('authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.slice(7))
+  if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data } = await supabase.from('user_stats').select('*').eq('id', user_id).single()
+  const { data } = await supabase.from('user_stats').select('*').eq('id', user.id).single()
   if (!data) return NextResponse.json({ streak: 0, points: 0, level: 1, badges: [] })
 
   const levelInfo = getLevel(data.total_points ?? 0)
