@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const PUBLIC_PATHS = [
   '/login', '/register', '/forgot-password', '/reset-password',
-  '/api/auth/callback', '/api/confirm',
+  '/api/', // كل الـ API routes تتحقق من الصلاحية داخلياً
 ]
 
 export async function proxy(request: NextRequest) {
