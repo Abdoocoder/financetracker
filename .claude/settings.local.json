@@ -81,7 +81,12 @@
       "Bash(grep -r \"reactStrictMode\\\\|StrictMode\" c:/Users/user/Projects/financetracker/next.config*)",
       "Bash(ls c:/Users/user/Projects/financetracker/.env*)",
       "Bash(grep -rn \"CRON_SECRET\\\\|financetracker2026\" c:/Users/user/Projects/financetracker/.env*)",
-      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")"
+      "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
+      "Bash(curl -X POST https://fajrak.com/api/push-test -H 'Authorization: Bearer cea406a4f71ac7dbec516e43e647f640094979379d295265b933f05a740130e1' -H 'Content-Type: application/json' -d '{\"user_id\":\"453fa35e-1eb3-47f6-9927-c67b9eb6a255\"}')",
+      "Bash(ls c:/Users/user/Projects/financetracker/public/*.js)",
+      "Bash(sed -n '578,582p' c:/Users/user/Projects/financetracker/README.md)",
+      "Bash(sed -n '662,668p' c:/Users/user/Projects/financetracker/README.ar.md)",
+      "Bash(sed -n '479,484p' \"c:/Users/user/Projects/financetracker/mobile/fajrak_flutter/README.md\")"
     ]
   }
 }

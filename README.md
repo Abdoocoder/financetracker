@@ -578,6 +578,14 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.1 — 2026-04-10 *(Security & Notifications Fix)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔒 **API Security** | Protected `stock-price`, `zakat/prices`, and `gamification` routes with Bearer token auth — previously open to unauthenticated access |
+| 🔔 **Notifications Fix** | Fixed cron jobs blocked by 307 redirect — daily/evening reminders now deliver reliably |
+| 🔑 **CRON_SECRET Hardened** | Replaced weak secret with 64-char random hex — eliminates brute-force risk |
+
 ### v3.32.0 — 2026-04-09 *(Latest — Stability & Enhancements)*
 
 | Change | Description |
