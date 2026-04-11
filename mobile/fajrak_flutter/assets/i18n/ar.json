@@ -837,5 +837,11 @@
   "acc_type_bank": "بنك",
   "acc_type_cash": "نقدي",
   "acc_type_savings": "توفير",
-  "acc_type_credit": "بطاقة ائتمان"
+  "acc_type_credit": "بطاقة ائتمان",
+  "dash_accounts_total": "💰 إجمالي الرصيد",
+  "dash_accounts_all": "عبر جميع الحسابات",
+  "budget_remaining_label": "متبقي: ",
+  "budget_limit_label": "الحد: {amount} {currency}",
+  "gamif_badges_title": "الشارات ({earned}/{total})",
+  "gamif_points_to_next": "{points} للمستوى التالي"
 }

@@ -388,9 +388,9 @@ class _AccountsBalanceCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('💰 إجمالي الرصيد', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+            Text('dash_accounts_total'.tr(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
             const SizedBox(height: 2),
-            const Text('عبر جميع الحسابات', style: TextStyle(fontSize: 10, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+            Text('dash_accounts_all'.tr(), style: const TextStyle(fontSize: 10, color: Color(0xFF64748B), fontFamily: 'Cairo')),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${isPositive ? '+' : '-'}${_fmt(totalBalance)}',

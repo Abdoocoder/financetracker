@@ -837,5 +837,11 @@
   "acc_type_bank": "Bank",
   "acc_type_cash": "Cash",
   "acc_type_savings": "Savings",
-  "acc_type_credit": "Credit Card"
+  "acc_type_credit": "Credit Card",
+  "dash_accounts_total": "💰 Total Balance",
+  "dash_accounts_all": "Across all accounts",
+  "budget_remaining_label": "Remaining: ",
+  "budget_limit_label": "Limit: {amount} {currency}",
+  "gamif_badges_title": "Badges ({earned}/{total})",
+  "gamif_points_to_next": "{points} to next level"
 }

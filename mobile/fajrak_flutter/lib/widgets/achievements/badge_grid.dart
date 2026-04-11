@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class BadgeGrid extends StatelessWidget {
@@ -17,7 +18,7 @@ class BadgeGrid extends StatelessWidget {
     return Column(children: [
       Align(
           alignment: Alignment.centerRight,
-          child: Text('الشارات (${earnedBadges.length}/${badgeInfo.length})',
+          child: Text('gamif_badges_title'.tr(namedArgs: {'earned': earnedBadges.length.toString(), 'total': badgeInfo.length.toString()}),
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class LevelCard extends StatelessWidget {
@@ -76,7 +77,7 @@ class LevelCard extends StatelessWidget {
                   fontSize: 11,
                   fontFamily: 'Cairo')),
           if (nextLevel < 9999)
-            Text('$nextLevel للمستوى التالي',
+            Text('gamif_points_to_next'.tr(namedArgs: {'points': nextLevel.toString()}),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 11,

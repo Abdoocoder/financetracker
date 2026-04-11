@@ -281,7 +281,7 @@ class _DebtListItemState extends State<DebtListItem> {
                   color: cs.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
           Row(children: [
             if ((widget.debt['monthly_payment'] as num).toDouble() > 0)
-              Text('${(widget.debt['monthly_payment'] as num).toStringAsFixed(0)}/شهر',
+              Text('${(widget.debt['monthly_payment'] as num).toStringAsFixed(0)}${'debts_per_month'.tr()}',
                   style: TextStyle(
                       color: cs.onSurfaceVariant,
                       fontSize: 11,

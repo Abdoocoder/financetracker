@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class BudgetListItem extends StatelessWidget {
@@ -123,8 +124,8 @@ class BudgetListItem extends StatelessWidget {
         const SizedBox(height: 6),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [
-            const Text('متبقي: ',
-                style: TextStyle(
+            Text('budget_remaining_label'.tr(),
+                style: const TextStyle(
                     color: Color(0xFF64748B),
                     fontSize: 11,
                     fontFamily: 'Cairo')),
@@ -137,7 +138,7 @@ class BudgetListItem extends StatelessWidget {
                     fontSize: 11,
                     fontFamily: 'Cairo'))
           ]),
-          Text('الحد: ${limit.toStringAsFixed(0)} $currency',
+          Text('budget_limit_label'.tr(namedArgs: {'amount': limit.toStringAsFixed(0), 'currency': currency}),
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 11,
