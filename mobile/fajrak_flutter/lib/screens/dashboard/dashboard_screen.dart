@@ -22,6 +22,9 @@ import '../../widgets/dashboard/dashboard_stage_card.dart';
 import '../../widgets/dashboard/recent_transactions_list.dart';
 import '../../widgets/dashboard/net_worth_card.dart';
 import '../../widgets/dashboard/month_summary_card.dart';
+import '../../widgets/dashboard/dashboard_customizer_sheet.dart';
+import '../../providers/dashboard_layout_provider.dart';
+import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -222,6 +225,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final layout = context.watch<DashboardLayoutProvider>();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -234,8 +238,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-              // ── 1. Header — instant ───────────────────────────────
-              DashboardHeader(name: _name),
+              // ── 1. Header + Customize button ─────────────────────
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: DashboardHeader(name: _name)),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () => showDashboardCustomizer(context),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.2)),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.tune_rounded, size: 14, color: colorScheme.primary),
+                        const SizedBox(width: 4),
+                        Text(
+                          'dash_customize'.tr(),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: colorScheme.primary, fontFamily: 'Cairo'),
+                        ),
+                      ]),
+                    ),
+                  ),
+                ],
+              ),
               if (_lastUpdated != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 4, bottom: 12),
@@ -247,57 +276,61 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 12),
 
               // ── 2. Month Summary Banner (days 1-7 of new month) ──
-              if (!_loading) Builder(builder: (ctx) {
-                const monthKeys = ['month_jan', 'month_feb', 'month_mar', 'month_apr',
-                  'month_may', 'month_jun', 'month_jul', 'month_aug', 'month_sep',
-                  'month_oct', 'month_nov', 'month_dec'];
-                final prevIdx = (DateTime.now().month - 2 + 12) % 12;
-                final prevName = monthKeys[prevIdx].tr();
-                return MonthSummaryCard(
-                  prevIncome: _prevIncome,
-                  prevExpenses: _prevExpenses,
-                  currency: _currency,
-                  prevMonthName: prevName,
-                );
-              }),
+              if (!_loading && layout.isVisible(DashCardId.monthSummary))
+                Builder(builder: (ctx) {
+                  const monthKeys = ['month_jan', 'month_feb', 'month_mar', 'month_apr',
+                    'month_may', 'month_jun', 'month_jul', 'month_aug', 'month_sep',
+                    'month_oct', 'month_nov', 'month_dec'];
+                  final prevIdx = (DateTime.now().month - 2 + 12) % 12;
+                  final prevName = monthKeys[prevIdx].tr();
+                  return MonthSummaryCard(
+                    prevIncome: _prevIncome,
+                    prevExpenses: _prevExpenses,
+                    currency: _currency,
+                    prevMonthName: prevName,
+                  );
+                }),
 
-              // ── 4. Hero Balance Card — after phase 1 ─────────────
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: _accountsLoading
-                    ? _SkeletonBox(key: const ValueKey('hero-skel'), height: 110, radius: 18)
-                    : _AccountsBalanceCard(key: const ValueKey('hero-card'), accounts: _accounts, totalBalance: _totalAccountsBalance, currency: _currency),
-              ),
+              // ── 3. Hero Balance Card ──────────────────────────────
+              if (layout.isVisible(DashCardId.heroBalance))
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: _accountsLoading
+                      ? _SkeletonBox(key: const ValueKey('hero-skel'), height: 110, radius: 18)
+                      : _AccountsBalanceCard(key: const ValueKey('hero-card'), accounts: _accounts, totalBalance: _totalAccountsBalance, currency: _currency),
+                ),
               const SizedBox(height: 12),
 
-              // ── 5. Monthly Stats — after phase 2 ─────────────────
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: _loading
-                    ? Row(key: const ValueKey('stats-skel'), children: [
-                        Expanded(child: _SkeletonBox(height: 70, radius: 14)),
-                        const SizedBox(width: 8),
-                        Expanded(child: _SkeletonBox(height: 70, radius: 14)),
-                        const SizedBox(width: 8),
-                        Expanded(child: _SkeletonBox(height: 70, radius: 14)),
-                      ])
-                    : DashboardStats(key: const ValueKey('stats'), income: _income, expenses: _expenses, net: _net, totalBalance: _totalAccountsBalance, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
-              ),
+              // ── 4. Monthly Stats ──────────────────────────────────
+              if (layout.isVisible(DashCardId.monthlyStats))
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: _loading
+                      ? Row(key: const ValueKey('stats-skel'), children: [
+                          Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                          const SizedBox(width: 8),
+                          Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                          const SizedBox(width: 8),
+                          Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                        ])
+                      : DashboardStats(key: const ValueKey('stats'), income: _income, expenses: _expenses, net: _net, totalBalance: _totalAccountsBalance, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
+                ),
               const SizedBox(height: 16),
 
-              // ── 4. Quick Add — always visible ────────────────────
+              // ── 5. Quick Add — always visible (required) ──────────
               DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
               const SizedBox(height: 16),
 
-              // ── 5. Recent Transactions skeleton or real ───────────
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: _loading
-                    ? _SkeletonBox(key: const ValueKey('recent-skel'), height: 180, radius: 16)
-                    : RecentTransactionsList(key: const ValueKey('recent'), transactions: _recentTx, currency: _currency, colorScheme: colorScheme),
-              ),
+              // ── 6. Recent Transactions ────────────────────────────
+              if (layout.isVisible(DashCardId.recentTx))
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  child: _loading
+                      ? _SkeletonBox(key: const ValueKey('recent-skel'), height: 180, radius: 16)
+                      : RecentTransactionsList(key: const ValueKey('recent'), transactions: _recentTx, currency: _currency, colorScheme: colorScheme),
+                ),
 
-              // ── 6–end. Secondary sections — after phase 2 ─────────
+              // ── Secondary sections — after phase 2 ────────────────
               if (_loading) ...[
                 const SizedBox(height: 16),
                 _SkeletonBox(height: 80, radius: 16),
@@ -306,23 +339,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
               if (!_loading) ...[
                 const SizedBox(height: 16),
-                if (_invValue + _goalsSaved + _totalDebt > 0)
+                if (layout.isVisible(DashCardId.netWorth) && _invValue + _goalsSaved + _totalDebt > 0)
                   NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
-                DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
-                const SizedBox(height: 16),
-                DashboardStageCard(stage: _stage),
-                const SizedBox(height: 16),
-                RepaintBoundary(child: ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency)),
-                const SizedBox(height: 16),
-                BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
-                const SizedBox(height: 16),
-                QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
-                const SizedBox(height: 16),
-                GamificationCard(score: _healthScore),
-                const SizedBox(height: 16),
-                WealthSimulatorCard(currency: _currency),
-                const SizedBox(height: 16),
-                ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
+                if (layout.isVisible(DashCardId.healthScore))
+                  DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
+                if (layout.isVisible(DashCardId.stage)) ...[
+                  const SizedBox(height: 16),
+                  DashboardStageCard(stage: _stage),
+                ],
+                if (layout.isVisible(DashCardId.charts)) ...[
+                  const SizedBox(height: 16),
+                  RepaintBoundary(child: ChartsCard(months6Data: _months6Data, categoryData: _categoryData, currency: _currency)),
+                ],
+                if (layout.isVisible(DashCardId.budgets)) ...[
+                  const SizedBox(height: 16),
+                  BudgetProgressCard(income: _income, expenses: _expenses, currency: _currency),
+                ],
+                if (layout.isVisible(DashCardId.quickLinks)) ...[
+                  const SizedBox(height: 16),
+                  QuickLinksCards(totalDebt: _totalDebt, invValue: _invValue, goalsSaved: _goalsSaved, goalsTarget: _goalsTarget, currency: _currency),
+                ],
+                if (layout.isVisible(DashCardId.gamification)) ...[
+                  const SizedBox(height: 16),
+                  GamificationCard(score: _healthScore),
+                ],
+                if (layout.isVisible(DashCardId.simulator)) ...[
+                  const SizedBox(height: 16),
+                  WealthSimulatorCard(currency: _currency),
+                ],
+                if (layout.isVisible(DashCardId.challenges)) ...[
+                  const SizedBox(height: 16),
+                  ChallengesCard(expensesFood: _foodSpending, expectedFoodLimit: 50, income: _income, net: _net, prevExpenses: _prevExpenses, currentExpenses: _expenses, expensesEntertainment: _entertainmentSpending, currency: _currency),
+                ],
               ],
             ]),
           ),

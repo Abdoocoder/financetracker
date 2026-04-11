@@ -9,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'utils/error_handler.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
+import 'providers/dashboard_layout_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -126,8 +127,11 @@ void main() async {
       supportedLocales: const [Locale('ar'), Locale('en')],
       path: 'assets/i18n',
       fallbackLocale: const Locale('ar'),
-      child: ChangeNotifierProvider.value(
-        value: appState,
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: appState),
+          ChangeNotifierProvider(create: (_) => DashboardLayoutProvider()),
+        ],
         child: const FajrakApp(),
       ),
     ),
