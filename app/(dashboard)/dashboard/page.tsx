@@ -21,6 +21,8 @@ import { Section } from '@/components/dashboard/Section'
 import { DashSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { HeroBalanceCard } from '@/components/dashboard/HeroBalanceCard'
 import { MonthSummaryBanner } from '@/components/dashboard/MonthSummaryBanner'
+import { DashboardCustomizer } from '@/components/dashboard/DashboardCustomizer'
+import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
 const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
@@ -34,6 +36,7 @@ export default function DashboardPage() {
   const { t, lang, hydrated } = useI18n()
   const { user: currentUser, profile } = useUser()
   const queryClient = useQueryClient()
+  const { visibility, toggle, reset, show } = useDashboardLayout()
   
   // Use the new TanStack Query based hook
   const { data, isLoading } = useDashboardData()
@@ -116,14 +119,15 @@ export default function DashboardPage() {
               🔔 {data?.unreadAlerts}
             </Link>
           )}
+          <DashboardCustomizer visibility={visibility} onToggle={toggle} onReset={reset} lang={lang} />
         </div>
       </div>
 
       {/* ── 2. MONTH SUMMARY BANNER ── */}
-      <MonthSummaryBanner data={data || null} lang={lang} t={t} currency={currency} />
+      {show('month_summary') && <MonthSummaryBanner data={data || null} lang={lang} t={t} currency={currency} />}
 
       {/* ── 3. HERO BALANCE CARD ───────────────────────── */}
-      {accountsLoading && !accounts.length
+      {show('hero_balance') && (accountsLoading && !accounts.length
         ? <div className="skeleton" style={{ height: 128, borderRadius: 24 }} />
         : <HeroBalanceCard
             monthlyNet={net}
@@ -133,10 +137,10 @@ export default function DashboardPage() {
             totalBalance={accountsTotalBalance}
             prevMonthNet={(data?.prevIncome ?? 0) - (data?.prevExpenses ?? 0)}
           />
-      }
+      )}
 
       {/* ── 4. MONTHLY STATS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+      {show('monthly_stats') && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
         {[
           { label: t('dash_income'),   value: `+${fmt(income)}`,   color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑', sub: null },
           { label: t('dash_expenses'), value: fmt(realExpenses > 0 ? realExpenses : expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓', sub: null },
@@ -157,9 +161,9 @@ export default function DashboardPage() {
             {s.sub && <div style={{ fontSize: 8, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600, opacity: 0.8 }}>{s.sub}</div>}
           </div>
         ))}
-      </div>
+      </div>}
 
-      {(monthlyDebtCommitments > 0 || debtPayments > 0) && (
+      {show('debt_row') && (monthlyDebtCommitments > 0 || debtPayments > 0) && (
         <div style={{ display: 'flex', gap: 8 }}>
           {debtPayments > 0 && (
             <div style={{ flex: 1, padding: '8px 12px', borderRadius: 10, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -187,42 +191,52 @@ export default function DashboardPage() {
       }} />
 
       {/* ── 7. RECENT TRANSACTIONS ────────────────────── */}
-      <RecentTransactionsCard transactions={data?.recentTx ?? []} lang={lang} />
+      {show('recent_tx') && <RecentTransactionsCard transactions={data?.recentTx ?? []} lang={lang} />}
 
       {/* ── Secondary sections ── */}
-      <BudgetProgressCard income={income} expenses={expenses} net={net} currency={currency} />
+      {show('budgets') && <BudgetProgressCard income={income} expenses={expenses} net={net} currency={currency} />}
 
-      <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} currency={currency} />
+      {show('quick_links') && <QuickLinksCards totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} currency={currency} />}
 
-      {(data?.invValue ?? 0) + (data?.goalsSaved ?? 0) + (data?.totalDebt ?? 0) > 0 && (
+      {show('net_worth') && (data?.invValue ?? 0) + (data?.goalsSaved ?? 0) + (data?.totalDebt ?? 0) > 0 && (
         <NetWorthCard netWorth={data?.netWorth ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} totalDebt={data?.totalDebt ?? 0} totalReceivable={data?.totalReceivable ?? 0} currency={currency} lang={lang} />
       )}
 
-      <Section id="health" defaultOpen={false} icon="💊" title={`${lang === 'en' ? 'Financial Health' : 'الصحة المالية'} — ${data?.healthScore ?? 0}%`}>
-        <div style={{ padding: '12px 0 8px' }}>
-          <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
-        </div>
-      </Section>
+      {show('health') && (
+        <Section id="health" defaultOpen={false} icon="💊" title={`${lang === 'en' ? 'Financial Health' : 'الصحة المالية'} — ${data?.healthScore ?? 0}%`}>
+          <div style={{ padding: '12px 0 8px' }}>
+            <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
+          </div>
+        </Section>
+      )}
 
-      <Section id="gamification" defaultOpen={false} icon="🏆" title={lang === 'en' ? 'Achievements' : 'الإنجازات'}>
-        <div style={{ padding: '12px 0 8px' }}><GamificationCard /></div>
-      </Section>
+      {show('achievements') && (
+        <Section id="gamification" defaultOpen={false} icon="🏆" title={lang === 'en' ? 'Achievements' : 'الإنجازات'}>
+          <div style={{ padding: '12px 0 8px' }}><GamificationCard /></div>
+        </Section>
+      )}
 
-      <Section id="charts" defaultOpen={false} icon="📊" title={lang === 'en' ? 'Charts & Analysis' : 'الرسوم البيانية'}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
-          <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
-          {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
-          {data && data.categories.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
-        </div>
-      </Section>
+      {show('charts') && (
+        <Section id="charts" defaultOpen={false} icon="📊" title={lang === 'en' ? 'Charts & Analysis' : 'الرسوم البيانية'}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
+            <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
+            {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
+            {data && data.categories.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
+          </div>
+        </Section>
+      )}
 
-      <Section id="simulator" defaultOpen={false} icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
-        <div style={{ padding: '12px 0 8px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
-      </Section>
+      {show('simulator') && (
+        <Section id="simulator" defaultOpen={false} icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
+          <div style={{ padding: '12px 0 8px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
+        </Section>
+      )}
 
-      <Section id="challenges" defaultOpen={false} icon="🎯" title={lang === 'en' ? 'Challenges' : 'التحديات'}>
-        <div style={{ padding: '12px 0 8px' }}><ChallengesCard lang={lang} data={data || null} net={net} income={income} expenses={expenses} /></div>
-      </Section>
+      {show('challenges') && (
+        <Section id="challenges" defaultOpen={false} icon="🎯" title={lang === 'en' ? 'Challenges' : 'التحديات'}>
+          <div style={{ padding: '12px 0 8px' }}><ChallengesCard lang={lang} data={data || null} net={net} income={income} expenses={expenses} /></div>
+        </Section>
+      )}
 
     </div>
   )
