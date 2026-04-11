@@ -46,18 +46,54 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
     super.dispose();
   }
 
+  String? _validate() {
+    if (_nameCtrl.text.trim().isEmpty) return 'goals_name_hint'.tr();
+    final target = double.tryParse(_targetCtrl.text.replaceAll(',', '.'));
+    if (_targetCtrl.text.trim().isEmpty) return 'goals_target_amount'.tr();
+    if (target == null || target <= 0) {
+      return 'goals_target_invalid'.tr();
+    }
+    final current = double.tryParse(_currentCtrl.text.replaceAll(',', '.')) ?? 0;
+    if (current < 0) return 'goals_current_invalid'.tr();
+    if (current > target) return 'goals_current_exceeds_target'.tr();
+    return null;
+  }
+
+  void _showValidationError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(children: [
+          const Icon(Icons.warning_amber_rounded, color: Colors.white),
+          const SizedBox(width: 10),
+          Expanded(child: Text(message, style: const TextStyle(fontFamily: 'Cairo'))),
+        ]),
+        backgroundColor: const Color(0xFFF59E0B),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   Future<void> _save() async {
     if (_saving) return;
+    final validationError = _validate();
+    if (validationError != null) {
+      _showValidationError(validationError);
+      return;
+    }
     _saving = true;
     setState(() {});
     final user = Supabase.instance.client.auth.currentUser!;
     HapticFeedback.mediumImpact();
+    final target = double.parse(_targetCtrl.text.replaceAll(',', '.'));
+    final current = double.tryParse(_currentCtrl.text.replaceAll(',', '.')) ?? 0;
     final data = {
       'user_id': user.id,
-      'name': _nameCtrl.text,
+      'name': _nameCtrl.text.trim(),
       'icon': _selectedIcon.toString(),
-      'target_amount': double.tryParse(_targetCtrl.text) ?? 0,
-      'current_amount': double.tryParse(_currentCtrl.text) ?? 0,
+      'target_amount': target,
+      'current_amount': current,
       'deadline': _deadlineDate.isEmpty ? null : _deadlineDate,
     };
     try {

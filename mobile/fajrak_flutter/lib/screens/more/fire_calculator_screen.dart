@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
+import '../../widgets/common/calculator_disclaimer.dart';
 
 double? _yearsToFIRE(double target, double current, double monthlyContrib, double annualReturn) {
   if (monthlyContrib <= 0 && current >= target) return 0;
@@ -131,6 +132,7 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
+          const CalculatorDisclaimer(storageKey: 'disclaimer_fire'),
           // Mode toggle
           Container(
             decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: cs.outlineVariant)),

@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/currency_service.dart';
+import '../../widgets/common/calculator_disclaimer.dart';
 
 class ZakatCalculatorScreen extends StatefulWidget {
   const ZakatCalculatorScreen({super.key});
@@ -245,6 +246,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
+          const CalculatorDisclaimer(storageKey: 'disclaimer_zakat'),
           // Haul Countdown Section
           if (_invItems.isNotEmpty) ...[
             Container(

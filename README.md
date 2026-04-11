@@ -578,6 +578,18 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.2 — 2026-04-11 *(i18n & UX Fixes)*
+
+| Change | Description |
+|:-------|:------------|
+| 🌐 **i18n Critical Fix** | Fixed 50+ Arabic strings appearing in English mode — `en` translation object had Arabic values for notification, roadmap, and recurring keys |
+| 🛡️ **i18n Guard** | Added runtime fallback in `t()` that detects Arabic text in English translations and skips them |
+| 🎯 **Goal Validation** | Goals form now shows field-specific error messages and maps Supabase errors to human-readable text |
+| 📖 **Onboarding Fix** | Tour was always showing Arabic — fixed by using `currentLang` instead of `lang` (which can be `'system'`) |
+| ⚠️ **Calculator Disclaimer** | Added dismissible disclaimer to FIRE and Zakat calculators (web + Flutter) with "don't show again" option |
+| 🗑️ **Flutter Cleanup** | Removed stale Hive-generated `.g.dart` files (`debt`, `goal`, `profile`, `transaction`) that caused 40 analyzer errors |
+| 📝 **Flutter i18n** | Added 5 missing keys in Flutter `en.json`: goal validation errors + debt FAQ |
+
 ### v3.32.1 — 2026-04-10 *(Security & Notifications Fix)*
 
 | Change | Description |

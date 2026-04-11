@@ -1,12 +1,13 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/accounts_service.dart';
 
 const _accountTypes = [
-  {'type': 'bank',        'icon': '🏦', 'labelAr': 'بنك',          'color': Color(0xFF3B7EF6)},
-  {'type': 'cash',        'icon': '💵', 'labelAr': 'نقدي',         'color': Color(0xFF10B981)},
-  {'type': 'savings',     'icon': '🏛️', 'labelAr': 'توفير',        'color': Color(0xFF8B5CF6)},
-  {'type': 'credit_card', 'icon': '💳', 'labelAr': 'بطاقة ائتمان', 'color': Color(0xFFEF4444)},
+  {'type': 'bank',        'icon': '🏦', 'labelKey': 'acc_type_bank',   'color': Color(0xFF3B7EF6)},
+  {'type': 'cash',        'icon': '💵', 'labelKey': 'acc_type_cash',   'color': Color(0xFF10B981)},
+  {'type': 'savings',     'icon': '🏛️', 'labelKey': 'acc_type_savings','color': Color(0xFF8B5CF6)},
+  {'type': 'credit_card', 'icon': '💳', 'labelKey': 'acc_type_credit', 'color': Color(0xFFEF4444)},
 ];
 
 const _presetColors = [
@@ -48,7 +49,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('💰 الحسابات', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+        title: Text('accounts_title'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         actions: [
@@ -56,7 +57,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             TextButton.icon(
               onPressed: () => _showTransferDialog(),
               icon: const Icon(Icons.swap_horiz, size: 18),
-              label: const Text('تحويل', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              label: Text('accounts_transfer'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
             ),
           IconButton(
             icon: const Icon(Icons.add),
@@ -71,7 +72,6 @@ class _AccountsScreenState extends State<AccountsScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  // إجمالي الرصيد
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -80,7 +80,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       border: Border.all(color: _totalBalance >= 0 ? const Color(0xFF10B981).withValues(alpha: 0.25) : const Color(0xFFEF4444).withValues(alpha: 0.25)),
                     ),
                     child: Column(children: [
-                      Text('إجمالي الرصيد', style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
+                      Text('accounts_total_balance'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 6),
                       Text(
                         '${_totalBalance >= 0 ? '+' : '-'}${_fmt(_totalBalance)} $_currency',
@@ -92,17 +92,16 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     ]),
                   ),
                   const SizedBox(height: 16),
-                  // قائمة الحسابات
                   ..._accounts.map((acc) => _AccountCard(
                     acc: acc, currency: _currency,
                     onEdit: () => _showAccountDialog(account: acc),
                     onDelete: acc['is_default'] == true ? null : () async {
                       final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
-                        title: const Text('أرشفة الحساب', style: TextStyle(fontFamily: 'Cairo')),
-                        content: const Text('هل تريد أرشفة هذا الحساب؟', style: TextStyle(fontFamily: 'Cairo')),
+                        title: Text('accounts_archive_title'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                        content: Text('accounts_archive_confirm'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('أرشفة', style: TextStyle(fontFamily: 'Cairo', color: Colors.red))),
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('accounts_archive_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('accounts_archive'.tr(), style: const TextStyle(fontFamily: 'Cairo', color: Colors.red))),
                         ],
                       ));
                       if (ok == true) { await AccountsService.archiveAccount(acc['id'] as String); _load(); }
@@ -174,11 +173,11 @@ class _AccountCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(100), border: Border.all(color: color.withValues(alpha: 0.3))),
-                child: Text('افتراضي', style: TextStyle(color: color, fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                child: Text('accounts_default'.tr(), style: TextStyle(color: color, fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
               ),
             ]
           ]),
-          Text(info['labelAr'] as String, style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11)),
+          Text((info['labelKey'] as String).tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11)),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(
@@ -265,7 +264,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('حدث خطأ: ${e.toString()}',
+          content: Text('${'accounts_error_save'.tr()}: ${e.toString()}',
               style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
@@ -280,11 +279,10 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(widget.account == null ? 'حساب جديد' : 'تعديل الحساب',
+        Text(widget.account == null ? 'accounts_new'.tr() : 'accounts_edit'.tr(),
           style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 17)),
         const SizedBox(height: 16),
-        // نوع الحساب
-        Text('نوع الحساب', style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
+        Text('accounts_type'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), childAspectRatio: 3.5, crossAxisSpacing: 8, mainAxisSpacing: 8, children: _accountTypes.map((t) {
           final selected = _type == t['type'];
@@ -300,7 +298,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Text(t['icon'] as String, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 6),
-                Text(t['labelAr'] as String, style: TextStyle(color: selected ? tColor : cs.onSurfaceVariant, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13)),
+                Text((t['labelKey'] as String).tr(), style: TextStyle(color: selected ? tColor : cs.onSurfaceVariant, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13)),
               ]),
             ),
           );
@@ -309,9 +307,10 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
         TextField(
           controller: _nameCtrl,
           textAlign: TextAlign.right,
+          autofocus: true,
           style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
           decoration: InputDecoration(
-            labelText: 'اسم الحساب',
+            labelText: 'accounts_name_hint'.tr(),
             labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
             filled: true, fillColor: cs.surface,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: cs.outlineVariant)),
@@ -324,7 +323,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
           decoration: InputDecoration(
-            labelText: 'الرصيد الابتدائي',
+            labelText: 'accounts_opening_balance'.tr(),
             labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
             filled: true, fillColor: cs.surface,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: cs.outlineVariant)),
@@ -340,8 +339,9 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
         SizedBox(width: double.infinity, child: ElevatedButton(
           onPressed: _saving ? null : _save,
           style: ElevatedButton.styleFrom(backgroundColor: _color, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-          child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('حفظ', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+          child: _saving
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : Text('accounts_save'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
         )),
         const SizedBox(height: 12),
       ]),
@@ -393,7 +393,7 @@ class _TransferSheetState extends State<_TransferSheet> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('حدث خطأ أثناء التحويل: ${e.toString()}',
+          content: Text('${'accounts_error_transfer'.tr()}: ${e.toString()}',
               style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
           backgroundColor: const Color(0xFFEF4444),
           behavior: SnackBarBehavior.floating,
@@ -417,30 +417,31 @@ class _TransferSheetState extends State<_TransferSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('🔄 تحويل بين الحسابات', style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 17)),
+        Text('accounts_transfer_title'.tr(), style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 17)),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          initialValue: _fromId, decoration: inputDec('من'),
+          initialValue: _fromId, decoration: inputDec('accounts_transfer_from'.tr()),
           items: widget.accounts.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle(fontFamily: 'Cairo')))).toList(),
           onChanged: (v) => setState(() { _fromId = v!; if (_toId == _fromId) _toId = widget.accounts.firstWhere((a) => a['id'] != _fromId)['id'] as String; }),
         ),
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
           initialValue: avail.any((a) => a['id'] == _toId) ? _toId : avail.first['id'] as String,
-          decoration: inputDec('إلى'),
+          decoration: inputDec('accounts_transfer_to'.tr()),
           items: avail.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle(fontFamily: 'Cairo')))).toList(),
           onChanged: (v) => setState(() => _toId = v!),
         ),
         const SizedBox(height: 10),
-        TextField(controller: _amountCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'), decoration: inputDec('المبلغ')),
+        TextField(controller: _amountCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'), decoration: inputDec('accounts_transfer_amount'.tr())),
         const SizedBox(height: 10),
-        TextField(controller: _noteCtrl, style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'), decoration: inputDec('ملاحظة (اختياري)')),
+        TextField(controller: _noteCtrl, style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'), decoration: inputDec('accounts_transfer_note'.tr())),
         const SizedBox(height: 20),
         SizedBox(width: double.infinity, child: ElevatedButton(
           onPressed: _saving ? null : _save,
           style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
-          child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Text('تحويل', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+          child: _saving
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : Text('accounts_transfer'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
         )),
         const SizedBox(height: 12),
       ]),
