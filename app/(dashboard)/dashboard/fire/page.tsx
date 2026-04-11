@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
+import { CalculatorDisclaimer } from '@/components/ui/calculator-disclaimer'
 
 function yearsToFIRE(target: number, current: number, monthlyContrib: number, annualReturn: number): number | null {
   if (monthlyContrib <= 0 && current >= target) return 0
@@ -18,8 +19,8 @@ function yearsToFIRE(target: number, current: number, monthlyContrib: number, an
 }
 
 export default function FIREPage() {
-  const { t, lang } = useI18n()
-  const ar = lang === 'ar'
+  const { t, currentLang } = useI18n()
+  const ar = currentLang === 'ar'
   const { user } = useUser()
   const supabase = useMemo(() => createClient(), [])
 
@@ -91,6 +92,8 @@ export default function FIREPage() {
           {ar ? 'Financial Independence, Retire Early — اعرف متى تصل للحرية المالية' : 'Financial Independence, Retire Early'}
         </p>
       </div>
+
+      <CalculatorDisclaimer storageKey="disclaimer_fire" />
 
       {/* Mode Toggle */}
       <div style={{ display: 'flex', gap: 8 }}>

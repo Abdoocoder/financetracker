@@ -6,6 +6,7 @@ import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 import { fetchExchangeRate } from '@/lib/currency'
 import type { Investment, ZakatHistory } from '@/types'
+import { CalculatorDisclaimer } from '@/components/ui/calculator-disclaimer'
 
 const HAUL_DAYS = 354 // حول هجري
 const TROY_OZ_TO_GRAM = 31.1035
@@ -26,8 +27,8 @@ function haulDueDate(inv: Investment): string {
 }
 
 export default function ZakatPage() {
-  const { lang } = useI18n()
-  const ar = lang === 'ar'
+  const { currentLang } = useI18n()
+  const ar = currentLang === 'ar'
   const { user } = useUser()
   const supabase = useMemo(() => createClient(), [])
 
@@ -167,6 +168,8 @@ export default function ZakatPage() {
           {ar ? `حساب زكاة ${currentYear} — النصاب: ${fmt(nisab)} ${currency}` : `Zakat for ${currentYear} — Nisab: ${fmt(nisab)} ${currency}`}
         </p>
       </div>
+
+      <CalculatorDisclaimer storageKey="disclaimer_zakat" />
 
       {/* ── حول الاستثمارات ── */}
       {urgentInv.length > 0 && (

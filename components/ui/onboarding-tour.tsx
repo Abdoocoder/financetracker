@@ -122,7 +122,7 @@ const TOURS: Record<string, { ar: { title: string; desc: string }; en: { title: 
 }
 
 export function OnboardingTour() {
-  const { lang } = useI18n()
+  const { currentLang } = useI18n()
   const pathname = usePathname()
   const [step, setStep] = useState(0)
   const [mounted, setMounted] = useState(false)
@@ -152,9 +152,11 @@ export function OnboardingTour() {
   if (!show || steps.length === 0) return null
 
   const current = steps[step]
-  const info = current[lang as 'ar' | 'en'] ?? current['ar']
+  const info = current[currentLang] ?? current['ar']
 
   if (!info) return null
+
+  const isAr = currentLang === 'ar'
 
   return (
     <>
@@ -166,6 +168,7 @@ export function OnboardingTour() {
         borderRadius: 20, padding: '20px', zIndex: 9999,
         boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
         animation: 'slideUp 0.3s ease',
+        direction: isAr ? 'rtl' : 'ltr',
       }}>
         {/* Progress */}
         <div style={{ display: 'flex', gap: 4, marginBottom: 16 }}>
@@ -183,12 +186,12 @@ export function OnboardingTour() {
 
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button onClick={complete} style={{ padding: '9px 16px', borderRadius: 10, background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-            {lang === 'ar' ? 'تخطي' : 'Skip'}
+            {isAr ? 'تخطي' : 'Skip'}
           </button>
           <button onClick={next} style={{ flex: 1, padding: '10px', borderRadius: 10, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
             {step < steps.length - 1
-              ? (lang === 'ar' ? `التالي ← (${step + 1}/${steps.length})` : `Next → (${step + 1}/${steps.length})`)
-              : (lang === 'ar' ? '✅ فهمت!' : '✅ Got it!')}
+              ? (isAr ? `التالي ← (${step + 1}/${steps.length})` : `Next → (${step + 1}/${steps.length})`)
+              : (isAr ? '✅ فهمت!' : '✅ Got it!')}
           </button>
         </div>
       </div>

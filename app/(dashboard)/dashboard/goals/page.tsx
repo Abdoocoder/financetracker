@@ -21,7 +21,7 @@ export default function GoalsPage() {
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
-  const { t, lang } = useI18n()
+  const { t, lang, currentLang } = useI18n()
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
@@ -51,21 +51,46 @@ export default function GoalsPage() {
     setForm({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })
   }
 
+  function validateGoalForm(): string | null {
+    if (!form.name.trim()) return t('goals_name') + ' ' + (t('toast_fill_required'))
+    const target = parseFloat(form.target_amount.replace(',', '.'))
+    if (!form.target_amount.trim()) return t('goals_target') + ': ' + t('toast_fill_required')
+    if (isNaN(target) || target <= 0) return t('goals_target') + ': ' + (currentLang === 'ar' ? 'يجب أن يكون رقماً موجباً' : 'must be a positive number')
+    const current = parseFloat(form.current_amount.replace(',', '.'))
+    if (form.current_amount && (isNaN(current) || current < 0)) return t('goals_current') + ': ' + (currentLang === 'ar' ? 'قيمة غير صالحة' : 'invalid value')
+    if (!isNaN(current) && current > target) return currentLang === 'ar' ? 'المبلغ الحالي لا يمكن أن يتجاوز الهدف' : 'Current amount cannot exceed target'
+    return null
+  }
+
+  function mapGoalError(error: any): string {
+    const msg = error?.message ?? ''
+    if (msg.includes('check') && msg.includes('target_amount')) return currentLang === 'ar' ? 'المبلغ المستهدف يجب أن يكون أكبر من صفر' : 'Target amount must be greater than zero'
+    if (msg.includes('check') && msg.includes('current_amount')) return currentLang === 'ar' ? 'المبلغ الحالي غير صالح' : 'Current amount is invalid'
+    if (msg.includes('duplicate') || msg.includes('unique')) return currentLang === 'ar' ? 'يوجد هدف بنفس الاسم' : 'A goal with this name already exists'
+    if (msg.includes('foreign key')) return currentLang === 'ar' ? 'خطأ في بيانات المستخدم' : 'User data error'
+    return t('toast_error_save')
+  }
+
   async function saveGoal() {
-    if (!form.name || !form.target_amount) { toast.warning(t('toast_fill_required')); return }
+    const validationError = validateGoalForm()
+    if (validationError) { toast.warning(validationError); return }
     setSaving(true)
     const user = currentUser
-    if (!user) return
-    if (editingId) {
-      const { error } = await supabase.from('savings_goals').update({ name: form.name, target_amount: parseFloat(form.target_amount.replace(",", ".")), current_amount: parseFloat(form.current_amount.replace(",", ".")), target_date: form.target_date || null, icon: form.icon }).eq('id', editingId)
-      if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
-      toast.success(t('toast_edited'))
-    } else {
-      const { error } = await supabase.from('savings_goals').insert({ user_id: user.id, name: form.name, target_amount: parseFloat(form.target_amount.replace(",", ".")), current_amount: parseFloat(form.current_amount.replace(",", ".")) || 0, target_date: form.target_date || null, icon: form.icon })
-      if (error) { toast.error(t('toast_error_save')); setSaving(false); return }
-      toast.success(t('toast_goal_added'))
+    if (!user) { setSaving(false); return }
+    try {
+      if (editingId) {
+        const { error } = await supabase.from('savings_goals').update({ name: form.name.trim(), target_amount: parseFloat(form.target_amount.replace(',', '.')), current_amount: parseFloat(form.current_amount.replace(',', '.')) || 0, target_date: form.target_date || null, icon: form.icon }).eq('id', editingId)
+        if (error) { toast.error(mapGoalError(error)); return }
+        toast.success(t('toast_edited'))
+      } else {
+        const { error } = await supabase.from('savings_goals').insert({ user_id: user.id, name: form.name.trim(), target_amount: parseFloat(form.target_amount.replace(',', '.')), current_amount: parseFloat(form.current_amount.replace(',', '.')) || 0, target_date: form.target_date || null, icon: form.icon })
+        if (error) { toast.error(mapGoalError(error)); return }
+        toast.success(t('toast_goal_added'))
+      }
+      cancelForm(); load()
+    } finally {
+      setSaving(false)
     }
-    cancelForm(); setSaving(false); load()
   }
 
   async function deleteGoal(id: string) {
