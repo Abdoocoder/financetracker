@@ -578,6 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.3 — 2026-04-11 *(Dashboard Customization)*
+
+| Change | Description |
+|:-------|:------------|
+| ⚙️ **Dashboard Customization (Web)** | Added toggle show/hide for all 14 dashboard cards — persisted to localStorage with smart defaults |
+| ⚙️ **Dashboard Customization (Flutter)** | Ported to Flutter using `Provider` + `SharedPreferences` — bottom sheet with adaptive switches |
+| 🔒 **Required Card Guard** | Quick Add is always visible; hiding the last optional card is prevented |
+| 🌐 **i18n** | Added 20 new keys for customizer UI (`dash_customize_*`, `dash_card_*`) in both AR + EN |
+
 ### v3.32.2 — 2026-04-11 *(i18n & UX Fixes)*
 
 | Change | Description |
