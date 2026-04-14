@@ -65,6 +65,26 @@ describe('lib/currency', () => {
             const result = formatAmount(0, 'JOD')
             expect(result).toBe('0.000 JOD')
         })
+
+        it('should handle negative numbers', () => {
+            const result = formatAmount(-1234.5, 'USD')
+            expect(result).toBe('-1,234.50 USD')
+        })
+
+        it('should handle very large numbers', () => {
+            const result = formatAmount(1234567890.123, 'JOD')
+            expect(result).toBe('1,234,567,890.123 JOD')
+        })
+
+        it('should round correctly for 2 decimals', () => {
+            const result = formatAmount(1.235, 'USD')
+            expect(result).toBe('1.24 USD')
+        })
+
+        it('should round correctly for 0 decimals', () => {
+            const result = formatAmount(1.6, 'JPY')
+            expect(result).toBe('2 JPY')
+        })
     })
 
     describe('fetchExchangeRate', () => {

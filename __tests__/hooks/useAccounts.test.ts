@@ -1,8 +1,13 @@
 // Mock must come before imports
 const mockFrom = jest.fn()
 
+const mockRpc = jest.fn((_name?: string) => chainProxy({ data: [], error: null }))
+
 jest.mock('@/lib/supabase/client', () => ({
-  createClient: jest.fn(() => ({ from: mockFrom })),
+  createClient: jest.fn(() => ({ 
+    from: mockFrom,
+    rpc: mockRpc 
+  })),
 }))
 
 import { renderHook, waitFor, act } from '@testing-library/react'
@@ -57,9 +62,32 @@ const mockTxs = [
 
 function setupMock(accountData = mockAccounts, txData = mockTxs) {
   mockFrom.mockClear()
+  mockRpc.mockClear()
+  
   mockFrom.mockImplementation((table: string) => {
     if (table === 'accounts') return chainProxy({ data: accountData, error: null })
     if (table === 'transactions') return chainProxy({ data: txData, error: null })
+    return chainProxy({ data: null, error: null })
+  })
+
+  // Calculate balances for RPC mock
+  const balances = accountData.map(acc => {
+    let balance = Number(acc.opening_balance)
+    txData.forEach(tx => {
+      const amount = Number(tx.amount)
+      if (tx.account_id === acc.id) {
+        if (tx.type === 'income') balance += amount
+        else if (tx.type === 'expense' || tx.type === 'transfer') balance -= amount
+      }
+      if (tx.transfer_to_account_id === acc.id) {
+        balance += amount
+      }
+    })
+    return { account_id: acc.id, current_balance: balance }
+  })
+
+  mockRpc.mockImplementation((name: string) => {
+    if (name === 'get_account_balances') return chainProxy({ data: balances, error: null })
     return chainProxy({ data: null, error: null })
   })
 }

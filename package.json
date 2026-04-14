@@ -13,6 +13,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
+    "task-master": "task-master",
     "doctor": "npx next info && npm audit --audit-level=high && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
   },
   "dependencies": {

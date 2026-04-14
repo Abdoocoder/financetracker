@@ -192,8 +192,66 @@ describe('useTransactions — filtering and searching', () => {
     const { result } = renderHook(() => useTransactions())
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSearch('food'))
-    expect(result.current.filtered).toHaveLength(1)
     expect(result.current.filtered[0].id).toBe('tx2')
+  })
+
+  it('setSearch filters by amount string', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    act(() => result.current.setSearch('1000'))
+    expect(result.current.filtered).toHaveLength(1)
+    expect(result.current.filtered[0].id).toBe('tx1')
+  })
+
+  it('setSearch is case-insensitive', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    act(() => result.current.setSearch('FOOD'))
+    expect(result.current.filtered).toHaveLength(1)
+    expect(result.current.filtered[0].category).toBe('food')
+  })
+})
+
+describe('useTransactions — sorting', () => {
+  beforeEach(() => setupMock())
+
+  it('sorts by date desc by default', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    // Dates: tx1 (15th), tx2 (10th), tx3 (5th)
+    expect(result.current.filtered[0].id).toBe('tx1')
+    expect(result.current.filtered[1].id).toBe('tx2')
+    expect(result.current.filtered[2].id).toBe('tx3')
+  })
+
+  it('sorts by date asc', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    act(() => result.current.setSortOrder('asc'))
+    expect(result.current.filtered[0].id).toBe('tx3')
+    expect(result.current.filtered[1].id).toBe('tx2')
+    expect(result.current.filtered[2].id).toBe('tx1')
+  })
+
+  it('sorts by amount desc', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    act(() => result.current.setSortBy('amount'))
+    act(() => result.current.setSortOrder('desc'))
+    // Amounts: tx1 (1000), tx2 (200), tx3 (50)
+    expect(result.current.filtered[0].id).toBe('tx1')
+    expect(result.current.filtered[1].id).toBe('tx2')
+    expect(result.current.filtered[2].id).toBe('tx3')
+  })
+
+  it('sorts by amount asc', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    act(() => result.current.setSortBy('amount'))
+    act(() => result.current.setSortOrder('asc'))
+    expect(result.current.filtered[0].id).toBe('tx3')
+    expect(result.current.filtered[1].id).toBe('tx2')
+    expect(result.current.filtered[2].id).toBe('tx1')
   })
 })
 

@@ -22,8 +22,6 @@ async function processAutoDebts() {
     .eq('payment_day', dayOfMonth)
     .gt('remaining_amount', 0)
 
-  if (!debts?.length) return 0
-
 
   // ── الديون اليدوية (auto_deduct = false) ──
   const { data: manualDebts } = await supabase

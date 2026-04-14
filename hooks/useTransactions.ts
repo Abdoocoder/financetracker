@@ -60,6 +60,8 @@ export function useTransactions() {
   const now = new Date()
   const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1)
   const [filterYear, setFilterYear] = useState(now.getFullYear())
+  const [sortBy, setSortBy] = useState<'date' | 'amount'>('date')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [allTotals, setAllTotals] = useState<{ type: string; amount: number; category?: string; transaction_date: string }[]>([])
 
@@ -283,7 +285,20 @@ export function useTransactions() {
       : transactions
   }, [transactions, search])
 
-  const filtered = useMemo(() => searched.filter(tx => filter === 'all' || tx.type === filter), [searched, filter])
+  const filtered = useMemo(() => {
+    let result = searched.filter(tx => filter === 'all' || tx.type === filter)
+    
+    // Applying sorting
+    return [...result].sort((a, b) => {
+      let comparison = 0
+      if (sortBy === 'date') {
+        comparison = new Date(a.transaction_date).getTime() - new Date(b.transaction_date).getTime()
+      } else {
+        comparison = Number(a.amount) - Number(b.amount)
+      }
+      return sortOrder === 'desc' ? -comparison : comparison
+    })
+  }, [searched, filter, sortBy, sortOrder])
   // الإجماليات من استعلام منفصل يشمل الشهر كاملاً (غير مقيدة بالـ pagination)
   const DEBT_CATEGORIES = ['ديون', 'debts_title', 'Debts']
   const totalIncome = useMemo(() => {
@@ -318,6 +333,7 @@ export function useTransactions() {
     openAdd, startEdit, closeForm, saveTransaction,
     filter, setFilter, search, setSearch,
     filterMonth, setFilterMonth, filterYear, setFilterYear,
+    sortBy, setSortBy, sortOrder, setSortOrder,
     deleteTransaction, exportCSV, load,
     confirmDelete, setConfirmDelete,
   }

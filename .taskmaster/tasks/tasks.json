@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "تدقيق معايير الأمان والـ RLS لجميع الجداول",
         "description": "تدقيق شامل للتأكد من تفعيل Row Level Security على جميع جداول البيانات الحساسة (المعاملات، الديون، الاستثمارات، الميزانية) واختبار سياسات RLS لمنع تسريب البيانات بين المستخدمين",
         "details": "الخطوات:\n1. مراجعة جميع جداول Supabase (transactions, debts, investments, budgets, accounts, goals, alerts) والتأكد من وجود RLS مفعّل\n2. اختبار سياسات RLS من خلال محاولة الوصول للبيانات بحسابات مستخدمين مختلفين\n3. التحقق من أن جميع migrations صحيحة وآمنة (supabase/migrations/)\n4. تقييم security hardening (023, 024, 025, 032 migrations)\n5. إضافة tests لـ RLS policies إذا كانت ناقصة\n6. مراجعة functions والـ stored procedures للتأكد من عدم وجود security gaps",
@@ -192,7 +192,7 @@
         "updatedAt": "2026-04-14T09:52:23.956Z"
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "توحيد منطق الحسابات المالية بين الويب والجوال",
         "description": "مراجعة وتوحيد جميع الصيغ الحسابية (نسبة الميزانية، تقدم الديون، الأرباح/الخسائر، صحة الأموال) للتأكد من تطابق النتائج تماماً بين web و Flutter",
         "details": "الخطوات:\n1. تحديد جميع الحسابات المستخدمة: budget progress %, debt progress %, investment gains/losses, health score, net worth\n2. تجميع الصيغ في utility files مشترك في backend/migrations أو في Supabase functions\n3. التحقق من web implementations:\n   - lib/useFinancialSummary.ts\n   - lib/currencies.ts\n   - components/dashboard/Cards\n4. التحقق من mobile implementations:\n   - mobile/fajrak_flutter/lib/services/\n5. إضافة regression tests لكل صيغة\n6. توثيق كل صيغة بوضوح (الإدخالات والمخرجات والحالات الحدية)\nملاحظة: استخدم Decimal/BigDecimal للدقة العددية وتجنب floating point errors",
@@ -325,14 +325,14 @@
         "updatedAt": "2026-04-14T11:21:27.013Z"
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "ضمان Loading States و Skeletons في جميع الصفحات",
         "description": "مراجعة جميع صفحات الويب والجوال والتأكد من وجود loading skeletons (بدلاً من نصوص أو spinners عادية) لكل قسم ينتظر بيانات",
         "details": "الخطوات:\n1. Scan جميع صفحات dashboard:\n   - app/(dashboard)/dashboard/page.tsx → تحتاج skeleton لكل Card\n   - transactions, budgets, debts, investments, goals, accounts\n2. تطبيق skeleton pattern (className=\"skeleton\")\n3. استخدام dynamic imports مع loading fallbacks:\n   - تأكد من جميع nextDynamic() يحتوي على loading component\n   - مثال في dashboard/page.tsx lines 27-29\n4. Flutter mobile: التحقق من shimmer widgets و loading states في:\n   - mobile/fajrak_flutter/lib/screens/\n   - mobile/fajrak_flutter/lib/widgets/\n5. اختبار loading states بـ network throttling (DevTools)\n6. توثيق skeleton standards (أنماط التصميم المستخدمة)",
         "testStrategy": "visual regression tests، اختبارات e2e مع network delay، تحقق يدوي من عدم عرض spinners عادي أو نص loading",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -341,7 +341,8 @@
             "dependencies": [],
             "details": "يجب إنشاء ملفات في مجلد components/ui تحتوي على CardSkeleton و TableRowSkeleton و ChartSkeleton. استخدم فئة 'skeleton' مع تأثير 'animate-pulse' الخاص بـ Tailwind لضمان تناسق الحركة.",
             "status": "pending",
-            "testStrategy": "مراجعة بصرية للمكونات في Storybook أو صفحة اختبار مخصصة للتأكد من مطابقتها لأبعاد التصميم الأصلي."
+            "testStrategy": "مراجعة بصرية للمكونات في Storybook أو صفحة اختبار مخصصة للتأكد من مطابقتها لأبعاد التصميم الأصلي.",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -352,7 +353,8 @@
             ],
             "details": "تعديل الملفات في app/(dashboard)/ للتأكد من أن استخدام next/dynamic يتضمن loading: () => <SkeletonComponent />. يشمل ذلك صفحات المعاملات، الميزانيات، الديون، والاستثمارات.",
             "status": "pending",
-            "testStrategy": "استخدام Chrome DevTools مع تفعيل Network Throttling (Slow 3G) لملاحظة الانتقال السلس من الهيكل العظمي إلى البيانات."
+            "testStrategy": "استخدام Chrome DevTools مع تفعيل Network Throttling (Slow 3G) لملاحظة الانتقال السلس من الهيكل العظمي إلى البيانات.",
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -361,7 +363,8 @@
             "dependencies": [],
             "details": "تحديث ملفات mobile/fajrak_flutter/lib/screens/ و widgets/ لدمج حزمة 'shimmer'. يجب إنشاء SkeletonBuilder مخصص يطابق شكل عناصر القائمة والبطاقات في الجوال.",
             "status": "pending",
-            "testStrategy": "اختبار يدوي على محاكي الأندرويد و iOS مع تأخير استجابة الـ API للتأكد من جودة الرسوم المتحركة وعدم وجود وقفزات في الواجهة."
+            "testStrategy": "اختبار يدوي على محاكي الأندرويد و iOS مع تأخير استجابة الـ API للتأكد من جودة الرسوم المتحركة وعدم وجود وقفزات في الواجهة.",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -373,7 +376,8 @@
             ],
             "details": "التأكد من أن الـ Skeleton يختفي ويحل محله Error State في حال فشل الطلب، بدلاً من بقائه معلقاً. يتم ذلك عبر اختبار دوال الـ Fetch في الويب والـ Services في Flutter.",
             "status": "pending",
-            "testStrategy": "اختبارات E2E باستخدام Playwright للويب واختبارات Integration للـ Flutter لمحاكاة استجابات API بطيئة أو فاشلة."
+            "testStrategy": "اختبارات E2E باستخدام Playwright للويب واختبارات Integration للـ Flutter لمحاكاة استجابات API بطيئة أو فاشلة.",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -385,13 +389,14 @@
             ],
             "details": "كتابة مستند في مجلد docs يحدد الأبعاد القياسية للـ Skeletons، متى يتم استخدام Spinner (للمساحات الصغيرة جداً)، ومتى يتم استخدام Skeleton (للمساحات الكبيرة والمحتوى الرئيسي).",
             "status": "pending",
-            "testStrategy": null
+            "testStrategy": null,
+            "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-04-14T11:22:33.197Z"
+        "updatedAt": "2026-04-14T15:42:07.454Z"
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "تحديث وتوسيع اختبارات الوحدة والتكامل",
         "description": "إضافة واستكمال unit و integration tests لجميع المنطق الحساس: الحسابات المالية، RLS، تصفية المعاملات، إنشاء التنبيهات",
         "details": "الخطوات:\n1. مراجعة __tests__/ directory الحالي وتحديد الثغرات\n2. إضافة tests للمنطق الحساس:\n   - lib/useFinancialSummary.ts → نتائج الحسابات\n   - hooks/useTransactions.ts → filtering/sorting\n   - lib/currencies.ts → تحويل العملات\n3. اختبارات الـ async hooks:\n   - كل async test يجب أن ينتهي بـ await act(async () => {}) (CLAUDE.md)\n   - استخدام chainProxy pattern لـ Supabase mocks (موجود في __tests__/hooks/)\n4. integration tests:\n   - أتمتة التنبيهات عند تجاوز الميزانية\n   - عمليات الديون (الدفع والحساب)\n   - تحديث الاستثمارات\n5. e2e tests (Playwright):\n   - تسجيل المستخدم الجديد\n   - إضافة معاملة\n   - عرض الإحصائيات\n6. تشغيل npm run doctor والتأكد من 100% نجاح",
@@ -404,7 +409,7 @@
         "subtasks": []
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "مراجعة والتحقق من اكتمال i18n في جميع الصفحات",
         "description": "فحص شامل لجميع نصوص المستخدم للتأكد من توفر مفاتيح i18n بالعربية والإنجليزية، وفقاً لقواعس naming conventions المعرّفة",
         "details": "الخطوات:\n1. مراجعة i18n naming conventions من CLAUDE.md:\n   - dash_* (لوحة التحكم)\n   - tx_* (المعاملات)\n   - debts_* (الديون)\n   - budget_* (الميزانية)\n   - goals_* (الأهداف)\n   - invest_* (الاستثمار)\n   - alerts_* (التنبيهات)\n   - settings_* (الإعدادات)\n   - help_faq_<section>_* (المساعدة)\n2. فحص lib/i18n.tsx والملفات المرتبطة\n3. مسح جميع صفحات React للنصوص المباشرة (hardcoded strings)\n4. التحقق من i18n في Flutter:\n   - mobile/fajrak_flutter/assets/i18n/ar.json\n   - mobile/fajrak_flutter/assets/i18n/en.json\n5. إضافة مفاتيح i18n مفقودة وفقاً للقواعس\n6. اختبار في كلا اللغتين",
@@ -415,7 +420,7 @@
         "subtasks": []
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "ضمان معايير الـ UX (aria-labels، delete confirmation، autofocus)",
         "description": "مراجعة جميع buttons و forms في الويب والجوال للتأكد من معايير UX الأساسية: aria-labels للـ icon-only buttons، modals تأكيد للحذف، autofocus على حقول الإدخال",
         "details": "الخطوات:\n1. مراجعة Web:\n   - جميع buttons بـ icons فقط يجب أن يحتوي aria-label (CLAUDE.md)\n   - البحث عن patterns مثل <button><TrashIcon /></button> وإضافة aria-labels\n2. Delete confirmations:\n   - استبدال confirm() modals بـ proper modal components\n   - مثال: DebtCard, TransactionCard\n3. Forms:\n   - تأكد من autoFocus على أول input في كل form (CLAUDE.md)\n4. Flutter:\n   - مراجعة accessibility في widgets\n   - تأكد من tooltips و semantic labels\n5. اختبار مع screen readers (VoiceOver, NVDA)\n6. توثيق standards",
@@ -426,7 +431,7 @@
         "subtasks": []
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "تحديث ومراجعة نظام التنبيهات والإخطارات",
         "description": "مراجعة واختبار نظام التنبيهات الكامل: إنشاء التنبيهات عند تجاوز الميزانية، الإخطارات (Push/Web)، معالجة الأخطاء، وإعادة المحاولات",
         "details": "الخطوات:\n1. مراجعة alert generation logic:\n   - app/api/budget-alerts/route.ts\n   - app/api/alerts/route.ts\n   - supabase/migrations/023_notification_system_upgrade.sql\n2. اختبار scenarios:\n   - تجاوز الميزانية بـ 10% → يجب أن ينتج alert\n   - الوصول للحد الأدنى → يجب تنبيه user\n3. اختبار delivery:\n   - web push (firebase)\n   - mobile push (firebase_messaging)\n   - في-التطبيق (in-app notifications)\n4. أخطاء وإعادة محاولات:\n   - التحقق من retry logic في app/api/push-send/route.ts\n   - تسجيل failures في Sentry\n5. user opt-in/out:\n   - التحقق من notification preferences settings\n6. اختبار E2E",
@@ -440,7 +445,7 @@
         "subtasks": []
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "التحقق من توافق Supabase Flutter SDK واختبارات المحمول",
         "description": "إجراء فحص شامل لـ Flutter app للتأكد من استخدام Supabase Flutter SDK بشكل صحيح واتباع workflow doctor",
         "details": "الخطوات:\n1. التحقق من استخدام supabase_flutter SDK:\n   - mobile/fajrak_flutter/lib/services/ يجب أن يستخدم Supabase Flutter SDK (not REST)\n   - تجنب hardcoded API calls\n2. نماذج الحفظ (form save patterns):\n   - كل form يجب أن يتبع الـ guard pattern (CLAUDE.md):\n     ```dart\n     if (_saving) return;\n     _saving = true; setState(() {});\n     try { await ... } finally { _saving = false; setState(() {}); }\n     ```\n3. TextEditingControllers:\n   - جميع controllers يجب أن يُستدعى عليها dispose() في dispose()\n4. Bottom sheets:\n   - جميع showModalBottomSheet يجب أن يحتوي useSafeArea: true\n5. تشغيل make doctor:\n   - flutter analyze (zero issues)\n   - flutter test (all tests pass)\n6. منطق مشترك:\n   - التحقق من أن الحسابات والـ RLS متطابقة مع الويب",
@@ -454,7 +459,7 @@
         "subtasks": []
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "تحديث الوثائق والمعايير في CLAUDE.md و README",
         "description": "تحديث CLAUDE.md و README.md و README.ar.md للتأكد من انعكاس آخر version والميزات والـ best practices بشكل صحيح",
         "details": "الخطوات:\n1. تحديث CLAUDE.md:\n   - تحديث Current version إلى 3.32.3+27\n   - مراجعة جميع Rules والتأكد من اتباعها\n   - إضافة أي best practices جديدة تم اكتشافها\n2. تحديث README.md و README.ar.md:\n   - إضافة changelog entry لـ v3.32.3\n   - تحديث features list لتعكس الميزات الحالية\n   - تحديث screenshots إذا لزم\n3. تحديث app/download/page.tsx:\n   - التحقق من version badge\n   - تحديث APK link إذا لزم\n   - تحديث نص الزر\n4. Version checklist:\n   - تحديث mobile/fajrak_flutter/README.md\n   - التأكد من توافق جميع الملفات\n5. توثيق CSS variables الحالية\n6. مراجعة i18n key naming rules",
@@ -465,7 +470,7 @@
         "subtasks": []
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "اختبار وتحسين الأداء والتصيير (Performance & Rendering)",
         "description": "تحليل والعثور على병목processes في الأداء بالويب والجوال، وتحسين التصيير والاستعلامات",
         "details": "الخطوات:\n1. Web Performance:\n   - استخدام DevTools Lighthouse للتحقق من scores\n   - تحليل Network tab لحجم الـ bundles\n   - تحقق من Core Web Vitals (LCP, CLS, FID)\n2. Dashboard optimization:\n   - التحقق من عدد re-renders غير الضرورية\n   - مراجعة useDashboardData hook (hooks/useDashboardData.ts)\n   - تحسين TanStack Query queries (stale times, cache durations)\n3. استعلامات Supabase:\n   - مراجعة N+1 queries\n   - التأكد من وجود indexes (012, 030, 031 migrations)\n   - تحسين complex queries\n4. Charts و heavy components:\n   - استخدام useMemo/useCallback\n   - تأكد من dynamic imports working correctly\n5. Mobile optimization:\n   - مراجعة ListView performance في Flutter\n   - تحسين image loading/caching\n6. Sentry monitoring:\n   - مراجعة slow transactions\n   - fixing identified issues",
@@ -481,14 +486,12 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-14T11:22:33.200Z",
+      "lastModified": "2026-04-14T15:42:07.454Z",
       "taskCount": 10,
-      "completedCount": 2,
+      "completedCount": 3,
       "tags": [
         "master"
-      ],
-      "created": "2026-04-14T11:22:40.169Z",
-      "description": "Tasks for master context"
+      ]
     }
   }
 }

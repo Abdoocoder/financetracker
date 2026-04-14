@@ -6,19 +6,22 @@
 
 # Test info
 
-- Name: smoke.spec.ts >> Landing Page Smoke Test >> should have a working link to the login page
-- Location: e2e\smoke.spec.ts:25:7
+- Name: smoke.spec.ts >> Landing Page Smoke Test >> should load the landing page and show key brand elements
+- Location: e2e\smoke.spec.ts:4:7
 
 # Error details
 
 ```
-Test timeout of 30000ms exceeded.
-```
+Error: expect(locator).toBeVisible() failed
 
-```
-Error: locator.click: Test timeout of 30000ms exceeded.
+Locator: getByText('فجرك').first()
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
 Call log:
-  - waiting for getByRole('link', { name: 'تسجيل الدخول' })
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for getByText('فجرك').first()
 
 ```
 
@@ -67,7 +70,8 @@ Call log:
   7  | 
   8  |     // Check for the brand name "فجرك" in the nav
   9  |     const brandName = page.getByText('فجرك').first();
-  10 |     await expect(brandName).toBeVisible();
+> 10 |     await expect(brandName).toBeVisible();
+     |                             ^ Error: expect(locator).toBeVisible() failed
   11 | 
   12 |     // Check for the main hero heading
   13 |     const heroHeading = page.getByRole('heading', { name: 'كلنا نحلم بالثراء' });
@@ -84,8 +88,7 @@ Call log:
   24 | 
   25 |   test('should have a working link to the login page', async ({ page }) => {
   26 |     await page.goto('/');
-> 27 |     await page.getByRole('link', { name: 'تسجيل الدخول' }).click();
-     |                                                            ^ Error: locator.click: Test timeout of 30000ms exceeded.
+  27 |     await page.getByRole('link', { name: 'تسجيل الدخول' }).click();
   28 |     
   29 |     // Should navigate to /login
   30 |     await expect(page).toHaveURL(/\/login/);

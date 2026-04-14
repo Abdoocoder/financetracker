@@ -9,7 +9,7 @@ interface FinancialSummary {
   loading: boolean
 }
 
-export function useFinancialSummary(userId: string | undefined): FinancialSummary {
+export function useFinancialSummary(userId: string | undefined, year?: number, month?: number): FinancialSummary {
   const [summary, setSummary] = useState<FinancialSummary>({
     income: 0, expenses: 0, debtPayments: 0, net: 0, loading: true
   })
@@ -22,10 +22,12 @@ export function useFinancialSummary(userId: string | undefined): FinancialSummar
     }
     async function load() {
       const now = new Date()
+      const currentYear = year ?? now.getFullYear()
+      const currentMonth = month ?? (now.getMonth() + 1)
       const { data, error } = await supabase.rpc('get_monthly_financial_summary', {
         p_user_id: userId,
-        p_year: now.getFullYear(),
-        p_month: now.getMonth() + 1,
+        p_year: currentYear,
+        p_month: currentMonth,
       })
 
       if (error || !data) {
