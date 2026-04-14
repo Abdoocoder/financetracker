@@ -27,6 +27,7 @@ export const enCommon = {
     // Nav
     nav_home: 'Home',
     nav_transactions: 'Transactions',
+    nav_accounts: 'Accounts',
     nav_debts: 'Debts',
     nav_investments: 'Investments',
     nav_goals: 'Goals',
@@ -40,6 +41,8 @@ export const enCommon = {
     nav_fire: 'FIRE Calculator',
     nav_zakat: 'Zakat',
     nav_pdf: 'PDF Report',
+    nav_group_tools: 'Tools',
+    nav_group_account: 'Account',
 
     // Toast notifications
     toast_saved: 'Saved successfully ✅',

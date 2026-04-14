@@ -578,6 +578,14 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.5 — 2026-04-14 *(Internationalization)*
+
+| Change | Description |
+|:-------|:------------|
+| 🌐 **100% i18n Coverage** | Refactored Help Center, FIRE Calculator, and Zakat Calculator to use the central `t()` translation function. |
+| 🧹 **Cruft Removal** | Cleaned up duplicate keys in Arabic and English locale files to prevent TypeScript build failures. |
+| 🛡️ **Type Safety** | Updated the `t()` signature to return `any`, unlocking robust support for localized arrays like Help Center FAQs. |
+
 ### v3.32.4 — 2026-04-14 *(Performance & Testing)*
 
 | Change | Description |

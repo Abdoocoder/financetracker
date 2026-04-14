@@ -27,6 +27,7 @@ export const arCommon = {
     // Nav
     nav_home: 'الرئيسية',
     nav_transactions: 'المعاملات',
+    nav_accounts: 'الحسابات',
     nav_debts: 'الديون',
     nav_investments: 'الاستثمار',
     nav_goals: 'الأهداف',
@@ -40,6 +41,16 @@ export const arCommon = {
     nav_fire: 'حاسبة FIRE',
     nav_zakat: 'الزكاة',
     nav_pdf: 'تقرير PDF',
+    nav_group_tools: 'الأدوات المالية',
+    nav_group_account: 'حسابي',
+
+    // Feature specific nav
+    nav_accounts: 'الحسابات',
+
+    // Months and Time
+    months_ago: 'منذ {n} أشهر',
+    age_label: 'العمر',
+    age_value: '{n} سنة',
 
     // Toast notifications
     toast_saved: 'تم الحفظ بنجاح ✅',
