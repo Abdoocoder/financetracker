@@ -1,0 +1,17 @@
+export const arBudgets = {
+    budget_plan_pro: 'خطط مالياً كالمحترفين',
+    budget_new: 'ميزانية جديدة',
+    budget_edit: 'تعديل الميزانية',
+    budget_category: 'الفئة',
+    budget_monthly_limit: 'الحد الشهري ({})',
+    budget_category_exists: 'ميزانية هذه الفئة موجودة مسبقاً',
+    budget_apply_success: 'تم تطبيق التوزيع المقترح ✨',
+    budget_insight_over: 'تجاوزت ميزانية {} بـ {} {}',
+    budget_insight_near: 'اقتربت من حد {} — {} {} متبقي',
+    budget_insight_ratio_danger: 'أنفقت {}% من دخلك — خطر!',
+    budget_insight_ratio_success: 'ممتاز! أنفقت {}% فقط من دخلك',
+    budget_insight_empty: 'أضف ميزانية لكل فئة لتتبع إنفاقك بدقة',
+    budget_insight_surplus: 'فائض {} {} — فكر في الاستثمار!',
+    budget_insight_deficit: 'ميزانيتك تتجاوز المتاح بـ {} {}',
+    budget_insight_goal_near: 'أنت على وشك تحقيق هدف {}! ({} متبقي)',
+} as const

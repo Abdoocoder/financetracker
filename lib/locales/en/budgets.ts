@@ -1,0 +1,17 @@
+export const enBudgets = {
+    budget_plan_pro: 'Financial planning like a pro',
+    budget_new: 'New Budget',
+    budget_edit: 'Edit Budget',
+    budget_category: 'Category',
+    budget_monthly_limit: 'Monthly Limit ({})',
+    budget_category_exists: 'Budget for this category already exists',
+    budget_apply_success: 'Suggested distribution applied ✨',
+    budget_insight_over: 'You exceeded {} budget by {} {}',
+    budget_insight_near: 'Approaching {} limit — {} {} remaining',
+    budget_insight_ratio_danger: 'You spent {}% of income — danger!',
+    budget_insight_ratio_success: 'Excellent! You spent only {}% of income',
+    budget_insight_empty: 'Add a budget for each category to track spending accurately',
+    budget_insight_surplus: 'Surplus {} {} — consider investing!',
+    budget_insight_deficit: 'Your budget exceeds available income by {} {}',
+    budget_insight_goal_near: 'You\'re close to achieving {} goal! ({} remaining)',
+} as const

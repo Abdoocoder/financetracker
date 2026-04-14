@@ -27,8 +27,7 @@ function haulDueDate(inv: Investment): string {
 }
 
 export default function ZakatPage() {
-  const { currentLang } = useI18n()
-  const ar = currentLang === 'ar'
+  const { t } = useI18n()
   const { user } = useUser()
   const supabase = useMemo(() => createClient(), [])
 
@@ -162,10 +161,10 @@ export default function ZakatPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
         <h1 style={{ fontSize: 22, fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>
-          🌙 {ar ? 'حاسبة الزكاة' : 'Zakat Calculator'}
+          🌙 {t('zakat_title')}
         </h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-          {ar ? `حساب زكاة ${currentYear} — النصاب: ${fmt(nisab)} ${currency}` : `Zakat for ${currentYear} — Nisab: ${fmt(nisab)} ${currency}`}
+          {t('zakat_header_desc', { year: currentYear, nisab: fmt(nisab), currency })}
         </p>
       </div>
 
@@ -176,14 +175,14 @@ export default function ZakatPage() {
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
-              🗓️ {ar ? 'حول استثماراتك' : 'Investment Haul Dates'}
+              {t('zakat_haul_title')}
             </div>
             <button onClick={loadData} style={{
               padding: '4px 10px', borderRadius: 8, border: '1px solid var(--border)',
               background: 'var(--bg-elevated)', color: 'var(--text-muted)',
               fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
             }}>
-              🔄 {ar ? 'تحديث' : 'Refresh'}
+              🔄 {t('zakat_refresh')}
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -199,27 +198,27 @@ export default function ZakatPage() {
                 <div key={inv.id} style={{ padding: '12px 14px', borderRadius: 14, background: bg, border: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
-                      {inv.symbol ?? inv.name ?? (ar ? 'استثمار' : 'Investment')}
+                      {inv.symbol ?? inv.name ?? t('inv_assets')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                      {fmt(invValue)} {currency} · {ar ? `موعد الحول: ${inv.dueDate}` : `Haul due: ${inv.dueDate}`}
+                      {fmt(invValue)} {currency} · {t('zakat_haul_due', { date: inv.dueDate })}
                     </div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 18, fontWeight: 900, color, fontFamily: 'monospace' }}>
-                      {overdue ? (ar ? 'متأخر' : 'Overdue') : `${inv.daysLeft}`}
+                      {overdue ? t('zakat_overdue') : `${inv.daysLeft}`}
                     </div>
-                    {!overdue && <div style={{ fontSize: 10, color, fontWeight: 700 }}>{ar ? 'يوم' : 'days'}</div>}
+                    {!overdue && <div style={{ fontSize: 10, color, fontWeight: 700 }}>{t('zakat_days')}</div>}
                   </div>
                 </div>
               )
             })}
           </div>
           <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)', padding: '8px 10px', borderRadius: 10, background: 'var(--bg-elevated)' }}>
-            {ar ? 'الحول يُحسب من تاريخ الشراء إن وُجد، وإلا من تاريخ الإضافة (354 يوماً هجرياً)' : 'Haul calculated from purchase date if set, otherwise from creation date (354 lunar days)'}
+            {t('zakat_haul_note')}
           </div>
           <div style={{ marginTop: 8, fontSize: 11, padding: '8px 10px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B' }}>
-            💡 {ar ? 'لم يتغير تاريخ الحول؟ عدّل الاستثمار في صفحة الاستثمارات وأدخل تاريخ الشراء، ثم اضغط تحديث.' : "Haul date not updated? Edit the investment in the Investments page, enter the purchase date, then click Refresh."}
+            {t('zakat_haul_purchase_tip')}
           </div>
         </div>
       )}
@@ -231,19 +230,19 @@ export default function ZakatPage() {
         borderRadius: 20, padding: 20, textAlign: 'center'
       }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 8 }}>
-          {eligible ? (ar ? '✅ وجبت عليك الزكاة' : '✅ Zakat is due') : (ar ? '⏳ لم يبلغ المال النصاب بعد' : '⏳ Below nisab threshold')}
+          {eligible ? t('zakat_due_msg') : t('zakat_below_nisab')}
         </div>
         <div style={{ fontSize: 40, fontWeight: 900, color: eligible ? '#10B981' : 'var(--text-muted)', fontFamily: 'monospace', marginBottom: 4 }}>
           {fmt(zakatDue)}
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{currency} {ar ? '(2.5% من المال الزكوي)' : '(2.5% of zakatable assets)'}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{t('zakat_percentage', { currency })}</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 16 }}>
           <div style={{ background: 'var(--bg-elevated)', borderRadius: 12, padding: 12 }}>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>{ar ? 'المال الزكوي' : 'Zakatable Assets'}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>{t('zakat_total_zakatable')}</div>
             <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{fmt(totalZakatable)}</div>
           </div>
           <div style={{ background: 'var(--bg-elevated)', borderRadius: 12, padding: 12 }}>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>{ar ? 'النصاب (الذهب)' : 'Nisab (Gold)'}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>{t('zakat_nisab_gold_label')}</div>
             <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{fmt(nisabGold)}</div>
           </div>
         </div>
@@ -253,7 +252,7 @@ export default function ZakatPage() {
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
-            📊 {ar ? 'أصولك' : 'Your Assets'}
+            📊 {t('zakat_assets_header')}
           </div>
           <button onClick={fetchLivePrices} disabled={fetchingPrices} style={{
             padding: '5px 12px', borderRadius: 10, border: '1px solid rgba(59,126,246,0.3)',
@@ -261,21 +260,21 @@ export default function ZakatPage() {
             fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
             opacity: fetchingPrices ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: 5,
           }}>
-            {fetchingPrices ? '⏳' : '🔄'} {ar ? 'أسعار حية' : 'Live Prices'}
+            {fetchingPrices ? '⏳' : '🔄'} {t('zakat_fetch_prices')}
           </button>
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 16 }}>
-          {ar ? '✅ محسوب تلقائياً: الاستثمارات + أهداف الادخار + الديون' : '✅ Auto-filled: investments, savings goals, debts'}
+          {t('zakat_auto_filled_hint')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {[
-            { label: ar ? `سعر غرام الذهب (${currency})` : `Gold Price/gram (${currency})`, val: goldPrice, set: setGoldPrice, hint: ar ? 'السعر الحالي في السوق' : 'Current market price', auto: false },
-            { label: ar ? 'ذهب (غرام)' : 'Gold (grams)', val: goldGram, set: setGoldGram, hint: ar ? 'المصاغ والسبائك' : 'Jewelry & bars', auto: false },
-            { label: ar ? `سعر غرام الفضة (${currency})` : `Silver Price/gram (${currency})`, val: silverPrice, set: setSilverPrice, hint: '', auto: false },
-            { label: ar ? 'فضة (غرام)' : 'Silver (grams)', val: silverGram, set: setSilverGram, hint: '', auto: false },
-            { label: ar ? `نقد + أهداف الادخار (${currency})` : `Cash + Savings Goals (${currency})`, val: cash, set: setCash, hint: ar ? '✅ أهداف الادخار محسوبة تلقائياً' : '✅ Auto-includes savings goals', auto: true },
-            { label: ar ? `استثمارات (${currency})` : `Investments (${currency})`, val: investments, set: setInvestments, hint: ar ? '✅ محسوب من محفظتك تلقائياً' : '✅ Auto-fetched from portfolio', auto: true },
-            { label: ar ? `ديون عليك (${currency})` : `Debts You Owe (${currency})`, val: debtsOwed, set: setDebtsOwed, hint: ar ? '✅ محسوب من ديونك تلقائياً' : '✅ Auto-fetched from your debts', auto: true },
+            { label: t('zakat_gold_price', { currency }), val: goldPrice, set: setGoldPrice, hint: t('zakat_gold_price_hint'), auto: false },
+            { label: t('zakat_gold_gram'), val: goldGram, set: setGoldGram, hint: t('zakat_gold_gram_hint'), auto: false },
+            { label: t('zakat_silver_price', { currency }), val: silverPrice, set: setSilverPrice, hint: '', auto: false },
+            { label: t('zakat_silver_gram'), val: silverGram, set: setSilverGram, hint: '', auto: false },
+            { label: t('zakat_cash_label', { currency }), val: cash, set: setCash, hint: t('zakat_cash_label_hint'), auto: true },
+            { label: t('zakat_investments', { currency }), val: investments, set: setInvestments, hint: t('zakat_invest_hint'), auto: true },
+            { label: t('zakat_debts_label', { currency }), val: debtsOwed, set: setDebtsOwed, hint: t('zakat_debts_label_hint'), auto: true },
           ].map(({ label, val, set, hint, auto }) => (
             <div key={label}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -300,15 +299,15 @@ export default function ZakatPage() {
           color: 'white', fontSize: 14, fontWeight: 800, fontFamily: 'inherit',
           opacity: saving ? 0.7 : 1,
         }}>
-          {saved ? (ar ? '✅ تم الحفظ' : '✅ Saved') : saving ? (ar ? 'جاري الحفظ...' : 'Saving...') : (ar ? 'حفظ حساب الزكاة' : 'Save Zakat Calculation')}
+          {saved ? t('zakat_saved') : saving ? t('zakat_saving') : t('zakat_save_btn')}
         </button>
       </div>
 
-      {/* ── السجل ── */}
+      {/* ── سجل الزكاة ── */}
       {history.length > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
           <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 14 }}>
-            📋 {ar ? 'سجل الزكاة' : 'Zakat History'}
+            📋 {t('zakat_history')}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {history.map(record => (
@@ -323,7 +322,7 @@ export default function ZakatPage() {
                     {record.year} — {fmt(record.zakat_due ?? 0)} {currency}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                    {ar ? `مال زكوي: ${fmt(record.total_zakatable ?? 0)}` : `Zakatable: ${fmt(record.total_zakatable ?? 0)}`}
+                    {t('zakat_zakatable_label', { amount: fmt(record.total_zakatable ?? 0) })}
                   </div>
                 </div>
                 <button onClick={() => togglePaid(record.id, record.is_paid)} style={{
@@ -332,7 +331,7 @@ export default function ZakatPage() {
                   background: record.is_paid ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
                   color: record.is_paid ? '#10B981' : '#F59E0B',
                 }}>
-                  {record.is_paid ? (ar ? '✅ مُؤدَّاة' : '✅ Paid') : (ar ? '⏳ لم تُؤدَّ' : '⏳ Unpaid')}
+                  {record.is_paid ? t('zakat_paid') : t('zakat_unpaid')}
                 </button>
               </div>
             ))}
@@ -342,11 +341,9 @@ export default function ZakatPage() {
 
       {/* ── تنبيه شرعي ── */}
       <div style={{ background: 'rgba(245,158,11,0.04)', border: '1px solid rgba(245,158,11,0.15)', borderRadius: 16, padding: 16 }}>
-        <div style={{ fontSize: 12, color: '#F59E0B', fontWeight: 800, marginBottom: 6 }}>📌 {ar ? 'تنبيه شرعي' : 'Note'}</div>
+        <div style={{ fontSize: 12, color: '#F59E0B', fontWeight: 800, marginBottom: 6 }}>{t('zakat_sharia_note_title')}</div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-          {ar
-            ? 'تجب الزكاة بعد مرور حول هجري (354 يوماً) على بلوغ النصاب. الحساب هنا تقريبي — استشر عالماً للتحقق.'
-            : 'Zakat is due after one lunar year (354 days) passes on wealth above nisab. This is an estimate — consult a scholar for verification.'}
+          {t('zakat_note')}
         </div>
       </div>
     </div>

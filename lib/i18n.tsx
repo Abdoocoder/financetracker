@@ -12,7 +12,7 @@ interface I18nContextType {
   lang: 'ar' | 'en'
   currentLang: 'ar' | 'en' // Alias for compatibility
   setLang: (l: Lang) => void
-  t: (key: TranslationKey | string, params?: Record<string, string | number>) => string
+  t: (key: TranslationKey | string, params?: Record<string, string | number>) => any
   tCategory: (cat: string) => string
   hydrated: boolean
 }

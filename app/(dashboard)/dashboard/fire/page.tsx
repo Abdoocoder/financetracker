@@ -19,8 +19,7 @@ function yearsToFIRE(target: number, current: number, monthlyContrib: number, an
 }
 
 export default function FIREPage() {
-  const { t, currentLang } = useI18n()
-  const ar = currentLang === 'ar'
+  const { t } = useI18n()
   const { user } = useUser()
   const supabase = useMemo(() => createClient(), [])
 
@@ -64,9 +63,9 @@ export default function FIREPage() {
   const color = progress >= 75 ? '#10B981' : progress >= 40 ? '#F59E0B' : '#3B7EF6'
 
   const modes = [
-    { key: 'lean', label: ar ? 'FIRE بسيط' : 'Lean FIRE', mult: 0.7 },
-    { key: 'full', label: ar ? 'FIRE كامل' : 'Full FIRE', mult: 1 },
-    { key: 'fat', label: ar ? 'FIRE مريح' : 'Fat FIRE', mult: 1.5 },
+    { key: 'lean', label: t('lean_fire'), mult: 0.7 },
+    { key: 'full', label: t('full_fire'), mult: 1 },
+    { key: 'fat', label: t('fat_fire'), mult: 1.5 },
   ]
   const [mode, setMode] = useState('full')
   const modeMultiplier = modes.find(m => m.key === mode)?.mult ?? 1
@@ -86,10 +85,10 @@ export default function FIREPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
         <h1 style={{ fontSize: 22, fontWeight: 900, margin: 0, color: 'var(--text-primary)' }}>
-          🎯 {ar ? 'حاسبة FIRE' : 'FIRE Calculator'}
+          🎯 {t('fire_title')}
         </h1>
         <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-          {ar ? 'Financial Independence, Retire Early — اعرف متى تصل للحرية المالية' : 'Financial Independence, Retire Early'}
+          {t('fire_subtitle')}
         </p>
       </div>
 
@@ -112,20 +111,24 @@ export default function FIREPage() {
       {/* FIRE Number Card */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 8 }}>
-          🏁 {ar ? 'رقم FIRE المستهدف' : 'Your FIRE Number'}
+          🏁 {t('fire_number_label')}
         </div>
         <div style={{ fontSize: 36, fontWeight: 900, color: color, fontFamily: 'monospace', marginBottom: 4 }}>
           {fmt(adjustedFireNumber)} {currency}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
-          {ar ? `= ${fmt(annualExpenses * modeMultiplier)} ${currency} سنوياً ÷ ${withdrawalRate}% معدل سحب` : `= ${fmt(annualExpenses * modeMultiplier)} ${currency}/year ÷ ${withdrawalRate}% withdrawal rate`}
+          {t('fire_annually_div', { 
+            amount: fmt(annualExpenses * modeMultiplier), 
+            currency, 
+            rate: withdrawalRate 
+          })}
         </div>
 
         {/* Progress Bar */}
         <div style={{ marginBottom: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
             <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
-              {ar ? 'تقدمك الحالي' : 'Current Progress'}
+              {t('fire_progress')}
             </span>
             <span style={{ fontSize: 13, fontWeight: 900, color }}>{adjustedProgress.toFixed(1)}%</span>
           </div>
@@ -136,25 +139,25 @@ export default function FIREPage() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14 }}>
           <div style={{ background: 'var(--bg-elevated)', borderRadius: 12, padding: 12, textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{ar ? 'ثروتك الحالية' : 'Current Net Worth'}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{t('current_net_worth')}</div>
             <div style={{ fontSize: 18, fontWeight: 900, color: '#10B981', fontFamily: 'monospace' }}>{fmt(currentNetWorth)}</div>
           </div>
           <div style={{ background: 'var(--bg-elevated)', borderRadius: 12, padding: 12, textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{ar ? 'المتبقي' : 'Remaining'}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>{t('remaining')}</div>
             <div style={{ fontSize: 18, fontWeight: 900, color: '#EF4444', fontFamily: 'monospace' }}>{fmt(Math.max(0, adjustedFireNumber - currentNetWorth))}</div>
           </div>
         </div>
 
         {adjustedYears !== null ? (
           <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 14, background: adjustedYears <= 10 ? 'rgba(16,185,129,0.08)' : 'rgba(59,126,246,0.06)', border: `1px solid ${adjustedYears <= 10 ? 'rgba(16,185,129,0.2)' : 'rgba(59,126,246,0.15)'}`, textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>⏳ {ar ? 'متى تصل للحرية المالية؟' : 'Time to Financial Independence'}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>⏳ {t('fire_time_to_fi')}</div>
             <div style={{ fontSize: 28, fontWeight: 900, color: adjustedYears <= 10 ? '#10B981' : 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
-              {adjustedYears === 0 ? (ar ? 'وصلت بالفعل! 🎉' : 'Already there! 🎉') : `${adjustedYears} ${ar ? 'سنة' : 'years'}`}
+              {adjustedYears === 0 ? t('fire_already_there') : `${adjustedYears} ${t('fire_years')}`}
             </div>
           </div>
         ) : (
           <div style={{ marginTop: 14, padding: '12px 16px', borderRadius: 14, background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', textAlign: 'center', fontSize: 13, color: '#F87171', fontWeight: 700 }}>
-            {ar ? 'زِد مساهمتك الشهرية للوصول للهدف' : 'Increase monthly contribution to reach the goal'}
+            {t('fire_increase_contrib')}
           </div>
         )}
       </div>
@@ -162,14 +165,14 @@ export default function FIREPage() {
       {/* Inputs */}
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 16 }}>
-          ⚙️ {ar ? 'الإعدادات' : 'Settings'}
+          ⚙️ {t('fire_settings')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[
-            { label: ar ? `مصاريفك الشهرية (${currency})` : `Monthly Expenses (${currency})`, val: monthlyExpenses, set: setMonthlyExpenses, min: 100, max: 10000, step: 50 },
-            { label: ar ? 'معدل الادخار / الاستثمار الشهري' : `Monthly Contribution (${currency})`, val: monthlyContrib, set: setMonthlyContrib, min: 0, max: 5000, step: 50 },
-            { label: ar ? 'معدل العائد السنوي (%)' : 'Expected Annual Return (%)', val: annualReturn, set: setAnnualReturn, min: 1, max: 20, step: 0.5 },
-            { label: ar ? 'معدل السحب السنوي (%)' : 'Withdrawal Rate (%)', val: withdrawalRate, set: setWithdrawalRate, min: 2, max: 8, step: 0.5 },
+            { label: t('fire_monthly_expenses_label', { currency }), val: monthlyExpenses, set: setMonthlyExpenses, min: 100, max: 10000, step: 50 },
+            { label: t('fire_monthly_contrib_label', { currency }), val: monthlyContrib, set: setMonthlyContrib, min: 0, max: 5000, step: 50 },
+            { label: t('fire_annual_return_label'), val: annualReturn, set: setAnnualReturn, min: 1, max: 20, step: 0.5 },
+            { label: t('fire_withdrawal_label'), val: withdrawalRate, set: setWithdrawalRate, min: 2, max: 8, step: 0.5 },
           ].map(({ label, val, set, min, max, step }) => (
             <div key={label}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -188,12 +191,10 @@ export default function FIREPage() {
       {/* Explanation */}
       <div style={{ background: 'rgba(59,126,246,0.04)', border: '1px solid rgba(59,126,246,0.12)', borderRadius: 16, padding: 16 }}>
         <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--accent-blue-light)', marginBottom: 8 }}>
-          💡 {ar ? 'كيف يُحسب؟' : 'How is it calculated?'}
+          {t('fire_how_calc')}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-          {ar
-            ? `رقم FIRE = مصاريف سنوية ÷ معدل السحب. قاعدة الـ 4% تعني أن محفظتك يجب أن تكون 25× مصاريفك السنوية. مثلاً: إذا مصاريفك 500 د.أ شهرياً = 6,000 سنوياً، فرقم FIRE هو 150,000 د.أ.`
-            : `FIRE Number = Annual Expenses ÷ Withdrawal Rate. The 4% rule means your portfolio should be 25× your annual expenses. E.g., $500/month = $6,000/year → FIRE number = $150,000.`}
+          {t('fire_calc_explanation')}
         </div>
       </div>
     </div>
