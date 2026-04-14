@@ -217,16 +217,6 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  child: _loggingOut
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFEF4444)),
-                        )
-                      : Text(
-                          'settings_logout'.tr(),
-                          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
-                        ),
                   onPressed: _loggingOut
                       ? null
                       : () {
@@ -239,6 +229,16 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                             onConfirm: _logout,
                           );
                         },
+                  child: _loggingOut
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFEF4444)),
+                        )
+                      : Text(
+                          'settings_logout'.tr(),
+                          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+                        ),
                 ),
               ),
               const SizedBox(height: 20),

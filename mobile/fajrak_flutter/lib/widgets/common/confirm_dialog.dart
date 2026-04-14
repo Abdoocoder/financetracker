@@ -69,7 +69,7 @@ class ConfirmDialog extends StatelessWidget {
           Container(
             width: 40,
             height: 4,
-            margin: const EdgeInsets.bottom(24),
+            margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
               color: colorScheme.outlineVariant,
               borderRadius: BorderRadius.circular(2),
@@ -80,7 +80,7 @@ class ConfirmDialog extends StatelessWidget {
           Container(
             width: 64,
             height: 64,
-            margin: const EdgeInsets.bottom(20),
+            margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: danger 
                   ? colorScheme.error.withValues(alpha: 0.1) 

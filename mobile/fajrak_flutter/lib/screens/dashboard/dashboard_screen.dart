@@ -333,9 +333,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // ── Secondary sections — after phase 2 ────────────────
               if (_loading) ...[
                 const SizedBox(height: 16),
-                _SkeletonBox(height: 80, radius: 16),
+                const SkeletonLoader(width: double.infinity, height: 80, borderRadius: 16),
                 const SizedBox(height: 12),
-                _SkeletonBox(height: 100, radius: 16),
+                const SkeletonLoader(width: double.infinity, height: 100, borderRadius: 16),
               ],
               if (!_loading) ...[
                 const SizedBox(height: 16),
@@ -380,9 +380,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-  }
-}
-
 class _AccountsBalanceCard extends StatelessWidget {
   final List<Map<String, dynamic>> accounts;
   final double totalBalance;
@@ -424,7 +421,7 @@ class _AccountsBalanceCard extends StatelessWidget {
             final bal = acc['balance'] as double? ?? 0;
             final balColor = bal >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444);
             return Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.only(bottom: 24),
               child: Row(children: [
                 Text(acc['icon'] as String? ?? '🏦', style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 6),

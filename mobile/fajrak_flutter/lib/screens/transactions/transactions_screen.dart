@@ -15,6 +15,7 @@ import '../../widgets/transactions/month_year_picker_dialog.dart';
 import '../../widgets/transactions/transaction_filters.dart';
 import '../../widgets/transactions/transaction_summary.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/transactions/transaction_list_item.dart';
 import 'recurring_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
