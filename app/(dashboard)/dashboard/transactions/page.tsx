@@ -47,7 +47,7 @@ export default function TransactionsPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             {activeTab === 'all' && (
               <button onClick={tx.exportCSV} style={{ padding: '8px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                📥 CSV
+                📥 {t('settings_export').replace('CSV', '').trim()}
               </button>
             )}
             {activeTab === 'all' && <AddButton label={`+ ${t('add')}`} onClick={tx.openAdd} />}
@@ -60,7 +60,7 @@ export default function TransactionsPage() {
         {(['all', 'recurring'] as const).map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             style={{ padding: '8px 16px', borderRadius: 10, border: `1px solid ${activeTab === tab ? 'var(--accent-blue-light)' : 'var(--border)'}`, background: activeTab === tab ? 'var(--accent-blue-dim)' : 'transparent', color: activeTab === tab ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-            {tab === 'all' ? `📋 ${t('trans_all')}` : `🔄 ${t('trans_recurring')}`}
+            {tab === 'all' ? t('trans_all') : t('trans_recurring')}
           </button>
         ))}
       </div>
@@ -144,7 +144,7 @@ export default function TransactionsPage() {
           {tx.hasMore && (
             <div style={{ textAlign: 'center', padding: '16px 0' }}>
               <button onClick={tx.loadMore} disabled={tx.loadingMore} style={{ padding: '12px 32px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, cursor: tx.loadingMore ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: tx.loadingMore ? 0.6 : 1 }}>
-                {tx.loadingMore ? '⏳ ...' : `${t('trans_load_more')} ↓`}
+                {tx.loadingMore ? '⏳ ...' : `${t('trans_load_more')}`}
               </button>
             </div>
           )}

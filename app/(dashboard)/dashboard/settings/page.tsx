@@ -156,7 +156,7 @@ function ProfileSection({
         {/* Info */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>
-            {profileForm.full_name || (lang === 'en' ? 'Your Name' : 'اسمك')}
+            {profileForm.full_name || t('settings_your_name')}
           </div>
           {profileForm.job_title && (
             <div style={{ fontSize: 12, color: 'var(--accent-blue-light)', fontWeight: 700, marginBottom: 2 }}>
@@ -169,7 +169,7 @@ function ProfileSection({
         {/* Member since */}
         <div style={{ textAlign: 'center', flexShrink: 0 }}>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.05em' }}>
-            {lang === 'en' ? 'MEMBER' : 'عضو'}
+            {t('settings_member')}
           </div>
           <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-secondary)', marginTop: 2 }}>{memberSince}</div>
         </div>
@@ -178,49 +178,49 @@ function ProfileSection({
       {/* Stats Row */}
       {(age !== null || profileForm.phone || profileForm.job_title) && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-          {age !== null && <StatBadge icon="🎂" label={lang === 'en' ? 'Age' : 'العمر'} value={`${age} ${lang === 'en' ? 'yr' : 'سنة'}`} />}
-          {profileForm.phone && <StatBadge icon="📱" label={lang === 'en' ? 'Phone' : 'الهاتف'} value={profileForm.phone} />}
-          {profileForm.job_title && <StatBadge icon="💼" label={lang === 'en' ? 'Job' : 'الوظيفة'} value={profileForm.job_title} />}
+          {age !== null && <StatBadge icon="🎂" label={t('settings_age')} value={t('settings_age_value', { n: age })} />}
+          {profileForm.phone && <StatBadge icon="📱" label={t('settings_phone')} value={profileForm.phone} />}
+          {profileForm.job_title && <StatBadge icon="💼" label={t('settings_job_title')} value={profileForm.job_title} />}
         </div>
       )}
 
-      <SectionTitle>{lang === 'en' ? 'Personal Info' : 'المعلومات الشخصية'}</SectionTitle>
+      <SectionTitle>{t('settings_profile_info')}</SectionTitle>
 
-      <FormField label={lang === 'en' ? 'Full Name' : 'الاسم الكامل'}>
-        <Input placeholder={lang === 'en' ? 'Full Name' : 'الاسم الكامل'} value={profileForm.full_name} onChange={e => setProfileForm(f => ({ ...f, full_name: e.target.value }))} />
+      <FormField label={t('settings_name')}>
+        <Input placeholder={t('settings_name')} value={profileForm.full_name} onChange={e => setProfileForm(f => ({ ...f, full_name: e.target.value }))} />
       </FormField>
 
-      <FormField label={lang === 'en' ? 'Job Title' : 'المهنة / الوظيفة'}>
-        <Input placeholder={lang === 'en' ? 'e.g. Software Engineer' : 'مثال: مهندس برمجيات'} value={profileForm.job_title} onChange={e => setProfileForm(f => ({ ...f, job_title: e.target.value }))} />
+      <FormField label={t('settings_job_title')}>
+        <Input placeholder={t('settings_job_hint')} value={profileForm.job_title} onChange={e => setProfileForm(f => ({ ...f, job_title: e.target.value }))} />
       </FormField>
 
-      <FormField label={lang === 'en' ? 'Phone Number' : 'رقم الهاتف'}>
+      <FormField label={t('settings_phone')}>
         <Input type="tel" placeholder="+962 7X XXX XXXX" value={profileForm.phone} onChange={e => setProfileForm(f => ({ ...f, phone: e.target.value }))} />
       </FormField>
 
-      <FormField label={lang === 'en' ? 'Date of Birth' : 'تاريخ الميلاد'}>
+      <FormField label={t('settings_birth_date')}>
         <Input type="date" value={profileForm.birth_date} onChange={e => setProfileForm(f => ({ ...f, birth_date: e.target.value }))} />
       </FormField>
 
       <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
-      <SectionTitle>{lang === 'en' ? 'Financial Settings' : 'الإعدادات المالية'}</SectionTitle>
+      <SectionTitle>{t('settings_financial')}</SectionTitle>
 
-      <FormField label={lang === 'en' ? 'Monthly Salary' : 'الراتب الشهري'}>
+      <FormField label={t('settings_income')}>
         <Input type="number" min="0" step="0.01" placeholder="0" value={profileForm.monthly_income} onChange={e => setProfileForm(f => ({ ...f, monthly_income: e.target.value }))} />
       </FormField>
 
-      <FormField label={lang === 'en' ? 'Opening Balance (cash you had before using the app)' : 'الرصيد الابتدائي (النقد الذي كنت تملكه قبل التطبيق)'}>
+      <FormField label={t('settings_opening_balance_desc')}>
         <Input type="number" min="0" step="0.01" placeholder="0" value={profileForm.opening_balance} onChange={e => setProfileForm(f => ({ ...f, opening_balance: e.target.value }))} />
       </FormField>
 
-      <FormField label={lang === 'en' ? 'Salary Day (1-28)' : 'يوم استلام الراتب (1-28)'}>
+      <FormField label={t('settings_salary_day_desc')}>
         <Input type="number" min="1" max="28" placeholder="1" value={profileForm.salary_day} onChange={e => setProfileForm(f => ({ ...f, salary_day: e.target.value }))} />
       </FormField>
 
-      <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
+      <FormField label={t('settings_currency')}>
         <Select value={profileForm.currency} onChange={e => setProfileForm(f => ({ ...f, currency: e.target.value }))}>
           {(['arabic', 'islamic', 'global'] as const).map(g => (
-            <optgroup key={g} label={g === 'arabic' ? (lang === 'en' ? 'Arabic' : 'العربية') : g === 'islamic' ? (lang === 'en' ? 'Islamic' : 'الإسلامية') : (lang === 'en' ? 'Global' : 'العالمية')}>
+            <optgroup key={g} label={t(`currency_group_${g}`)}>
               {CURRENCIES_BY_GROUP[g].map(c => (
                 <option key={c.value} value={c.value}>{c.flag} {lang === 'en' ? c.labelEn : c.labelAr} ({c.value})</option>
               ))}
@@ -230,9 +230,9 @@ function ProfileSection({
       </FormField>
 
       <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
-      <SectionTitle>{lang === 'en' ? 'Preferences' : 'التفضيلات'}</SectionTitle>
+      <SectionTitle>{t('settings_preferences')}</SectionTitle>
 
-      <FormField label={lang === 'en' ? 'Language' : 'اللغة'}>
+      <FormField label={t('settings_language')}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
           {(['system', 'ar', 'en'] as const).map(l => (
             <button key={l} onClick={() => setLang(l)} style={{
@@ -247,7 +247,7 @@ function ProfileSection({
               fontFamily: 'inherit',
               transition: 'all 0.2s',
             }}>
-              {l === 'system' ? (lang === 'en' ? 'System' : 'تلقائي') : l === 'ar' ? '🇯🇴 AR' : '🇬🇧 EN'}
+              {l === 'system' ? t('settings_lang_system') : l === 'ar' ? '🇯🇴 AR' : '🇬🇧 EN'}
             </button>
           ))}
         </div>
@@ -274,7 +274,7 @@ function ProfileSection({
         </div>
       </FormField>
 
-      <SaveButton label={lang === 'en' ? 'Save Changes' : 'حفظ التغييرات'} loading={saving} onClick={onSave} />
+      <SaveButton label={t('settings_save')} loading={saving} onClick={onSave} />
     </SectionCard>
   )
 }
@@ -310,7 +310,7 @@ function AssetsSection({
             border: `1px solid ${assetsAge >= 3 ? 'var(--accent-amber-glow)' : 'var(--accent-green-glow)'}`,
           }}>
             {assetsAge >= 3 ? '⚠️ ' : '✓ '}
-            {lang === 'en' ? `${assetsAge}mo ago` : `منذ ${assetsAge} أشهر`}
+            {t('settings_months_ago', { n: assetsAge })}
           </div>
         )}
       </div>
@@ -333,7 +333,7 @@ function AssetsSection({
           <div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>💼 {t('settings_assets_total')}</div>
             <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-              {lang === 'en' ? 'Used in net worth calculation' : 'يُستخدم في حساب صافي الثروة'}
+              {t('settings_net_worth_desc')}
             </div>
           </div>
           <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
@@ -357,7 +357,7 @@ function AssetsSection({
         </FormField>
       ))}
 
-      <SaveButton label={lang === 'en' ? 'Save Assets' : 'حفظ الأصول'} loading={saving} onClick={onSave} />
+      <SaveButton label={t('settings_assets_save')} loading={saving} onClick={onSave} />
     </SectionCard>
   )
 }
@@ -366,10 +366,10 @@ function AssetsSection({
 // ACCOUNT SECTION
 // ══════════════════════════════════════════════════════
 function AccountSection({ onLogout, loggingOut }: { onLogout: () => Promise<void>; loggingOut: boolean }) {
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
   return (
     <SectionCard>
-      <SectionTitle>{lang === 'en' ? 'Account' : 'الحساب'}</SectionTitle>
+      <SectionTitle>{t('settings_account')}</SectionTitle>
       <PushToggle />
       <div style={{ height: 1, background: 'var(--border)', margin: '16px 0' }} />
       <button onClick={onLogout} disabled={loggingOut} style={{
@@ -379,7 +379,7 @@ function AccountSection({ onLogout, loggingOut }: { onLogout: () => Promise<void
         cursor: 'pointer', fontFamily: 'inherit', opacity: loggingOut ? 0.5 : 1,
         transition: 'opacity 0.2s',
       }}>
-        {loggingOut ? '⏳ ...' : lang === 'en' ? 'Sign Out ←' : 'تسجيل الخروج ←'}
+        {loggingOut ? '⏳ ...' : t('settings_logout')}
       </button>
     </SectionCard>
   )
@@ -405,12 +405,10 @@ function ExportSection({ exporting, userId }: { exporting: boolean; userId: stri
       return
     }
 
-    const headers = lang === 'en'
-      ? ['Date', 'Type', 'Amount', 'Category', 'Description']
-      : ['التاريخ', 'النوع', 'المبلغ', 'الفئة', 'الوصف']
+    const headers = t('csv_header').split(',')
     const rows = data.map(tx => [
       tx.transaction_date,
-      tx.type === 'income' ? (lang === 'en' ? 'Income' : 'دخل') : (lang === 'en' ? 'Expense' : 'مصروف'),
+      tx.type === 'income' ? t('trans_income') : t('trans_expense'),
       tx.amount, tx.category ?? '', tx.description ?? '',
     ])
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
@@ -461,7 +459,7 @@ function DangerZone({
     <SectionCard accent="var(--accent-red)">
       <SectionTitle>⚠️ {t('settings_danger')}</SectionTitle>
       <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 14, lineHeight: 1.6 }}>
-        {lang === 'en' ? 'Permanently erase all your data. Cannot be undone.' : 'سيُمسح جميع بياناتك نهائياً ولا يمكن استرجاعها.'}
+        {t('settings_delete_account_warning')}
       </p>
       {!showDeleteConfirm ? (
         <button onClick={() => setShowDeleteConfirm(true)} style={{
@@ -470,17 +468,17 @@ function DangerZone({
           color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 700,
           cursor: 'pointer', fontFamily: 'inherit',
         }}>
-          🗑️ {lang === 'en' ? 'Delete My Account' : 'حذف حسابي نهائياً'}
+          🗑️ {t('settings_account_danger_zone')}
         </button>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <p style={{ fontSize: 13, color: 'var(--accent-red-light)', fontWeight: 700 }}>
-            {lang === 'en' ? 'Type "delete my account" to confirm:' : 'اكتب "حذف حسابي" للتأكيد:'}
+            {t('delete_account_confirmation_text')}
           </p>
           <input
             value={deleteInput}
             onChange={e => setDeleteInput(e.target.value)}
-            placeholder={lang === 'en' ? 'delete my account' : 'حذف حسابي'}
+            placeholder={t('settings_delete_confirm_text')}
             style={{
               padding: '12px 14px', borderRadius: 12,
               background: 'var(--bg-secondary)', border: '1px solid rgba(239,68,68,0.3)',
@@ -490,17 +488,17 @@ function DangerZone({
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={onDelete}
-              disabled={deleteInput !== 'حذف حسابي' || deleting}
+              disabled={deleteInput !== t('settings_delete_confirm_text') || deleting}
               style={{
                 flex: 1, padding: '12px', borderRadius: 12,
                 background: '#EF4444', border: 'none', color: 'white',
                 fontSize: 14, fontWeight: 800,
-                cursor: deleteInput !== 'حذف حسابي' ? 'not-allowed' : 'pointer',
+                cursor: deleteInput !== t('settings_delete_confirm_text') ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit',
-                opacity: deleteInput !== 'حذف حسابي' ? 0.4 : 1,
+                opacity: deleteInput !== t('settings_delete_confirm_text') ? 0.4 : 1,
               }}
             >
-              {deleting ? '⏳ ...' : lang === 'en' ? 'Confirm Delete' : 'تأكيد الحذف'}
+              {deleting ? '⏳ ...' : t('confirm_delete')}
             </button>
             <button
               onClick={() => { setShowDeleteConfirm(false); setDeleteInput('') }}
@@ -510,7 +508,7 @@ function DangerZone({
                 color: 'var(--text-muted)', fontSize: 14, cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
-              {lang === 'en' ? 'Cancel' : 'إلغاء'}
+              {t('goals_cancel')}
             </button>
           </div>
         </div>
@@ -734,7 +732,7 @@ export default function SettingsPage() {
   }
 
   const handleDeleteAccount = async () => {
-    const user = currentUser; if (!user || deleteInput !== 'حذف حسابي') return
+    const user = currentUser; if (!user || deleteInput !== t('settings_delete_confirm_text')) return
     setLoading('delete', true)
     const { error } = await supabase.rpc('delete_user_account', { user_id: user.id })
     if (error) { toast.error(t('toast_error_save')); setLoading('delete', false); return }
@@ -770,7 +768,7 @@ export default function SettingsPage() {
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <PageHeader title={t('settings_title')} subtitle={t('settings_subtitle')} />
 
-      <AccordionCard icon="👤" title={lang === 'en' ? 'Personal Profile' : 'الملف الشخصي'} defaultOpen={true}>
+      <AccordionCard icon="👤" title={t('settings_profile_info')} defaultOpen={true}>
         <ProfileSection
           profileForm={profileForm} setProfileForm={setProfileForm}
           userEmail={userEmail} initials={initials} memberSince={memberSince}
@@ -778,7 +776,7 @@ export default function SettingsPage() {
         />
       </AccordionCard>
 
-      <AccordionCard icon="💎" title={lang === 'en' ? 'Personal Assets' : 'أصولي الشخصية'} badge={lang === 'en' ? 'Net Worth' : 'صافي الثروة'}>
+      <AccordionCard icon="💎" title={t('settings_assets_title')} badge={t('settings_net_worth')}>
         <AssetsSection
           assetsForm={assetsForm} setAssetsForm={setAssetsForm}
           totalAssets={totalAssets} assetsAge={assetsAge}
@@ -787,16 +785,16 @@ export default function SettingsPage() {
         />
       </AccordionCard>
 
-      <AccordionCard icon="🔔" title={lang === 'en' ? 'Account & Notifications' : 'الحساب والإشعارات'}>
+      <AccordionCard icon="🔔" title={t('settings_account_notifs')}>
         <AccountSection onLogout={handleLogout} loggingOut={loadingStates.logout} />
       </AccordionCard>
 
-      <AccordionCard icon="📥" title={lang === 'en' ? 'Export Data' : 'تصدير البيانات'}>
+      <AccordionCard icon="📥" title={t('settings_data')}>
         <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
       </AccordionCard>
 
 
-      <AccordionCard icon="🔗" title={lang === 'en' ? 'Share Fajrak' : 'شارك فجرك مع أصدقائك'}>
+      <AccordionCard icon="🔗" title={t('settings_share_msg').split('\n')[0].replace('?', '')}>
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🌅</div>
           <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>

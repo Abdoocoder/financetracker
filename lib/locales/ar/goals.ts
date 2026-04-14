@@ -36,4 +36,6 @@ export const arGoals = {
     goals_add_first: 'أضف هدفك الأول',
     goals_progress_percent: 'تم إنجاز {}%',
     goals_remaining_value: 'متبقي: {} {}',
+    goals_name_error: 'يوجد هدف بنفس الاسم',
+    goals_user_error: 'خطأ في بيانات المستخدم',
 } as const

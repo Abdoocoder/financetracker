@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import type { Debt } from '@/types'
 import { CURRENCIES } from '@/lib/currency'
+import { useI18n } from '@/lib/i18n'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
@@ -33,6 +34,7 @@ export const DebtCard = memo(function DebtCard({
   onEdit, onDelete, onStartPayment, onCancelPayment, onConfirmPayment,
   onPaymentAmountChange, onPaymentCurrencyChange,
 }: Props) {
+  const { t } = useI18n()
   const pct = Number(debt.original_amount) > 0
     ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
     : 0
@@ -65,16 +67,16 @@ export const DebtCard = memo(function DebtCard({
           {(debt.auto_deduct || isOverdue || daysUntil !== null) && (
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
               {debt.auto_deduct && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(59,126,246,0.12)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>⚡ تلقائي</span>
+                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(59,126,246,0.12)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>⚡ {t('debts_auto_deduct')}</span>
               )}
               {isOverdue && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(239,68,68,0.12)', color: 'var(--accent-red-light)', fontWeight: 700 }}>🔴 متأخر</span>
+                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(239,68,68,0.12)', color: 'var(--accent-red-light)', fontWeight: 700 }}>🔴 {t('debts_overdue')}</span>
               )}
               {daysUntil === 0 && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(245,158,11,0.15)', color: 'var(--accent-amber-light)', fontWeight: 700 }}>🔔 اليوم!</span>
+                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(245,158,11,0.15)', color: 'var(--accent-amber-light)', fontWeight: 700 }}>🔔 {t('debts_today')}</span>
               )}
               {daysUntil !== null && daysUntil > 0 && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', fontWeight: 600 }}>📅 بعد {daysUntil} يوم</span>
+                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', fontWeight: 600 }}>📅 {t('debts_after_days', { n: daysUntil })}</span>
               )}
             </div>
           )}
@@ -87,7 +89,7 @@ export const DebtCard = memo(function DebtCard({
           {debt.currency && debt.currency !== baseCurrency && (
             <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>≈ {Number(debt.remaining_amount).toFixed(0)} {baseCurrency}</div>
           )}
-          {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}/شهر</div>}
+          {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}{t('debts_per_month')}</div>}
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
           <button onClick={() => onEdit(debt)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
@@ -102,7 +104,7 @@ export const DebtCard = memo(function DebtCard({
 
       {/* ── Footer ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{pct.toFixed(0)}% مسدد</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{t('debts_paid_status', { pct: pct.toFixed(0) })}</span>
         {isPaying ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <select
@@ -116,7 +118,7 @@ export const DebtCard = memo(function DebtCard({
               type="number"
               value={paymentAmount}
               onChange={e => onPaymentAmountChange(e.target.value)}
-              placeholder={lang === 'en' ? 'Amount' : 'المبلغ'}
+              placeholder={t('trans_amount')}
               autoFocus
               onKeyDown={e => e.key === 'Enter' && onConfirmPayment(debt.id)}
               style={{ width: 70, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }}
@@ -131,7 +133,7 @@ export const DebtCard = memo(function DebtCard({
         ) : (
           <button onClick={() => onStartPayment(debt.id)}
             style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-            + دفعة
+            {t('debts_add_payment_btn')}
           </button>
         )}
       </div>

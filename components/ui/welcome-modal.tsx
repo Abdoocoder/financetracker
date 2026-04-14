@@ -43,7 +43,7 @@ export function WelcomeModal() {
         <div style={{ width: 72, height: 72, borderRadius: 20, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 30, fontWeight: 900, color: 'white', boxShadow: '0 8px 32px rgba(59,126,246,0.4)' }}>{t('app_name')[0]}</div>
 
         <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>
-          {name ? `${t('dash_greeting')} ${name} 👋` : `${t('onboard_welcome')}`}
+          {name ? t('dash_greeting', { name }) : t('onboard_welcome')}
         </div>
 
         <div style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 24 }}>

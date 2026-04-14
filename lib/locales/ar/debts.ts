@@ -79,4 +79,32 @@ export const arDebts = {
     priority_medium: 'متوسطة',
     priority_low: 'منخفضة',
     priority_deferred: 'مؤجل',
+
+    // New labels
+    debts_total_paid_label: 'إجمالي ما سددته',
+    debts_paid_title: 'ديون مسددة',
+    debts_received_cat: 'دين مستلم',
+    debts_received_desc: 'استلام دين: {name}',
+    debts_loan_received_cat: 'قرض مستلم',
+    debts_loan_received_desc: 'قرض مستلم: {name}',
+    debts_receive_date_label: '📅 موعد الاستلام: {date}',
+    debts_original_label: 'الأصل: {amount}',
+    debts_paid_summary: 'مسدد: {amount}',
+
+    // Priority
+    priority_title: 'الأولوية',
+    priority_1: 'عالية جداً',
+    priority_2: 'عالية',
+    priority_3: 'متوسطة',
+    priority_4: 'منخفضة',
+    priority_5: 'مؤجلة',
+
+    // Labels
+    debts_receive_confirm: 'استلمت هذا المبلغ',
+    debts_receive_confirm_yes: 'نعم، استلمت هذا المبلغ اليوم',
+    debts_receive_confirm_desc: 'سيُضاف تلقائياً كدخل في معاملاتك',
+    debts_overdue: 'متأخر',
+    debts_today: 'اليوم!',
+    debts_after_days: 'بعد {n} يوم',
+    debts_paid_status: '{pct}% مسدد',
 } as const

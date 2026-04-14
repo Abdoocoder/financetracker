@@ -36,7 +36,7 @@ const stageOrder: FinancialStage[] = ['awareness', 'debt', 'emergency', 'investi
 
 export default function LearnPage() {
   const { user } = useUser()
-  const { lang, currentLang } = useI18n()
+  const { lang, currentLang, t } = useI18n()
   const supabase = createClient()
   const [lesson, setLesson] = useState<DailyLesson | null>(null)
   const [stage, setStage] = useState<FinancialStage>('awareness')
@@ -246,7 +246,7 @@ export default function LearnPage() {
         if (!blob) return
         const file = new File([blob], 'fajrak-lesson.png', { type: 'image/png' })
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: currentLang === 'ar' ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak" })
+          await navigator.share({ files: [file], title: t('learn_share_title') })
         } else {
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
@@ -275,8 +275,8 @@ export default function LearnPage() {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <PageHeader
-        title={currentLang === 'ar' ? 'درس اليوم' : "Today's Lesson"}
-        subtitle={currentLang === 'ar' ? 'تعلم خطوة كل يوم نحو حريتك المالية' : 'One step every day toward financial freedom'}
+        title={t('learn_title')}
+        subtitle={t('learn_subtitle')}
       />
 
       {/* مرحلتك + السلسلة */}
@@ -284,14 +284,14 @@ export default function LearnPage() {
         <div style={{ flex: 1, padding: '14px 16px', borderRadius: 16, background: 'var(--bg-card)', border: `1px solid ${info.color}33`, display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 24 }}>{info.icon}</span>
           <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{currentLang === 'ar' ? 'مرحلتك' : 'Your Stage'}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: info.color }}>{info[currentLang]}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>{t('learn_stage_label')}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: info.color }}>{t(`learn_stage_${stage}` as Parameters<typeof t>[0])}</div>
           </div>
         </div>
         <div style={{ padding: '14px 16px', borderRadius: 16, background: 'var(--bg-card)', border: '1px solid rgba(245,158,11,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 24 }}>🔥</span>
           <div>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700 }}>{currentLang === 'ar' ? 'السلسلة' : 'Streak'}</div>
+            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700 }}>{t('learn_streak')}</div>
             <div style={{ fontSize: 18, fontWeight: 900, color: '#F59E0B' }}>{streak}</div>
           </div>
         </div>
@@ -300,7 +300,7 @@ export default function LearnPage() {
       {/* خارطة التقدم */}
       <div style={{ padding: '16px', borderRadius: 16, background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textTransform: 'uppercase' }}>
-          {currentLang === 'ar' ? 'رحلتك المالية' : 'Your Financial Journey'}
+          {t('learn_journey')}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           {stageOrder.map((s, i) => (
@@ -337,7 +337,7 @@ export default function LearnPage() {
               fontSize: 13, fontWeight: 800, textDecoration: 'none',
               textAlign: 'center', display: 'block',
             }}>
-              {currentLang === 'ar' ? '← طبّق الدرس' : 'Apply Lesson →'}
+              {t('learn_apply')}
             </a>
             {!completed && (
               <button onClick={markComplete} style={{
@@ -345,18 +345,18 @@ export default function LearnPage() {
                 background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)',
                 color: '#10B981', fontSize: 13, fontWeight: 800, cursor: 'pointer',
               }}>
-                ✅ {currentLang === 'ar' ? 'أتممت الدرس' : 'Done'}
+                ✅ {t('learn_done')}
               </button>
             )}
             {completed && (
               <div style={{ padding: '12px 16px', borderRadius: 12, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10B981', fontSize: 13, fontWeight: 800 }}>
-                ✅ {currentLang === 'ar' ? 'مكتمل' : 'Completed'}
+                ✅ {t('learn_completed')}
               </div>
             )}
             <button
               onClick={shareLesson}
               disabled={sharing}
-              title={currentLang === 'ar' ? 'شارك الدرس' : 'Share lesson'}
+              title={t('learn_share_btn')}
               style={{
                 padding: '12px 14px', borderRadius: 12,
                 background: sharing ? 'rgba(245,158,11,0.05)' : 'rgba(245,158,11,0.1)',
@@ -375,12 +375,10 @@ export default function LearnPage() {
       {/* نصيحة اليوم */}
       <div style={{ padding: '16px 20px', borderRadius: 16, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.15)' }}>
         <div style={{ fontSize: 12, color: 'var(--accent-blue-light)', fontWeight: 800, marginBottom: 6 }}>
-          💡 {currentLang === 'ar' ? 'هل تعلم؟' : 'Did you know?'}
+          💡 {t('learn_did_you_know')}
         </div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          {currentLang === 'ar'
-            ? 'الدروس تتغير يومياً وتُخصَّص لمرحلتك المالية الحالية. كل 7 أيام يأتيك درس إسلامي مرتبط بالرزق.'
-            : 'Lessons change daily and are tailored to your current financial stage. Every 7 days you receive an Islamic lesson about provision.'}
+          {t('learn_did_you_know_msg')}
         </div>
       </div>
     </div>

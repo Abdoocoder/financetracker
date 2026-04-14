@@ -1,7 +1,7 @@
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { CURRENCIES } from '@/lib/currency'
-import type { TranslationKey } from '@/lib/i18n'
+import { useI18n } from '@/lib/i18n'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
@@ -34,13 +34,13 @@ interface Props {
   editingId: string | null
   baseCurrency: string
   lang: string
-  t: (key: TranslationKey) => string
   saving: boolean
   onSave: () => void
   onClose: () => void
 }
 
-export function DebtForm({ form, setForm, editingId, baseCurrency, lang, t, saving, onSave, onClose }: Props) {
+export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving, onSave, onClose }: Props) {
+  const { t } = useI18n()
   return (
     <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={onClose}>
       {/* نوع الدين */}
@@ -64,14 +64,14 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, t, savi
       </FormField>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
+        <FormField label={t('trans_amount')}>
           <Input type="number" placeholder="0"
             value={form.currency === baseCurrency ? form.original_amount : form.original_amount_foreign}
             onChange={e => form.currency === baseCurrency
               ? setForm(f => ({ ...f, original_amount: e.target.value }))
               : setForm(f => ({ ...f, original_amount_foreign: e.target.value }))} />
         </FormField>
-        <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
+        <FormField label={t('settings_currency')}>
           <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
             {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
           </Select>
@@ -84,7 +84,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, t, savi
             <FormField label={t('trans_exchange_rate') || 'سعر الصرف'}>
               <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => setForm(f => ({ ...f, exchange_rate: e.target.value }))} />
             </FormField>
-            <FormField label="المعادل">
+            <FormField label={t('trans_equivalent')}>
               <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, textAlign: 'center', fontSize: 13 }}>
                 {(parseFloat(form.original_amount_foreign) * parseFloat(form.exchange_rate) || 0).toFixed(2)} {baseCurrency}
               </div>
@@ -102,16 +102,16 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, t, savi
         </FormField>
       </div>
 
-      <FormField label="الأولوية">
+      <FormField label={t('priority_title')}>
         <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
           {PRIORITY_CONFIG.map((p, i) => (
-            <option key={i + 1} value={i + 1}>{lang === 'en' ? p.en : p.ar}</option>
+            <option key={i + 1} value={i + 1}>{t(`priority_${i + 1}` as Parameters<typeof t>[0])}</option>
           ))}
         </Select>
       </FormField>
 
       {!editingId && (
-        <FormField label={lang === 'ar' ? '💳 استلمت هذا المبلغ' : '💳 I received this amount'}>
+        <FormField label={t('debts_receive_confirm')}>
           <div
             onClick={() => setForm(f => ({ ...f, received_amount: !f.received_amount }))}
             style={{
@@ -132,10 +132,10 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, t, savi
             </div>
             <div>
               <div style={{ fontSize: 13, fontWeight: 700, color: form.received_amount ? '#10B981' : 'var(--text-secondary)' }}>
-                {lang === 'ar' ? 'نعم، استلمت هذا المبلغ اليوم' : 'Yes, I received this amount today'}
+                {t('debts_receive_confirm_yes')}
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                {lang === 'ar' ? 'سيُضاف تلقائياً كدخل في معاملاتك' : 'Will be added automatically as income in your transactions'}
+                {t('debts_receive_confirm_desc')}
               </div>
             </div>
           </div>

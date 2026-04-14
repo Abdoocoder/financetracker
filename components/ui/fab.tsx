@@ -9,7 +9,7 @@ import { useUser } from '@/lib/user-context'
 
 export function GlobalFAB() {
   const [open, setOpen] = useState(false)
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
   const { user } = useUser()
   const supabase = createClient()
 
@@ -38,7 +38,7 @@ export function GlobalFAB() {
       {/* FAB Button */}
       <button
         onClick={() => setOpen(true)}
-        aria-label={lang === 'ar' ? 'إضافة معاملة' : 'Add transaction'}
+        aria-label={t('fab_add_tx')}
         className="global-fab"
         style={{
           position: 'fixed',
@@ -117,11 +117,11 @@ export function GlobalFAB() {
             padding: '10px 4px 12px',
           }}>
             <span style={{ fontSize: 'var(--fs-md)', fontWeight: 'var(--fw-black)', color: 'var(--text-primary)' }}>
-              {lang === 'ar' ? 'إضافة معاملة' : 'Add Transaction'}
+              {t('fab_title')}
             </span>
             <button
               onClick={() => setOpen(false)}
-              aria-label={lang === 'ar' ? 'إغلاق' : 'Close'}
+              aria-label={t('close')}
               style={{
                 width: 32, height: 32, borderRadius: '50%',
                 background: 'var(--bg-elevated)',

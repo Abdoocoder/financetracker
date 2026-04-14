@@ -25,9 +25,9 @@ const CATEGORIES = [
 
 
 // ── المستشار المالي الذكي ─────────────────────────────
-function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted, totalSpent, ar }: {
+function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted, totalSpent, lang, t, baseCurrency }: {
   budgets: Budget[]; spending: Record<string, number>; income: number
-  available: number; totalBudgeted: number; totalSpent: number; ar: boolean
+  available: number; totalBudgeted: number; totalSpent: number; lang: string; t: any; baseCurrency: string
 }) {
   const insights: { icon: string; text: string; type: 'warning' | 'success' | 'info' | 'danger' }[] = []
 
@@ -36,37 +36,37 @@ function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted,
     const spent = spending[b.category] ?? 0
     const limit = Number(b.monthly_limit)
     const cat = CATEGORIES.find(c => c.key === b.category)
-    const name = ar ? cat?.ar : cat?.en
+    const name = lang === 'ar' ? cat?.ar : cat?.en
     if (spent > limit) {
-      insights.push({ icon: '🔴', type: 'danger', text: ar ? `تجاوزت ميزانية ${name} بـ ${(spent - limit).toFixed(0)} JOD` : `Over ${name} budget by ${(spent - limit).toFixed(0)} JOD` })
+      insights.push({ icon: '🔴', type: 'danger', text: t('budget_insight_over', name || '', (spent - limit).toFixed(0), baseCurrency) })
     } else if (limit > 0 && (spent / limit) > 0.8) {
-      insights.push({ icon: '🔶', type: 'warning', text: ar ? `اقتربت من حد ${name} — ${(limit - spent).toFixed(0)} JOD متبقي` : `Near ${name} limit — ${(limit - spent).toFixed(0)} JOD left` })
+      insights.push({ icon: '🔶', type: 'warning', text: t('budget_insight_near', name || '', (limit - spent).toFixed(0), baseCurrency) })
     }
   })
 
   // ميزانية تتجاوز المتاح
   if (totalBudgeted > available && available > 0) {
-    insights.push({ icon: '⚠️', type: 'warning', text: ar ? `ميزانيتك تتجاوز المتاح بـ ${(totalBudgeted - available).toFixed(0)} JOD` : `Budget exceeds available by ${(totalBudgeted - available).toFixed(0)} JOD` })
+    insights.push({ icon: '⚠️', type: 'warning', text: t('budget_insight_deficit', (totalBudgeted - available).toFixed(0), baseCurrency) })
   }
 
   // نسبة الإنفاق من الدخل
   if (income > 0 && totalSpent > 0) {
     const spendRatio = (totalSpent / income) * 100
     if (spendRatio > 90) {
-      insights.push({ icon: '🚨', type: 'danger', text: ar ? `أنفقت ${spendRatio.toFixed(0)}% من دخلك — خطر!` : `Spent ${spendRatio.toFixed(0)}% of income — danger!` })
+      insights.push({ icon: '🚨', type: 'danger', text: t('budget_insight_ratio_danger', spendRatio.toFixed(0)) })
     } else if (spendRatio < 70) {
-      insights.push({ icon: '✅', type: 'success', text: ar ? `ممتاز! أنفقت ${spendRatio.toFixed(0)}% فقط من دخلك` : `Great! Only ${spendRatio.toFixed(0)}% of income spent` })
+      insights.push({ icon: '✅', type: 'success', text: t('budget_insight_ratio_success', spendRatio.toFixed(0)) })
     }
   }
 
   // لا توجد ميزانيات
   if (budgets.length === 0) {
-    insights.push({ icon: '💡', type: 'info', text: ar ? 'أضف ميزانية لكل فئة لتتبع إنفاقك بدقة' : 'Add budgets per category to track spending' })
+    insights.push({ icon: '💡', type: 'info', text: t('budget_insight_empty') })
   }
 
   // فائض جيد
   if (available > income * 0.2 && income > 0) {
-    insights.push({ icon: '💰', type: 'success', text: ar ? `فائض ${available.toFixed(0)} JOD — فكر في الاستثمار!` : `${available.toFixed(0)} JOD surplus — consider investing!` })
+    insights.push({ icon: '💰', type: 'success', text: t('budget_insight_surplus', available.toFixed(0), baseCurrency) })
   }
 
   if (insights.length === 0) return null
@@ -84,7 +84,7 @@ function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted,
         <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', gap: 8, borderBottom: '1px solid var(--border)' }}>
           <span style={{ fontSize: 18 }}>🤖</span>
           <span style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>
-            {ar ? 'المستشار المالي' : 'Financial Advisor'}
+            {t('budget_advisor_title')}
           </span>
         </div>
         <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -104,9 +104,9 @@ function FinancialAdvisor({ budgets, spending, income, available, totalBudgeted,
 }
 
 // ── قاعدة 50/30/20 ───────────────────────────────────
-function Rule502030({ income, totalDebtPayments, totalGoalSavings, ar, onApply }: {
+function Rule502030({ income, totalDebtPayments, totalGoalSavings, t, onApply }: {
   income: number; totalDebtPayments: number; totalGoalSavings: number
-  ar: boolean; onApply: (suggestions: { category: string; limit: number }[]) => void
+  t: any; onApply: (suggestions: { category: string; limit: number }[]) => void
 }) {
   const [show, setShow] = useState(false)
   if (income <= 0) return null
@@ -132,7 +132,7 @@ function Rule502030({ income, totalDebtPayments, totalGoalSavings, ar, onApply }
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 18 }}>⚖️</span>
             <span style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>
-              {ar ? 'قاعدة 50/30/20 المقترحة' : 'Suggested 50/30/20 Rule'}
+              {t('budget_rule_title')}
             </span>
           </div>
           <span style={{ fontSize: 11, color: 'var(--text-muted)', transform: show ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', display: 'inline-block' }}>▼</span>
@@ -142,9 +142,9 @@ function Rule502030({ income, totalDebtPayments, totalGoalSavings, ar, onApply }
           <div style={{ padding: '0 16px 16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
               {[
-                { label: ar ? '🏠 ضروريات' : '🏠 Needs', value: needs, pct: '50%', color: 'var(--accent-blue-light)', bg: 'var(--accent-blue-dim)' },
-                { label: ar ? '🎯 رغبات' : '🎯 Wants', value: wants, pct: '30%', color: 'var(--accent-purple-light)', bg: 'var(--accent-purple-dim)' },
-                { label: ar ? '💰 ادخار' : '💰 Savings', value: savings, pct: '20%', color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)' },
+                { label: t('budget_rule_needs'), value: needs, pct: '50%', color: 'var(--accent-blue-light)', bg: 'var(--accent-blue-dim)' },
+                { label: t('budget_rule_wants'), value: wants, pct: '30%', color: 'var(--accent-purple-light)', bg: 'var(--accent-purple-dim)' },
+                { label: t('budget_rule_savings'), value: savings, pct: '20%', color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)' },
               ].map((item, i) => (
                 <div key={i} style={{ background: item.bg, borderRadius: 14, padding: '12px 10px', textAlign: 'center' }}>
                   <div style={{ fontSize: 16, fontWeight: 900, color: item.color, fontFamily: 'monospace' }}>{item.pct}</div>
@@ -154,7 +154,7 @@ function Rule502030({ income, totalDebtPayments, totalGoalSavings, ar, onApply }
               ))}
             </div>
             <button onClick={() => { onApply(suggestions); setShow(false) }} style={{ width: '100%', padding: '11px', borderRadius: 12, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
-              {ar ? '✨ تطبيق التوزيع المقترح' : '✨ Apply Suggested Split'}
+              {t('budget_rule_apply')}
             </button>
           </div>
         )}
@@ -173,6 +173,7 @@ export default function BudgetsPage() {
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [spending, setSpending] = useState<Record<string, number>>({})
   const [monthlyIncome, setMonthlyIncome] = useState(0)
+  const [baseCurrency, setBaseCurrency] = useState('JOD')
   const [totalDebtPayments, setTotalDebtPayments] = useState(0)
   const [totalGoalSavings, setTotalGoalSavings] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -180,7 +181,6 @@ export default function BudgetsPage() {
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState({ category: 'طعام', monthly_limit: '' })
-  const ar = lang === 'ar'
 
   const load = useCallback(async () => {
     const user = currentUser
@@ -191,7 +191,7 @@ export default function BudgetsPage() {
     const [budgetRes, txRes, profileRes, debtRes, goalRes] = await Promise.all([
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', month).eq('year', year),
       supabase.from('transactions').select('category,amount,type').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay),
-      supabase.from('profiles').select('monthly_income').eq('id', user.id).single(),
+      supabase.from('profiles').select('monthly_income, base_currency').eq('id', user.id).single(),
       supabase.from('debts').select('monthly_payment').eq('user_id', user.id).eq('is_paid', false),
       supabase.from('savings_goals').select('current_amount,target_amount').eq('user_id', user.id),
     ])
@@ -203,6 +203,7 @@ export default function BudgetsPage() {
     setSpending(spendMap)
     const actualIncome = (txRes.data ?? []).filter((t: any) => t.type === 'income').reduce((a: number, t: any) => a + Number(t.amount), 0)
     setMonthlyIncome(actualIncome || (profileRes.data?.monthly_income ?? 0))
+    setBaseCurrency(profileRes.data?.base_currency || 'JOD')
     setTotalDebtPayments((debtRes.data ?? []).reduce((a: number, d: any) => a + Number(d.monthly_payment), 0))
     const goalTotal = (goalRes.data ?? []).reduce((a: number, g: any) => {
       const remaining = Number(g.target_amount) - Number(g.current_amount)
@@ -221,13 +222,13 @@ export default function BudgetsPage() {
 
   async function handleSave() {
     const user = currentUser
-    if (!user || !form.monthly_limit) { toast.error(ar ? 'أدخل الحد' : 'Enter a limit'); return }
+    if (!user || !form.monthly_limit) { toast.error(t('settings_enter_limit') || (lang === 'ar' ? 'أدخل الحد' : 'Enter a limit')); return }
     setSaving(true)
     if (editingId) {
       await supabase.from('budgets').update({ monthly_limit: parseFloat(form.monthly_limit) }).eq('id', editingId)
     } else {
       const { error } = await supabase.from('budgets').insert({ user_id: user.id, category: form.category, monthly_limit: parseFloat(form.monthly_limit), month, year })
-      if (error?.code === '23505') { toast.error(ar ? 'ميزانية هذه الفئة موجودة مسبقاً' : 'Budget already exists for this category'); setSaving(false); return }
+      if (error?.code === '23505') { toast.error(t('budget_category_exists')); setSaving(false); return }
     }
     clearUserCache(currentUser?.id ?? '')
     toast.success(t('toast_saved'))
@@ -257,7 +258,7 @@ export default function BudgetsPage() {
       }
     }
     clearUserCache(user.id)
-    toast.success(ar ? 'تم تطبيق التوزيع المقترح ✨' : 'Suggested split applied ✨')
+    toast.success(t('budget_apply_success'))
     setSaving(false)
     await load()
   }
@@ -265,7 +266,7 @@ export default function BudgetsPage() {
   const available = monthlyIncome - totalDebtPayments - totalGoalSavings
   const totalBudgeted = budgets.reduce((a, b) => a + Number(b.monthly_limit), 0)
   const totalSpent = budgets.reduce((a, b) => a + (spending[b.category] ?? 0), 0)
-  const months = ar
+  const months = lang === 'ar'
     ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
     : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -273,7 +274,7 @@ export default function BudgetsPage() {
     <div ref={pageRef} className="animate-fade-in" style={{ padding: '0 0 100px' }}>
       <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
-        title={ar ? 'الميزانية' : 'Budget'}
+        title={t('budget_title')}
         subtitle={t('budget_plan_pro')}
         action={<button onClick={openAdd} style={{ padding: '10px 18px', borderRadius: 12, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>+ {t('add')}</button>}
       />
@@ -292,12 +293,12 @@ export default function BudgetsPage() {
         <div style={{ padding: '0 16px 12px' }}>
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '16px' }}>
             <div style={{ fontSize: 12, fontWeight: 900, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
-              {ar ? '📋 ملخص الشهر' : '📋 Monthly Summary'}
+              {t('budget_monthly_summary')}
             </div>
             {[
-              { label: ar ? '💵 الدخل' : '💵 Income', value: monthlyIncome, color: 'var(--accent-green-light)', sign: '+' },
-              { label: ar ? '💳 أقساط الديون' : '💳 Debt Payments', value: totalDebtPayments, color: 'var(--accent-red-light)', sign: '-' },
-              { label: ar ? '🎯 الأهداف' : '🎯 Goals', value: totalGoalSavings, color: 'var(--accent-amber)', sign: '-' },
+              { label: t('budget_income_row'), value: monthlyIncome, color: 'var(--accent-green-light)', sign: '+' },
+              { label: t('budget_debt_row'), value: totalDebtPayments, color: 'var(--accent-red-light)', sign: '-' },
+              { label: t('budget_goals_row'), value: totalGoalSavings, color: 'var(--accent-amber)', sign: '-' },
             ].map((row, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{row.label}</span>
@@ -306,14 +307,14 @@ export default function BudgetsPage() {
             ))}
             <div style={{ height: 1, background: 'var(--border)', margin: '10px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: totalBudgeted > 0 ? 12 : 0 }}>
-              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{ar ? '✅ المتاح للإنفاق' : '✅ Available to Spend'}</span>
-              <span style={{ fontSize: 20, fontWeight: 900, color: available >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{available.toFixed(0)} JOD</span>
+              <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{t('budget_available')}</span>
+              <span style={{ fontSize: 20, fontWeight: 900, color: available >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{available.toFixed(0)} {baseCurrency}</span>
             </div>
             {totalBudgeted > 0 && (
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  <span>{ar ? 'مُنفق من الفئات' : 'Spent from categories'}</span>
-                  <span style={{ fontWeight: 700, color: totalSpent > totalBudgeted ? 'var(--accent-red-light)' : 'var(--text-muted)' }}>{totalSpent.toFixed(0)} / {totalBudgeted.toFixed(0)} JOD</span>
+                  <span>{t('budget_spent_of')}</span>
+                  <span style={{ fontWeight: 700, color: totalSpent > totalBudgeted ? 'var(--accent-red-light)' : 'var(--text-muted)' }}>{totalSpent.toFixed(0)} / {totalBudgeted.toFixed(0)} {baseCurrency}</span>
                 </div>
                 <div style={{ height: 8, background: 'var(--bg-secondary)', borderRadius: 99, overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${Math.min((totalSpent / totalBudgeted) * 100, 100)}%`, background: totalSpent > totalBudgeted ? 'var(--accent-red)' : 'var(--accent-blue)', borderRadius: 99, transition: 'width 0.5s ease' }} />
@@ -327,13 +328,13 @@ export default function BudgetsPage() {
       {/* المستشار المالي */}
       <FinancialAdvisor
         budgets={budgets} spending={spending} income={monthlyIncome}
-        available={available} totalBudgeted={totalBudgeted} totalSpent={totalSpent} ar={ar}
+        available={available} totalBudgeted={totalBudgeted} totalSpent={totalSpent} lang={lang} t={t} baseCurrency={baseCurrency}
       />
 
       {/* قاعدة 50/30/20 */}
       <Rule502030
         income={monthlyIncome} totalDebtPayments={totalDebtPayments}
-        totalGoalSavings={totalGoalSavings} ar={ar} onApply={handleApply502030}
+        totalGoalSavings={totalGoalSavings} t={t} onApply={handleApply502030}
       />
 
       {/* قائمة الفئات */}
@@ -343,8 +344,8 @@ export default function BudgetsPage() {
         ) : budgets.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>{ar ? 'لا توجد فئات بعد' : 'No categories yet'}</div>
-            <div style={{ fontSize: 13, marginTop: 6 }}>{ar ? 'أضف ميزانية أو جرب قاعدة 50/30/20 ⬆️' : 'Add a budget or try the 50/30/20 rule ⬆️'}</div>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>{t('budget_empty_title')}</div>
+            <div style={{ fontSize: 13, marginTop: 6 }}>{t('budget_empty_sub')}</div>
           </div>
         ) : budgets.map(b => {
           const cat = CATEGORIES.find(c => c.key === b.category)
@@ -362,11 +363,11 @@ export default function BudgetsPage() {
                     {cat?.icon ?? '📝'}
                   </div>
                   <div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{ar ? cat?.ar : cat?.en ?? b.category}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{lang === 'ar' ? cat?.ar : cat?.en ?? b.category}</div>
                     <div style={{ fontSize: 12, color: over ? 'var(--accent-red-light)' : warn ? '#F59E0B' : 'var(--text-muted)', fontWeight: 600 }}>
-                      {spent.toFixed(0)} / {limit.toFixed(0)} JOD
-                      {over && <span> ⚠️ {ar ? 'تجاوزت!' : 'Over!'}</span>}
-                      {warn && !over && <span> 🔶 {ar ? 'اقتربت' : 'Near limit'}</span>}
+                      {spent.toFixed(0)} / {limit.toFixed(0)} {baseCurrency}
+                      {over && <span> ⚠️ {t('budget_over')}</span>}
+                      {warn && !over && <span> 🔶 {t('budget_near')}</span>}
                     </div>
                   </div>
                 </div>
@@ -382,8 +383,8 @@ export default function BudgetsPage() {
                 <div style={{ height: '100%', width: `${pct}%`, background: over ? 'var(--accent-red)' : warn ? '#F59E0B' : 'var(--accent-green)', borderRadius: 99, transition: 'width 0.5s ease' }} />
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', justifyContent: 'space-between' }}>
-                <span>{ar ? 'متبقي' : 'Remaining'}: <span style={{ color: over ? 'var(--accent-red-light)' : 'var(--accent-green-light)', fontWeight: 700 }}>{remaining.toFixed(0)} JOD</span></span>
-                <span>{ar ? 'الحد' : 'Limit'}: {limit.toFixed(0)} JOD</span>
+                <span>{t('budget_remaining')}: <span style={{ color: over ? 'var(--accent-red-light)' : 'var(--accent-green-light)', fontWeight: 700 }}>{remaining.toFixed(0)} {baseCurrency}</span></span>
+                <span>{t('budget_limit')}: {limit.toFixed(0)} {baseCurrency}</span>
               </div>
             </div>
           )
@@ -392,26 +393,26 @@ export default function BudgetsPage() {
 
       {/* Modal إضافة/تعديل */}
       {showForm && (
-        <Modal title={editingId ? (ar ? 'تعديل الميزانية' : 'Edit Budget') : (ar ? 'ميزانية جديدة' : 'New Budget')} onClose={() => setShowForm(false)}>
+        <Modal title={editingId ? t('budget_edit') : t('budget_new')} onClose={() => setShowForm(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {!editingId && (
               <div>
-                <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{ar ? 'الفئة' : 'Category'}</label>
+                <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{t('budget_category')}</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: 8 }}>
                   {CATEGORIES.map(cat => (
                     <button key={cat.key} onClick={() => setForm(f => ({ ...f, category: cat.key }))} style={{ padding: '10px 4px', borderRadius: 12, background: form.category === cat.key ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${form.category === cat.key ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: form.category === cat.key ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                       <span style={{ fontSize: 18 }}>{cat.icon}</span>
-                      <span>{ar ? cat.ar : cat.en}</span>
+                      <span>{lang === 'ar' ? cat.ar : cat.en}</span>
                     </button>
                   ))}
                 </div>
               </div>
             )}
             <div>
-              <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{ar ? 'الحد الشهري (JOD)' : 'Monthly Limit (JOD)'}</label>
+              <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{t('budget_limit_monthly').replace('{}', baseCurrency)}</label>
               <input type="number" value={form.monthly_limit} onChange={e => setForm(f => ({ ...f, monthly_limit: e.target.value }))} placeholder="0.00" autoFocus style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 16, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
               {!editingId && available > 0 && (
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>💡 {ar ? `المتاح للإنفاق: ${available.toFixed(0)} JOD` : `Available to spend: ${available.toFixed(0)} JOD`}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>💡 {t('budget_available_hint').replace('{1}', available.toFixed(0).toString()).replace('{2}', baseCurrency)}</div>
               )}
             </div>
             <button onClick={handleSave} disabled={saving} style={{ width: '100%', padding: 14, borderRadius: 14, background: 'var(--accent-blue)', border: 'none', color: 'white', fontSize: 15, fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1 }}>

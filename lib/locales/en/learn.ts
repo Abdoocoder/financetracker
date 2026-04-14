@@ -9,6 +9,8 @@ export const enLearn = {
     learn_completed: 'Completed',
     learn_did_you_know: 'Did you know?',
     learn_did_you_know_msg: 'Lessons change daily and are personalized to your financial stage. Every 7 days there\'s an Islamic lesson related to wealth.',
+    learn_share_btn: 'Share lesson',
+    learn_share_title: "Today's lesson from Fajrak",
     learn_stage_label: 'Your Stage',
     learn_streak_day: 'day',
     learn_streak_consecutive: '{} days in a row!',

@@ -31,7 +31,8 @@ async function fetchStockPrice(symbol: string): Promise<number | null> {
   } catch { return null }
 }
 
-function WealthSimulator({ lang, currency }: { lang: string; currency: string }) {
+function WealthSimulator({ currency }: { currency: string }) {
+  const { t, lang } = useI18n()
   const ar = lang === 'ar'
   const [monthly, setMonthly] = useState(50)
   const [years, setYears] = useState(10)
@@ -60,10 +61,10 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
           <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>
-            📈 {ar ? 'محاكي الثروة' : 'Wealth Simulator'}
+            📈 {t('inv_sim_title')}
           </div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-            {ar ? 'شاهد كيف ينمو استثمارك مع الزمن' : 'See how your investment grows over time'}
+            {t('inv_sim_subtitle')}
           </div>
         </div>
         <div style={{
@@ -72,7 +73,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
           border: '1px solid rgba(59,126,246,0.2)',
           fontSize: 11, fontWeight: 800, color: 'var(--accent-blue-light)',
         }}>
-          {ar ? `${multiplier.toFixed(1)}x` : `${multiplier.toFixed(1)}x return`}
+          {t('inv_sim_return').replace('{}', multiplier.toFixed(1))}
         </div>
       </div>
 
@@ -83,14 +84,14 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
-              {ar ? 'الاستثمار الشهري' : 'Monthly Investment'}
+              {t('inv_sim_monthly')}
             </span>
             <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
               {monthly} {currency}
             </span>
           </div>
           <input type="range" min={10} max={1000} step={10} value={monthly}
-            aria-label={ar ? 'قيمة الاستثمار الشهري' : 'Monthly investment amount'}
+            aria-label={t('inv_sim_monthly')}
             onChange={e => setMonthly(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
           />
@@ -103,19 +104,19 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
-              {ar ? 'المدة' : 'Duration'}
+              {t('inv_sim_duration')}
             </span>
             <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
-              {years} {ar ? 'سنة' : 'yrs'}
+              {years} {t('inv_sim_years')}
             </span>
           </div>
           <input type="range" min={1} max={30} step={1} value={years}
-            aria-label={ar ? 'عدد سنوات الاستثمار' : 'Investment duration in years'}
+            aria-label={t('inv_sim_duration')}
             onChange={e => setYears(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-            <span>1 {ar ? 'سنة' : 'yr'}</span><span>30 {ar ? 'سنة' : 'yrs'}</span>
+            <span>1 {t('inv_sim_years')}</span><span>30 {t('inv_sim_years')}</span>
           </div>
         </div>
 
@@ -123,14 +124,14 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
-              {ar ? 'معدل العائد السنوي' : 'Annual Return'}
+              {t('inv_sim_rate')}
             </span>
             <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
               {rate}%
             </span>
           </div>
           <input type="range" min={1} max={20} step={0.5} value={rate}
-            aria-label={ar ? 'معدل العائد السنوي' : 'Annual return rate'}
+            aria-label={t('inv_sim_rate')}
             onChange={e => setRate(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--accent-green)' }}
           />
@@ -149,7 +150,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
         borderRadius: 16, padding: 20, marginBottom: 16, textAlign: 'center',
       }}>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>
-          {ar ? `بعد ${years} سنة ستمتلك` : `After ${years} years you'll have`}
+          {t('inv_sim_after_years').replace('{}', years.toString())}
         </div>
         <div style={{
           fontSize: 36, fontWeight: 900, fontFamily: 'monospace',
@@ -165,21 +166,21 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12 }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'ما دفعته' : 'You invested'}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t('inv_sim_invested')}</div>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
               {(invested/1000).toFixed(1)}K {currency}
             </div>
           </div>
           <div style={{ width: 1, background: 'var(--border)' }} />
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'الربح' : 'Profit'}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t('inv_sim_profit')}</div>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
               +{profit >= 1000 ? (profit/1000).toFixed(1) + 'K' : profit.toFixed(0)} {currency}
             </div>
           </div>
           <div style={{ width: 1, background: 'var(--border)' }} />
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ar ? 'المضاعف' : 'Multiplier'}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t('inv_sim_multiplier')}</div>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
               {multiplier.toFixed(1)}x
             </div>
@@ -194,9 +195,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
         color: 'var(--text-muted)', fontSize: 12, fontWeight: 700,
         cursor: 'pointer', fontFamily: 'inherit',
       }}>
-        {showDetails
-          ? (ar ? '▲ إخفاء التفاصيل' : '▲ Hide details')
-          : (ar ? '▼ عرض التفاصيل سنة بسنة' : '▼ Show year by year')}
+        {showDetails ? t('inv_sim_hide') : t('inv_sim_show')}
       </button>
 
       {showDetails && (
@@ -213,7 +212,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
                 border: `1px solid ${y === years ? 'rgba(59,126,246,0.2)' : 'var(--border)'}`,
               }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: y === years ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>
-                  {ar ? `بعد ${y} سنة` : `${y} years`}
+                  {t('inv_sim_after_y').replace('{}', y.toString())}
                 </span>
                 <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
                   <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: y === years ? 'var(--accent-blue-light)' : 'var(--text-primary)' }}>
@@ -229,9 +228,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
 
       {/* تلميح */}
       <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6 }}>
-        💡 {ar
-          ? 'هذا الحساب يعتمد على الفائدة المركبة. العوائد الفعلية قد تختلف.'
-          : 'This calculation is based on compound interest. Actual returns may vary.'}
+        💡 {t('inv_sim_disclaimer')}
       </div>
     </div>
   )
@@ -518,7 +515,7 @@ export default function InvestmentsPage() {
     <div ref={pageRef} className="animate-fade-in">
       <PullToRefreshIndicator refreshing={refreshing} />
       <PageHeader
-        title={lang === 'en' ? 'Portfolio' : 'المحفظة'}
+        title={t('inv_title')}
         subtitle={usdToJod && userCurrency !== 'USD' ? `1 USD = ${usdToJod.toFixed(3)} ${userCurrency}` : undefined}
         action={
           <div style={{ display: 'flex', gap: 8 }}>
@@ -540,13 +537,13 @@ export default function InvestmentsPage() {
       )}
 
       <StatBar stats={[
-        { label: lang === 'en' ? 'Value' : 'القيمة', value: showJod && usdToJod ? `${(totalValueUSD * usdToJod).toFixed(0)} ${userCurrency}` : `$${totalValueUSD.toFixed(0)}`, color: 'var(--accent-blue-light)' },
-        { label: lang === 'en' ? 'Profit' : 'الربح',  value: showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)} ${userCurrency}` : `${totalPnL >= 0 ? '+$' : '-$'}${Math.abs(totalPnL).toFixed(0)}`, color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
-        { label: lang === 'en' ? 'Return' : 'العائد', value: `${parseFloat(pnlPct) >= 0 ? '+' : ''}${pnlPct}%`, color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+        { label: t('inv_sort_value'), value: showJod && usdToJod ? `${(totalValueUSD * usdToJod).toFixed(0)} ${userCurrency}` : `$${totalValueUSD.toFixed(0)}`, color: 'var(--accent-blue-light)' },
+        { label: t('inv_profit'),  value: showJod && usdToJod ? `${(totalPnL * usdToJod).toFixed(0)} ${userCurrency}` : `${totalPnL >= 0 ? '+$' : '-$'}${Math.abs(totalPnL).toFixed(0)}`, color: totalPnL >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
+        { label: t('inv_roi_label'), value: `${parseFloat(pnlPct) >= 0 ? '+' : ''}${pnlPct}%`, color: parseFloat(pnlPct) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' },
       ]} />
 
       {investments.length === 0 ? (
-        <EmptyState icon="📈" title="لا توجد استثمارات" subtitle="أضف أول أصل استثماري" />
+        <EmptyState icon="📈" title={t('inv_empty')} subtitle={t('inv_add_first')} />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* Filter + Sort bar */}
@@ -560,15 +557,15 @@ export default function InvestmentsPage() {
                   color: filterType === f ? 'white' : 'var(--text-muted)',
                   border: `1px solid ${filterType === f ? 'var(--accent-blue)' : 'var(--border)'}`,
                 }}>
-                  {f === 'all' ? (lang === 'ar' ? 'الكل' : 'All')
-                    : f === 'halal' ? (lang === 'ar' ? 'حلال' : 'Halal')
-                    : f === 'crypto' ? (lang === 'ar' ? 'كريبتو' : 'Crypto')
-                    : (lang === 'ar' ? 'أسهم' : 'Stocks')}
+                  {f === 'all' ? t('inv_filter_all')
+                    : f === 'halal' ? t('inv_filter_halal')
+                    : f === 'crypto' ? t('inv_filter_crypto')
+                    : t('inv_filter_stocks')}
                 </button>
               ))}
             </div>
             <select
-              aria-label={lang === 'ar' ? 'ترتيب الاستثمارات' : 'Sort investments'}
+              aria-label={t('inv_sort_by')}
               value={sortBy}
               onChange={e => setSortBy(e.target.value as typeof sortBy)}
               style={{
@@ -578,11 +575,11 @@ export default function InvestmentsPage() {
               border: `1px solid ${sortBy !== 'none' ? 'rgba(59,126,246,0.4)' : 'var(--border)'}`,
               outline: 'none',
             }}>
-              <option value="none">{lang === 'ar' ? 'ترتيب' : 'Sort'}</option>
-              <option value="gain">{lang === 'ar' ? 'الأعلى ربحاً' : 'Top Gainers'}</option>
-              <option value="loss">{lang === 'ar' ? 'الأعلى خسارة' : 'Top Losers'}</option>
-              <option value="value">{lang === 'ar' ? 'القيمة' : 'Value'}</option>
-              <option value="name">{lang === 'ar' ? 'الاسم' : 'Name'}</option>
+              <option value="none">{t('inv_sort_by')}</option>
+              <option value="gain">{t('inv_sort_gain')}</option>
+              <option value="loss">{t('inv_sort_loss')}</option>
+              <option value="value">{t('inv_sort_value')}</option>
+              <option value="name">{t('inv_sort_name')}</option>
             </select>
           </div>
 
@@ -605,7 +602,7 @@ export default function InvestmentsPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{inv.symbol}</span>
-                      {inv.is_halal && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)', fontWeight: 700 }}>{lang === 'en' ? 'Halal' : 'حلال'}</span>}
+                      {inv.is_halal && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)', fontWeight: 700 }}>{t('inv_halal').replace(' ✅', '')}</span>}
                       {isLive && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-blue-dim)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>LIVE</span>}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.name}</div>
@@ -623,9 +620,9 @@ export default function InvestmentsPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
                   {[
-                    { label: lang === 'en' ? 'Units' : 'الوحدات', value: inv.shares.toFixed(5) },
-                    { label: lang === 'en' ? 'Avg Buy' : 'متوسط الشراء', value: `$${inv.avg_buy_price.toFixed(2)}` },
-                    { label: lang === 'en' ? 'Current Price' : 'السعر الحالي', value: `$${inv.current_price.toFixed(2)}` },
+                    { label: t('inv_shares'), value: inv.shares.toFixed(5) },
+                    { label: t('inv_avg_price'), value: `$${inv.avg_buy_price.toFixed(2)}` },
+                    { label: t('inv_current_price'), value: `$${inv.current_price.toFixed(2)}` },
                   ].map((s, i) => (
                     <div key={i} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
                       <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.value}</div>
@@ -637,7 +634,7 @@ export default function InvestmentsPage() {
                 {/* ROI row */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, marginBottom: 8, background: isPos ? 'var(--accent-green-dim)' : 'rgba(239,68,68,0.08)', border: `1px solid ${isPos ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}` }}>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
-                    {lang === 'ar' ? 'التكلفة' : 'Cost'}: ${costUSD.toFixed(2)}
+                    {t('inv_cost')}: ${costUSD.toFixed(2)}
                   </span>
                   <span style={{ fontSize: 11, fontWeight: 900, fontFamily: 'monospace', color: isPos ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
                     P&L: {isPos ? '+' : ''}${pnl.toFixed(2)}
@@ -655,10 +652,10 @@ export default function InvestmentsPage() {
                   <div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
                       {[
-                        { label: lang === 'en' ? 'Units' : 'الوحدات', key: 'shares', placeholder: '0.5', type: 'number' },
-                        { label: lang === 'en' ? 'Price $' : 'السعر $', key: 'price', placeholder: '50', type: 'number' },
-                        { label: lang === 'en' ? 'Commission $' : 'العمولة $', key: 'commission', placeholder: '0.5', type: 'number' },
-                        { label: lang === 'en' ? 'Date' : 'التاريخ', key: 'date', placeholder: '', type: 'date' },
+                        { label: t('inv_shares'), key: 'shares', placeholder: '0.5', type: 'number' },
+                        { label: t('inv_price_with_dollar_hint'), key: 'price', placeholder: '50', type: 'number' },
+                        { label: t('inv_comm_hint'), key: 'commission', placeholder: '0.5', type: 'number' },
+                        { label: t('inv_purchase_date'), key: 'date', placeholder: '', type: 'date' },
                       ].map(f => (
                         <div key={f.key}>
                           <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>{f.label}</label>
@@ -668,22 +665,22 @@ export default function InvestmentsPage() {
                       ))}
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => recordBuy(inv.id)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--accent-green)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>{saving ? '⏳' : (lang === 'en' ? 'Record Buy' : 'تسجيل الشراء')}</button>
-                      <button onClick={() => setShowBuyForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+                      <button onClick={() => recordBuy(inv.id)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--accent-green)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>{saving ? '⏳' : t('inv_submit_btn')}</button>
+                      <button onClick={() => setShowBuyForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => { setShowBuyForm(inv.id); setShowSellForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? '+ Record Buy' : '+ تسجيل شراء'}</button>
+                  <button onClick={() => { setShowBuyForm(inv.id); setShowSellForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_record_buy')}</button>
                 )}
 
                 {showSellForm === inv.id ? (
                   <div style={{ marginTop: 8 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
                       {[
-                        { label: lang === 'en' ? 'Units to sell' : 'الوحدات للبيع', key: 'shares', placeholder: '0.5', type: 'number' },
-                        { label: lang === 'en' ? 'Sale Price $' : 'سعر البيع $', key: 'price', placeholder: '50', type: 'number' },
-                        { label: lang === 'en' ? 'Commission $' : 'العمولة $', key: 'commission', placeholder: '0.5', type: 'number' },
-                        { label: lang === 'en' ? 'Date' : 'التاريخ', key: 'date', placeholder: '', type: 'date' },
+                        { label: t('inv_shares'), key: 'shares', placeholder: '0.5', type: 'number' },
+                        { label: t('inv_price_with_dollar_hint'), key: 'price', placeholder: '50', type: 'number' },
+                        { label: t('inv_comm_hint'), key: 'commission', placeholder: '0.5', type: 'number' },
+                        { label: t('inv_purchase_date'), key: 'date', placeholder: '', type: 'date' },
                       ].map(f => (
                         <div key={f.key}>
                           <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>{f.label}</label>
@@ -693,17 +690,17 @@ export default function InvestmentsPage() {
                       ))}
                     </div>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
-                      {lang === 'en' ? `Max: ${inv.shares.toFixed(4)} units` : `الحد الأقصى: ${inv.shares.toFixed(4)} وحدة`}
+                      {t('inv_sell_max_shares')}: {inv.shares.toFixed(4)} {t('inv_unit')}
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={() => openSellConfirm(inv)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>
-                        {lang === 'en' ? 'Review Sale' : 'مراجعة البيع'}
+                        {t('inv_sell_confirm_btn')}
                       </button>
-                      <button onClick={() => setShowSellForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+                      <button onClick={() => setShowSellForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => { setShowSellForm(inv.id); setShowBuyForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, marginTop: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? '- Record Sell' : '- تسجيل بيع'}</button>
+                  <button onClick={() => { setShowSellForm(inv.id); setShowBuyForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, marginTop: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_record_sell')}</button>
                 )}
               </div>
             )
@@ -712,29 +709,29 @@ export default function InvestmentsPage() {
       )}
 
       {showForm && (
-        <Modal title={lang === 'en' ? 'Add New Asset' : 'إضافة أصل جديد'} onClose={() => setShowForm(false)}>
+        <Modal title={t('inv_new')} onClose={() => setShowForm(false)}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label="الرمز"><Input placeholder="SPUS" value={form.symbol} onChange={e => setForm(f => ({ ...f, symbol: e.target.value.toUpperCase() }))} /></FormField>
-            <FormField label="الاسم"><Input placeholder="SP Funds ETF" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></FormField>
+            <FormField label={t('inv_symbol')}><Input placeholder="SPUS" value={form.symbol} onChange={e => setForm(f => ({ ...f, symbol: e.target.value.toUpperCase() }))} /></FormField>
+            <FormField label={t('inv_name')}><Input placeholder="SP Funds ETF" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></FormField>
           </div>
-          <FormField label="النوع">
+          <FormField label={t('inv_type_label')}>
             <Select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
               <option value="etf">ETF</option>
-              <option value="stock">{lang === 'en' ? 'Stock' : 'سهم'}</option>
-              <option value="crypto">{lang === 'en' ? 'Crypto' : 'عملة رقمية'}</option>
-              <option value="other">{lang === 'en' ? 'Other' : 'أخرى'}</option>
+              <option value="stock">{t('inv_filter_stocks')}</option>
+              <option value="crypto">{t('inv_filter_crypto')}</option>
+              <option value="other">{t('inv_type_other')}</option>
             </Select>
           </FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
             <input
               type="checkbox"
-              aria-label={lang === 'en' ? 'Mark investment as halal' : 'تحديد الاستثمار كحلال'}
+              aria-label={t('inv_mark_halal')}
               checked={form.is_halal}
               onChange={e => setForm(f => ({ ...f, is_halal: e.target.checked }))}
               style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{lang === 'en' ? '✅ Halal Investment' : '✅ استثمار حلال'}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{t('inv_halal_asset')}</span>
           </div>
-          <SaveButton label={lang === 'en' ? 'Add Asset' : 'إضافة الأصل'} loading={saving} onClick={addInvestment} />
+          <SaveButton label={t('inv_save')} loading={saving} onClick={addInvestment} />
         </Modal>
       )}
 
@@ -781,7 +778,7 @@ export default function InvestmentsPage() {
               <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
             </div>
           ) : txHistory.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>لا توجد معاملات بعد</div>
+            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>{t('inv_empty_tx')}</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {txHistory.map(tx => (
@@ -790,7 +787,7 @@ export default function InvestmentsPage() {
                     {tx.type === 'buy' ? '📈' : '📉'}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? (lang === 'en' ? 'Buy' : 'شراء') : (lang === 'en' ? 'Sell' : 'بيع')} {Number(tx.shares).toFixed(4)} {lang === 'en' ? 'units' : 'وحدة'}</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? t('inv_buy') : t('inv_sell')} {Number(tx.shares).toFixed(4)} {t('inv_unit')}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{tx.transaction_date} · سعر ${Number(tx.price).toFixed(2)}</div>
                   </div>
                   <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
@@ -810,16 +807,16 @@ export default function InvestmentsPage() {
       {/* ── كاش المحفظة الاستثمارية ── */}
       <div style={{ background: 'var(--bg-card)', border: `1px solid ${cashBalance > 0 ? 'rgba(16,185,129,0.3)' : 'var(--border)'}`, borderRadius: 20, padding: 16, marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: cashBalance > 0 ? 12 : 0 }}>
-          <span style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>💵 {lang === 'en' ? 'Portfolio Cash' : 'كاش المحفظة'}</span>
+          <span style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>💵 {t('inv_cash_title').replace('💵 ', '')}</span>
           {cashBalance > 0 && <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)' }}>{cashCurrency}</span>}
         </div>
         {cashBalance <= 0 ? (
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{lang === 'en' ? 'No cash yet — will appear after selling investments' : 'لا يوجد كاش بعد — سيظهر هنا بعد بيع استثماراتك'}</div>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{t('inv_cash_empty')}</div>
         ) : (
           <>
             <div style={{ fontSize: 30, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace', marginBottom: 12 }}>{cashBalance.toFixed(2)} {cashCurrency}</div>
             <button onClick={openTransferModal} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-              {lang === 'en' ? '→ Transfer to Main Wallet' : '→ نقل للمحفظة الرئيسية'}
+              → {t('inv_cash_transfer_btn')}
             </button>
           </>
         )}
@@ -827,12 +824,12 @@ export default function InvestmentsPage() {
 
       {/* مودال تأكيد البيع */}
       {sellConfirm && (
-        <Modal title={lang === 'en' ? 'Confirm Sale' : 'تأكيد البيع'} onClose={() => setSellConfirm(null)}>
+        <Modal title={t('inv_sell_confirm_btn')} onClose={() => setSellConfirm(null)}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
             {[
-              { label: lang === 'en' ? 'Avg. Buy Price' : 'متوسط سعر الشراء', value: `$${sellConfirm.inv.avg_buy_price.toFixed(2)}`, color: 'var(--text-muted)' },
-              { label: lang === 'en' ? 'Sale Price' : 'سعر البيع', value: `$${sellConfirm.price.toFixed(2)}`, color: 'var(--text-muted)' },
-              { label: lang === 'en' ? 'Net Proceeds' : 'العائد الصافي', value: `$${sellConfirm.proceeds.toFixed(2)}`, color: 'var(--text-primary)' },
+              { label: t('inv_sell_avg_buy'), value: `$${sellConfirm.inv.avg_buy_price.toFixed(2)}`, color: 'var(--text-muted)' },
+              { label: t('inv_sale_price'), value: `$${sellConfirm.price.toFixed(2)}`, color: 'var(--text-muted)' },
+              { label: t('inv_sell_proceeds'), value: `$${sellConfirm.proceeds.toFixed(2)}`, color: 'var(--text-primary)' },
             ].map((r, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{r.label}</span>
@@ -840,7 +837,7 @@ export default function InvestmentsPage() {
               </div>
             ))}
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', borderRadius: 10, background: sellConfirm.realizedPnl >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: `1px solid ${sellConfirm.realizedPnl >= 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{sellConfirm.realizedPnl >= 0 ? (lang === 'en' ? 'Realized Gain' : 'الربح المحقق') : (lang === 'en' ? 'Realized Loss' : 'الخسارة المحققة')}</span>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{sellConfirm.realizedPnl >= 0 ? t('inv_sell_realized_gain') : t('inv_sell_realized_loss')}</span>
               <span style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: sellConfirm.realizedPnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
                 {sellConfirm.realizedPnl >= 0 ? '+' : ''}${sellConfirm.realizedPnl.toFixed(2)}
               </span>
@@ -848,91 +845,91 @@ export default function InvestmentsPage() {
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={confirmSell} disabled={saving} style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#EF4444', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>
-              {saving ? '⏳' : (lang === 'en' ? 'Confirm Sale' : 'تأكيد البيع')}
+              {saving ? '⏳' : t('inv_sell_confirm_btn')}
             </button>
-            <button onClick={() => setSellConfirm(null)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+            <button onClick={() => setSellConfirm(null)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
           </div>
         </Modal>
       )}
 
       {/* مودال التحويل للمحفظة الرئيسية */}
       {showTransferModal && (
-        <Modal title={lang === 'en' ? 'Transfer to Main Wallet' : 'نقل للمحفظة الرئيسية'} onClose={() => setShowTransferModal(false)}>
+        <Modal title={t('inv_cash_transfer_title')} onClose={() => setShowTransferModal(false)}>
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
-              {lang === 'en' ? `Available: ${cashBalance.toFixed(2)} ${cashCurrency}` : `المتاح: ${cashBalance.toFixed(2)} ${cashCurrency}`}
+              {t('inv_available')}: {cashBalance.toFixed(2)} {cashCurrency}
             </div>
-            <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>{lang === 'en' ? `Amount (${cashCurrency})` : `المبلغ (${cashCurrency})`}</label>
+            <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>{t('inv_cash_transfer_amount_hint')}</label>
             <input type="number" value={transferAmount}
-              aria-label={lang === 'en' ? 'Transfer amount' : 'مبلغ التحويل'}
-              placeholder={lang === 'en' ? 'Enter amount' : 'ادخل المبلغ'}
+              aria-label={t('inv_cash_transfer_amount_hint')}
+              placeholder={t('inv_cash_transfer_amount')}
               onChange={e => setTransferAmount(e.target.value)}
               style={{ width: '100%', padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 18, fontWeight: 900, fontFamily: 'monospace', outline: 'none', boxSizing: 'border-box', textAlign: 'center' }} />
             {cashCurrency !== userCurrency && (
               <div style={{ marginTop: 12, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
                 {loadingRate ? (
-                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>⏳ {lang === 'en' ? 'Fetching live rate...' : 'جاري جلب سعر الصرف...'}</div>
+                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>⏳ {t('inv_fetching_rate')}</div>
                 ) : transferRate ? (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Exchange Rate' : 'سعر الصرف'}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('inv_exchange_rate')}</span>
                       <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>1 {cashCurrency} = {transferRate.toFixed(4)} {userCurrency}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{lang === 'en' ? "You'll receive" : 'ستستلم'}</span>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('inv_receive_amount')}</span>
                       <span style={{ fontSize: 14, fontWeight: 900, fontFamily: 'monospace', color: 'var(--accent-green-light)' }}>{((parseFloat(transferAmount) || 0) * transferRate).toFixed(2)} {userCurrency}</span>
                     </div>
                   </>
                 ) : (
-                  <div style={{ textAlign: 'center', color: 'var(--accent-red-light)', fontSize: 12 }}>❌ {lang === 'en' ? 'Could not fetch rate' : 'تعذر جلب سعر الصرف'}</div>
+                  <div style={{ textAlign: 'center', color: 'var(--accent-red-light)', fontSize: 12 }}>❌ {t('inv_fetch_rate_err')}</div>
                 )}
               </div>
             )}
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={confirmTransfer} disabled={saving || loadingRate} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: (saving || loadingRate) ? 0.5 : 1 }}>
-              {saving ? '⏳' : (lang === 'en' ? 'Confirm Transfer' : 'تأكيد النقل')}
+              {saving ? '⏳' : t('inv_cash_transfer_confirm')}
             </button>
-            <button onClick={() => setShowTransferModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{lang === 'en' ? 'Cancel' : 'إلغاء'}</button>
+            <button onClick={() => setShowTransferModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
           </div>
         </Modal>
       )}
 
       {/* ── محاكي الثروة ── */}
-      <WealthSimulator lang={lang} currency={userCurrency} />
+      <WealthSimulator currency={userCurrency} />
       {editingInv && (
-        <Modal title={`تعديل ${editingInv.symbol}`} onClose={() => setEditingInv(null)}>
+        <Modal title={`${t('inv_edit_title')} ${editingInv.symbol}`} onClose={() => setEditingInv(null)}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label="الرمز"><Input value={editForm.symbol} onChange={e => setEditForm(f => ({ ...f, symbol: e.target.value }))} /></FormField>
-            <FormField label="الاسم"><Input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} /></FormField>
-            <FormField label="الوحدات"><Input type="number" value={editForm.shares} onChange={e => setEditForm(f => ({ ...f, shares: e.target.value }))} /></FormField>
-            <FormField label="متوسط الشراء $"><Input type="number" value={editForm.avg_buy_price} onChange={e => setEditForm(f => ({ ...f, avg_buy_price: e.target.value }))} /></FormField>
-            <FormField label="السعر الحالي $"><Input type="number" value={editForm.current_price} onChange={e => setEditForm(f => ({ ...f, current_price: e.target.value }))} /></FormField>
-            <FormField label="النوع">
+            <FormField label={t('inv_symbol')}><Input value={editForm.symbol} onChange={e => setEditForm(f => ({ ...f, symbol: e.target.value }))} /></FormField>
+            <FormField label={t('inv_name')}><Input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} /></FormField>
+            <FormField label={t('inv_shares')}><Input type="number" value={editForm.shares} onChange={e => setEditForm(f => ({ ...f, shares: e.target.value }))} /></FormField>
+            <FormField label={t('inv_avg_price')}><Input type="number" value={editForm.avg_buy_price} onChange={e => setEditForm(f => ({ ...f, avg_buy_price: e.target.value }))} /></FormField>
+            <FormField label={t('inv_current_price')}><Input type="number" value={editForm.current_price} onChange={e => setEditForm(f => ({ ...f, current_price: e.target.value }))} /></FormField>
+            <FormField label={t('inv_type_label')}>
               <Select value={editForm.type} onChange={e => setEditForm(f => ({ ...f, type: e.target.value }))}>
-                <option value="etf">ETF</option><option value="stock">{lang === 'en' ? 'Stock' : 'سهم'}</option><option value="crypto">{lang === 'en' ? 'Crypto' : 'عملة رقمية'}</option>
+                <option value="etf">ETF</option><option value="stock">{t('inv_filter_stocks')}</option><option value="crypto">{t('inv_filter_crypto')}</option><option value="other">{t('inv_type_other')}</option>
               </Select>
             </FormField>
           </div>
-          <FormField label={lang === 'en' ? 'Purchase Date' : 'تاريخ الشراء'}>
+          <FormField label={t('inv_purchase_date')}>
             <Input type="date" value={editForm.purchase_date} max={new Date().toISOString().split('T')[0]} onChange={e => setEditForm(f => ({ ...f, purchase_date: e.target.value }))} />
           </FormField>
-          <FormField label={lang === 'en' ? 'Notes' : 'ملاحظات'}><Input placeholder={lang === "en" ? "Optional" : "اختياري"} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
+          <FormField label={t('inv_notes')}><Input placeholder={t('inv_optional')} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
             <input
               type="checkbox"
-              aria-label={lang === 'en' ? 'Mark edited investment as halal' : 'تحديد الاستثمار المعدل كحلال'}
+              aria-label={t('inv_mark_halal')}
               checked={editForm.is_halal}
               onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))}
               style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ {lang === 'en' ? 'Halal' : 'حلال'}</span>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{t('inv_halal_asset')}</span>
           </div>
           <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B', fontSize: 12, marginBottom: 14 }}>
-            ⚠️ {lang === 'en' ? 'Editing units and prices affects P&L calculations' : 'تعديل الوحدات والأسعار يؤثر على حسابات الربح والخسارة'}
+            ⚠️ {t('inv_edit_warning')}
           </div>
-          <SaveButton label={lang === 'en' ? 'Save Changes' : 'حفظ التعديلات'} loading={saving} onClick={saveEditInv} />
-          <button onClick={() => { if (confirm(lang === 'en' ? 'Delete this investment?' : 'حذف هذا الاستثمار؟')) { deleteInv(editingInv.id); setEditingInv(null) } }} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-            🗑️ {lang === 'en' ? 'Delete Investment' : 'حذف الاستثمار'}
+          <SaveButton label={t('inv_save')} loading={saving} onClick={saveEditInv} />
+          <button onClick={() => { if (confirm(t('inv_delete_confirm'))) { deleteInv(editingInv.id); setEditingInv(null) } }} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            🗑️ {t('inv_delete_btn').replace('🗑️ ', '')}
           </button>
         </Modal>
       )}

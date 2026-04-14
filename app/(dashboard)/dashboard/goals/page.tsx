@@ -23,6 +23,7 @@ export default function GoalsPage() {
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
   const { t, lang, currentLang } = useI18n()
+  const baseCurrency = currentUser?.user_metadata?.base_currency || 'USD'
   const { el: pageRef, refreshing } = usePullToRefresh(async () => { await load() })
 
   const load = useCallback(async () => {
@@ -56,19 +57,19 @@ export default function GoalsPage() {
     if (!form.name.trim()) return t('goals_name') + ' ' + (t('toast_fill_required'))
     const target = parseFloat(form.target_amount.replace(',', '.'))
     if (!form.target_amount.trim()) return t('goals_target') + ': ' + t('toast_fill_required')
-    if (isNaN(target) || target <= 0) return t('goals_target') + ': ' + (currentLang === 'ar' ? 'يجب أن يكون رقماً موجباً' : 'must be a positive number')
+    if (isNaN(target) || target <= 0) return t('goals_target') + ': ' + t('goals_target_invalid')
     const current = parseFloat(form.current_amount.replace(',', '.'))
-    if (form.current_amount && (isNaN(current) || current < 0)) return t('goals_current') + ': ' + (currentLang === 'ar' ? 'قيمة غير صالحة' : 'invalid value')
-    if (!isNaN(current) && current > target) return currentLang === 'ar' ? 'المبلغ الحالي لا يمكن أن يتجاوز الهدف' : 'Current amount cannot exceed target'
+    if (form.current_amount && (isNaN(current) || current < 0)) return t('goals_current') + ': ' + t('goals_current_invalid')
+    if (!isNaN(current) && current > target) return t('goals_current_exceeds_target')
     return null
   }
 
   function mapGoalError(error: any): string {
     const msg = error?.message ?? ''
-    if (msg.includes('check') && msg.includes('target_amount')) return currentLang === 'ar' ? 'المبلغ المستهدف يجب أن يكون أكبر من صفر' : 'Target amount must be greater than zero'
-    if (msg.includes('check') && msg.includes('current_amount')) return currentLang === 'ar' ? 'المبلغ الحالي غير صالح' : 'Current amount is invalid'
-    if (msg.includes('duplicate') || msg.includes('unique')) return currentLang === 'ar' ? 'يوجد هدف بنفس الاسم' : 'A goal with this name already exists'
-    if (msg.includes('foreign key')) return currentLang === 'ar' ? 'خطأ في بيانات المستخدم' : 'User data error'
+    if (msg.includes('check') && msg.includes('target_amount')) return t('goals_target_invalid')
+    if (msg.includes('check') && msg.includes('current_amount')) return t('goals_current_invalid')
+    if (msg.includes('duplicate') || msg.includes('unique')) return t('goals_name_error')
+    if (msg.includes('foreign key')) return t('goals_user_error')
     return t('toast_error_save')
   }
 
@@ -109,7 +110,7 @@ export default function GoalsPage() {
     const { error } = await supabase.from('savings_goals').update({ current_amount: newAmount }).eq('id', goalId)
     if (error) { toast.error(t('toast_error_save')); return }
     if (newAmount >= goal.target_amount) toast.success(`${t('toast_goal_reached')} "${goal.name}"`)
-    else toast.success(`${t('toast_saving_added')} ${amount} JOD`)
+    else toast.success(`${t('toast_saving_added')} ${amount} ${baseCurrency}`)
     setSavingGoalId(null); setSavingAmount(''); load()
   }
 
@@ -153,11 +154,11 @@ export default function GoalsPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-green-light)' }}>{totalSaved.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_saved')} JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_saved')} {baseCurrency}</div>
           </div>
           <div className="card p-3 text-center">
             <div className="text-base font-black font-mono" style={{ color: 'var(--accent-blue-light)' }}>{totalTarget.toFixed(0)}</div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_target_lbl')} JOD</div>
+            <div className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{t('goals_target_lbl')} {baseCurrency}</div>
           </div>
         </div>
       )}
@@ -233,11 +234,11 @@ export default function GoalsPage() {
               </div>
               <div className="flex justify-between items-center mb-2">
                 <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                  <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span> / {goal.target_amount.toFixed(0)} JOD
+                  <span className="font-mono font-bold" style={{ color: 'var(--text-primary)' }}>{goal.current_amount.toFixed(0)}</span> / {goal.target_amount.toFixed(0)} {baseCurrency}
                 </div>
                 {remaining > 0 && (
                   <div className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    {t('goals_remaining')}: <span className="font-mono">{remaining.toFixed(0)} JOD</span>
+                    {t('goals_remaining')}: <span className="font-mono">{remaining.toFixed(0)} {baseCurrency}</span>
                   </div>
                 )}
               </div>
@@ -246,7 +247,7 @@ export default function GoalsPage() {
                   <input type="number" value={savingAmount} onChange={e => setSavingAmount(e.target.value)}
                     className="flex-1 px-3 py-2 rounded-xl text-sm outline-none text-center"
                     style={{ background: 'var(--bg-secondary)', border: '1px solid var(--accent-green)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                    placeholder="0 JOD" autoFocus onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
+                    placeholder={`0 ${baseCurrency}`} autoFocus onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
                   <button onClick={() => addSaving(goal.id)} className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black">✓</button>
                   <button onClick={() => { setSavingGoalId(null); setSavingAmount('') }} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
                 </div>

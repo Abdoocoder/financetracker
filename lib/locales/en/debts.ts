@@ -74,4 +74,32 @@ export const enDebts = {
     priority_medium: 'Medium',
     priority_low: 'Low',
     priority_deferred: 'Deferred',
+
+    // New labels
+    debts_total_paid_label: 'Total Paid',
+    debts_paid_title: 'Paid Debts',
+    debts_received_cat: 'Debt Received',
+    debts_received_desc: 'Debt Received: {name}',
+    debts_loan_received_cat: 'Loan Received',
+    debts_loan_received_desc: 'Loan Received: {name}',
+    debts_receive_date_label: '📅 Receive Date: {date}',
+    debts_original_label: 'Original: {amount}',
+    debts_paid_summary: 'Paid: {amount}',
+
+    // Priority
+    priority_title: 'Priority',
+    priority_1: 'Very High',
+    priority_2: 'High',
+    priority_3: 'Medium',
+    priority_4: 'Low',
+    priority_5: 'Deferred',
+
+    // Labels
+    debts_receive_confirm: 'I received this amount',
+    debts_receive_confirm_yes: 'Yes, I received this amount today',
+    debts_receive_confirm_desc: 'Will be added automatically as income in your transactions',
+    debts_overdue: 'Overdue',
+    debts_today: 'Today!',
+    debts_after_days: 'In {n} days',
+    debts_paid_status: '{pct}% paid',
 } as const

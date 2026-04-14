@@ -1,6 +1,6 @@
 export const arDashboard = {
     // Dashboard page
-    dash_greeting: '👋 أهلاً',
+    dash_greeting: '👋 أهلاً {name}',
     dash_subtitle: 'فجرك المالي يبدأ اليوم 🌅',
     dash_title: 'لوحة التحكم',
     dash_monthly: 'ملخص هذا الشهر',
@@ -10,6 +10,7 @@ export const arDashboard = {
     dash_after_debts: 'بعد الالتزامات',
     dash_debt_payments: 'أقساط ديون',
     dash_updated: 'تم التحديث',
+    dash_updated_at: 'تم التحديث {date}',
     dash_streak: 'أيام المداومة',
     dash_month: 'الشهر',
     dash_health_title: 'الصحة المالية',
@@ -104,4 +105,22 @@ export const arDashboard = {
     // PDF Report
     pdf_title: 'التقرير الشهري',
     pdf_subtitle: 'احفظ أو اطبع تقريرك المالي',
+    pdf_error_load: 'تعذر تحميل التقرير. حاول مرة أخرى.',
+    pdf_retry: 'إعادة المحاولة',
+    pdf_select_month: 'اختيار الشهر',
+    pdf_select_year: 'اختيار السنة',
+    pdf_print: 'طباعة / حفظ PDF',
+    pdf_title_report: 'التقرير المالي الشهري',
+    pdf_income: 'الدخل',
+    pdf_expenses: 'المصاريف',
+    pdf_net: 'الصافي',
+    pdf_breakdown: 'توزيع المصاريف',
+    pdf_transactions: 'المعاملات',
+    pdf_date: 'التاريخ',
+    pdf_category: 'الفئة',
+    pdf_desc: 'الوصف',
+    pdf_amount: 'المبلغ',
+    pdf_active_debts: 'الديون النشطة',
+    pdf_savings_goals: 'أهداف الادخار',
+    pdf_footer: 'تقرير فجرك المالي — {month} {year}',
 } as const

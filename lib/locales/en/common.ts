@@ -11,12 +11,18 @@ export const enCommon = {
     edit: 'Edit',
     add: 'Add',
     apply: 'Apply',
+    close: 'Close',
+    fab_add_tx: 'Add transaction',
+    fab_title: 'Add New Transaction',
     confirm_delete: 'Are you sure you want to delete?',
     jod: 'JOD',
     usd: 'USD',
     month: 'Month',
     year: 'Year',
     search_hint: 'Search...',
+    rate: 'Rate',
+    repeat: 'Repeat',
+    saved: 'Saved!',
 
     // Greetings
     greeting_morning: 'Good Morning',
@@ -43,6 +49,10 @@ export const enCommon = {
     nav_pdf: 'PDF Report',
     nav_group_tools: 'Tools',
     nav_group_account: 'Account',
+    nav_main_aria: 'Main navigation',
+    nav_quick_aria: 'Quick access',
+    nav_more_aria: 'More menu',
+
 
     // Toast notifications
     toast_saved: 'Saved successfully ✅',
@@ -196,4 +206,6 @@ export const enCommon = {
     recurringDayEn: 'Repeat day each month',
     recurringNote: '✅ Will auto-execute every month',
     recurringNoteEn: '✅ Will auto-execute every month',
+    quick_add_title: 'Quick Add',
+    quick_add_repeat: 'Repeat Last',
 } as const

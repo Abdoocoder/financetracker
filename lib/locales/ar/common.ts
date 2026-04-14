@@ -11,12 +11,18 @@ export const arCommon = {
     edit: 'تعديل',
     add: 'إضافة',
     apply: 'تطبيق',
+    close: 'إغلاق',
+    fab_add_tx: 'إضافة معاملة',
+    fab_title: 'إضافة معاملة جديدة',
     confirm_delete: 'هل أنت متأكد من الحذف؟',
     jod: 'دينار',
     usd: 'دولار',
     month: 'شهر',
     year: 'سنة',
     search_hint: 'بحث...',
+    rate: 'سعر الصرف',
+    repeat: 'تكرار',
+    saved: 'تم الحفظ!',
 
     // Greetings
     greeting_morning: 'صباح الخير',
@@ -43,9 +49,12 @@ export const arCommon = {
     nav_pdf: 'تقرير PDF',
     nav_group_tools: 'الأدوات المالية',
     nav_group_account: 'حسابي',
+    nav_main_aria: 'التنقل الرئيسي',
+    nav_quick_aria: 'الوصول السريع',
+    nav_more_aria: 'قائمة المزيد',
+
 
     // Feature specific nav
-    nav_accounts: 'الحسابات',
 
     // Months and Time
     months_ago: 'منذ {n} أشهر',
@@ -204,4 +213,6 @@ export const arCommon = {
     recurringDayEn: 'Repeat day each month',
     recurringNote: '✅ سيتم التنفيذ تلقائياً كل شهر',
     recurringNoteEn: '✅ Will auto-execute every month',
+    quick_add_title: 'إضافة سريعة',
+    quick_add_repeat: 'كرر آخر معاملة',
 } as const

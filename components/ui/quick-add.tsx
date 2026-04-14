@@ -7,22 +7,25 @@ import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 import { CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 
-const CATEGORIES_AR = [
-  { key: 'food', label: 'طعام', labelEn: 'Food', icon: '🍔', type: 'expense' },
-  { key: 'transport', label: 'مواصلات', labelEn: 'Transport', icon: '🚗', type: 'expense' },
-  { key: 'bills', label: 'فواتير', labelEn: 'Bills', icon: '💡', type: 'expense' },
-  { key: 'health', label: 'صحة', labelEn: 'Health', icon: '💊', type: 'expense' },
-  { key: 'freelance', label: 'عمل حر', labelEn: 'Freelance', icon: '💼', type: 'income' },
-  { key: 'other', label: 'أخرى', labelEn: 'Other', icon: '📝', type: 'expense' },
+const CATEGORIES_RAW = [
+  { key: 'food',      icon: '🍔', type: 'expense' },
+  { key: 'transport', icon: '🚗', type: 'expense' },
+  { key: 'bills',     icon: '💡', type: 'expense' },
+  { key: 'health',    icon: '💊', type: 'expense' },
+  { key: 'freelance', icon: '💼', type: 'income' },
+  { key: 'other',     icon: '📝', type: 'expense' },
 ]
 
 
 export function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const { user } = useUser()
-  const { t, lang } = useI18n()
-  const CATEGORIES = CATEGORIES_AR.map(c => ({ ...c, label: lang === 'en' ? c.labelEn : c.label }))
+  const { t, lang, tCategory } = useI18n()
+  const CATEGORIES = CATEGORIES_RAW.map(c => ({ 
+    ...c, 
+    label: tCategory(c.key)
+  }))
   const supabase = createClient()
-  const [selected, setSelected] = useState<typeof CATEGORIES_AR[0] | null>(null)
+  const [selected, setSelected] = useState<typeof CATEGORIES[0] | null>(null)
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState('')
   const [exchangeRate, setExchangeRate] = useState(1)
@@ -107,7 +110,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       original_currency: lastTx.original_currency || baseCurrency,
       exchange_rate: lastTx.exchange_rate || 1,
       category: lastTx.category,
-      description: lang === 'en' ? 'Repeat' : 'تكرار',
+      description: t('repeat'),
       transaction_date: new Date().toISOString().split('T')[0],
     })
     setSaving(false)
@@ -125,7 +128,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{t('quick_add_title')}</span>
         {showSuccess && (
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-green-light)', animation: 'fadeIn 0.2s ease' }}>{lang === 'en' ? '✅ Saved!' : '✅ تم الحفظ!'}</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-green-light)', animation: 'fadeIn 0.2s ease' }}>{`✅ ${t('saved')}`}</span>
         )}
       </div>
 
@@ -161,7 +164,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
               type="number"
               value={amount}
               onChange={e => setAmount(e.target.value)}
-              placeholder={lang === "en" ? "Amount..." : "المبلغ..."}
+              placeholder={t('onboard_amount').replace(' *', '') + '...'}
               autoFocus
               onKeyDown={e => e.key === 'Enter' && save()}
               style={{
@@ -196,12 +199,12 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
                 transition: 'opacity 0.15s',
               }}
             >
-              {saving ? '⏳' : (lang === 'en' ? '+ Save' : '+ حفظ')}
+              {saving ? '⏳' : `+ ${t('save')}`}
             </button>
           </div>
           {currency !== baseCurrency && (
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 4px', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
-              <span>Rate: {exchangeRate.toFixed(4)}</span>
+              <span>{t('rate')}: {exchangeRate.toFixed(4)}</span>
               <span>≈ {(parseFloat(amount) * exchangeRate || 0).toFixed(2)} {baseCurrency}</span>
             </div>
           )}

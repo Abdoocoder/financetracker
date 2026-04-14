@@ -95,13 +95,13 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <h1 suppressHydrationWarning style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
-            {!hydrated ? t('dash_title') : (firstName ? `${t('dash_greeting')} ${firstName}` : t('dash_title'))}
+            {!hydrated ? t('dash_title') : (firstName ? t('dash_greeting', { name: firstName }) : t('dash_title'))}
           </h1>
           <p suppressHydrationWarning style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
             {hydrated && new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
             {hydrated && data?.lastUpdated && (
               <span style={{ margin: '0 8px', opacity: 0.5 }}>
-                • {t('dash_updated')} {data.lastUpdated}
+                • {t('dash_updated_at', { date: data.lastUpdated })}
               </span>
             )}
           </p>

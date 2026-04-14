@@ -36,4 +36,6 @@ export const enGoals = {
     goals_add_first: 'Add your first goal',
     goals_progress_percent: '{}% achieved',
     goals_remaining_value: 'Remaining: {} {}',
+    goals_name_error: 'A goal with this name already exists',
+    goals_user_error: 'User data error',
 } as const

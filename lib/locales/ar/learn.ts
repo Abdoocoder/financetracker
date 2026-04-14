@@ -9,6 +9,8 @@ export const arLearn = {
     learn_completed: 'مكتمل',
     learn_did_you_know: 'هل تعلم؟',
     learn_did_you_know_msg: 'الدروس تتغير يومياً وتُخصَّص لمرحلتك المالية. كل 7 أيام درس إسلامي مرتبط بالرزق.',
+    learn_share_btn: 'شارك الدرس',
+    learn_share_title: 'درس اليوم من فجرك',
     learn_stage_label: 'مرحلتك',
     learn_streak_day: 'يوم',
     learn_streak_consecutive: '{} يوم متواصل!',

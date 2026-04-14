@@ -61,6 +61,7 @@ function Confetti({ onDone }: { onDone: () => void }) {
 
 // ── Celebration Modal ──
 function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: () => void }) {
+  const { t } = useI18n()
   useEffect(() => {
     const timer = setTimeout(onClose, 4000)
     return () => clearTimeout(timer)
@@ -72,11 +73,11 @@ function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: ()
       <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 24, padding: '40px 32px', textAlign: 'center', maxWidth: 320, margin: 16, boxShadow: '0 0 60px rgba(16,185,129,0.3)' }}
         onClick={e => e.stopPropagation()}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>أحرار من الدين!</div>
+        <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>{t('debts_celebration_title')}</div>
         <div style={{ fontSize: 15, color: 'var(--accent-green-light)', fontWeight: 700, marginBottom: 12 }}>&quot;{debtName}&quot;</div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>تهانيّ! لقد سددت هذا الدين بالكامل. خطوة عظيمة نحو حريتك المالية 💪</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{t('debts_celebration_msg')}</div>
         <button onClick={onClose} style={{ marginTop: 24, padding: '10px 28px', borderRadius: 12, background: 'var(--accent-green)', color: 'white', border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-          شكراً 🙌
+          {t('debts_celebration_btn')}
         </button>
       </div>
     </div>
@@ -208,8 +209,8 @@ export default function DebtsPage() {
       user_id: currentUser.id,
       type: 'income',
       amount: Number(debt.remaining_amount),
-      category: lang === 'ar' ? 'دين مستلم' : 'Debt Received',
-      description: lang === 'ar' ? `استلام دين: ${debt.name}` : `Debt Received: ${debt.name}`,
+      category: t('debts_received_cat'),
+      description: t('debts_received_desc', { name: debt.name }),
       transaction_date: new Date().toISOString().split('T')[0],
     })
     toast.success(t('debts_received_msg'))
@@ -264,8 +265,8 @@ export default function DebtsPage() {
           original_amount: isMulti ? origForeign : origBase,
           original_currency: form.currency,
           exchange_rate: rate,
-          category: lang === 'ar' ? 'قرض مستلم' : 'Loan Received',
-          description: lang === 'ar' ? `قرض مستلم: ${form.name}` : `Loan Received: ${form.name}`,
+          category: t('debts_loan_received_cat'),
+          description: t('debts_loan_received_desc', { name: form.name }),
           transaction_date: new Date().toISOString().split('T')[0],
         })
       }
@@ -319,7 +320,7 @@ export default function DebtsPage() {
       payment_date: new Date().toISOString().split('T')[0]
     })
     if (paymentError) {
-      toast.error(t('toast_error_generic') || 'حدث خطأ أثناء تسجيل الدفعة، يرجى المحاولة مجدداً')
+      toast.error(t('toast_error_generic'))
       setPayingSaving(false)
       return
     }
@@ -400,11 +401,11 @@ export default function DebtsPage() {
         <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 16, padding: '14px 16px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ fontSize: 28 }}>💪</div>
           <div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 2 }}>إجمالي ما سددته</div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>{totalPaidAmount.toFixed(0)} JOD</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 2 }}>{t('debts_total_paid_label')}</div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>{totalPaidAmount.toFixed(0)} {baseCurrency}</div>
           </div>
           <div style={{ marginRight: 'auto' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>ديون مسددة</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>{t('debts_paid_title')}</div>
             <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-green-light)' }}>{paidDebts.length} 🎯</div>
           </div>
         </div>
@@ -420,8 +421,8 @@ export default function DebtsPage() {
             <div className="progress-fill gradient-green" style={{ width: `${Math.min(paidPct, 100)}%` }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>مسدد: {(totalOriginal - totalRemaining).toFixed(0)} JOD</span>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>الأصل: {totalOriginal.toFixed(0)} JOD</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('debts_paid_summary', { amount: (totalOriginal - totalRemaining).toFixed(0) })} {baseCurrency}</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('debts_original_label', { amount: totalOriginal.toFixed(0) })} {baseCurrency}</span>
           </div>
         </div>
       )}
@@ -488,7 +489,7 @@ export default function DebtsPage() {
                           {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{debt.notes}</div>}
                           {debt.due_date && (
                             <div style={{ fontSize: 11, color: '#10B981', marginTop: 4, fontWeight: 600 }}>
-                              📅 موعد الاستلام: {new Date(debt.due_date).toLocaleDateString('ar-EG')}
+                              {t('debts_receive_date_label', { date: new Date(debt.due_date).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') })}
                             </div>
                           )}
                         </div>
@@ -498,7 +499,7 @@ export default function DebtsPage() {
                           {Number(debt.remaining_amount).toFixed(0)} {debt.currency || 'JOD'}
                         </div>
                         <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
-                          الأصل: {Number(debt.original_amount).toFixed(0)}
+                          {t('debts_original_label', { amount: Number(debt.original_amount).toFixed(0) })}
                         </div>
                       </div>
                     </div>
@@ -530,7 +531,7 @@ export default function DebtsPage() {
           <button
             onClick={() => setShowPaid(p => !p)}
             style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>✅ الديون المسددة ({paidDebts.length})</span>
+            <span>✅ {t('debts_paid_title')} ({paidDebts.length})</span>
             <span style={{ fontSize: 16 }}>{showPaid ? '▲' : '▼'}</span>
           </button>
 
@@ -542,11 +543,11 @@ export default function DebtsPage() {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{debt.name}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                      {debt.updated_at ? new Date(debt.updated_at).toLocaleDateString('ar-EG') : ''}
+                      {debt.updated_at ? new Date(debt.updated_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : ''}
                     </div>
                   </div>
                   <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
-                    {Number(debt.original_amount).toFixed(0)} JOD
+                    {Number(debt.original_amount).toFixed(0)} {baseCurrency}
                   </div>
                 </div>
               ))}
@@ -557,8 +558,8 @@ export default function DebtsPage() {
 
       {confirmDelete && (
         <ConfirmDialog
-          title="حذف الدين"
-          message="هل أنت متأكد من حذف هذا الدين؟ لا يمكن التراجع."
+          title={t('debts_delete_title')}
+          message={t('trans_delete_msg')}
           onConfirm={() => { deleteDebt(confirmDelete); setConfirmDelete(null) }}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -571,7 +572,6 @@ export default function DebtsPage() {
           editingId={editingId}
           baseCurrency={baseCurrency}
           lang={lang}
-          t={t}
           saving={saving}
           onSave={saveDebt}
           onClose={() => setShowForm(false)}
