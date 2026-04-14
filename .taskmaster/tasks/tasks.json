@@ -416,8 +416,9 @@
         "testStrategy": "grep search للنصوص المباشرة، visual review للصفحات بالعربية والإنجليزية، check for missing keys في translation files",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [],
+        "updatedAt": "2026-04-14T18:28:53.870Z"
       },
       {
         "id": "6",
@@ -486,7 +487,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-14T15:42:07.454Z",
+      "lastModified": "2026-04-14T18:28:53.871Z",
       "taskCount": 10,
       "completedCount": 3,
       "tags": [
