@@ -6,10 +6,14 @@ export function usePush() {
   const [supported, setSupported] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [permissionState, setPermissionState] = useState<NotificationPermission>('default')
   const supabase = createClient()
 
   useEffect(() => {
     setSupported('serviceWorker' in navigator && 'PushManager' in window)
+    if ('Notification' in window) {
+      setPermissionState(Notification.permission)
+    }
     checkSubscription()
   }, [])
 
@@ -26,6 +30,7 @@ export function usePush() {
     setLoading(true)
     try {
       const permission = await Notification.requestPermission()
+      setPermissionState(permission)
       if (permission !== 'granted') {
         setLoading(false)
         return { ok: false, reason: 'permission_denied' }
@@ -112,7 +117,7 @@ export function usePush() {
     setLoading(false)
   }
 
-  return { supported, subscribed, loading, subscribe, unsubscribe }
+  return { supported, subscribed, loading, permissionState, subscribe, unsubscribe }
 }
 
 function urlBase64ToUint8Array(base64String: string) {

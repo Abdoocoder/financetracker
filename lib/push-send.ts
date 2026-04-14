@@ -6,24 +6,63 @@ function getSupabase() {
   return _supabase
 }
 
+/**
+ * خريطة الـ tags إلى تصنيفات قاعدة البيانات.
+ * يستخدمها كل من:
+ *   - notification_history (للإرسال)
+ *   - Edge Function (لتحديد قواعد الإرسال والفلترة)
+ */
 const TAG_TO_CATEGORY: Record<string, string> = {
-  morning:           'SystemUpdate',
-  evening:           'SystemUpdate',
-  weekly:            'SystemUpdate',
-  nudge:             'SystemUpdate',
-  lesson:            'SystemUpdate',
-  wealth:            'SystemUpdate',
-  warning:           'BudgetAlert',
-  budget:            'BudgetAlert',
-  debt:              'DebtReminder',
-  'debt-reminder':   'DebtReminder',
-  'debt-auto':       'DebtReminder',
-  'debt-paid':       'DebtReminder',
-  'receivable-debt': 'DebtReminder',
-  goal:              'SavingGoal',
-  achievement:       'SavingGoal',
-  'finance-daily':   'SystemUpdate',
-  security:          'SecurityAlert',
+  // ── تذكيرات يومية عامة ─────────────────────────────
+  morning:             'SystemUpdate',
+  evening:             'SystemUpdate',
+  weekly:              'SystemUpdate',
+  nudge:               'SystemUpdate',
+  lesson:              'SystemUpdate',
+  wealth:              'SystemUpdate',
+  'finance-daily':     'SystemUpdate',
+  'daily-reminder':    'SystemUpdate',
+  'evening-reminder':  'SystemUpdate',
+  'new-user-nudge':    'SystemUpdate',
+  'finance-alert':     'SystemUpdate',
+  'streak-alert':      'SystemUpdate',
+
+  // ── تنبيهات الميزانية ──────────────────────────────
+  warning:             'BudgetAlert',
+  budget:              'BudgetAlert',
+  'budget-warning':    'BudgetAlert',
+
+  // ── الديون والأقساط ────────────────────────────────
+  debt:                'DebtReminder',
+  'debt-reminder':     'DebtReminder',
+  'debt-auto':         'DebtReminder',
+  'debt-paid':         'DebtReminder',
+  'receivable-debt':   'DebtReminder',
+
+  // ── الزكاة ─────────────────────────────────────────
+  'zakat-due':         'ZakatAlert',
+  'zakat-reminder':    'ZakatAlert',
+
+  // ── أهداف الادخار ──────────────────────────────────
+  goal:                'SavingGoal',
+  achievement:         'SavingGoal',
+  'goal-reached':      'SavingGoal',
+  'goal-progress':     'SavingGoal',
+
+  // ── الأمان ─────────────────────────────────────────
+  security:            'SecurityAlert',
+}
+
+/**
+ * الروابط الافتراضية لكل تصنيف — تستخدم عند عدم تحديد URL صريح.
+ */
+const CATEGORY_DEFAULT_URL: Record<string, string> = {
+  BudgetAlert:   '/dashboard/budgets',
+  DebtReminder:  '/dashboard/debts',
+  ZakatAlert:    '/dashboard/zakat',
+  SavingGoal:    '/dashboard/goals',
+  SecurityAlert: '/dashboard/settings',
+  SystemUpdate:  '/dashboard/alerts',
 }
 
 function toCategory(tag: string): string {
@@ -43,23 +82,26 @@ export async function sendPushToUser(
   userId: string,
   title: string,
   message: string,
-  url = '/dashboard/alerts',
+  url?: string,
   tag = 'finance-alert',
   supabaseClient?: any,
   customFingerprint?: string
 ) {
   const supabase = supabaseClient || getSupabase()
+  const category = toCategory(tag)
 
   // fingerprint يومي افتراضي — أو مخصص لمطابقة DB Trigger
   const fingerprint = customFingerprint
     ?? `${userId}:${tag}:${new Date().toISOString().slice(0, 10)}`
 
+  const finalUrl = url || CATEGORY_DEFAULT_URL[category] || '/dashboard/alerts'
+
   const { error } = await supabase.from('notification_history').insert({
     user_id:     userId,
-    category:    toCategory(tag),
+    category,
     title,
     body:        message,
-    data:        { url, tag },
+    data:        { url: finalUrl, tag },
     fingerprint,
   })
 

@@ -16,6 +16,7 @@ self.addEventListener('push', function(event) {
       { action: 'close', title: 'إغلاق' }
     ]
   };
+
   event.waitUntil(
     self.registration.showNotification(data.title, options).then(() => {
       if ('setAppBadge' in self) {

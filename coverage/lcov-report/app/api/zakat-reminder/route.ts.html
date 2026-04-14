@@ -1,0 +1,322 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for app/api/zakat-reminder/route.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">app/api/zakat-reminder</a> route.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/46</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/27</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/42</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest, NextResponse } from <span class="cstat-no" title="statement not covered" >'next/server'</span>
+import { createAdminClient } from <span class="cstat-no" title="statement not covered" >'@/lib/supabase/admin'</span>
+import { sendPushToUser } from <span class="cstat-no" title="statement not covered" >'@/lib/push-send'</span>
+import { verifyCronAuth } from <span class="cstat-no" title="statement not covered" >'@/lib/cron-auth'</span>
+&nbsp;
+const supabase = <span class="cstat-no" title="statement not covered" >createAdminClient()</span>
+&nbsp;
+const HAUL_DAYS = <span class="cstat-no" title="statement not covered" >354</span>
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >sendZakatReminders(u</span>serId?: string) {
+  const today = <span class="cstat-no" title="statement not covered" >new Date()</span>
+&nbsp;
+  // جلب كل المستخدمين (أو مستخدم واحد للاختبار)
+  const profileQuery = <span class="cstat-no" title="statement not covered" >supabase.from('profiles').select('id, full_name')</span>
+  const { data: profiles } = <span class="cstat-no" title="statement not covered" >userId</span>
+    ? await profileQuery.eq('id', userId)
+    : await profileQuery
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  if (!profiles?.length) <span class="cstat-no" title="statement not covered" >return 0</span></span>
+&nbsp;
+  let sent = <span class="cstat-no" title="statement not covered" >0</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  for (const profile of profiles) {</span>
+    const uid = <span class="cstat-no" title="statement not covered" >profile.id</span>
+    const name = <span class="cstat-no" title="statement not covered" >profile.full_name?.split(' ')[0] ?? 'أخي'</span>
+&nbsp;
+    // جلب كل استثمارات المستخدم
+    const { data: investments } = <span class="cstat-no" title="statement not covered" >await supabase</span>
+      .from('investments')
+      .select('id, name, symbol, shares, current_price, created_at')
+      .eq('user_id', uid)
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!investments?.length) <span class="cstat-no" title="statement not covered" >continue</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    for (const inv of investments) {</span>
+<span class="cstat-no" title="statement not covered" >      if (!inv.created_at) <span class="cstat-no" title="statement not covered" >continue</span></span>
+&nbsp;
+      const createdAt = <span class="cstat-no" title="statement not covered" >new Date(inv.created_at)</span>
+      const haulDate = <span class="cstat-no" title="statement not covered" >new Date(createdAt.getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)</span>
+      const daysLeft = <span class="cstat-no" title="statement not covered" >Math.ceil((haulDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000))</span>
+&nbsp;
+      // تنبيه عند: 30 يوم + 7 أيام + يوم الحول (0)
+      const shouldNotify = <span class="cstat-no" title="statement not covered" >daysLeft === 30 || daysLeft === 7 || daysLeft === 0 || daysLeft === -1</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (!shouldNotify) <span class="cstat-no" title="statement not covered" >continue</span></span>
+&nbsp;
+      const invName = <span class="cstat-no" title="statement not covered" >inv.symbol ?? inv.name ?? 'الاستثمار'</span>
+      const invValue = <span class="cstat-no" title="statement not covered" >Number(inv.shares) * Number(inv.current_price)</span>
+&nbsp;
+      let title: string
+      let body: string
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      if (daysLeft &lt;= 0) {</span>
+<span class="cstat-no" title="statement not covered" >        title = `${name}، حان موعد زكاة ${invName} 🌙`</span>
+<span class="cstat-no" title="statement not covered" >        body = `قيمة الاستثمار ${invValue.toLocaleString('ar', { maximumFractionDigits: 0 })} — الزكاة المستحقة ${(invValue * 0.025).toLocaleString('ar', { maximumFractionDigits: 0 })}`</span>
+      } else <span class="cstat-no" title="statement not covered" >if (daysLeft === 7) {</span>
+<span class="cstat-no" title="statement not covered" >        title = `${name}، بقي 7 أيام على حول ${invName} ⏳`</span>
+<span class="cstat-no" title="statement not covered" >        body = `استعدّ لأداء الزكاة — قيمة الاستثمار ${invValue.toLocaleString('ar', { maximumFractionDigits: 0 })}`</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        title = `${name}، بقي شهر على حول ${invName} 📅`</span>
+<span class="cstat-no" title="statement not covered" >        body = `موعد زكاة استثماراتك يقترب — لا تنسَ حسابها في فجرك`</span>
+      }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >      await sendPushToUser(uid, title, body, '/dashboard/zakat', 'reminder')</span>
+<span class="cstat-no" title="statement not covered" >      sent++</span>
+    }
+  }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >  return sent</span>
+}
+&nbsp;
+export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >GET(r</span></span>equest: NextRequest) {
+<span class="cstat-no" title="statement not covered" >  if (!verifyCronAuth(request)) {</span>
+<span class="cstat-no" title="statement not covered" >    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })</span>
+  }
+  const userId = <span class="cstat-no" title="statement not covered" >request.nextUrl.searchParams.get('userId') ?? undefined</span>
+  const sent = <span class="cstat-no" title="statement not covered" >await sendZakatReminders(userId)</span>
+<span class="cstat-no" title="statement not covered" >  return NextResponse.json({ ok: true, sent })</span>
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-04-14T22:22:35.038Z
+            </div>
+        <script src="../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
+    </body>
+</html>
+    

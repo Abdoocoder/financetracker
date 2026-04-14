@@ -24,6 +24,7 @@ const TAG_TO_ALERT_TYPE: Record<string, string> = {
   SavingGoal:    'achievement',
   SystemUpdate:  'reminder',
   SecurityAlert: 'warning',
+  ZakatAlert:    'warning',
 }
 
 async function getFcmAccessToken(serviceAccount: any): Promise<string> {

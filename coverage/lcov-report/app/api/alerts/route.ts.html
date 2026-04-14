@@ -1,0 +1,514 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for app/api/alerts/route.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">app/api/alerts</a> route.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>0/125</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/144</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/17</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>0/91</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { NextRequest, NextResponse } from <span class="cstat-no" title="statement not covered" >'next/server'</span>
+import { sendPushToUser } from <span class="cstat-no" title="statement not covered" >'@/lib/push-send'</span>
+import { createAdminClient } from <span class="cstat-no" title="statement not covered" >'@/lib/supabase/admin'</span>
+import { verifyCronAuth } from <span class="cstat-no" title="statement not covered" >'@/lib/cron-auth'</span>
+&nbsp;
+const supabase = <span class="cstat-no" title="statement not covered" >createAdminClient()</span>
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >alreadyExists(u</span>serId: string, title: string, withinHours = <span class="branch-0 cbranch-no" title="branch not covered" >24)</span>: Promise&lt;boolean&gt; {
+  const since = <span class="cstat-no" title="statement not covered" >new Date(Date.now() - withinHours * 60 * 60 * 1000).toISOString()</span>
+  const { count } = <span class="cstat-no" title="statement not covered" >await supabase</span>
+    .from('alerts').select('id', { count: 'exact', head: true })
+    .eq('user_id', userId).eq('title', title).gte('created_at', since)
+<span class="cstat-no" title="statement not covered" >  return (count ?? 0) &gt; 0</span>
+}
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >pushAlert(l</span>ist: Record&lt;string, unknown&gt;[], userId: string, type: string, title: string, message: string, withinHours = <span class="branch-0 cbranch-no" title="branch not covered" >20)</span> {
+  const exists = <span class="cstat-no" title="statement not covered" >await alreadyExists(userId, title, withinHours)</span>
+<span class="cstat-no" title="statement not covered" >  if (!exists) <span class="cstat-no" title="statement not covered" >list.push({ user_id: userId, type, title, message, frequency: 'daily', is_read: false, is_active: true })</span></span>
+}
+&nbsp;
+async function <span class="fstat-no" title="function not covered" >generateAlerts(u</span>serId?: string) {
+  const now = <span class="cstat-no" title="statement not covered" >new Date()</span>
+  const dayOfWeek = <span class="cstat-no" title="statement not covered" >now.getDay()</span>
+  const dayOfMonth = <span class="cstat-no" title="statement not covered" >now.getDate()</span>
+  const month = <span class="cstat-no" title="statement not covered" >now.getMonth() + 1</span>
+  const query = <span class="cstat-no" title="statement not covered" >supabase.from('profiles').select('id, monthly_income, full_name')</span>
+  const { data: profiles } = <span class="cstat-no" title="statement not covered" >userId ? await query.eq('id', userId) : await query</span>
+<span class="cstat-no" title="statement not covered" >  if (!profiles?.length) <span class="cstat-no" title="statement not covered" >return 0</span></span>
+  const toInsert: Record&lt;string, unknown&gt;[] = <span class="cstat-no" title="statement not covered" >[]</span>
+<span class="cstat-no" title="statement not covered" >  for (const profile of profiles) {</span>
+    const uid = <span class="cstat-no" title="statement not covered" >profile.id</span>
+    const income = <span class="cstat-no" title="statement not covered" >profile.monthly_income ?? 0</span>
+    const name = <span class="cstat-no" title="statement not covered" >profile.full_name?.split(' ')[0] ?? 'أخي'</span>
+    const n = <span class="cstat-no" title="statement not covered" >profile.full_name?.split(' ')[0] ?? 'Friend'</span>
+    const ar = <span class="cstat-no" title="statement not covered" >true</span>
+    const firstOfMonth = <span class="cstat-no" title="statement not covered" >`${now.getFullYear()}-${String(month).padStart(2,'0')}-01`</span>
+    const [txRes, debtRes, invRes, goalRes] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
+      supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', uid).gte('transaction_date', firstOfMonth),
+      supabase.from('debts').select('name,remaining_amount,original_amount,monthly_payment').eq('user_id', uid).eq('is_paid', false),
+      supabase.from('investments').select('symbol,shares,current_price,avg_buy_price').eq('user_id', uid),
+      supabase.from('savings_goals').select('name,current_amount,target_amount').eq('user_id', uid),
+    ])
+    const txns = <span class="cstat-no" title="statement not covered" >txRes.data ?? []</span>
+    const debts = <span class="cstat-no" title="statement not covered" >debtRes.data ?? []</span>
+    const invs = <span class="cstat-no" title="statement not covered" >invRes.data ?? []</span>
+    const goals = <span class="cstat-no" title="statement not covered" >goalRes.data ?? []</span>
+    const monthIncome = <span class="cstat-no" title="statement not covered" >txns.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.type === 'income').r</span>educe(<span class="fstat-no" title="function not covered" >(a</span>,t) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(t.amount), 0</span>)</span>
+    const monthExpenses = <span class="cstat-no" title="statement not covered" >txns.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.type === 'expense').r</span>educe(<span class="fstat-no" title="function not covered" >(a</span>,t) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(t.amount), 0</span>)</span>
+    const totalMonthly = <span class="cstat-no" title="statement not covered" >debts.reduce(<span class="fstat-no" title="function not covered" >(a</span>,d) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(d.monthly_payment), 0</span>)</span>
+    const totalDebt = <span class="cstat-no" title="statement not covered" >debts.reduce(<span class="fstat-no" title="function not covered" >(a</span>,d) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(d.remaining_amount), 0</span>)</span>
+    const invValue = <span class="cstat-no" title="statement not covered" >invs.reduce(<span class="fstat-no" title="function not covered" >(a</span>,i) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(i.shares) * Number(i.current_price), 0</span>)</span>
+    const invCost = <span class="cstat-no" title="statement not covered" >invs.reduce(<span class="fstat-no" title="function not covered" >(a</span>,i) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(i.shares) * Number(i.avg_buy_price), 0</span>)</span>
+    const invPnl = <span class="cstat-no" title="statement not covered" >invValue - invCost</span>
+    const effectiveIncome = <span class="cstat-no" title="statement not covered" >monthIncome || income</span>
+<span class="cstat-no" title="statement not covered" >    if (effectiveIncome &gt; 0) {</span>
+      const ratio = <span class="cstat-no" title="statement not covered" >monthExpenses / effectiveIncome</span>
+<span class="cstat-no" title="statement not covered" >      if (ratio &gt; 0.9) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'warning', ar ? '🚨 تجاوزت 90% من دخلك!' : '🚨 You exceeded 90% of income!', ar ? `مصاريفك ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% من دخلك.` : `Expenses ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% of income.`)</span></span>
+      else <span class="cstat-no" title="statement not covered" >if (ratio &gt; 0.75) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'warning', ar ? '⚠️ مصاريفك تجاوزت 75% من دخلك' : '⚠️ Expenses exceeded 75% of income', ar ? `أنفقت ${monthExpenses.toFixed(0)} JOD من أصل ${effectiveIncome.toFixed(0)} JOD.` : `Spent ${monthExpenses.toFixed(0)} JOD of ${effectiveIncome.toFixed(0)} JOD.`)</span></span>
+      else <span class="cstat-no" title="statement not covered" >if (ratio &lt; 0.5 &amp;&amp; monthExpenses &gt; 0) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'achievement', ar ? '🏆 ادخرت أكثر من 50% من دخلك!' : '🏆 Saved over 50% of income!', ar ? `رائع يا ${name}! مصاريفك فقط ${(ratio*100).toFixed(0)}% من دخلك. استثمر الفائض!` : `Great ${n}! Expenses only ${(ratio*100).toFixed(0)}% of income. Invest the rest!`)</span></span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (debts.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >      if (dayOfMonth &gt;= 23 &amp;&amp; dayOfMonth &lt;= 25) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'reminder', ar ? '📅 تذكير: أقساط الشهر القادم' : '📅 Reminder: Next month installments', ar ? `إجمالي أقساطك ${totalMonthly.toFixed(0)} JOD.` : `Total installments: ${totalMonthly.toFixed(0)} JOD.`, 48)</span></span>
+      const nearlyPaid = <span class="cstat-no" title="statement not covered" >debts.find(<span class="fstat-no" title="function not covered" >d =&gt; { c</span>onst pct = <span class="cstat-no" title="statement not covered" >(Number(d.original_amount) - Number(d.remaining_amount)) / Number(d.original_amount); <span class="cstat-no" title="statement not covered" >r</span>eturn pct &gt;= 0.8 &amp;&amp; pct &lt; 1 }</span>)</span>
+<span class="cstat-no" title="statement not covered" >      if (nearlyPaid) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'achievement', ar ? `🎯 اقتربت من سداد "${nearlyPaid.name}"!` : `🎯 Almost paid off "${nearlyPaid.name}"!`, ar ? `تبقى فقط ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD!` : `Only ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD left!`, 168)</span></span>
+<span class="cstat-no" title="statement not covered" >      if (effectiveIncome &gt; 0 &amp;&amp; totalDebt &gt; effectiveIncome * 6) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'warning', ar ? '💳 ديونك تجاوزت 6 أضعاف دخلك' : '💳 Debts exceed 6x your income', ar ? `إجمالي ديونك ${totalDebt.toFixed(0)} JOD.` : `Total debts: ${totalDebt.toFixed(0)} JOD.`, 168)</span></span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (invs.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >      if (invPnl &gt; 0) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'achievement', ar ? `📈 محفظتك في المنطقة الخضراء +${(invPnl/invCost*100).toFixed(1)}%` : `📈 Portfolio in the green +${(invPnl/invCost*100).toFixed(1)}%`, ar ? `قيمة محفظتك $${invValue.toFixed(0)} مقابل تكلفة $${invCost.toFixed(0)}.` : `Portfolio value $${invValue.toFixed(0)} vs cost $${invCost.toFixed(0)}.`, 168)</span></span>
+      else <span class="cstat-no" title="statement not covered" >if (invPnl &lt; -invCost * 0.1) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'reminder', ar ? '📉 انخفاض مؤقت في محفظتك' : '📉 Temporary portfolio dip', ar ? 'لا تتسرع في البيع — الاستثمار طويل الأمد مصمم لتحمل التذبذبات.' : "Don't rush to sell — long-term investing is designed to weather volatility.", 168)</span></span>
+<span class="cstat-no" title="statement not covered" >      if (dayOfMonth &lt;= 3 &amp;&amp; [1,4,7,10].includes(month)) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'reminder', ar ? '🗓️ وقت الشراء الربعي لـ SPUS' : '🗓️ Quarterly buy time for SPUS', ar ? 'أضف دفعتك الاستثمارية الربعية للاستفادة من متوسط التكلفة.' : 'Add your quarterly investment to benefit from dollar-cost averaging.', 168)</span></span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (goals.length &gt; 0) {</span>
+      const almostGoal = <span class="cstat-no" title="statement not covered" >goals.find(<span class="fstat-no" title="function not covered" >g =&gt; { c</span>onst pct = <span class="cstat-no" title="statement not covered" >Number(g.current_amount) / Number(g.target_amount); <span class="cstat-no" title="statement not covered" >r</span>eturn pct &gt;= 0.9 &amp;&amp; pct &lt; 1 }</span>)</span>
+<span class="cstat-no" title="statement not covered" >      if (almostGoal) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'achievement', ar ? `🎯 كدت تحقق هدف "${almostGoal.name}"!` : `🎯 Almost reached goal "${almostGoal.name}"!`, ar ? `تبقى ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD فقط!` : `Only ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD left!`, 168)</span></span>
+      const stagnant = <span class="cstat-no" title="statement not covered" >goals.find(<span class="fstat-no" title="function not covered" >g =&gt; <span class="cstat-no" title="statement not covered" >N</span>umber(g.current_amount) === 0)</span></span>
+<span class="cstat-no" title="statement not covered" >      if (stagnant) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'reminder', ar ? `⏰ هدف "${stagnant.name}" ينتظرك` : `⏰ Goal "${stagnant.name}" is waiting`, ar ? `حتى ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD شهرياً يصنع فارقاً.` : `Even ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD/month makes a difference.`, 168)</span></span>
+    }
+<span class="cstat-no" title="statement not covered" >    if (dayOfWeek === 0) {</span>
+      const weekAgo = <span class="cstat-no" title="statement not covered" >new Date(now); <span class="cstat-no" title="statement not covered" >w</span>eekAgo.setDate(weekAgo.getDate() - 7)</span>
+      const { count } = <span class="cstat-no" title="statement not covered" >await supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', uid).gte('transaction_date', weekAgo.toISOString().split('T')[0])</span>
+<span class="cstat-no" title="statement not covered" >      if ((count ?? 0) === 0) <span class="cstat-no" title="statement not covered" >await pushAlert(toInsert, uid, 'reminder', ar ? '⏰ لم تسجل أي معاملات هذا الأسبوع' : '⏰ No transactions recorded this week', ar ? 'سجّل مصاريفك بانتظام — التتبع اليومي هو أقوى أداة للوعي المالي.' : 'Track your expenses regularly — daily tracking is the most powerful financial awareness tool.', 168)</span></span>
+    }
+    const motivations = <span class="cstat-no" title="statement not covered" >ar ? [</span>
+      { title: '💪 خطوة صغيرة تصنع فارقاً كبيراً', message: `يا ${name}، كل دينار تدخره اليوم هو استثمار في حريتك المالية غداً.` },
+      { title: '🌟 الانضباط المالي عادة لا موهبة', message: 'الأثرياء بنوا عادات يومية صغيرة جعلتهم يختلفون.' },
+      { title: '📊 راجع ميزانيتك الأسبوع القادم', message: 'خصص 10 دقائق أسبوعياً لمراجعة المصاريف.' },
+      { title: '🏦 الادخار أولاً قبل الإنفاق', message: 'ادخر أول 20% من راتبك قبل أي إنفاق.' },
+      { title: `⚡ أنت على الطريق الصحيح يا ${name}`, message: 'سداد الديون → صندوق طوارئ → استثمار منتظم. استمر!' },
+      { title: '🎯 هدف واحد كل شهر يغير حياتك', message: 'التركيز على هدف واحد أقوى من عشرة أهداف متوازية.' },
+      { title: '💡 المعرفة المالية هي أفضل استثمار', message: 'كل دقيقة في تتبع مالك تساوي أضعافها على المدى البعيد.' },
+    ] : [
+      { title: '💪 Small steps make a big difference', message: `Hey ${n}, every dollar you save today is an investment in tomorrow's financial freedom.` },
+      { title: '🌟 Financial discipline is a habit, not a talent', message: 'Wealthy people built small daily habits that set them apart.' },
+      { title: '📊 Review your budget next week', message: 'Set aside 10 minutes weekly to review your expenses.' },
+      { title: '🏦 Save first, spend later', message: 'Save the first 20% of your income before any spending.' },
+      { title: `⚡ You are on the right track ${n}`, message: 'Pay debts → Emergency fund → Regular investment. Keep going!' },
+      { title: '🎯 One goal a month changes your life', message: 'Focusing on one goal is more powerful than ten parallel goals.' },
+      { title: '💡 Financial knowledge is the best investment', message: 'Every minute tracking your money is worth many times over in the long run.' },
+    ]
+<span class="cstat-no" title="statement not covered" >    for (const mot of motivations) {</span>
+      const exists = <span class="cstat-no" title="statement not covered" >await alreadyExists(uid, mot.title, 20)</span>
+<span class="cstat-no" title="statement not covered" >      if (!exists) { <span class="cstat-no" title="statement not covered" >toInsert.push({ user_id: uid, type: 'motivation', title: mot.title, message: mot.message, frequency: 'daily', is_read: false, is_active: true }); <span class="cstat-no" title="statement not covered" >b</span>reak }</span></span>
+    }
+  }
+  // sendPushToUser يكتب في notification_history → Edge Function تتولى
+  // إرسال الإشعار والكتابة في alerts. لا نكتب في alerts هنا مباشرة.
+<span class="cstat-no" title="statement not covered" >  if (toInsert.length &gt; 0) {</span>
+    const byUser = <span class="cstat-no" title="statement not covered" >new Map&lt;string, typeof toInsert&gt;()</span>
+<span class="cstat-no" title="statement not covered" >    for (const a of toInsert) {</span>
+      const uid = <span class="cstat-no" title="statement not covered" >a.user_id </span>as string
+<span class="cstat-no" title="statement not covered" >      if (!byUser.has(uid)) <span class="cstat-no" title="statement not covered" >byUser.set(uid, [])</span></span>
+<span class="cstat-no" title="statement not covered" >      byUser.get(uid)!.push(a)</span>
+    }
+<span class="cstat-no" title="statement not covered" >    for (const [uid, list] of byUser) {</span>
+      const title = <span class="cstat-no" title="statement not covered" >list.length === 1 ? String(list[0].title) : `🔔 ${list.length} تنبيهات جديدة`</span>
+      const message = <span class="cstat-no" title="statement not covered" >list.length === 1 ? String(list[0].message).slice(0, 100) : list.map(<span class="fstat-no" title="function not covered" >a =&gt; <span class="cstat-no" title="statement not covered" >S</span>tring(a.title)).j</span>oin(' • ').slice(0, 100)</span>
+<span class="cstat-no" title="statement not covered" >      await sendPushToUser(uid, title, message, '/dashboard/alerts', 'finance-daily')</span>
+    }
+  }
+<span class="cstat-no" title="statement not covered" >  return toInsert.length</span>
+}
+&nbsp;
+export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >GET(r</span></span>equest: NextRequest) {
+<span class="cstat-no" title="statement not covered" >  if (!verifyCronAuth(request)) {</span>
+<span class="cstat-no" title="statement not covered" >    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })</span>
+  }
+  const count = <span class="cstat-no" title="statement not covered" >await generateAlerts()</span>
+<span class="cstat-no" title="statement not covered" >  return NextResponse.json({ ok: true, generated: count })</span>
+}
+&nbsp;
+export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >POST(r</span></span>equest: NextRequest) {
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const authHeader = <span class="cstat-no" title="statement not covered" >request.headers.get('authorization')</span>
+<span class="cstat-no" title="statement not covered" >    if (!authHeader?.startsWith('Bearer ')) <span class="cstat-no" title="statement not covered" >return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })</span></span>
+    const token = <span class="cstat-no" title="statement not covered" >authHeader.replace('Bearer ', '')</span>
+    const { data: { user }, error } = <span class="cstat-no" title="statement not covered" >await supabase.auth.getUser(token)</span>
+<span class="cstat-no" title="statement not covered" >    if (error || !user) <span class="cstat-no" title="statement not covered" >return NextResponse.json({ error: 'Invalid token' }, { status: 401 })</span></span>
+    const count = <span class="cstat-no" title="statement not covered" >await generateAlerts(user.id)</span>
+<span class="cstat-no" title="statement not covered" >    return NextResponse.json({ ok: true, generated: count, message: count &gt; 0 ? `✅ تم توليد ${count} تنبيه جديد` : 'ℹ️ لا تنبيهات جديدة — كل شيء محدّث' })</span>
+  } catch (err: any) {
+<span class="cstat-no" title="statement not covered" >    return NextResponse.json({ error: err.message }, { status: 500 })</span>
+  }
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-04-14T22:22:35.038Z
+            </div>
+        <script src="../../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
+    </body>
+</html>
+    

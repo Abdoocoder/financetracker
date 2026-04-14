@@ -61,7 +61,7 @@ async function sendZakatReminders(userId?: string) {
         body = `موعد زكاة استثماراتك يقترب — لا تنسَ حسابها في فجرك`
       }
 
-      await sendPushToUser(uid, title, body, '/dashboard/zakat', 'reminder')
+      await sendPushToUser(uid, title, body, '/dashboard/zakat', 'zakat-due')
       sent++
     }
   }
