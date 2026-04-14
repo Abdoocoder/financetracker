@@ -1,8 +1,5 @@
 {
 	"mcpServers": {
-		"Sentry": {
-			"url": "https://mcp.sentry.dev/mcp/abdoocoder-m2/javascript-nextjs"
-		},
 		"task-master-ai": {
 			"command": "npx",
 			"args": ["-y", "task-master-ai"],

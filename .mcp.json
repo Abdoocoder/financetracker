@@ -1,11 +1,12 @@
 {
 	"mcpServers": {
-		"Sentry": {
-			"url": "https://mcp.sentry.dev/mcp/abdoocoder-m2/javascript-nextjs"
-		},
 		"task-master-ai": {
+			"type": "stdio",
 			"command": "npx",
-			"args": ["-y", "task-master-ai"],
+			"args": [
+				"-y",
+				"task-master-ai"
+			],
 			"env": {
 				"TASK_MASTER_TOOLS": "core",
 				"ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",

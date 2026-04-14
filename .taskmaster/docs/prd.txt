@@ -1,0 +1,148 @@
+# Product Requirements Document - Fajrak (FinanceTracker)
+
+## 1) Product Overview
+Fajrak is a bilingual personal finance product (Web + Flutter Mobile) that helps users manage daily financial life in one unified system: transactions, budgets, debts, goals, investments, and alerts.
+
+Primary objective: give users a reliable, simple, and motivating financial control experience with accurate numbers, strong UX, and consistent behavior across platforms.
+
+## 2) Current Platform Context (Must Respect)
+- Web stack: Next.js App Router + React 19 + TypeScript strict
+- Mobile stack: Flutter + Supabase Flutter SDK
+- Backend/data: Supabase PostgreSQL with mandatory RLS
+- Auth: Supabase Auth
+- State: TanStack Query on web
+- Notifications: Firebase + Web Push
+- Monitoring: Sentry
+- i18n: Arabic + English (RTL/LTR), with naming conventions already defined
+- Default currency: KWD (user-configurable via profile)
+
+## 3) Target Users and Core Jobs
+- User A (daily tracker): wants fast transaction entry and monthly visibility.
+- User B (debt-focused): wants a clear payoff path and progress indicators.
+- User C (planner): wants goals + budgets + alerts to prevent overspending.
+- User D (investor): wants net worth and investment growth view with low friction.
+
+Core jobs to be done:
+- Capture money movements quickly and correctly.
+- Understand current financial health at a glance.
+- Stay within budget and receive meaningful alerts.
+- Track long-term obligations (debts) and targets (goals).
+
+## 4) Scope and Features
+
+### 4.1 Authentication and Profile
+- Email/password sign up and sign in via Supabase Auth.
+- Profile setup with preferred currency and language.
+- Persisted session across web and mobile.
+
+### 4.2 Transactions Module
+- Full CRUD for income/expense transactions.
+- Category assignment and filtering by date/category/type.
+- Validation for required fields and amount rules.
+- Support quick entry UX and edit/delete with confirmation.
+
+### 4.3 Dashboard Module
+- KPI cards: balance, income, expense, savings delta.
+- Monthly trend visualization and recent activity list.
+- Debt and investment summary widgets where relevant.
+- Loading skeletons for all dashboard sections.
+
+### 4.4 Budgets and Alerts
+- Monthly budget CRUD by category/overall.
+- Budget usage progress and overspending indicators.
+- Alert generation when threshold exceeded.
+- Alerts list and basic management actions.
+
+### 4.5 Debts Module
+- Debt item CRUD (principal, paid amount, status).
+- Progress tracking and payoff visibility.
+- Aggregate debt metrics on dashboard.
+
+### 4.6 Goals Module
+- Goal CRUD (target amount/date, current progress).
+- Progress calculation and visual status.
+- Dashboard contribution (upcoming/at-risk goals).
+
+### 4.7 Investments Module
+- Investment position CRUD and valuation fields.
+- Portfolio totals and gain/loss calculations.
+- Dashboard-level investment snapshot.
+
+### 4.8 Notifications
+- Web push + mobile push integration for alerts.
+- User-level opt-in/out controls.
+- Basic delivery status handling and retries where possible.
+
+## 5) Non-Functional Requirements
+- Security: RLS enforced for all financial/user data.
+- Reliability: deterministic calculations for totals/progress.
+- Performance: responsive dashboard and list rendering.
+- Accessibility: icon-only buttons require descriptive aria-label.
+- UX consistency: loading state must use skeletons, not plain text spinners.
+- Internationalization: all user-facing strings translatable (ar/en).
+
+## 6) Engineering Constraints and Rules
+- Never disable RLS.
+- Add new DB migrations only (no rewriting old migrations).
+- Use `lib/supabase/server.ts` in server components and `lib/supabase/client.ts` in client components.
+- Keep TypeScript strict; avoid `any` except strict necessity.
+- Use TanStack Query for client-side server data fetching/caching.
+- Do not modify generated artifacts like `.next/` or coverage outputs.
+- Mirror business logic across web and mobile for shared features.
+
+## 7) MVP Definition (Phase 1 - Must Ship First)
+1. Auth + profile bootstrap (currency/language)
+2. Transactions CRUD + filters
+3. Dashboard with core KPI + monthly chart + recent transactions
+4. Budgets CRUD + usage tracking + overspending alert trigger
+5. Basic alerts view
+
+MVP acceptance criteria:
+- A new user can sign up, add transactions, set a budget, and see dashboard changes immediately.
+- Overspending path is visible through alerting.
+- Core flows are available in both Arabic and English.
+
+## 8) Phase 2 Scope
+- Debts full workflow
+- Goals full workflow
+- Investments full workflow
+- Push notifications polishing and settings controls
+
+## 9) Phase 3 Scope
+- Advanced analytics and richer trend intelligence
+- Gamification improvements
+- UX/performance optimizations across high-traffic screens
+- Additional reporting/export capabilities
+
+## 10) Logical Dependency Chain (Implementation Order)
+1. Foundation: auth, profile, shared data access patterns, validation helpers
+2. Transactions domain (data model + CRUD + filters)
+3. Dashboard aggregates fed by transactions
+4. Budget engine + alerts generation
+5. Debts and goals domains
+6. Investments domain
+7. Notification delivery improvements and cross-platform polishing
+8. Advanced analytics and optimization
+
+## 11) Testing and Quality Expectations
+- Web: lint, typecheck, unit tests, and e2e smoke for critical flows.
+- Mobile: analyze + test via doctor workflow.
+- Add tests for calculation utilities (budget progress, debt progress, gains/losses).
+- Ensure async test hooks are flushed correctly (`act(...)`) where relevant.
+
+## 12) Risks and Mitigations
+- Risk: calculation drift across modules/platforms.
+  - Mitigation: centralize formulas and add regression tests.
+- Risk: inconsistency between web and mobile behavior.
+  - Mitigation: shared product rules checklist for dual-platform features.
+- Risk: feature creep before stable MVP.
+  - Mitigation: enforce phase gates; no Phase 2 work before MVP acceptance.
+- Risk: notification reliability gaps.
+  - Mitigation: explicit retries/logging + observability in Sentry.
+
+## 13) Definition of Done (Per Feature)
+- Functional flow implemented end-to-end.
+- Localization keys added and validated for ar/en.
+- Loading/empty/error states covered.
+- Tests updated at appropriate level.
+- No lint/type errors in modified scope.

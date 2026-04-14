@@ -162,3 +162,7 @@ help_faq_<section>_title/q1/a1  # صفحة المساعدة
   - `try/catch/finally` مع `setState(() => _saving = false)` في الـ `finally`
 - كل `TextEditingController` يجب أن يُستدعى عليه `dispose()` في `dispose()`
 - كل `showModalBottomSheet` يجب أن يحتوي على `useSafeArea: true`
+
+## Task Master AI Instructions
+**Import Task Master's development workflow commands and guidelines, treat as if import is in the main CLAUDE.md file.**
+@./.taskmaster/CLAUDE.md
