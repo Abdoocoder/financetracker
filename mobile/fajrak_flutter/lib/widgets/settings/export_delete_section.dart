@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'settings_accordion.dart';
+import '../common/confirm_dialog.dart';
 
 class ExportDeleteSection extends StatefulWidget {
   const ExportDeleteSection({super.key});
@@ -74,13 +75,44 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
   Future<void> _deleteAccount() async {
     if (_deleteInputCtrl.text.trim() != 'settings_delete_confirm_text'.tr()) return;
     setState(() => _deleting = true);
-    final user = Supabase.instance.client.auth.currentUser!;
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      setState(() => _deleting = false);
+      return;
+    }
+
     try {
       await Supabase.instance.client
           .rpc('delete_user_account', params: {'user_id': user.id});
-    } catch (_) {}
-    await Supabase.instance.client.auth.signOut();
-    if (mounted) Navigator.pushReplacementNamed(context, '/login');
+      await Supabase.instance.client.auth.signOut();
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _deleting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('error_generic'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+        );
+      }
+    }
+  }
+
+  Future<void> _logout() async {
+    setState(() => _loggingOut = true);
+    try {
+      await Supabase.instance.client.auth.signOut();
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loggingOut = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('error_generic'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+        );
+      }
+    }
   }
 
   @override
@@ -185,24 +217,28 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
+                  child: _loggingOut
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFEF4444)),
+                        )
+                      : Text(
+                          'settings_logout'.tr(),
+                          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+                        ),
                   onPressed: _loggingOut
                       ? null
-                      : () async {
-                          setState(() => _loggingOut = true);
-                          await Supabase.instance.client.auth.signOut();
-                          if (!context.mounted) return;
-                          Navigator.pushReplacementNamed(context, '/login');
+                      : () {
+                          ConfirmDialog.show(
+                            context: context,
+                            title: 'settings_logout'.tr(),
+                            message: 'settings_logout_confirm_msg'.tr(),
+                            confirmLabel: 'settings_logout'.tr(),
+                            danger: true,
+                            onConfirm: _logout,
+                          );
                         },
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFEF4444),
-                    side: const BorderSide(color: Color(0xFFEF4444)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: Text(
-                    _loggingOut ? '...' : 'settings_logout'.tr(),
-                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
-                  ),
                 ),
               ),
               const SizedBox(height: 20),

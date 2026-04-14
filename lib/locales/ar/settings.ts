@@ -9,6 +9,8 @@ export const arSettings = {
     settings_saving: 'جاري الحفظ...',
     settings_logout: 'تسجيل الخروج',
     settings_account: 'الحساب',
+    settings_logout_confirm_title: 'تسجيل الخروج',
+    settings_logout_confirm_msg: 'هل أنت متأكد من رغبتك في تسجيل الخروج؟',
     settings_lang_ar: 'العربية',
     settings_lang_en: 'English',
     settings_lang_system: 'تلقائي (حسب الجهاز)',

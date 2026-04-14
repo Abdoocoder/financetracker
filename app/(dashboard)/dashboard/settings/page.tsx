@@ -13,6 +13,7 @@ import { FormField, Input, Select, SaveButton } from "@/components/ui/form-field
 import { CURRENCIES_BY_GROUP } from "@/lib/currencies"
 import { PushToggle } from "@/components/ui/push-toggle"
 import { TestimonialSection } from "@/components/ui/testimonial-section"
+import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 
 interface ProfileFormData {
   full_name: string
@@ -365,7 +366,7 @@ function AssetsSection({
 // ══════════════════════════════════════════════════════
 // ACCOUNT SECTION
 // ══════════════════════════════════════════════════════
-function AccountSection({ onLogout, loggingOut }: { onLogout: () => Promise<void>; loggingOut: boolean }) {
+function AccountSection({ onLogout, loggingOut }: { onLogout: () => void | Promise<void>; loggingOut: boolean }) {
   const { lang, t } = useI18n()
   return (
     <SectionCard>
@@ -609,6 +610,7 @@ export default function SettingsPage() {
     profile: false, assets: false, logout: false, export: false, delete: false,
   })
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [deleteInput, setDeleteInput] = useState('')
 
   useEffect(() => {
@@ -744,22 +746,28 @@ export default function SettingsPage() {
     setLoading('logout', true)
     try {
       // حذف اشتراك الإشعارات عند تسجيل الخروج
-      const reg = await navigator.serviceWorker?.ready
-      const sub = await reg?.pushManager?.getSubscription()
+      const reg = await navigator.serviceWorker?.ready;
+      const sub = await reg?.pushManager?.getSubscription();
       if (sub) {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           await fetch('/api/push-subscribe', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
             body: JSON.stringify({ endpoint: sub.endpoint })
-          })
+          }).catch(() => {}); // Ignore fetch errors on logout
         }
-        await sub.unsubscribe()
+        await sub.unsubscribe().catch(() => {});
       }
-    } catch {}
-    await supabase.auth.signOut()
-    router.push('/login')
+      
+      await supabase.auth.signOut();
+      window.location.href = '/login'; // Full reload to clear all state
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error(t('error_generic'));
+      setLoading('logout', false);
+      setShowLogoutConfirm(false);
+    }
   }
 
   const { lang } = useI18n()
@@ -786,8 +794,20 @@ export default function SettingsPage() {
       </AccordionCard>
 
       <AccordionCard icon="🔔" title={t('settings_account_notifs')}>
-        <AccountSection onLogout={handleLogout} loggingOut={loadingStates.logout} />
+        <AccountSection onLogout={() => setShowLogoutConfirm(true)} loggingOut={loadingStates.logout} />
       </AccordionCard>
+
+      {showLogoutConfirm && (
+        <ConfirmDialog
+          title={t('settings_logout_confirm_title') || t('settings_logout')}
+          message={t('settings_logout_confirm_msg') || 'هل أنت متأكد من رغبتك في تسجيل الخروج؟'}
+          confirmLabel={t('settings_logout')}
+          cancelLabel={t('goals_cancel')}
+          onConfirm={handleLogout}
+          onCancel={() => setShowLogoutConfirm(false)}
+          danger={true}
+        />
+      )}
 
       <AccordionCard icon="📥" title={t('settings_data')}>
         <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />

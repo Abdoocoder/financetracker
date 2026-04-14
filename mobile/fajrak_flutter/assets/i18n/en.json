@@ -451,6 +451,7 @@
   "settings_delete_account_warning": "Please note that deleting your account will permanently delete all your financial data and this step cannot be undone.",
   "delete_account_confirmation_text": "Type 'delete my account' to confirm",
   "confirm_delete": "Confirm Delete",
+  "settings_logout_confirm_msg": "Are you sure you want to log out?",
   "settings_dark_success": "Dark Mode Activated ✅",
   "settings_light_success": "Light Mode Activated ✅",
   "settings_net_worth": "Net Worth",

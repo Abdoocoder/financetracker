@@ -9,6 +9,8 @@ export const enSettings = {
     settings_saving: 'Saving...',
     settings_logout: 'Logout',
     settings_account: 'Account',
+    settings_logout_confirm_title: 'Logout',
+    settings_logout_confirm_msg: 'Are you sure you want to log out?',
     settings_lang_ar: 'العربية',
     settings_lang_en: 'English',
     settings_lang_system: 'Auto (System)',
