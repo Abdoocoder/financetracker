@@ -9,6 +9,7 @@ import '../../widgets/debts/debt_summary_section.dart';
 import '../../widgets/debts/paid_debt_item.dart';
 import '../../widgets/debts/debt_list_item.dart';
 import '../../widgets/debts/add_debt_dialog.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 const _priorityColors = [
   Color(0xFFEF4444),
@@ -250,8 +251,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         ],
       ),
       body: _loading
-          ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
+          ? const PageSkeleton()
           : RefreshIndicator(
               onRefresh: _load,
               color: const Color(0xFF3B7EF6),

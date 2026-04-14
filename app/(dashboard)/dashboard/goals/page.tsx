@@ -9,6 +9,7 @@ import { useI18n } from '@/lib/i18n'
 import type { SavingsGoal } from '@/types'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
+import { ListSkeleton, Skeleton } from '@/components/ui/skeleton'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<SavingsGoal[]>([])
@@ -117,9 +118,19 @@ export default function GoalsPage() {
   const totalSaved  = goals.reduce((a, g) => a + g.current_amount, 0)
 
   if (loading) return (
-    <div className="space-y-4">
-      <div className="skeleton" style={{ height: 52, borderRadius: 16 }} />
-      {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 120, borderRadius: 20 }} />)}
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48 rounded-xl" />
+          <Skeleton className="h-4 w-32 rounded-lg" />
+        </div>
+        <Skeleton className="h-10 w-24 rounded-2xl" />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Skeleton className="h-20 rounded-2xl" />
+        <Skeleton className="h-20 rounded-2xl" />
+      </div>
+      <ListSkeleton count={3} />
     </div>
   )
 

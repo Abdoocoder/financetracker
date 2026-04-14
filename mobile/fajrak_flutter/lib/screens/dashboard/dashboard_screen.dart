@@ -14,6 +14,7 @@ import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/dashboard_header.dart';
 import '../../services/finance_service.dart';
 import '../../widgets/common/glass_panel.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 import '../../widgets/dashboard/dashboard_stats.dart';
 import '../../widgets/dashboard/dashboard_health_score.dart';
@@ -233,7 +234,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            child: _loading 
+              ? const PageSkeleton() 
+              : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
               // ── 1. Header + Customize button ─────────────────────
               Row(
@@ -293,7 +296,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 400),
                   child: _accountsLoading
-                      ? _SkeletonBox(key: const ValueKey('hero-skel'), height: 110, radius: 18)
+                      ? const CardSkeleton(height: 110)
                       : _AccountsBalanceCard(key: const ValueKey('hero-card'), accounts: _accounts, totalBalance: _totalAccountsBalance, currency: _currency),
                 ),
               const SizedBox(height: 12),
@@ -303,12 +306,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: _loading
-                      ? Row(key: const ValueKey('stats-skel'), children: [
-                          Expanded(child: _SkeletonBox(height: 70, radius: 14)),
-                          const SizedBox(width: 8),
-                          Expanded(child: _SkeletonBox(height: 70, radius: 14)),
-                          const SizedBox(width: 8),
-                          Expanded(child: _SkeletonBox(height: 70, radius: 14)),
+                      ? Row(key: const ValueKey('stats-skel'), children: const [
+                          Expanded(child: CardSkeleton(height: 70)),
+                          SizedBox(width: 8),
+                          Expanded(child: CardSkeleton(height: 70)),
+                          SizedBox(width: 8),
+                          Expanded(child: CardSkeleton(height: 70)),
                         ])
                       : DashboardStats(key: const ValueKey('stats'), income: _income, expenses: _expenses, net: _net, totalBalance: _totalAccountsBalance, monthlyDebtCommitments: _monthlyDebtCommitments, colorScheme: colorScheme),
                 ),
@@ -323,7 +326,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: _loading
-                      ? _SkeletonBox(key: const ValueKey('recent-skel'), height: 180, radius: 16)
+                      ? const CardSkeleton(height: 180)
                       : RecentTransactionsList(key: const ValueKey('recent'), transactions: _recentTx, currency: _currency, colorScheme: colorScheme),
                 ),
 
@@ -377,37 +380,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-// ── Skeleton shimmer box ──────────────────────────────────────────
-class _SkeletonBox extends StatefulWidget {
-  final double height;
-  final double radius;
-  const _SkeletonBox({super.key, required this.height, this.radius = 12});
-  @override
-  State<_SkeletonBox> createState() => _SkeletonBoxState();
-}
-
-class _SkeletonBoxState extends State<_SkeletonBox> with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0.3, end: 0.7).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
-  @override
-  void dispose() { _ctrl.dispose(); super.dispose(); }
-  @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-    animation: _anim,
-    builder: (_, __) => Container(
-      height: widget.height,
-      decoration: BoxDecoration(
-        color: Color.lerp(const Color(0xFF1E293B), const Color(0xFF334155), _anim.value),
-        borderRadius: BorderRadius.circular(widget.radius),
-      ),
-    ),
-  );
 }
 
 class _AccountsBalanceCard extends StatelessWidget {

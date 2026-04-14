@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/modal'
 import { toast } from '@/components/ui/toast'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
+import { ListSkeleton } from '@/components/ui/skeleton'
 
 const CATEGORIES = [
   { key: 'طعام', ar: 'طعام', en: 'Food', icon: '🍔' },
@@ -338,7 +339,7 @@ export default function BudgetsPage() {
       {/* قائمة الفئات */}
       <div style={{ padding: '12px 16px 0', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {loading ? (
-          [1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 100, borderRadius: 20 }} />)
+          <ListSkeleton count={3} />
         ) : budgets.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📊</div>

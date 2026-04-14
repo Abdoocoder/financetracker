@@ -13,8 +13,8 @@ import '../../utils/error_handler.dart';
 import '../../widgets/transactions/add_transaction_dialog.dart';
 import '../../widgets/transactions/month_year_picker_dialog.dart';
 import '../../widgets/transactions/transaction_filters.dart';
-import '../../widgets/transactions/transaction_list_item.dart';
 import '../../widgets/transactions/transaction_summary.dart';
+import '../../widgets/common/skeleton_loader.dart';
 import 'recurring_screen.dart';
 
 class TransactionsScreen extends StatefulWidget {
@@ -448,7 +448,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ),
           Expanded(
             child: _loading && _transactions.isEmpty
-                ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+                ? const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: ListSkeleton(count: 8),
+                  )
                 : filtered.isEmpty
                     ? Center(
                         child: Column(

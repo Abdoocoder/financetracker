@@ -9,6 +9,7 @@ import '../../widgets/goals/goal_summary_cards.dart';
 import '../../widgets/goals/overall_progress_card.dart';
 import '../../widgets/goals/add_goal_dialog.dart';
 import '../../widgets/goals/add_amount_dialog.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -149,7 +150,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ],
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+          ? const PageSkeleton()
           : RefreshIndicator(
               onRefresh: _load,
               color: colorScheme.primary,

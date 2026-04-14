@@ -18,6 +18,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 import { DebtCard } from './_components/DebtCard'
 import { DebtForm } from './_components/DebtForm'
+import { PageSkeleton, ListSkeleton, Skeleton } from '@/components/ui/skeleton'
 
 // ── Confetti Component ──
 function Confetti({ onDone }: { onDone: () => void }) {
@@ -368,11 +369,7 @@ export default function DebtsPage() {
     }
   }, [debts])
 
-  if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {[0, 1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: 140, borderRadius: 16 }} />)}
-    </div>
-  )
+  if (loading) return <PageSkeleton />
 
   return (
     <div className="animate-fade-in" ref={pageRef}>

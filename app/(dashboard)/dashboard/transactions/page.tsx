@@ -18,6 +18,8 @@ import { TransactionFilters } from '@/components/transactions/TransactionFilters
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
 import { RecurringList } from '@/components/transactions/RecurringList'
 
+import { ListSkeleton } from '@/components/ui/skeleton'
+
 export default function TransactionsPage() {
   const { t, lang } = useI18n()
   const { profile, user } = useUser()
@@ -33,11 +35,7 @@ export default function TransactionsPage() {
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
   const monthStartBalance = accountsLoading ? null : (totalBalance - (tx.monthToDateNet ?? 0))
 
-  if (tx.loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {[0, 1, 2, 3, 4].map(i => <div key={i} className="skeleton" style={{ height: 72, borderRadius: 16 }} />)}
-    </div>
-  )
+  if (tx.loading) return <ListSkeleton count={8} />
 
   return (
     <div className="animate-fade-in" ref={pageRef}>

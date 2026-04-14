@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { useI18n } from '@/lib/i18n'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
+import { PageSkeleton, ListSkeleton, Skeleton } from '@/components/ui/skeleton'
 
 
 // مسح cache المستخدم بعد أي تعديل
@@ -511,11 +512,7 @@ export default function InvestmentsPage() {
     return list
   })()
 
-  if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {[0,1].map(i => <div key={i} className="skeleton" style={{ height: 200, borderRadius: 16 }} />)}
-    </div>
-  )
+  if (loading) return <PageSkeleton />
 
   return (
     <div ref={pageRef} className="animate-fade-in">

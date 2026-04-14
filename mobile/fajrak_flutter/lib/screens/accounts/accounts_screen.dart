@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/accounts_service.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 const _accountTypes = [
   {'type': 'bank',        'icon': '🏦', 'labelKey': 'acc_type_bank',   'color': Color(0xFF3B7EF6)},
@@ -66,7 +67,10 @@ class _AccountsScreenState extends State<AccountsScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Padding(
+              padding: EdgeInsets.all(16),
+              child: ListSkeleton(count: 3),
+            )
           : RefreshIndicator(
               onRefresh: _load,
               child: ListView(

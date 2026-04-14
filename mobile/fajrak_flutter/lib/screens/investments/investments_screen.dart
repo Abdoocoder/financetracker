@@ -12,6 +12,7 @@ import '../../widgets/investments/add_investment_dialog.dart';
 import '../../widgets/investments/investment_cash_card.dart';
 import '../../services/investments_service.dart';
 import '../../services/currency_service.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 class InvestmentsScreen extends StatefulWidget {
   const InvestmentsScreen({super.key});
@@ -257,7 +258,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         ],
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+          ? const PageSkeleton()
             : RefreshIndicator(
               onRefresh: () => _load(refreshPrices: true),
               color: colorScheme.primary,

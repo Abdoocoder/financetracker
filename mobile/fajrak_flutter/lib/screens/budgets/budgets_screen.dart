@@ -11,6 +11,7 @@ import '../../widgets/budgets/budget_rule_card.dart';
 import '../../widgets/budgets/budget_list_item.dart';
 import '../../widgets/budgets/add_budget_dialog.dart';
 import '../../widgets/budgets/category_spending_item.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 class BudgetsScreen extends StatefulWidget {
   const BudgetsScreen({super.key});
@@ -289,7 +290,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         ],
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
+          ? const PageSkeleton()
           : RefreshIndicator(
               onRefresh: _load,
               color: colorScheme.primary,
