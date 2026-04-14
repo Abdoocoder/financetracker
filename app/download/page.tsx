@@ -23,7 +23,7 @@ export default function DownloadPage() {
 
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 100, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', marginBottom: 20 }}>
           <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#10B981' }}>متوفر الآن — Available Now (v3.32.3+27)</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#10B981' }}>متوفر الآن — Available Now (v3.32.4+28)</span>
         </div>
 
         <h1 style={{ fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 16px', letterSpacing: '-0.03em' }}>
@@ -38,16 +38,16 @@ export default function DownloadPage() {
 
         <div style={{ marginBottom: 40 }}>
           <a
-            href="/fajrak-v3.32.3.apk"
+            href="/fajrak-v3.32.4.apk"
             download
             style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 16, background: 'var(--accent-blue)', color: 'white', fontSize: 18, fontWeight: 900, textDecoration: 'none', boxShadow: '0 10px 30px rgba(59,126,246,0.3)' }}
           >
-            تحميل APK مباشر (63MB) ↓
+            تحميل APK مباشر (55MB) ↓
           </a>
           <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
              {[
                { icon: '🛡️', label: 'آمن ونسخة رسمية' },
-               { icon: '✨', label: 'تحديث v3.32.3+27' }
+               { icon: '✨', label: 'تحديث v3.32.4+28' }
              ].map((b, i) => (
                <span key={i} style={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                  <span>{b.icon}</span> {b.label}

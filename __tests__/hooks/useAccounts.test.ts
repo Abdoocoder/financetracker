@@ -86,7 +86,7 @@ function setupMock(accountData = mockAccounts, txData = mockTxs) {
     return { account_id: acc.id, current_balance: balance }
   })
 
-  mockRpc.mockImplementation((name: string) => {
+  mockRpc.mockImplementation((name?: string) => {
     if (name === 'get_account_balances') return chainProxy({ data: balances, error: null })
     return chainProxy({ data: null, error: null })
   })

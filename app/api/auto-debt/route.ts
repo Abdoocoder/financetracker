@@ -67,6 +67,8 @@ async function processAutoDebts() {
   }
 
   let count = 0
+  if (!debts) return NextResponse.json({ success: true, count: 0 })
+
   for (const debt of debts) {
     const payment = Math.min(debt.monthly_payment, debt.remaining_amount)
     const newRemaining = Math.max(0, debt.remaining_amount - payment)

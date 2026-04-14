@@ -578,6 +578,16 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.4 — 2026-04-14 *(Performance & Testing)*
+
+| Change | Description |
+|:-------|:------------|
+| 🦴 **Unified Skeletons** | Implemented consistent pulse-loading states across all dashboard cards, charts, and transaction lists on both Web and Mobile. |
+| 🧪 **Integration Testing** | Reached 100% pass rate on all 240+ tests, including critical serverless API routes (`budget-alerts`, `auto-debt`, `cron-auth`). |
+| 🐛 **Logic Fix (Critical)** | Resolved a logical error in the `auto-debt` API where manual reminders were incorrectly skipped in specific scenarios. |
+| 🛠️ **Dev Experience** | Integrated **Task Master AI** for streamlined goal tracking and development workflow automation. |
+| 🔧 **TS Stability** | Fixed strict TypeScript type mismatches in core test suites and mocked Supabase chaining with `chainProxy`. |
+
 ### v3.32.3 — 2026-04-11 *(Dashboard Customization)*
 
 | Change | Description |
