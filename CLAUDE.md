@@ -65,7 +65,7 @@ make build-apk   # release APK
 ## App Info
 
 - **Support email**: `support@fajrak.com` — لا تستخدم `abdooraf3@gmail.com` أبداً
-- **Current version**: `3.32.5+29` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+- **Current version**: `3.32.6+30` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
 
 ## Version Update Checklist
 
@@ -111,9 +111,11 @@ help_faq_<section>_title/q1/a1  # صفحة المساعدة
 
 ## Tech Stack Details
 
-- **State (Web)**: TanStack Query v5 for server state
-- **State (Mobile)**: Flutter built-in + Supabase realtime
-- **Charts**: Recharts (web), fl_chart (Flutter)
+- **UX Standards**:
+  - **Data Safety**: Use `ConfirmDialog` component for ALL destructive actions (Delete, Reset, Cancel).
+  - **Accessibility**: Every icon-only button MUST have a descriptive `aria-label`.
+  - **Smart Focus**: Always set `autoFocus` on the primary input of any new form.
+- **State Management**: TanStack Query v5 (Web), Flutter Provider + Supabase (Mobile)
 - **Styling**: Tailwind CSS
 - **i18n**: custom i18n (`lib/i18n.tsx`) — Arabic/English support, easy_localization (Flutter)
 - **Database migrations**: `supabase/migrations/` — numbered sequentially

@@ -578,6 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.6 — 2026-04-15 *(UX & Security Hardening)*
+
+| Change | Description |
+|:-------|:------------|
+| 🎨 **UX & Security Hardening** | Implemented `ConfirmDialog` for all destructive actions (Budgets, Goals, Recurring). |
+| 🛡️ **ARIA Accessibility** | 100% coverage for icon-only buttons with descriptive `aria-label` tags. |
+| 🎯 **Smart Autofocus** | Automatic keyboard focus on primary inputs for all forms (Auth, Transactions, Management). |
+| 🧪 **Test Stability** | Fixed cross-platform type mismatches in transaction test suites. |
+
 ### v3.32.5 — 2026-04-14 *(Internationalization)*
 
 | Change | Description |
