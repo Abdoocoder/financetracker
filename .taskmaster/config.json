@@ -7,15 +7,15 @@
       "temperature": 0.2
     },
     "research": {
-      "provider": "perplexity",
-      "modelId": "sonar",
-      "maxTokens": 8700,
+      "provider": "claude-code",
+      "modelId": "haiku",
+      "maxTokens": 200000,
       "temperature": 0.1
     },
     "fallback": {
-      "provider": "anthropic",
-      "modelId": "claude-3-7-sonnet-20250219",
-      "maxTokens": 120000,
+      "provider": "gemini-cli",
+      "modelId": "gemini-3-flash-preview",
+      "maxTokens": 1048576,
       "temperature": 0.2
     }
   },

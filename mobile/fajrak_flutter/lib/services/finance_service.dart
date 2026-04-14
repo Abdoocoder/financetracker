@@ -3,6 +3,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class FinanceService {
   static SupabaseClient get _db => Supabase.instance.client;
 
+  /// جلب ملخص الشهر الحالي الموحّد (income/expenses/debt_payments/net)
+  static Future<Map<String, dynamic>> fetchMonthlyFinancialSummary(
+    String userId, {
+    int? year,
+    int? month,
+  }) async {
+    final response = await _db.rpc('get_monthly_financial_summary', params: {
+      'p_user_id': userId,
+      'p_year': year,
+      'p_month': month,
+    });
+    return Map<String, dynamic>.from(response as Map);
+  }
+
   /// جلب ملخص لوحة المعلومات المالية باستخدام RPC المركزية
   static Future<Map<String, dynamic>> fetchFinancialDashboard(String userId, double usdToLocalRate) async {
     final response = await _db.rpc('get_financial_dashboard', params: {

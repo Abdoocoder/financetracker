@@ -103,23 +103,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
-      final txs = results[1] as List;
       final recent = results[2] as List;
       final debts = results[3] as List;
       // investments is now handled via FinanceService.fetchFinancialDashboard
       final goals = results[5] as List;
 
-      double txIncome = 0, txExpenses = 0;
-      for (final tx in txs) {
-        if (tx['type'] == 'income') {
-          txIncome += (tx['amount'] as num).toDouble();
-        } else if (tx['type'] == 'expense') {
-          txExpenses += (tx['amount'] as num).toDouble();
-        }
-        // transfers وأنواع أخرى لا تُحسب كمصاريف
-      }
-      final profileIncome = (profile['monthly_income'] as num?)?.toDouble() ?? 0;
-      final income = txIncome > 0 ? txIncome : profileIncome;
+      // Use centralized monthly summary RPC to match web logic exactly.
+      final monthly = await FinanceService.fetchMonthlyFinancialSummary(
+        user.id,
+        year: now.year,
+        month: now.month,
+      );
+      final income = (monthly['income'] as num?)?.toDouble() ?? 0.0;
+      final txExpenses = (monthly['expenses'] as num?)?.toDouble() ?? 0.0;
+      final net = (monthly['net'] as num?)?.toDouble() ?? (income - txExpenses);
       
       final currency = (profile['currency'] as String? ?? 'JOD').toUpperCase();
       final usdToLocal = currency != 'USD'
@@ -170,7 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _currency = currency;
           _income = income;
           _expenses = txExpenses;
-          _net = income - txExpenses;
+          _net = net;
           _monthlyDebtCommitments = monthlyDebtCommitments;
           _recentTx = recent.cast<Map<String, dynamic>>();
           _healthScore = score.clamp(0, 100);

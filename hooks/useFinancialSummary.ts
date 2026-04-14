@@ -16,31 +16,33 @@ export function useFinancialSummary(userId: string | undefined): FinancialSummar
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) {
+      setSummary({ income: 0, expenses: 0, debtPayments: 0, net: 0, loading: true })
+      return
+    }
     async function load() {
       const now = new Date()
-      const firstDay = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`
-      const lastDay  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()}`
+      const { data, error } = await supabase.rpc('get_monthly_financial_summary', {
+        p_user_id: userId,
+        p_year: now.getFullYear(),
+        p_month: now.getMonth() + 1,
+      })
 
-      const [txRes, debtRes] = await Promise.all([
-        supabase.from('transactions').select('type, amount')
-          .eq('user_id', userId)
-          .gte('transaction_date', firstDay)
-          .lte('transaction_date', lastDay),
-        supabase.from('debts').select('monthly_payment')
-          .eq('user_id', userId)
-          .eq('is_paid', false)
-      ])
+      if (error || !data) {
+        setSummary({ income: 0, expenses: 0, debtPayments: 0, net: 0, loading: false })
+        return
+      }
 
-      const income       = (txRes.data ?? []).filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
-      const expenses     = (txRes.data ?? []).filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      const debtPayments = (debtRes.data ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0)
-      const net          = income - expenses - debtPayments
-
-      setSummary({ income, expenses, debtPayments, net, loading: false })
+      setSummary({
+        income: Number(data.income ?? 0),
+        expenses: Number(data.expenses ?? 0),
+        debtPayments: Number(data.debt_payments ?? 0),
+        net: Number(data.net ?? 0),
+        loading: false,
+      })
     }
     load()
-  }, [userId])
+  }, [userId, supabase])
 
   return summary
 }

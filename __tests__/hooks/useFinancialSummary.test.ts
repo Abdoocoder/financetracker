@@ -1,44 +1,24 @@
 // Mock must come before imports
-const mockFrom = jest.fn()
+const mockRpc = jest.fn()
 
 jest.mock('@/lib/supabase/client', () => ({
-  createClient: jest.fn(() => ({ from: mockFrom })),
+  createClient: jest.fn(() => ({ rpc: mockRpc })),
 }))
 
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { useFinancialSummary } from '../../hooks/useFinancialSummary'
 
-// Proxy chain: any method call returns the same proxy; when awaited resolves to `resolveWith`
-function chainProxy(resolveWith: any) {
-  const proxy: any = new Proxy(
-    {},
-    {
-      get(_target, prop) {
-        if (prop === 'then') return (resolve: any) => Promise.resolve(resolveWith).then(resolve)
-        if (prop === 'catch') return (reject: any) => Promise.resolve(resolveWith).catch(reject)
-        if (prop === 'finally') return (fn: any) => Promise.resolve(resolveWith).finally(fn)
-        return () => proxy
-      },
-    }
-  )
-  return proxy
-}
-
-const txData = [
-  { type: 'income',  amount: '1000' },
-  { type: 'income',  amount: '500' },
-  { type: 'expense', amount: '300' },
-]
-
-const debtData = [
-  { monthly_payment: '200' },
-]
-
 describe('useFinancialSummary', () => {
   beforeEach(() => {
-    mockFrom.mockImplementation((table: string) => {
-      if (table === 'transactions') return chainProxy({ data: txData, error: null })
-      return chainProxy({ data: debtData, error: null })
+    jest.clearAllMocks()
+    mockRpc.mockResolvedValue({
+      data: {
+        income: 1500,
+        expenses: 300,
+        debt_payments: 200,
+        net: 1000,
+      },
+      error: null,
     })
   })
 
@@ -84,7 +64,7 @@ describe('useFinancialSummary', () => {
   })
 
   it('handles null data gracefully (all zeros)', async () => {
-    mockFrom.mockImplementation(() => chainProxy({ data: null, error: null }))
+    mockRpc.mockResolvedValue({ data: null, error: null })
     const { result } = renderHook(() => useFinancialSummary('user-1'))
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.income).toBe(0)
@@ -94,7 +74,7 @@ describe('useFinancialSummary', () => {
   })
 
   it('handles empty arrays (all zeros)', async () => {
-    mockFrom.mockImplementation(() => chainProxy({ data: [], error: null }))
+    mockRpc.mockResolvedValue({ data: {}, error: { message: 'fail' } })
     const { result } = renderHook(() => useFinancialSummary('user-1'))
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.income).toBe(0)
@@ -102,9 +82,14 @@ describe('useFinancialSummary', () => {
   })
 
   it('handles multiple debt payments', async () => {
-    mockFrom.mockImplementation((table: string) => {
-      if (table === 'transactions') return chainProxy({ data: [], error: null })
-      return chainProxy({ data: [{ monthly_payment: '100' }, { monthly_payment: '150' }], error: null })
+    mockRpc.mockResolvedValue({
+      data: {
+        income: 0,
+        expenses: 0,
+        debt_payments: 250,
+        net: -250,
+      },
+      error: null,
     })
     const { result } = renderHook(() => useFinancialSummary('user-2'))
     await waitFor(() => expect(result.current.loading).toBe(false))
