@@ -11,6 +11,7 @@ import { StatBar } from '@/components/ui/stat-bar'
 import { Modal } from '@/components/ui/modal'
 import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useI18n } from '@/lib/i18n'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
@@ -253,6 +254,7 @@ export default function InvestmentsPage() {
   const [txHistory, setTxHistory] = useState<InvestmentTransaction[]>([])
   const [txLoading, setTxLoading] = useState(false)
   const [editingInv, setEditingInv] = useState<Investment | null>(null)
+  const [confirmDeleteInvId, setConfirmDeleteInvId] = useState<string | null>(null)
   const [form, setForm] = useState({ symbol: '', name: '', type: 'etf', currency: 'USD', is_halal: true })
   const [editForm, setEditForm] = useState({ symbol: '', name: '', type: 'etf', shares: '', avg_buy_price: '', current_price: '', is_halal: true, notes: '', purchase_date: '' })
   const [buyForm, setBuyForm] = useState({ shares: '', price: '', commission: '0.5', date: new Date().toISOString().split('T')[0] })
@@ -928,10 +930,26 @@ export default function InvestmentsPage() {
             ⚠️ {t('inv_edit_warning')}
           </div>
           <SaveButton label={t('inv_save')} loading={saving} onClick={saveEditInv} />
-          <button onClick={() => { if (confirm(t('inv_delete_confirm'))) { deleteInv(editingInv.id); setEditingInv(null) } }} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button onClick={() => setConfirmDeleteInvId(editingInv.id)} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
             🗑️ {t('inv_delete_btn').replace('🗑️ ', '')}
           </button>
         </Modal>
+      )}
+
+      {confirmDeleteInvId && (
+        <ConfirmDialog
+          title={t('confirm')}
+          message={t('inv_delete_confirm')}
+          confirmLabel={t('inv_delete_btn')}
+          cancelLabel={t('cancel')}
+          onConfirm={() => {
+            deleteInv(confirmDeleteInvId)
+            setConfirmDeleteInvId(null)
+            setEditingInv(null)
+          }}
+          onCancel={() => setConfirmDeleteInvId(null)}
+          danger
+        />
       )}
     </div>
   )

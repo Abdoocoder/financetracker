@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>23/23</span>
+                <span class='fraction'>0/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.88% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>8/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -91,58 +91,58 @@
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from <span class="cstat-no" title="statement not covered" >'react'</span>
 &nbsp;
-export function useCountUp(target: number, duration = 1000) {
-  const [value, setValue] = useState(0)
-  const startTime = useRef&lt;number | null&gt;(null)
-  const rafRef = useRef&lt;number | undefined&gt;(undefined)
+export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >useCountUp(t</span></span>arget: number, duration = <span class="branch-0 cbranch-no" title="branch not covered" >1000)</span> {
+  const [value, setValue] = <span class="cstat-no" title="statement not covered" >useState(0)</span>
+  const startTime = <span class="cstat-no" title="statement not covered" >useRef&lt;number | null&gt;(null)</span>
+  const rafRef = <span class="cstat-no" title="statement not covered" >useRef&lt;number | undefined&gt;(undefined)</span>
 &nbsp;
-  useEffect(() =&gt; {
-    if (target === 0) { setValue(0); return }
-    startTime.current = null
+<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >() =&gt; {</span></span>
+<span class="cstat-no" title="statement not covered" >    if (target === 0) { <span class="cstat-no" title="statement not covered" >setValue(0); <span class="cstat-no" title="statement not covered" >r</span>eturn }</span></span>
+<span class="cstat-no" title="statement not covered" >    startTime.current = null</span>
 &nbsp;
-    function animate(timestamp: number) {
-      if (!startTime.current) startTime.current = timestamp
-      const progress = Math.min((timestamp - startTime.current) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setValue(target * eased)
-      if (progress &lt; 1) rafRef.current = requestAnimationFrame(animate)
-      else setValue(target)
+    function <span class="fstat-no" title="function not covered" >animate(t</span>imestamp: number) {
+<span class="cstat-no" title="statement not covered" >      if (!startTime.current) <span class="cstat-no" title="statement not covered" >startTime.current = timestamp</span></span>
+      const progress = <span class="cstat-no" title="statement not covered" >Math.min((timestamp - startTime.current) / duration, 1)</span>
+      const eased = <span class="cstat-no" title="statement not covered" >1 - Math.pow(1 - progress, 3)</span>
+<span class="cstat-no" title="statement not covered" >      setValue(target * eased)</span>
+<span class="cstat-no" title="statement not covered" >      if (progress &lt; 1) <span class="cstat-no" title="statement not covered" >rafRef.current = requestAnimationFrame(animate)</span></span>
+      else <span class="cstat-no" title="statement not covered" >setValue(target)</span>
     }
 &nbsp;
-    rafRef.current = requestAnimationFrame(animate)
-    return () =&gt; { <span class="missing-if-branch" title="else path not taken" >E</span>if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+<span class="cstat-no" title="statement not covered" >    rafRef.current = requestAnimationFrame(animate)</span>
+<span class="cstat-no" title="statement not covered" >    return <span class="fstat-no" title="function not covered" >() =&gt; { <span class="cstat-no" title="statement not covered" >i</span>f (rafRef.current) <span class="cstat-no" title="statement not covered" >cancelAnimationFrame(rafRef.current) }</span></span></span>
   }, [target, duration])
 &nbsp;
-  return value
+<span class="cstat-no" title="statement not covered" >  return value</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -151,7 +151,7 @@ export function useCountUp(target: number, duration = 1000) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T21:08:13.469Z
+                at 2026-04-14T21:26:37.307Z
             </div>
         <script src="../prettify.js"></script>
         <script>

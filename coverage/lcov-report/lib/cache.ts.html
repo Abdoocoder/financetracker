@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>10/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/3</span>
+                <span class='fraction'>0/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/9</span>
+                <span class='fraction'>0/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -88,19 +88,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
@@ -108,19 +108,19 @@
  * يمسح كل cache المستخدم بعد أي تعديل على البيانات
  */
 &nbsp;
-const CACHE_KEYS = ['dashboard', 'tx', 'debts', 'goals', 'inv'] as const
+const CACHE_KEYS = <span class="cstat-no" title="statement not covered" >['dashboard', 'tx', 'debts', 'goals', 'inv'] as const</span>
 &nbsp;
-export function clearUserCache(userId: string): void {
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (!userId) <span class="cstat-no" title="statement not covered" >return</span>
-  try {
-    CACHE_KEYS.forEach(k =&gt; sessionStorage.removeItem(`${k}_${userId}`))
+export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >clearUserCache(u</span></span>serId: string): void {
+<span class="cstat-no" title="statement not covered" >  if (!userId) <span class="cstat-no" title="statement not covered" >return</span></span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    CACHE_KEYS.forEach(<span class="fstat-no" title="function not covered" >k =&gt; <span class="cstat-no" title="statement not covered" >s</span>essionStorage.removeItem(`${k}_${userId}`))</span></span>
   } catch {}
 }
 &nbsp;
-export function clearCacheKey(key: typeof CACHE_KEYS[number], userId: string): void {
-  <span class="missing-if-branch" title="if path not taken" >I</span>if (!userId) <span class="cstat-no" title="statement not covered" >return</span>
-  try {
-    sessionStorage.removeItem(`${key}_${userId}`)
+export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >clearCacheKey(k</span></span>ey: typeof CACHE_KEYS[number], userId: string): void {
+<span class="cstat-no" title="statement not covered" >  if (!userId) <span class="cstat-no" title="statement not covered" >return</span></span>
+<span class="cstat-no" title="statement not covered" >  try {</span>
+<span class="cstat-no" title="statement not covered" >    sessionStorage.removeItem(`${key}_${userId}`)</span>
   } catch {}
 }
 &nbsp;</pre></td></tr></table></pre>
@@ -130,7 +130,7 @@ export function clearCacheKey(key: typeof CACHE_KEYS[number], userId: string): v
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T21:08:13.469Z
+                at 2026-04-14T21:26:37.307Z
             </div>
         <script src="../prettify.js"></script>
         <script>

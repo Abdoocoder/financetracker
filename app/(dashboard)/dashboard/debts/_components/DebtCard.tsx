@@ -92,8 +92,16 @@ export const DebtCard = memo(function DebtCard({
           {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}{t('debts_per_month')}</div>}
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-          <button onClick={() => onEdit(debt)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
-          <button onClick={() => onDelete(debt.id)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          <button
+            onClick={() => onEdit(debt)}
+            aria-label={t('edit_item', { name: debt.name })}
+            title={t('edit_item', { name: debt.name })}
+            style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
+          <button
+            onClick={() => onDelete(debt.id)}
+            aria-label={t('delete_item', { name: debt.name })}
+            title={t('delete_item', { name: debt.name })}
+            style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
       </div>
 
@@ -123,11 +131,16 @@ export const DebtCard = memo(function DebtCard({
               onKeyDown={e => e.key === 'Enter' && onConfirmPayment(debt.id)}
               style={{ width: 70, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }}
             />
-            <button onClick={() => onConfirmPayment(debt.id)} disabled={payingSaving}
+            <button
+              onClick={() => onConfirmPayment(debt.id)}
+              disabled={payingSaving}
+              aria-label={t('confirm_payment')}
               style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
               {payingSaving ? '⏳' : '✓'}
             </button>
-            <button onClick={onCancelPayment}
+            <button
+              onClick={onCancelPayment}
+              aria-label={t('cancel_payment')}
               style={{ padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
           </div>
         ) : (

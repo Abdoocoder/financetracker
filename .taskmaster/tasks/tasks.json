@@ -416,9 +416,9 @@
         "testStrategy": "grep search للنصوص المباشرة، visual review للصفحات بالعربية والإنجليزية، check for missing keys في translation files",
         "priority": "high",
         "dependencies": [],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [],
-        "updatedAt": "2026-04-14T18:28:53.870Z"
+        "updatedAt": "2026-04-14T21:15:31.801Z"
       },
       {
         "id": "6",
@@ -428,8 +428,9 @@
         "testStrategy": "accessibility audits (axe)، manual testing بـ screen readers، visual inspection for aria-labels، integration tests لـ autofocus behavior",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-14T21:22:55.945Z"
       },
       {
         "id": "7",
@@ -487,9 +488,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-14T18:28:53.871Z",
+      "lastModified": "2026-04-14T21:22:55.945Z",
       "taskCount": 10,
-      "completedCount": 3,
+      "completedCount": 5,
       "tags": [
         "master"
       ]

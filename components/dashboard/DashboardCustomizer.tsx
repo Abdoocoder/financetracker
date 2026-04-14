@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { CARD_CONFIGS, type CardId } from '@/hooks/useDashboardLayout'
+import { useI18n } from '@/lib/i18n'
 
 interface Props {
   visibility: Record<CardId, boolean>
@@ -11,7 +12,8 @@ interface Props {
 
 export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Props) {
   const [open, setOpen] = useState(false)
-  const isAr = lang === 'ar'
+  const { t, lang: currentLang } = useI18n()
+  const isAr = currentLang === 'ar'
 
   const visibleCount = CARD_CONFIGS.filter(c => !c.required && visibility[c.id]).length
   const totalOptional = CARD_CONFIGS.filter(c => !c.required).length
@@ -21,8 +23,8 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
       {/* Trigger button */}
       <button
         onClick={() => setOpen(true)}
-        aria-label={isAr ? 'تخصيص لوحة التحكم' : 'Customize dashboard'}
-        title={isAr ? 'تخصيص لوحة التحكم' : 'Customize dashboard'}
+        aria-label={t('dash_customize_title')}
+        title={t('dash_customize_title')}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -37,7 +39,7 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
           cursor: 'pointer',
         }}
       >
-        ⚙️ {isAr ? 'تخصيص' : 'Customize'}
+        ⚙️ {t('dash_customize')}
       </button>
 
       {/* Modal overlay */}
@@ -77,17 +79,15 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)' }}>
-                  {isAr ? '⚙️ تخصيص لوحة التحكم' : '⚙️ Customize Dashboard'}
+                  {t('dash_customize_title')}
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                  {isAr
-                    ? `${visibleCount} من ${totalOptional} بطاقة مفعّلة`
-                    : `${visibleCount} of ${totalOptional} cards visible`}
+                  {t('dash_customize_count', { n: visibleCount, total: totalOptional })}
                 </div>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                aria-label={isAr ? 'إغلاق' : 'Close'}
+                aria-label={t('close')}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: 'var(--text-muted)', padding: 4 }}
               >
                 ✕
@@ -127,7 +127,7 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
                       </span>
                       {card.required && (
                         <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>
-                          ({isAr ? 'مطلوب' : 'required'})
+                          ({t('dash_required')})
                         </span>
                       )}
                     </div>
@@ -173,7 +173,7 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
                   fontSize: 13, fontWeight: 700, cursor: 'pointer',
                 }}
               >
-                {isAr ? '↺ إعادة الضبط' : '↺ Reset'}
+                {t('dash_reset')}
               </button>
               <button
                 onClick={() => setOpen(false)}
@@ -185,7 +185,7 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
                   fontSize: 13, fontWeight: 800, cursor: 'pointer',
                 }}
               >
-                {isAr ? '✓ حفظ' : '✓ Done'}
+                {isAr ? `✓ ${t('dash_done')}` : `✓ ${t('dash_done')}`}
               </button>
             </div>
           </div>

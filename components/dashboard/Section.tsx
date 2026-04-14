@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useI18n } from '@/lib/i18n'
 
 export function Section({ id, title, icon, defaultOpen = false, children }: {
   id: string
@@ -10,6 +11,7 @@ export function Section({ id, title, icon, defaultOpen = false, children }: {
 }) {
   const STORAGE_KEY = `dash_section_${id}`
   const [open, setOpen] = useState(defaultOpen)
+  const { t } = useI18n()
 
   useEffect(() => {
     try {
@@ -31,7 +33,7 @@ export function Section({ id, title, icon, defaultOpen = false, children }: {
         onClick={toggle}
         aria-expanded={open}
         aria-controls={`section-${id}`}
-        aria-label={`${open ? 'Collapse' : 'Expand'} ${title}`}
+        aria-label={`${open ? t('section_collapse') : t('section_expand')} ${title}`}
         style={{
           width: '100%', padding: '12px 16px',
           background: open ? 'var(--bg-elevated)' : 'var(--bg-card)',

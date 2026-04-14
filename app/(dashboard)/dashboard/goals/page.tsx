@@ -186,10 +186,10 @@ export default function GoalsPage() {
               { label: t('goals_target'),  key: 'target_amount',  type: 'number', col: '' },
               { label: t('goals_current'), key: 'current_amount', type: 'number', col: '' },
               { label: t('goals_date'),    key: 'target_date',    type: 'date',   col: 'col-span-2' },
-            ].map(f => (
+            ].map((f, i) => (
               <div key={f.key} className={f.col}>
                 <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--text-muted)' }}>{f.label}</label>
-                <input type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                <input autoFocus={i === 0} type={f.type} value={(form as any)[f.key]} onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
                   className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
                   style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }} />
               </div>

@@ -60,7 +60,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
       </div>
 
       <FormField label={t('debts_name')}>
-        <Input placeholder={t('debts_name_hint')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+        <Input autoFocus placeholder={t('debts_name_hint')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </FormField>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.35% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/17</span>
+                <span class='fraction'>0/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/12</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -97,7 +97,7 @@
 <a name='L32'></a><a href='#L32'>32</a>
 <a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -107,21 +107,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -129,7 +129,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">'use client'
 &nbsp;
-export { CURRENCIES, <span class="cstat-no" title="statement not covered" >CURRENCIES_BY_GROUP, <span class="cstat-no" title="statement not covered" >C</span>URRENCY_MAP, <span class="cstat-no" title="statement not covered" >g</span>etCurrencyDecimals } from '</span>./currencies'
+export { <span class="cstat-no" title="statement not covered" >CURRENCIES, <span class="cstat-no" title="statement not covered" >C</span>URRENCIES_BY_GROUP, <span class="cstat-no" title="statement not covered" >C</span>URRENCY_MAP, <span class="cstat-no" title="statement not covered" >g</span>etCurrencyDecimals } from <span class="cstat-no" title="statement not covered" >'</span>./currencies'</span>
 export type { CurrencyInfo, CurrencyGroup, GroupedCurrency } from './currencies'
 import { getCurrencyDecimals } from './currencies'
 &nbsp;
@@ -139,21 +139,21 @@ export interface ExchangeRateResponse {
   rate: number
 }
 &nbsp;
-export async function fetchExchangeRate(base: string, target: string): Promise&lt;number | null&gt; {
-  try {
-    const res = await fetch(`/api/exchange-rate?base=${base}&amp;target=${target}`)
-    if (!res.ok) return null
-    const data: ExchangeRateResponse = await res.json()
-    return data.rate
+export async function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >fetchExchangeRate(b</span></span>ase: string, target: string): Promise&lt;number | null&gt; {
+<span class="cstat-no" title="statement not covered" >  try {</span>
+    const res = <span class="cstat-no" title="statement not covered" >await fetch(`/api/exchange-rate?base=${base}&amp;target=${target}`)</span>
+<span class="cstat-no" title="statement not covered" >    if (!res.ok) <span class="cstat-no" title="statement not covered" >return null</span></span>
+    const data: ExchangeRateResponse = <span class="cstat-no" title="statement not covered" >await res.json()</span>
+<span class="cstat-no" title="statement not covered" >    return data.rate</span>
   } catch (err) {
-    console.error('Failed to fetch exchange rate:', err)
-    return null
+<span class="cstat-no" title="statement not covered" >    console.error('Failed to fetch exchange rate:', err)</span>
+<span class="cstat-no" title="statement not covered" >    return null</span>
   }
 }
 &nbsp;
-export function formatAmount(amount: number, currency: string) {
-  const decimals = getCurrencyDecimals(currency)
-  return new Intl.NumberFormat('en-US', {
+export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >formatAmount(a</span></span>mount: number, currency: string) {
+  const decimals = <span class="cstat-no" title="statement not covered" >getCurrencyDecimals(currency)</span>
+<span class="cstat-no" title="statement not covered" >  return new Intl.NumberFormat('en-US', {</span>
     style: 'decimal',
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
@@ -166,7 +166,7 @@ export function formatAmount(amount: number, currency: string) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T21:08:13.469Z
+                at 2026-04-14T21:26:37.307Z
             </div>
         <script src="../prettify.js"></script>
         <script>
