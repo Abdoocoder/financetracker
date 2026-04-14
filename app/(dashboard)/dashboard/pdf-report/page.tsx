@@ -17,42 +17,53 @@ export default function PDFReportPage() {
   const [year, setYear] = useState(now.getFullYear())
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   async function load() {
     if (!user) return
     setLoading(true)
+    setLoadError(null)
     const firstDay = `${year}-${String(month + 1).padStart(2, '0')}-01`
     const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0]
+    try {
+      const [txRes, debtRes, invRes, goalRes, profileRes] = await Promise.all([
+        supabase.from('transactions').select('*').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay).order('transaction_date'),
+        supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false),
+        supabase.from('investments').select('*').eq('user_id', user.id),
+        supabase.from('savings_goals').select('*').eq('user_id', user.id),
+        supabase.from('profiles').select('full_name, currency, monthly_income').eq('id', user.id).single(),
+      ])
 
-    const [txRes, debtRes, invRes, goalRes, profileRes] = await Promise.all([
-      supabase.from('transactions').select('*').eq('user_id', user.id).gte('transaction_date', firstDay).lte('transaction_date', lastDay).order('transaction_date'),
-      supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false),
-      supabase.from('investments').select('*').eq('user_id', user.id),
-      supabase.from('savings_goals').select('*').eq('user_id', user.id),
-      supabase.from('profiles').select('full_name, currency, monthly_income').eq('id', user.id).single(),
-    ])
+      if (txRes.error || debtRes.error || invRes.error || goalRes.error || profileRes.error) {
+        throw new Error('failed to load report data')
+      }
 
-    const txs = txRes.data ?? []
-    const txIncome = txs.filter((t: any) => t.type === 'income').reduce((a: number, t: any) => a + Number(t.amount), 0)
-    const monthlyIncome = Number(profileRes.data?.monthly_income ?? 0)
-    const income = txIncome + monthlyIncome
-    const expenses = txs.filter((t: any) => t.type === 'expense').reduce((a: number, t: any) => a + Number(t.amount), 0)
-    const catMap: Record<string, number> = {}
-    txs.filter((t: any) => t.type === 'expense').forEach((t: any) => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
-    const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1])
+      const txs = txRes.data ?? []
+      const txIncome = txs.filter((t: any) => t.type === 'income').reduce((a: number, t: any) => a + Number(t.amount), 0)
+      const monthlyIncome = Number(profileRes.data?.monthly_income ?? 0)
+      const income = txIncome + monthlyIncome
+      const expenses = txs.filter((t: any) => t.type === 'expense').reduce((a: number, t: any) => a + Number(t.amount), 0)
+      const catMap: Record<string, number> = {}
+      txs.filter((t: any) => t.type === 'expense').forEach((t: any) => { catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount) })
+      const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1])
 
-    setData({
-      profile: profileRes.data,
-      transactions: txs,
-      income,
-      expenses,
-      net: income - expenses,
-      categories,
-      debts: debtRes.data ?? [],
-      investments: invRes.data ?? [],
-      goals: goalRes.data ?? [],
-    })
-    setLoading(false)
+      setData({
+        profile: profileRes.data,
+        transactions: txs,
+        income,
+        expenses,
+        net: income - expenses,
+        categories,
+        debts: debtRes.data ?? [],
+        investments: invRes.data ?? [],
+        goals: goalRes.data ?? [],
+      })
+    } catch {
+      setData(null)
+      setLoadError(ar ? 'تعذر تحميل التقرير. حاول مرة أخرى.' : 'Failed to load report. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => { load() }, [user, month, year])
@@ -71,10 +82,18 @@ export default function PDFReportPage() {
         <h1 style={{ fontSize: 20, fontWeight: 900, margin: 0, color: 'var(--text-primary)', flex: 1 }}>
           📄 {ar ? 'التقرير الشهري' : 'Monthly Report'}
         </h1>
-        <select value={month} onChange={e => setMonth(Number(e.target.value))} style={{ padding: '8px 12px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
+        <select
+          aria-label={ar ? 'اختيار الشهر' : 'Select month'}
+          value={month}
+          onChange={e => setMonth(Number(e.target.value))}
+          style={{ padding: '8px 12px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
           {monthNames.map((m, i) => <option key={i} value={i}>{m}</option>)}
         </select>
-        <select value={year} onChange={e => setYear(Number(e.target.value))} style={{ padding: '8px 12px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
+        <select
+          aria-label={ar ? 'اختيار السنة' : 'Select year'}
+          value={year}
+          onChange={e => setYear(Number(e.target.value))}
+          style={{ padding: '8px 12px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontFamily: 'inherit' }}>
           {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
         </select>
         <button onClick={() => window.print()} style={{ padding: '10px 20px', borderRadius: 12, background: 'var(--accent-blue)', border: 'none', color: 'white', fontWeight: 800, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
@@ -82,7 +101,28 @@ export default function PDFReportPage() {
         </button>
       </div>
 
-      {loading && <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>{ar ? 'جاري التحميل...' : 'Loading...'}</div>}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div className="skeleton" style={{ height: 84, borderRadius: 14 }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+            <div className="skeleton" style={{ height: 96, borderRadius: 12 }} />
+            <div className="skeleton" style={{ height: 96, borderRadius: 12 }} />
+            <div className="skeleton" style={{ height: 96, borderRadius: 12 }} />
+          </div>
+          <div className="skeleton" style={{ height: 160, borderRadius: 14 }} />
+        </div>
+      )}
+
+      {!loading && loadError && (
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, padding: 16 }}>
+          <div style={{ color: 'var(--text-secondary)', fontSize: 14, marginBottom: 10 }}>{loadError}</div>
+          <button
+            onClick={load}
+            style={{ padding: '10px 14px', borderRadius: 10, background: 'var(--accent-blue)', border: 'none', color: '#fff', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            {ar ? 'إعادة المحاولة' : 'Retry'}
+          </button>
+        </div>
+      )}
 
       {data && (
         <div ref={printRef} style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'Cairo, sans-serif' }}>

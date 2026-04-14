@@ -89,6 +89,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
             </span>
           </div>
           <input type="range" min={10} max={1000} step={10} value={monthly}
+            aria-label={ar ? 'قيمة الاستثمار الشهري' : 'Monthly investment amount'}
             onChange={e => setMonthly(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
           />
@@ -108,6 +109,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
             </span>
           </div>
           <input type="range" min={1} max={30} step={1} value={years}
+            aria-label={ar ? 'عدد سنوات الاستثمار' : 'Investment duration in years'}
             onChange={e => setYears(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
           />
@@ -127,6 +129,7 @@ function WealthSimulator({ lang, currency }: { lang: string; currency: string })
             </span>
           </div>
           <input type="range" min={1} max={20} step={0.5} value={rate}
+            aria-label={ar ? 'معدل العائد السنوي' : 'Annual return rate'}
             onChange={e => setRate(Number(e.target.value))}
             style={{ width: '100%', accentColor: 'var(--accent-green)' }}
           />
@@ -567,7 +570,11 @@ export default function InvestmentsPage() {
                 </button>
               ))}
             </div>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value as typeof sortBy)} style={{
+            <select
+              aria-label={lang === 'ar' ? 'ترتيب الاستثمارات' : 'Sort investments'}
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as typeof sortBy)}
+              style={{
               padding: '5px 10px', borderRadius: 10, fontSize: 11, fontWeight: 700, flexShrink: 0,
               cursor: 'pointer', fontFamily: 'inherit', background: 'var(--bg-secondary)',
               color: sortBy !== 'none' ? 'var(--accent-blue-light)' : 'var(--text-muted)',
@@ -722,7 +729,12 @@ export default function InvestmentsPage() {
             </Select>
           </FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
-            <input type="checkbox" checked={form.is_halal} onChange={e => setForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
+            <input
+              type="checkbox"
+              aria-label={lang === 'en' ? 'Mark investment as halal' : 'تحديد الاستثمار كحلال'}
+              checked={form.is_halal}
+              onChange={e => setForm(f => ({ ...f, is_halal: e.target.checked }))}
+              style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
             <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{lang === 'en' ? '✅ Halal Investment' : '✅ استثمار حلال'}</span>
           </div>
           <SaveButton label={lang === 'en' ? 'Add Asset' : 'إضافة الأصل'} loading={saving} onClick={addInvestment} />
@@ -766,7 +778,11 @@ export default function InvestmentsPage() {
       {showTxHistory && (
         <Modal title={t('inv_tx_history')} onClose={() => { setShowTxHistory(null); setTxHistory([]) }}>
           {txLoading ? (
-            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>{lang === 'en' ? '⏳ Loading...' : '⏳ جاري التحميل...'}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 4 }}>
+              <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
+              <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
+              <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
+            </div>
           ) : txHistory.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>لا توجد معاملات بعد</div>
           ) : (
@@ -850,7 +866,10 @@ export default function InvestmentsPage() {
               {lang === 'en' ? `Available: ${cashBalance.toFixed(2)} ${cashCurrency}` : `المتاح: ${cashBalance.toFixed(2)} ${cashCurrency}`}
             </div>
             <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>{lang === 'en' ? `Amount (${cashCurrency})` : `المبلغ (${cashCurrency})`}</label>
-            <input type="number" value={transferAmount} onChange={e => setTransferAmount(e.target.value)}
+            <input type="number" value={transferAmount}
+              aria-label={lang === 'en' ? 'Transfer amount' : 'مبلغ التحويل'}
+              placeholder={lang === 'en' ? 'Enter amount' : 'ادخل المبلغ'}
+              onChange={e => setTransferAmount(e.target.value)}
               style={{ width: '100%', padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 18, fontWeight: 900, fontFamily: 'monospace', outline: 'none', boxSizing: 'border-box', textAlign: 'center' }} />
             {cashCurrency !== userCurrency && (
               <div style={{ marginTop: 12, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
@@ -903,7 +922,12 @@ export default function InvestmentsPage() {
           </FormField>
           <FormField label={lang === 'en' ? 'Notes' : 'ملاحظات'}><Input placeholder={lang === "en" ? "Optional" : "اختياري"} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
-            <input type="checkbox" checked={editForm.is_halal} onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))} style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
+            <input
+              type="checkbox"
+              aria-label={lang === 'en' ? 'Mark edited investment as halal' : 'تحديد الاستثمار المعدل كحلال'}
+              checked={editForm.is_halal}
+              onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))}
+              style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
             <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>✅ {lang === 'en' ? 'Halal' : 'حلال'}</span>
           </div>
           <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B', fontSize: 12, marginBottom: 14 }}>

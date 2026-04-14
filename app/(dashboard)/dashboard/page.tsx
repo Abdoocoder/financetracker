@@ -26,7 +26,10 @@ import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
 const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
-const ChallengesCard = nextDynamic(() => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })), { ssr: false })
+const ChallengesCard = nextDynamic(
+  () => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })),
+  { ssr: false, loading: () => <div className="skeleton" style={{ height: 140, borderRadius: 16 }} /> }
+)
 
 const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })

@@ -227,8 +227,12 @@ export default function AlertsPage() {
   ]
 
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="text-3xl animate-pulse-slow">⏳</div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className="skeleton" style={{ height: 56, borderRadius: 16 }} />
+      <div className="skeleton" style={{ height: 92, borderRadius: 16 }} />
+      {[0, 1, 2].map(i => (
+        <div key={i} className="skeleton" style={{ height: 110, borderRadius: 16 }} />
+      ))}
     </div>
   )
 
