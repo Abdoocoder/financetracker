@@ -10,6 +10,7 @@ import type { SavingsGoal } from '@/types'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { ListSkeleton, Skeleton } from '@/components/ui/skeleton'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<SavingsGoal[]>([])
@@ -20,6 +21,7 @@ export default function GoalsPage() {
   const [form, setForm] = useState({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })
   const [saving, setSaving] = useState(false)
   const [savingGoalId, setSavingGoalId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [savingAmount, setSavingAmount] = useState('')
   const supabase = createClient()
   const { t, lang, currentLang } = useI18n()
@@ -98,7 +100,9 @@ export default function GoalsPage() {
   async function deleteGoal(id: string) {
     const { error } = await supabase.from('savings_goals').delete().eq('id', id)
     if (error) { toast.error(t('toast_error_delete')); return }
-    toast.success(t('toast_deleted')); load()
+    toast.success(t('toast_deleted'))
+    setConfirmDeleteId(null)
+    load()
   }
 
   async function addSaving(goalId: string) {
@@ -225,8 +229,8 @@ export default function GoalsPage() {
                   <div className="font-black font-mono text-sm ml-1" style={{ color: pct >= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}>
                     {pct >= 100 ? '✅' : `${pct.toFixed(0)}%`}
                   </div>
-                  <button onClick={() => startEdit(goal)} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>✏️</button>
-                  <button onClick={() => deleteGoal(goal.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>🗑️</button>
+                  <button onClick={() => startEdit(goal)} aria-label={lang === 'en' ? 'Edit goal' : 'تعديل الهدف'} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>✏️</button>
+                  <button onClick={() => setConfirmDeleteId(goal.id)} aria-label={lang === 'en' ? 'Delete goal' : 'حذف الهدف'} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>🗑️</button>
                 </div>
               </div>
               <div className="progress-track mb-2">
@@ -247,9 +251,9 @@ export default function GoalsPage() {
                   <input type="number" value={savingAmount} onChange={e => setSavingAmount(e.target.value)}
                     className="flex-1 px-3 py-2 rounded-xl text-sm outline-none text-center"
                     style={{ background: 'var(--bg-secondary)', border: '1px solid var(--accent-green)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                    placeholder={`0 ${baseCurrency}`} autoFocus onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
-                  <button onClick={() => addSaving(goal.id)} className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black">✓</button>
-                  <button onClick={() => { setSavingGoalId(null); setSavingAmount('') }} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
+                    placeholder={`0 ${baseCurrency}`} aria-label={t('goals_add_saving')} autoFocus onKeyDown={e => e.key === 'Enter' && addSaving(goal.id)} />
+                  <button onClick={() => addSaving(goal.id)} aria-label={t('save')} className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black">✓</button>
+                  <button onClick={() => { setSavingGoalId(null); setSavingAmount('') }} aria-label={t('close')} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>✕</button>
                 </div>
               ) : (
                 remaining > 0 && (
@@ -261,13 +265,22 @@ export default function GoalsPage() {
             </div>
           )
         })}
-        {goals.length === 0 && (
+      {goals.length === 0 && (
           <div className="text-center py-16 card">
             <div className="text-4xl mb-3">🎯</div>
             <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>{t('goals_empty')}</div>
           </div>
         )}
       </div>
+
+      {confirmDeleteId && (
+        <ConfirmDialog
+          title={t('goal_delete_title') || (lang === 'ar' ? 'حذف الهدف' : 'Delete Goal')}
+          message={t('goal_delete_msg') || (lang === 'ar' ? 'هل أنت متأكد من حذف هذا الهدف؟ لا يمكن التراجع عن هذه العملية.' : 'Are you sure you want to delete this goal? This action cannot be undone.')}
+          onConfirm={() => deleteGoal(confirmDeleteId)}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
+      )}
     </div>
   )
 }

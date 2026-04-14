@@ -163,11 +163,11 @@ export function RecurringList({ baseCurrency }: { baseCurrency: string }) {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
-              <button onClick={() => toggleActive(rec)} title={rec.is_active ? 'Pause' : 'Resume'} style={{ width: 28, height: 28, borderRadius: 8, background: rec.is_active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)', border: '1px solid transparent', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button onClick={() => toggleActive(rec)} aria-label={rec.is_active ? (lang === 'en' ? 'Pause' : 'إيقاف مؤقت') : (lang === 'en' ? 'Resume' : 'استئناف')} title={rec.is_active ? 'Pause' : 'Resume'} style={{ width: 28, height: 28, borderRadius: 8, background: rec.is_active ? 'rgba(245,158,11,0.1)' : 'rgba(16,185,129,0.1)', border: '1px solid transparent', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {rec.is_active ? '⏸' : '▶'}
               </button>
-              <button onClick={() => openEdit(rec)} style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
-              <button onClick={() => remove(rec.id)} style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+              <button onClick={() => openEdit(rec)} aria-label={lang === 'en' ? 'Edit rule' : 'تعديل القاعدة'} style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
+              <button onClick={() => { if (window.confirm(lang === 'en' ? 'Delete this recurring rule?' : 'حذف هذه القاعدة المتكررة؟')) remove(rec.id) }} aria-label={lang === 'en' ? 'Delete rule' : 'حذف القاعدة'} style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
             </div>
           </div>
         </div>
@@ -180,27 +180,28 @@ export function RecurringList({ baseCurrency }: { baseCurrency: string }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               {(['expense', 'income'] as const).map(tp => (
                 <button key={tp} onClick={() => setForm(f => ({ ...f, type: tp, category: tp === 'income' ? 'راتب' : 'طعام' }))}
+                  aria-pressed={form.type === tp}
                   style={{ padding: '9px', borderRadius: 10, border: `1px solid ${form.type === tp ? (tp === 'income' ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)') : 'var(--border)'}`, background: form.type === tp ? (tp === 'income' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)') : 'transparent', color: form.type === tp ? (tp === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)') : 'var(--text-muted)', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
                   {tp === 'income' ? (lang === 'en' ? '↑ Income' : '↑ دخل') : (lang === 'en' ? '↓ Expense' : '↓ مصروف')}
                 </button>
               ))}
             </div>
 
-            <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={lang === 'en' ? 'Name (e.g. Rent, Salary)' : 'الاسم (مثال: إيجار، راتب)'} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }} />
+            <input autoFocus value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={lang === 'en' ? 'Name (e.g. Rent, Salary)' : 'الاسم (مثال: إيجار، راتب)'} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }} />
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <input type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder={lang === 'en' ? 'Amount' : 'المبلغ'} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }} />
-              <select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
+              <select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))} aria-label={lang === 'en' ? 'Currency' : 'العملة'} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
                 {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
               </select>
             </div>
 
-            <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
+            <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} aria-label={lang === 'en' ? 'Category' : 'الفئة'} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <select value={form.frequency} onChange={e => setForm(f => ({ ...f, frequency: e.target.value as RecurringFrequency }))} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
+              <select value={form.frequency} onChange={e => setForm(f => ({ ...f, frequency: e.target.value as RecurringFrequency }))} aria-label={lang === 'en' ? 'Frequency' : 'التكرار'} style={{ padding: '10px 12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, fontFamily: 'inherit', outline: 'none' }}>
                 {(Object.keys(FREQ_LABELS) as RecurringFrequency[]).map(k => (
                   <option key={k} value={k}>{FREQ_LABELS[k][lang as 'ar' | 'en'] ?? k}</option>
                 ))}

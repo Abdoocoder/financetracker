@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast'
 import { usePullToRefresh } from '@/lib/use-pull-to-refresh'
 import { PullToRefreshIndicator } from '@/components/ui/pull-to-refresh'
 import { ListSkeleton } from '@/components/ui/skeleton'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 
 const CATEGORIES = [
   { key: 'طعام', ar: 'طعام', en: 'Food', icon: '🍔' },
@@ -180,6 +181,7 @@ export default function BudgetsPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [form, setForm] = useState({ category: 'طعام', monthly_limit: '' })
 
   const load = useCallback(async () => {
@@ -241,6 +243,7 @@ export default function BudgetsPage() {
     await supabase.from('budgets').delete().eq('id', id)
     clearUserCache(currentUser?.id ?? '')
     toast.success(t('toast_deleted'))
+    setConfirmDeleteId(null)
     await load()
   }
 
@@ -282,7 +285,10 @@ export default function BudgetsPage() {
       {/* اختيار الشهر */}
       <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflowX: 'auto' }}>
         {months.map((m, i) => (
-          <button key={i} onClick={() => setMonth(i + 1)} style={{ padding: '7px 14px', borderRadius: 100, background: month === i + 1 ? 'var(--accent-blue)' : 'var(--bg-card)', border: `1px solid ${month === i + 1 ? 'var(--accent-blue)' : 'var(--border)'}`, color: month === i + 1 ? 'white' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}>
+          <button key={i} onClick={() => setMonth(i + 1)} 
+            aria-label={lang === 'en' ? `View budgets for ${m}` : `عرض ميزانيات ${m}`}
+            aria-pressed={month === i + 1}
+            style={{ padding: '7px 14px', borderRadius: 100, background: month === i + 1 ? 'var(--accent-blue)' : 'var(--bg-card)', border: `1px solid ${month === i + 1 ? 'var(--accent-blue)' : 'var(--border)'}`, color: month === i + 1 ? 'white' : 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0 }}>
             {m}
           </button>
         ))}
@@ -375,8 +381,8 @@ export default function BudgetsPage() {
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 16, fontWeight: 900, color: over ? 'var(--accent-red-light)' : 'var(--accent-green-light)', fontFamily: 'monospace' }}>{Math.round(pct)}%</div>
                   </div>
-                  <button onClick={() => openEdit(b)} style={{ padding: '6px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
-                  <button onClick={() => handleDelete(b.id)} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>🗑️</button>
+                  <button onClick={() => openEdit(b)} aria-label={lang === 'en' ? 'Edit budget' : 'تعديل الميزانية'} style={{ padding: '6px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✏️</button>
+                  <button onClick={() => setConfirmDeleteId(b.id)} aria-label={lang === 'en' ? 'Delete budget' : 'حذف الميزانية'} style={{ padding: '6px 10px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>🗑️</button>
                 </div>
               </div>
               <div style={{ height: 8, background: 'var(--bg-secondary)', borderRadius: 99, overflow: 'hidden', marginBottom: 8 }}>
@@ -400,7 +406,7 @@ export default function BudgetsPage() {
                 <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{t('budget_category')}</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(64px, 1fr))', gap: 8 }}>
                   {CATEGORIES.map(cat => (
-                    <button key={cat.key} onClick={() => setForm(f => ({ ...f, category: cat.key }))} style={{ padding: '10px 4px', borderRadius: 12, background: form.category === cat.key ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${form.category === cat.key ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: form.category === cat.key ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                    <button key={cat.key} onClick={() => setForm(f => ({ ...f, category: cat.key }))} aria-label={lang === 'ar' ? cat.ar : cat.en} aria-pressed={form.category === cat.key} style={{ padding: '10px 4px', borderRadius: 12, background: form.category === cat.key ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)', border: `1px solid ${form.category === cat.key ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`, color: form.category === cat.key ? 'var(--accent-blue-light)' : 'var(--text-muted)', fontSize: 11, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                       <span style={{ fontSize: 18 }}>{cat.icon}</span>
                       <span>{lang === 'ar' ? cat.ar : cat.en}</span>
                     </button>
@@ -410,7 +416,7 @@ export default function BudgetsPage() {
             )}
             <div>
               <label style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700, display: 'block', marginBottom: 8 }}>{t('budget_limit_monthly').replace('{}', baseCurrency)}</label>
-              <input type="number" value={form.monthly_limit} onChange={e => setForm(f => ({ ...f, monthly_limit: e.target.value }))} placeholder="0.00" autoFocus style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 16, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+              <input type="number" value={form.monthly_limit} onChange={e => setForm(f => ({ ...f, monthly_limit: e.target.value }))} placeholder="0.00" aria-label={t('budget_limit_monthly').replace('{}', baseCurrency)} autoFocus style={{ width: '100%', padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 16, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
               {!editingId && available > 0 && (
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>💡 {t('budget_available_hint').replace('{1}', available.toFixed(0).toString()).replace('{2}', baseCurrency)}</div>
               )}
@@ -420,6 +426,14 @@ export default function BudgetsPage() {
             </button>
           </div>
         </Modal>
+      )}
+      {confirmDeleteId && (
+        <ConfirmDialog
+          title={t('budget_delete_title') || (lang === 'ar' ? 'حذف الميزانية' : 'Delete Budget')}
+          message={t('budget_delete_msg') || (lang === 'ar' ? 'هل أنت متأكد من حذف هذه الميزانية؟ سيتم استرداد مبالغ الإنفاق إلى الفئة الافتراضية.' : 'Are you sure you want to delete this budget? Spending will revert to default category.')}
+          onConfirm={() => handleDelete(confirmDeleteId)}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
       )}
     </div>
   )

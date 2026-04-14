@@ -55,7 +55,7 @@ export default function RegisterPage() {
           )}
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('auth_email')}</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               placeholder="you@example.com" />

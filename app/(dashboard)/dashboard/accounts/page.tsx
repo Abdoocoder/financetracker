@@ -155,7 +155,7 @@ function AccountModal({ account, lang, onSave, onClose }: {
           <h2 style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
             {account ? (lang === 'en' ? 'Edit Account' : 'تعديل الحساب') : (lang === 'en' ? 'New Account' : 'حساب جديد')}
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
+          <button onClick={onClose} aria-label={lang === 'en' ? 'Close' : 'إغلاق'} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
         </div>
 
         {/* نوع الحساب */}
@@ -257,7 +257,7 @@ function TransferModal({ accounts, lang, onSave, onClose }: {
           <h2 style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
             🔄 {lang === 'en' ? 'Transfer Between Accounts' : 'تحويل بين الحسابات'}
           </h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
+          <button onClick={onClose} aria-label={lang === 'en' ? 'Close' : 'إغلاق'} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
         </div>
 
         <div style={{ marginBottom: 12 }}>

@@ -42,6 +42,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
             <Input 
               type="number" 
               placeholder="0.00" 
+              autoFocus
               value={isMultiCurrency ? form.original_amount : form.amount} 
               onChange={e => isMultiCurrency ? onChange({ original_amount: e.target.value }) : onChange({ amount: e.target.value, original_amount: e.target.value })} 
             />

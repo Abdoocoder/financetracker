@@ -488,7 +488,7 @@ describe('useTransactions — pagination and export', () => {
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.hasMore).toBe(true)
     
-    setupMock([{ id: 'tx-new', amount: 99, type: 'income', transaction_date: '2024-06-01' }])
+    setupMock([{ id: 'tx-new', amount: 99, type: 'income', transaction_date: '2024-06-01', category: 'other', description: '', user_id: 'test-user' }])
     
     await act(async () => {
       await result.current.loadMore()

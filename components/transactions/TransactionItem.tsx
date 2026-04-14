@@ -30,8 +30,8 @@ export function TransactionItem({ tx, deletingId, onEdit, onDelete }: Props) {
           {tx.type === 'income' ? '+' : '−'}{Number(tx.amount) % 1 === 0 ? Number(tx.amount).toFixed(0) : Number(tx.amount).toFixed(2)}
         </div>
         <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-          <button onClick={() => onEdit(tx)} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
-          <button onClick={() => onDelete(tx.id)} disabled={deletingId === tx.id} style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          <button onClick={() => onEdit(tx)} aria-label="تعديل المعاملة" style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
+          <button onClick={() => onDelete(tx.id)} disabled={deletingId === tx.id} aria-label="حذف المعاملة" style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
       </div>
     </SwipeRow>

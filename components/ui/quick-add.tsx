@@ -138,6 +138,8 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
           <button
             key={cat.key}
             onClick={() => setSelected(selected?.key === cat.key ? null : cat)}
+            aria-label={cat.label}
+            aria-pressed={selected?.key === cat.key}
             style={{
               padding: '10px 6px', borderRadius: 12, border: 'none', cursor: 'pointer',
               background: selected?.key === cat.key
@@ -165,6 +167,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
               value={amount}
               onChange={e => setAmount(e.target.value)}
               placeholder={t('onboard_amount').replace(' *', '') + '...'}
+              aria-label={t('onboard_amount')}
               autoFocus
               onKeyDown={e => e.key === 'Enter' && save()}
               style={{
@@ -178,6 +181,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
             <select
               value={currency}
               onChange={e => setCurrency(e.target.value)}
+              aria-label={t('onboard_currency')}
               style={{
                 padding: '0 10px', borderRadius: 12, border: '1px solid var(--border)',
                 background: 'var(--bg-secondary)', color: 'var(--text-primary)',
@@ -190,6 +194,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
             <button
               onClick={save}
               disabled={saving || !amount}
+              aria-label={t('save')}
               style={{
                 padding: '12px 20px', borderRadius: 12, border: 'none',
                 background: selected.type === 'income' ? 'var(--accent-green)' : 'var(--accent-blue)',
@@ -216,6 +221,7 @@ export function QuickAdd({ onAdded }: { onAdded: () => void }) {
         <button
           onClick={repeatLast}
           disabled={saving}
+          aria-label={lang === 'ar' ? 'تكرار آخر معاملة' : 'Repeat last transaction'}
           style={{
             padding: '10px 14px', borderRadius: 12,
             border: '1px dashed var(--border)',

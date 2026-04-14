@@ -46,12 +46,14 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
       {/* نوع الدين */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         <button onClick={() => setForm(f => ({ ...f, debt_type: 'owed' }))}
+          aria-label={t('debts_type_owed')}
           style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
             background: form.debt_type === 'owed' ? 'rgba(239,68,68,0.15)' : 'var(--bg-secondary)',
             color: form.debt_type === 'owed' ? '#EF4444' : 'var(--text-muted)' }}>
           💳 {t('debts_type_owed')}
         </button>
         <button onClick={() => setForm(f => ({ ...f, debt_type: 'receivable' }))}
+          aria-label={t('debts_type_receivable')}
           style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
             background: form.debt_type === 'receivable' ? 'rgba(16,185,129,0.15)' : 'var(--bg-secondary)',
             color: form.debt_type === 'receivable' ? '#10B981' : 'var(--text-muted)' }}>
@@ -112,10 +114,13 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
 
       {!editingId && (
         <FormField label={t('debts_receive_confirm')}>
-          <div
+          <button
+            type="button"
             onClick={() => setForm(f => ({ ...f, received_amount: !f.received_amount }))}
+            aria-label={t('debts_receive_confirm_yes')}
+            aria-pressed={form.received_amount}
             style={{
-              display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+              display: 'flex', alignItems: 'center', width: '100%', gap: 12, padding: '12px 16px',
               borderRadius: 10, cursor: 'pointer',
               background: form.received_amount ? 'rgba(16,185,129,0.1)' : 'var(--bg-elevated)',
               border: `1px solid ${form.received_amount ? 'rgba(16,185,129,0.4)' : 'var(--border)'}`,
@@ -130,7 +135,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
             }}>
               {form.received_amount && <span style={{ color: 'white', fontSize: 12 }}>✓</span>}
             </div>
-            <div>
+            <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: form.received_amount ? '#10B981' : 'var(--text-secondary)' }}>
                 {t('debts_receive_confirm_yes')}
               </div>
@@ -138,7 +143,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
                 {t('debts_receive_confirm_desc')}
               </div>
             </div>
-          </div>
+          </button>
         </FormField>
       )}
 
@@ -152,7 +157,10 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
       <FormField label={t('debts_auto_deduct')}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
           <button
+            type="button"
             onClick={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
+            aria-label={t('debts_auto_deduct')}
+            aria-pressed={form.auto_deduct}
             style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: form.auto_deduct ? 'var(--accent-green)' : 'var(--bg-elevated)', transition: 'background 0.2s', position: 'relative', flexShrink: 0 }}>
             <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form.auto_deduct ? 3 : 23 }} />
           </button>
