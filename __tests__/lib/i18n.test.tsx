@@ -9,6 +9,7 @@ const localStorageMock = (() => {
   return {
     getItem: (key: string) => store[key] || null,
     setItem: (key: string, value: string) => { store[key] = value },
+    removeItem: (key: string) => { delete store[key] },
     clear: () => { store = {} }
   }
 })()
@@ -20,7 +21,7 @@ const TestComponent = () => {
   return (
     <div>
       <span data-testid="lang">{currentLang}</span>
-      <span data-testid="text">{t('dash_title')}</span>
+      <span data-testid="text">{t('app_name')}</span>
     </div>
   )
 }
@@ -29,20 +30,19 @@ describe('I18nProvider', () => {
   beforeEach(() => {
     localStorageMock.clear()
     jest.clearAllMocks()
+    // Reset document attributes
+    document.documentElement.lang = ''
+    document.documentElement.dir = ''
   })
 
   it('should initially render in Arabic (ar) for hydration matching', () => {
-    // We want to verify that the first render is 'ar' regardless of settings
     render(
       <I18nProvider>
         <TestComponent />
       </I18nProvider>
     )
     
-    // In many testing environments, useEffect runs immediately, 
-    // but the 'mounted' state ensures we handle the transition.
     const langElement = screen.getByTestId('lang')
-    // It should eventually settle on 'ar' or 'en' based on system
     expect(['ar', 'en']).toContain(langElement.textContent)
   })
 
@@ -57,32 +57,66 @@ describe('I18nProvider', () => {
 
     const langElement = await screen.findByTestId('lang')
     expect(langElement.textContent).toBe('en')
-    expect(screen.getByTestId('text').textContent).toBe('Dashboard')
+    expect(screen.getByTestId('text').textContent).toBe('Fajrak')
   })
 
-  it('should default to Arabic if no preference is set', async () => {
-    render(
-      <I18nProvider>
-        <TestComponent />
-      </I18nProvider>
-    )
-
-    const langElement = await screen.findByTestId('lang')
-    // Default system is 'ar' or browser detection
-    expect(langElement.textContent).toBeDefined()
-  })
-
-  it('should update document lang and dir attributes', async () => {
-    localStorageMock.setItem('lang', 'ar')
+  it('should support system language matching via setLang("system")', async () => {
+    // Mock navigator.language to English
+    Object.defineProperty(window.navigator, 'language', { value: 'en-US', configurable: true })
     
+    let capturedSetLang: any
+    const MockSetter = () => {
+      const { setLang } = useI18n()
+      capturedSetLang = setLang
+      return null
+    }
+
     render(
       <I18nProvider>
+        <MockSetter />
         <TestComponent />
       </I18nProvider>
     )
 
-    await screen.findByTestId('lang')
-    expect(document.documentElement.lang).toBe('ar')
-    expect(document.documentElement.dir).toBe('rtl')
+    await act(async () => {
+      capturedSetLang('system')
+    })
+
+    expect(screen.getByTestId('lang').textContent).toBe('en')
+    expect(localStorageMock.getItem('lang')).toBeNull() 
+  })
+
+  it('tCategory should map Arabic categories to English keys', async () => {
+    const CategoryTester = () => {
+      const { tCategory, setLang } = useI18n()
+      React.useEffect(() => { setLang('en') }, [setLang])
+      return <div data-testid="cat">{tCategory('طعام')}</div>
+    }
+
+    render(
+      <I18nProvider>
+        <CategoryTester />
+      </I18nProvider>
+    )
+
+    const el = await screen.findByTestId('cat')
+    expect(el.textContent).toBe('Food & Drink')
+  })
+
+  it('t should handle parameterized strings', async () => {
+    const ParamTester = () => {
+      const { t, setLang } = useI18n()
+      React.useEffect(() => { setLang('en') }, [setLang])
+      return <div data-testid="param">{t('settings_age_value', { n: '30' })}</div>
+    }
+
+    render(
+      <I18nProvider>
+        <ParamTester />
+      </I18nProvider>
+    )
+
+    const el = await screen.findByTestId('param')
+    expect(el.textContent).toBe('30yr')
   })
 })

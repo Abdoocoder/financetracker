@@ -355,3 +355,189 @@ describe('useTransactions — month/year navigation', () => {
     await act(async () => { await new Promise(r => setTimeout(r, 0)) })
   })
 })
+
+describe('useTransactions — currency logic', () => {
+  beforeEach(() => {
+    setupMock()
+    jest.clearAllMocks()
+  })
+
+  it('updates exchange_rate when original_currency changes', async () => {
+    const { fetchExchangeRate } = require('@/lib/currency')
+    fetchExchangeRate.mockResolvedValue(3.1)
+    
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      result.current.setForm(f => ({ ...f, original_currency: 'USD' }))
+    })
+
+    await waitFor(() => {
+      expect(result.current.form.exchange_rate).toBe('3.1')
+    })
+  })
+
+  it('sets exchange_rate to 1 when original_currency matches profile currency', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      // Profile currency is KWD in mock
+      result.current.setForm(f => ({ ...f, original_currency: 'KWD' }))
+    })
+
+    await waitFor(() => {
+      expect(result.current.form.exchange_rate).toBe('1')
+    })
+  })
+
+  it('automatically updates amount based on original_amount and exchange_rate', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      result.current.setForm(f => ({ ...f, original_amount: '100', exchange_rate: '0.5' }))
+    })
+
+    await waitFor(() => {
+      expect(result.current.form.amount).toBe('50.00')
+    })
+  })
+})
+
+describe('useTransactions — saveTransaction integration', () => {
+  beforeEach(() => setupMock())
+
+  it('calls supabase.insert on saveTransaction when not editing', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    act(() => {
+      result.current.openAdd()
+      result.current.setForm(f => ({ 
+        ...f, 
+        amount: '500', 
+        category: 'Salary', 
+        original_amount: '500',
+        original_currency: 'KWD'
+      }))
+    })
+
+    await act(async () => {
+      await result.current.saveTransaction()
+    })
+
+    expect(mockFrom).toHaveBeenCalledWith('transactions')
+    expect(toast.success).toHaveBeenCalled()
+    expect(result.current.showForm).toBe(false)
+  })
+
+  it('calls supabase.update on saveTransaction when editing', async () => {
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const tx = mockTxData[0]
+    act(() => {
+      result.current.startEdit(tx as any)
+      result.current.setForm(f => ({ ...f, amount: '1200' }))
+    })
+
+    await act(async () => {
+      await result.current.saveTransaction()
+    })
+
+    expect(mockFrom).toHaveBeenCalledWith('transactions')
+    expect(toast.success).toHaveBeenCalledWith('toast_edited')
+  })
+})
+
+describe('useTransactions — monthToDateNet and advanced totals', () => {
+  it('computes monthToDateNet correctly based on today', async () => {
+    const today = new Date().toISOString().split('T')[0]
+    const futureDate = '2099-01-01'
+    
+    const customData = [
+      { type: 'income',  amount: 1000, transaction_date: today },
+      { type: 'expense', amount: 200,  transaction_date: today },
+      { type: 'income',  amount: 5000, transaction_date: futureDate }, // Should be ignored in MTD
+    ]
+    setupMock(customData as any)
+
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    
+    // MTD Net should be 1000 - 200 = 800
+    expect(result.current.monthToDateNet).toBe(800)
+    // Total Net includes future: 1000 - 200 + 5000 = 5800
+    expect(result.current.net).toBe(5800)
+  })
+})
+
+describe('useTransactions — pagination and export', () => {
+  beforeEach(() => setupMock())
+
+  it('loadMore updates page and appends transactions', async () => {
+    // Provide 20 items so hasMore stays true
+    const twentyItems = Array.from({ length: 20 }, (_, i) => ({
+      id: `tx-init-${i}`, type: 'income', amount: 100, transaction_date: '2024-06-01'
+    }))
+    setupMock(twentyItems as any)
+
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.hasMore).toBe(true)
+    
+    setupMock([{ id: 'tx-new', amount: 99, type: 'income', transaction_date: '2024-06-01' }])
+    
+    await act(async () => {
+      await result.current.loadMore()
+    })
+
+    await waitFor(() => expect(result.current.loadingMore).toBe(false))
+    expect(result.current.transactions).toHaveLength(21)
+  })
+
+  it('computes totalRealExpense correctly by excluding debt categories', async () => {
+    const customData = [
+      { type: 'expense', amount: 500, category: 'Food', transaction_date: '2024-06-01' },
+      { type: 'expense', amount: 200, category: 'Debts', transaction_date: '2024-06-01' }, // Debt category
+      { type: 'income',  amount: 1000, category: 'Salary', transaction_date: '2024-06-01' },
+    ]
+    setupMock(customData as any)
+
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    
+    expect(result.current.totalExpense).toBe(700)
+    expect(result.current.totalDebtPayments).toBe(200)
+    expect(result.current.totalRealExpense).toBe(500) // 700 - 200
+  })
+
+  it('exportCSV triggers a download', async () => {
+    // Mock URL
+    global.URL.createObjectURL = jest.fn(() => 'blob:abc')
+    global.URL.revokeObjectURL = jest.fn()
+    
+    const mockClick = jest.fn()
+    const mockA = { click: mockClick, setAttribute: jest.fn(), style: {}, href: '', download: '' }
+    
+    const realCreateElement = document.createElement
+    const spy = jest.spyOn(document, 'createElement').mockImplementation((tagName) => {
+      if (tagName === 'a') return mockA as any
+      return realCreateElement.call(document, tagName)
+    })
+
+    const { result } = renderHook(() => useTransactions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.exportCSV()
+    })
+
+    expect(mockClick).toHaveBeenCalled()
+    expect(mockA.download).toContain('.csv')
+    
+    spy.mockRestore()
+  })
+})

@@ -1,7 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n'
@@ -311,7 +311,7 @@ function Step3({ onGo, t, name }: { onGo: () => void; t: any; name: string }) {
 export default function OnboardingPage() {
   const router = useRouter()
   const { lang, t, tCategory, hydrated } = useI18n()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const [step, setStep] = useState<Step>(1)
   const [saving, setSaving] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(true)

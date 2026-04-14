@@ -23,6 +23,7 @@ const customJestConfig = {
         '<rootDir>/e2e/',
     ],
     collectCoverageFrom: [
+        'app/**/*.{js,ts,tsx}',
         'lib/**/*.{js,ts,tsx}',
         'hooks/**/*.{js,ts,tsx}',
         'types/**/*.{js,ts,tsx}',
