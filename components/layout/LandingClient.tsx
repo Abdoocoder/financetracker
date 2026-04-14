@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useI18n } from '@/lib/i18n'
 
 export default function LandingClient() {
   const [showSticky, setShowSticky] = useState(false)
+  const { t } = useI18n()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,8 +37,8 @@ export default function LandingClient() {
       }}
     >
       <div>
-        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>جاهز تتحكم في أموالك؟</div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>مجاني تماماً · بدون بطاقة ائتمانية</div>
+        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>{t('land_cta_title')}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{t('land_cta_subtitle')}</div>
       </div>
       <Link 
         href="/register" 
@@ -52,7 +54,7 @@ export default function LandingClient() {
           boxShadow: '0 0 20px rgba(59,126,246,0.4)' 
         }}
       >
-        ابدأ الآن ←
+        {t('land_cta_btn')}
       </Link>
     </div>
   )

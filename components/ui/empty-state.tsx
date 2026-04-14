@@ -4,7 +4,7 @@ import { useI18n } from '@/lib/i18n'
 import Link from 'next/link'
 
 export function DashboardEmptyState() {
-  const { lang } = useI18n()
+  const { lang, t } = useI18n()
 
   return (
     <div style={{
@@ -17,21 +17,19 @@ export function DashboardEmptyState() {
       <div style={{ fontSize: 48, marginBottom: 16 }}>🌅</div>
 
       <h2 style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8, letterSpacing: '-0.02em' }}>
-        {lang === 'ar' ? 'رحلتك تبدأ الآن' : 'Your Journey Starts Now'}
+        {t('empty_title')}
       </h2>
 
       <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 24, maxWidth: 280, margin: '0 auto 24px' }}>
-        {lang === 'ar'
-          ? 'سجّل أول معاملة لك وابدأ رحلة الوعي المالي. كل دينار تسجله هو خطوة نحو حريتك المالية.'
-          : 'Log your first transaction and start your financial awareness journey. Every dinar you track is a step toward financial freedom.'}
+        {t('empty_desc')}
       </p>
 
       {/* خطوات البداية */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24, textAlign: lang === 'ar' ? 'right' : 'left' }}>
         {[
-          { num: '1', ar: 'أضف راتبك أو دخلك الشهري', en: 'Add your monthly salary or income', href: '/dashboard/transactions', color: '#10B981' },
-          { num: '2', ar: 'سجّل مصاريفك اليومية', en: 'Log your daily expenses', href: '/dashboard/transactions', color: '#3B7EF6' },
-          { num: '3', ar: 'حدد هدفاً مالياً واحداً', en: 'Set one financial goal', href: '/dashboard/goals', color: '#8B5CF6' },
+          { num: '1', key: 'empty_step1', href: '/dashboard/transactions', color: '#10B981' },
+          { num: '2', key: 'empty_step2', href: '/dashboard/transactions', color: '#3B7EF6' },
+          { num: '3', key: 'empty_step3', href: '/dashboard/goals', color: '#8B5CF6' },
         ].map((step, i) => (
           <Link key={i} href={step.href} style={{ textDecoration: 'none' }}>
             <div style={{
@@ -46,8 +44,8 @@ export function DashboardEmptyState() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 900, color: step.color,
               }}>{step.num}</div>
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>
-                {step[lang as 'ar' | 'en']}
+              <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', textAlign: 'start' }}>
+                {t(step.key)}
               </span>
               <span style={{ marginInlineStart: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>{lang === 'ar' ? '←' : '→'}</span>
             </div>
@@ -63,16 +61,14 @@ export function DashboardEmptyState() {
         fontSize: 14, fontWeight: 900, textDecoration: 'none',
         boxShadow: '0 4px 20px rgba(59,126,246,0.3)',
       }}>
-        ⚡ {lang === 'ar' ? 'سجّل أول معاملة' : 'Log First Transaction'}
+        ⚡ {t('empty_btn')}
       </Link>
 
       {/* اقتباس تحفيزي */}
       <div style={{ marginTop: 20, padding: '12px 16px', borderRadius: 12, background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.12)' }}>
         <div style={{ fontSize: 11, color: '#F59E0B', fontWeight: 800, marginBottom: 4 }}>🕌</div>
         <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6, fontStyle: 'italic' }}>
-          {lang === 'ar'
-            ? '"ما أنفقت من نفقة فإنها صدقة" — صحيح البخاري'
-            : '"Every spending in goodness is charity" — Sahih Bukhari'}
+          {t('empty_quote')}
         </div>
       </div>
     </div>

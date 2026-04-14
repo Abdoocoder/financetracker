@@ -1,12 +1,13 @@
 'use client'
-// app/(auth)/register/page.tsx
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useI18n } from '@/lib/i18n'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { t } = useI18n()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -37,9 +38,11 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: 'var(--bg-primary)' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl gradient-blue flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">ف</div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>ابدأ رحلتك المالية</h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>حساب مجاني — لا بطاقة مطلوبة</p>
+          <div className="w-12 h-12 rounded-2xl gradient-blue flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
+            {t('app_name')[0]}
+          </div>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('auth_register_title')}</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>{t('auth_register_subtitle')}</p>
         </div>
 
         <form onSubmit={handleRegister} className="p-8 rounded-2xl border space-y-5"
@@ -51,27 +54,27 @@ export default function RegisterPage() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>البريد الإلكتروني</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('auth_email')}</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               placeholder="you@example.com" />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>كلمة المرور</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('auth_password')}</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-              placeholder="6 أحرف على الأقل" />
+              placeholder={t('auth_pass_placeholder')} />
           </div>
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
-            {loading ? 'جاري إنشاء الحساب...' : 'إنشاء حساب مجاني'}
+            {loading ? t('auth_btn_creating') : t('auth_btn_register')}
           </button>
           <p className="text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
-            لديك حساب؟{' '}
+            {t('auth_have_account')}{' '}
             <Link href="/login" style={{ color: 'var(--accent-blue)' }} className="hover:underline font-medium">
-              سجل الدخول
+              {t('auth_login_link')}
             </Link>
           </p>
         </form>

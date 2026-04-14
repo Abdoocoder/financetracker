@@ -1,958 +1,105 @@
 'use client'
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { ar } from './locales/ar'
+import { en } from './locales/en'
 
 export type Lang = 'ar' | 'en' | 'system'
+export type TranslationKey = keyof typeof ar
 
-const translations = {
-  ar: {
-    // Forgot Password
-    forgot_title: 'نسيت كلمة المرور؟',
-    forgot_subtitle: 'أدخل بريدك وسنرسل لك رابط الاسترجاع',
-    forgot_email: 'البريد الإلكتروني',
-    forgot_btn: 'إرسال رابط الاسترجاع',
-    forgot_sending: 'جاري الإرسال...',
-    forgot_sent_title: 'تم الإرسال!',
-    forgot_sent_body: 'تحقق من بريدك الإلكتروني واضغط على الرابط لإعادة تعيين كلمة المرور.',
-    forgot_back: '← العودة لتسجيل الدخول',
-    forgot_error: 'حدث خطأ — تأكد من البريد الإلكتروني',
-
-    // Reset Password
-    reset_title: 'إعادة تعيين كلمة المرور',
-    reset_subtitle: 'أدخل كلمة المرور الجديدة',
-    reset_new: 'كلمة المرور الجديدة',
-    reset_confirm: 'تأكيد كلمة المرور',
-    reset_btn: 'تعيين كلمة المرور',
-    reset_saving: 'جاري الحفظ...',
-    reset_success: '✅ تم تغيير كلمة المرور! جاري التحويل...',
-    reset_mismatch: 'كلمتا المرور غير متطابقتين',
-    reset_error: 'حدث خطأ — حاول مرة أخرى',
-
-    // Forgot Password
-    // Share
-    share_title: 'شارك فجرك مع أصدقائك',
-    share_subtitle: 'ساعد أصدقاءك يبدأوا رحلتهم',
-    share_body: 'كل شخص تدعوه لفجرك قد يغير حياته المالية للأبد 💪',
-    share_btn: '🔗 شارك فجرك',
-    share_msg: 'فجرك 🌅\n\nراتبك يختفي كل شهر وما تعرف وين؟\nفجرك يجاوبك — ويمشي معك خطوة بخطوة نحو حريتك المالية.\n\nمجاني للأبد ✓ يعلم الاستثمار الحلال ✓',
-    share_copied: '✅ تم نسخ الرابط!',
-
-    // Install Prompt
-    install_title: 'أضف فجرك لهاتفك 📱',
-    install_body: 'ثبّت التطبيق للحصول على تجربة أفضل وإشعارات أسرع 🚀',
-    install_ios: 'اضغط على زر المشاركة ⬆️ ثم "إضافة إلى الشاشة الرئيسية"',
-    install_btn: 'تثبيت',
-    install_later: 'لاحقاً',
-
-    // Help
-    help_title: 'مركز المساعدة',
-    help_subtitle: 'كل ما تحتاج معرفته عن فجرك',
-    help_search: '🔍 ابحث عن سؤال...',
-    help_contact: 'لم تجد إجابتك؟',
-    help_contact_sub: 'تواصل معنا مباشرة وسنساعدك',
-    help_contact_btn: 'راسلنا',
-
-    // Financial Health Score
-    health_score: 'نقاط الصحة المالية',
-    health_excellent: 'ممتاز 🌟',
-    health_good: 'جيد 💪',
-    health_fair: 'متوسط ⚡',
-    health_poor: 'يحتاج تحسين 🔴',
-    health_savings: 'الادخار',
-    health_debt: 'الديون',
-    health_emergency: 'الطوارئ',
-    health_investing: 'الاستثمار',
-    health_tracking: 'التتبع',
-    health_tip: 'نصيحة للتحسين',
-
-    // Onboarding
-    onboard_welcome: 'مرحباً بك في فجرك 👋',
-    onboard_subtitle: 'رفيقك في رحلة الحرية المالية',
-    onboard_skip: 'تخطي',
-    onboard_next: 'التالي',
-    onboard_start: '🚀 ابدأ الجولة التعريفية',
-    onboard_skip_tour: 'تخطي — أنا أعرف كيف أستخدمه',
-    onboard_finish: '🎉 ابدأ رحلتك!',
-
-    // Learn
-    learn_title: 'درس اليوم',
-    learn_subtitle: 'تعلم خطوة كل يوم نحو حريتك المالية',
-    learn_stage: 'مرحلتك',
-    learn_streak: 'السلسلة',
-    learn_journey: 'رحلتك المالية',
-    learn_apply: '← طبّق الدرس',
-    learn_done: 'أتممت الدرس',
-    learn_completed: 'مكتمل',
-    learn_did_you_know: 'هل تعلم؟',
-
-    // Header
-    greeting_morning: 'صباح الخير',
-    greeting_afternoon: 'مساء الخير',
-    greeting_evening: 'مساء النور',
-    greeting_fallback: 'أهلاً',
-    header_salary: 'الراتب الشهري',
-
-    // Nav
-    nav_home: 'الرئيسية',
-    nav_transactions: 'المعاملات',
-    nav_debts: 'الديون',
-    nav_investments: 'الاستثمار',
-    nav_goals: 'الأهداف',
-    nav_alerts: 'التنبيهات',
-    nav_settings: 'الإعدادات',
-    nav_logout: 'تسجيل الخروج',
-    app_name: 'فجرك',
-    app_subtitle: 'إدارة مالية ذكية',
-
-    // Dashboard
-    dash_greeting: '👋 أهلاً',
-    dash_subtitle: 'فجرك المالي يبدأ اليوم 🌅',
-    dash_title: 'لوحة التحكم',
-    dash_monthly: 'ملخص هذا الشهر',
-    dash_income: 'الدخل',
-    dash_expenses: 'المصاريف',
-    dash_net: 'إجمالي الرصيد',
-    dash_after_debts: 'بعد الالتزامات',
-    dash_debt_payments: 'أقساط ديون',
-    month_summary_title: 'ملخص شهر {month}',
-    month_summary_income: 'الدخل',
-    month_summary_expenses: 'المصاريف',
-    month_summary_saved: 'وفّرت',
-    month_summary_rate: 'من دخلك',
-    month_summary_positive: 'شهر موفّر',
-    month_summary_negative: 'شهر بالعجز',
-    month_summary_view: 'عرض المعاملات',
-    dash_debts: 'إجمالي الديون',
-    dash_investments: 'قيمة الاستثمارات',
-    dash_goals: 'أهداف الادخار',
-    dash_recent: 'آخر المعاملات',
-    dash_unread_alerts: 'تنبيه غير مقروء',
-    dash_view_all: 'عرض الكل',
-    dash_no_transactions: 'لا توجد معاملات',
-
-    // Transactions
-    trans_title: 'المعاملات',
-    trans_add: 'إضافة',
-    trans_new: 'معاملة جديدة',
-    trans_edit: 'تعديل معاملة',
-    trans_income: 'دخل',
-    trans_expense: 'مصروف',
-    trans_all: 'الكل',
-    trans_amount: 'المبلغ',
-    trans_category: 'الفئة',
-    trans_description: 'الوصف',
-    trans_date: 'التاريخ',
-    trans_save: 'إضافة',
-    trans_save_edit: 'حفظ التعديل',
-    trans_cancel: 'إلغاء',
-    trans_empty: 'لا توجد معاملات',
-    trans_total_income: 'الدخل الكلي',
-    trans_total_expenses: 'المصاريف الكلية',
-    trans_total_net: 'الصافي',
-    trans_exchange_rate: 'سعر الصرف',
-    trans_equivalent: 'المعادل',
-    trans_currency: 'العملة',
-    trans_count: 'معاملة',
-    trans_add_note: 'أضف ملاحظة (اختياري)',
-
-    // Debts
-    debts_title: 'إدارة الديون',
-    debts_tab_owed: 'ديون عليّ',
-    debts_tab_receivable: 'ديون لي',
-    debts_type_owed: 'دين عليّ',
-    debts_type_receivable: 'دين لي',
-    debts_receive_btn: 'استلمت الدين',
-    debts_received_msg: 'تم استلام دينك! 🎉',
-    debts_add: 'إضافة',
-    debts_new: 'إضافة دين جديد',
-    debts_edit: 'تعديل الدين',
-    debts_name: 'اسم الدين',
-    debts_original: 'المبلغ الأصلي',
-    debts_remaining: 'المبلغ المتبقي',
-    debts_monthly: 'القسط الشهري',
-    debts_due_date: 'تاريخ الاستحقاق',
-    debts_notes: 'ملاحظات',
-    debts_notes_hint: 'ملاحظات اختيارية',
-    debts_name_hint: 'مثال: بطاقة Visa',
-    debts_save: 'إضافة',
-    debts_save_edit: 'حفظ التعديل',
-    debts_cancel: 'إلغاء',
-    debts_total: 'إجمالي الديون',
-    debts_paid_pct: 'نسبة السداد',
-    debts_count: 'عدد الديون',
-    debts_progress: 'التقدم الإجمالي',
-    debts_paid: 'مسدد',
-    debts_payment_add: '+ دفعة',
-    debts_active: 'دين نشط',
-    debts_empty: 'لا توجد ديون!',
-    debts_empty_sub: 'لا ديون نشطة — أحسنت!',
-    debts_per_month: '/شهر',
-
-    // Investments
-    inv_title: 'المحفظة الاستثمارية',
-    inv_add: 'إضافة',
-    inv_new: 'استثمار جديد',
-    inv_edit: 'تعديل الاستثمار',
-    inv_symbol: 'الرمز',
-    inv_name: 'الاسم',
-    inv_shares: 'الوحدات',
-    inv_avg_price: 'متوسط سعر الشراء',
-    inv_current_price: 'السعر الحالي',
-    inv_type: 'النوع',
-    inv_notes: 'ملاحظات',
-    inv_save: 'إضافة',
-    inv_save_edit: 'حفظ التعديل',
-    inv_cancel: 'إلغاء',
-    inv_total_value: 'القيمة الإجمالية',
-    inv_total_profit: 'الربح/الخسارة',
-    inv_assets: 'الأصول',
-    inv_profit: 'ربح',
-    inv_loss: 'خسارة',
-    inv_live: 'حي',
-    inv_manual: 'يدوي',
-    inv_refresh: 'تحديث الأسعار',
-    inv_refreshing: 'جاري التحديث...',
-    inv_empty: 'لا توجد استثمارات',
-    inv_halal: 'حلال ✅',
-    inv_usd: 'USD',
-    inv_jod: 'JOD',
-
-    // Goals
-    goals_title: 'أهداف الادخار',
-    goals_add: 'إضافة',
-    goals_new: 'هدف جديد',
-    goals_edit: 'تعديل الهدف',
-    goals_name: 'اسم الهدف',
-    goals_target: 'المبلغ المستهدف',
-    goals_current: 'المبلغ الحالي',
-    goals_date: 'تاريخ الهدف',
-    goals_icon: 'الأيقونة',
-    goals_save: 'إضافة',
-    goals_save_edit: 'حفظ التعديل',
-    goals_cancel: 'إلغاء',
-    goals_saved: 'تم ادخاره',
-    goals_target_lbl: 'المستهدف',
-    goals_remaining: 'متبقي',
-    goals_add_saving: '+ إضافة ادخار',
-    goals_empty: 'لا توجد أهداف بعد',
-    goals_count: 'هدف',
-
-    // Alerts
-    alerts_title: 'التنبيهات',
-    alerts_generate: 'توليد تنبيهات الآن',
-    alerts_generating: '⏳ جاري التحليل...',
-    alerts_auto: 'يعمل تلقائياً كل يوم الساعة 7:00 صباحاً',
-    alerts_mark_all: 'قراءة الكل',
-    alerts_delete_all: 'حذف الكل',
-    alerts_unread: 'غير مقروء',
-    alerts_empty: 'لا توجد تنبيهات',
-    alerts_empty_sub: 'اضغط الزر أعلاه لتحليل وضعك المالي',
-    alerts_bot_title: 'توليد تنبيهات ذكية',
-    alerts_bot_sub: 'تحليل وضعك المالي وإنشاء توصيات مخصصة',
-
-    // Settings
-    settings_title: 'الإعدادات',
-    settings_subtitle: 'بيانات حسابك الشخصي',
-    settings_name: 'الاسم الكامل',
-    settings_income: 'الراتب الشهري',
-    settings_currency: 'العملة',
-    settings_language: 'اللغة',
-    settings_save: 'حفظ التغييرات',
-    settings_saving: 'جاري الحفظ...',
-    settings_logout: 'تسجيل الخروج',
-    settings_account: 'الحساب',
-    settings_lang_ar: 'العربية',
-    settings_lang_en: 'English',
-    settings_lang_system: 'تلقائي (حسب الجهاز)',
-    settings_theme_system: 'تلقائي',
-    settings_theme_dark: 'داكن',
-    settings_theme_light: 'فاتح',
-
-    // Common
-    loading: 'جاري التحميل...',
-    save: 'حفظ',
-    cancel: 'إلغاء',
-    delete: 'حذف',
-    edit: 'تعديل',
-    add: 'إضافة',
-    confirm_delete: 'هل أنت متأكد من الحذف؟',
-    jod: 'دينار',
-    usd: 'دولار',
-
-    // Toast
-    toast_saved: 'تم الحفظ بنجاح ✅',
-    toast_deleted: 'تم الحذف',
-    toast_error_save: 'فشل الحفظ',
-    toast_error_delete: 'فشل الحذف',
-    toast_error_generic: 'حدث خطأ، يرجى المحاولة مجدداً',
-    toast_fill_required: 'يرجى تعبئة الحقول المطلوبة',
-    toast_income_added: 'تم تسجيل الدخل 💰',
-    toast_expense_added: 'تم تسجيل المصروف 💸',
-    toast_edited: 'تم التعديل بنجاح ✏️',
-    toast_debt_added: 'تم إضافة الدين بنجاح 💳',
-    toast_payment_done: 'تم تسجيل الدفعة ✅',
-    toast_debt_paid: '🎉 تهانينا! تم سداد الدين بالكامل',
-    toast_goal_added: 'تم إضافة الهدف 🎯',
-    toast_goal_reached: '🎉 تهانينا! تحقق الهدف',
-    toast_saving_added: 'تم إضافة الادخار 💰',
-    toast_settings_saved: 'تم حفظ الإعدادات بنجاح ✅',
-    toast_alerts_done: 'تم توليد التنبيهات ✅',
-    toast_marked_read: 'تم تعيين الكل كمقروء',
-    toast_all_deleted: 'تم حذف كل التنبيهات',
-
-    // New features
-    quick_add_title: '⚡ إضافة سريعة',
-    quick_add_repeat: 'تكرار آخر معاملة',
-    dash_compare: '📊 مقارنة بالشهر الماضي',
-    dash_challenges: 'تحديات الادخار',
-    dash_challenge_active: 'تحدٍّ نشط',
-    dash_challenge_join: 'انضم',
-    dash_challenge_progress: 'التقدم',
-    dash_challenge_done: 'مكتمل ✅',
-    dash_challenge_days_left: 'يوم متبقٍّ',
-    budget_plan_pro: 'خطط مالياً كالمحترفين',
-    settings_assets_title: 'أصولي الشخصية',
-    settings_assets_desc: 'أدخل قيمة أصولك الشخصية لحساب صافي ثروتك الحقيقية.',
-    settings_assets_total: 'إجمالي أصولك الشخصية',
-    settings_assets_realestate: 'العقارات',
-    settings_assets_vehicles: 'المركبات',
-    settings_assets_jewelry: 'المجوهرات والذهب',
-    settings_assets_other: 'أصول أخرى',
-    gamif_journey: 'رحلة الثروة',
-    gamif_next_level: 'للمستوى التالي',
-    gamif_streak: 'يوم متواصل',
-    gamif_badges: 'شارة',
-    gamif_your_badges: 'شاراتك',
-    gamif_start: 'سجّل أول معاملة لتبدأ رحلتك واكسب أول شارة!',
-    gamif_updating: 'جاري تحديث الإنجازات...',
-    gamif_points: 'نقطة',
-    settings_profile_info: 'المعلومات الشخصية',
-    settings_job_title: 'المهنة / الوظيفة',
-    settings_phone: 'رقم الهاتف',
-    settings_birth_date: 'تاريخ الميلاد',
-    settings_financial: 'الإعدادات المالية',
-    settings_preferences: 'التفضيلات',
-    debts_payment_day: 'يوم الخصم الشهري (1-28)',
-    debts_auto_deduct: 'خصم تلقائي شهري',
-    debts_payment_type: 'نوع الدفع',
-    debts_auto_bank: '🏦 تلقائي من البنك',
-    debts_manual_confirm: '💬 يحتاج تأكيد مني',
-    debts_auto_bank_hint: 'يُسجَّل تلقائياً بدون تأكيد — مناسب لأقساط البنك',
-    debts_manual_hint: 'سيصلك إشعار لتأكيد الدفع — مناسب للإيجار وصلة الرحم',
-    debts_auto_on: '✅ سيتم الخصم تلقائياً كل شهر',
-    debts_auto_off: 'غير مفعّل — يدوي فقط',
-    inv_tx_history: '📋 سجل المعاملات',
-    inv_portfolio_chart: '📊 توزيع المحفظة',
-    settings_theme: 'المظهر',
-    settings_export: '📥 تصدير المعاملات CSV',
-    settings_exporting: '⏳ جاري التصدير...',
-    settings_no_export: 'لا توجد معاملات للتصدير',
-    settings_export_ok: 'تم تصدير البيانات بنجاح ✅',
-    settings_danger: '⚠️ منطقة الخطر',
-    settings_data: 'البيانات',
-
-    // Wealth Simulator
-    wealthSimulator: 'محاكي الثروة',
-    wealthSimulatorDesc: 'شاهد كيف تنمو استثماراتك مع الوقت',
-    monthlyInvestment: 'الاستثمار الشهري',
-    duration: 'المدة',
-    annualReturn: 'العائد السنوي',
-    youInvested: 'استثمرت',
-    profit: 'الربح',
-    multiplier: 'المضاعف',
-    showYearByYear: 'عرض سنة بسنة',
-    hideDetails: 'إخفاء التفاصيل',
-    compoundNote: 'بناءً على الفائدة المركبة. العوائد الفعلية قد تختلف.',
-
-    // Evening & Weekly Notifications
-    eveningReminderTitle: 'لم تسجل اليوم بعد 🤔',
-    eveningReminderBody: 'هل كان يوماً بدون إنفاق؟ سجّل الآن قبل أن تنسى',
-    eveningReminderTitleDone: 'أحسنت اليوم! 💪',
-    eveningReminderBodyDone: 'سجّلت {n} معاملة اليوم. استمر على هذا النهج',
-    weeklyReportTitle: 'تقرير أسبوعك 📊',
-    weeklyReportBetter: 'أسبوع أفضل! وفّرت {n} مقارنة بالأسبوع الماضي ✅',
-    weeklyReportWorse: 'أنفقت {n} أكثر من الأسبوع الماضي — راجع مصاريفك',
-    weeklyReportSame: 'إنفاقك مستقر هذا الأسبوع',
-    investmentNudgeTitle: 'فرصة استثمار 📈',
-    investmentNudgeBody: 'وفّرت {n} هذا الشهر — لو استثمرتها ستصبح {future} بعد 10 سنوات',
-    monthEndTitle: 'آخر {n} أيام في الشهر ⚠️',
-    monthEndBody: 'تبقى لك {amount} — أنفق بحكمة حتى نهاية الشهر',
-    categoryWarningTitle: 'تنبيه إنفاق 🔶',
-    categoryWarningBody: 'أنفقت {amount} على {category} هذا الشهر — {pct}% من ميزانيتك',
-
-    // Wealth Roadmap
-    financialScore: 'درجتك المالية',
-    financialScoreEn: 'Financial Score',
-    stage: 'المرحلة',
-    stageEn: 'Stage',
-    stage1: 'الوعي المالي',
-    stage1En: 'Financial Awareness',
-    stage2: 'التحكم المالي',
-    stage2En: 'Financial Control',
-    stage3: 'الاحتياطي المالي',
-    stage3En: 'Financial Reserve',
-    stage4: 'بناء الثروة',
-    stage4En: 'Wealth Building',
-    stage5: 'الحرية المالية',
-    stage5En: 'Financial Freedom',
-    nextStep: 'الخطوة التالية',
-    nextStepEn: 'Next Step',
-    strengths: 'نقاط القوة',
-    strengthsEn: 'Strengths',
-    improvements: 'تحتاج تحسين',
-    improvementsEn: 'Needs Improvement',
-    debtRatioHigh: 'نسبة ديونك {pct}% من دخلك — مرتفعة',
-    debtRatioOk: 'نسبة ديونك {pct}% من دخلك — جيدة',
-    noEmergencyFund: 'لا يوجد صندوق طوارئ',
-    hasEmergencyFund: 'لديك صندوق طوارئ ✅',
-    notInvesting: 'لا تستثمر بعد',
-    isInvesting: 'تستثمر بانتظام ✅',
-    trackingExpenses: 'تتبع مصاريفك ✅',
-    focusOnDebt: 'ركز على سداد "{name}" ({amount} JOD)',
-    focusOnSaving: 'ادخر {amount} JOD شهرياً لصندوق الطوارئ',
-    focusOnInvest: 'استثمر {amount} JOD شهرياً في SPUS',
-    afterPayoff: 'بعد سدادها ستوفر {amount} JOD شهرياً للأبد',
-    yourRoadmap: 'خارطة طريقك للثراء',
-    yourRoadmapEn: 'Your Wealth Roadmap',
-
-    // Recurring Transactions
-    recurringTx: 'معاملة متكررة',
-    recurringTxEn: 'Recurring Transaction',
-    recurringDay: 'يوم التكرار كل شهر',
-    recurringDayEn: 'Repeat day each month',
-    recurringNote: '✅ سيتم التنفيذ تلقائياً كل شهر',
-    recurringNoteEn: '✅ Will auto-execute every month',
-    // FIRE Calculator
-    fire_title: 'حاسبة FIRE',
-    fire_subtitle: 'اعرف متى تصل للحرية المالية',
-    // Zakat Calculator
-    zakat_title: 'حاسبة الزكاة',
-    zakat_subtitle: 'احسب زكاتك السنوية',
-    // PDF Report
-    pdf_title: 'التقرير الشهري',
-    pdf_subtitle: 'احفظ أو اطبع تقريرك المالي',
-    // Health History
-    health_history: '📈 التاريخ',
-    health_history_empty: 'لا يوجد سجل بعد — سيُضاف كل يوم تلقائياً',
-    nav_fire: 'حاسبة FIRE',
-    nav_zakat: 'الزكاة',
-    nav_pdf: 'تقرير PDF',
-    // Error Boundary
-    error_boundary_title: 'حدث خطأ غير متوقع',
-    error_boundary_sub: 'نعتذر عن الإزعاج. حاول إعادة تحميل الصفحة.',
-    error_boundary_retry: '🔄 إعادة المحاولة',
-  },
-  en: {
-    // Forgot Password
-    forgot_title: 'Forgot your password?',
-    forgot_subtitle: 'Enter your email and we will send you a reset link',
-    forgot_email: 'Email',
-    forgot_btn: 'Send Reset Link',
-    forgot_sending: 'Sending...',
-    forgot_sent_title: 'Sent!',
-    forgot_sent_body: 'Check your email and click the link to reset your password.',
-    forgot_back: '← Back to login',
-    forgot_error: 'An error occurred — check your email address',
-
-    // Reset Password
-    reset_title: 'Reset Password',
-    reset_subtitle: 'Enter your new password',
-    reset_new: 'New Password',
-    reset_confirm: 'Confirm Password',
-    reset_btn: 'Set Password',
-    reset_saving: 'Saving...',
-    reset_success: '✅ Password changed! Redirecting...',
-    reset_mismatch: 'Passwords do not match',
-    reset_error: 'An error occurred — please try again',
-
-    // Share
-    share_title: 'Share Fajrak with your friends',
-    share_subtitle: 'Help your friends start their journey',
-    share_body: 'Every person you invite may change their financial life forever 💪',
-    share_btn: '🔗 Share Fajrak',
-    share_msg: 'Fajrak 🌅\n\nDoes your salary disappear every month without knowing where?\nFajrak answers you — and walks with you step by step toward financial freedom.\n\nFree forever ✓ Teaches halal investing ✓',
-    share_copied: '✅ Link copied!',
-
-    // Install Prompt
-    install_title: 'Add Fajrak to your phone 📱',
-    install_body: 'Install for a better experience and faster notifications 🚀',
-    install_ios: 'Tap the share button ⬆️ then "Add to Home Screen"',
-    install_btn: 'Install',
-    install_later: 'Later',
-
-    // Help
-    help_title: 'Help Center',
-    help_subtitle: 'Everything you need to know about Fajrak',
-    help_search: '🔍 Search a question...',
-    help_contact: "Didn't find your answer?",
-    help_contact_sub: "Contact us directly and we'll help you",
-    help_contact_btn: 'Contact Us',
-
-    // Financial Health Score
-    health_score: 'Financial Health Score',
-    health_excellent: 'Excellent 🌟',
-    health_good: 'Good 💪',
-    health_fair: 'Fair ⚡',
-    health_poor: 'Needs Improvement 🔴',
-    health_savings: 'Savings',
-    health_debt: 'Debt',
-    health_emergency: 'Emergency',
-    health_investing: 'Investing',
-    health_tracking: 'Tracking',
-    health_tip: 'Improvement Tip',
-
-    // Onboarding
-    onboard_welcome: 'Welcome to Fajrak 👋',
-    onboard_subtitle: 'Your companion on the journey to financial freedom',
-    onboard_skip: 'Skip',
-    onboard_next: 'Next',
-    onboard_start: '🚀 Start the Tour',
-    onboard_skip_tour: "Skip — I know how to use it",
-    onboard_finish: '🎉 Start your journey!',
-
-    // Learn
-    learn_title: "Today's Lesson",
-    learn_subtitle: 'One step every day toward financial freedom',
-    learn_stage: 'Your Stage',
-    learn_streak: 'Streak',
-    learn_journey: 'Your Financial Journey',
-    learn_apply: 'Apply Lesson →',
-    learn_done: 'Done',
-    learn_completed: 'Completed',
-    learn_did_you_know: 'Did you know?',
-
-    // Header
-    greeting_morning: 'Good morning',
-    greeting_afternoon: 'Good afternoon',
-    greeting_evening: 'Good evening',
-    greeting_fallback: 'Hello',
-    header_salary: 'Monthly Salary',
-
-    // Nav
-    nav_home: 'Home',
-    nav_transactions: 'Transactions',
-    nav_debts: 'Debts',
-    nav_investments: 'Investments',
-    nav_goals: 'Goals',
-    nav_alerts: 'Alerts',
-    nav_settings: 'Settings',
-    nav_logout: 'Logout',
-    app_name: 'Fajrak',
-    app_subtitle: 'Smart Finance',
-
-    // Dashboard
-    dash_greeting: '👋 Hey',
-    dash_subtitle: 'Your financial dawn starts today 🌅',
-    dash_title: 'Dashboard',
-    dash_monthly: 'This Month',
-    dash_income: 'Income',
-    dash_expenses: 'Expenses',
-    dash_net: 'Total Balance',
-    dash_after_debts: 'After Debts',
-    dash_debt_payments: 'Debt Payments',
-    month_summary_title: '{month} Summary',
-    month_summary_income: 'Income',
-    month_summary_expenses: 'Expenses',
-    month_summary_saved: 'Saved',
-    month_summary_rate: 'of income',
-    month_summary_positive: 'Savings month',
-    month_summary_negative: 'Deficit month',
-    month_summary_view: 'View Transactions',
-    dash_debts: 'Total Debts',
-    dash_investments: 'Investments',
-    dash_goals: 'Savings Goals',
-    dash_recent: 'Recent Transactions',
-    dash_unread_alerts: 'unread alert',
-    dash_view_all: 'View All',
-    dash_no_transactions: 'No transactions yet',
-
-    // Transactions
-    trans_title: 'Transactions',
-    trans_add: 'Add',
-    trans_new: 'New Transaction',
-    trans_edit: 'Edit Transaction',
-    trans_income: 'Income',
-    trans_expense: 'Expense',
-    trans_all: 'All',
-    trans_amount: 'Amount',
-    trans_category: 'Category',
-    trans_description: 'Description',
-    trans_date: 'Date',
-    trans_save: 'Add',
-    trans_save_edit: 'Save Changes',
-    trans_cancel: 'Cancel',
-    trans_empty: 'No transactions yet',
-    trans_total_income: 'Total Income',
-    trans_total_expenses: 'Total Expenses',
-    trans_total_net: 'Net',
-    trans_exchange_rate: 'Exchange Rate',
-    trans_equivalent: 'Equivalent',
-    trans_currency: 'Currency',
-    trans_count: 'transactions',
-    trans_add_note: 'Add a note (optional)',
-
-    // Debts
-    debts_title: 'Debt Manager',
-    debts_tab_owed: 'My Debts',
-    debts_tab_receivable: 'Owed to Me',
-    debts_type_owed: 'I owe this',
-    debts_type_receivable: 'Owed to me',
-    debts_receive_btn: 'Mark as Received',
-    debts_received_msg: 'Payment received! 🎉',
-    debts_add: 'Add',
-    debts_new: 'Add New Debt',
-    debts_edit: 'Edit Debt',
-    debts_name: 'Debt Name',
-    debts_original: 'Original Amount',
-    debts_remaining: 'Remaining Amount',
-    debts_monthly: 'Monthly Payment',
-    debts_due_date: 'Due Date',
-    debts_notes: 'Notes',
-    debts_notes_hint: 'Optional notes',
-    debts_name_hint: 'e.g. Visa Card',
-    debts_save: 'Add',
-    debts_save_edit: 'Save Changes',
-    debts_cancel: 'Cancel',
-    debts_total: 'Total Debt',
-    debts_paid_pct: 'Paid',
-    debts_count: 'Active Debts',
-    debts_progress: 'Overall Progress',
-    debts_paid: 'paid',
-    debts_payment_add: '+ Payment',
-    debts_active: 'active debt',
-    debts_empty: 'No debts! 🎉',
-    debts_empty_sub: 'No active debts — Great job!',
-    debts_per_month: '/mo',
-
-    // Investments
-    inv_title: 'Portfolio',
-    inv_add: 'Add',
-    inv_new: 'New Investment',
-    inv_edit: 'Edit Investment',
-    inv_symbol: 'Symbol',
-    inv_name: 'Name',
-    inv_shares: 'Shares',
-    inv_avg_price: 'Avg Buy Price',
-    inv_current_price: 'Current Price',
-    inv_type: 'Type',
-    inv_notes: 'Notes',
-    inv_save: 'Add',
-    inv_save_edit: 'Save Changes',
-    inv_cancel: 'Cancel',
-    inv_total_value: 'Total Value',
-    inv_total_profit: 'P&L',
-    inv_assets: 'Assets',
-    inv_profit: 'Profit',
-    inv_loss: 'Loss',
-    inv_live: 'LIVE',
-    inv_manual: 'Manual',
-    inv_refresh: 'Refresh Prices',
-    inv_refreshing: 'Refreshing...',
-    inv_empty: 'No investments yet',
-    inv_halal: 'Halal ✅',
-    inv_usd: 'USD',
-    inv_jod: 'JOD',
-
-    // Goals
-    goals_title: 'Savings Goals',
-    goals_add: 'Add',
-    goals_new: 'New Goal',
-    goals_edit: 'Edit Goal',
-    goals_name: 'Goal Name',
-    goals_target: 'Target Amount',
-    goals_current: 'Current Amount',
-    goals_date: 'Target Date',
-    goals_icon: 'Icon',
-    goals_save: 'Add',
-    goals_save_edit: 'Save Changes',
-    goals_cancel: 'Cancel',
-    goals_saved: 'Saved',
-    goals_target_lbl: 'Target',
-    goals_remaining: 'Remaining',
-    goals_add_saving: '+ Add Savings',
-    goals_empty: 'No goals yet',
-    goals_count: 'goal',
-
-    // Alerts
-    alerts_title: 'Alerts',
-    alerts_generate: 'Generate Alerts Now',
-    alerts_generating: '⏳ Analyzing...',
-    alerts_auto: 'Runs automatically every day at 7:00 AM',
-    alerts_mark_all: 'Mark All Read',
-    alerts_delete_all: 'Delete All',
-    alerts_unread: 'unread',
-    alerts_empty: 'No alerts yet',
-    alerts_empty_sub: 'Click the button above to analyze your finances',
-    alerts_bot_title: 'Smart Alert Generator',
-    alerts_bot_sub: 'Analyze your finances and get personalized insights',
-
-    // Settings
-    settings_title: 'Settings',
-    settings_subtitle: 'Your account preferences',
-    settings_name: 'Full Name',
-    settings_income: 'Monthly Income',
-    settings_currency: 'Currency',
-    settings_language: 'Language',
-    settings_save: 'Save Changes',
-    settings_saving: 'Saving...',
-    settings_logout: 'Logout',
-    settings_account: 'Account',
-    settings_lang_ar: 'العربية',
-    settings_lang_en: 'English',
-    settings_lang_system: 'System Default',
-    settings_theme_system: 'System',
-    settings_theme_dark: 'Dark',
-    settings_theme_light: 'Light',
-
-    // Common
-    loading: 'Loading...',
-    save: 'Save',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    edit: 'Edit',
-    add: 'Add',
-    confirm_delete: 'Are you sure you want to delete?',
-    jod: 'JOD',
-    usd: 'USD',
-
-    // Toast
-    toast_saved: 'Saved successfully ✅',
-    toast_deleted: 'Deleted',
-    toast_error_save: 'Failed to save',
-    toast_error_delete: 'Failed to delete',
-    toast_error_generic: 'An error occurred, please try again',
-    toast_fill_required: 'Please fill required fields',
-    toast_income_added: 'Income recorded 💰',
-    toast_expense_added: 'Expense recorded 💸',
-    toast_edited: 'Updated successfully ✏️',
-    toast_debt_added: 'Debt added 💳',
-    toast_payment_done: 'Payment recorded ✅',
-    toast_debt_paid: '🎉 Debt fully paid off!',
-    toast_goal_added: 'Goal added 🎯',
-    toast_goal_reached: '🎉 Goal achieved!',
-    toast_saving_added: 'Savings added 💰',
-    toast_settings_saved: 'Settings saved ✅',
-    toast_alerts_done: 'Alerts generated ✅',
-    toast_marked_read: 'All marked as read',
-    toast_all_deleted: 'All alerts deleted',
-
-    // New features
-    quick_add_title: '⚡ Quick Add',
-    quick_add_repeat: 'Repeat last transaction',
-    dash_compare: '📊 vs Last Month',
-    dash_challenges: 'Savings Challenges',
-    dash_challenge_active: 'Active Challenge',
-    dash_challenge_join: 'Join',
-    dash_challenge_progress: 'Progress',
-    dash_challenge_done: 'Completed ✅',
-    dash_challenge_days_left: 'days left',
-    budget_plan_pro: 'Plan your finances like a pro',
-    settings_assets_title: 'Personal Assets',
-    settings_assets_desc: 'Enter your personal asset values to calculate your true net worth.',
-    settings_assets_total: 'Total Personal Assets',
-    settings_assets_realestate: 'Real Estate',
-    settings_assets_vehicles: 'Vehicles',
-    settings_assets_jewelry: 'Jewelry & Gold',
-    settings_assets_other: 'Other Assets',
-    gamif_journey: 'Wealth Journey',
-    gamif_next_level: 'Next level',
-    gamif_streak: 'Day Streak',
-    gamif_badges: 'Badges',
-    gamif_your_badges: 'Your Badges',
-    gamif_start: 'Log your first transaction to start your journey!',
-    gamif_updating: 'Updating achievements...',
-    gamif_points: 'pts',
-    settings_profile_info: 'Personal Info',
-    settings_job_title: 'Job Title',
-    settings_phone: 'Phone Number',
-    settings_birth_date: 'Date of Birth',
-    settings_financial: 'Financial Settings',
-    settings_preferences: 'Preferences',
-    debts_payment_day: 'Monthly payment day (1-28)',
-    debts_auto_deduct: 'Auto monthly deduction',
-    debts_payment_type: 'Payment Type',
-    debts_auto_bank: '🏦 Auto from Bank',
-    debts_manual_confirm: '💬 Needs my confirmation',
-    debts_auto_bank_hint: 'Recorded automatically — suitable for bank installments',
-    debts_manual_hint: 'You will receive a notification to confirm payment',
-    debts_auto_on: '✅ Will auto-deduct every month',
-    debts_auto_off: 'Disabled — manual only',
-    inv_tx_history: '📋 Transaction History',
-    inv_portfolio_chart: '📊 Portfolio Breakdown',
-    settings_theme: 'Theme',
-    settings_export: '📥 Export Transactions CSV',
-    settings_exporting: '⏳ Exporting...',
-    settings_no_export: 'No transactions to export',
-    settings_export_ok: 'Data exported successfully ✅',
-    settings_danger: '⚠️ Danger Zone',
-    settings_data: 'Data',
-    wealthSimulator: 'Wealth Simulator',
-    wealthSimulatorDesc: 'See how your investment grows over time',
-    monthlyInvestment: 'Monthly Investment',
-    duration: 'Duration',
-    annualReturn: 'Annual Return',
-    youInvested: 'You invested',
-    profit: 'Profit',
-    multiplier: 'Multiplier',
-    showYearByYear: 'Show year by year',
-    hideDetails: 'Hide details',
-    compoundNote: 'Based on compound interest. Actual returns may vary.',
-    eveningReminderTitle: "Haven't logged today yet 🤔",
-    eveningReminderBody: 'Was it a spend-free day? Log now before you forget',
-    eveningReminderTitleDone: 'Great job today! 💪',
-    eveningReminderBodyDone: 'You logged {n} transactions today. Keep it up',
-    weeklyReportTitle: 'Your weekly report 📊',
-    weeklyReportBetter: 'Better week! You saved {n} compared to last week ✅',
-    weeklyReportWorse: 'You spent {n} more than last week — review your expenses',
-    weeklyReportSame: 'Your spending is stable this week',
-    investmentNudgeTitle: 'Investment opportunity 📈',
-    investmentNudgeBody: 'You saved {n} this month — if invested, it could become {future} in 10 years',
-    monthEndTitle: 'Last {n} days of the month ⚠️',
-    monthEndBody: 'You have {amount} left — spend wisely until month end',
-    categoryWarningTitle: 'Spending alert 🔶',
-    categoryWarningBody: 'You spent {amount} on {category} this month — {pct}% of your budget',
-    financialScore: 'Your Financial Score',
-    financialScoreEn: 'Financial Score',
-    stage: 'Stage',
-    stageEn: 'Stage',
-    stage1: 'Financial Awareness',
-    stage1En: 'Financial Awareness',
-    stage2: 'Financial Control',
-    stage2En: 'Financial Control',
-    stage3: 'Financial Reserve',
-    stage3En: 'Financial Reserve',
-    stage4: 'Wealth Building',
-    stage4En: 'Wealth Building',
-    stage5: 'Financial Freedom',
-    stage5En: 'Financial Freedom',
-    nextStep: 'Next Step',
-    nextStepEn: 'Next Step',
-    strengths: 'Strengths',
-    strengthsEn: 'Strengths',
-    improvements: 'Needs Improvement',
-    improvementsEn: 'Needs Improvement',
-    debtRatioHigh: 'Your debt ratio is {pct}% of income — high',
-    debtRatioOk: 'Your debt ratio is {pct}% of income — good',
-    noEmergencyFund: 'No emergency fund',
-    hasEmergencyFund: 'You have an emergency fund ✅',
-    notInvesting: 'Not investing yet',
-    isInvesting: 'Investing regularly ✅',
-    trackingExpenses: 'Tracking expenses ✅',
-    focusOnDebt: 'Focus on paying off "{name}" ({amount} JOD)',
-    focusOnSaving: 'Save {amount} JOD/month for your emergency fund',
-    focusOnInvest: 'Invest {amount} JOD/month in SPUS',
-    afterPayoff: 'After paying it off you will save {amount} JOD/month forever',
-    yourRoadmap: 'Your Wealth Roadmap',
-    yourRoadmapEn: 'Your Wealth Roadmap',
-    recurringTx: 'Recurring Transaction',
-    recurringTxEn: 'Recurring Transaction',
-    recurringDay: 'Repeat day each month',
-    recurringDayEn: 'Repeat day each month',
-    recurringNote: '✅ Will be executed automatically every month',
-    recurringNoteEn: '✅ Will auto-execute every month',
-    // FIRE Calculator
-    fire_title: 'FIRE Calculator',
-    fire_subtitle: 'Calculate your path to financial independence',
-    // Zakat Calculator
-    zakat_title: 'Zakat Calculator',
-    zakat_subtitle: 'Calculate your annual zakat',
-    // PDF Report
-    pdf_title: 'Monthly Report',
-    pdf_subtitle: 'Print or save your financial report',
-    // Health History
-    health_history: '📈 History',
-    health_history_empty: 'No history yet — recorded daily automatically',
-    nav_fire: 'FIRE Calculator',
-    nav_zakat: 'Zakat',
-    nav_pdf: 'PDF Report',
-    // Error Boundary
-    error_boundary_title: 'An unexpected error occurred',
-    error_boundary_sub: 'We apologize for the inconvenience. Please try reloading the page.',
-    error_boundary_retry: '🔄 Retry',
-  }
-
-} as const
-
-export type TranslationKey = keyof typeof translations.ar
+const translations = { ar, en }
 
 interface I18nContextType {
-  lang: Lang
-  currentLang: 'ar' | 'en'
+  lang: 'ar' | 'en'
+  currentLang: 'ar' | 'en' // Alias for compatibility
   setLang: (l: Lang) => void
-  t: (key: TranslationKey) => string
-  isRTL: boolean
+  t: (key: TranslationKey | string, params?: Record<string, string | number>) => string
+  tCategory: (cat: string) => string
   hydrated: boolean
+}
+
+const CAT_MAP: Record<string, string> = {
+  'طعام وشراب': 'cat_food',
+  'طعام': 'cat_food',
+  'مواصلات': 'cat_transport',
+  'فواتير': 'cat_bills',
+  'صحة': 'cat_health',
+  'تعليم': 'cat_edu',
+  'ترفيه': 'cat_fun',
+  'صلة رحم': 'cat_family',
+  'ملابس': 'cat_clothes',
+  'ديون': 'cat_debts',
+  'إيجار / قسط': 'cat_rent',
+  'أخرى': 'cat_other',
+  'راتب': 'cat_salary',
+  'عمل حر': 'cat_freelance',
+  'استثمار': 'cat_invest',
+  'مكافأة': 'cat_gift',
+  'هدية': 'cat_gift',
 }
 
 const I18nContext = createContext<I18nContextType>({
   lang: 'ar',
   currentLang: 'ar',
-  setLang: () => { },
-  t: (key) => key,
-  isRTL: true,
+  setLang: () => {},
+  t: (k) => k,
+  tCategory: (c) => c,
   hydrated: false,
 })
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('system')
+  const [lang, setLangState] = useState<'ar' | 'en'>('ar')
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    // Two-phase hydration:
-    // In React concurrent hydration, effects can run before the entire tree is fully hydrated.
-    // If we read localStorage and update language immediately, it can flip text mid-hydration
-    // and trigger "Hydration failed" warnings. We mark hydrated first, then apply preferences
-    // on a second commit.
+    const saved = localStorage.getItem('lang') as Lang
+    if (saved === 'en' || saved === 'ar') {
+      setLangState(saved)
+    } else {
+      // system or default
+      const isEn = navigator.language.startsWith('en')
+      setLangState(isEn ? 'en' : 'ar')
+    }
     setHydrated(true)
   }, [])
 
   useEffect(() => {
-    if (!hydrated) return
-    const saved = localStorage.getItem('lang') as Lang | null
-    if (saved) setLangState(saved)
-  }, [hydrated])
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+  }, [lang])
 
   const setLang = useCallback((l: Lang) => {
-    setLangState(l)
-    localStorage.setItem('lang', l)
-    // Update profile in DB if user is logged in
-    try {
-      const { createClient } = require('@/lib/supabase/client')
-      const supabase = createClient()
-      supabase.auth.getUser().then(({ data }: any) => {
-        if (data?.user) supabase.from('profiles').update({ lang: l }).eq('id', data.user.id)
-      })
-    } catch { }
+    if (l === 'system') {
+      localStorage.removeItem('lang')
+      const isEn = navigator.language.startsWith('en')
+      setLangState(isEn ? 'en' : 'ar')
+    } else {
+      localStorage.setItem('lang', l)
+      setLangState(l)
+    }
   }, [])
 
-  const currentLang = useMemo((): 'ar' | 'en' => {
-    if (!hydrated) return 'ar' // Match SSR fallback until hydration is fully done
-    if (lang !== 'system') return lang
-    if (typeof navigator === 'undefined') return 'ar'
-    const browserLang = navigator.language || (navigator as any).userLanguage || 'ar'
-    return browserLang.startsWith('ar') ? 'ar' : 'en'
-  }, [hydrated, lang])
-
-  useEffect(() => {
-    const html = document.documentElement
-    html.lang = currentLang
-    html.dir = currentLang === 'ar' ? 'rtl' : 'ltr'
-  }, [currentLang])
-
-  const t = useCallback((key: TranslationKey): string => {
-    const value = (translations[currentLang] as any)[key]
-    // Fallback if value is missing OR if en-mode value is purely Arabic text (bug guard)
-    if (value == null) return (translations.ar as any)[key] ?? key
-    if (currentLang === 'en' && typeof value === 'string' && /^[\u0600-\u06FF\s\p{P}]+$/u.test(value)) {
-      return (translations.en as any)[key] ?? (translations.ar as any)[key] ?? key
+  const t = useCallback((key: string, params?: Record<string, string | number>) => {
+    let str = (translations[lang] as any)[key] || (translations['ar'] as any)[key] || key
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        str = str.replace(`{${k}}`, String(v))
+      })
     }
-    return value
-  }, [currentLang])
+    return str
+  }, [lang])
+
+  const tCategory = useCallback((cat: string) => {
+    const key = CAT_MAP[cat] || cat
+    return t(key)
+  }, [t])
 
   return (
-    <I18nContext.Provider value={{ lang, currentLang, setLang, t, isRTL: currentLang === 'ar', hydrated }}>
+    <I18nContext.Provider value={{ lang, currentLang: lang, setLang, t, tCategory, hydrated }}>
       {children}
     </I18nContext.Provider>
   )
 }
 
-export const useI18n = () => useContext(I18nContext)
+export function useI18n() {
+  return useContext(I18nContext)
+}

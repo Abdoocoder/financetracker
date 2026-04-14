@@ -12,36 +12,40 @@ import {
 } from 'lucide-react'
 
 const MAIN_NAV = [
-  { href: '/dashboard',              Icon: LayoutDashboard, ar: 'الرئيسية',  en: 'Home'         },
-  { href: '/dashboard/transactions', Icon: ArrowUpDown,     ar: 'المعاملات', en: 'Transactions' },
-  { href: '/dashboard/accounts',     Icon: Wallet,          ar: 'الحسابات',  en: 'Accounts'     },
-  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
+  { href: '/dashboard',              Icon: LayoutDashboard, key: 'nav_home'         },
+  { href: '/dashboard/transactions', Icon: ArrowUpDown,     key: 'nav_transactions' },
+  { href: '/dashboard/accounts',     Icon: Wallet,          key: 'nav_accounts'     },
+  { href: '/dashboard/debts',        Icon: CreditCard,      key: 'nav_debts'        },
 ]
 
 const MORE_NAV = [
-  { href: '/dashboard/debts',        Icon: CreditCard,      ar: 'الديون',    en: 'Debts'        },
-  { href: '/dashboard/budgets',      Icon: PieChart,        ar: 'الميزانية', en: 'Budget'       },
-  { href: '/dashboard/goals',       Icon: Target,     ar: 'الأهداف',    en: 'Goals'       },
-  { href: '/dashboard/investments', Icon: TrendingUp, ar: 'الاستثمار',  en: 'Investments' },
-  { href: '/dashboard/fire',   Icon: Flame,      ar: 'حاسبة FIRE',  en: 'FIRE Calculator' },
-  { href: '/dashboard/zakat',  Icon: Star,        ar: 'حاسبة الزكاة', en: 'Zakat Calculator' },
-  { href: '/dashboard/pdf-report', Icon: FileText, ar: 'تقرير PDF', en: 'PDF Report' },
-  { href: '/dashboard/learn',        Icon: BookOpen,   ar: 'تعلّم',       en: 'Learn'       },
-  { href: '/dashboard/alerts',      Icon: Bell,       ar: 'التنبيهات',  en: 'Alerts'      },
-  { href: '/dashboard/settings',    Icon: Settings,   ar: 'الإعدادات',  en: 'Settings'    },
-  { href: '/dashboard/help',          Icon: HelpCircle, ar: 'المساعدة',   en: 'Help'        },
+  { href: '/dashboard/debts',        Icon: CreditCard,      key: 'nav_debts'        },
+  { href: '/dashboard/budgets',      Icon: PieChart,        key: 'nav_budgets'      },
+  { href: '/dashboard/goals',       Icon: Target,     key: 'nav_goals'        },
+  { href: '/dashboard/investments', Icon: TrendingUp, key: 'nav_investments'  },
+  { href: '/dashboard/fire',   Icon: Flame,      key: 'nav_fire'         },
+  { href: '/dashboard/zakat',  Icon: Star,        key: 'nav_zakat'        },
+  { href: '/dashboard/pdf-report', Icon: FileText, key: 'nav_pdf'          },
+  { href: '/dashboard/learn',        Icon: BookOpen,   key: 'nav_learn'        },
+  { href: '/dashboard/alerts',      Icon: Bell,       key: 'nav_alerts'       },
+  { href: '/dashboard/settings',    Icon: Settings,   key: 'nav_settings'     },
+  { href: '/dashboard/help',          Icon: HelpCircle, key: 'nav_help'         },
 ]
 
 export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
   const pathname = usePathname()
-  const { lang, setLang } = useI18n()
+  const { lang, setLang, t } = useI18n()
   const [showMore, setShowMore] = useState(false)
   const isMoreActive = MORE_NAV.some(item => pathname.startsWith(item.href))
 
+  const handleLangToggle = () => {
+    const newLang = lang === 'ar' ? 'en' : 'ar';
+    setLang(newLang);
+    document.cookie = `lang=${newLang}; path=/; max-age=31536000`;
+  }
+
   return (
     <>
-      {/* ── Desktop Sidebar ── */}
-      {/* ── Desktop Sidebar ── */}
       <aside style={{
         display: 'none', width: 240, flexShrink: 0,
         height: '100vh', position: 'sticky', top: 0,
@@ -51,17 +55,17 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         <div style={{ padding: '0 8px 24px', marginBottom: 16, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div className="glow-avatar" style={{ width: 42, height: 42, borderRadius: 12, overflow: 'hidden', flexShrink: 0 }}>
-              <Image src="/icon-512.png" alt="فجرك" width={42} height={42} style={{ objectFit: 'cover' }} priority />
+              <Image src="/icon-512.png" alt={t('app_name')} width={42} height={42} style={{ objectFit: 'cover' }} priority />
             </div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>فجرك</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{lang === 'en' ? 'Smart Finance' : 'إدارة مالية ذكية'}</div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '0.02em' }}>{t('app_name')}</div>
+              <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>{t('app_subtitle')}</div>
             </div>
           </div>
         </div>
-        <nav aria-label={lang === 'ar' ? 'القائمة الرئيسية' : 'Main navigation'} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <nav aria-label={t('nav_main_aria')} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
           {/* Core */}
-          {MAIN_NAV.map(({ href, Icon, ar, en }) => {
+          {MAIN_NAV.map(({ href, Icon, key }) => {
             const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
@@ -72,16 +76,16 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                   color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
                 }}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} opacity={isActive ? 1 : 0.6} />
-                  <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
+                  <span style={{ flex: 1 }}>{t(key)}</span>
                 </div>
               </Link>
             )
           })}
           {/* Separator + Tools group */}
           <div style={{ margin: '16px 8px 6px', fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>
-            {lang === 'ar' ? 'الأدوات' : 'Tools'}
+            {t('nav_group_tools')}
           </div>
-          {[MORE_NAV[0], MORE_NAV[1], MORE_NAV[2], MORE_NAV[3], MORE_NAV[4], MORE_NAV[5], MORE_NAV[6], MORE_NAV[7]].map(({ href, Icon, ar, en }) => {
+          {MORE_NAV.slice(0, 8).map(({ href, Icon, key }) => {
             const isActive = pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
@@ -92,8 +96,8 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                   color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
                 }}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} opacity={isActive ? 1 : 0.6} />
-                  <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
-                  {href === '/dashboard/alerts' && alertsCount > 0 && (
+                  <span style={{ flex: 1 }}>{t(key)}</span>
+                  {key === 'nav_alerts' && alertsCount > 0 && (
                     <span style={{ minWidth: 20, height: 20, borderRadius: 10, background: 'var(--accent-red)', color: 'white', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(239,68,68,0.4)' }}>{alertsCount}</span>
                   )}
                 </div>
@@ -102,9 +106,9 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
           })}
           {/* Separator + Account group */}
           <div style={{ margin: '16px 8px 6px', fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.8 }}>
-            {lang === 'ar' ? 'الحساب' : 'Account'}
+            {t('nav_group_account')}
           </div>
-          {[MORE_NAV[8], MORE_NAV[9], MORE_NAV[10]].map(({ href, Icon, ar, en }) => {
+          {MORE_NAV.slice(8).map(({ href, Icon, key }) => {
             const isActive = pathname.startsWith(href)
             return (
               <Link key={href} href={href} style={{ textDecoration: 'none' }}>
@@ -115,21 +119,24 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                   color: isActive ? 'var(--accent-blue-light)' : 'var(--text-secondary)',
                 }}>
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 2} opacity={isActive ? 1 : 0.6} />
-                  <span style={{ flex: 1 }}>{lang === 'en' ? en : ar}</span>
+                  <span style={{ flex: 1 }}>{t(key)}</span>
+                  {key === 'nav_alerts' && alertsCount > 0 && (
+                    <span style={{ minWidth: 20, height: 20, borderRadius: 10, background: 'var(--accent-red)', color: 'white', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 10px rgba(239,68,68,0.4)' }}>{alertsCount}</span>
+                  )}
                 </div>
               </Link>
             )
           })}
         </nav>
         <div style={{ paddingTop: 16, marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setTimeout(() => window.location.reload(), 100) }} aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'} style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.15)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s' }} className="btn-press">
+          <button onClick={handleLangToggle} aria-label={lang === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'} style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.15)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s' }} className="btn-press">
             <Globe size={16} /> {lang === 'ar' ? 'English' : 'العربية'}
           </button>
         </div>
       </aside>
 
       {/* ── Mobile Bottom Nav ── */}
-      <nav aria-label={lang === 'ar' ? 'التنقل السريع' : 'Quick navigation'} style={{
+      <nav aria-label={t('nav_quick_aria')} style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
         background: 'rgba(7,11,20,0.98)',
         backdropFilter: 'blur(24px)',
@@ -140,12 +147,11 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
         paddingBottom: 'max(18px, env(safe-area-inset-bottom))',
       }} className="mobile-nav">
 
-        {(lang === 'ar' ? [...MAIN_NAV].reverse() : MAIN_NAV).map(({ href, Icon, ar, en }) => {
+        {(lang === 'ar' ? [...MAIN_NAV].reverse() : MAIN_NAV).map(({ href, Icon, key }) => {
           const isActive = href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href)
           return (
             <Link key={href} href={href} style={{ flex: 1, textDecoration: 'none' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '2px 4px', position: 'relative' }}>
-                {/* Active pill */}
                 {isActive && (
                   <div style={{
                     position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)',
@@ -154,7 +160,6 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                     boxShadow: '0 0 8px var(--accent-blue)',
                   }} />
                 )}
-                {/* Icon container */}
                 <div style={{
                   width: 44, height: 36, borderRadius: 12,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -173,15 +178,14 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                   letterSpacing: isActive ? '0.01em' : 0,
                   transition: 'all 0.2s ease',
                 }}>
-                  {lang === 'en' ? en : ar}
+                  {t(key)}
                 </span>
               </div>
             </Link>
           )
         })}
 
-        {/* More button */}
-        <button onClick={() => setShowMore(true)} aria-label={lang === 'ar' ? 'عرض المزيد' : 'Show more'} aria-expanded={showMore} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
+        <button onClick={() => setShowMore(true)} aria-label={t('nav_more')} aria-expanded={showMore} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '2px 4px', position: 'relative' }}>
             {isMoreActive && (
               <div style={{
@@ -222,7 +226,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
               color: isMoreActive ? 'var(--accent-blue-light)' : 'var(--text-muted)',
               transition: 'all 0.2s ease',
             }}>
-              {lang === 'en' ? 'More' : 'المزيد'}
+              {t('nav_more')}
             </span>
           </div>
         </button>
@@ -241,11 +245,10 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
             display: 'flex', flexDirection: 'column',
             animation: 'slideUp 0.25s ease',
           }} className="mobile-nav">
-            {/* Handle */}
             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '14px auto 16px', flexShrink: 0 }} />
             <div style={{ overflowY: 'auto', flex: 1, padding: '0 20px', paddingBottom: 'max(32px, env(safe-area-inset-bottom))' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
-              {MORE_NAV.map(({ href, Icon, ar, en }) => {
+              {MORE_NAV.map(({ href, Icon, key }) => {
                 const isActive = pathname.startsWith(href)
                 return (
                   <Link key={href} href={href} onClick={() => setShowMore(false)} style={{ textDecoration: 'none' }}>
@@ -263,14 +266,14 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                         position: 'relative',
                       }}>
                         <Icon size={20} color={isActive ? 'var(--accent-blue-light)' : 'var(--text-muted)'} strokeWidth={isActive ? 2.5 : 1.8} />
-                        {href === '/dashboard/alerts' && alertsCount > 0 && (
+                        {key === 'nav_alerts' && alertsCount > 0 && (
                           <span style={{ position: 'absolute', top: -4, right: -4, minWidth: 18, height: 18, borderRadius: 9, background: 'var(--accent-red)', color: 'white', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', boxShadow: '0 0 8px rgba(239,68,68,0.5)' }}>
                             {alertsCount}
                           </span>
                         )}
                       </div>
                       <span style={{ fontSize: 15, fontWeight: isActive ? 800 : 600, color: isActive ? 'var(--accent-blue-light)' : 'var(--text-primary)', flex: 1 }}>
-                        {lang === 'en' ? en : ar}
+                        {t(key)}
                       </span>
                       {lang === 'ar' ? <ChevronLeft size={18} color="var(--text-muted)" /> : <ChevronRight size={18} color="var(--text-muted)" />}
                     </div>
@@ -278,7 +281,7 @@ export default function Sidebar({ alertsCount = 0 }: { alertsCount?: number }) {
                 )
               })}
             </div>
-            <button onClick={() => { setLang(lang === 'ar' ? 'en' : 'ar'); setShowMore(false); setTimeout(() => window.location.reload(), 100) }} style={{ width: '100%', padding: '13px', borderRadius: 14, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <button onClick={handleLangToggle} style={{ width: '100%', padding: '13px', borderRadius: 14, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               <Globe size={16} /> {lang === 'ar' ? 'English' : 'العربية'}
             </button>
             </div>

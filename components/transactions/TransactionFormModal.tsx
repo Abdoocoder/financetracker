@@ -7,8 +7,8 @@ import { useUser } from '@/lib/user-context'
 import { useAccounts } from '@/hooks/useAccounts'
 import type { TransactionForm } from '@/hooks/useTransactions'
 
-const CATEGORIES_EXPENSE = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','أخرى']
-const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','هدية','أخرى']
+const CATEGORIES_EXPENSE = ['طعام وشراب','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','ديون','إيجار / قسط','أخرى']
+const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','مكافأة','أخرى']
 
 interface Props {
   editingId: string | null
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function TransactionFormModal({ editingId, form, saving, onClose, onSave, onChange }: Props) {
-  const { t, lang } = useI18n()
+  const { t, tCategory } = useI18n()
   const { profile, user } = useUser()
   const baseCurrency = profile?.currency || 'JOD'
   const isMultiCurrency = form.original_currency && form.original_currency !== baseCurrency
@@ -31,14 +31,14 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {(['expense','income'] as const).map(type => (
           <button key={type} onClick={() => onChange({ type, category: '' })} style={{ flex: 1, padding: '11px', borderRadius: 12, background: form.type === type ? (type === 'income' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)') : 'var(--bg-card)', border: `1px solid ${form.type === type ? (type === 'income' ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)') : 'var(--border)'}`, color: form.type === type ? (type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)') : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
-            {type === 'income' ? `💰 ${lang === 'en' ? 'Income' : 'دخل'}` : `💸 ${lang === 'en' ? 'Expense' : 'مصروف'}`}
+            {type === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
           </button>
         ))}
       </div>
 
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', marginBottom: 16 }}>
         <div style={{ flex: 2 }}>
-          <FormField label={lang === 'en' ? 'Amount' : 'المبلغ'}>
+          <FormField label={t('trans_amount')}>
             <Input 
               type="number" 
               placeholder="0.00" 
@@ -48,7 +48,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
           </FormField>
         </div>
         <div style={{ flex: 1 }}>
-          <FormField label={lang === 'en' ? 'Currency' : 'العملة'}>
+          <FormField label={t('trans_currency')}>
             <Select value={form.original_currency || baseCurrency} onChange={e => onChange({ original_currency: e.target.value })}>
               {CURRENCIES.map(c => (
                 <option key={c.value} value={c.value}>{c.value}</option>
@@ -61,10 +61,10 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
       {isMultiCurrency && (
         <div style={{ background: 'var(--bg-secondary)', padding: '12px', borderRadius: 12, marginBottom: 16, border: '1px dashed var(--border)', animation: 'slideDown 0.2s ease' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <FormField label={lang === 'en' ? 'Exchange Rate' : 'سعر الصرف'}>
+            <FormField label={t('trans_exchange_rate')}>
               <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => onChange({ exchange_rate: e.target.value })} />
             </FormField>
-            <FormField label={lang === 'en' ? 'Equivalent' : 'المعادل'}>
+            <FormField label={t('trans_equivalent')}>
               <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, direction: 'ltr', textAlign: 'center', fontSize: 13 }}>
                 {form.amount} {baseCurrency}
               </div>
@@ -76,22 +76,22 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
         </div>
       )}
 
-      <FormField label={lang === 'en' ? 'Category' : 'الفئة'}>
+      <FormField label={t('trans_category')}>
         <Select value={form.category} onChange={e => onChange({ category: e.target.value })}>
-          <option value="">{lang === 'en' ? 'Select category' : 'اختر فئة'}</option>
+          <option value="">{t('trans_select_cat')}</option>
           {(form.type === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map(c => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>{tCategory(c)}</option>
           ))}
         </Select>
       </FormField>
-      <FormField label={lang === 'en' ? 'Description' : 'الوصف'}>
-        <Input placeholder={lang === 'en' ? 'Optional description' : 'وصف اختياري'} value={form.description} onChange={e => onChange({ description: e.target.value })} />
+      <FormField label={t('trans_description')}>
+        <Input placeholder={t('trans_desc_hint')} value={form.description} onChange={e => onChange({ description: e.target.value })} />
       </FormField>
 
       {accounts.length > 0 && (
-        <FormField label={lang === 'en' ? 'Account' : 'الحساب'}>
+        <FormField label={t('settings_account')}>
           <Select value={form.account_id} onChange={e => onChange({ account_id: e.target.value })}>
-            <option value="">{lang === 'en' ? 'Default account' : 'الحساب الافتراضي'}</option>
+            <option value="">{t('trans_default_acc')}</option>
             {accounts.map(a => (
               <option key={a.id} value={a.id}>{a.icon} {a.name}</option>
             ))}
@@ -99,7 +99,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
         </FormField>
       )}
 
-      <FormField label={lang === 'en' ? 'Date' : 'التاريخ'}>
+      <FormField label={t('trans_date')}>
         <Input type="date" value={form.transaction_date} onChange={e => onChange({ transaction_date: e.target.value })} />
       </FormField>
       {/* تكرار شهري */}
@@ -107,10 +107,10 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: form.is_recurring ? 12 : 0 }}>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
-              🔁 {lang === 'ar' ? 'معاملة متكررة' : 'Recurring'}
+              🔁 {t('trans_recurring_title')}
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-              {lang === 'ar' ? 'تنفيذ تلقائي كل شهر' : 'Auto-execute monthly'}
+              {t('trans_auto_execute')}
             </div>
           </div>
           <button
@@ -135,7 +135,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
         {form.is_recurring && (
           <div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
-              {lang === 'ar' ? 'يوم التكرار كل شهر' : 'Repeat day each month'}
+              {t('trans_repeat_day')}
             </div>
             <input
               type="number" min="1" max="31"
@@ -149,13 +149,13 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
               }}
             />
             <div style={{ fontSize: 11, color: 'var(--accent-green-light)', marginTop: 8, fontWeight: 700 }}>
-              ✅ {lang === 'ar' ? 'سيتم التنفيذ تلقائياً كل شهر' : 'Will auto-execute every month'}
+              ✅ {t('trans_auto_execute')}
             </div>
 
             {/* نوع التكرار */}
             <div style={{ marginTop: 12 }}>
               <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, fontWeight: 700 }}>
-                {lang === 'ar' ? 'نوع الدفع' : 'Payment Type'}
+                {t('trans_payment_type')}
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
@@ -167,7 +167,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
                     color: form.recurring_auto !== false ? 'var(--accent-blue-light)' : 'var(--text-muted)',
                     fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
                   }}>
-                  🏦 {lang === 'ar' ? 'تلقائي من البنك' : 'Auto from Bank'}
+                  🏦 {t('trans_auto_bank')}
                 </button>
                 <button
                   onClick={() => onChange({ recurring_auto: false })}
@@ -178,21 +178,18 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
                     color: form.recurring_auto === false ? '#F59E0B' : 'var(--text-muted)',
                     fontSize: 12, fontWeight: 700, fontFamily: 'inherit',
                   }}>
-                  💬 {lang === 'ar' ? 'يحتاج تأكيد' : 'Needs Confirmation'}
+                  💬 {t('trans_needs_conf')}
                 </button>
               </div>
               <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>
-                {form.recurring_auto !== false
-                  ? (lang === 'ar' ? 'يُضاف تلقائياً بدون تدخل منك' : 'Added automatically without your input')
-                  : (lang === 'ar' ? 'ستصلك رسالة تذكير لتسجيله يدوياً' : 'You will receive a reminder to record it manually')
-                }
+                {form.recurring_auto !== false ? t('trans_auto_hint') : t('trans_manual_hint')}
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <SaveButton label={editingId ? (lang === 'en' ? 'Save Changes' : 'حفظ التعديل') : (lang === 'en' ? 'Add' : 'إضافة')} loading={saving} onClick={onSave} />
+      <SaveButton label={editingId ? t('trans_save_edit') : t('trans_add')} loading={saving} onClick={onSave} />
     </Modal>
   )
 }

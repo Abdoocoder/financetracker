@@ -12,7 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function InstallPrompt() {
-  const { lang, t } = useI18n()
+  const { t } = useI18n()
   const [show, setShow] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -98,24 +98,16 @@ export function InstallPrompt() {
         background: 'var(--accent-blue)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 24, fontWeight: 900, color: 'white',
-        boxShadow: '0 4px 16px rgba(59,126,246,0.4)',
-      }}>ف</div>
+        boxShadow: '0 4px 166px rgba(59,126,246,0.4)',
+      }}>{t('app_name')[0]}</div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 3 }}>
-          {lang === 'ar' ? '📱 أضف فجرك لهاتفك' : '📱 Add Fajrak to your phone'}
+          {t('install_title')}
         </div>
-        {isIOS ? (
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            {t('install_ios')}
-          </div>
-        ) : (
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            {lang === 'ar'
-              ? 'تجربة أفضل وأسرع — مثل التطبيقات العادية'
-              : 'Better and faster experience — like native apps'}
-          </div>
-        )}
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+          {isIOS ? t('install_ios') : t('install_body')}
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>

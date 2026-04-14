@@ -1,12 +1,12 @@
 'use client'
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { UserProvider, useUser } from '@/lib/user-context'
+import { useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
 import { ToastProvider } from '@/components/ui/toast'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
-import { I18nProvider, useI18n } from '@/lib/i18n'
+import { useI18n } from '@/lib/i18n'
 import { PushPrompt } from '@/components/ui/push-prompt'
 import { InstallPrompt } from '@/components/ui/install-prompt'
 import { WelcomeModal } from '@/components/ui/welcome-modal'
@@ -35,7 +35,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     setAlertsCount(count ?? 0)
   }, [user, supabase])
 
-  // debounced version — تمنع طلبات متعددة عند تغييرات متتالية سريعة
   const fetchCountDebounced = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(fetchCount, 500)
@@ -85,15 +84,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <UserProvider>
-      <I18nProvider>
-        <ToastProvider>
-          <TranslatedErrorBoundary>
-            <DashboardContent>
-      {children}</DashboardContent>
-          </TranslatedErrorBoundary>
-        </ToastProvider>
-      </I18nProvider>
-    </UserProvider>
+    <ToastProvider>
+      <TranslatedErrorBoundary>
+        <DashboardContent>{children}</DashboardContent>
+      </TranslatedErrorBoundary>
+    </ToastProvider>
   )
 }

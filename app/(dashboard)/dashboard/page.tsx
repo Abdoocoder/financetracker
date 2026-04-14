@@ -51,8 +51,6 @@ export default function DashboardPage() {
     if (!currentUser) return
     const today = new Date().toISOString().split('T')[0]
     
-    // Using simple fetch for gamification to avoid creating too many high-level hooks for now
-    // but ultimately these should also be useQueryified.
     ;(async () => {
       try {
         const { createClient } = await import('@/lib/supabase/client')
@@ -103,7 +101,7 @@ export default function DashboardPage() {
             {hydrated && new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
             {hydrated && data?.lastUpdated && (
               <span style={{ margin: '0 8px', opacity: 0.5 }}>
-                • {lang === 'en' ? 'Updated' : 'تم التحديث'} {data.lastUpdated}
+                • {t('dash_updated')} {data.lastUpdated}
               </span>
             )}
           </p>
@@ -112,7 +110,7 @@ export default function DashboardPage() {
           {streakInfo && streakInfo.streak >= 3 && (
             <button 
               onClick={() => streakInfo.loggedToday ? document.getElementById('gamification')?.scrollIntoView({ behavior: 'smooth' }) : document.getElementById('quick-add-trigger')?.click()}
-              aria-label={lang === 'ar' ? `أيام المداومة: ${streakInfo.streak}` : `Streak days: ${streakInfo.streak}`}
+              aria-label={`${t('dash_streak')}: ${streakInfo.streak}`}
               style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 13, fontWeight: 800, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF', cursor: 'pointer' }}>
               {streakInfo.loggedToday ? '🔥' : '❄️'} {streakInfo.streak}
             </button>
@@ -154,7 +152,7 @@ export default function DashboardPage() {
             bg: (accountsTotalBalance ?? net) >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)',
             border: (accountsTotalBalance ?? net) >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
             icon: '🏦',
-            sub: `${lang === 'en' ? 'Month' : 'الشهر'}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,
+            sub: `${t('dash_month')}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,
           },
         ].map(s => (
           <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: '10px 6px', textAlign: 'center' }}>
@@ -206,7 +204,7 @@ export default function DashboardPage() {
       )}
 
       {show('health') && (
-        <Section id="health" defaultOpen={false} icon="💊" title={`${lang === 'en' ? 'Financial Health' : 'الصحة المالية'} — ${data?.healthScore ?? 0}%`}>
+        <Section id="health" defaultOpen={false} icon="💊" title={`${t('dash_health_title')} — ${data?.healthScore ?? 0}%`}>
           <div style={{ padding: '12px 0 8px' }}>
             <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
           </div>
@@ -214,13 +212,13 @@ export default function DashboardPage() {
       )}
 
       {show('achievements') && (
-        <Section id="gamification" defaultOpen={false} icon="🏆" title={lang === 'en' ? 'Achievements' : 'الإنجازات'}>
+        <Section id="gamification" defaultOpen={false} icon="🏆" title={t('dash_achievements_title')}>
           <div style={{ padding: '12px 0 8px' }}><GamificationCard /></div>
         </Section>
       )}
 
       {show('charts') && (
-        <Section id="charts" defaultOpen={false} icon="📊" title={lang === 'en' ? 'Charts & Analysis' : 'الرسوم البيانية'}>
+        <Section id="charts" defaultOpen={false} icon="📊" title={t('dash_charts_title')}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
             <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
             {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
@@ -230,13 +228,13 @@ export default function DashboardPage() {
       )}
 
       {show('simulator') && (
-        <Section id="simulator" defaultOpen={false} icon="💰" title={lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}>
+        <Section id="simulator" defaultOpen={false} icon="💰" title={t('dash_simulator_title')}>
           <div style={{ padding: '12px 0 8px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
         </Section>
       )}
 
       {show('challenges') && (
-        <Section id="challenges" defaultOpen={false} icon="🎯" title={lang === 'en' ? 'Challenges' : 'التحديات'}>
+        <Section id="challenges" defaultOpen={false} icon="🎯" title={t('dash_challenges_title')}>
           <div style={{ padding: '12px 0 8px' }}><ChallengesCard lang={lang} data={data || null} net={net} income={income} expenses={expenses} /></div>
         </Section>
       )}

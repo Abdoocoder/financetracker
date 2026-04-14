@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>49/49</span>
+                <span class='fraction'>38/38</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.14% </span>
+                <span class="strong">81.25% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>23/28</span>
+                <span class='fraction'>13/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>18/18</span>
+                <span class='fraction'>10/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>33/33</span>
+                <span class='fraction'>29/29</span>
             </div>
         
             
@@ -145,11 +145,7 @@
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
-<a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a>
-<a name='L85'></a><a href='#L85'>85</a>
-<a name='L86'></a><a href='#L86'>86</a>
-<a name='L87'></a><a href='#L87'>87</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L83'></a><a href='#L83'>83</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,12 +156,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">21x</span>
-<span class="cline-any cline-yes">18x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">18x</span>
@@ -174,19 +164,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">17x</span>
-<span class="cline-any cline-yes">170x</span>
-<span class="cline-any cline-yes">170x</span>
-<span class="cline-any cline-yes">170x</span>
-<span class="cline-any cline-yes">170x</span>
 <span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
@@ -246,34 +238,30 @@ export function useAccounts(userId: string | undefined) {
 &nbsp;
   async function fetchAccounts() {
     if (!userId) return
-    const { data } = await supabase
-      .from('accounts')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_archived', false)
-      .order('is_default', { ascending: false })
-      .order('created_at')
+&nbsp;
+    // جلب الحسابات والأرصدة بالتوازي — نفس منطق Flutter (get_account_balances RPC)
+    const [{ data }, { data: balances }] = await Promise.all([
+      supabase
+        .from('accounts')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_archived', false)
+        .order('is_default', { ascending: false })
+        .order('created_at'),
+      supabase.rpc('get_account_balances', { p_user_id: userId }),
+    ])
 &nbsp;
     if (!data) { setLoading(false); return }
 &nbsp;
-    // حساب الرصيد لكل حساب
-    // Important: Only include posted (non-future) transactions in balances.
-    // Future/scheduled transactions are shown elsewhere (e.g. Transactions "Upcoming")
-    // and should not affect current account balances.
-    const today = new Date().toISOString().split('T')[0]
-    const { data: txs } = await supabase
-      .from('transactions')
-      .select('account_id, transfer_to_account_id, type, amount')
-      .eq('user_id', userId)
-      .lte('transaction_date', today)
+    const balanceMap: Record&lt;string, number&gt; = {}
+    for (const b of (balances ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>) {
+      balanceMap[b.account_id] = Number(b.current_balance)
+    }
 &nbsp;
-    const withBalance = data.map(acc =&gt; {
-      const income   = (txs ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>.filter(t =&gt; t.account_id === acc.id &amp;&amp; t.type === 'income').reduce((a, t) =&gt; a + Number(t.amount), 0)
-      const expense  = (txs ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>.filter(t =&gt; t.account_id === acc.id &amp;&amp; t.type === 'expense').reduce((a, t) =&gt; a + Number(t.amount), 0)
-      const xferIn   = (txs ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>.filter(t =&gt; t.transfer_to_account_id === acc.id &amp;&amp; t.type === 'transfer').reduce((a, t) =&gt; a + Number(t.amount), 0)
-      const xferOut  = (txs ?? <span class="branch-1 cbranch-no" title="branch not covered" >[])</span>.filter(t =&gt; t.account_id === acc.id &amp;&amp; t.type === 'transfer').reduce((a, t) =&gt; a + Number(t.amount), 0)
-      return { ...acc, balance: Number(acc.opening_balance) + income - expense + xferIn - xferOut }
-    })
+    const withBalance = data.map(acc =&gt; ({
+      ...acc,
+      balance: balanceMap[acc.id] ?? <span class="branch-1 cbranch-no" title="branch not covered" >Number(acc.opening_balance),</span>
+    }))
 &nbsp;
     setAccounts(withBalance)
     setLoading(false)
@@ -328,7 +316,7 @@ export function useAccounts(userId: string | undefined) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-09T20:57:29.543Z
+                at 2026-04-14T18:25:07.688Z
             </div>
         <script src="../prettify.js"></script>
         <script>

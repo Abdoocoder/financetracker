@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/58</span>
+                <span class='fraction'>0/56</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/44</span>
+                <span class='fraction'>0/45</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/42</span>
+                <span class='fraction'>0/40</span>
             </div>
         
             
@@ -183,24 +183,7 @@
 <a name='L118'></a><a href='#L118'>118</a>
 <a name='L119'></a><a href='#L119'>119</a>
 <a name='L120'></a><a href='#L120'>120</a>
-<a name='L121'></a><a href='#L121'>121</a>
-<a name='L122'></a><a href='#L122'>122</a>
-<a name='L123'></a><a href='#L123'>123</a>
-<a name='L124'></a><a href='#L124'>124</a>
-<a name='L125'></a><a href='#L125'>125</a>
-<a name='L126'></a><a href='#L126'>126</a>
-<a name='L127'></a><a href='#L127'>127</a>
-<a name='L128'></a><a href='#L128'>128</a>
-<a name='L129'></a><a href='#L129'>129</a>
-<a name='L130'></a><a href='#L130'>130</a>
-<a name='L131'></a><a href='#L131'>131</a>
-<a name='L132'></a><a href='#L132'>132</a>
-<a name='L133'></a><a href='#L133'>133</a>
-<a name='L134'></a><a href='#L134'>134</a>
-<a name='L135'></a><a href='#L135'>135</a>
-<a name='L136'></a><a href='#L136'>136</a>
-<a name='L137'></a><a href='#L137'>137</a>
-<a name='L138'></a><a href='#L138'>138</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L121'></a><a href='#L121'>121</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -246,7 +229,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -254,22 +236,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -297,14 +271,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -382,37 +348,28 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
       const chartFrom = <span class="cstat-no" title="statement not covered" >new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0];</span>
       const firstDay = <span class="cstat-no" title="statement not covered" >new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];</span>
 &nbsp;
-      // Step 1: Fetch Profile &amp; RPC Data &amp; Alert Count (Critical Totals)
-      // Note: We avoid manual queries for debts, investments, goals as the RPC covers them.
-      const [profileRes, alertRes, dashRpcRes, goalRes] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
+      // Step 1: كل الطلبات بالتوازي في دفعة واحدة
+      const [profileRes, alertRes, goalRes, txRes, debtCommitmentsRes, exchangeRate] = <span class="cstat-no" title="statement not covered" >await Promise.all([</span>
         supabase.from('profiles').select('monthly_income, full_name, currency').eq('id', user.id).single(),
         supabase.from('alerts').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('is_read', false),
-        supabase.rpc('get_financial_dashboard', { p_user_id: user.id, p_usd_to_local_rate: 1.0 }), // We'll re-scale if needed
         supabase.from('savings_goals').select('target_amount').eq('user_id', user.id),
+        supabase.from('transactions').select('*').eq('user_id', user.id).gte('transaction_date', chartFrom).order('transaction_date', { ascending: false }),
+        supabase.from('debts').select('monthly_payment').eq('user_id', user.id).eq('is_paid', false).eq('auto_deduct', true).eq('debt_type', 'owed'),
+        fetchExchangeRate('USD', 'KWD'), // pre-fetch — يُستبدل بالعملة الفعلية أدناه
       ]);
 &nbsp;
       const profileData = <span class="cstat-no" title="statement not covered" >profileRes.data;</span>
       const userCurrency = <span class="cstat-no" title="statement not covered" >(profileData?.currency ?? 'JOD').toUpperCase();</span>
-      const usdToLocal = <span class="cstat-no" title="statement not covered" >userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? 1) : 1;</span>
 &nbsp;
-      // Re-fetch RPC with correct exchange rate if it's not 1.0
-      const dash = <span class="cstat-no" title="statement not covered" >usdToLocal !== 1.0 </span>
-        ? (await supabase.rpc('get_financial_dashboard', { p_user_id: user.id, p_usd_to_local_rate: usdToLocal })).data 
-        : dashRpcRes.data;
+      // Step 2: RPC مع سعر الصرف الصحيح (طلب واحد فقط)
+      const usdToLocal = <span class="cstat-no" title="statement not covered" >userCurrency !== 'USD' ? (await fetchExchangeRate('USD', userCurrency) ?? exchangeRate ?? 1) : 1;</span>
+      const { data: dash } = <span class="cstat-no" title="statement not covered" >await supabase.rpc('get_financial_dashboard', { p_user_id: user.id, p_usd_to_local_rate: usdToLocal ?? 1 });</span>
 &nbsp;
-      // Step 2: Fetch Transactions (Consolidated)
-      // We fetch all transactions from the start of the 6-month chart window until today.
-      const { data: allTx } = <span class="cstat-no" title="statement not covered" >await supabase.from('transactions')</span>
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('transaction_date', chartFrom)
-        .order('transaction_date', { ascending: false });
-&nbsp;
-      const txs = <span class="cstat-no" title="statement not covered" >allTx ?? [];</span>
+      const txs = <span class="cstat-no" title="statement not covered" >txRes.data ?? [];</span>
       const currentMonthTxs = <span class="cstat-no" title="statement not covered" >txs.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.transaction_date &gt;= firstDay);</span></span>
-      
+&nbsp;
       const DEBT_CATEGORIES = <span class="cstat-no" title="statement not covered" >['ديون', 'debts_title', 'Debts'];</span>
-      
+&nbsp;
       const income = <span class="cstat-no" title="statement not covered" >currentMonthTxs.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.type === 'income').r</span>educe(<span class="fstat-no" title="function not covered" >(a</span>, t) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(t.amount), 0</span>) || Number(profileData?.monthly_income ?? 0);</span>
       const expenses = <span class="cstat-no" title="statement not covered" >currentMonthTxs.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.type === 'expense').r</span>educe(<span class="fstat-no" title="function not covered" >(a</span>, t) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(t.amount), 0</span>);</span>
       const debtPayments = <span class="cstat-no" title="statement not covered" >currentMonthTxs.filter(<span class="fstat-no" title="function not covered" >t =&gt; <span class="cstat-no" title="statement not covered" >t</span>.type === 'expense' &amp;&amp; DEBT_CATEGORIES.includes(t.category ?? '')).r</span>educe(<span class="fstat-no" title="function not covered" >(a</span>, t) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(t.amount), 0</span>);</span>
@@ -434,16 +391,8 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
       });
 &nbsp;
       const prevMonth = <span class="cstat-no" title="statement not covered" >months6[4] ?? { income: 0, expense: 0 };</span>
-      
-      // Fetch debt commitments separately as they require a complex filter
-      const { data: debtCommitments } = <span class="cstat-no" title="statement not covered" >await supabase.from('debts')</span>
-        .select('monthly_payment')
-        .eq('user_id', user.id)
-        .eq('is_paid', false)
-        .eq('auto_deduct', true)
-        .eq('debt_type', 'owed');
-      
-      const monthlyDebtCommitments = <span class="cstat-no" title="statement not covered" >(debtCommitments ?? []).reduce(<span class="fstat-no" title="function not covered" >(a</span>, d) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(d.monthly_payment), 0</span>);</span>
+&nbsp;
+      const monthlyDebtCommitments = <span class="cstat-no" title="statement not covered" >(debtCommitmentsRes.data ?? []).reduce(<span class="fstat-no" title="function not covered" >(a</span>, d) =&gt; <span class="cstat-no" title="statement not covered" >a + Number(d.monthly_payment), 0</span>);</span>
 &nbsp;
       const recentTx = <span class="cstat-no" title="statement not covered" >txs.slice(0, 5);</span>
 &nbsp;
@@ -481,7 +430,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-09T20:57:29.543Z
+                at 2026-04-14T18:25:07.688Z
             </div>
         <script src="../prettify.js"></script>
         <script>
