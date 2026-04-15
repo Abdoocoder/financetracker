@@ -28,8 +28,8 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.2.2
   url_launcher: ^6.2.4
-  package_info_plus: ^9.0.0
-  share_plus: ^12.0.1
+  package_info_plus: ^10.0.0
+  share_plus: ^13.0.0
   path_provider: ^2.1.5
   easy_localization: ^3.0.3
   provider: ^6.1.1
@@ -42,7 +42,7 @@ dependencies:
 
   # Offline-first local database
   drift: ^2.18.0
-  sqlcipher_flutter_libs: ^0.5.0  # SQLCipher encryption — mobile/desktop only
+  sqlcipher_flutter_libs: ^0.7.0  # SQLCipher encryption — mobile/desktop only
   path: ^1.9.0
 
 dev_dependencies:
