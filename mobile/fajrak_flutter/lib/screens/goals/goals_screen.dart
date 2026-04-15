@@ -116,7 +116,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text('delete'.tr(),
-                  style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error, fontFamily: 'Cairo'))),
         ],
       ),
     );

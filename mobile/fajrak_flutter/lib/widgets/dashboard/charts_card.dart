@@ -53,7 +53,8 @@ class ChartsCard extends StatelessWidget {
                   fontFamily: 'Cairo',
                   fontSize: 14)),
           const SizedBox(height: 24),
-          SizedBox(
+          RepaintBoundary(
+          child: SizedBox(
             height: 200,
             child: BarChart(
                BarChartData(
@@ -114,6 +115,7 @@ class ChartsCard extends StatelessWidget {
               ),
             ),
           ),
+          ), // RepaintBoundary
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

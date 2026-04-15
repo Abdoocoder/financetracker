@@ -289,7 +289,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('حدث خطأ أثناء إنشاء التقرير',
               style: const TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: Theme.of(context).colorScheme.error,
         ));
       }
     } finally {
@@ -316,7 +316,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => AddTransactionDialog(
@@ -331,7 +331,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => MonthYearPickerDialog(

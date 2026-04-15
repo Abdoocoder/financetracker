@@ -19,7 +19,10 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 4; // Default to Dashboard
 
-  final List<Widget> _screens = const [
+  // Track which tabs have been visited — only build a screen on first visit.
+  late final List<bool> _visited;
+
+  static const List<Widget> _screens = [
     MoreScreen(),
     AccountsScreen(),
     DebtsScreen(),
@@ -28,39 +31,49 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Mark only the initial tab as visited.
+    _visited = List.generate(_screens.length, (i) => i == _currentIndex);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AppState>().loadUnreadAlerts();
+    });
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is Map && args['tab'] is int) {
-      _currentIndex = args['tab'] as int;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<AppState>().loadUnreadAlerts();
+      final tab = args['tab'] as int;
+      if (tab != _currentIndex) {
+        setState(() {
+          _currentIndex = tab;
+          _visited[tab] = true;
+        });
       }
-    });
+    }
   }
 
   void _onTabSelected(int index) {
     setState(() {
       _currentIndex = index;
+      _visited[index] = true;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: List.generate(_screens.length, (i) {
+          // Render a blank box until the tab is first visited — avoids
+          // initializing all 5 screens on startup.
+          if (!_visited[i]) return const SizedBox.shrink();
+          return RepaintBoundary(child: _screens[i]);
+        }),
       ),
       bottomNavigationBar: MainBottomNavBar(
         currentIndex: _currentIndex,

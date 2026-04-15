@@ -173,7 +173,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('budget_apply_success'.tr(),
               style: const TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: const Color(0xFF10B981)));
+          backgroundColor: Theme.of(context).colorScheme.primary));
     }
   }
 

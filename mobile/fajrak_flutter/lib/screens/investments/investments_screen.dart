@@ -201,7 +201,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => AddInvestmentDialog(onSaved: () => _load()),
@@ -406,13 +406,13 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.05),
+                        color: colorScheme.primary.withValues(alpha: 0.05),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: const Color(0xFF10B981)
+                            color: colorScheme.primary
                                 .withValues(alpha: 0.15))),
                     child: Row(children: [
-                      Icon(Icons.mosque, size: 18, color: const Color(0xFF10B981)),
+                      Icon(Icons.mosque, size: 18, color: colorScheme.primary),
                       const SizedBox(width: 10),
                       Expanded(
                           child: Text(

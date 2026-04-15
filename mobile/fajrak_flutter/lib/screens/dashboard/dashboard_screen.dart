@@ -36,6 +36,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _accountsLoading = true;
   bool _loading = true;
+  bool _hasError = false;
   double _income = 0, _expenses = 0, _net = 0, _monthlyDebtCommitments = 0;
   double _totalAccountsBalance = 0;
   List<Map<String, dynamic>> _accounts = [];
@@ -55,7 +56,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
-    setState(() { _accountsLoading = true; _loading = true; });
+    setState(() { _accountsLoading = true; _loading = true; _hasError = false; });
     await _loadPhase1();
     await _loadPhase2();
   }
@@ -186,7 +187,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) setState(() { _loading = false; _hasError = true; });
     }
   }
 
@@ -208,13 +209,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
       await _load();
       if (mounted) {
+        final cs = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFF10B981)));
+          SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: cs.primary));
       }
     } catch (e) {
       if (mounted) {
+        final cs = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: const Color(0xFFEF4444)));
+          SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: cs.error));
       }
     }
   }
@@ -234,8 +237,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
-            child: _loading 
-              ? const PageSkeleton() 
+            child: _hasError
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.wifi_off_rounded, size: 56, color: colorScheme.onSurface.withValues(alpha: 0.3)),
+                      const SizedBox(height: 16),
+                      Text('error_load_failed'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface), textAlign: TextAlign.center),
+                      const SizedBox(height: 8),
+                      Text('error_check_connection'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
+                      const SizedBox(height: 24),
+                      FilledButton.icon(
+                        onPressed: _load,
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: Text('btn_retry'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                      ),
+                    ]),
+                  ),
+                )
+              : _loading
+              ? const PageSkeleton()
               : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
               // ── 1. Header + Customize button ─────────────────────
@@ -342,7 +364,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 if (layout.isVisible(DashCardId.netWorth) && _invValue + _goalsSaved + _totalDebt > 0)
                   NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
                 if (layout.isVisible(DashCardId.healthScore))
-                  DashboardHealthScore(score: _healthScore, colorScheme: colorScheme),
+                  RepaintBoundary(child: DashboardHealthScore(score: _healthScore, colorScheme: colorScheme)),
                 if (layout.isVisible(DashCardId.stage)) ...[
                   const SizedBox(height: 16),
                   DashboardStageCard(stage: _stage),
@@ -390,8 +412,9 @@ class _AccountsBalanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final isPositive = totalBalance >= 0;
-    final color = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final color = isPositive ? cs.primary : cs.error;
 
     return GlassPanel(
       padding: const EdgeInsets.all(16),
@@ -403,29 +426,29 @@ class _AccountsBalanceCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('dash_accounts_total'.tr(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+            Text('dash_accounts_total'.tr(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
             const SizedBox(height: 2),
-            Text('dash_accounts_all'.tr(), style: const TextStyle(fontSize: 10, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+            Text('dash_accounts_all'.tr(), style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${isPositive ? '+' : '-'}${_fmt(totalBalance)}',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
-            Text(currency, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontFamily: 'Cairo')),
+            Text(currency, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
           ]),
         ]),
         if (accounts.length > 1) ...[
           const SizedBox(height: 10),
-          const Divider(height: 1, color: Color(0xFF1E293B)),
+          Divider(height: 1, color: cs.outlineVariant),
           const SizedBox(height: 8),
           ...accounts.map((acc) {
             final bal = acc['balance'] as double? ?? 0;
-            final balColor = bal >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+            final balColor = bal >= 0 ? cs.primary : cs.error;
             return Padding(
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: const EdgeInsets.only(bottom: 8),
               child: Row(children: [
                 Text(acc['icon'] as String? ?? '🏦', style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 6),
-                Expanded(child: Text(acc['name'] as String? ?? '', style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8), fontFamily: 'Cairo'))),
+                Expanded(child: Text(acc['name'] as String? ?? '', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, fontFamily: 'Cairo'))),
                 Text('${bal >= 0 ? '+' : '-'}${_fmt(bal)}',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: balColor, fontFamily: 'monospace')),
               ]),

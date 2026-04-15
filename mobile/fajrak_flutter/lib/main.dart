@@ -10,7 +10,6 @@ import 'utils/error_handler.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
 import 'providers/dashboard_layout_provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -31,25 +30,34 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  // Only set icon brightness — avoid setStatusBarColor / setNavigationBarColor
+  // which are deprecated in Android 15 (API 35). Transparency is handled by
+  // enableEdgeToEdge() in MainActivity via WindowInsetsController.
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.light,
   ));
 
-  // Load environment variables from .env file
-  // For web, it looks in web/.env, for mobile it looks in project root
-  try {
-    await dotenv.load(fileName: '.env');
-  } catch (e) {
-    // .env file not found - continue without it
-    if (kDebugMode) {
-      print('Note: .env file not found, using default configuration');
-    }
-  }
+  // Global Error Handling — set up before anything async
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    ErrorHandler.handle(details.exception, developerMessage: 'FlutterError: ${details.library}');
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    ErrorHandler.handle(error, developerMessage: 'PlatformError');
+    return true;
+  };
 
-  // Initialize Firebase with platform-specific options
+  // Load .env + EasyLocalization in parallel (neither depends on the other)
+  await Future.wait([
+    dotenv.load(fileName: '.env').catchError((_) {}),
+    EasyLocalization.ensureInitialized(),
+  ]);
+
+  // Firebase init — must happen after dotenv (needs env vars on web)
   if (kIsWeb) {
-    // Web configuration
     final projectId = dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1';
     await Firebase.initializeApp(
       options: FirebaseOptions(
@@ -62,65 +70,30 @@ void main() async {
       ),
     );
   } else {
-    // Android/iOS configuration (uses google-services.json)
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
 
-  // Get Supabase credentials from environment variables
-  final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
-  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
-
-  // If credentials are empty, try to continue anyway for development
-  // (some platforms may have env vars set externally)
-  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
-    if (kDebugMode) {
-      // In debug mode, show warning but continue if values exist in .env file
-      print('Warning: SUPABASE_URL or SUPABASE_ANON_KEY not found in .env');
-      print('App may not function correctly without valid credentials.');
-    }
-  }
-
+  // Supabase init — can run after Firebase since both are now sequential only
+  // where necessary; both use different services so order doesn't matter here.
   await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
-
-  await NotificationService.initialize();
 
   final appState = AppState();
 
-  // تحديث الشارة عند وصول إشعار والتطبيق مفتوح (Foreground)
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  FirebaseMessaging.onMessage.listen((_) => appState.loadUnreadAlerts());
+  FirebaseMessaging.onMessageOpenedApp.listen((msg) {
+    NotificationService.handleMessage(msg);
     appState.loadUnreadAlerts();
   });
-
-  // Handle background clicks (when app is in background but not terminated)
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    NotificationService.handleMessage(message);
-    appState.loadUnreadAlerts(); // تحديث الشارة عند فتح التطبيق من الخلفية
-  });
-
-  // Handle terminated state clicks (when app is launched from notification)
-  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-    if (message != null) {
-      NotificationService.handleMessage(message);
-      appState.loadUnreadAlerts(); // تحديث الشارة عند فتح التطبيق من الإشعار مباشرة
+  FirebaseMessaging.instance.getInitialMessage().then((msg) {
+    if (msg != null) {
+      NotificationService.handleMessage(msg);
+      appState.loadUnreadAlerts();
     }
   });
-
-  await EasyLocalization.ensureInitialized();
-
-  // Global Error Handling
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    ErrorHandler.handle(details.exception, developerMessage: 'FlutterError: ${details.library}');
-  };
-
-  PlatformDispatcher.instance.onError = (error, stack) {
-    ErrorHandler.handle(error, developerMessage: 'PlatformError');
-    return true;
-  };
 
   runApp(
     EasyLocalization(
@@ -136,11 +109,18 @@ void main() async {
       ),
     ),
   );
+
+  // Initialize notifications AFTER runApp — keeps startup fast.
+  // Fire-and-forget: no await, doesn't block the first frame.
+  NotificationService.initialize();
 }
 
 class FajrakApp extends StatelessWidget {
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   const FajrakApp({super.key});
+
+  static final ThemeData _lightTheme = FajrakApp._buildTheme(Brightness.light);
+  static final ThemeData _darkTheme = FajrakApp._buildTheme(Brightness.dark);
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +129,8 @@ class FajrakApp extends StatelessWidget {
       title: 'فجرك',
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      theme: _buildTheme(Brightness.light),
-      darkTheme: _buildTheme(Brightness.dark),
+      theme: _lightTheme,
+      darkTheme: _darkTheme,
       themeMode: appState.themeMode,
       locale: context.locale, // Use context.locale from EasyLocalization
       supportedLocales: context.supportedLocales,
@@ -169,7 +149,7 @@ class FajrakApp extends StatelessWidget {
     );
   }
 
-  ThemeData _buildTheme(Brightness brightness) {
+  static ThemeData _buildTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     
     final primary = const Color(0xFF3B7EF6);
@@ -201,12 +181,9 @@ class FajrakApp extends StatelessWidget {
       ),
       dividerColor: outlineVariant,
       fontFamily: 'Cairo',
-      fontFamilyFallback: [
-        'Cairo',
-        GoogleFonts.cairo().fontFamily!,
-        GoogleFonts.notoColorEmoji().fontFamily!,
-        GoogleFonts.notoSans().fontFamily!,
+      fontFamilyFallback: const [
         'Roboto',
+        'Noto Color Emoji',
         'Noto Sans Arabic',
         'sans-serif',
       ],

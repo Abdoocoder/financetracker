@@ -11,12 +11,12 @@ import '../../widgets/debts/debt_list_item.dart';
 import '../../widgets/debts/add_debt_dialog.dart';
 import '../../widgets/common/skeleton_loader.dart';
 
-const _priorityColors = [
-  Color(0xFFEF4444),
-  Color(0xFFF59E0B),
-  Color(0xFF3B7EF6),
-  Color(0xFF8B9CC8),
-  Color(0xFF4A5568),
+List<Color> _buildPriorityColors(ColorScheme cs) => [
+  cs.error,
+  const Color(0xFFF59E0B), // warning amber — no semantic equivalent in M3
+  cs.primary,
+  cs.onSurfaceVariant,
+  cs.outlineVariant,
 ];
 
 class DebtsScreen extends StatefulWidget {
@@ -124,24 +124,19 @@ class _DebtsScreenState extends State<DebtsScreen> {
   }
 
   Future<void> _deleteDebt(String id) async {
+    final cs = Theme.of(context).colorScheme;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF0F1629),
-        title: Text('debts_delete_title'.tr(),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
-        content: Text('confirm_delete'.tr(),
-            style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+        title: Text('debts_delete_title'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        content: Text('confirm_delete'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child:
-                  Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+              child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('delete'.tr(),
-                  style: const TextStyle(
-                      color: Color(0xFFEF4444), fontFamily: 'Cairo'))),
+              child: Text('delete'.tr(), style: TextStyle(color: cs.error, fontFamily: 'Cairo'))),
         ],
       ),
     );
@@ -152,15 +147,14 @@ class _DebtsScreenState extends State<DebtsScreen> {
   }
 
   Future<void> _receiveDebt(Map<String, dynamic> debt) async {
+    final cs = Theme.of(context).colorScheme;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF0F1629),
-        title: Text('debts_receive_btn'.tr(),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
+        title: Text('debts_receive_btn'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
         content: Text(
             '${'debts_tab_receivable'.tr()}: ${debt['name']}\n${(debt['remaining_amount'] as num).toStringAsFixed(0)} $_currency',
-            style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo')),
+            style: const TextStyle(fontFamily: 'Cairo')),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -168,7 +162,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text('debts_receive_btn'.tr(),
-                  style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo'))),
+                  style: TextStyle(color: cs.primary, fontFamily: 'Cairo'))),
         ],
       ),
     );
@@ -194,6 +188,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
   }
 
   void _showAddDialog({Map<String, dynamic>? existing, List<String>? labels}) {
+    final cs = Theme.of(context).colorScheme;
+    final priorityColors = _buildPriorityColors(cs);
     final defaultLabels = [
       'priority_very_high'.tr(),
       'priority_high'.tr(),
@@ -205,13 +201,13 @@ class _DebtsScreenState extends State<DebtsScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: cs.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => AddDebtDialog(
         existing: existing,
         onSaved: _load,
-        priorityColors: _priorityColors,
+        priorityColors: priorityColors,
         priorityLabels: labels ?? defaultLabels,
         baseCurrency: _currency,
       ),
@@ -222,6 +218,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final priorityColors = _buildPriorityColors(cs);
 
     final priorityLabels = [
       'priority_very_high'.tr(),
@@ -246,7 +243,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         title: Text('debts_title'.tr()),
         actions: [
           IconButton(
-              icon: const Icon(Icons.add, color: Color(0xFF3B7EF6)),
+              icon: Icon(Icons.add, color: cs.primary),
               onPressed: () => _showAddDialog(labels: priorityLabels))
         ],
       ),
@@ -254,7 +251,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
           ? const PageSkeleton()
           : RefreshIndicator(
               onRefresh: _load,
-              color: const Color(0xFF3B7EF6),
+              color: cs.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
@@ -276,10 +273,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       final isAchievement = type == 'achievement';
                       final isWarning = type == 'warning';
                       final color = isAchievement
-                          ? const Color(0xFF10B981)
+                          ? cs.primary
                           : isWarning
                               ? const Color(0xFFF59E0B)
-                              : const Color(0xFF3B7EF6);
+                              : cs.secondary;
                       return Dismissible(
                         key: ValueKey(alert['id']),
                         direction: DismissDirection.endToStart,
@@ -288,10 +285,10 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                            color: cs.error.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.delete_outline, color: Color(0xFFEF4444), size: 20),
+                          child: Icon(Icons.delete_outline, color: cs.error, size: 20),
                         ),
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 8),
@@ -316,8 +313,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                         fontFamily: 'Cairo')),
                                 if ((alert['message'] ?? '').toString().isNotEmpty)
                                   Text(alert['message'],
-                                      style: const TextStyle(
-                                          color: Color(0xFF94A3B8),
+                                      style: TextStyle(
+                                          color: cs.onSurfaceVariant,
                                           fontSize: 11,
                                           fontFamily: 'Cairo'),
                                       maxLines: 2,
@@ -342,26 +339,26 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: const Color(0x1AEF4444),
+                          color: cs.error.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0x33EF4444)),
+                          border: Border.all(color: cs.error.withValues(alpha: 0.2)),
                         ),
                         child: Row(children: [
-                          const Icon(Icons.credit_card, size: 16, color: Color(0xFFEF4444)),
+                          Icon(Icons.credit_card, size: 16, color: cs.error),
                           const SizedBox(width: 6),
                           Expanded(child: Text('debts_tab_owed'.tr(),
-                            style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                            style: TextStyle(color: cs.error, fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
                           if (!_showOwed)
                             Text('${totalRemaining.toStringAsFixed(0)} $_currency',
-                              style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                              style: TextStyle(color: cs.error, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                            decoration: BoxDecoration(color: const Color(0x26EF4444), borderRadius: BorderRadius.circular(6)),
-                            child: Text('${_debts.length}', style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
+                            decoration: BoxDecoration(color: cs.error.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
+                            child: Text('${_debts.length}', style: TextStyle(color: cs.error, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
                           ),
                           const SizedBox(width: 6),
-                          Icon(_showOwed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: const Color(0xFFEF4444)),
+                          Icon(_showOwed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: cs.error),
                         ]),
                       ),
                     ),
@@ -371,7 +368,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         key: ValueKey(d['id']),
                         debt: d,
                         currency: _currency,
-                        priorityColors: _priorityColors,
+                        priorityColors: priorityColors,
                         priorityLabels: priorityLabels,
                         onEdit: (debt) => _showAddDialog(existing: debt, labels: priorityLabels),
                         onDelete: _deleteDebt,
@@ -389,26 +386,26 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: const Color(0x1A10B981),
+                          color: cs.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0x3310B981)),
+                          border: Border.all(color: cs.primary.withValues(alpha: 0.2)),
                         ),
                         child: Row(children: [
-                          const Icon(Icons.account_balance_wallet, size: 16, color: Color(0xFF10B981)),
+                          Icon(Icons.account_balance_wallet, size: 16, color: cs.primary),
                           const SizedBox(width: 6),
                           Expanded(child: Text('debts_tab_receivable'.tr(),
-                            style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                            style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
                           if (!_showReceivable)
                             Text('${totalReceivable.toStringAsFixed(0)} $_currency',
-                              style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                              style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                            decoration: BoxDecoration(color: const Color(0x2610B981), borderRadius: BorderRadius.circular(6)),
-                            child: Text('${_receivableDebts.length}', style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
+                            decoration: BoxDecoration(color: cs.primary.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
+                            child: Text('${_receivableDebts.length}', style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
                           ),
                           const SizedBox(width: 6),
-                          Icon(_showReceivable ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: const Color(0xFF10B981)),
+                          Icon(_showReceivable ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: cs.primary),
                         ]),
                       ),
                     ),
@@ -430,7 +427,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                     Container(
                       padding: const EdgeInsets.all(40),
                       child: Column(children: [
-                        Icon(Icons.celebration, size: 48, color: const Color(0xFF10B981)),
+                        Icon(Icons.celebration, size: 48, color: cs.primary),
                         const SizedBox(height: 12),
                         Text('debts_no_active'.tr(),
                           style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 15)),
@@ -454,8 +451,8 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                       fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700))),
                           Text('${_paidDebts.length}',
-                              style: const TextStyle(
-                                  color: Color(0xFF10B981),
+                              style: TextStyle(
+                                  color: cs.primary,
                                   fontWeight: FontWeight.w900,
                                   fontFamily: 'Cairo')),
                           const SizedBox(width: 8),
@@ -463,7 +460,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                               _showPaid
                                   ? Icons.keyboard_arrow_up
                                   : Icons.keyboard_arrow_down,
-                              color: const Color(0xFF64748B)),
+                              color: cs.onSurfaceVariant),
                         ]),
                       ),
                     ),
@@ -501,6 +498,7 @@ class _ReceivableDebtCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final amount = (debt['remaining_amount'] as num).toStringAsFixed(0);
     final dueDate = debt['due_date'] as String?;
 
@@ -508,31 +506,31 @@ class _ReceivableDebtCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0x0A10B981),
+        color: cs.primary.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0x2610B981)),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.15)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.circle, color: Color(0xFF10B981), size: 10),
+          Icon(Icons.circle, color: cs.primary, size: 10),
           const SizedBox(width: 10),
           Expanded(child: Text(debt['name'] ?? '',
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 15))),
+            style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 15))),
           Text('$amount $currency',
-            style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
+            style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
         ]),
         if (debt['notes'] != null && (debt['notes'] as String).isNotEmpty) ...[
           const SizedBox(height: 4),
-          Text(debt['notes'], style: const TextStyle(color: Color(0xFF64748B), fontFamily: 'Cairo', fontSize: 12)),
+          Text(debt['notes'], style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12)),
         ],
         if (dueDate != null) ...[
           const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.calendar_today, size: 12, color: Color(0xFF10B981)),
+              Icon(Icons.calendar_today, size: 12, color: cs.primary),
               const SizedBox(width: 4),
               Text("${'debts_due_date'.tr()}: $dueDate",
-                style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
         ],
@@ -544,12 +542,12 @@ class _ReceivableDebtCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0x2610B981),
+                  color: cs.primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0x4D10B981)),
+                  border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
                 ),
                 child: Center(child: Text('debts_receive_btn'.tr(),
-                  style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
+                  style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
               ),
             ),
           ),
@@ -558,8 +556,8 @@ class _ReceivableDebtCard extends StatelessWidget {
             onTap: onEdit,
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.edit_outlined, color: Color(0xFF64748B), size: 18),
+              decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(10)),
+              child: Icon(Icons.edit_outlined, color: cs.onSurfaceVariant, size: 18),
             ),
           ),
           const SizedBox(width: 8),
@@ -567,8 +565,8 @@ class _ReceivableDebtCard extends StatelessWidget {
             onTap: onDelete,
             child: Container(
               padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: const Color(0x1AEF4444), borderRadius: BorderRadius.circular(10)),
-              child: const Icon(Icons.delete_outline, color: Color(0xFFEF4444), size: 18),
+              decoration: BoxDecoration(color: cs.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)),
+              child: Icon(Icons.delete_outline, color: cs.error, size: 18),
             ),
           ),
         ]),
