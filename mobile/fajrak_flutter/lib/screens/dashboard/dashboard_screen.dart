@@ -44,8 +44,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
-  final List<Map<String, dynamic>> _months6Data = [];
-  final List<Map<String, dynamic>> _categoryData = [];
+  List<Map<String, dynamic>> _months6Data = [];
+  List<Map<String, dynamic>> _categoryData = [];
   double _totalDebt = 0, _totalReceivable = 0, _netWorth = 0, _invValue = 0, _goalsSaved = 0, _goalsTarget = 0;
   double _prevIncome = 0, _prevExpenses = 0;
   DateTime? _lastUpdated;
@@ -109,6 +109,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final debts = results[3] as List;
       // investments is now handled via FinanceService.fetchFinancialDashboard
       final goals = results[5] as List;
+
+      // ── Charts data (6-month bar chart + category breakdown) ──
+      final sixMonthsAgo = DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
+      final chartsTxs = await Supabase.instance.client
+          .from('transactions')
+          .select('type, amount, category, transaction_date')
+          .eq('user_id', user.id)
+          .gte('transaction_date', sixMonthsAgo)
+          .order('transaction_date', ascending: true);
+
+      // Build 6-month aggregated data
+      final chartsList = chartsTxs as List;
+      final monthMap = <String, Map<String, double>>{};
+      for (final tx in chartsList) {
+        final date = tx['transaction_date'] as String;
+        final monthKey = date.substring(0, 7); // "YYYY-MM"
+        monthMap.putIfAbsent(monthKey, () => {'income': 0.0, 'expenses': 0.0});
+        final amount = (tx['amount'] as num).toDouble();
+        if (tx['type'] == 'income') {
+          monthMap[monthKey]!['income'] = (monthMap[monthKey]!['income'] ?? 0) + amount;
+        } else if (tx['type'] == 'expense') {
+          monthMap[monthKey]!['expenses'] = (monthMap[monthKey]!['expenses'] ?? 0) + amount;
+        }
+      }
+      final months6 = monthMap.entries.map((e) => {
+        'month': e.key,
+        'income': e.value['income'] ?? 0.0,
+        'expenses': e.value['expenses'] ?? 0.0,
+      }).toList();
+
+      // Build category breakdown (current month expenses only)
+      final catMap = <String, double>{};
+      for (final tx in chartsList) {
+        if (tx['type'] == 'expense' && (tx['transaction_date'] as String).startsWith('${now.year}-${now.month.toString().padLeft(2, '0')}')) {
+          final cat = tx['category'] as String? ?? 'other';
+          catMap[cat] = (catMap[cat] ?? 0) + (tx['amount'] as num).toDouble();
+        }
+      }
+      final catData = catMap.entries.map((e) => {'category': e.key, 'amount': e.value}).toList();
 
       // Use centralized monthly summary RPC to match web logic exactly.
       final monthly = await FinanceService.fetchMonthlyFinancialSummary(
@@ -181,6 +220,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _goalsTarget = goals.fold(0.0, (a, g) => a + (g['target_amount'] as num).toDouble());
           _prevIncome = prevIncome;
           _prevExpenses = prevExpenses;
+          _months6Data = months6;
+          _categoryData = catData;
           _lastUpdated = DateTime.now();
           _loading = false;
         });
