@@ -5,7 +5,7 @@
 			"command": "npx",
 			"args": [
 				"-y",
-				"task-master-ai"
+				"github:Abdoocoder/claude-task-master"
 			],
 			"env": {
 				"TASK_MASTER_TOOLS": "core",

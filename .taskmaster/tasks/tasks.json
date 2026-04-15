@@ -405,8 +405,9 @@
         "dependencies": [
           "2"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-14T23:51:32.719Z"
       },
       {
         "id": "5",
@@ -443,8 +444,9 @@
           "1",
           "4"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-14T23:58:45.299Z"
       },
       {
         "id": "8",
@@ -484,13 +486,26 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": "11",
+        "title": "تحسين واجهة Flutter — UI/UX",
+        "description": "إصلاح مشكلات واجهة المستخدم في تطبيق Flutter: الألوان المكتوبة مباشرة، خلفيات ModalBottomSheet، error states، وتوحيد loading skeletons",
+        "status": "in-progress",
+        "priority": "medium",
+        "dependencies": [],
+        "details": "الخطوات:\n1. استبدال جميع الألوان المكتوبة مباشرة (0xFF10B981, 0xFFEF4444, 0xFF0F1629 إلخ) بألوان من الـ colorScheme في جميع الشاشات\n2. إصلاح خلفية ModalBottomSheet لتستخدم theme.scaffoldBackgroundColor أو colorScheme.surface بدلاً من اللون الثابت\n3. إضافة error states واضحة مع زر retry في dashboard_screen و transactions_screen (حالياً تفشل بصمت)\n4. استبدال CircularProgressIndicator في recurring_screen بـ skeleton loader للاتساق مع باقي الشاشات\n5. توحيد الـ padding (16 افتراضي) والـ border radius عبر جميع الشاشات",
+        "testStrategy": "مراجعة بصرية للشاشات في الوضعين الفاتح والداكن، التحقق من عدم ظهور ألوان ثابتة في الوضع الداكن، اختبار حالات الخطأ بقطع الإنترنت",
+        "subtasks": [],
+        "createdAt": "2026-04-15T00:17:56.664Z",
+        "updatedAt": "2026-04-15T00:22:10.741Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-14T21:22:55.945Z",
-      "taskCount": 10,
-      "completedCount": 5,
+      "lastModified": "2026-04-15T00:22:10.742Z",
+      "taskCount": 11,
+      "completedCount": 7,
       "tags": [
         "master"
       ]

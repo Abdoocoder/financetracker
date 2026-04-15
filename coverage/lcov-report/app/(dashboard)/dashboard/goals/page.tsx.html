@@ -25,28 +25,28 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/149</span>
+                <span class='fraction'>0/154</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/106</span>
+                <span class='fraction'>0/119</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/29</span>
+                <span class='fraction'>0/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/100</span>
+                <span class='fraction'>0/106</span>
             </div>
         
             
@@ -336,7 +336,20 @@
 <a name='L271'></a><a href='#L271'>271</a>
 <a name='L272'></a><a href='#L272'>272</a>
 <a name='L273'></a><a href='#L273'>273</a>
-<a name='L274'></a><a href='#L274'>274</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L274'></a><a href='#L274'>274</a>
+<a name='L275'></a><a href='#L275'>275</a>
+<a name='L276'></a><a href='#L276'>276</a>
+<a name='L277'></a><a href='#L277'>277</a>
+<a name='L278'></a><a href='#L278'>278</a>
+<a name='L279'></a><a href='#L279'>279</a>
+<a name='L280'></a><a href='#L280'>280</a>
+<a name='L281'></a><a href='#L281'>281</a>
+<a name='L282'></a><a href='#L282'>282</a>
+<a name='L283'></a><a href='#L283'>283</a>
+<a name='L284'></a><a href='#L284'>284</a>
+<a name='L285'></a><a href='#L285'>285</a>
+<a name='L286'></a><a href='#L286'>286</a>
+<a name='L287'></a><a href='#L287'>287</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -348,6 +361,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -363,6 +377,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -434,9 +449,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -592,6 +609,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -604,6 +623,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -621,6 +647,7 @@ import type { SavingsGoal } from '@/types'
 import { usePullToRefresh } from <span class="cstat-no" title="statement not covered" >'@/lib/use-pull-to-refresh'</span>
 import { PullToRefreshIndicator } from <span class="cstat-no" title="statement not covered" >'@/components/ui/pull-to-refresh'</span>
 import { ListSkeleton, Skeleton } from <span class="cstat-no" title="statement not covered" >'@/components/ui/skeleton'</span>
+import { ConfirmDialog } from <span class="cstat-no" title="statement not covered" >'@/components/ui/confirm-dialog'</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >GoalsPage() {</span></span>
   const [goals, setGoals] = <span class="cstat-no" title="statement not covered" >useState&lt;SavingsGoal[]&gt;([])</span>
@@ -631,6 +658,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   const [form, setForm] = <span class="cstat-no" title="statement not covered" >useState({ name: '', target_amount: '', current_amount: '0', target_date: '', icon: '🎯' })</span>
   const [saving, setSaving] = <span class="cstat-no" title="statement not covered" >useState(false)</span>
   const [savingGoalId, setSavingGoalId] = <span class="cstat-no" title="statement not covered" >useState&lt;string | null&gt;(null)</span>
+  const [confirmDeleteId, setConfirmDeleteId] = <span class="cstat-no" title="statement not covered" >useState&lt;string | null&gt;(null)</span>
   const [savingAmount, setSavingAmount] = <span class="cstat-no" title="statement not covered" >useState('')</span>
   const supabase = <span class="cstat-no" title="statement not covered" >createClient()</span>
   const { t, lang, currentLang } = <span class="cstat-no" title="statement not covered" >useI18n()</span>
@@ -709,7 +737,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   async function <span class="fstat-no" title="function not covered" >deleteGoal(i</span>d: string) {
     const { error } = <span class="cstat-no" title="statement not covered" >await supabase.from('savings_goals').delete().eq('id', id)</span>
 <span class="cstat-no" title="statement not covered" >    if (error) { <span class="cstat-no" title="statement not covered" >toast.error(t('toast_error_delete')); <span class="cstat-no" title="statement not covered" >r</span>eturn }</span></span>
-<span class="cstat-no" title="statement not covered" >    toast.success(t('toast_deleted')); <span class="cstat-no" title="statement not covered" >l</span>oad()</span>
+<span class="cstat-no" title="statement not covered" >    toast.success(t('toast_deleted'))</span>
+<span class="cstat-no" title="statement not covered" >    setConfirmDeleteId(null)</span>
+<span class="cstat-no" title="statement not covered" >    load()</span>
   }
 &nbsp;
   async function <span class="fstat-no" title="function not covered" >addSaving(g</span>oalId: string) {
@@ -836,8 +866,8 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                   &lt;div className="font-black font-mono text-sm ml-1" style={{ color: pct &gt;= 100 ? 'var(--accent-green-light)' : 'var(--accent-blue-light)' }}&gt;
                     {pct &gt;= 100 ? '✅' : `${pct.toFixed(0)}%`}
                   &lt;/div&gt;
-                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>tartEdit(goal)} c</span>lassName="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}&gt;✏️&lt;/button&gt;
-                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >d</span>eleteGoal(goal.id)} c</span>lassName="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}&gt;🗑️&lt;/button&gt;
+                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>tartEdit(goal)} a</span>ria-label={lang === 'en' ? 'Edit goal' : 'تعديل الهدف'} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}&gt;✏️&lt;/button&gt;
+                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etConfirmDeleteId(goal.id)} a</span>ria-label={lang === 'en' ? 'Delete goal' : 'حذف الهدف'} className="w-8 h-8 rounded-lg flex items-center justify-center text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}&gt;🗑️&lt;/button&gt;
                 &lt;/div&gt;
               &lt;/div&gt;
               &lt;div className="progress-track mb-2"&gt;
@@ -858,9 +888,9 @@ export default function <span class="cstat-no" title="statement not covered" ><s
                   &lt;input type="number" value={savingAmount} onChange={<span class="fstat-no" title="function not covered" >e =&gt; <span class="cstat-no" title="statement not covered" >s</span>etSavingAmount(e.target.value)}</span>
                     className="flex-1 px-3 py-2 rounded-xl text-sm outline-none text-center"
                     style={{ background: 'var(--bg-secondary)', border: '1px solid var(--accent-green)', color: 'var(--text-primary)', fontFamily: 'inherit' }}
-                    placeholder={`0 ${baseCurrency}`} autoFocus onKeyDown={<span class="fstat-no" title="function not covered" >e =&gt; <span class="cstat-no" title="statement not covered" >e</span>.key === 'Enter' &amp;&amp; addSaving(goal.id)} /&gt;</span>
-                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >a</span>ddSaving(goal.id)} c</span>lassName="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black"&gt;✓&lt;/button&gt;
-                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; { <span class="cstat-no" title="statement not covered" >s</span>etSavingGoalId(null); <span class="cstat-no" title="statement not covered" >s</span>etSavingAmount('') }</span>} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}&gt;✕&lt;/button&gt;
+                    placeholder={`0 ${baseCurrency}`} aria-label={t('goals_add_saving')} autoFocus onKeyDown={<span class="fstat-no" title="function not covered" >e =&gt; <span class="cstat-no" title="statement not covered" >e</span>.key === 'Enter' &amp;&amp; addSaving(goal.id)} /&gt;</span>
+                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >a</span>ddSaving(goal.id)} a</span>ria-label={t('save')} className="px-4 py-2 rounded-xl gradient-green text-white text-sm font-black"&gt;✓&lt;/button&gt;
+                  &lt;button onClick={<span class="fstat-no" title="function not covered" >() =&gt; { <span class="cstat-no" title="statement not covered" >s</span>etSavingGoalId(null); <span class="cstat-no" title="statement not covered" >s</span>etSavingAmount('') }</span>} aria-label={t('close')} className="px-3 py-2 rounded-xl text-sm" style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)' }}&gt;✕&lt;/button&gt;
                 &lt;/div&gt;
               ) : (
 <span class="branch-0 cbranch-no" title="branch not covered" >                remaining &gt; 0 &amp;&amp; (</span>
@@ -872,13 +902,22 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             &lt;/div&gt;
           )
         })}
-        {<span class="branch-0 cbranch-no" title="branch not covered" >goals.length === 0 &amp;&amp; (</span>
+      {<span class="branch-0 cbranch-no" title="branch not covered" >goals.length === 0 &amp;&amp; (</span>
           &lt;div className="text-center py-16 card"&gt;
             &lt;div className="text-4xl mb-3"&gt;🎯&lt;/div&gt;
             &lt;div className="font-bold" style={{ color: 'var(--text-secondary)' }}&gt;{t('goals_empty')}&lt;/div&gt;
           &lt;/div&gt;
         )}
       &lt;/div&gt;
+&nbsp;
+      {<span class="branch-0 cbranch-no" title="branch not covered" >confirmDeleteId &amp;&amp; (</span>
+        &lt;ConfirmDialog
+          title={t('goal_delete_title') || (lang === 'ar' ? 'حذف الهدف' : 'Delete Goal')}
+          message={t('goal_delete_msg') || (lang === 'ar' ? 'هل أنت متأكد من حذف هذا الهدف؟ لا يمكن التراجع عن هذه العملية.' : 'Are you sure you want to delete this goal? This action cannot be undone.')}
+          onConfirm={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >d</span>eleteGoal(confirmDeleteId)}</span>
+          onCancel={<span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etConfirmDeleteId(null)}</span>
+        /&gt;
+      )}
     &lt;/div&gt;
   )
 }
@@ -889,7 +928,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T22:22:35.038Z
+                at 2026-04-14T23:50:24.850Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

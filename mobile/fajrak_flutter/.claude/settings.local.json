@@ -4,7 +4,22 @@
       "Bash(xargs wc:*)",
       "Bash(flutter build:*)",
       "Bash(./gradlew bundleRelease --stacktrace)",
-      "Bash(./gradlew bundleRelease)"
+      "Bash(./gradlew bundleRelease)",
+      "Read(//mnt/c/Users/user/Projects/**)",
+      "Bash(task-master list:*)",
+      "Bash(npx task-master-ai:*)",
+      "Bash(npx -y task-master-ai list)",
+      "mcp__task-master-ai__get_tasks",
+      "Bash(flutter analyze:*)",
+      "Bash(/c/flutter/flutter/bin/flutter analyze:*)",
+      "mcp__task-master-ai__get_task",
+      "Bash(npx jest:*)",
+      "mcp__task-master-ai__set_task_status",
+      "Bash(npx --yes task-master-ai@latest add-task --prompt=\"تحسين واجهة Flutter UI/UX: استبدال الألوان المكتوبة مباشرة بألوان من الـ theme، إصلاح خلفية ModalBottomSheet، إضافة error states مع retry، توحيد loading skeletons\" --priority=medium)",
+      "Bash(node -e ':*)",
+      "Bash(grep:*)",
+      "Bash(/c/flutter/flutter/bin/flutter.bat analyze:*)",
+      "Bash(cmd:*)"
     ]
   }
 }

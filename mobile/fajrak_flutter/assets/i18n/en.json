@@ -867,5 +867,8 @@
   "dash_card_charts": "Charts",
   "dash_card_gamification": "Achievements",
   "dash_card_simulator": "Wealth Simulator",
-  "dash_card_challenges": "Challenges"
+  "dash_card_challenges": "Challenges",
+  "error_load_failed": "Failed to load data",
+  "error_check_connection": "Check your internet connection and try again",
+  "btn_retry": "Retry"
 }

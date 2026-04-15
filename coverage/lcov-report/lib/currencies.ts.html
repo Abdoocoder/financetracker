@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -145,7 +145,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -186,18 +186,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">70x</span>
+<span class="cline-any cline-yes">70x</span>
+<span class="cline-any cline-yes">70x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">70x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export interface CurrencyInfo {
   value: string
@@ -213,7 +213,7 @@ export interface GroupedCurrency extends CurrencyInfo {
   group: CurrencyGroup
 }
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >CURRENCIES: GroupedCurrency[] = <span class="cstat-no" title="statement not covered" >[</span></span>
+export const CURRENCIES: GroupedCurrency[] = [
   // ── العربية ──────────────────────────────────────────────────────────
   { value: 'JOD', labelAr: 'دينار أردني',       labelEn: 'Jordanian Dinar',     flag: '🇯🇴', decimals: 3, group: 'arabic' },
   { value: 'SAR', labelAr: 'ريال سعودي',         labelEn: 'Saudi Riyal',          flag: '🇸🇦', decimals: 2, group: 'arabic' },
@@ -254,18 +254,18 @@ export const <span class="cstat-no" title="statement not covered" >CURRENCIES: G
   { value: 'KES', labelAr: 'شلن كيني',           labelEn: 'Kenyan Shilling',      flag: '🇰🇪', decimals: 2, group: 'global' },
 ]
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >CURRENCIES_BY_GROUP: Record&lt;CurrencyGroup, CurrencyInfo[]&gt; = <span class="cstat-no" title="statement not covered" >{</span></span>
-  arabic:  CURRENCIES.filter(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >c</span>.group === 'arabic'),</span>
-  islamic: CURRENCIES.filter(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >c</span>.group === 'islamic'),</span>
-  global:  CURRENCIES.filter(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >c</span>.group === 'global'),</span>
+export const CURRENCIES_BY_GROUP: Record&lt;CurrencyGroup, CurrencyInfo[]&gt; = {
+  arabic:  CURRENCIES.filter(c =&gt; c.group === 'arabic'),
+  islamic: CURRENCIES.filter(c =&gt; c.group === 'islamic'),
+  global:  CURRENCIES.filter(c =&gt; c.group === 'global'),
 }
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >CURRENCY_MAP: Record&lt;string, CurrencyInfo&gt; = <span class="cstat-no" title="statement not covered" >O</span>bject.fromEntries(</span>
-  CURRENCIES.map(<span class="fstat-no" title="function not covered" >c =&gt; <span class="cstat-no" title="statement not covered" >[</span>c.value, c])</span>
+export const CURRENCY_MAP: Record&lt;string, CurrencyInfo&gt; = Object.fromEntries(
+  CURRENCIES.map(c =&gt; [c.value, c])
 )
 &nbsp;
-export function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >getCurrencyDecimals(c</span></span>ode: string): number {
-<span class="cstat-no" title="statement not covered" >  return CURRENCY_MAP[code]?.decimals ?? 2</span>
+export function getCurrencyDecimals(code: string): number {
+  return CURRENCY_MAP[code]?.decimals ?? 2
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -274,7 +274,7 @@ export function <span class="cstat-no" title="statement not covered" ><span clas
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T22:22:35.038Z
+                at 2026-04-14T23:50:24.850Z
             </div>
         <script src="../prettify.js"></script>
         <script>

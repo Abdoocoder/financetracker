@@ -65,7 +65,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => _RecurringForm(
         existing: existing,
@@ -88,12 +88,26 @@ class _RecurringScreenState extends State<RecurringScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showForm(),
-        backgroundColor: const Color(0xFF10B981),
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text('recurring_add'.tr(), style: const TextStyle(color: Colors.white, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+        backgroundColor: cs.primary,
+        foregroundColor: cs.onPrimary,
+        icon: const Icon(Icons.add),
+        label: Text('recurring_add'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? ListView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+              itemCount: 5,
+              itemBuilder: (_, __) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Container(
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerHighest.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            )
           : _list.isEmpty
               ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.repeat, size: 48, color: cs.onSurfaceVariant),
@@ -107,7 +121,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                     final rec = _list[i];
                     final isIncome = rec['type'] == 'income';
                     final isActive = rec['is_active'] as bool? ?? true;
-                    final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+                    final color = isIncome ? cs.primary : cs.error;
                     final freqLabel = _freqLabel(rec['frequency'] as String? ?? 'monthly');
                     return Opacity(
                       opacity: isActive ? 1 : 0.5,
@@ -150,7 +164,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
                               itemBuilder: (_) => [
                                 PopupMenuItem(value: 'toggle', child: Text(isActive ? 'recurring_pause'.tr() : 'recurring_resume'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
                                 PopupMenuItem(value: 'edit', child: Text('btn_edit'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-                                PopupMenuItem(value: 'delete', child: Text('btn_delete'.tr(), style: const TextStyle(fontFamily: 'Cairo', color: Color(0xFFEF4444)))),
+                                PopupMenuItem(value: 'delete', child: Text('btn_delete'.tr(), style: TextStyle(fontFamily: 'Cairo', color: cs.error))),
                               ],
                             ),
                           ]),
@@ -304,7 +318,7 @@ class _RecurringFormState extends State<_RecurringForm> {
           // النوع
           Row(children: ['expense', 'income'].map((tp) {
             final selected = _type == tp;
-            final color = tp == 'income' ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+            final color = tp == 'income' ? cs.primary : cs.error;
             return Expanded(child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: GestureDetector(
@@ -364,7 +378,7 @@ class _RecurringFormState extends State<_RecurringForm> {
 
           ElevatedButton(
             onPressed: _saving ? null : _save,
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             child: _saving
                 ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                 : Text(isEdit ? 'btn_save'.tr() : 'recurring_add'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 15)),
