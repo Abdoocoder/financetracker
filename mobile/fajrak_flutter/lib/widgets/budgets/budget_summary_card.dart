@@ -1,3 +1,4 @@
+import '../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -40,12 +41,12 @@ class BudgetSummaryCard extends StatelessWidget {
         _summaryRow(
             'dash_income'.tr(),
             '+${income.toStringAsFixed(0)} $currency',
-            const Color(0xFF6EE7B7)),
+            AppColors.successLight),
         if (totalDebtPayments > 0)
           _summaryRow(
               'dash_debts_payment'.tr(),
               '-${totalDebtPayments.toStringAsFixed(0)} $currency',
-              const Color(0xFFFCA5A5)),
+              AppColors.errorLight),
         Divider(color: colorScheme.outlineVariant, height: 20),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('dash_available_spending'.tr(),
@@ -56,8 +57,8 @@ class BudgetSummaryCard extends StatelessWidget {
           Text('${available.toStringAsFixed(0)} $currency',
               style: TextStyle(
                   color: available >= 0
-                      ? const Color(0xFF6EE7B7)
-                      : const Color(0xFFFCA5A5),
+                      ? AppColors.successLight
+                      : AppColors.errorLight,
                   fontWeight: FontWeight.w900,
                   fontSize: 18,
                   fontFamily: 'Cairo')),

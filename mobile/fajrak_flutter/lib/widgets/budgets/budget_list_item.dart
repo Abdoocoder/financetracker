@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 
 class BudgetListItem extends StatelessWidget {
   final Map<String, dynamic> budget;
@@ -31,10 +32,10 @@ class BudgetListItem extends StatelessWidget {
     final over = spent > limit;
     final warn = !over && pct > 0.8;
     final color = over
-        ? const Color(0xFFEF4444)
+        ? AppColors.error
         : warn
-            ? const Color(0xFFF59E0B)
-            : const Color(0xFF10B981);
+            ? AppColors.warning
+            : AppColors.success;
     final remaining = (limit - spent).clamp(0.0, double.infinity);
 
     return Container(
@@ -82,7 +83,7 @@ class BudgetListItem extends StatelessWidget {
           Text('${(pct * 100).round()}%',
               style: TextStyle(
                   color:
-                      over ? const Color(0xFFFCA5A5) : const Color(0xFF6EE7B7),
+                      over ? AppColors.errorLight : AppColors.successLight,
                   fontWeight: FontWeight.w900,
                   fontSize: 16,
                   fontFamily: 'Cairo')),
@@ -106,12 +107,12 @@ class BudgetListItem extends StatelessWidget {
                   width: 30,
                   height: 30,
                   decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                          color: const Color(0xFFEF4444).withValues(alpha: 0.2))),
+                          color: AppColors.error.withValues(alpha: 0.2))),
                   child: const Icon(Icons.close,
-                      color: Color(0xFFEF4444), size: 14))),
+                      color: AppColors.error, size: 14))),
         ]),
         const SizedBox(height: 10),
         ClipRRect(
@@ -126,14 +127,14 @@ class BudgetListItem extends StatelessWidget {
           Row(children: [
             Text('budget_remaining_label'.tr(),
                 style: const TextStyle(
-                    color: Color(0xFF64748B),
+                    color: AppColors.textSecondary,
                     fontSize: 11,
                     fontFamily: 'Cairo')),
             Text('${remaining.toStringAsFixed(0)} $currency',
                 style: TextStyle(
                     color: over
-                        ? const Color(0xFFFCA5A5)
-                        : const Color(0xFF6EE7B7),
+                        ? AppColors.errorLight
+                        : AppColors.successLight,
                     fontWeight: FontWeight.w700,
                     fontSize: 11,
                     fontFamily: 'Cairo'))

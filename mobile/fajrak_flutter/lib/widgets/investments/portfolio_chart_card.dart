@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class PortfolioChartCard extends StatelessWidget {
@@ -12,11 +13,11 @@ class PortfolioChartCard extends StatelessWidget {
   });
 
   static const List<Color> _colors = [
-    Color(0xFF3B7EF6),
-    Color(0xFF10B981),
-    Color(0xFFF59E0B),
-    Color(0xFF8B5CF6),
-    Color(0xFFEF4444)
+    AppColors.primary,
+    AppColors.success,
+    AppColors.warning,
+    AppColors.purple,
+    AppColors.error
   ];
 
   @override
@@ -29,9 +30,9 @@ class PortfolioChartCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: const Color(0xFF0F1629),
+          color: AppColors.surface0,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFF1E293B))),
+          border: Border.all(color: AppColors.surface2)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('inv_portfolio_chart'.tr(),
             style: TextStyle(

@@ -18,9 +18,10 @@ class MainBottomNavBar extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return GlassPanel(
-      borderRadius: 0, // Fill the bottom
+      borderRadius: 0,
       blur: 20,
       opacity: 0.8,
+      topBorderOnly: true,
       color: colorScheme.surface,
       borderColor: colorScheme.outlineVariant.withValues(alpha: 0.2),
       child: SafeArea(
@@ -41,7 +42,7 @@ class MainBottomNavBar extends StatelessWidget {
                 index: 1,
                 icon: Icons.account_balance_wallet_outlined,
                 selectedIcon: Icons.account_balance_wallet,
-                label: 'الحسابات',
+                label: 'nav_accounts'.tr(),
                 currentIndex: currentIndex,
                 onTap: onTabSelected,
               ),

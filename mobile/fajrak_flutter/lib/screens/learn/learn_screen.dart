@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../widgets/learn/financial_roadmap.dart';
@@ -25,11 +26,11 @@ class _LearnScreenState extends State<LearnScreen> {
   bool _sharing = false;
 
   final _stageInfo = {
-    'awareness': (Icons.eco, 'learn_stage_awareness'.tr(), const Color(0xFF8B5CF6)),
-    'debt': (Icons.credit_card, 'learn_stage_debt'.tr(), const Color(0xFFEF4444)),
-    'emergency': (Icons.shield, 'learn_stage_emergency'.tr(), const Color(0xFFF59E0B)),
-    'investing': (Icons.trending_up, 'learn_stage_investing'.tr(), const Color(0xFF10B981)),
-    'wealth': (Icons.workspace_premium, 'learn_stage_wealth'.tr(), const Color(0xFF3B7EF6)),
+    'awareness': (Icons.eco, 'learn_stage_awareness'.tr(), AppColors.purple),
+    'debt': (Icons.credit_card, 'learn_stage_debt'.tr(), AppColors.error),
+    'emergency': (Icons.shield, 'learn_stage_emergency'.tr(), AppColors.warning),
+    'investing': (Icons.trending_up, 'learn_stage_investing'.tr(), AppColors.success),
+    'wealth': (Icons.workspace_premium, 'learn_stage_wealth'.tr(), AppColors.primary),
   };
 
   final _lessons = {
@@ -262,11 +263,11 @@ class _LearnScreenState extends State<LearnScreen> {
         showDialog(
             context: context,
             builder: (_) => AlertDialog(
-                  backgroundColor: const Color(0xFF0F1629),
+                  backgroundColor: AppColors.surface0,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                   content: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Icon(Icons.local_fire_department, size: 56, color: Color(0xFFF59E0B)),
+                    const Icon(Icons.local_fire_department, size: 56, color: AppColors.warning),
                     const SizedBox(height: 12),
                     Text('learn_streak_consecutive'.tr(args: [newStreak.toString()]),
                         style: TextStyle(
@@ -329,8 +330,8 @@ class _LearnScreenState extends State<LearnScreen> {
           const Offset(W / 2, 160),
           400,
           [
-            const Color(0xFFF59E0B).withValues(alpha: 0.12),
-            const Color(0xFFF59E0B).withValues(alpha: 0)
+            AppColors.warning.withValues(alpha: 0.12),
+            AppColors.warning.withValues(alpha: 0)
           ],
         );
       canvas.drawRect(bgRect, glowPaint);
@@ -364,7 +365,7 @@ class _LearnScreenState extends State<LearnScreen> {
         textDirection: ui.TextDirection.rtl,
       );
       final titleBuilder = ui.ParagraphBuilder(titleParagraphStyle)
-        ..pushStyle(ui.TextStyle(color: const Color(0xFFF59E0B)))
+        ..pushStyle(ui.TextStyle(color: AppColors.warning))
         ..addText('فجرك');
       final titleParagraph = titleBuilder.build()
         ..layout(const ui.ParagraphConstraints(width: W));
@@ -412,7 +413,7 @@ class _LearnScreenState extends State<LearnScreen> {
         textDirection: ui.TextDirection.rtl,
       );
       final lessonBodyBuilder = ui.ParagraphBuilder(lessonBodyStyle)
-        ..pushStyle(ui.TextStyle(color: const Color(0xFF94A3B8)))
+        ..pushStyle(ui.TextStyle(color: AppColors.textMuted))
         ..addText(_lesson['body'] ?? '');
       final lessonBodyParagraph = lessonBodyBuilder.build()
         ..layout(const ui.ParagraphConstraints(width: W - 160));
@@ -430,7 +431,7 @@ class _LearnScreenState extends State<LearnScreen> {
         fontSize: 34,
       );
       final linkBuilder = ui.ParagraphBuilder(linkStyle)
-        ..pushStyle(ui.TextStyle(color: const Color(0xFF64748B)))
+        ..pushStyle(ui.TextStyle(color: AppColors.textSecondary))
         ..addText('fajrak.com');
       final linkParagraph = linkBuilder.build()
         ..layout(const ui.ParagraphConstraints(width: W));
@@ -525,20 +526,20 @@ class _LearnScreenState extends State<LearnScreen> {
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                   color: (_completed || _streak == 0)
-                      ? const Color(0xFFF59E0B).withValues(alpha: 0.08)
-                      : const Color(0xFF9CA3AF).withValues(alpha: 0.08),
+                      ? AppColors.warning.withValues(alpha: 0.08)
+                      : AppColors.textDisabled.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                       color: (_completed || _streak == 0)
-                          ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
-                          : const Color(0xFF9CA3AF).withValues(alpha: 0.25))),
+                          ? AppColors.warning.withValues(alpha: 0.25)
+                          : AppColors.textDisabled.withValues(alpha: 0.25))),
               child: Column(children: [
                 Icon((!_completed && _streak > 0) ? Icons.ac_unit : Icons.local_fire_department,
-                    size: 22, color: (!_completed && _streak > 0) ? const Color(0xFF9CA3AF) : const Color(0xFFF59E0B)),
+                    size: 22, color: (!_completed && _streak > 0) ? AppColors.textDisabled : AppColors.warning),
                 Text('$_streak',
                     style: TextStyle(
                         color: (!_completed && _streak > 0)
-                            ? const Color(0xFF9CA3AF)
+                            ? AppColors.textDisabled
                             : cs.primary,
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
@@ -591,7 +592,7 @@ class _LearnScreenState extends State<LearnScreen> {
                         ? ElevatedButton(
                             onPressed: _markComplete,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF10B981),
+                              backgroundColor: AppColors.success,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
@@ -606,16 +607,16 @@ class _LearnScreenState extends State<LearnScreen> {
                         : Container(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             decoration: BoxDecoration(
-                                color: const Color(0xFF10B981)
+                                color: AppColors.success
                                     .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                    color: const Color(0xFF10B981)
+                                    color: AppColors.success
                                         .withValues(alpha: 0.3))),
                             child: Center(
                                 child: Text('learn_completed_msg'.tr(),
                                     style: const TextStyle(
-                                        color: Color(0xFF10B981),
+                                        color: AppColors.success,
                                         fontFamily: 'Cairo',
                                         fontWeight: FontWeight.w900,
                                         fontSize: 15))),
@@ -630,11 +631,11 @@ class _LearnScreenState extends State<LearnScreen> {
                           horizontal: 14, vertical: 11),
                       decoration: BoxDecoration(
                         color: _sharing
-                            ? const Color(0xFFF59E0B).withValues(alpha: 0.05)
-                            : const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                            ? AppColors.warning.withValues(alpha: 0.05)
+                            : AppColors.warning.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: const Color(0xFFF59E0B)
+                            color: AppColors.warning
                                 .withValues(alpha: 0.3)),
                       ),
                       child: _sharing
@@ -643,8 +644,8 @@ class _LearnScreenState extends State<LearnScreen> {
                               height: 24,
                               child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Color(0xFFF59E0B)))
-                          : const Icon(Icons.file_upload_outlined, size: 18, color: Color(0xFFF59E0B)),
+                                  color: AppColors.warning))
+                          : const Icon(Icons.file_upload_outlined, size: 18, color: AppColors.warning),
                     ),
                   )
                 ],

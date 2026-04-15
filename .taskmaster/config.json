@@ -1,10 +1,11 @@
 {
   "models": {
     "main": {
-      "provider": "claude-code",
-      "modelId": "haiku",
+      "provider": "ollama",
+      "modelId": "qwen3-coder:30b",
       "maxTokens": 200000,
-      "temperature": 0.2
+      "temperature": 0.2,
+      "baseURL": "http://localhost:11434/api"
     },
     "research": {
       "provider": "claude-code",
@@ -13,9 +14,9 @@
       "temperature": 0.1
     },
     "fallback": {
-      "provider": "gemini-cli",
-      "modelId": "gemini-3-flash-preview",
-      "maxTokens": 1048576,
+      "provider": "ollama",
+      "modelId": "deepseek-coder:6.7b",
+      "maxTokens": 8192,
       "temperature": 0.2
     }
   },

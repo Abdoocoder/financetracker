@@ -578,6 +578,14 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.8 — 2026-04-15 *(Performance & UI Consistency)*
+
+| Change | Description |
+|:-------|:------------|
+| 🎨 **AppColors System** | Added 12 new semantic color constants (surface0/1/2, successLight/Dark, sky, gold/silver/bronze, textTertiary/Disabled, warningDark) — 86 hardcoded `Color(0xFF...)` replaced across all files. |
+| ⚡ **Layout Performance** | Replaced `GridView` + `shrinkWrap: true` with `Wrap` in BadgeGrid, BadgesGrid, ChallengesCard — eliminates double-layout pass inside scroll views. |
+| 🔁 **Build Optimization** | `HelpScreen` FAQ list now built once in `didChangeDependencies` instead of on every `build()` call; same for `ChallengesCard` challenge list. |
+
 ### v3.32.7 — 2026-04-15 *(Performance & Android 15 Edge-to-Edge)*
 
 | Change | Description |

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,7 +45,7 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFFFEF3C7),
-        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.5)),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.5)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -62,7 +63,7 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
                       : 'Results are estimates for financial awareness only — not financial, legal, or religious advice. Consult a professional before any decision.',
                   style: TextStyle(
                     fontSize: 12,
-                    color: const Color(0xFF92400E),
+                    color: AppColors.warningDark,
                     fontFamily: 'Cairo',
                     height: 1.5,
                   ),
@@ -76,7 +77,7 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
                         isAr ? 'لا تظهر مجدداً' : "Don't show again",
                         style: const TextStyle(
                           fontSize: 11,
-                          color: Color(0xFF92400E),
+                          color: AppColors.warningDark,
                           fontFamily: 'Cairo',
                           decoration: TextDecoration.underline,
                         ),

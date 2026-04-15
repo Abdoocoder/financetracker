@@ -662,6 +662,14 @@ npm run test:coverage
 
 ## 📝 سجل التغييرات
 
+### v3.32.8 — 2026-04-15 *(الأداء واتساق الواجهة)*
+
+| التغيير | الوصف |
+|:--------|:------|
+| 🎨 **نظام AppColors** | إضافة 12 ثابتاً لونياً جديداً (surface0/1/2، successLight/Dark، sky، gold/silver/bronze، textTertiary/Disabled، warningDark) — استبدال 86 لوناً مشفّراً `Color(0xFF...)` في جميع الملفات. |
+| ⚡ **أداء التخطيط** | استبدال `GridView` + `shrinkWrap: true` بـ `Wrap` في BadgeGrid وBadgesGrid وChallengesCard — إلغاء مرور التخطيط المزدوج داخل الـ scroll views. |
+| 🔁 **تحسين build()** | قائمة الأسئلة في `HelpScreen` تُبنى مرة واحدة في `didChangeDependencies` بدلاً من كل `build()`؛ وكذلك قائمة التحديات في `ChallengesCard`. |
+
 ### v3.32.7 — 2026-04-15 *(الأداء وتوافق Android 15)*
 
 | التغيير | الوصف |

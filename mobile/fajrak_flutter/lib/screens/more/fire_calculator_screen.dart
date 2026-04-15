@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
@@ -110,7 +111,7 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
     final fireNumber = annualExpenses / (_withdrawalRate / 100);
     final progress = ((_currentNetWorth / fireNumber) * 100).clamp(0.0, 100.0);
     final years = _yearsToFIRE(fireNumber, _currentNetWorth, _monthlyContrib, _annualReturn);
-    final color = progress >= 75 ? const Color(0xFF10B981) : progress >= 40 ? const Color(0xFFF59E0B) : cs.primary;
+    final color = progress >= 75 ? AppColors.success : progress >= 40 ? AppColors.warning : cs.primary;
 
     String fmt(double n) => NumberFormat('#,##0', 'en').format(n);
 
@@ -180,28 +181,28 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
                   valueColor: AlwaysStoppedAnimation(color), minHeight: 8)),
               const SizedBox(height: 14),
               Row(children: [
-                Expanded(child: _StatBox(label: 'current_net_worth'.tr(), value: fmt(_currentNetWorth), currency: _currency, color: const Color(0xFF10B981), cs: cs)),
+                Expanded(child: _StatBox(label: 'current_net_worth'.tr(), value: fmt(_currentNetWorth), currency: _currency, color: AppColors.success, cs: cs)),
                 const SizedBox(width: 10),
-                Expanded(child: _StatBox(label: 'remaining'.tr(), value: fmt((fireNumber - _currentNetWorth).clamp(0, double.infinity)), currency: _currency, color: const Color(0xFFEF4444), cs: cs)),
+                Expanded(child: _StatBox(label: 'remaining'.tr(), value: fmt((fireNumber - _currentNetWorth).clamp(0, double.infinity)), currency: _currency, color: AppColors.error, cs: cs)),
               ]),
               const SizedBox(height: 14),
               Container(
                 width: double.infinity, padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: years != null && years <= 10 ? const Color(0xFF10B981).withValues(alpha: 0.08) : cs.primary.withValues(alpha: 0.06),
+                  color: years != null && years <= 10 ? AppColors.success.withValues(alpha: 0.08) : cs.primary.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: years != null && years <= 10 ? const Color(0xFF10B981).withValues(alpha: 0.2) : cs.primary.withValues(alpha: 0.15)),
+                  border: Border.all(color: years != null && years <= 10 ? AppColors.success.withValues(alpha: 0.2) : cs.primary.withValues(alpha: 0.15)),
                 ),
                 child: years == null
                   ? Text('fire_increase_contrib'.tr(), textAlign: TextAlign.center,
-                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13, color: Color(0xFFEF4444)))
+                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.error))
                   : years == 0
                     ? Text('fire_already_there'.tr(), textAlign: TextAlign.center,
-                        style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF10B981)))
+                        style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.success))
                     : Column(children: [
                         Text('fire_time_label'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: cs.onSurfaceVariant)),
                         const SizedBox(height: 4),
-                        Text('$years ${'fire_years'.tr()}', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 26, color: years <= 10 ? const Color(0xFF10B981) : cs.primary)),
+                        Text('$years ${'fire_years'.tr()}', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 26, color: years <= 10 ? AppColors.success : cs.primary)),
                       ]),
               ),
             ]),

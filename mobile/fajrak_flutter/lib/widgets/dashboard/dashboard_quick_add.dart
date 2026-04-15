@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../services/currency_service.dart';
 
@@ -94,8 +95,8 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
             });
           },
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _txType == 'income' ? const Color(0xFF10B981).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? const Color(0xFF10B981) : widget.colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: Color(0xFF10B981), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              decoration: BoxDecoration(color: _txType == 'income' ? AppColors.success.withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? AppColors.success : widget.colorScheme.outlineVariant)),
+              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: AppColors.success, fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
           const SizedBox(width: 8),
           Expanded(child: GestureDetector(onTap: () {
             setState(() {
@@ -106,8 +107,8 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
             });
           },
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(color: _txType == 'expense' ? const Color(0xFFEF4444).withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? const Color(0xFFEF4444) : widget.colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: Color(0xFFEF4444), fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              decoration: BoxDecoration(color: _txType == 'expense' ? AppColors.error.withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? AppColors.error : widget.colorScheme.outlineVariant)),
+              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: AppColors.error, fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
         ]),
         const SizedBox(height: 12),
         SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: categories.length,

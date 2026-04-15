@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import '../../app_state.dart';
@@ -175,7 +176,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     messenger.showSnackBar(
       SnackBar(
         content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -191,7 +192,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     messenger.showSnackBar(
       SnackBar(
         content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),
     );

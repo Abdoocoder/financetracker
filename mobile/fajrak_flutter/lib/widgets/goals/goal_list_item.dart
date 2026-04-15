@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class GoalListItem extends StatelessWidget {
@@ -28,7 +29,7 @@ class GoalListItem extends StatelessWidget {
     final isDone = current >= target;
     
     final color = isDone
-        ? const Color(0xFF10B981)
+        ? AppColors.success
         : progress >= 0.7
             ? colorScheme.primary
             : colorScheme.secondary;
@@ -73,12 +74,12 @@ class GoalListItem extends StatelessWidget {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(7),
                       border: Border.all(
-                          color: const Color(0xFFEF4444).withValues(alpha: 0.2))),
+                          color: AppColors.error.withValues(alpha: 0.2))),
                   child: const Icon(Icons.close,
-                      color: Color(0xFFEF4444), size: 14))),
+                      color: AppColors.error, size: 14))),
         ]),
         const SizedBox(height: 12),
         ClipRRect(

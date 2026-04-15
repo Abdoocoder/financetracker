@@ -1,3 +1,4 @@
+import '../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -43,7 +44,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                   color: colorScheme.secondary.withValues(alpha: 0.3)),
             ),
             child: Row(children: [
-              const Icon(Icons.rocket_launch, size: 20, color: Color(0xFF3B7EF6)),
+              const Icon(Icons.rocket_launch, size: 20, color: AppColors.primary),
               const SizedBox(width: 10),
               Expanded(
                   child: Text('wealthSimulator'.tr(),

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
@@ -106,22 +107,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: (theme.brightness == Brightness.dark
-                            ? const Color(0xFF10B981)
-                            : const Color(0xFF059669))
+                            ? AppColors.success
+                            : AppColors.successDark)
                         .withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                         color: (theme.brightness == Brightness.dark
-                                ? const Color(0xFF10B981)
-                                : const Color(0xFF059669))
+                                ? AppColors.success
+                                : AppColors.successDark)
                             .withValues(alpha: 0.3)),
                   ),
                   child: Text(
                       'auth_reset_password_success'.tr(),
                       style: TextStyle(
                           color: theme.brightness == Brightness.dark
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFF059669),
+                              ? AppColors.success
+                              : AppColors.successDark,
                           fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),

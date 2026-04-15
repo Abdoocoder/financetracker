@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'dart:math';
 
@@ -63,7 +64,7 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             child: Text(
               '${futureValue.toStringAsFixed(0)} ${widget.currency}',
               style: TextStyle(
-                  color: isDark ? const Color(0xFF10B981) : colorScheme.primary,
+                  color: isDark ? AppColors.success : colorScheme.primary,
                   fontSize: 26,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'Cairo'),

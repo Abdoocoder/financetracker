@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../app_state.dart';
@@ -101,7 +102,7 @@ class DashboardHeader extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(5),
                         decoration: const BoxDecoration(
-                          color: Color(0xFFEF4444),
+                          color: AppColors.error,
                           shape: BoxShape.circle,
                         ),
                         child: Text(

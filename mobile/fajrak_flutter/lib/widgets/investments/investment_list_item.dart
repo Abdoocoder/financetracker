@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'investment_transaction_history.dart';
@@ -49,7 +50,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      backgroundColor: const Color(0xFF0F1629),
+      backgroundColor: AppColors.surface0,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => AddInvestmentDialog(
@@ -167,7 +168,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
             ctx,
             isGain ? 'inv_sell_realized_gain'.tr() : 'inv_sell_realized_loss'.tr(),
             '${isGain ? '+' : ''}\$${realizedPnl.toStringAsFixed(2)}',
-            isGain ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+            isGain ? AppColors.success : AppColors.error,
           ),
         ]),
         actions: [
@@ -178,7 +179,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEF4444),
+                backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             child: Text('inv_sell_confirm_btn'.tr(),
@@ -335,8 +336,8 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
             Text('${gain >= 0 ? '+' : ''}${gainPct.toStringAsFixed(1)}%',
                 style: TextStyle(
                     color: gain >= 0
-                        ? const Color(0xFF10B981)
-                        : const Color(0xFFEF4444),
+                        ? AppColors.success
+                        : AppColors.error,
                     fontSize: 12,
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.w700)),
@@ -383,8 +384,8 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
               '${'inv_roi_label'.tr()}: ${gain >= 0 ? "+" : ""}\$${gain.toStringAsFixed(2)}',
               style: TextStyle(
                   color: gain >= 0
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFFEF4444),
+                      ? AppColors.success
+                      : AppColors.error,
                   fontSize: 10,
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.w700),
@@ -398,7 +399,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
             value: cost > 0 ? (value / (cost * 2)).clamp(0.0, 1.0) : 0,
             backgroundColor: colorScheme.outlineVariant,
             valueColor: AlwaysStoppedAnimation(
-                gain >= 0 ? const Color(0xFF10B981) : colorScheme.error),
+                gain >= 0 ? AppColors.success : colorScheme.error),
             minHeight: 4,
           ),
         ),
@@ -427,9 +428,9 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
               _showSellForm = false;
             }),
             style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF10B981),
+                foregroundColor: AppColors.success,
                 side: BorderSide(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                    color: AppColors.success.withValues(alpha: 0.3)),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
@@ -449,9 +450,9 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
               _showBuyForm = false;
             }),
             style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFEF4444),
+                foregroundColor: AppColors.error,
                 side: BorderSide(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.3)),
+                    color: AppColors.error.withValues(alpha: 0.3)),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
@@ -489,7 +490,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                   child: ElevatedButton(
                     onPressed: _savingBuy ? null : _recordBuy,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
+                        backgroundColor: AppColors.success,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         shape: RoundedRectangleBorder(
@@ -514,9 +515,9 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.07),
+                color: AppColors.error.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2))),
+                border: Border.all(color: AppColors.error.withValues(alpha: 0.2))),
             child: Column(children: [
               Row(children: [
                 Expanded(
@@ -545,7 +546,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                   child: ElevatedButton(
                     onPressed: _savingSell ? null : _recordSell,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFEF4444),
+                        backgroundColor: AppColors.error,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         shape: RoundedRectangleBorder(

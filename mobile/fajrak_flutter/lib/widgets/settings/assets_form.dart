@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'settings_accordion.dart';
@@ -69,7 +70,7 @@ class _AssetsFormState extends State<AssetsForm> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: AppColors.success,
         ));
       }
     } finally {
@@ -97,12 +98,12 @@ class _AssetsFormState extends State<AssetsForm> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFF3B7EF6).withValues(alpha: 0.05),
-                  const Color(0xFF10B981).withValues(alpha: 0.03),
+                  AppColors.primary.withValues(alpha: 0.05),
+                  AppColors.success.withValues(alpha: 0.03),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF3B7EF6).withValues(alpha: 0.15)),
+              border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
             ),
             child: Column(
               children: [
@@ -119,7 +120,7 @@ class _AssetsFormState extends State<AssetsForm> {
                 Text(
                   '${displayedNetWorth.toStringAsFixed(0)} ${widget.currency}',
                   style: TextStyle(
-                    color: displayedNetWorth >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                    color: displayedNetWorth >= 0 ? AppColors.success : AppColors.error,
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'Cairo',
@@ -129,10 +130,10 @@ class _AssetsFormState extends State<AssetsForm> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _netWorthStat('health_tracking'.tr(), widget.cashBalance, const Color(0xFF3B7EF6), colorScheme),
-                    _netWorthStat('health_savings'.tr(), widget.savings, const Color(0xFF8B5CF6), colorScheme),
-                    _netWorthStat('health_investing'.tr(), widget.investments, const Color(0xFF10B981), colorScheme),
-                    _netWorthStat('health_debt'.tr(), -widget.totalDebt, const Color(0xFFEF4444), colorScheme),
+                    _netWorthStat('health_tracking'.tr(), widget.cashBalance, AppColors.primary, colorScheme),
+                    _netWorthStat('health_savings'.tr(), widget.savings, AppColors.purple, colorScheme),
+                    _netWorthStat('health_investing'.tr(), widget.investments, AppColors.success, colorScheme),
+                    _netWorthStat('health_debt'.tr(), -widget.totalDebt, AppColors.error, colorScheme),
                   ],
                 ),
               ],
@@ -160,7 +161,7 @@ class _AssetsFormState extends State<AssetsForm> {
             child: ElevatedButton(
               onPressed: _savingAssets ? null : _saveAssets,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981),
+                backgroundColor: AppColors.success,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

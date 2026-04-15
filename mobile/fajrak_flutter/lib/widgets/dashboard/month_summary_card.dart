@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,8 +61,8 @@ class _MonthSummaryCardState extends State<MonthSummaryCard> {
         ? (prevSaved / widget.prevIncome * 100).round()
         : 0;
 
-    final green = const Color(0xFF10B981);
-    final red = const Color(0xFFEF4444);
+    final green = AppColors.success;
+    final red = AppColors.error;
     final accentColor = isPositive ? green : red;
 
     String fmt(double n) {

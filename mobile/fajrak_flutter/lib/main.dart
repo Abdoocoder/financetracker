@@ -1,3 +1,4 @@
+import 'utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -19,6 +20,7 @@ import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/settings/notification_settings_screen.dart';
 import 'services/notification_service.dart';
+import 'database/app_database.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -80,6 +82,15 @@ void main() async {
     url: dotenv.env['SUPABASE_URL'] ?? '',
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
+
+  // Initialize local encrypted database.
+  // Key: user's auth session token (or anonymous key before login).
+  // The DB is re-opened with the correct key after the user signs in
+  // (handled in AuthService / SplashScreen).
+  final initialKey = Supabase.instance.client.auth.currentSession?.accessToken
+      ?? dotenv.env['SUPABASE_ANON_KEY']
+      ?? 'fajrak_default_key';
+  await AppDatabase.initialize(encryptionKey: initialKey);
 
   final appState = AppState();
 
@@ -152,15 +163,15 @@ class FajrakApp extends StatelessWidget {
   static ThemeData _buildTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     
-    final primary = const Color(0xFF3B7EF6);
-    final secondary = const Color(0xFF10B981);
-    final error = const Color(0xFFEF4444);
+    final primary = AppColors.primary;
+    final secondary = AppColors.success;
+    final error = AppColors.error;
     
     final scaffoldBg = isDark ? const Color(0xFF070B14) : const Color(0xFFF8FAFC);
-    final surface = isDark ? const Color(0xFF0F1629) : Colors.white;
-    final onSurface = isDark ? Colors.white : const Color(0xFF0F172A);
-    final onSurfaceVariant = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final outlineVariant = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
+    final surface = isDark ? AppColors.surface0 : Colors.white;
+    final onSurface = isDark ? Colors.white : AppColors.surface1;
+    final onSurfaceVariant = isDark ? AppColors.textMuted : AppColors.textSecondary;
+    final outlineVariant = isDark ? AppColors.surface2 : const Color(0xFFE2E8F0);
 
     return ThemeData(
       useMaterial3: true,
@@ -223,7 +234,7 @@ class FajrakApp extends StatelessWidget {
           borderSide: BorderSide(color: primary),
         ),
         labelStyle: TextStyle(color: onSurfaceVariant),
-        hintStyle: TextStyle(color: isDark ? const Color(0xFF475569) : const Color(0xFF94A3B8)),
+        hintStyle: TextStyle(color: isDark ? AppColors.textTertiary : AppColors.textMuted),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

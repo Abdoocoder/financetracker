@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class NetWorthCard extends StatefulWidget {
@@ -30,17 +31,17 @@ class _NetWorthCardState extends State<NetWorthCard> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final isPositive = widget.netWorth >= 0;
-    final mainColor = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final mainColor = isPositive ? AppColors.success : AppColors.error;
 
     String fmt(double n) => n.abs().toStringAsFixed(0).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},',
     );
 
     final items = [
-      (label: 'net_worth_investments'.tr(), value: widget.invValue,      color: const Color(0xFF3B7EF6), icon: Icons.trending_up),
-      (label: 'net_worth_goals'.tr(),       value: widget.goalsSaved,    color: const Color(0xFF10B981), icon: Icons.flag_outlined),
-      (label: 'net_worth_receivable'.tr(),  value: widget.totalReceivable, color: const Color(0xFF8B5CF6), icon: Icons.account_balance_wallet_outlined),
-      (label: 'net_worth_debts'.tr(),       value: -widget.totalDebt,    color: const Color(0xFFEF4444), icon: Icons.credit_card_outlined),
+      (label: 'net_worth_investments'.tr(), value: widget.invValue,      color: AppColors.primary, icon: Icons.trending_up),
+      (label: 'net_worth_goals'.tr(),       value: widget.goalsSaved,    color: AppColors.success, icon: Icons.flag_outlined),
+      (label: 'net_worth_receivable'.tr(),  value: widget.totalReceivable, color: AppColors.purple, icon: Icons.account_balance_wallet_outlined),
+      (label: 'net_worth_debts'.tr(),       value: -widget.totalDebt,    color: AppColors.error, icon: Icons.credit_card_outlined),
     ];
 
     return Container(
@@ -98,13 +99,13 @@ class _NetWorthCardState extends State<NetWorthCard> {
                       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
                       decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(10)),
                       child: Row(children: [
-                        Icon(item.icon, size: 16, color: item.value >= 0 ? item.color : const Color(0xFFEF4444)),
+                        Icon(item.icon, size: 16, color: item.value >= 0 ? item.color : AppColors.error),
                         const SizedBox(width: 8),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(item.label, style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 9, fontWeight: FontWeight.w600)),
                           Text(
                             '${item.value >= 0 ? '+' : '-'}${fmt(item.value)}',
-                            style: TextStyle(color: item.value >= 0 ? item.color : const Color(0xFFEF4444), fontFamily: 'monospace', fontSize: 13, fontWeight: FontWeight.w900),
+                            style: TextStyle(color: item.value >= 0 ? item.color : AppColors.error, fontFamily: 'monospace', fontSize: 13, fontWeight: FontWeight.w900),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ])),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class TransactionSummary extends StatelessWidget {
@@ -32,21 +33,21 @@ class TransactionSummary extends StatelessWidget {
         children: [
           Expanded(
               child: _statCard('trans_total_net'.tr(), net,
-                  net >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                  net >= 0 ? AppColors.success : AppColors.error,
                   isNet: true)),
           const SizedBox(width: 8),
           Expanded(
               child: _expensesCard(realExpenses, debtPayments)),
           const SizedBox(width: 8),
           Expanded(
-              child: _statCard('trans_total_income'.tr(), income, const Color(0xFF10B981))),
+              child: _statCard('trans_total_income'.tr(), income, AppColors.success)),
         ],
       ),
     );
   }
 
   Widget _expensesCard(double realExpenses, double debtPayments) {
-    const color = Color(0xFFEF4444);
+    const color = AppColors.error;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
       decoration: BoxDecoration(
@@ -76,20 +77,20 @@ class TransactionSummary extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Column(children: [
                 Text('💳 ${'dash_debt_payments'.tr()}',
                     style: const TextStyle(
-                        color: Color(0xFF3B7EF6),
+                        color: AppColors.primary,
                         fontSize: 8,
                         fontFamily: 'Cairo',
                         fontWeight: FontWeight.w700)),
                 FittedBox(
                   child: Text(debtPayments.toStringAsFixed(0),
                       style: const TextStyle(
-                          color: Color(0xFF3B7EF6),
+                          color: AppColors.primary,
                           fontWeight: FontWeight.w900,
                           fontSize: 11,
                           fontFamily: 'Cairo')),

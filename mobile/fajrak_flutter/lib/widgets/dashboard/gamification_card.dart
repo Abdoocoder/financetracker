@@ -1,3 +1,4 @@
+import '../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -21,17 +22,17 @@ class GamificationCard extends StatelessWidget {
     if (score < 40) {
       rank = 'gamif_rank_bronze'.tr();
       icon = Icons.military_tech;
-      color = const Color(0xFFCD7F32);
+      color = AppColors.bronze;
       progress = score / 40;
     } else if (score < 60) {
       rank = 'gamif_rank_silver'.tr();
       icon = Icons.workspace_premium;
-      color = const Color(0xFFC0C0C0);
+      color = AppColors.silver;
       progress = (score - 40) / 20;
     } else if (score < 80) {
       rank = 'gamif_rank_gold'.tr();
       icon = Icons.emoji_events;
-      color = const Color(0xFFFFD700);
+      color = AppColors.gold;
       progress = (score - 60) / 20;
     } else {
       rank = 'gamif_rank_diamond'.tr();

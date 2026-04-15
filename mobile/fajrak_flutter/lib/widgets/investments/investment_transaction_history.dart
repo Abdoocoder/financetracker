@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -91,11 +92,11 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                   final isBuy = tx['type'] == 'buy';
                   final color = isBuy
                       ? (Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFF10B981))
+                          ? AppColors.success
+                          : AppColors.success)
                       : (Theme.of(context).brightness == Brightness.dark
-                          ? const Color(0xFFEF4444)
-                          : const Color(0xFFEF4444));
+                          ? AppColors.error
+                          : AppColors.error);
                   final shares = (tx['shares'] as num).toDouble();
                   final price = (tx['price'] as num).toDouble();
                   final comm = (tx['commission'] as num?)?.toDouble() ?? 0;

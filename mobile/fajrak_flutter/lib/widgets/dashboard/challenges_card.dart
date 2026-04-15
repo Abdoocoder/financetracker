@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class ChallengesCard extends StatefulWidget {
@@ -29,6 +30,18 @@ class ChallengesCard extends StatefulWidget {
 
 class _ChallengesCardState extends State<ChallengesCard> {
   int? _activeChallenge;
+  late List<Map<String, dynamic>> _challenges;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _challenges = [
+      {'id': 1, 'icon': Icons.restaurant, 'title': 'challenge_1_title'.tr(), 'days': 7},
+      {'id': 2, 'icon': Icons.account_balance_wallet, 'title': 'challenge_2_title'.tr(), 'days': 30},
+      {'id': 3, 'icon': Icons.trending_down, 'title': 'challenge_3_title'.tr(), 'days': 30},
+      {'id': 4, 'icon': Icons.track_changes, 'title': 'challenge_4_title'.tr(), 'days': 14},
+    ];
+  }
 
   double _getProgress(int id) {
     if (id == 1) {
@@ -52,12 +65,6 @@ class _ChallengesCardState extends State<ChallengesCard> {
     return 0.0;
   }
 
-  final _challenges = [
-    {'id': 1, 'icon': Icons.restaurant, 'title': 'challenge_1_title'.tr(), 'days': 7},
-    {'id': 2, 'icon': Icons.account_balance_wallet, 'title': 'challenge_2_title'.tr(), 'days': 30},
-    {'id': 3, 'icon': Icons.trending_down, 'title': 'challenge_3_title'.tr(), 'days': 30},
-    {'id': 4, 'icon': Icons.track_changes, 'title': 'challenge_4_title'.tr(), 'days': 14},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +141,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
           const SizedBox(height: 6),
           Text('${pct.toStringAsFixed(0)}%',
               style: TextStyle(
-                  color: isDark ? const Color(0xFF10B981) : colorScheme.primary,
+                  color: isDark ? AppColors.success : colorScheme.primary,
                   fontSize: 13,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'monospace')),
@@ -145,21 +152,20 @@ class _ChallengesCardState extends State<ChallengesCard> {
 
   Widget _buildGrid(ColorScheme colorScheme) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 0.85,
+    final itemWidth = (MediaQuery.sizeOf(context).width - 32 - 10) / 2;
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
       children: _challenges.map((c) {
         final pct = _getProgress(c['id'] as int);
         final isCompleted = pct >= 100;
         final color = isCompleted
-            ? (isDark ? const Color(0xFF10B981) : colorScheme.primary)
+            ? (isDark ? AppColors.success : colorScheme.primary)
             : colorScheme.primary;
 
-        return GestureDetector(
+        return SizedBox(
+          width: itemWidth,
+          child: GestureDetector(
           onTap: () => setState(() => _activeChallenge = c['id'] as int),
           child: Container(
             padding: const EdgeInsets.all(12),
@@ -173,8 +179,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
               children: [
                 Icon(c['icon'] as IconData, size: 22, color: color),
                 const SizedBox(height: 6),
-                Expanded(
-                  child: Text(
+                Text(
                     c['title'] as String,
                     style: TextStyle(
                         color: colorScheme.onSurface,
@@ -183,8 +188,9 @@ class _ChallengesCardState extends State<ChallengesCard> {
                         fontFamily: 'Cairo',
                         height: 1.3),
                     textAlign: TextAlign.right,
-                  ),
+                    maxLines: 2,
                 ),
+                const SizedBox(height: 6),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
                   child: LinearProgressIndicator(
@@ -199,7 +205,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
                   '${isCompleted ? '✓ ' : ''}${pct.toStringAsFixed(0)}%',
                   style: TextStyle(
                       color: isCompleted
-                          ? (isDark ? const Color(0xFF6EE7B7) : colorScheme.primary)
+                          ? (isDark ? AppColors.successLight : colorScheme.primary)
                           : (isDark ? colorScheme.secondary : colorScheme.primary),
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
@@ -208,7 +214,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
               ],
             ),
           ),
-        );
+        ));
       }).toList(),
     );
   }

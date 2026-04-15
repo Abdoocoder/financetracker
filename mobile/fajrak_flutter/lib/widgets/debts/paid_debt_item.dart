@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 
 class PaidDebtItem extends StatelessWidget {
   final Map<String, dynamic> debt;
@@ -13,12 +14,12 @@ class PaidDebtItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-          color: const Color(0xFF10B981).withValues(alpha: 0.05),
+          color: AppColors.success.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-              color: const Color(0xFF10B981).withValues(alpha: 0.15))),
+              color: AppColors.success.withValues(alpha: 0.15))),
       child: Row(children: [
-        const Icon(Icons.check_circle, size: 24, color: Color(0xFF10B981)),
+        const Icon(Icons.check_circle, size: 24, color: AppColors.success),
         const SizedBox(width: 12),
         Expanded(
             child: Column(
@@ -40,7 +41,7 @@ class PaidDebtItem extends StatelessWidget {
         Text(
             '${(debt['original_amount'] as num).toStringAsFixed(0)} $currency',
             style: const TextStyle(
-                color: Color(0xFF6EE7B7),
+                color: AppColors.successLight,
                 fontWeight: FontWeight.w900,
                 fontFamily: 'Cairo')),
       ]),

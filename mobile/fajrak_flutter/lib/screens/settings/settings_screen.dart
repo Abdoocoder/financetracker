@@ -1,3 +1,4 @@
+import '../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -123,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B7EF6)))
+          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(

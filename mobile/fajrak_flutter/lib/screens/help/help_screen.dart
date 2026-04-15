@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -11,7 +12,16 @@ class HelpScreen extends StatefulWidget {
 
 class _HelpScreenState extends State<HelpScreen> {
   String _search = '';
-  List<Map<String, dynamic>> get _localizedFaqs => [
+  late final List<Map<String, dynamic>> _localizedFaqs;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Built once after locale is available; rebuilds only on locale change.
+    _localizedFaqs = _buildFaqs();
+  }
+
+  List<Map<String, dynamic>> _buildFaqs() => [
     {
       'section': 'help_faq_dashboard_title'.tr(),
       'items': [
@@ -153,6 +163,8 @@ class _HelpScreenState extends State<HelpScreen> {
     },
   ];
 
+  // _localizedFaqs is built in didChangeDependencies above
+
   @override
   Widget build(BuildContext context) {
     final filtered = _localizedFaqs
@@ -232,9 +244,9 @@ class _HelpScreenState extends State<HelpScreen> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                    color: const Color(0xFF3B7EF6).withValues(alpha: 0.05),
+                    color: AppColors.primary.withValues(alpha: 0.05),
                     border: Border.all(
-                        color: const Color(0xFF3B7EF6).withValues(alpha: 0.2)),
+                        color: AppColors.primary.withValues(alpha: 0.2)),
                     borderRadius: BorderRadius.circular(16)),
                 child: Row(
                   children: [
@@ -242,11 +254,11 @@ class _HelpScreenState extends State<HelpScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                            color: const Color(0xFF3B7EF6).withValues(alpha: 0.1),
+                            color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12)),
                         child: const Center(
                             child: Icon(Icons.support_agent,
-                                color: Color(0xFF3B7EF6)))),
+                                color: AppColors.primary))),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -267,7 +279,7 @@ class _HelpScreenState extends State<HelpScreen> {
                       ),
                     ),
                     const Icon(Icons.arrow_forward_ios,
-                        color: Color(0xFF64748B), size: 14),
+                        color: AppColors.textSecondary, size: 14),
                   ],
                 ),
               ),
@@ -282,7 +294,7 @@ class _HelpScreenState extends State<HelpScreen> {
                       padding: const EdgeInsets.only(bottom: 12, top: 8),
                       child: Text(section['section'],
                           style: const TextStyle(
-                              color: Color(0xFF94A3B8),
+                              color: AppColors.textMuted,
                               fontWeight: FontWeight.w900,
                               fontFamily: 'Cairo',
                               fontSize: 13,

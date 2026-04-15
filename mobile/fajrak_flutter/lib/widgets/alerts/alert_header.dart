@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class AlertHeader extends StatelessWidget {
@@ -29,11 +30,11 @@ class AlertHeader extends StatelessWidget {
             Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12)),
                 child: Text('alerts_unread_count'.tr(args: [unreadCount.toString()]),
                     style: const TextStyle(
-                        color: Color(0xFFEF4444),
+                        color: AppColors.error,
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Cairo'))),

@@ -1,7 +1,7 @@
 name: fajrak
 description: فجرك - تطبيق إدارة مالية ذكي
-publish_to: 'none'
-version: 3.32.7+31
+publish_to: 'fajrak.com'
+version: 3.32.8+32
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -40,11 +40,18 @@ dependencies:
   printing: ^5.13.1
   uuid: ^4.5.3
 
+  # Offline-first local database
+  drift: ^2.18.0
+  sqlcipher_flutter_libs: ^0.5.0  # SQLCipher encryption — mobile/desktop only
+  path: ^1.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.0
 
 flutter_launcher_icons:
   android: "ic_launcher"

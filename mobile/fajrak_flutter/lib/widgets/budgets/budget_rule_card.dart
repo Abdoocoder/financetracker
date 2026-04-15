@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class BudgetRuleCard extends StatelessWidget {
@@ -78,7 +79,7 @@ class BudgetRuleCard extends StatelessWidget {
                     '20%',
                     'dash_rule_savings'.tr(),
                     (available * 0.2).round().toDouble(),
-                    const Color(0xFF10B981))),
+                    AppColors.success)),
           ]),
         ),
       ]),

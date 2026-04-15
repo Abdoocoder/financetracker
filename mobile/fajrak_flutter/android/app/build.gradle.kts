@@ -19,7 +19,7 @@ android {
         println("Warning: key.properties not found at ${keystorePropertiesFile.absolutePath}")
     }
 
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
     namespace = "com.fajrak.app"
     compileSdk = flutter.compileSdkVersion
 

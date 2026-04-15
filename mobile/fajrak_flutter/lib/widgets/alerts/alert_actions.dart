@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class AlertActions extends StatelessWidget {
@@ -34,7 +35,7 @@ class AlertActions extends StatelessWidget {
             onPressed: onDeleteAll,
             child: Text('alerts_delete_all'.tr(),
                 style: const TextStyle(
-                    color: Color(0xFFEF4444),
+                    color: AppColors.error,
                     fontFamily: 'Cairo',
                     fontSize: 12,
                     fontWeight: FontWeight.w900))),

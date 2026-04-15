@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
@@ -258,10 +259,10 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
   Color _insightColor(String type) {
     switch (type) {
-      case 'danger': return const Color(0xFFEF4444);
-      case 'warning': return const Color(0xFFF59E0B);
-      case 'success': return const Color(0xFF10B981);
-      default: return const Color(0xFF3B7EF6);
+      case 'danger': return AppColors.error;
+      case 'warning': return AppColors.warning;
+      case 'success': return AppColors.success;
+      default: return AppColors.primary;
     }
   }
 

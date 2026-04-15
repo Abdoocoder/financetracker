@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -190,13 +191,13 @@ class _AlertsScreenState extends State<AlertsScreen> {
   Color _getColor(String? type) {
     switch (type) {
       case 'warning':
-        return const Color(0xFFF59E0B);
+        return AppColors.warning;
       case 'achievement':
-        return const Color(0xFF10B981);
+        return AppColors.success;
       case 'motivation':
-        return const Color(0xFF8B5CF6);
+        return AppColors.purple;
       default:
-        return const Color(0xFF3B7EF6);
+        return AppColors.primary;
     }
   }
 

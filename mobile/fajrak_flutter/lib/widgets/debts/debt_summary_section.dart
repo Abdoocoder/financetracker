@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class DebtSummarySection extends StatelessWidget {
@@ -34,21 +35,21 @@ class DebtSummarySection extends StatelessWidget {
               child: _statCard(
                   'debts_total_remaining'.tr(),
                   '${totalRemaining.toStringAsFixed(0)} $currency',
-                  const Color(0xFFEF4444),
+                  AppColors.error,
                   cs)),
           const SizedBox(width: 8),
           Expanded(
               child: _statCard(
                   'debts_paid'.tr(),
                   '${paidPct.toStringAsFixed(0)}%',
-                  const Color(0xFF10B981),
+                  AppColors.success,
                   cs)),
           const SizedBox(width: 8),
           Expanded(
               child: _statCard(
                   'debts_monthly_total'.tr(),
                   '${totalMonthly.toStringAsFixed(0)} $currency',
-                  const Color(0xFFF59E0B),
+                  AppColors.warning,
                   cs)),
         ]),
         const SizedBox(height: 12),
@@ -59,12 +60,12 @@ class DebtSummarySection extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.08),
+                color: AppColors.success.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.2))),
+                    color: AppColors.success.withValues(alpha: 0.2))),
             child: Row(children: [
-              const Icon(Icons.emoji_events, size: 28, color: Color(0xFF10B981)),
+              const Icon(Icons.emoji_events, size: 28, color: AppColors.success),
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('debts_total_paid_life'.tr(),
@@ -74,7 +75,7 @@ class DebtSummarySection extends StatelessWidget {
                         fontFamily: 'Cairo')),
                 Text('${lifeTimePaid.toStringAsFixed(0)} $currency',
                     style: const TextStyle(
-                        color: Color(0xFF6EE7B7),
+                        color: AppColors.successLight,
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Cairo')),
@@ -89,11 +90,11 @@ class DebtSummarySection extends StatelessWidget {
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Text('$paidCount ',
                       style: const TextStyle(
-                          color: Color(0xFF6EE7B7),
+                          color: AppColors.successLight,
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           fontFamily: 'Cairo')),
-                  const Icon(Icons.check_circle_outline, size: 16, color: Color(0xFF6EE7B7)),
+                  const Icon(Icons.check_circle_outline, size: 16, color: AppColors.successLight),
                 ]),
               ]),
             ]),
@@ -117,7 +118,7 @@ class DebtSummarySection extends StatelessWidget {
                       fontWeight: FontWeight.w700)),
               Text('${paidPct.toStringAsFixed(1)}%',
                   style: const TextStyle(
-                      color: Color(0xFF6EE7B7),
+                      color: AppColors.successLight,
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                       fontFamily: 'Cairo')),
@@ -128,7 +129,7 @@ class DebtSummarySection extends StatelessWidget {
                 child: LinearProgressIndicator(
                     value: (paidPct / 100).clamp(0.0, 1.0),
                     backgroundColor: cs.outlineVariant,
-                    color: const Color(0xFF10B981),
+                    color: AppColors.success,
                     minHeight: 10)),
             const SizedBox(height: 6),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class GoalSummaryCards extends StatelessWidget {
@@ -26,7 +27,7 @@ class GoalSummaryCards extends StatelessWidget {
       const SizedBox(width: 8),
       Expanded(
           child: _statCard(Icons.check_circle_outline, '$completedGoals', 'goals_completed_label'.tr(),
-              const Color(0xFF10B981))),
+              AppColors.success)),
       const SizedBox(width: 8),
       Expanded(
           child: _statCard(Icons.account_balance_wallet, totalSaved.toStringAsFixed(0),

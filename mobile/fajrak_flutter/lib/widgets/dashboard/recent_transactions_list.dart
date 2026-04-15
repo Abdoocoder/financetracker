@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class RecentTransactionsList extends StatelessWidget {
@@ -37,7 +38,7 @@ class RecentTransactionsList extends StatelessWidget {
       ...transactions.map((tx) {
         final isIncome = tx['type'] == 'income';
         final amount = (tx['amount'] as num).toDouble();
-        final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+        final color = isIncome ? AppColors.success : AppColors.error;
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.all(12),

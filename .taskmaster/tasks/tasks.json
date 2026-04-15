@@ -470,8 +470,65 @@
         "testStrategy": "manual review، verification أن جميع الملفات محدثة، check أن version consistent في جميع الأماكن",
         "priority": "medium",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "تحديث Current version في CLAUDE.md",
+            "description": "تحديث Current version من 3.32.3+27 إلى 3.32.7+31",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 9,
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:11:36.582Z"
+          },
+          {
+            "id": 2,
+            "title": "تحديث changelog في README.md و README.ar.md",
+            "description": "إضافة قسم v3.32.7 في changelog",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 9,
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:11:36.610Z"
+          },
+          {
+            "id": 3,
+            "title": "تحديث app/download/page.tsx",
+            "description": "تحديث version badge ورابط APK ونص الزر",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 9,
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:11:36.628Z"
+          },
+          {
+            "id": 4,
+            "title": "تحديث mobile/fajrak_flutter/README.md",
+            "description": "تحديث قسم الإصدار والتغييرات",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 9,
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:11:36.641Z"
+          },
+          {
+            "id": 5,
+            "title": "التحقق من توافق الإصدار في جميع الملفات",
+            "description": "التحقق من أن الإصدار متسق في package.json و pubspec.yaml",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 9,
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:11:36.646Z"
+          }
+        ],
+        "updatedAt": "2026-04-15T17:11:36.646Z"
       },
       {
         "id": "10",
@@ -496,16 +553,423 @@
         "dependencies": [],
         "details": "الخطوات:\n1. استبدال جميع الألوان المكتوبة مباشرة (0xFF10B981, 0xFFEF4444, 0xFF0F1629 إلخ) بألوان من الـ colorScheme في جميع الشاشات\n2. إصلاح خلفية ModalBottomSheet لتستخدم theme.scaffoldBackgroundColor أو colorScheme.surface بدلاً من اللون الثابت\n3. إضافة error states واضحة مع زر retry في dashboard_screen و transactions_screen (حالياً تفشل بصمت)\n4. استبدال CircularProgressIndicator في recurring_screen بـ skeleton loader للاتساق مع باقي الشاشات\n5. توحيد الـ padding (16 افتراضي) والـ border radius عبر جميع الشاشات",
         "testStrategy": "مراجعة بصرية للشاشات في الوضعين الفاتح والداكن، التحقق من عدم ظهور ألوان ثابتة في الوضع الداكن، اختبار حالات الخطأ بقطع الإنترنت",
-        "subtasks": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "استبدال الألوان الثابتة بألوان colorScheme",
+            "description": "تحديد واستبدال جميع الألوان المكتوبة مباشرة (0xFF10B981, 0xFFEF4444, 0xFF0F1629 إلخ) بألوان من Theme.of(context).colorScheme في جميع ملفات Flutter",
+            "details": "الخطوات:\\n1. البحث عن جميع الألوان الثابتة (grep على 0xFF* في mobile/fajrak_flutter/lib/)\\n2. تصنيف الألوان: primary (أخضر), error (أحمر), background/dark\\n3. استبدال كل لون باللون المناسب من colorScheme\\n4. التحقق من دعم الوضع الداكن (ThemeMode.dark)\\n5. اختبار على جميع الشاشات",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 11,
+            "updatedAt": "2026-04-15T19:12:54.412Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "إصلاح خلفية ModalBottomSheet",
+            "description": "تعديل خلفية ModalBottomSheet لتستخدم theme.scaffoldBackgroundColor أو colorScheme.surface بدلاً من اللون الثابت في جميع الملفات",
+            "details": "الخطوات:\\n1. البحث عن ModalBottomSheet في ملفات Flutter\\n2. تحديد الخلفيات الثابتة (Color(0xFF...) أو Colors.white/black الثابتة)\\n3. استبدالها بـ theme.scaffoldBackgroundColor أو colorScheme.surface\\n4. التحقق من استخدام useSafeArea: true\\n5. اختبار في الوضعين الفاتح والداكن",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 11,
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "استبدال الألوان الثابتة بألوان colorScheme في Flutter",
+            "description": "استبدال جميع الألوان المكتوبة مباشرة (0xFF10B981, 0xFFEF4444, 0xFF0F1629 إلخ) بألوان من الـ colorScheme في جميع الشاشات",
+            "dependencies": [],
+            "details": "البحث عن جميع الألوان الثابتة (grep على 0xFF* في mobile/fajrak_flutter/lib/), تصنيف الألوان: primary (أخضر), error (أحمر), background/dark, استبدال كل لون باللون المناسب من colorScheme، التحقق من دعم الوضع الداكن (ThemeMode.dark)، اختبار على جميع الشاشات",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "إصلاح خلفية ModalBottomSheet في Flutter",
+            "description": "إصلاح خلفية ModalBottomSheet لتستخدم theme.scaffoldBackgroundColor أو colorScheme.surface بدلاً من اللون الثابت",
+            "dependencies": [
+              3
+            ],
+            "details": "التحقق من جميع ملفات Flutter التي تستخدم ModalBottomSheet، استبدال اللون الثابت بـ theme.scaffoldBackgroundColor أو colorScheme.surface، التأكد من توافق اللون مع الوضع الداكن والفاتح، اختبار العرض في جميع الحالات",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "إضافة error states واضحة مع زر retry في dashboard_screen و transactions_screen",
+            "description": "إضافة error states واضحة مع زر retry في dashboard_screen و transactions_screen (حالياً تفشل بصمت)",
+            "dependencies": [
+              3
+            ],
+            "details": "تحديد صفحات dashboard_screen و transactions_screen التي تحتاج error states، إضافة عناصر UI للخطأ مع زر retry، تنفيذ منطق إعادة المحاولة، التأكد من أن الأخطاء تظهر بشكل واضح للمستخدم، اختبار حالات الخطأ بقطع الإنترنت",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "استبدال CircularProgressIndicator بـ skeleton loader في recurring_screen",
+            "description": "استبدال CircularProgressIndicator في recurring_screen بـ skeleton loader للاتساق مع باقي الشاشات",
+            "dependencies": [
+              3
+            ],
+            "details": "التحقق من استخدام CircularProgressIndicator في recurring_screen، استبداله بـ skeleton loader متوافق مع الـ UI design، التأكد من أن skeleton loader يظهر بشكل صحيح في جميع الحالات، مقارنة مع الـ loading skeletons في باقي الشاشات",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "توحيد الـ padding والـ border radius عبر جميع الشاشات",
+            "description": "توحيد الـ padding (16 افتراضي) والـ border radius عبر جميع الشاشات",
+            "dependencies": [
+              3
+            ],
+            "details": "تحديد القيم الافتراضية للـ padding (16) والـ border radius في جميع الشاشات، تطبيق هذه القيم بشكل موحد عبر جميع ملفات Flutter، التأكد من عدم وجود اختلافات في التصميم، اختبار العرض في جميع الأجهزة والتصغيرات",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          }
+        ],
         "createdAt": "2026-04-15T00:17:56.664Z",
-        "updatedAt": "2026-04-15T00:22:10.741Z"
+        "updatedAt": "2026-04-15T19:12:54.412Z"
+      },
+      {
+        "id": "12",
+        "title": "إنشاء طبقة قاعدة البيانات المحلية (Drift) مع تشفير SQLCipher",
+        "description": "تطبيق قاعدة بيانات محلية SQLite عبر Drift مع تشفير SQLCipher لضمان حماية بيانات المستخدم المحفوظة محلياً عند عدم توفر الاتصال بالإنترنت",
+        "details": "الخطوات المطلوبة:\n\n1. إضافة المكتبات إلى pubspec.yaml:\n   - drift: ^2.14.0 (قاعدة البيانات المحلية)\n   - drift_sqflite: ^2.1.0 (إدارة SQLite)\n   - sqlcipher_flutter_libs: ^0.0.2 (تشفير قاعدة البيانات)\n   - build_runner: ^2.4.0 (code generation)\n\n2. إنشاء ملف قاعدة البيانات في mobile/fajrak_flutter/lib/services/database/app_database.dart:\n   - تعريف جداول Drift لـ: transactions, debts, investments, budgets, savings_goals, accounts, sync_queue\n   - كل جدول يحتوي على حقول مطابقة لـ Supabase schema مع إضافة حقول sync\n   - إضافة حقول sync_status (pending_create, pending_update, pending_delete, synced)\n\n3. تطبيق التشفير:\n   - استخدام sqlCipherOpenConnection() بدلاً من openConnection()\n   - تعيين كلمة المرور من Supabase auth token\n\n4. إنشاء جدول sync_queue في Drift:\n   ```dart\n   @DataClass()\n   class SyncQueueItem {\n     final String id;\n     final String entityId;\n     final String entityType; // 'transaction', 'debt', etc.\n     final String operationType; // 'create', 'update', 'delete'\n     final Map<String, dynamic> payload;\n     final int attemptCount;\n     final DateTime createdAt;\n     final DateTime? lastAttemptAt;\n   }\n   ```\n\n5. إنشاء getter لـ app database instance (Singleton pattern):\n   ```dart\n   class AppDatabase {\n     static final AppDatabase _instance = AppDatabase._internal();\n     factory AppDatabase() => _instance;\n     AppDatabase._internal();\n     \n     late final GeneratedDatabase _db;\n     GeneratedDatabase get db => _db;\n     \n     Future<void> initialize() async {\n       final encryptedDb = await sqlCipherOpenConnection(/* ... */);\n       _db = encryptedDb;\n     }\n   }\n   ```\n\n6. تشغيل code generation:\n   ```bash\n   cd mobile/fajrak_flutter\n   flutter pub run build_runner build\n   ```\n\n7. إضافة initialization في main.dart بعد Supabase init:\n   ```dart\n   await AppDatabase().initialize();\n   ```",
+        "testStrategy": "1. اختبار إنشاء قاعدة البيانات وتشفيرها بنجاح\n2. التحقق من إمكانية إدراج وجلب البيانات من جميع الجداول\n3. اختبار استمرار البيانات بعد إغلاق وإعادة فتح التطبيق\n4. التحقق من تشفير البيانات على القرص (محاولة فتح ملف القاعدة بدون كلمة المرور يجب أن تفشل)\n5. اختبار أداء الجداول الكبيرة (1000+ صف)\n6. اختبار unit: AppDatabase initialization, CRUD operations للجداول",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "إضافة المكتبات المطلوبة إلى pubspec.yaml",
+            "description": "إضافة مكتبات Drift وSQLCipher وBuild Runner إلى ملف pubspec.yaml",
+            "dependencies": [],
+            "details": "تحديث ملف pubspec.yaml بإضافة drift: ^2.14.0, drift_sqflite: ^2.1.0, sqlcipher_flutter_libs: ^0.0.2, build_runner: ^2.4.0",
+            "status": "done",
+            "testStrategy": "اختبار أن المكتبات تُثبت بنجاح وتعمل مع المشروع",
+            "updatedAt": "2026-04-15T13:20:03.434Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "إنشاء ملف قاعدة البيانات AppDatabase",
+            "description": "إنشاء ملف قاعدة البيانات المحلية مع تعريف الجداول المطلوبة",
+            "dependencies": [
+              1
+            ],
+            "details": "إنشاء ملف app_database.dart في services/database/ يحتوي على تعريف الجداول: transactions, debts, investments, budgets, savings_goals, accounts, sync_queue مع إضافة حقول sync_status",
+            "status": "done",
+            "testStrategy": "اختبار إنشاء الجداول والتأكد من وجود الحقول المطلوبة",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T13:22:44.128Z"
+          },
+          {
+            "id": 3,
+            "title": "تطبيق التشفير باستخدام SQLCipher",
+            "description": "تهيئة التشفير في قاعدة البيانات باستخدام SQLCipher",
+            "dependencies": [
+              2
+            ],
+            "details": "استخدام sqlCipherOpenConnection() بدلاً من openConnection() وتعيين كلمة المرور من Supabase auth token",
+            "status": "done",
+            "testStrategy": "اختبار أن قاعدة البيانات تُشفّر بشكل صحيح وتعمل مع كلمة المرور",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T13:22:44.136Z"
+          },
+          {
+            "id": 4,
+            "title": "تنفيذ Singleton Pattern لـ AppDatabase",
+            "description": "إنشاء نمط التكرار (Singleton) لقاعدة البيانات",
+            "dependencies": [
+              3
+            ],
+            "details": "إنشاء كلاس AppDatabase بـ Singleton pattern مع getter للـ database instance ودالة initialize تستخدم sqlCipherOpenConnection",
+            "status": "done",
+            "testStrategy": "اختبار أن القاعدة تُنشئ مرة واحدة فقط وتعمل بشكل صحيح",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T13:22:44.142Z"
+          },
+          {
+            "id": 5,
+            "title": "تشغيل code generation لـ Drift",
+            "description": "تنفيذ عملية code generation لإنشاء ملفات Drift",
+            "dependencies": [
+              4
+            ],
+            "details": "تشغيل الأمر flutter pub run build_runner build في مجلد mobile/fajrak_flutter لإنشاء ملفات Drift المطلوبة",
+            "status": "done",
+            "testStrategy": "اختبار أن ملفات Drift تُنشئ بنجاح ولا توجد أخطاء في الكود",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T13:23:10.202Z"
+          },
+          {
+            "id": 6,
+            "title": "إضافة مكتبات Drift وSQLCipher وBuild Runner إلى pubspec.yaml",
+            "description": "تحديث ملف pubspec.yaml بإضافة المكتبات المطلوبة لتطبيق قاعدة البيانات المحلية مع التشفير",
+            "dependencies": [],
+            "details": "تحديث ملف pubspec.yaml بإضافة drift: ^2.14.0, drift_sqflite: ^2.1.0, sqlcipher_flutter_libs: ^0.0.2, build_runner: ^2.4.0",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "إنشاء ملف قاعدة البيانات وتعريف الجداول",
+            "description": "إنشاء ملف قاعدة البيانات في المسار المحدد وتعريف الجداول المطلوبة مع حقول sync",
+            "dependencies": [
+              6
+            ],
+            "details": "إنشاء ملف app_database.dart في mobile/fajrak_flutter/lib/services/database/ وتعريف جداول transactions, debts, investments, budgets, savings_goals, accounts, sync_queue مع إضافة حقول sync_status",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "تطبيق التشفير باستخدام SQLCipher",
+            "description": "تطبيق تشفير قاعدة البيانات باستخدام sqlCipherOpenConnection وتعيين كلمة المرور",
+            "dependencies": [
+              7
+            ],
+            "details": "استخدام sqlCipherOpenConnection() بدلاً من openConnection() وتعيين كلمة المرور من Supabase auth token في عملية التهيئة",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "إنشاء جدول sync_queue في Drift",
+            "description": "تعريف جدول sync_queue في قاعدة البيانات مع الحقول المطلوبة",
+            "dependencies": [
+              7
+            ],
+            "details": "تعريف جدول SyncQueueItem في Drift بحقول id, entityId, entityType, operationType, payload, attemptCount, createdAt, lastAttemptAt",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "إنشاء Singleton Instance لقاعدة البيانات",
+            "description": "تطبيق نمط Singleton لـ AppDatabase وتنفيذ التهيئة مع التشفير",
+            "dependencies": [
+              8,
+              9
+            ],
+            "details": "إنشاء فئة AppDatabase بـ Singleton pattern مع getter للـ database instance وتنفيذ initialize() method باستخدام sqlCipherOpenConnection",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-04-15T13:23:10.209Z"
+      },
+      {
+        "id": "13",
+        "title": "تطبيق آلية Queue Collapse لمنع انفجار قائمة الانتظار",
+        "description": "منع تراكم عمليات متعددة على نفس المعاملة في قائمة الانتظار بدمج التحديثات المتكررة قبل الإرسال للسيرفر",
+        "details": "الخطوات المطلوبة:\n\n1. إنشاء TransactionRepository في mobile/fajrak_flutter/lib/services/repositories/transaction_repository.dart:\n   ```dart\n   class TransactionRepository {\n     final AppDatabase _db;\n     \n     Future<void> _enqueueUpdate(String entityId, Map<String, dynamic> payload) async {\n       // تحقق من وجود pending_create لنفس entityId\n       final existing = await _db.syncQueueItems\n         .select()\n         .where((q) => q.entityId.equals(entityId))\n         .get();\n       \n       if (existing.isNotEmpty) {\n         // دمج الـ payload بدلاً من إضافة صف جديد\n         final merged = {...existing.first.payload, ...payload};\n         await _db.syncQueueItems.update(existing.first.id).go(\n           SyncQueueItem(\n             payload: merged,\n             attemptCount: 0, // reset للعودة إلى البداية\n           ),\n         );\n       } else {\n         // إضافة صف جديد\n         await _db.syncQueueItems.insert(SyncQueueItem(\n           entityId: entityId,\n           operationType: 'update',\n           payload: payload,\n           attemptCount: 0,\n           createdAt: DateTime.now(),\n         ));\n       }\n     }\n   }\n   ```\n\n2. إضافة index إلى جدول sync_queue في Drift:\n   ```dart\n   @DataClass()\n   class SyncQueueItem {\n     // ...\n   }\n   \n   class SyncQueue extends Table {\n     TextColumn get entityId => text();\n     TextColumn get operationType => text();\n     \n     @override\n     List<Set<Column>>? get uniqueKeys => [\n       {entityId, operationType}, // منع تكرار same entity + operation\n     ];\n   }\n   ```\n\n3. تحديث create و update operations في TransactionRepository:\n   - استدعاء _enqueueUpdate() عند حفظ معاملة\n   - استخدام UPSERT logic بدلاً من INSERT دائماً\n\n4. إنشاء unit tests في mobile/fajrak_flutter/test/repositories/transaction_repository_test.dart:\n   ```dart\n   test('10 تعديلات على نفس المعاملة ينتج صف واحد فقط', () async {\n     final repo = TransactionRepository(mockDb);\n     final txId = 'tx-123';\n     \n     // تعديل 10 مرات\n     for (int i = 0; i < 10; i++) {\n       await repo.updateTransaction(txId, {'amount': 100 + i});\n     }\n     \n     // التحقق من أن القائمة تحتوي على صف واحد فقط\n     final queue = await mockDb.syncQueueItems.select().get();\n     expect(queue.length, 1);\n     expect(queue.first.payload['amount'], 109); // آخر تحديث\n   });\n   ```",
+        "testStrategy": "1. اختبار unit: دمج 10 تحديثات على نفس المعاملة → صف واحد في القائمة\n2. اختبار unit: دمج create ثم multiple updates → صف واحد مع payload محدث\n3. اختبار unit: دمج عمليات من entities مختلفة → أصفار منفصلة\n4. اختبار unit: reset attemptCount عند دمج تحديث جديد\n5. اختبار integration: إنشاء معاملة، تعديل 20 مرة offline، التحقق من صف واحد يُرسل\n6. اختبار performance: 100 معاملة × 10 تعديلات لكل واحدة → تأكيد دمج صحيح",
+        "priority": "high",
+        "dependencies": [
+          "12"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "إنشاء TransactionRepository مع آلية Queue Collapse",
+            "description": "إنشاء ملف TransactionRepository في المسار المطلوب وتطبيق منطق الدمج عند إضافة تحديثات متكررة",
+            "dependencies": [],
+            "details": "إنشاء ملف في mobile/fajrak_flutter/lib/services/repositories/transaction_repository.dart وتنفيذ دالة _enqueueUpdate التي تتحقق من وجود صف موجود لنفس entityId وتدمج الـ payload بدلاً من إضافة صف جديد",
+            "status": "done",
+            "testStrategy": "اختبار unit: دمج 10 تحديثات على نفس المعاملة → صف واحد في القائمة",
+            "updatedAt": "2026-04-15T15:03:30.016Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "إضافة index إلى جدول sync_queue في Drift",
+            "description": "تعديل جدول SyncQueue لإضافة unique key لمنع تكرار نفس المعاملة مع نفس نوع العملية",
+            "dependencies": [],
+            "details": "تحديث ملف Drift database لتعريف uniqueKeys في جدول SyncQueue يشمل entityId و operationType لمنع تكرار نفس المعاملة مع نفس نوع العملية",
+            "status": "done",
+            "testStrategy": "اختبار unit: دمج عمليات من entities مختلفة → أصفار منفصلة",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T15:03:59.218Z"
+          },
+          {
+            "id": 3,
+            "title": "تحديث create و update operations في TransactionRepository",
+            "description": "تعديل وظائف الإنشاء والتحديث لاستخدام آلية Queue Collapse بدلاً من INSERT دائمًا",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "تحديث دوال createTransaction و updateTransaction في TransactionRepository لاستخدام _enqueueUpdate بدلاً من INSERT مباشر، وتطبيق منطق UPSERT عند الحاجة\n<info added on 2026-04-15T15:06:07.204Z>\nتمت المهمة. تطبق TransactionRepository عمليات الإنشاء والتحديث مع منطق Queue Collapse بالفعل.\n</info added on 2026-04-15T15:06:07.204Z>",
+            "status": "done",
+            "testStrategy": "اختبار unit: دمج create ثم multiple updates → صف واحد مع payload محدث",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T15:04:30.897Z"
+          },
+          {
+            "id": 4,
+            "title": "كتابة unit tests لاختبار آلية Queue Collapse",
+            "description": "إنشاء ملف اختبارات unit لاختبار سلوك آلية Queue Collapse عند الدمج",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "إنشاء ملف في mobile/fajrak_flutter/test/repositories/transaction_repository_test.dart وكتابة اختبارات تحقق من أن 10 تحديثات على نفس المعاملة تنتج صف واحد فقط، مع اختبارات إضافية لحالات مختلفة",
+            "status": "done",
+            "testStrategy": "اختبار unit: reset attemptCount عند دمج تحديث جديد",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T15:04:30.864Z"
+          },
+          {
+            "id": 5,
+            "title": "اختبار integration لآلية Queue Collapse",
+            "description": "إجراء اختبارات تكاملية لتأكيد عمل آلية Queue Collapse في سياق كامل",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "إجراء اختبارات تكاملية تحقق من أن آلية Queue Collapse تعمل بشكل صحيح في سياق كامل، من إنشاء المعاملة إلى التعديلات المتعددة، مع التحقق من أن عدد الصفوف في القائمة يبقى ثابتاً عند الدمج",
+            "status": "done",
+            "testStrategy": "اختبار integration: إنشاء معاملة، تحديثها عدة مرات → صف واحد في القائمة مع payload محدث",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T15:06:46.345Z"
+          }
+        ],
+        "updatedAt": "2026-04-15T15:06:46.345Z"
+      },
+      {
+        "id": "14",
+        "title": "إصلاح معضلة Delete/Create Race و ترتيب العمليات",
+        "description": "ضمان إرسال العمليات بالترتيب الصحيح (create → update → delete) ومنع حذف المعاملات غير المرسلة بعد للسيرفر",
+        "details": "الخطوات المطلوبة:\n\n1. تعديل _enqueueDelete() في TransactionRepository:\n   ```dart\n   Future<void> deleteTransaction(String entityId) async {\n     // تحقق من وجود pending_create لنفس entityId\n     final pendingCreate = await _db.syncQueueItems\n       .select()\n       .where((q) => q.entityId.equals(entityId) & q.operationType.equals('create'))\n       .getSingleOrNull();\n     \n     if (pendingCreate != null) {\n       // الصف لم يصل Supabase بعد → احذف من الـ DB محلياً فقط\n       await _db.transactions.delete().where((t) => t.id.equals(entityId)).go();\n       await _db.syncQueueItems.delete().where((q) => q.id.equals(pendingCreate.id)).go();\n       return; // لا تُضف delete إلى القائمة\n     }\n     \n     // إذا لم يكن pending_create، احذف جميع العمليات السابقة لنفس entityId\n     await _db.syncQueueItems\n       .delete()\n       .where((q) => q.entityId.equals(entityId))\n       .go();\n     \n     // أضف delete operation\n     await _db.syncQueueItems.insert(SyncQueueItem(\n       entityId: entityId,\n       operationType: 'delete',\n       payload: {},\n       attemptCount: 0,\n       createdAt: DateTime.now(),\n     ));\n   }\n   ```\n\n2. إنشاء _processQueue() في SyncService:\n   ```dart\n   Future<void> _processQueue() async {\n     // ترتيب العمليات: creates أولاً ← updates ثانياً ← deletes أخيراً\n     final items = await _db.syncQueueItems\n       .select()\n       .orderBy([/* order by operation_type */])\n       .get();\n     \n     final ordered = <SyncQueueItem>[];\n     ordered.addAll(items.where((i) => i.operationType == 'create'));\n     ordered.addAll(items.where((i) => i.operationType == 'update'));\n     ordered.addAll(items.where((i) => i.operationType == 'delete'));\n     \n     for (final item in ordered) {\n       await _processSingleItem(item);\n     }\n   }\n   ```\n\n3. تطبيق exponential backoff للمحاولات الفاشلة:\n   ```dart\n   Future<void> _processSingleItem(SyncQueueItem item) async {\n     try {\n       // استدعاء Supabase\n       await _syncToSupabase(item);\n       // حذف من القائمة بعد النجاح\n       await _db.syncQueueItems.delete().where((i) => i.id.equals(item.id)).go();\n     } catch (e) {\n       // زيادة attemptCount وحفظ آخر محاولة\n       final newAttemptCount = item.attemptCount + 1;\n       if (newAttemptCount <= 5) {\n         final backoffMs = 1000 * (2 ^ (newAttemptCount - 1)); // exponential\n         await _db.syncQueueItems.update(item.id).go(\n           item.copyWith(attemptCount: newAttemptCount, lastAttemptAt: DateTime.now()),\n         );\n       } else {\n         // 5 محاولات فاشلة → حفظ للمراجعة اليدوية (error_log table)\n         await _recordFailedSync(item, e);\n       }\n       rethrow;\n     }\n   }\n   ```\n\n4. إضافة unit test:\n   ```dart\n   test('create offline → delete offline → لا يُرسل شيء', () async {\n     final repo = TransactionRepository(mockDb);\n     final txId = 'tx-new';\n     \n     // إنشاء معاملة\n     await repo.createTransaction({...});\n     var queue = await mockDb.syncQueueItems.select().get();\n     expect(queue.length, 1);\n     expect(queue.first.operationType, 'create');\n     \n     // حذف المعاملة\n     await repo.deleteTransaction(txId);\n     queue = await mockDb.syncQueueItems.select().get();\n     \n     // يجب أن تكون القائمة فارغة (delete قبل create = لا شيء)\n     expect(queue.length, 0);\n   });\n   ```",
+        "testStrategy": "1. اختبار unit: create offline → delete offline → القائمة فارغة\n2. اختبار unit: عمليات متعددة مرتبة: [update1, delete, create] → تُعاد ترتيبها إلى [create, update1, delete]\n3. اختبار unit: حذف معاملة موجودة بالفعل → إضافة delete إلى القائمة\n4. اختبار unit: exponential backoff على 5 محاولات فاشلة\n5. اختبار integration: create + update + delete بنجاح على الإنترنت → جميع العمليات مُرسلة\n6. اختبار integration: create + update + delete مع فشل + retry → استمرار آلي بعد استعادة الاتصال",
+        "priority": "high",
+        "dependencies": [
+          "12",
+          "13"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "تعديل دالة deleteTransaction في TransactionRepository",
+            "description": "تحقق من وجود pending_create لنفس entityId قبل delete، واحذف محلياً دون إض��فة للقائمة إذا كان هنالك create pending",
+            "dependencies": [],
+            "details": "تعديل deleteTransaction في TransactionRepository:\n1. تحقق من وجود pending_create لنفس entityId في syncQueueItems\n2. إذا وجد: احذف من DB محلياً + احذف الـ create من القائمة ولا تضيف delete\n3. إذا لم يوجد: احذف جميع العمليات السابقة لنفس entityId وأضف delete operation\n4. استخدم Drift query syntax المناسب",
+            "status": "done",
+            "testStrategy": "وحدة اختبار: create offline → delete offline → القائمة فارغة",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:01:48.001Z"
+          },
+          {
+            "id": 2,
+            "title": "إنشاء دالة _processQueue في SyncService",
+            "description": "إنشاء دالة لترتيب العمليات (create → update → delete) قبل الإرسال إلى Supabase",
+            "dependencies": [
+              1
+            ],
+            "details": "إنشاء _processQueue() في SyncService:\n1. جلب جميع items من syncQueueItems\n2. ترتيب: creates أولاً ثم updates ثم deletes\n3. تنفيذ كل item بالتسلسل\n4. استخدام نفس الترتيب في fetch من قاعدة البيانات",
+            "status": "done",
+            "testStrategy": "وحدة اختبار: [update, delete, create] → تُعاد ترتيبها إلى [create, update, delete]",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:02:21.716Z"
+          },
+          {
+            "id": 3,
+            "title": "تطبيق exponential backoff للمحاولات الفاشلة",
+            "description": "تنفيذ exponential backoff مع最多 5 محاولات قبل تسجيل الفشل للمراجعة اليدوية",
+            "dependencies": [
+              2
+            ],
+            "details": "تطبيق exponential backoff في _processSingleItem:\n1. زيادة attemptCount مع كل فشل\n2. حساب backoff time: 1000 * 2^(attemptCount-1)\n3. بعد 5 محاولات فاشلة: حفظ في error_log للمراجعة اليدوية\n4. تحديث lastAttemptAt في كل محاولة",
+            "status": "done",
+            "testStrategy": "وحدة اختبار: exponential backoff على 5 محاولات فاشلة",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:02:21.723Z"
+          },
+          {
+            "id": 4,
+            "title": "إضافة اختبارات وحدة شاملة",
+            "description": "إنشاء اختبارات وحدة تغطي جميع السيناريوهات: delete/create race, ordering, backoff",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "إضافة اختبارات في __tests__/:\n1. create offline → delete offline → القائمة فارغة\n2. عمليات متعددة مرتبة\n3. delete لمعاملة موجودة → إضافة delete\n4. exponential backoff\n5. integration: create+update+delete online",
+            "status": "done",
+            "testStrategy": "تشغيل flutter test + ensure all pass",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-15T17:02:21.730Z"
+          },
+          {
+            "id": 5,
+            "title": "تشغيل flutter doctor والتحقق من الـ lint",
+            "description": "تشغيل flutter analyze و flutter test للتأكد من عدم وجود أخطاء أو تحذيرات",
+            "dependencies": [
+              4
+            ],
+            "details": "تشغيل workflow:\n1. flutter analyze\n2. flutter test\n3. make doctor\n4. حل أي issues تظهر",
+            "status": "pending",
+            "testStrategy": "flutter analyze zero warnings, flutter test all pass",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2026-04-15T17:02:40.564Z"
+      },
+      {
+        "id": "17",
+        "title": "إضافة شارات حالة المزامنة (Sync Status Badges) في الواجهة",
+        "description": "عرض مؤشرات بصرية للمستخدم تشير إلى حالة مزامنة المعاملات (معلقة، مزامنة، فشل) مع إمكانية سحب للتحديث اليدوي",
+        "details": "الخطوات المطلوبة:\n\n1. تحديث TransactionListItem widget في mobile/fajrak_flutter/lib/widgets/transactions/transaction_list_item.dart:\n   ```dart\n   class TransactionListItem extends StatelessWidget {\n     final Map<String, dynamic> transaction;\n     final String? syncStatus; // 'pending_create', 'pending_update', 'pending_delete', 'synced', 'failed'\n     final String currency;\n     final ColorScheme colorScheme;\n     final Function(String) onDelete;\n     final Function(Map<String, dynamic>) onTap;\n     \n     @override\n     Widget build(BuildContext context) {\n       final isIncome = transaction['type'] == 'income';\n       final amount = (transaction['amount'] as num).toDouble();\n       final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);\n       \n       // تحديد أيقونة ولون المزامنة\n       Widget? syncBadge;\n       if (syncStatus == 'pending_create' || syncStatus == 'pending_update') {\n         syncBadge = Tooltip(\n           message: 'قيد الانتظار',\n           child: Icon(Icons.cloud_upload, size: 16, color: Colors.orange[600]),\n         );\n       } else if (syncStatus == 'pending_delete') {\n         syncBadge = Tooltip(\n           message: 'حذف قيد الانتظار',\n           child: Icon(Icons.delete_outline, size: 16, color: Colors.red[600]),\n         );\n       } else if (syncStatus == 'failed') {\n         syncBadge = Tooltip(\n           message: 'فشلت المزامنة',\n           child: Icon(Icons.error_outline, size: 16, color: Colors.red),\n         );\n       }\n       // syncStatus == 'synced' أو null → لا أيقونة\n       \n       return Dismissible(\n         key: Key(transaction['id'].toString()),\n         // ... باقي الـ widget ...\n         child: ListTile(\n           leading: CircleAvatar(\n             // ... category icon ...\n           ),\n           title: Text(transaction['category']),\n           subtitle: Text(transaction['description'] ?? ''),\n           trailing: Row(\n             mainAxisSize: MainAxisSize.min,\n             children: [\n               if (syncBadge != null) syncBadge,\n               SizedBox(width: 8),\n               Text('$currency $amount'),\n             ],\n           ),\n           onTap: () => onTap(transaction),\n         ),\n       );\n     }\n   }\n   ```\n\n2. تحديث TransactionsScreen لعرض عدد العمليات المعلقة:\n   ```dart\n   class TransactionsScreen extends StatefulWidget {\n     // ...\n   }\n   \n   class _TransactionsScreenState extends State<TransactionsScreen> {\n     late StreamSubscription<List<SyncQueueItem>> _syncQueueSubscription;\n     int _pendingCount = 0;\n     \n     @override\n     void initState() {\n       super.initState();\n       \n       // مراقبة قائمة المزامنة\n       _syncQueueSubscription = AppDatabase()\n         .syncQueueItems\n         .select()\n         .watch()\n         .listen((items) {\n         setState(() => _pendingCount = items.length);\n       });\n     }\n     \n     @override\n     void dispose() {\n       _syncQueueSubscription.cancel();\n       super.dispose();\n     }\n     \n     @override\n     Widget build(BuildContext context) {\n       return Scaffold(\n         appBar: AppBar(\n           title: Column(\n             crossAxisAlignment: CrossAxisAlignment.start,\n             children: [\n               Text('المعاملات'),\n               if (_pendingCount > 0)\n                 Text(\n                   '$_pendingCount قيد الانتظار',\n                   style: Theme.of(context).textTheme.bodySmall?.copyWith(\n                     color: Colors.orange[600],\n                   ),\n                 ),\n             ],\n           ),\n           actions: [\n             if (_pendingCount > 0)\n               Padding(\n                 padding: EdgeInsets.all(16),\n                 child: Center(\n                   child: Tooltip(\n                     message: 'اسحب للتحديث',\n                     child: Badge(\n                       label: Text(_pendingCount.toString()),\n                       backgroundColor: Colors.orange[600],\n                       child: Icon(Icons.cloud_upload),\n                     ),\n                   ),\n                 ),\n               ),\n           ],\n         ),\n         body: RefreshIndicator(\n           onRefresh: () async {\n             // تشغيل مزامنة يدوية\n             final syncService = SyncService(AppDatabase(), Supabase.instance.client);\n             await syncService.syncPendingQueue();\n           },\n           child: TransactionList(\n             transactions: _transactions,\n             syncStatuses: _syncStatuses, // خريطة من ID إلى sync status\n           ),\n         ),\n       );\n     }\n   }\n   ```\n\n3. تحديث add_transaction_dialog.dart لحفظ في قاعدة البيانات المحلية:\n   ```dart\n   class AddTransactionDialog extends StatefulWidget {\n     // ...\n   }\n   \n   class _AddTransactionDialogState extends State<AddTransactionDialog> {\n     bool _saving = false;\n     \n     Future<void> _saveTransaction() async {\n       if (_saving) return; // guard clause\n       \n       setState(() => _saving = true);\n       try {\n         final user = Supabase.instance.client.auth.currentUser!;\n         final data = {\n           'user_id': user.id,\n           'type': _typeController.value,\n           'amount': baseAmount,\n           // ... باقي البيانات\n         };\n         \n         // حفظ في قاعدة البيانات المحلية أولاً\n         final txId = widget.existing?['id'] ?? uuid.v4();\n         await AppDatabase().transactions.insertOnConflictUpdate(\n           TransactionCompanion.insert(\n             id: txId,\n             userId: user.id,\n             type: data['type'],\n             amount: data['amount'],\n             // ...\n           ),\n         );\n         \n         // إضافة إلى قائمة المزامنة\n         final repo = TransactionRepository(AppDatabase());\n         if (widget.existing != null) {\n           await repo.updateTransaction(txId, data);\n         } else {\n           await repo.createTransaction(data);\n         }\n         \n         widget.onSaved();\n         if (mounted) Navigator.pop(context);\n       } catch (e) {\n         if (mounted) {\n           ScaffoldMessenger.of(context).showSnackBar(\n             SnackBar(content: Text(e.toString())),\n           );\n         }\n       } finally {\n         if (mounted) setState(() => _saving = false);\n       }\n     }\n   }\n   ```\n\n4. إضافة pull-to-refresh في جميع شاشات البيانات (transactions, debts, investments, goals, budgets):\n   ```dart\n   RefreshIndicator(\n     onRefresh: () => _triggerSync(),\n     child: ListView(...),\n   )\n   ```",
+        "testStrategy": "1. اختبار widget: شارة pending_create تعرض أيقونة برتقالية\n2. اختبار widget: شارة pending_delete تعرض أيقونة حمراء\n3. اختبار widget: معاملة synced لا تظهر أي شارة\n4. اختبار widget: عدد العمليات المعلقة يُحدَّث تلقائياً\n5. اختبار integration: إنشاء معاملة offline → تظهر badge pending\n6. اختبار integration: pull-to-refresh يُشغّل sync ويُزيل الـ badges\n7. اختبار accessibility: كل الأيقونات لها aria-label أو tooltip",
+        "priority": "medium",
+        "dependencies": [
+          "12",
+          "13",
+          "14",
+          "15"
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": "18",
+        "title": "تأكيد أمان userId وإضافة تشفير SQLCipher على Drift",
+        "description": "التحقق النهائي من أن جميع Models تستخدم userId من Supabase Auth بدلاً من parameters، وتطبيق التشفير على قاعدة البيانات المحلية",
+        "details": "الخطوات المطلوبة:\n\n1. تدقيق جميع models و services لضمان userId الصحيح:\n   ```dart\n   // ✅ CORRECT\n   final user = Supabase.instance.client.auth.currentUser!;\n   await _db.from('transactions').insert({'user_id': user.id, ...});\n   \n   // ❌ INCORRECT (تم البحث عنها وإزالتها)\n   // لا يمكن تمرير userId كـ parameter من الشاشة\n   ```\n\n2. البحث في كل الملفات عن patterns خطيرة:\n   ```bash\n   grep -r \"userId.*widget\\.\\|userId.*parameter\\|userId.*argument\" mobile/fajrak_flutter/lib/\n   grep -r \"from('transactions')\" mobile/fajrak_flutter/lib/ | grep -v \"currentUser\"\n   ```\n\n3. التحقق من RLS policies في Supabase:\n   ```sql\n   -- تشغيل الاستعلام التالي في Supabase SQL Editor\n   SELECT \n     tablename,\n     policyname,\n     qual,\n     with_check\n   FROM pg_policies\n   WHERE schemaname = 'public';\n   \n   -- يجب أن تحتوي جميع الـ policies على: auth.uid() = user_id\n   -- أو: auth.uid() = (SELECT user_id FROM table WHERE id = ...)\n   ```\n\n4. تطبيق التشفير SQLCipher:\n   ```dart\n   // في AppDatabase.initialize()\n   import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';\n   \n   Future<void> initialize() async {\n     // الحصول على كلمة المرور من Supabase auth session\n     final user = Supabase.instance.client.auth.currentUser;\n     if (user == null) throw Exception('User not authenticated');\n     \n     // استخدام JWT token الثابت للمستخدم كـ encryption key\n     // (أو جزء منه)\n     final authSession = await Supabase.instance.client.auth.getSession();\n     final encryptionKey = authSession.session?.accessToken ?? '';\n     \n     // تشفير قاعدة البيانات\n     final db = await openDriftDatabase(\n       encryptionKey: encryptionKey,\n       path: 'fajrak.db',\n     );\n     \n     _instance._db = db;\n   }\n   ```\n\n5. كتابة security audit checklist:\n   ```markdown\n   # Security Checklist\n   \n   - [ ] جميع INSERT operations تستخدم `currentUser!.id` من Supabase Auth\n   - [ ] جميع UPDATE operations تحتوي على WHERE clause: `WHERE user_id = currentUser.id`\n   - [ ] جميع DELETE operations تحتوي على WHERE clause: `WHERE user_id = currentUser.id`\n   - [ ] كل RLS policy تحتوي على: `WITH CHECK (auth.uid() = user_id)`\n   - [ ] قاعدة البيانات المحلية مشفرة مع SQLCipher\n   - [ ] لا يوجد hardcoded user IDs أو emails\n   - [ ] shared_preferences لا تحتوي على sensitive data (passwords, tokens)\n   - [ ] API keys محفوظة في .env فقط\n   ```\n\n6. إنشاء unit test للتحقق من الأمان:\n   ```dart\n   test('userId يأتي دائماً من currentUser وليس كـ parameter', () async {\n     final user = Supabase.instance.client.auth.currentUser!;\n     \n     // حاول تمرير userId مختلف (يجب أن يفشل أو يتم تجاهله)\n     final maliciousUserId = 'hack-123';\n     \n     await TransactionRepository(_db).createTransaction(\n       userId: maliciousUserId, // ❌ يجب أن يكون معامل غير موجود\n       data: {...},\n     );\n     \n     // التحقق من أن المعاملة محفوظة بـ user.id الحقيقي\n     final saved = await _db.transactions.select().getSingle();\n     expect(saved.userId, user.id);\n     expect(saved.userId, isNot(maliciousUserId));\n   });\n   ```\n\n7. توثيق الترتيب الآمن في CLAUDE.md:\n   ```markdown\n   ## Security Principles - Mobile\n   \n   1. **userId Source**: ALWAYS from `Supabase.instance.client.auth.currentUser!.id`\n   2. **No Direct Parameter**: Never pass userId as function parameter\n   3. **RLS Protection**: All Supabase policies use `WITH CHECK (auth.uid() = user_id)`\n   4. **Local Encryption**: SQLCipher protects local database\n   5. **Auth First**: Verify Supabase auth token before any database operation\n   ```",
+        "testStrategy": "1. اختبار unit: تأكيد أن جميع repositories تستخدم currentUser.id\n2. اختبار unit: تمرير userId مختلف لا يُؤثر على البيانات المحفوظة\n3. اختبار security: التحقق من RLS policies عبر Supabase API\n4. اختبار encryption: محاولة قراءة قاعدة البيانات بدون كلمة مرور تفشل\n5. اختبار integration: دورة كاملة من auth → create → verify userId صحيح\n6. اختبار compliance: مراجعة يدوية للـ code باستخدام checklist الأمان",
+        "priority": "high",
+        "dependencies": [
+          "12"
+        ],
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-04-15T13:28:00.578Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-15T00:22:10.742Z",
-      "taskCount": 11,
-      "completedCount": 7,
+      "lastModified": "2026-04-15T19:12:54.413Z",
+      "taskCount": 16,
+      "completedCount": 12,
       "tags": [
         "master"
       ]

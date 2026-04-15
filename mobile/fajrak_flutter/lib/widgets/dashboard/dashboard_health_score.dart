@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -48,7 +49,7 @@ class _DashboardHealthScoreState extends State<DashboardHealthScore> {
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.score >= 80 ? const Color(0xFF10B981) : widget.score >= 60 ? widget.colorScheme.primary : widget.score >= 40 ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
+    final color = widget.score >= 80 ? AppColors.success : widget.score >= 60 ? widget.colorScheme.primary : widget.score >= 40 ? AppColors.warning : AppColors.error;
     final label = widget.score >= 80 ? 'health_excellent'.tr() : widget.score >= 60 ? 'health_good'.tr() : widget.score >= 40 ? 'health_fair'.tr() : 'health_poor'.tr();
 
     return Container(

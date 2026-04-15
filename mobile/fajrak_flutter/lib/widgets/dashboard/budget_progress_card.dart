@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class BudgetProgressCard extends StatelessWidget {
@@ -22,10 +23,10 @@ class BudgetProgressCard extends StatelessWidget {
         income > 0 ? (expenses / income).clamp(0.0, 1.0) : 0.0;
     final isDark = theme.brightness == Brightness.dark;
     final Color progressColor = percentage > 0.9
-        ? (isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626))
+        ? (isDark ? AppColors.error : const Color(0xFFDC2626))
         : percentage > 0.7
-            ? (isDark ? const Color(0xFFF59E0B) : const Color(0xFFD97706))
-            : (isDark ? const Color(0xFF10B981) : const Color(0xFF059669));
+            ? (isDark ? AppColors.warning : const Color(0xFFD97706))
+            : (isDark ? AppColors.success : AppColors.successDark);
 
     return Container(
       padding: const EdgeInsets.all(16),

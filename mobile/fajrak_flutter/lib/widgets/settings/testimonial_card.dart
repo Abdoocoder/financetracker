@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -94,7 +95,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
               'testimonial_success'.tr(),
               style: const TextStyle(fontFamily: 'Cairo'),
             ),
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: AppColors.success,
           ),
         );
       }
@@ -106,7 +107,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
               'testimonial_error'.tr(),
               style: const TextStyle(fontFamily: 'Cairo'),
             ),
-            backgroundColor: const Color(0xFFEF4444),
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -193,18 +194,18 @@ class _TestimonialCardState extends State<TestimonialCard> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withValues(alpha: 0.1),
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+        color: AppColors.success.withValues(alpha: 0.1),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
-          const Icon(Icons.celebration, size: 32, color: Color(0xFF10B981)),
+          const Icon(Icons.celebration, size: 32, color: AppColors.success),
           const SizedBox(height: 8),
           Text(
             'testimonial_thankyou'.tr(),
             style: const TextStyle(
-              color: Color(0xFF10B981),
+              color: AppColors.success,
               fontWeight: FontWeight.w800,
               fontFamily: 'Cairo',
               fontSize: 14,
@@ -251,7 +252,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 padding: const EdgeInsets.only(right: 6),
                 child: Icon(
                   starNum <= _stars ? Icons.star : Icons.star_border,
-                  color: starNum <= _stars ? const Color(0xFFF59E0B) : colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                  color: starNum <= _stars ? AppColors.warning : colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                   size: 32,
                 ),
               ),
@@ -359,7 +360,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
             Text(
               '${_textCtrl.text.length}/20+',
               style: TextStyle(
-                color: _textCtrl.text.length < 20 ? colorScheme.error : const Color(0xFF10B981),
+                color: _textCtrl.text.length < 20 ? colorScheme.error : AppColors.success,
                 fontFamily: 'Cairo',
                 fontSize: 12,
               ),
@@ -396,7 +397,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           child: ElevatedButton(
             onPressed: (!canSubmit || _saving) ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: canSubmit ? const Color(0xFFF59E0B) : colorScheme.outlineVariant,
+              backgroundColor: canSubmit ? AppColors.warning : colorScheme.outlineVariant,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -420,7 +421,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
             child: Text(
               'testimonial_existing_notice'.tr(),
               style: const TextStyle(
-                color: Color(0xFFF59E0B),
+                color: AppColors.warning,
                 fontFamily: 'Cairo',
                 fontWeight: FontWeight.bold,
                 fontSize: 12,

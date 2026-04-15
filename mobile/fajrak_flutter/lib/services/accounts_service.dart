@@ -4,8 +4,11 @@ import 'package:uuid/uuid.dart';
 class AccountsService {
   static SupabaseClient get _db => Supabase.instance.client;
 
+  static String get _uid => _db.auth.currentUser!.id;
+
   /// جلب الحسابات مع حساب الرصيد باستخدام RPC المركزية
-  static Future<List<Map<String, dynamic>>> fetchAccounts(String userId) async {
+  static Future<List<Map<String, dynamic>>> fetchAccounts() async {
+    final userId = _uid;
     // جلب بيانات الحسابات الأساسية
     final accounts = await _db
         .from('accounts')
@@ -32,7 +35,6 @@ class AccountsService {
   }
 
   static Future<void> createAccount({
-    required String userId,
     required String name,
     required String type,
     required double openingBalance,
@@ -42,7 +44,7 @@ class AccountsService {
     bool isDefault = false,
   }) async {
     await _db.from('accounts').insert({
-      'user_id': userId,
+      'user_id': _uid,
       'name': name,
       'type': type,
       'opening_balance': openingBalance,
@@ -62,7 +64,6 @@ class AccountsService {
   }
 
   static Future<void> transfer({
-    required String userId,
     required String fromAccountId,
     required String toAccountId,
     required double amount,
@@ -71,7 +72,7 @@ class AccountsService {
   }) async {
     final pairId = const Uuid().v4();
     await _db.from('transactions').insert({
-      'user_id': userId,
+      'user_id': _uid,
       'type': 'transfer',
       'amount': amount,
       'category': 'تحويل',

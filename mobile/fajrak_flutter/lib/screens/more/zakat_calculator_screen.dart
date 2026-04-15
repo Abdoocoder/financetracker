@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -276,8 +277,8 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                   final overdue = days < 0;
                   final urgent = !overdue && days <= 30;
                   final soon = !overdue && days > 30 && days <= 60;
-                  final color = overdue ? const Color(0xFFEF4444) : urgent ? const Color(0xFFF59E0B) : soon ? cs.primary : const Color(0xFF10B981);
-                  final bgColor = overdue ? const Color(0xFFEF4444).withValues(alpha: 0.06) : urgent ? const Color(0xFFF59E0B).withValues(alpha: 0.06) : cs.surfaceContainerHighest;
+                  final color = overdue ? AppColors.error : urgent ? AppColors.warning : soon ? cs.primary : AppColors.success;
+                  final bgColor = overdue ? AppColors.error.withValues(alpha: 0.06) : urgent ? AppColors.warning.withValues(alpha: 0.06) : cs.surfaceContainerHighest;
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -300,9 +301,9 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: const Color(0xFFF59E0B).withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.25))),
+                  decoration: BoxDecoration(color: AppColors.warning.withValues(alpha: 0.08), borderRadius: BorderRadius.circular(10), border: Border.all(color: AppColors.warning.withValues(alpha: 0.25))),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Icon(Icons.lightbulb_outline, size: 14, color: Color(0xFFF59E0B)),
+                    const Icon(Icons.lightbulb_outline, size: 14, color: AppColors.warning),
                     const SizedBox(width: 6),
                     Expanded(child: Text('zakat_haul_purchase_tip'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant, height: 1.5))),
                   ]),
@@ -316,18 +317,18 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
           Container(
             width: double.infinity, padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: _eligible ? const Color(0xFF10B981).withValues(alpha: 0.06) : cs.surface,
+              color: _eligible ? AppColors.success.withValues(alpha: 0.06) : cs.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _eligible ? const Color(0xFF10B981).withValues(alpha: 0.3) : cs.outlineVariant),
+              border: Border.all(color: _eligible ? AppColors.success.withValues(alpha: 0.3) : cs.outlineVariant),
             ),
             child: Column(children: [
               Text(_eligible ? 'zakat_due_msg'.tr() : 'zakat_below_nisab'.tr(),
                 style: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700,
-                  color: _eligible ? const Color(0xFF10B981) : cs.onSurfaceVariant)),
+                  color: _eligible ? AppColors.success : cs.onSurfaceVariant)),
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Text(_fmt(_zakatDue), style: TextStyle(fontFamily: 'Cairo', fontSize: 36, fontWeight: FontWeight.w900,
-                  color: _eligible ? const Color(0xFF10B981) : cs.onSurfaceVariant)),
+                  color: _eligible ? AppColors.success : cs.onSurfaceVariant)),
                 const SizedBox(width: 8),
                 Text(_currency, style: TextStyle(fontFamily: 'Cairo', fontSize: 14, color: cs.onSurfaceVariant)),
               ]),
@@ -394,9 +395,9 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: record['is_paid'] == true ? const Color(0xFF10B981).withValues(alpha: 0.06) : cs.surfaceContainerHighest,
+                    color: record['is_paid'] == true ? AppColors.success.withValues(alpha: 0.06) : cs.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: record['is_paid'] == true ? const Color(0xFF10B981).withValues(alpha: 0.25) : cs.outlineVariant),
+                    border: Border.all(color: record['is_paid'] == true ? AppColors.success.withValues(alpha: 0.25) : cs.outlineVariant),
                   ),
                   child: Row(children: [
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -411,7 +412,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                       child: Text(
                         record['is_paid'] == true ? 'zakat_paid'.tr() : 'zakat_unpaid'.tr(),
                         style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 11,
-                          color: record['is_paid'] == true ? const Color(0xFF10B981) : const Color(0xFFF59E0B)),
+                          color: record['is_paid'] == true ? AppColors.success : AppColors.warning),
                       ),
                     ),
                   ]),
@@ -425,11 +426,11 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFFF59E0B).withValues(alpha: 0.05),
+              color: AppColors.warning.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.2)),
+              border: Border.all(color: AppColors.warning.withValues(alpha: 0.2)),
             ),
-            child: Text('zakat_note'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Color(0xFFF59E0B), height: 1.6)),
+            child: Text('zakat_note'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.warning, height: 1.6)),
           ),
           const SizedBox(height: 80),
         ]),

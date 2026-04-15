@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../services/analytics_service.dart';
 import 'dart:developer' as dev;
@@ -32,7 +33,7 @@ class ErrorHandler {
               ),
             ],
           ),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           duration: const Duration(seconds: 4),
@@ -52,12 +53,12 @@ class ErrorHandler {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: AppColors.surface2,
         title: Text('error_dialog_title'.tr(),
             style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
         content: SingleChildScrollView(
           child: Text(message,
-              style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 13)),
+              style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Cairo', fontSize: 13)),
         ),
         actions: [
           TextButton(

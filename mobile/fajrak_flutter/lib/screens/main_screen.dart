@@ -72,7 +72,7 @@ class _MainScreenState extends State<MainScreen> {
           // Render a blank box until the tab is first visited — avoids
           // initializing all 5 screens on startup.
           if (!_visited[i]) return const SizedBox.shrink();
-          return RepaintBoundary(child: _screens[i]);
+          return _screens[i];
         }),
       ),
       bottomNavigationBar: MainBottomNavBar(

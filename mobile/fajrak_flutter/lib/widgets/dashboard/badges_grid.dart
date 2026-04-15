@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 
 class BadgesGrid extends StatelessWidget {
   final int score;
@@ -77,56 +78,51 @@ class BadgesGrid extends StatelessWidget {
                   fontFamily: 'Cairo',
                   fontSize: 13)),
         ),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 0.85,
-          ),
-          itemCount: badges.length,
-          itemBuilder: (context, index) {
-            final b = badges[index];
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: badges.map((b) {
             final bool isDone = b['done'] as bool;
-            return Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF0F1629),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: isDone
-                        ? const Color(0xFF10B981).withValues(alpha: 0.3)
-                        : const Color(0xFF1E293B)),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Opacity(
-                    opacity: isDone ? 1.0 : 0.2,
-                    child: Icon(b['icon'] as IconData,
-                        size: 28,
-                        color: isDone ? const Color(0xFF10B981) : const Color(0xFF64748B)),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(b['title'] as String,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color:
-                              isDone ? Colors.white : const Color(0xFF64748B),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 10,
-                          fontFamily: 'Cairo')),
-                  Text(b['desc'] as String,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          color: Color(0xFF475569),
-                          fontSize: 8,
-                          fontFamily: 'Cairo')),
-                ],
+            return SizedBox(
+              width: (MediaQuery.sizeOf(context).width - 32 - 16) / 3,
+              height: (MediaQuery.sizeOf(context).width - 32 - 16) / 3 / 0.85,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface0,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: isDone
+                          ? AppColors.success.withValues(alpha: 0.3)
+                          : AppColors.surface2),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Opacity(
+                      opacity: isDone ? 1.0 : 0.2,
+                      child: Icon(b['icon'] as IconData,
+                          size: 28,
+                          color: isDone ? AppColors.success : AppColors.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(b['title'] as String,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: isDone ? Colors.white : AppColors.textSecondary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            fontFamily: 'Cairo')),
+                    Text(b['desc'] as String,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: AppColors.textTertiary,
+                            fontSize: 8,
+                            fontFamily: 'Cairo')),
+                  ],
+                ),
               ),
             );
-          },
+          }).toList(),
         ),
       ],
     );

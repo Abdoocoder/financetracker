@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class DashboardStats extends StatelessWidget {
@@ -22,21 +23,21 @@ class DashboardStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Expanded(child: _statCard('dash_income'.tr(), income, const Color(0xFF10B981), '↑', colorScheme)),
+      Expanded(child: _statCard('dash_income'.tr(), income, AppColors.success, '↑', colorScheme)),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('dash_expenses'.tr(), expenses, const Color(0xFFEF4444), '↓', colorScheme)),
+      Expanded(child: _statCard('dash_expenses'.tr(), expenses, AppColors.error, '↓', colorScheme)),
       const SizedBox(width: 8),
       Expanded(child: _netCard(colorScheme)),
     ]);
   }
 
   Widget _netCard(ColorScheme colorScheme) {
-    final balColor = totalBalance >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final balColor = totalBalance >= 0 ? AppColors.success : AppColors.error;
     final monthlyNet = income - expenses;
-    final monthlyNetColor = monthlyNet >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final monthlyNetColor = monthlyNet >= 0 ? AppColors.success : AppColors.error;
     final hasCommitments = monthlyDebtCommitments > 0;
     final netAfterDebts = monthlyNet - monthlyDebtCommitments;
-    final netAfterColor = netAfterDebts >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final netAfterColor = netAfterDebts >= 0 ? AppColors.success : AppColors.error;
 
     return Container(
       padding: const EdgeInsets.all(12),

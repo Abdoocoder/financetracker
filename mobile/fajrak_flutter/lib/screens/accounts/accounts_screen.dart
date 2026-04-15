@@ -1,19 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/accounts_service.dart';
 import '../../widgets/common/skeleton_loader.dart';
 
 const _accountTypes = [
-  {'type': 'bank',        'icon': '🏦', 'labelKey': 'acc_type_bank',   'color': Color(0xFF3B7EF6)},
-  {'type': 'cash',        'icon': '💵', 'labelKey': 'acc_type_cash',   'color': Color(0xFF10B981)},
-  {'type': 'savings',     'icon': '🏛️', 'labelKey': 'acc_type_savings','color': Color(0xFF8B5CF6)},
-  {'type': 'credit_card', 'icon': '💳', 'labelKey': 'acc_type_credit', 'color': Color(0xFFEF4444)},
+  {'type': 'bank',        'icon': '🏦', 'labelKey': 'acc_type_bank',   'color': AppColors.primary},
+  {'type': 'cash',        'icon': '💵', 'labelKey': 'acc_type_cash',   'color': AppColors.success},
+  {'type': 'savings',     'icon': '🏛️', 'labelKey': 'acc_type_savings','color': AppColors.purple},
+  {'type': 'credit_card', 'icon': '💳', 'labelKey': 'acc_type_credit', 'color': AppColors.error},
 ];
 
 const _presetColors = [
-  Color(0xFF3B7EF6), Color(0xFF10B981), Color(0xFF8B5CF6),
-  Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF06B6D4),
+  AppColors.primary, AppColors.success, AppColors.purple,
+  AppColors.warning, AppColors.error, AppColors.cyan,
 ];
 
 Map<String, dynamic> _typeInfo(String type) =>
@@ -35,7 +36,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
   Future<void> _load() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
-    final data = await AccountsService.fetchAccounts(user.id);
+    final data = await AccountsService.fetchAccounts();
     if (mounted) setState(() { _accounts = data; _loading = false; });
   }
 
@@ -79,9 +80,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: _totalBalance >= 0 ? const Color(0xFF10B981).withValues(alpha: 0.08) : const Color(0xFFEF4444).withValues(alpha: 0.08),
+                      color: _totalBalance >= 0 ? AppColors.success.withValues(alpha: 0.08) : AppColors.error.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _totalBalance >= 0 ? const Color(0xFF10B981).withValues(alpha: 0.25) : const Color(0xFFEF4444).withValues(alpha: 0.25)),
+                      border: Border.all(color: _totalBalance >= 0 ? AppColors.success.withValues(alpha: 0.25) : AppColors.error.withValues(alpha: 0.25)),
                     ),
                     child: Column(children: [
                       Text('accounts_total_balance'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
@@ -89,7 +90,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       Text(
                         '${_totalBalance >= 0 ? '+' : '-'}${_fmt(_totalBalance)} $_currency',
                         style: TextStyle(
-                          color: _totalBalance >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                          color: _totalBalance >= 0 ? AppColors.success : AppColors.error,
                           fontFamily: 'monospace', fontSize: 32, fontWeight: FontWeight.w900,
                         ),
                       ),
@@ -186,7 +187,7 @@ class _AccountCard extends StatelessWidget {
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(
             '${bal >= 0 ? '+' : '-'}${fmt(bal)}',
-            style: TextStyle(color: bal >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444), fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 18),
+            style: TextStyle(color: bal >= 0 ? AppColors.success : AppColors.error, fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 18),
           ),
           Text(currency, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
         ]),
@@ -201,8 +202,8 @@ class _AccountCard extends StatelessWidget {
             const SizedBox(height: 4),
             GestureDetector(onTap: onDelete, child: Container(
               padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(color: const Color(0xFFEF4444).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-              child: const Icon(Icons.archive_outlined, size: 16, color: Color(0xFFEF4444)),
+              decoration: BoxDecoration(color: AppColors.error.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+              child: const Icon(Icons.archive_outlined, size: 16, color: AppColors.error),
             )),
           ],
         ]),
@@ -223,7 +224,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
   late TextEditingController _nameCtrl;
   late TextEditingController _balanceCtrl;
   String _type = 'bank';
-  Color _color = const Color(0xFF3B7EF6);
+  Color _color = AppColors.primary;
   String _icon = '🏦';
   bool _saving = false;
 
@@ -235,7 +236,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
     _balanceCtrl = TextEditingController(text: a?['opening_balance']?.toString() ?? '0');
     _type  = a?['type']  as String? ?? 'bank';
     _icon  = a?['icon']  as String? ?? '🏦';
-    _color = a != null ? Color(int.parse((a['color'] as String).replaceFirst('#', '0xFF'))) : const Color(0xFF3B7EF6);
+    _color = a != null ? Color(int.parse((a['color'] as String).replaceFirst('#', '0xFF'))) : AppColors.primary;
   }
 
   @override
@@ -247,11 +248,10 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
     _saving = true;
     setState(() {});
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
       final colorHex = '#${_color.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
       if (widget.account == null) {
         await AccountsService.createAccount(
-          userId: user.id, name: _nameCtrl.text.trim(), type: _type,
+          name: _nameCtrl.text.trim(), type: _type,
           openingBalance: double.tryParse(_balanceCtrl.text) ?? 0,
           currency: 'JOD', color: colorHex, icon: _icon,
         );
@@ -270,7 +270,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('${'accounts_error_save'.tr()}: ${e.toString()}',
               style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ));
       }
@@ -386,9 +386,8 @@ class _TransferSheetState extends State<_TransferSheet> {
     _saving = true;
     setState(() {});
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
       await AccountsService.transfer(
-        userId: user.id, fromAccountId: _fromId, toAccountId: _toId,
+        fromAccountId: _fromId, toAccountId: _toId,
         amount: amount, date: _date, note: _noteCtrl.text.isEmpty ? null : _noteCtrl.text,
       );
       widget.onSaved();
@@ -399,7 +398,7 @@ class _TransferSheetState extends State<_TransferSheet> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('${'accounts_error_transfer'.tr()}: ${e.toString()}',
               style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ));
       }
@@ -442,7 +441,7 @@ class _TransferSheetState extends State<_TransferSheet> {
         const SizedBox(height: 20),
         SizedBox(width: double.infinity, child: ElevatedButton(
           onPressed: _saving ? null : _save,
-          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B7EF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
           child: _saving
               ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
               : Text('accounts_transfer'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),

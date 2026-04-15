@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class FinancialRoadmap extends StatelessWidget {
@@ -49,7 +50,7 @@ class FinancialRoadmap extends StatelessWidget {
               final Color color = isCurrent
                   ? colorScheme.primary
                   : (isPast
-                      ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF10B981) : const Color(0xFF059669))
+                      ? (Theme.of(context).brightness == Brightness.dark ? AppColors.success : AppColors.successDark)
                       : colorScheme.onSurfaceVariant);
 
               return Column(

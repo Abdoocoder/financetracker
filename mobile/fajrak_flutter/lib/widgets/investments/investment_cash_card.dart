@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/currency_service.dart';
@@ -151,7 +152,7 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
                                     fontSize: 12, color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
                                 Text('${converted.toStringAsFixed(2)} ${widget.accountCurrency}',
                                     style: const TextStyle(fontFamily: 'Cairo', fontSize: 14,
-                                        fontWeight: FontWeight.w900, color: Color(0xFF10B981))),
+                                        fontWeight: FontWeight.w900, color: AppColors.success)),
                               ]),
                             ]);
                           }(),
@@ -231,7 +232,7 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('inv_cash_transfer_success'.tr(),
                 style: const TextStyle(fontFamily: 'Cairo')),
-            backgroundColor: const Color(0xFF10B981)));
+            backgroundColor: AppColors.success));
       }
     } catch (e) {
       setModalState(() => _transferring = false);
@@ -251,7 +252,7 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
               color: hasBalance
-                  ? const Color(0xFF10B981).withValues(alpha: 0.3)
+                  ? AppColors.success.withValues(alpha: 0.3)
                   : colorScheme.outlineVariant)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -267,14 +268,14 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                  color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8)),
               child: Text(widget.currency,
                   style: const TextStyle(
                       fontFamily: 'Cairo',
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF10B981))),
+                      color: AppColors.success)),
             ),
         ]),
         const SizedBox(height: 10),
@@ -290,7 +291,7 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
                   fontFamily: 'Cairo',
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF10B981))),
+                  color: AppColors.success)),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,

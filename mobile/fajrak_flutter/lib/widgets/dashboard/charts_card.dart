@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -33,8 +34,8 @@ class ChartsCard extends StatelessWidget {
 
   Widget _buildBarChart(ThemeData theme, ColorScheme colorScheme) {
     final isDark = theme.brightness == Brightness.dark;
-    final incomeColor = isDark ? const Color(0xFF10B981) : colorScheme.primary;
-    final expenseColor = isDark ? const Color(0xFFEF4444) : colorScheme.error;
+    final incomeColor = isDark ? AppColors.success : colorScheme.primary;
+    final expenseColor = isDark ? AppColors.error : colorScheme.error;
 
     return Container(
       padding: const EdgeInsets.all(16),

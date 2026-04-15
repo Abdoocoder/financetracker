@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'settings_accordion.dart';
@@ -78,7 +79,7 @@ class _ProfileFormState extends State<ProfileForm> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: AppColors.success,
         ));
       }
     } finally {
@@ -113,7 +114,7 @@ class _ProfileFormState extends State<ProfileForm> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF3B7EF6), Color(0xFF8B5CF6)],
+                      colors: [AppColors.primary, AppColors.purple],
                     ),
                   ),
                   child: Center(
@@ -163,7 +164,7 @@ class _ProfileFormState extends State<ProfileForm> {
                     Text(
                       'settings_member'.tr(),
                       style: const TextStyle(
-                        color: Color(0xFF64748B),
+                        color: AppColors.textSecondary,
                         fontSize: 9,
                         fontFamily: 'Cairo',
                       ),
@@ -282,7 +283,7 @@ class _ProfileFormState extends State<ProfileForm> {
             child: ElevatedButton(
               onPressed: _savingProfile ? null : _saveProfile,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3B7EF6),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

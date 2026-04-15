@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class QuickLinksCards extends StatelessWidget {
@@ -23,15 +24,15 @@ class QuickLinksCards extends StatelessWidget {
       children: [
         Expanded(
             child: _buildCard(context, 'nav_debts'.tr(), Icons.credit_card, totalDebt,
-                const Color(0xFFEF4444), '/debts')),
+                AppColors.error, '/debts')),
         const SizedBox(width: 8),
         Expanded(
             child: _buildCard(context, 'nav_investments'.tr(), Icons.show_chart, invValue,
-                const Color(0xFF10B981), '/investments')),
+                AppColors.success, '/investments')),
         const SizedBox(width: 8),
         Expanded(
             child: _buildCard(context, 'nav_goals'.tr(), Icons.track_changes, goalsSaved,
-                const Color(0xFF3B7EF6), '/goals')),
+                AppColors.primary, '/goals')),
       ],
     );
   }

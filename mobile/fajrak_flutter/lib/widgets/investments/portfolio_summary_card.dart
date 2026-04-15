@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 class PortfolioSummaryCard extends StatelessWidget {
@@ -57,15 +58,15 @@ class PortfolioSummaryCard extends StatelessWidget {
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(gain >= 0 ? Icons.trending_up : Icons.trending_down,
               color:
-                  gain >= 0 ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                  gain >= 0 ? AppColors.success : AppColors.error,
               size: 18),
           const SizedBox(width: 6),
           Text(
               '${gain >= 0 ? '+' : ''}\$${gain.toStringAsFixed(2)} (${gainPct.toStringAsFixed(1)}%)',
               style: TextStyle(
                   color: gain >= 0
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFFEF4444),
+                      ? AppColors.success
+                      : AppColors.error,
                   fontFamily: 'Cairo',
                   fontWeight: FontWeight.w700)),
         ]),
@@ -79,7 +80,7 @@ class PortfolioSummaryCard extends StatelessWidget {
           _miniStat(
               context, 'inv_assets'.tr(), '$assetsCount', colorScheme.primary),
           _miniStat(context, 'inv_halal'.tr(), '$halalCount',
-              const Color(0xFF10B981)),
+              AppColors.success),
         ]),
       ]),
     );

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
@@ -13,7 +14,7 @@ import '../../widgets/common/skeleton_loader.dart';
 
 List<Color> _buildPriorityColors(ColorScheme cs) => [
   cs.error,
-  const Color(0xFFF59E0B), // warning amber — no semantic equivalent in M3
+  AppColors.warning, // warning amber — no semantic equivalent in M3
   cs.primary,
   cs.onSurfaceVariant,
   cs.outlineVariant,
@@ -275,7 +276,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                       final color = isAchievement
                           ? cs.primary
                           : isWarning
-                              ? const Color(0xFFF59E0B)
+                              ? AppColors.warning
                               : cs.secondary;
                       return Dismissible(
                         key: ValueKey(alert['id']),
@@ -430,7 +431,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         Icon(Icons.celebration, size: 48, color: cs.primary),
                         const SizedBox(height: 12),
                         Text('debts_no_active'.tr(),
-                          style: const TextStyle(color: Color(0xFF94A3B8), fontFamily: 'Cairo', fontSize: 15)),
+                          style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Cairo', fontSize: 15)),
                       ])),
                   const SizedBox(height: 16),
 

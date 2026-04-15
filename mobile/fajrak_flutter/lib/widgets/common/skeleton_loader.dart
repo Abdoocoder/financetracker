@@ -1,3 +1,4 @@
+import '../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -20,7 +21,7 @@ class SkeletonLoader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     final baseColor = isDark 
-        ? const Color(0xFF1E293B) 
+        ? AppColors.surface2 
         : Colors.grey[300]!;
     final highlightColor = isDark 
         ? const Color(0xFF334155) 

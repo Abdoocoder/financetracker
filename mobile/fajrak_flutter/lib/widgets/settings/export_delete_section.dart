@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -131,7 +132,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
               Text(
                 'settings_assets_desc'.tr(),
                 style: const TextStyle(
-                  color: Color(0xFF94A3B8),
+                  color: AppColors.textMuted,
                   fontSize: 12,
                   fontFamily: 'Cairo',
                   height: 1.6,
@@ -193,7 +194,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                 child: ElevatedButton(
                   onPressed: _shareApp,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3B7EF6),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -233,7 +234,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                       ? const SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFEF4444)),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.error),
                         )
                       : Text(
                           'settings_logout'.tr(),
@@ -250,7 +251,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                   child: TextButton(
                     onPressed: () => setState(() => _showDeleteConfirm = true),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFFEF4444).withValues(alpha: 0.7),
+                      foregroundColor: AppColors.error.withValues(alpha: 0.7),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Text(
@@ -296,7 +297,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                             ? null
                             : _deleteAccount,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFEF4444),
+                          backgroundColor: AppColors.error,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

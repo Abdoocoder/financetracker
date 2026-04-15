@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 
 class TransactionListItem extends StatelessWidget {
   final Map<String, dynamic> transaction;
@@ -20,7 +21,7 @@ class TransactionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = transaction['type'] == 'income';
     final amount = (transaction['amount'] as num).toDouble();
-    final color = isIncome ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final color = isIncome ? AppColors.success : AppColors.error;
 
     return Dismissible(
       key: Key(transaction['id'].toString()),
@@ -29,7 +30,7 @@ class TransactionListItem extends StatelessWidget {
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFEF4444),
+          color: AppColors.error,
           borderRadius: BorderRadius.circular(14),
         ),
         child: const Icon(Icons.delete, color: Colors.white),

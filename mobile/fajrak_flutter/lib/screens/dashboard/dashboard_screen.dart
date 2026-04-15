@@ -66,7 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) { if (mounted) setState(() { _accountsLoading = false; }); return; }
-      final accounts = await AccountsService.fetchAccounts(user.id);
+      final accounts = await AccountsService.fetchAccounts();
       final totalAccountsBalance = accounts.fold(0.0, (a, acc) => a + (acc['balance'] as double? ?? 0));
       if (mounted) {
         setState(() {
@@ -112,7 +112,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       // Use centralized monthly summary RPC to match web logic exactly.
       final monthly = await FinanceService.fetchMonthlyFinancialSummary(
-        user.id,
         year: now.year,
         month: now.month,
       );
@@ -126,7 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           : 1.0;
 
       // FIX: Use Centralized RPC for Net Worth components (Best Practice)
-      final dash = await FinanceService.fetchFinancialDashboard(user.id, usdToLocal);
+      final dash = await FinanceService.fetchFinancialDashboard(usdToLocal);
       
       final netWorth = (dash['net_worth'] as num).toDouble();
       final totalDebt = (dash['total_debt_owed'] as num).toDouble();

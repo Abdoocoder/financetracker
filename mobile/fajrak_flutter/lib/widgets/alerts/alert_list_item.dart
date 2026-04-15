@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
 
 class AlertListItem extends StatelessWidget {
   final Map<String, dynamic> alert;
@@ -94,7 +95,7 @@ class AlertListItem extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.close, size: 16),
-              color: const Color(0xFFEF4444).withValues(alpha: 0.7),
+              color: AppColors.error.withValues(alpha: 0.7),
               onPressed: onDelete,
             )
           ],
