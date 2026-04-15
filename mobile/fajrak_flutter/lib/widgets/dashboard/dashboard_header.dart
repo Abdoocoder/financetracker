@@ -19,29 +19,33 @@ class DashboardHeader extends StatelessWidget {
     final isAr = context.locale.languageCode == 'ar';
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              name.isNotEmpty ? 'dash_welcome'.tr(args: [name]) : 'dash_title'.tr(),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-                color: colorScheme.onSurface,
-                fontFamily: 'Cairo',
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name.isNotEmpty ? 'dash_welcome'.tr(args: [name]) : 'dash_title'.tr(),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.onSurface,
+                  fontFamily: 'Cairo',
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Text(
-              'dash_subtitle'.tr(),
-              style: TextStyle(
-                fontSize: 12,
-                color: colorScheme.onSurfaceVariant,
-                fontFamily: 'Cairo',
+              Text(
+                'dash_subtitle'.tr(),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: colorScheme.onSurfaceVariant,
+                  fontFamily: 'Cairo',
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         Row(
           children: [
