@@ -16,7 +16,6 @@ class DashboardHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final unreadCount = context.watch<AppState>().unreadAlerts;
-    final isAr = context.locale.languageCode == 'ar';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -49,33 +48,6 @@ class DashboardHeader extends StatelessWidget {
         ),
         Row(
           children: [
-            // Language Toggle
-            GestureDetector(
-              onTap: () async {
-                final newLocale = isAr ? const Locale('en') : const Locale('ar');
-                await context.setLocale(newLocale);
-                if (context.mounted) {
-                  context.read<AppState>().setLanguageCode(newLocale.languageCode);
-                }
-              },
-              child: GlassPanel(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                borderRadius: 12,
-                blur: 8,
-                opacity: 0.1,
-                color: colorScheme.surface,
-                borderColor: colorScheme.outlineVariant.withValues(alpha: 0.3),
-                child: Text(
-                  isAr ? 'EN' : 'AR',
-                  style: TextStyle(
-                    fontFamily: 'Cairo',
-                    fontWeight: FontWeight.w800,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
             // Alerts Bell
             GestureDetector(
               onTap: () {
