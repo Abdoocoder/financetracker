@@ -21,7 +21,7 @@ android {
 
     ndkVersion = "28.2.13676358"
     namespace = "com.fajrak.app"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

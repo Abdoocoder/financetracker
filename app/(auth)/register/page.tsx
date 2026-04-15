@@ -5,6 +5,18 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { useI18n } from '@/lib/i18n'
 
+const MIN_LENGTH = 8
+
+function checkPassword(pw: string) {
+  return {
+    upper:  /[A-Z]/.test(pw),
+    lower:  /[a-z]/.test(pw),
+    number: /[0-9]/.test(pw),
+    symbol: /[^A-Za-z0-9]/.test(pw),
+    length: pw.length,
+  }
+}
+
 export default function RegisterPage() {
   const router = useRouter()
   const { t } = useI18n()
@@ -13,8 +25,12 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const checks = checkPassword(password)
+  const allMet = checks.upper && checks.lower && checks.number && checks.symbol && checks.length >= MIN_LENGTH
+
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
+    if (loading) return
     setLoading(true)
     setError('')
     const supabase = createClient()
@@ -62,13 +78,28 @@ export default function RegisterPage() {
           </div>
           <div>
             <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('auth_password')}</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
               className="w-full px-4 py-3 rounded-xl text-sm outline-none"
               style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
               placeholder={t('auth_pass_placeholder')} />
+
+            {password.length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5">
+                <Req met={checks.upper}  label={t('auth_pass_req_upper')} />
+                <Req met={checks.lower}  label={t('auth_pass_req_lower')} />
+                <Req met={checks.number} label={t('auth_pass_req_number')} />
+                <Req met={checks.symbol} label={t('auth_pass_req_symbol')} />
+                <div className="col-span-2">
+                  <Req
+                    met={checks.length >= MIN_LENGTH}
+                    label={`${t('auth_pass_req_length')}: ${checks.length}/${MIN_LENGTH}`}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          <button type="submit" disabled={loading}
-            className="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+          <button type="submit" disabled={loading || !allMet}
+            className="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
             {loading ? t('auth_btn_creating') : t('auth_btn_register')}
           </button>
           <p className="text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -79,6 +110,19 @@ export default function RegisterPage() {
           </p>
         </form>
       </div>
+    </div>
+  )
+}
+
+function Req({ met, label }: { met: boolean; label: string }) {
+  return (
+    <div className="flex items-center gap-1.5 text-xs">
+      <span style={{ color: met ? 'var(--accent-green-light)' : 'var(--text-muted)', transition: 'color 0.2s' }}>
+        {met ? '✓' : '✗'}
+      </span>
+      <span style={{ color: met ? 'var(--accent-green-light)' : 'var(--text-muted)', transition: 'color 0.2s' }}>
+        {label}
+      </span>
     </div>
   )
 }
