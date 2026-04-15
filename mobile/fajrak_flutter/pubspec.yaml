@@ -1,7 +1,7 @@
 name: fajrak
 description: فجرك - تطبيق إدارة مالية ذكي
 publish_to: 'fajrak.com'
-version: 3.32.8+32
+version: 3.32.9+33
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

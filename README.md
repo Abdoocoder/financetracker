@@ -578,6 +578,14 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.9 — 2026-04-16 *(Android Build & UX)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔧 **Android Build Fix** | Upgraded `compileSdk` to 36, `sqlcipher_flutter_libs` to 0.7.0, `package_info_plus` to 10.0.0, `share_plus` to 13.0.0 — resolves `lStar` AAPT error and SDK 36 plugin warnings. |
+| 📱 **Edge-to-Edge** | Updated `MainActivity.kt` to use `WindowCompat.setDecorFitsSystemWindows` — removes deprecated `setStatusBarColor`/`setNavigationBarColor` Play Console warnings. |
+| 🔐 **Password Checklist** | Added real-time password requirements indicator on register screen (uppercase, lowercase, number, symbol, character count) — matches web implementation. |
+
 ### v3.32.8 — 2026-04-15 *(Performance & UI Consistency)*
 
 | Change | Description |
