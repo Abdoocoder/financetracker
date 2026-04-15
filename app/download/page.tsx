@@ -58,8 +58,9 @@ export default function DownloadPage() {
 
         <div style={{ marginBottom: 40 }}>
           <a
-            href="/fajrak-v3.32.7.apk"
-            download
+            href="https://play.google.com/store/apps/details?id=com.fajrak.app"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 16, background: 'var(--accent-blue)', color: 'white', fontSize: 18, fontWeight: 900, textDecoration: 'none', boxShadow: '0 10px 30px rgba(59,126,246,0.3)' }}
           >
             {t('down_btn')}
