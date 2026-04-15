@@ -123,7 +123,7 @@ class _DebtCelebrationDialogState extends State<DebtCelebrationDialog>
           child: IgnorePointer(
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (_, __) => CustomPaint(
+              builder: (context, _) => CustomPaint(
                 painter: _ConfettiPainter(_controller.value, _particles),
               ),
             ),

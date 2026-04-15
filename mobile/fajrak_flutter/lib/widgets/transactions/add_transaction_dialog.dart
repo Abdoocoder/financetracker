@@ -188,7 +188,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             // Toggle Type
             ValueListenableBuilder<String>(
               valueListenable: _typeController,
-              builder: (_, type, __) => Container(
+              builder: (context, type, _) => Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -218,7 +218,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             _buildLabel('trans_date'.tr()),
             ValueListenableBuilder<DateTime>(
               valueListenable: _dateController,
-              builder: (_, date, __) => GestureDetector(
+              builder: (context, date, _) => GestureDetector(
                 onTap: () async {
                   final picked = await showDatePicker(
                     context: context,

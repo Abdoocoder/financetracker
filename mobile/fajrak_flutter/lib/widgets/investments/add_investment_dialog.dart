@@ -97,7 +97,7 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
           'avg_buy_price': double.tryParse(_avgPriceCtrl.text) ?? 0,
           'current_price': double.tryParse(_currentPriceCtrl.text) ?? 0,
           'is_halal': _isHalal,
-          if (purchaseDateStr != null) 'purchase_date': purchaseDateStr,
+          'purchase_date': purchaseDateStr,
         }).eq('id', _editingId!);
       } else {
         await Supabase.instance.client.from('investments').insert({
@@ -112,7 +112,7 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
           'is_halal': _isHalal,
           'type': 'etf',
           'currency': 'USD',
-          if (purchaseDateStr != null) 'purchase_date': purchaseDateStr,
+          'purchase_date': purchaseDateStr,
         });
       }
     } finally {

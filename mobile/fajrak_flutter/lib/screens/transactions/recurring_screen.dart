@@ -97,7 +97,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
           ? ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
               itemCount: 5,
-              itemBuilder: (_, __) => Padding(
+              itemBuilder: (context, _) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Container(
                   height: 80,
