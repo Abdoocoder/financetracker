@@ -141,7 +141,8 @@
       "Bash(C:\\\\flutter\\\\flutter\\\\bin\\\\dart.bat --version)",
       "Read(//c/flutter/flutter/**)",
       "Read(//c/flutter/flutter/bin/internal/**)",
-      "Read(//c/flutter/flutter/bin//**)"
+      "Read(//c/flutter/flutter/bin//**)",
+      "Bash(claude mcp *)"
     ]
   }
 }
