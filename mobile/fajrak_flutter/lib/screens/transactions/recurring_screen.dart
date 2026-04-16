@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../widgets/common/skeleton_loader.dart';
 
 class RecurringScreen extends StatefulWidget {
   const RecurringScreen({super.key});
@@ -94,19 +95,9 @@ class _RecurringScreenState extends State<RecurringScreen> {
         label: Text('recurring_add'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
       ),
       body: _loading
-          ? ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-              itemCount: 5,
-              itemBuilder: (context, _) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Container(
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: cs.surfaceContainerHighest.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-              ),
+          ? const Padding(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 100),
+              child: ListSkeleton(count: 5),
             )
           : _list.isEmpty
               ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [

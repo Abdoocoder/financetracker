@@ -30,6 +30,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Map<String, dynamic>> _allTransactions = [];
   bool _loading = true;
   bool _loadingMore = false;
+  bool _hasError = false;
   int _limit = 20;
   bool _hasMore = true;
 
@@ -71,6 +72,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         setState(() {
           _limit = 20;
           _loading = true;
+          _hasError = false;
           _transactions = [];
         });
       }
@@ -157,6 +159,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         });
       }
     } catch (e) {
+      if (mounted) setState(() => _hasError = true);
       if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Transactions Load');
     } finally {
       if (mounted) {
@@ -448,7 +451,26 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             },
           ),
           Expanded(
-            child: _loading && _transactions.isEmpty
+            child: _hasError && _transactions.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.wifi_off_rounded, size: 56, color: colorScheme.onSurface.withValues(alpha: 0.3)),
+                        const SizedBox(height: 16),
+                        Text('error_load_failed'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface), textAlign: TextAlign.center),
+                        const SizedBox(height: 8),
+                        Text('error_check_connection'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
+                        const SizedBox(height: 24),
+                        FilledButton.icon(
+                          onPressed: () => _load(reset: true),
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: Text('btn_retry'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                        ),
+                      ]),
+                    ),
+                  )
+                : _loading && _transactions.isEmpty
                 ? const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: ListSkeleton(count: 8),

@@ -143,7 +143,8 @@
       "Read(//c/flutter/flutter/bin/internal/**)",
       "Read(//c/flutter/flutter/bin//**)",
       "Bash(claude mcp *)",
-      "Bash(npx skills *)"
+      "Bash(npx skills *)",
+      "mcp__task-master-ai__next_task"
     ]
   }
 }
