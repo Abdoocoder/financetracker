@@ -121,7 +121,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
   void _showAccountDialog({Map<String, dynamic>? account}) {
     showModalBottomSheet(
       context: context, isScrollControlled: true, useSafeArea: true,
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => _AccountFormSheet(account: account, onSaved: _load),
     );
@@ -130,7 +130,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
   void _showTransferDialog() {
     showModalBottomSheet(
       context: context, isScrollControlled: true, useSafeArea: true,
-      backgroundColor: Theme.of(context).cardColor,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => _TransferSheet(accounts: _accounts, onSaved: _load),
     );

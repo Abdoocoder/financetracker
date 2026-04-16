@@ -99,13 +99,13 @@ class ChartsCard extends StatelessWidget {
                     x: e.key,
                     barRods: [
                       BarChartRodData(
-                        toY: e.value['income'],
+                        toY: (e.value['income'] as num?)?.toDouble() ?? 0.0,
                         color: incomeColor,
                         width: 10,
                         borderRadius: BorderRadius.circular(3),
                       ),
                       BarChartRodData(
-                        toY: e.value['expense'],
+                        toY: (e.value['expenses'] as num?)?.toDouble() ?? 0.0,
                         color: expenseColor,
                         width: 10,
                         borderRadius: BorderRadius.circular(3),
@@ -134,8 +134,10 @@ class ChartsCard extends StatelessWidget {
   double _getMaxY() {
     double maxVal = 0;
     for (var m in months6Data) {
-      if (m['income'] > maxVal) maxVal = m['income'];
-      if (m['expense'] > maxVal) maxVal = m['expense'];
+      final inc = (m['income'] as num?)?.toDouble() ?? 0.0;
+      final exp = (m['expenses'] as num?)?.toDouble() ?? 0.0;
+      if (inc > maxVal) maxVal = inc;
+      if (exp > maxVal) maxVal = exp;
     }
     return maxVal == 0 ? 100 : maxVal * 1.2;
   }

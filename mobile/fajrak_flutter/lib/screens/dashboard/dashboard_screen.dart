@@ -147,7 +147,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           catMap[cat] = (catMap[cat] ?? 0) + (tx['amount'] as num).toDouble();
         }
       }
-      final catData = catMap.entries.map((e) => {'category': e.key, 'amount': e.value}).toList();
+      final totalCatExpenses = catMap.values.fold(0.0, (a, b) => a + b);
+      final catData = catMap.entries.map((e) => {
+        'category': e.key,
+        'amount': e.value,
+        'percentage': totalCatExpenses > 0 ? (e.value / totalCatExpenses).clamp(0.0, 1.0) : 0.0,
+      }).toList();
 
       // Use centralized monthly summary RPC to match web logic exactly.
       final monthly = await FinanceService.fetchMonthlyFinancialSummary(

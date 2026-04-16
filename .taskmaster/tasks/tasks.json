@@ -786,6 +786,59 @@
             "details": "تطبيق padding افتراضي 16px وborder radius موحد عبر جميع الشاشات. التأكد من عدم وجود اختلافات في التصميم وتوحيد جميع العناصر المرتبطة بالتنسيق",
             "status": "pending",
             "testStrategy": null
+          },
+          {
+            "id": 23,
+            "title": "استبدال الألوان المكتوبة مباشرة بألوان colorScheme",
+            "description": "استبدال جميع الألوان الثابتة مثل 0xFF10B981 بألوان من colorScheme في جميع الشاشات",
+            "dependencies": [],
+            "details": "البحث عن جميع الحالات التي تستخدم ألواناً ثابتة (Color(0xFF...) أو Colors.white/black) في ملفات Flutter وتبديلها بألوان من colorScheme. التأكد من التوافق مع الوضع الداكن والفاتح.",
+            "status": "pending",
+            "testStrategy": null
+          },
+          {
+            "id": 24,
+            "title": "إصلاح خلفية ModalBottomSheet باستخدام theme.scaffoldBackgroundColor",
+            "description": "تعديل خلفية ModalBottomSheet لتستخدم theme.scaffoldBackgroundColor أو colorScheme.surface بدلاً من اللون الثابت",
+            "dependencies": [
+              23
+            ],
+            "details": "البحث عن جميع ModalBottomSheet في ملفات Flutter، تحديد الخلفيات الثابتة، واستبدالها بـ theme.scaffoldBackgroundColor أو colorScheme.surface. التحقق من استخدام useSafeArea: true والتأكد من التوافق مع الوضعين الفاتح والداكن.",
+            "status": "pending",
+            "testStrategy": null
+          },
+          {
+            "id": 25,
+            "title": "إضافة error states واضحة مع زر retry في dashboard_screen و transactions_screen",
+            "description": "إضافة حالات خطأ واضحة مع زر إعادة المحاولة في الشاشات المطلوبة",
+            "dependencies": [
+              24
+            ],
+            "details": "تحليل حالات الخطأ الحالية في dashboard_screen و transactions_screen، وإضافة عناصر UI واضحة تظهر عند فشل العمليات، مع زر retry لمحاولة إعادة العملية. التأكد من تطبيق التصميم الموحد للحالات.",
+            "status": "pending",
+            "testStrategy": null
+          },
+          {
+            "id": 26,
+            "title": "استبدال CircularProgressIndicator بـ skeleton loader في recurring_screen",
+            "description": "استبدال مؤشر التحميل بالـ skeleton loader للاتساق مع باقي الشاشات",
+            "dependencies": [
+              25
+            ],
+            "details": "استبدال CircularProgressIndicator في recurring_screen بـ skeleton loader باستخدام الـ shimmer widget أو مكون مشابه. التأكد من أن الـ skeleton loader يتوافق مع تصميم الواجهة العامة ويظهر في نفس المواقع.",
+            "status": "pending",
+            "testStrategy": null
+          },
+          {
+            "id": 27,
+            "title": "توحيد padding و border radius عبر جميع الشاشات",
+            "description": "توحيد الـ padding (16 افتراضي) والـ border radius عبر جميع الشاشات",
+            "dependencies": [
+              26
+            ],
+            "details": "مراجعة جميع الشاشات للتأكد من استخدام الـ padding القياسي 16 وتطبيق الـ border radius الموحد. إنشاء ملفات متعددة للتصميم (theme) لتوحيد الأبعاد والتصاميم بشكل مركزي.",
+            "status": "pending",
+            "testStrategy": null
           }
         ],
         "createdAt": "2026-04-15T00:17:56.664Z",
