@@ -142,7 +142,8 @@
       "Read(//c/flutter/flutter/**)",
       "Read(//c/flutter/flutter/bin/internal/**)",
       "Read(//c/flutter/flutter/bin//**)",
-      "Bash(claude mcp *)"
+      "Bash(claude mcp *)",
+      "Bash(npx skills *)"
     ]
   }
 }
