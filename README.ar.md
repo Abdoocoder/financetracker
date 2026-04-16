@@ -662,6 +662,15 @@ npm run test:coverage
 
 ## 📝 سجل التغييرات
 
+### v3.32.10 — 2026-04-16 *(إصلاحات UI/UX في Flutter)*
+
+| التغيير | الوصف |
+|:--------|:------|
+| 🎨 **ModalBottomSheet** | إصلاح الألوان الثابتة (`cardColor`, `AppColors.surface0`) → `colorScheme.surface` في شاشات الحسابات والاستثمارات. |
+| 📊 **إصلاح الرسوم البيانية** | إصلاح crash في رسوم لوحة التحكم — تصحيح مفتاح `'expense'` → `'expenses'`، إضافة حقل `percentage` لبيانات الفئات. |
+| ⚠️ **حالات الخطأ** | إضافة واجهة خطأ واضحة مع زر retry في `transactions_screen` عند فشل الاتصال. |
+| 💀 **Skeleton Loader** | استبدال containers التحميل اليدوية في `recurring_screen` بـ `ListSkeleton` (shimmer animation). |
+
 ### v3.32.9 — 2026-04-16 *(إصلاح البناء وتحسين UX)*
 
 | التغيير | الوصف |

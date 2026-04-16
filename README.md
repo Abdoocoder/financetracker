@@ -578,6 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.10 — 2026-04-16 *(Flutter UI/UX Fixes)*
+
+| Change | Description |
+|:-------|:------------|
+| 🎨 **ModalBottomSheet** | Fixed hardcoded background colors (`cardColor`, `AppColors.surface0`) → `colorScheme.surface` in accounts and investments screens. |
+| 📊 **Charts Fix** | Fixed dashboard charts crash — `'expense'` key mismatch corrected to `'expenses'`, added `percentage` field to category data. |
+| ⚠️ **Error States** | Added clear error UI with retry button in `transactions_screen` when network fails. |
+| 💀 **Skeleton Loader** | Replaced manual loading containers in `recurring_screen` with `ListSkeleton` (shimmer animation). |
+
 ### v3.32.9 — 2026-04-16 *(Android Build & UX)*
 
 | Change | Description |

@@ -1,0 +1,238 @@
+.page {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: inherit;
+}
+
+.ltr { direction: ltr; }
+.rtl { direction: rtl; }
+
+/* ── Nav ── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  background: rgba(10, 12, 18, 0.85);
+}
+
+.navInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logoIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.logoText {
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.langBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.navCta {
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ── Hero ── */
+.hero {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: clamp(60px, 10vw, 100px) 24px;
+  text-align: center;
+}
+
+.appIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 24px;
+  background: rgba(59, 126, 246, 0.1);
+  border: 1px solid rgba(59, 126, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-size: 36px;
+}
+
+/* ── Status Badge ── */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  margin-bottom: 20px;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  display: inline-block;
+}
+
+.statusText {
+  font-size: 12px;
+  font-weight: 700;
+  color: #10B981;
+}
+
+/* ── Title ── */
+.title {
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 0 0 16px;
+  letter-spacing: -0.03em;
+}
+
+.titleGradient {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.desc {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+/* ── CTA ── */
+.ctaWrap {
+  margin-bottom: 40px;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 40px;
+  border-radius: 16px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(59, 126, 246, 0.3);
+}
+
+.badges {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Features ── */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.featureCard {
+  padding: 16px 12px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.featureIcon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.featureLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* ── Web link ── */
+.webHint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.webBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
