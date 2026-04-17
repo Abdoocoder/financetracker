@@ -1,16 +1,21 @@
 package com.fajrak.app
 
 import android.os.Bundle
-import androidx.core.view.WindowCompat
-import io.flutter.embedding.android.FlutterActivity
+import androidx.activity.enableEdgeToEdge
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity() {
+// FlutterFragmentActivity extends FragmentActivity → ComponentActivity,
+// which is required for enableEdgeToEdge() (a ComponentActivity extension).
+// FlutterActivity extends Activity directly in some Flutter versions and
+// would cause a "receiver type mismatch" compile error with enableEdgeToEdge().
+class MainActivity : FlutterFragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Must be called before super.onCreate so Flutter inherits the
+        // correct inset configuration. Replaces the deprecated
+        // Window.setStatusBarColor / setNavigationBarColor /
+        // setNavigationBarDividerColor APIs flagged by Google Play Console
+        // for Android 15 (API 35) compliance.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        // Opt into edge-to-edge without calling the deprecated
-        // Window.setStatusBarColor / setNavigationBarColor APIs.
-        // The remaining Play Console warnings (io.flutter.plugin.platform.*)
-        // originate from the Flutter engine itself and are fixed by upgrading Flutter.
-        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 }
