@@ -40,102 +40,113 @@ export async function GET(request: NextRequest) {
   // ── Loop 1: الجدول القديم (is_recurring على transactions) ──
   const { data: templates } = await supabase
     .from('transactions')
-    .select('*')
+    .select('id,user_id,type,amount,category,description,recurring_auto')
     .eq('is_recurring', true)
     .eq('recurring_day', dayOfMonth)
 
-  for (const tx of templates ?? []) {
-    const { count: existing } = await supabase
+  if ((templates ?? []).length > 0) {
+    const templateUserIds = [...new Set(templates!.map(tx => tx.user_id))]
+    const { data: existingThisMonth } = await supabase
       .from('transactions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', tx.user_id)
+      .select('user_id,category,amount,description')
+      .in('user_id', templateUserIds)
       .eq('is_recurring', false)
-      .eq('category', tx.category)
-      .eq('amount', tx.amount)
-      .eq('description', (tx.description ? `${tx.description} (تلقائي)` : 'معاملة تلقائية'))
       .gte('transaction_date', firstDay)
 
-    if ((existing ?? 0) > 0) continue
+    const existingSet = new Set(
+      (existingThisMonth ?? []).map(t => `${t.user_id}|${t.category}|${t.amount}|${t.description}`)
+    )
 
-    if (tx.recurring_auto !== false) {
-      await supabase.from('transactions').insert({
-        user_id: tx.user_id,
-        type: tx.type,
-        amount: tx.amount,
-        category: tx.category,
-        description: tx.description ? `${tx.description} (تلقائي)` : 'معاملة تلقائية',
-        transaction_date: dateStr,
-        is_recurring: false,
-      })
-      await sendPushToUser(
-        tx.user_id,
-        `✅ تم تسجيل ${tx.category} تلقائياً`,
-        `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — تم التسجيل تلقائياً 🔄`,
-        '/dashboard/transactions',
-        'info'
-      )
-      autoCount++
-    } else {
-      await sendPushToUser(
-        tx.user_id,
-        `🔔 تذكير: ${tx.category} يستحق اليوم`,
-        `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — هل قمت بالدفع؟ سجّله في التطبيق.`,
-        '/dashboard/transactions',
-        'warning'
-      )
-      reminderCount++
+    const toInsert1: Record<string, unknown>[] = []
+    const pushTasks1: Promise<unknown>[] = []
+
+    for (const tx of templates!) {
+      const autoDesc = tx.description ? `${tx.description} (تلقائي)` : 'معاملة تلقائية'
+      if (existingSet.has(`${tx.user_id}|${tx.category}|${tx.amount}|${autoDesc}`)) continue
+
+      if (tx.recurring_auto !== false) {
+        toInsert1.push({
+          user_id: tx.user_id, type: tx.type, amount: tx.amount,
+          category: tx.category, description: autoDesc,
+          transaction_date: dateStr, is_recurring: false,
+        })
+        pushTasks1.push(sendPushToUser(
+          tx.user_id,
+          `✅ تم تسجيل ${tx.category} تلقائياً`,
+          `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — تم التسجيل تلقائياً 🔄`,
+          '/dashboard/transactions', 'info'
+        ))
+        autoCount++
+      } else {
+        pushTasks1.push(sendPushToUser(
+          tx.user_id,
+          `🔔 تذكير: ${tx.category} يستحق اليوم`,
+          `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — هل قمت بالدفع؟ سجّله في التطبيق.`,
+          '/dashboard/transactions', 'warning'
+        ))
+        reminderCount++
+      }
     }
+
+    if (toInsert1.length > 0) await supabase.from('transactions').insert(toInsert1)
+    await Promise.allSettled(pushTasks1)
   }
 
   // ── Loop 2: الجدول الجديد (recurring_transactions) ──
   const { data: recurringList } = await supabase
     .from('recurring_transactions')
-    .select('*')
+    .select('id,user_id,type,amount,currency,category,name,notes,frequency')
     .eq('is_active', true)
     .lte('next_date', dateStr)
 
-  for (const rec of recurringList ?? []) {
-    // منع التكرار: هل يوجد معاملة لنفس المصدر اليوم؟
-    const { count: dupCount } = await supabase
+  if ((recurringList ?? []).length > 0) {
+    const recurringIds = recurringList!.map(r => r.id)
+    const { data: existingToday } = await supabase
       .from('transactions')
-      .select('id', { count: 'exact', head: true })
-      .eq('source_recurring_id', rec.id)
+      .select('source_recurring_id')
+      .in('source_recurring_id', recurringIds)
       .eq('transaction_date', dateStr)
 
-    if ((dupCount ?? 0) > 0) {
-      // حدّث next_date فقط إذا كانت قديمة
-      await supabase.from('recurring_transactions')
-        .update({ next_date: nextDateAfter(dateStr, rec.frequency), updated_at: new Date().toISOString() })
-        .eq('id', rec.id)
-      continue
+    const dupSet = new Set((existingToday ?? []).map(t => t.source_recurring_id))
+    const updatedAt = new Date().toISOString()
+
+    const toInsert2: Record<string, unknown>[] = []
+    const updateTasks: Promise<unknown>[] = []
+    const pushTasks2: Promise<unknown>[] = []
+
+    for (const rec of recurringList!) {
+      const nextDate = nextDateAfter(dateStr, rec.frequency)
+      updateTasks.push(
+        Promise.resolve(
+          supabase.from('recurring_transactions')
+            .update({ next_date: nextDate, updated_at: updatedAt })
+            .eq('id', rec.id)
+        )
+      )
+
+      if (dupSet.has(rec.id)) continue
+
+      toInsert2.push({
+        user_id: rec.user_id, type: rec.type, amount: rec.amount,
+        original_amount: rec.amount, original_currency: rec.currency,
+        exchange_rate: 1, category: rec.category,
+        description: rec.notes ? `${rec.name} (${rec.notes})` : rec.name,
+        transaction_date: dateStr, is_recurring: false, source_recurring_id: rec.id,
+      })
+      pushTasks2.push(sendPushToUser(
+        rec.user_id,
+        `🔄 ${rec.name} — تم تسجيله تلقائياً`,
+        `${rec.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(rec.amount).toFixed(0)} ${rec.currency}`,
+        '/dashboard/transactions', 'info'
+      ))
+      autoCount++
     }
 
-    await supabase.from('transactions').insert({
-      user_id: rec.user_id,
-      type: rec.type,
-      amount: rec.amount,
-      original_amount: rec.amount,
-      original_currency: rec.currency,
-      exchange_rate: 1,
-      category: rec.category,
-      description: rec.notes ? `${rec.name} (${rec.notes})` : rec.name,
-      transaction_date: dateStr,
-      is_recurring: false,
-      source_recurring_id: rec.id,
-    })
-
-    await supabase.from('recurring_transactions')
-      .update({ next_date: nextDateAfter(dateStr, rec.frequency), updated_at: new Date().toISOString() })
-      .eq('id', rec.id)
-
-    await sendPushToUser(
-      rec.user_id,
-      `🔄 ${rec.name} — تم تسجيله تلقائياً`,
-      `${rec.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(rec.amount).toFixed(0)} ${rec.currency}`,
-      '/dashboard/transactions',
-      'info'
-    )
-    autoCount++
+    await Promise.allSettled([
+      toInsert2.length > 0 ? supabase.from('transactions').insert(toInsert2) : Promise.resolve(),
+      ...updateTasks,
+      ...pushTasks2,
+    ])
   }
 
   return NextResponse.json({ ok: true, auto: autoCount, reminders: reminderCount })

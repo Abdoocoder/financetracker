@@ -57,107 +57,94 @@ function WealthSimulator({ currency }: { currency: string }) {
   const milestones = [1, 3, 5, 10, 15, 20].filter(y => y <= years + 5)
 
   return (
-    <div style={{ margin: '20px 0', background: 'var(--bg-card)', borderRadius: 20, padding: 20, border: '1px solid rgba(59,126,246,0.2)' }}>
+    <div className="my-5 bg-[var(--bg-card)] rounded-[20px] p-5 border border-[rgba(59,126,246,0.2)]">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div className="flex justify-between items-center mb-5">
         <div>
-          <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>
+          <div className="text-[15px] font-black text-[var(--text-primary)]">
             📈 {t('inv_sim_title')}
           </div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+          <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
             {t('inv_sim_subtitle')}
           </div>
         </div>
-        <div style={{
-          padding: '6px 14px', borderRadius: 20,
-          background: 'linear-gradient(135deg, var(--accent-blue-dim), rgba(16,185,129,0.1))',
-          border: '1px solid rgba(59,126,246,0.2)',
-          fontSize: 11, fontWeight: 800, color: 'var(--accent-blue-light)',
-        }}>
+        <div className="px-3.5 py-1.5 rounded-full bg-gradient-to-br from-[var(--accent-blue-dim)] to-[rgba(16,185,129,0.1)] border border-[rgba(59,126,246,0.2)] text-[11px] font-extrabold text-[var(--accent-blue-light)]">
           {t('inv_sim_return').replace('{}', multiplier.toFixed(1))}
         </div>
       </div>
 
       {/* Sliders */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 20 }}>
+      <div className="flex flex-col gap-4 mb-5">
 
         {/* الاستثمار الشهري */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
+          <div className="flex justify-between mb-2">
+            <span className="text-xs text-[var(--text-muted)] font-bold">
               {t('inv_sim_monthly')}
             </span>
-            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
+            <span className="text-sm font-black text-[var(--accent-blue-light)] font-mono">
               {monthly} {currency}
             </span>
           </div>
           <input type="range" min={10} max={1000} step={10} value={monthly}
             aria-label={t('inv_sim_monthly')}
             onChange={e => setMonthly(Number(e.target.value))}
-            style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
+            className="w-full accent-[var(--accent-blue)]"
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+          <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-0.5">
             <span>10 {currency}</span><span>1,000 {currency}</span>
           </div>
         </div>
 
         {/* عدد السنوات */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
+          <div className="flex justify-between mb-2">
+            <span className="text-xs text-[var(--text-muted)] font-bold">
               {t('inv_sim_duration')}
             </span>
-            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
+            <span className="text-sm font-black text-[var(--accent-blue-light)] font-mono">
               {years} {t('inv_sim_years')}
             </span>
           </div>
           <input type="range" min={1} max={30} step={1} value={years}
             aria-label={t('inv_sim_duration')}
             onChange={e => setYears(Number(e.target.value))}
-            style={{ width: '100%', accentColor: 'var(--accent-blue)' }}
+            className="w-full accent-[var(--accent-blue)]"
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+          <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-0.5">
             <span>1 {t('inv_sim_years')}</span><span>30 {t('inv_sim_years')}</span>
           </div>
         </div>
 
         {/* معدل العائد */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 700 }}>
+          <div className="flex justify-between mb-2">
+            <span className="text-xs text-[var(--text-muted)] font-bold">
               {t('inv_sim_rate')}
             </span>
-            <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
+            <span className="text-sm font-black text-[var(--accent-green-light)] font-mono">
               {rate}%
             </span>
           </div>
           <input type="range" min={1} max={20} step={0.5} value={rate}
             aria-label={t('inv_sim_rate')}
             onChange={e => setRate(Number(e.target.value))}
-            style={{ width: '100%', accentColor: 'var(--accent-green)' }}
+            className="w-full accent-[var(--accent-green)]"
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+          <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-0.5">
             <span>1%</span>
-            <span style={{ color: '#F59E0B' }}>7% S&P500</span>
+            <span className="text-[#F59E0B]">7% S&P500</span>
             <span>20%</span>
           </div>
         </div>
       </div>
 
       {/* النتيجة الرئيسية */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(59,126,246,0.1), rgba(16,185,129,0.08))',
-        border: '1px solid rgba(59,126,246,0.2)',
-        borderRadius: 16, padding: 20, marginBottom: 16, textAlign: 'center',
-      }}>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>
+      <div className="bg-gradient-to-br from-[rgba(59,126,246,0.1)] to-[rgba(16,185,129,0.08)] border border-[rgba(59,126,246,0.2)] rounded-2xl p-5 mb-4 text-center">
+        <div className="text-xs text-[var(--text-muted)] mb-1.5">
           {t('inv_sim_after_years').replace('{}', years.toString())}
         </div>
-        <div style={{
-          fontSize: 36, fontWeight: 900, fontFamily: 'monospace',
-          background: 'linear-gradient(135deg, var(--accent-blue-light), var(--accent-green-light))',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-        }}>
+        <div className="text-[36px] font-black font-mono bg-gradient-to-br from-[var(--accent-blue-light)] to-[var(--accent-green-light)] bg-clip-text text-transparent">
           {future >= 1000000
             ? (future / 1000000).toFixed(2) + 'M'
             : future >= 1000
@@ -165,24 +152,24 @@ function WealthSimulator({ currency }: { currency: string }) {
             : future.toFixed(0)
           } {currency}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12 }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t('inv_sim_invested')}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
+        <div className="flex justify-center gap-5 mt-3">
+          <div className="text-center">
+            <div className="text-[11px] text-[var(--text-muted)]">{t('inv_sim_invested')}</div>
+            <div className="text-[13px] font-extrabold text-[var(--text-secondary)] font-mono">
               {(invested/1000).toFixed(1)}K {currency}
             </div>
           </div>
-          <div style={{ width: 1, background: 'var(--border)' }} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t('inv_sim_profit')}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
+          <div className="w-px bg-[var(--border)]" />
+          <div className="text-center">
+            <div className="text-[11px] text-[var(--text-muted)]">{t('inv_sim_profit')}</div>
+            <div className="text-[13px] font-extrabold text-[var(--accent-green-light)] font-mono">
               +{profit >= 1000 ? (profit/1000).toFixed(1) + 'K' : profit.toFixed(0)} {currency}
             </div>
           </div>
-          <div style={{ width: 1, background: 'var(--border)' }} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t('inv_sim_multiplier')}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>
+          <div className="w-px bg-[var(--border)]" />
+          <div className="text-center">
+            <div className="text-[11px] text-[var(--text-muted)]">{t('inv_sim_multiplier')}</div>
+            <div className="text-[13px] font-extrabold text-[var(--accent-blue-light)] font-mono">
               {multiplier.toFixed(1)}x
             </div>
           </div>
@@ -190,36 +177,30 @@ function WealthSimulator({ currency }: { currency: string }) {
       </div>
 
       {/* جدول المعالم */}
-      <button onClick={() => setShowDetails(!showDetails)} style={{
-        width: '100%', padding: '10px', borderRadius: 12,
-        background: 'var(--bg-secondary)', border: '1px solid var(--border)',
-        color: 'var(--text-muted)', fontSize: 12, fontWeight: 700,
-        cursor: 'pointer', fontFamily: 'inherit',
-      }}>
+      <button
+        type="button"
+        onClick={() => setShowDetails(!showDetails)}
+        className="w-full p-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-xs font-bold cursor-pointer font-[inherit]"
+      >
         {showDetails ? t('inv_sim_hide') : t('inv_sim_show')}
       </button>
 
       {showDetails && (
-        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className="mt-3 flex flex-col gap-1.5">
           {milestones.map(y => {
             const val = calc(monthly, y, rate)
             const inv = monthly * y * 12
             const pct = ((val - inv) / inv * 100)
             return (
-              <div key={y} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '10px 14px', borderRadius: 10,
-                background: y === years ? 'var(--accent-blue-dim)' : 'var(--bg-secondary)',
-                border: `1px solid ${y === years ? 'rgba(59,126,246,0.2)' : 'var(--border)'}`,
-              }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: y === years ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>
+              <div key={y} className={`flex justify-between items-center px-3.5 py-2.5 rounded-[10px] border ${y === years ? 'bg-[var(--accent-blue-dim)] border-[rgba(59,126,246,0.2)]' : 'bg-[var(--bg-secondary)] border-[var(--border)]'}`}>
+                <span className={`text-xs font-bold ${y === years ? 'text-[var(--accent-blue-light)]' : 'text-[var(--text-muted)]'}`}>
                   {t('inv_sim_after_y').replace('{}', y.toString())}
                 </span>
-                <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
-                  <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: y === years ? 'var(--accent-blue-light)' : 'var(--text-primary)' }}>
+                <div className={`text-${lang === 'ar' ? 'right' : 'left'}`}>
+                  <div className={`text-[13px] font-black font-mono ${y === years ? 'text-[var(--accent-blue-light)]' : 'text-[var(--text-primary)]'}`}>
                     {val >= 1000 ? (val/1000).toFixed(1) + 'K' : val.toFixed(0)} {currency}
                   </div>
-                  <div style={{ fontSize: 10, color: 'var(--accent-green-light)' }}>+{pct.toFixed(0)}%</div>
+                  <div className="text-[10px] text-[var(--accent-green-light)]">+{pct.toFixed(0)}%</div>
                 </div>
               </div>
             )
@@ -228,7 +209,7 @@ function WealthSimulator({ currency }: { currency: string }) {
       )}
 
       {/* تلميح */}
-      <div style={{ marginTop: 12, fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.6 }}>
+      <div className="mt-3 text-[11px] text-[var(--text-muted)] text-center leading-relaxed">
         💡 {t('inv_sim_disclaimer')}
       </div>
     </div>
@@ -520,22 +501,37 @@ export default function InvestmentsPage() {
         title={t('inv_title')}
         subtitle={usdToJod && userCurrency !== 'USD' ? `1 USD = ${usdToJod.toFixed(3)} ${userCurrency}` : undefined}
         action={
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="flex gap-2">
             {usdToJod !== null && (
-              <button onClick={() => setShowJod(!showJod)} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              <button
+                type="button"
+                onClick={() => setShowJod(!showJod)}
+                className="px-3 py-2.5 rounded-xl bg-[var(--accent-blue-dim)] border border-[rgba(59,126,246,0.2)] text-[var(--accent-blue-light)] text-xs font-bold cursor-pointer font-[inherit]"
+              >
                 {showJod ? '$ USD' : userCurrency}
               </button>
             )}
-            <button onClick={refreshPrices} disabled={pricesRefreshing} style={{ padding: '9px 12px', borderRadius: 12, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 16, cursor: pricesRefreshing ? 'wait' : 'pointer', fontFamily: 'inherit', opacity: pricesRefreshing ? 0.5 : 1 }}>
+            <button
+              type="button"
+              onClick={refreshPrices}
+              disabled={pricesRefreshing}
+              className={`px-3 py-2.5 rounded-xl bg-[var(--accent-green-dim)] border border-[rgba(16,185,129,0.2)] text-[var(--accent-green-light)] text-base font-[inherit] ${pricesRefreshing ? 'cursor-wait opacity-50' : 'cursor-pointer'}`}
+            >
               {pricesRefreshing ? '⏳' : '⟳'}
             </button>
-            <button onClick={() => setShowForm(true)} style={{ padding: '9px 16px', borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', color: 'white', fontSize: 18, fontWeight: 900, border: 'none', cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 4px 16px var(--accent-blue-glow)' }}>+</button>
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-purple)] text-white text-lg font-black border-none cursor-pointer font-[inherit] shadow-[0_4px_16px_var(--accent-blue-glow)]"
+            >+</button>
           </div>
         }
       />
 
       {refreshMsg && (
-        <div style={{ padding: '12px 16px', borderRadius: 12, marginBottom: 12, fontSize: 13, textAlign: 'center', background: refreshMsg.startsWith('✅') ? 'var(--accent-green-dim)' : 'rgba(245,158,11,0.1)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}>{refreshMsg}</div>
+        <div className={`px-4 py-3 rounded-xl mb-3 text-[13px] text-center text-[var(--text-primary)] border border-[var(--border)] ${refreshMsg.startsWith('✅') ? 'bg-[var(--accent-green-dim)]' : 'bg-[rgba(245,158,11,0.1)]'}`}>
+          {refreshMsg}
+        </div>
       )}
 
       <StatBar stats={[
@@ -547,18 +543,17 @@ export default function InvestmentsPage() {
       {investments.length === 0 ? (
         <EmptyState icon="📈" title={t('inv_empty')} subtitle={t('inv_add_first')} />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className="flex flex-col gap-3">
           {/* Filter + Sort bar */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            <div style={{ display: 'flex', gap: 6, overflowX: 'auto', flexShrink: 1 }}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex gap-1.5 overflow-x-auto shrink">
               {(['all', 'halal', 'crypto', 'stocks'] as const).map(f => (
-                <button key={f} onClick={() => setFilterType(f)} style={{
-                  padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap', flexShrink: 0,
-                  background: filterType === f ? 'var(--accent-blue)' : 'var(--bg-secondary)',
-                  color: filterType === f ? 'white' : 'var(--text-muted)',
-                  border: `1px solid ${filterType === f ? 'var(--accent-blue)' : 'var(--border)'}`,
-                }}>
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilterType(f)}
+                  className={`px-3 py-[5px] rounded-full text-[11px] font-bold cursor-pointer font-[inherit] whitespace-nowrap shrink-0 border ${filterType === f ? 'bg-[var(--accent-blue)] text-white border-[var(--accent-blue)]' : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border)]'}`}
+                >
                   {f === 'all' ? t('inv_filter_all')
                     : f === 'halal' ? t('inv_filter_halal')
                     : f === 'crypto' ? t('inv_filter_crypto')
@@ -570,13 +565,8 @@ export default function InvestmentsPage() {
               aria-label={t('inv_sort_by')}
               value={sortBy}
               onChange={e => setSortBy(e.target.value as typeof sortBy)}
-              style={{
-              padding: '5px 10px', borderRadius: 10, fontSize: 11, fontWeight: 700, flexShrink: 0,
-              cursor: 'pointer', fontFamily: 'inherit', background: 'var(--bg-secondary)',
-              color: sortBy !== 'none' ? 'var(--accent-blue-light)' : 'var(--text-muted)',
-              border: `1px solid ${sortBy !== 'none' ? 'rgba(59,126,246,0.4)' : 'var(--border)'}`,
-              outline: 'none',
-            }}>
+              className={`px-2.5 py-[5px] rounded-[10px] text-[11px] font-bold shrink-0 cursor-pointer font-[inherit] bg-[var(--bg-secondary)] outline-none border ${sortBy !== 'none' ? 'text-[var(--accent-blue-light)] border-[rgba(59,126,246,0.4)]' : 'text-[var(--text-muted)] border-[var(--border)]'}`}
+            >
               <option value="none">{t('inv_sort_by')}</option>
               <option value="gain">{t('inv_sort_gain')}</option>
               <option value="loss">{t('inv_sort_loss')}</option>
@@ -593,66 +583,77 @@ export default function InvestmentsPage() {
             const pnlP = costUSD > 0 ? (pnl / costUSD * 100).toFixed(1) : '0'
             const isPos = pnl >= 0
             const isLive = priceStatus[inv.id] === 'live'
-            const typeColors: Record<string,string> = { etf: '#3B7EF6', stock: '#10B981', crypto: '#F59E0B', other: '#8B9CC8' }
-            const typeColor = typeColors[inv.type] ?? '#3B7EF6'
+            const typeCls: Record<string,string> = {
+              etf:    'bg-[rgba(59,126,246,0.09)]  border-[rgba(59,126,246,0.19)]  text-[#3B7EF6]',
+              stock:  'bg-[rgba(16,185,129,0.09)]  border-[rgba(16,185,129,0.19)]  text-[#10B981]',
+              crypto: 'bg-[rgba(245,158,11,0.09)]  border-[rgba(245,158,11,0.19)]  text-[#F59E0B]',
+              other:  'bg-[rgba(139,156,200,0.09)] border-[rgba(139,156,200,0.19)] text-[#8B9CC8]',
+            }
+            const typeClass = typeCls[inv.type] ?? typeCls.etf
             return (
-              <div key={inv.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-                  <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: `${typeColor}18`, border: `1px solid ${typeColor}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 900, color: typeColor, fontFamily: 'monospace', letterSpacing: '-0.03em' }}>
+              <div key={inv.id} className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[20px] p-4">
+                <div className="flex items-center gap-3 mb-3.5">
+                  <div className={`w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center text-[11px] font-black font-mono tracking-[-0.03em] border ${typeClass}`}>
                     {inv.symbol.slice(0, 4)}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{inv.symbol}</span>
-                      {inv.is_halal && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)', fontWeight: 700 }}>{t('inv_halal').replace(' ✅', '')}</span>}
-                      {isLive && <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 5, background: 'var(--accent-blue-dim)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>LIVE</span>}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                      <span className="text-sm font-black text-[var(--text-primary)]">{inv.symbol}</span>
+                      {inv.is_halal && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-green-dim)] text-[var(--accent-green-light)] font-bold">{t('inv_halal').replace(' ✅', '')}</span>}
+                      {isLive && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--accent-blue-dim)] text-[var(--accent-blue-light)] font-bold">LIVE</span>}
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inv.name}</div>
+                    <div className="text-[11px] text-[var(--text-muted)] overflow-hidden text-ellipsis whitespace-nowrap">{inv.name}</div>
                   </div>
-                  <div style={{ textAlign: lang === 'ar' ? 'right' : 'left', flexShrink: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
+                  <div className={`shrink-0 ${lang === 'ar' ? 'text-right' : 'text-left'}`}>
+                    <div className="text-[15px] font-black text-[var(--text-primary)] font-mono">
                       {showJod && valueLocal ? `${valueLocal.toFixed(0)} ${userCurrency}` : `$${valueUSD.toFixed(2)}`}
                     </div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: isPos ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>
+                    <div className={`text-xs font-bold font-mono ${isPos ? 'text-[var(--accent-green-light)]' : 'text-[var(--accent-red-light)]'}`}>
                       {isPos ? '+' : ''}{pnlP}%
                     </div>
                   </div>
-                  <button onClick={() => startEditInv(inv)} style={{ width: 32, height: 32, borderRadius: 9, flexShrink: 0, background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B', fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
+                  <button
+                    type="button"
+                    onClick={() => startEditInv(inv)}
+                    className="w-8 h-8 rounded-[9px] shrink-0 bg-[rgba(245,158,11,0.15)] border border-[rgba(245,158,11,0.2)] text-[#F59E0B] text-[13px] cursor-pointer flex items-center justify-center"
+                    aria-label={t('inv_edit_title')}
+                  >✎</button>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 12 }}>
+                <div className="grid grid-cols-3 gap-2 mb-3">
                   {[
                     { label: t('inv_shares'), value: inv.shares.toFixed(5) },
                     { label: t('inv_avg_price'), value: `$${inv.avg_buy_price.toFixed(2)}` },
                     { label: t('inv_current_price'), value: `$${inv.current_price.toFixed(2)}` },
                   ].map((s, i) => (
-                    <div key={i} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'var(--bg-elevated)', border: '1px solid var(--border)' }}>
-                      <div style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.value}</div>
-                      <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600 }}>{s.label}</div>
+                    <div key={i} className="text-center px-1 py-2 rounded-[10px] bg-[var(--bg-elevated)] border border-[var(--border)]">
+                      <div className="text-[11px] font-black text-[var(--text-primary)] font-mono">{s.value}</div>
+                      <div className="text-[9px] text-[var(--text-muted)] mt-0.5 font-semibold">{s.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* ROI row */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, marginBottom: 8, background: isPos ? 'var(--accent-green-dim)' : 'rgba(239,68,68,0.08)', border: `1px solid ${isPos ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}` }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
+                <div className={`flex justify-between px-3 py-2 rounded-[10px] mb-2 border ${isPos ? 'bg-[var(--accent-green-dim)] border-[rgba(16,185,129,0.2)]' : 'bg-[rgba(239,68,68,0.08)] border-[rgba(239,68,68,0.2)]'}`}>
+                  <span className="text-[11px] text-[var(--text-muted)] font-bold">
                     {t('inv_cost')}: ${costUSD.toFixed(2)}
                   </span>
-                  <span style={{ fontSize: 11, fontWeight: 900, fontFamily: 'monospace', color: isPos ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+                  <span className={`text-[11px] font-black font-mono ${isPos ? 'text-[var(--accent-green-light)]' : 'text-[var(--accent-red-light)]'}`}>
                     P&L: {isPos ? '+' : ''}${pnl.toFixed(2)}
                   </span>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => loadTxHistory(inv.id)}
-                  style={{ width: '100%', padding: '9px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8 }}
+                  className="w-full py-2.5 rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-xs font-bold cursor-pointer font-[inherit] mb-2"
                 >
                   {t('inv_tx_history')}
                 </button>
 
                 {showBuyForm === inv.id ? (
                   <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }}>
+                    <div className="grid grid-cols-2 gap-2 mb-2.5">
                       {[
                         { label: t('inv_shares'), key: 'shares', placeholder: '0.5', type: 'number' },
                         { label: t('inv_price_with_dollar_hint'), key: 'price', placeholder: '50', type: 'number' },
@@ -660,24 +661,24 @@ export default function InvestmentsPage() {
                         { label: t('inv_purchase_date'), key: 'date', placeholder: '', type: 'date' },
                       ].map(f => (
                         <div key={f.key}>
-                          <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>{f.label}</label>
+                          <label className="block text-[10px] font-bold text-[var(--text-muted)] mb-[5px] uppercase">{f.label}</label>
                           <input type={f.type} value={(buyForm as any)[f.key]} onChange={e => setBuyForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder}
-                            style={{ width: '100%', padding: '9px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                            className="w-full px-2.5 py-[9px] rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-[inherit] outline-none box-border" />
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => recordBuy(inv.id)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--accent-green)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>{saving ? '⏳' : t('inv_submit_btn')}</button>
-                      <button onClick={() => setShowBuyForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => recordBuy(inv.id)} disabled={saving} className={`flex-1 py-[11px] rounded-[10px] bg-[var(--accent-green)] text-white text-[13px] font-extrabold cursor-pointer border-none font-[inherit] ${saving ? 'opacity-50' : ''}`}>{saving ? '⏳' : t('inv_submit_btn')}</button>
+                      <button type="button" onClick={() => setShowBuyForm(null)} className="flex-1 py-[11px] rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-[13px] cursor-pointer font-[inherit]">{t('inv_cancel')}</button>
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => { setShowBuyForm(inv.id); setShowSellForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_record_buy')}</button>
+                  <button type="button" onClick={() => { setShowBuyForm(inv.id); setShowSellForm(null) }} className="w-full py-[11px] rounded-[10px] bg-[var(--accent-green-dim)] border border-[rgba(16,185,129,0.2)] text-[var(--accent-green-light)] text-[13px] font-bold cursor-pointer font-[inherit]">{t('inv_record_buy')}</button>
                 )}
 
                 {showSellForm === inv.id ? (
-                  <div style={{ marginTop: 8 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+                  <div className="mt-2">
+                    <div className="grid grid-cols-2 gap-2 mb-2">
                       {[
                         { label: t('inv_shares'), key: 'shares', placeholder: '0.5', type: 'number' },
                         { label: t('inv_price_with_dollar_hint'), key: 'price', placeholder: '50', type: 'number' },
@@ -685,24 +686,24 @@ export default function InvestmentsPage() {
                         { label: t('inv_purchase_date'), key: 'date', placeholder: '', type: 'date' },
                       ].map(f => (
                         <div key={f.key}>
-                          <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>{f.label}</label>
+                          <label className="block text-[10px] font-bold text-[var(--text-muted)] mb-[5px] uppercase">{f.label}</label>
                           <input type={f.type} value={(sellForm as any)[f.key]} onChange={e => setSellForm(p => ({ ...p, [f.key]: e.target.value }))} placeholder={f.placeholder}
-                            style={{ width: '100%', padding: '9px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+                            className="w-full px-2.5 py-[9px] rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-[inherit] outline-none box-border" />
                         </div>
                       ))}
                     </div>
-                    <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 8 }}>
+                    <div className="text-[10px] text-[var(--text-muted)] mb-2">
                       {t('inv_sell_max_shares')}: {inv.shares.toFixed(4)} {t('inv_unit')}
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => openSellConfirm(inv)} disabled={saving} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#EF4444', fontSize: 13, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => openSellConfirm(inv)} disabled={saving} className={`flex-1 py-[11px] rounded-[10px] bg-[rgba(239,68,68,0.15)] border border-[rgba(239,68,68,0.3)] text-[#EF4444] text-[13px] font-extrabold cursor-pointer font-[inherit] ${saving ? 'opacity-50' : ''}`}>
                         {t('inv_sell_confirm_btn')}
                       </button>
-                      <button onClick={() => setShowSellForm(null)} style={{ flex: 1, padding: '11px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
+                      <button type="button" onClick={() => setShowSellForm(null)} className="flex-1 py-[11px] rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-[13px] cursor-pointer font-[inherit]">{t('inv_cancel')}</button>
                     </div>
                   </div>
                 ) : (
-                  <button onClick={() => { setShowSellForm(inv.id); setShowBuyForm(null) }} style={{ width: '100%', padding: '11px', borderRadius: 10, marginTop: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_record_sell')}</button>
+                  <button type="button" onClick={() => { setShowSellForm(inv.id); setShowBuyForm(null) }} className="w-full py-[11px] rounded-[10px] mt-2 bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] text-[#EF4444] text-[13px] font-bold cursor-pointer font-[inherit]">{t('inv_record_sell')}</button>
                 )}
               </div>
             )
@@ -712,7 +713,7 @@ export default function InvestmentsPage() {
 
       {showForm && (
         <Modal title={t('inv_new')} onClose={() => setShowForm(false)}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5">
             <FormField label={t('inv_symbol')}><Input placeholder="SPUS" value={form.symbol} onChange={e => setForm(f => ({ ...f, symbol: e.target.value.toUpperCase() }))} /></FormField>
             <FormField label={t('inv_name')}><Input placeholder="SP Funds ETF" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></FormField>
           </div>
@@ -724,14 +725,15 @@ export default function InvestmentsPage() {
               <option value="other">{t('inv_type_other')}</option>
             </Select>
           </FormField>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
+          <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-[10px] bg-[var(--bg-card)] border border-[var(--border)] mb-3.5">
             <input
               type="checkbox"
               aria-label={t('inv_mark_halal')}
               checked={form.is_halal}
               onChange={e => setForm(f => ({ ...f, is_halal: e.target.checked }))}
-              style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{t('inv_halal_asset')}</span>
+              className="w-4 h-4 accent-[var(--accent-green)]"
+            />
+            <span className="text-[13px] text-[var(--text-secondary)] font-semibold">{t('inv_halal_asset')}</span>
           </div>
           <SaveButton label={t('inv_save')} loading={saving} onClick={addInvestment} />
         </Modal>
@@ -740,28 +742,35 @@ export default function InvestmentsPage() {
       {/* رسم بياني */}
       {investments.length > 0 && (() => {
         const total = investments.reduce((a,i) => a + i.shares * i.current_price, 0)
-        const colors = ['#3B7EF6','#10B981','#F59E0B','#8B5CF6','#EF4444','#EC4899']
+        const colorClasses = [
+          'bg-[#3B7EF6]','bg-[#10B981]','bg-[#F59E0B]',
+          'bg-[#8B5CF6]','bg-[#EF4444]','bg-[#EC4899]',
+        ]
         return total > 0 ? (
-          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 14 }}>{t('inv_portfolio_chart')}</div>
-            <div style={{ display: 'flex', height: 10, borderRadius: 8, overflow: 'hidden', gap: 2, marginBottom: 14 }}>
+          <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[20px] p-4">
+            <div className="text-[13px] font-black text-[var(--text-primary)] mb-3.5">{t('inv_portfolio_chart')}</div>
+            <div className="flex h-[10px] rounded-lg overflow-hidden gap-0.5 mb-3.5">
+              <style>{investments.map((inv, i) => {
+                const pct = total > 0 ? (inv.shares * inv.current_price / total) * 100 : 0
+                return `.cb-${inv.id.replace(/-/g,'')}{width:${pct.toFixed(2)}%}`
+              }).join('')}</style>
               {investments.map((inv, i) => {
                 const pct = total > 0 ? (inv.shares * inv.current_price / total) * 100 : 0
-                return pct > 0 ? <div key={inv.id} style={{ height: '100%', width: `${pct}%`, background: colors[i % colors.length], borderRadius: 4 }} /> : null
+                return pct > 0 ? <div key={inv.id} className={`h-full rounded-[4px] ${colorClasses[i % colorClasses.length]} cb-${inv.id.replace(/-/g,'')}`} /> : null
               })}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="flex flex-col gap-2">
               {investments.map((inv, i) => {
                 const val = inv.shares * inv.current_price
                 const pct = total > 0 ? (val / total * 100).toFixed(1) : '0'
                 const pnl = val - (inv.shares * inv.avg_buy_price)
                 return (
-                  <div key={inv.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 10, height: 10, borderRadius: 3, background: colors[i % colors.length], flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', flex: 1 }}>{inv.symbol}</span>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{pct}%</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: pnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{pnl >= 0 ? '+' : ''}${pnl.toFixed(0)}</span>
-                    <span style={{ fontSize: 12, fontWeight: 900, fontFamily: 'monospace', color: 'var(--text-secondary)', minWidth: 55, textAlign: lang === 'ar' ? 'right' : 'left' }}>${val.toFixed(0)}</span>
+                  <div key={inv.id} className="flex items-center gap-2.5">
+                    <div className={`w-2.5 h-2.5 rounded-[3px] shrink-0 ${colorClasses[i % colorClasses.length]}`} />
+                    <span className="text-[13px] font-bold text-[var(--text-primary)] flex-1">{inv.symbol}</span>
+                    <span className="text-xs text-[var(--text-muted)]">{pct}%</span>
+                    <span className={`text-xs font-bold font-mono ${pnl >= 0 ? 'text-[var(--accent-green-light)]' : 'text-[var(--accent-red-light)]'}`}>{pnl >= 0 ? '+' : ''}${pnl.toFixed(0)}</span>
+                    <span className={`text-xs font-black font-mono text-[var(--text-secondary)] min-w-[55px] ${lang === 'ar' ? 'text-right' : 'text-left'}`}>${val.toFixed(0)}</span>
                   </div>
                 )
               })}
@@ -774,29 +783,29 @@ export default function InvestmentsPage() {
       {showTxHistory && (
         <Modal title={t('inv_tx_history')} onClose={() => { setShowTxHistory(null); setTxHistory([]) }}>
           {txLoading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 4 }}>
-              <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
-              <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
-              <div className="skeleton" style={{ height: 62, borderRadius: 12 }} />
+            <div className="flex flex-col gap-2 p-1">
+              <div className="skeleton h-[62px] rounded-xl" />
+              <div className="skeleton h-[62px] rounded-xl" />
+              <div className="skeleton h-[62px] rounded-xl" />
             </div>
           ) : txHistory.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>{t('inv_empty_tx')}</div>
+            <div className="text-center p-6 text-[var(--text-muted)]">{t('inv_empty_tx')}</div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="flex flex-col gap-2">
               {txHistory.map(tx => (
-                <div key={tx.id} style={{ padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: tx.type === 'buy' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                <div key={tx.id} className="px-3.5 py-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] flex items-center gap-3">
+                  <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center text-base shrink-0 ${tx.type === 'buy' ? 'bg-[var(--accent-green-dim)]' : 'bg-[var(--accent-red-dim)]'}`}>
                     {tx.type === 'buy' ? '📈' : '📉'}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{tx.type === 'buy' ? t('inv_buy') : t('inv_sell')} {Number(tx.shares).toFixed(4)} {t('inv_unit')}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{tx.transaction_date} · سعر ${Number(tx.price).toFixed(2)}</div>
+                  <div className="flex-1">
+                    <div className="text-[13px] font-bold text-[var(--text-primary)]">{tx.type === 'buy' ? t('inv_buy') : t('inv_sell')} {Number(tx.shares).toFixed(4)} {t('inv_unit')}</div>
+                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{tx.transaction_date} · سعر ${Number(tx.price).toFixed(2)}</div>
                   </div>
-                  <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
-                    <div style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: tx.type === 'buy' ? 'var(--accent-red-light)' : 'var(--accent-green-light)' }}>
+                  <div className={lang === 'ar' ? 'text-right' : 'text-left'}>
+                    <div className={`text-[13px] font-black font-mono ${tx.type === 'buy' ? 'text-[var(--accent-red-light)]' : 'text-[var(--accent-green-light)]'}`}>
                       {tx.type === 'buy' ? '-' : '+'}${(Number(tx.shares) * Number(tx.price)).toFixed(0)}
                     </div>
-                    {Number(tx.commission) > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>عمولة ${Number(tx.commission).toFixed(2)}</div>}
+                    {Number(tx.commission) > 0 && <div className="text-[10px] text-[var(--text-muted)]">عمولة ${Number(tx.commission).toFixed(2)}</div>}
                   </div>
                 </div>
               ))}
@@ -807,17 +816,21 @@ export default function InvestmentsPage() {
 
 
       {/* ── كاش المحفظة الاستثمارية ── */}
-      <div style={{ background: 'var(--bg-card)', border: `1px solid ${cashBalance > 0 ? 'rgba(16,185,129,0.3)' : 'var(--border)'}`, borderRadius: 20, padding: 16, marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: cashBalance > 0 ? 12 : 0 }}>
-          <span style={{ fontSize: 15, fontWeight: 900, color: 'var(--text-primary)' }}>💵 {t('inv_cash_title').replace('💵 ', '')}</span>
-          {cashBalance > 0 && <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 8, background: 'var(--accent-green-dim)', color: 'var(--accent-green-light)' }}>{cashCurrency}</span>}
+      <div className={`bg-[var(--bg-card)] rounded-[20px] p-4 mb-4 border ${cashBalance > 0 ? 'border-[rgba(16,185,129,0.3)]' : 'border-[var(--border)]'}`}>
+        <div className={`flex items-center justify-between ${cashBalance > 0 ? 'mb-3' : ''}`}>
+          <span className="text-[15px] font-black text-[var(--text-primary)]">💵 {t('inv_cash_title').replace('💵 ', '')}</span>
+          {cashBalance > 0 && <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg bg-[var(--accent-green-dim)] text-[var(--accent-green-light)]">{cashCurrency}</span>}
         </div>
         {cashBalance <= 0 ? (
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{t('inv_cash_empty')}</div>
+          <div className="text-xs text-[var(--text-muted)] mt-2">{t('inv_cash_empty')}</div>
         ) : (
           <>
-            <div style={{ fontSize: 30, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace', marginBottom: 12 }}>{cashBalance.toFixed(2)} {cashCurrency}</div>
-            <button onClick={openTransferModal} style={{ width: '100%', padding: '11px', borderRadius: 10, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+            <div className="text-[30px] font-black text-[var(--accent-green-light)] font-mono mb-3">{cashBalance.toFixed(2)} {cashCurrency}</div>
+            <button
+              type="button"
+              onClick={openTransferModal}
+              className="w-full py-[11px] rounded-[10px] bg-[var(--accent-blue-dim)] border border-[rgba(59,126,246,0.2)] text-[var(--accent-blue-light)] text-[13px] font-bold cursor-pointer font-[inherit]"
+            >
               → {t('inv_cash_transfer_btn')}
             </button>
           </>
@@ -827,29 +840,29 @@ export default function InvestmentsPage() {
       {/* مودال تأكيد البيع */}
       {sellConfirm && (
         <Modal title={t('inv_sell_confirm_btn')} onClose={() => setSellConfirm(null)}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+          <div className="flex flex-col gap-2.5 mb-4">
             {[
-              { label: t('inv_sell_avg_buy'), value: `$${sellConfirm.inv.avg_buy_price.toFixed(2)}`, color: 'var(--text-muted)' },
-              { label: t('inv_sale_price'), value: `$${sellConfirm.price.toFixed(2)}`, color: 'var(--text-muted)' },
-              { label: t('inv_sell_proceeds'), value: `$${sellConfirm.proceeds.toFixed(2)}`, color: 'var(--text-primary)' },
+              { label: t('inv_sell_avg_buy'), value: `$${sellConfirm.inv.avg_buy_price.toFixed(2)}`, cls: 'text-[var(--text-muted)]' },
+              { label: t('inv_sale_price'), value: `$${sellConfirm.price.toFixed(2)}`, cls: 'text-[var(--text-muted)]' },
+              { label: t('inv_sell_proceeds'), value: `$${sellConfirm.proceeds.toFixed(2)}`, cls: 'text-[var(--text-primary)]' },
             ].map((r, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
-                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{r.label}</span>
-                <span style={{ fontSize: 13, fontWeight: 900, fontFamily: 'monospace', color: r.color }}>{r.value}</span>
+              <div key={i} className="flex justify-between px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)]">
+                <span className="text-[13px] text-[var(--text-muted)]">{r.label}</span>
+                <span className={`text-[13px] font-black font-mono ${r.cls}`}>{r.value}</span>
               </div>
             ))}
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', borderRadius: 10, background: sellConfirm.realizedPnl >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: `1px solid ${sellConfirm.realizedPnl >= 0 ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}` }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{sellConfirm.realizedPnl >= 0 ? t('inv_sell_realized_gain') : t('inv_sell_realized_loss')}</span>
-              <span style={{ fontSize: 16, fontWeight: 900, fontFamily: 'monospace', color: sellConfirm.realizedPnl >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+            <div className={`flex justify-between p-3 rounded-[10px] border ${sellConfirm.realizedPnl >= 0 ? 'bg-[var(--accent-green-dim)] border-[rgba(16,185,129,0.3)]' : 'bg-[var(--accent-red-dim)] border-[rgba(239,68,68,0.3)]'}`}>
+              <span className="text-sm font-bold text-[var(--text-primary)]">{sellConfirm.realizedPnl >= 0 ? t('inv_sell_realized_gain') : t('inv_sell_realized_loss')}</span>
+              <span className={`text-base font-black font-mono ${sellConfirm.realizedPnl >= 0 ? 'text-[var(--accent-green-light)]' : 'text-[var(--accent-red-light)]'}`}>
                 {sellConfirm.realizedPnl >= 0 ? '+' : ''}${sellConfirm.realizedPnl.toFixed(2)}
               </span>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={confirmSell} disabled={saving} style={{ flex: 1, padding: '12px', borderRadius: 10, background: '#EF4444', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: saving ? 0.5 : 1 }}>
+          <div className="flex gap-2">
+            <button type="button" onClick={confirmSell} disabled={saving} className={`flex-1 py-3 rounded-[10px] bg-[#EF4444] text-white text-[13px] font-extrabold cursor-pointer border-none font-[inherit] ${saving ? 'opacity-50' : ''}`}>
               {saving ? '⏳' : t('inv_sell_confirm_btn')}
             </button>
-            <button onClick={() => setSellConfirm(null)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
+            <button type="button" onClick={() => setSellConfirm(null)} className="flex-1 py-3 rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-[13px] cursor-pointer font-[inherit]">{t('inv_cancel')}</button>
           </div>
         </Modal>
       )}
@@ -857,42 +870,43 @@ export default function InvestmentsPage() {
       {/* مودال التحويل للمحفظة الرئيسية */}
       {showTransferModal && (
         <Modal title={t('inv_cash_transfer_title')} onClose={() => setShowTransferModal(false)}>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+          <div className="mb-4">
+            <div className="text-xs text-[var(--text-muted)] mb-3">
               {t('inv_available')}: {cashBalance.toFixed(2)} {cashCurrency}
             </div>
-            <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>{t('inv_cash_transfer_amount_hint')}</label>
+            <label className="block text-[10px] font-bold text-[var(--text-muted)] mb-1.5 uppercase">{t('inv_cash_transfer_amount_hint')}</label>
             <input type="number" value={transferAmount}
               aria-label={t('inv_cash_transfer_amount_hint')}
               placeholder={t('inv_cash_transfer_amount')}
               onChange={e => setTransferAmount(e.target.value)}
-              style={{ width: '100%', padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 18, fontWeight: 900, fontFamily: 'monospace', outline: 'none', boxSizing: 'border-box', textAlign: 'center' }} />
+              className="w-full p-3 rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-lg font-black font-mono outline-none box-border text-center"
+            />
             {cashCurrency !== userCurrency && (
-              <div style={{ marginTop: 12, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+              <div className="mt-3 p-3 rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)]">
                 {loadingRate ? (
-                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>⏳ {t('inv_fetching_rate')}</div>
+                  <div className="text-center text-[var(--text-muted)] text-xs">⏳ {t('inv_fetching_rate')}</div>
                 ) : transferRate ? (
                   <>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('inv_exchange_rate')}</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>1 {cashCurrency} = {transferRate.toFixed(4)} {userCurrency}</span>
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-xs text-[var(--text-muted)]">{t('inv_exchange_rate')}</span>
+                      <span className="text-xs font-bold text-[var(--text-primary)]">1 {cashCurrency} = {transferRate.toFixed(4)} {userCurrency}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('inv_receive_amount')}</span>
-                      <span style={{ fontSize: 14, fontWeight: 900, fontFamily: 'monospace', color: 'var(--accent-green-light)' }}>{((parseFloat(transferAmount) || 0) * transferRate).toFixed(2)} {userCurrency}</span>
+                    <div className="flex justify-between">
+                      <span className="text-xs text-[var(--text-muted)]">{t('inv_receive_amount')}</span>
+                      <span className="text-sm font-black font-mono text-[var(--accent-green-light)]">{((parseFloat(transferAmount) || 0) * transferRate).toFixed(2)} {userCurrency}</span>
                     </div>
                   </>
                 ) : (
-                  <div style={{ textAlign: 'center', color: 'var(--accent-red-light)', fontSize: 12 }}>❌ {t('inv_fetch_rate_err')}</div>
+                  <div className="text-center text-[var(--accent-red-light)] text-xs">❌ {t('inv_fetch_rate_err')}</div>
                 )}
               </div>
             )}
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={confirmTransfer} disabled={saving || loadingRate} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 13, fontWeight: 800, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: (saving || loadingRate) ? 0.5 : 1 }}>
+          <div className="flex gap-2">
+            <button type="button" onClick={confirmTransfer} disabled={saving || loadingRate} className={`flex-1 py-3 rounded-[10px] bg-[var(--accent-blue)] text-white text-[13px] font-extrabold cursor-pointer border-none font-[inherit] ${(saving || loadingRate) ? 'opacity-50' : ''}`}>
               {saving ? '⏳' : t('inv_cash_transfer_confirm')}
             </button>
-            <button onClick={() => setShowTransferModal(false)} style={{ flex: 1, padding: '12px', borderRadius: 10, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>{t('inv_cancel')}</button>
+            <button type="button" onClick={() => setShowTransferModal(false)} className="flex-1 py-3 rounded-[10px] bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-[13px] cursor-pointer font-[inherit]">{t('inv_cancel')}</button>
           </div>
         </Modal>
       )}
@@ -901,7 +915,7 @@ export default function InvestmentsPage() {
       <WealthSimulator currency={userCurrency} />
       {editingInv && (
         <Modal title={`${t('inv_edit_title')} ${editingInv.symbol}`} onClose={() => setEditingInv(null)}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div className="grid grid-cols-2 gap-2.5">
             <FormField label={t('inv_symbol')}><Input value={editForm.symbol} onChange={e => setEditForm(f => ({ ...f, symbol: e.target.value }))} /></FormField>
             <FormField label={t('inv_name')}><Input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} /></FormField>
             <FormField label={t('inv_shares')}><Input type="number" value={editForm.shares} onChange={e => setEditForm(f => ({ ...f, shares: e.target.value }))} /></FormField>
@@ -917,20 +931,25 @@ export default function InvestmentsPage() {
             <Input type="date" value={editForm.purchase_date} max={new Date().toISOString().split('T')[0]} onChange={e => setEditForm(f => ({ ...f, purchase_date: e.target.value }))} />
           </FormField>
           <FormField label={t('inv_notes')}><Input placeholder={t('inv_optional')} value={editForm.notes} onChange={e => setEditForm(f => ({ ...f, notes: e.target.value }))} /></FormField>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 10, background: 'var(--bg-card)', border: '1px solid var(--border)', marginBottom: 14 }}>
+          <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-[10px] bg-[var(--bg-card)] border border-[var(--border)] mb-3.5">
             <input
               type="checkbox"
               aria-label={t('inv_mark_halal')}
               checked={editForm.is_halal}
               onChange={e => setEditForm(f => ({ ...f, is_halal: e.target.checked }))}
-              style={{ width: 16, height: 16, accentColor: 'var(--accent-green)' }} />
-            <span style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 600 }}>{t('inv_halal_asset')}</span>
+              className="w-4 h-4 accent-[var(--accent-green)]"
+            />
+            <span className="text-[13px] text-[var(--text-secondary)] font-semibold">{t('inv_halal_asset')}</span>
           </div>
-          <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B', fontSize: 12, marginBottom: 14 }}>
+          <div className="px-3.5 py-2.5 rounded-[10px] bg-[rgba(245,158,11,0.08)] border border-[rgba(245,158,11,0.2)] text-[#F59E0B] text-xs mb-3.5">
             ⚠️ {t('inv_edit_warning')}
           </div>
           <SaveButton label={t('inv_save')} loading={saving} onClick={saveEditInv} />
-          <button onClick={() => setConfirmDeleteInvId(editingInv.id)} style={{ width: '100%', padding: '12px', borderRadius: 10, marginTop: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button
+            type="button"
+            onClick={() => setConfirmDeleteInvId(editingInv.id)}
+            className="w-full py-3 rounded-[10px] mt-2 bg-[var(--accent-red-dim)] border border-[rgba(239,68,68,0.2)] text-[var(--accent-red-light)] text-[13px] font-bold cursor-pointer font-[inherit]"
+          >
             🗑️ {t('inv_delete_btn').replace('🗑️ ', '')}
           </button>
         </Modal>

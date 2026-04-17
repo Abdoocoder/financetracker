@@ -651,8 +651,67 @@
           "3",
           "4"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "تحليل أداء الويب باستخدام DevTools Lighthouse",
+            "description": "تحليل أداء التطبيق باستخدام أدوات تطوير الويب لتحديد نقاط الضعف",
+            "dependencies": [],
+            "details": "استخدام DevTools Lighthouse للتحقق من نقاط الأداء والوصول إلى أداء الويب، مع التركيز على تحسين Core Web Vitals (LCP, CLS, FID)",
+            "status": "pending",
+            "testStrategy": "lighthouse audits، DevTools profiling",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "مراجعة Network tab لحجم الـ bundles",
+            "description": "تحليل حجم الحزم المحمّلة لتحديد مصادر التحميل البطيء",
+            "dependencies": [
+              1
+            ],
+            "details": "تحليل Network tab لتحديد حجم الـ bundles وتحسينها من خلال تقنيات مثل code splitting و lazy loading",
+            "status": "pending",
+            "testStrategy": "DevTools profiling، performance budgets (< 3s load)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "تحسين TanStack Query queries",
+            "description": "تحسين استعلامات TanStack Query من خلال تعديل أوقات التخزين المؤقت والتحديث",
+            "dependencies": [],
+            "details": "مراجعة واستخدام ميزات TanStack Query مثل stale times و cache durations لتحسين الأداء وتجنب الاستعلامات الزائدة",
+            "status": "done",
+            "testStrategy": "manual testing on slow networks، Sentry performance monitoring",
+            "updatedAt": "2026-04-17T14:24:16.982Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "مراجعة N+1 queries في Supabase",
+            "description": "التحقق من وجود استعلامات N+1 وتحسينها",
+            "dependencies": [],
+            "details": "تحليل الاستعلامات في Supabase للتأكد من عدم وجود N+1 queries وتحسين الأداء باستخدام joins و eager loading",
+            "status": "done",
+            "testStrategy": "manual testing on slow networks، Sentry performance monitoring",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-17T14:24:23.419Z"
+          },
+          {
+            "id": 5,
+            "title": "تحسين استعلامات Supabase المعقدة",
+            "description": "تحسين الاستعلامات المعقدة في Supabase لزيادة سرعة الاستجابة",
+            "dependencies": [
+              4
+            ],
+            "details": "تحليل الاستعلامات المعقدة وتحسينها باستخدام indexes وتحسين بنية البيانات وتجنب العمليات غير الضرورية",
+            "status": "done",
+            "testStrategy": "DevTools profiling، Sentry performance monitoring",
+            "parentId": "undefined",
+            "updatedAt": "2026-04-17T14:24:29.820Z"
+          }
+        ],
+        "updatedAt": "2026-04-17T14:24:29.820Z"
       },
       {
         "id": "11",
@@ -1322,7 +1381,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-04-17T14:09:39.623Z",
+      "lastModified": "2026-04-17T14:24:29.821Z",
       "taskCount": 16,
       "completedCount": 14,
       "tags": [

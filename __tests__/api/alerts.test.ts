@@ -64,8 +64,20 @@ function setupMock({
     if (table === 'investments') return chain({ data: investments, error: null })
     if (table === 'savings_goals') return chain({ data: goals, error: null })
     if (table === 'alerts') {
-      // alreadyExists: returns count
-      return chain({ count: alertsCount, error: null })
+      // pre-fetch returns user_id+title rows; alertsCount > 0 means all titles already exist
+      const alertData = alertsCount > 0 ? [
+        { user_id: 'u1', title: '🚨 تجاوزت 90% من دخلك!' },
+        { user_id: 'u1', title: '⚠️ مصاريفك تجاوزت 75% من دخلك' },
+        { user_id: 'u1', title: '🏆 ادخرت أكثر من 50% من دخلك!' },
+        { user_id: 'u1', title: '💪 خطوة صغيرة تصنع فارقاً كبيراً' },
+        { user_id: 'u1', title: '🌟 الانضباط المالي عادة لا موهبة' },
+        { user_id: 'u1', title: '📊 راجع ميزانيتك الأسبوع القادم' },
+        { user_id: 'u1', title: '🏦 الادخار أولاً قبل الإنفاق' },
+        { user_id: 'u1', title: '⚡ أنت على الطريق الصحيح يا أحمد' },
+        { user_id: 'u1', title: '🎯 هدف واحد كل شهر يغير حياتك' },
+        { user_id: 'u1', title: '💡 المعرفة المالية هي أفضل استثمار' },
+      ] : []
+      return chain({ data: alertData, count: alertsCount, error: null })
     }
     return chain()
   })

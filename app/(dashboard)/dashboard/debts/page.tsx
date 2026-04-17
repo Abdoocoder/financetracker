@@ -33,21 +33,16 @@ function Confetti({ onDone }: { onDone: () => void }) {
     delay: Math.random() * 1.5,
     color: ['#10B981', '#3B7EF6', '#F59E0B', '#8B5CF6', '#EF4444'][Math.floor(Math.random() * 5)],
     size: Math.random() * 8 + 6,
+    round: Math.random() > 0.5,
   }))
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 999, pointerEvents: 'none', overflow: 'hidden' }}>
+    <div className="fixed inset-0 z-[999] pointer-events-none overflow-hidden">
+      <style>{pieces.map(p =>
+        `.cf-${p.id}{position:absolute;left:${p.left.toFixed(2)}%;top:-20px;width:${p.size.toFixed(1)}px;height:${p.size.toFixed(1)}px;border-radius:${p.round ? '50%' : '2px'};background:${p.color};animation:confettiFall 3s ${p.delay.toFixed(2)}s ease-in forwards}`
+      ).join('')}</style>
       {pieces.map(p => (
-        <div key={p.id} style={{
-          position: 'absolute',
-          left: `${p.left}%`,
-          top: '-20px',
-          width: p.size,
-          height: p.size,
-          borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-          background: p.color,
-          animation: `confettiFall 3s ${p.delay}s ease-in forwards`,
-        }} />
+        <div key={p.id} className={`cf-${p.id}`} />
       ))}
       <style>{`
         @keyframes confettiFall {
@@ -68,15 +63,23 @@ function CelebrationModal({ debtName, onClose }: { debtName: string, onClose: ()
   }, [onClose])
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)' }}
-      onClick={onClose}>
-      <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: 24, padding: '40px 32px', textAlign: 'center', maxWidth: 320, margin: 16, boxShadow: '0 0 60px rgba(16,185,129,0.3)' }}
-        onClick={e => e.stopPropagation()}>
-        <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
-        <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>{t('debts_celebration_title')}</div>
-        <div style={{ fontSize: 15, color: 'var(--accent-green-light)', fontWeight: 700, marginBottom: 12 }}>&quot;{debtName}&quot;</div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{t('debts_celebration_msg')}</div>
-        <button onClick={onClose} style={{ marginTop: 24, padding: '10px 28px', borderRadius: 12, background: 'var(--accent-green)', color: 'white', border: 'none', fontFamily: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+    <div
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/70 backdrop-blur-[8px]"
+      onClick={onClose}
+    >
+      <div
+        className="bg-[var(--bg-card)] border border-[rgba(16,185,129,0.4)] rounded-3xl px-8 py-10 text-center max-w-xs m-4 shadow-[0_0_60px_rgba(16,185,129,0.3)]"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="text-[56px] mb-4">🎉</div>
+        <div className="text-[22px] font-black text-[var(--text-primary)] mb-2">{t('debts_celebration_title')}</div>
+        <div className="text-[15px] text-[var(--accent-green-light)] font-bold mb-3">&quot;{debtName}&quot;</div>
+        <div className="text-[13px] text-[var(--text-muted)] leading-relaxed">{t('debts_celebration_msg')}</div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-6 px-7 py-2.5 rounded-xl bg-[var(--accent-green)] text-white border-none font-[inherit] text-sm font-bold cursor-pointer"
+        >
           {t('debts_celebration_btn')}
         </button>
       </div>
@@ -398,31 +401,32 @@ export default function DebtsPage() {
 
       {/* ── إحصائية المبالغ المسددة ── */}
       {totalPaidAmount > 0 && (
-        <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 16, padding: '14px 16px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 28 }}>💪</div>
+        <div className="bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.2)] rounded-2xl px-4 py-3.5 mb-2 flex items-center gap-3">
+          <div className="text-[28px]">💪</div>
           <div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 2 }}>{t('debts_total_paid_label')}</div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>{totalPaidAmount.toFixed(0)} {baseCurrency}</div>
+            <div className="text-xs text-[var(--text-muted)] mb-0.5">{t('debts_total_paid_label')}</div>
+            <div className="text-lg font-black text-[var(--accent-green-light)] font-mono">{totalPaidAmount.toFixed(0)} {baseCurrency}</div>
           </div>
-          <div style={{ marginRight: 'auto' }}>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>{t('debts_paid_title')}</div>
-            <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-green-light)' }}>{paidDebts.length} 🎯</div>
+          <div className="mr-auto">
+            <div className="text-[11px] text-[var(--text-muted)] mb-0.5">{t('debts_paid_title')}</div>
+            <div className="text-base font-black text-[var(--accent-green-light)]">{paidDebts.length} 🎯</div>
           </div>
         </div>
       )}
 
       {debts.length > 0 && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px', marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{t('debts_progress')}</span>
-            <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--accent-green-light)' }}>{paidPct.toFixed(1)}%</span>
+        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl px-4 py-3.5 mb-4">
+          <div className="flex justify-between mb-2.5">
+            <span className="text-xs font-bold text-[var(--text-secondary)]">{t('debts_progress')}</span>
+            <span className="text-xs font-black text-[var(--accent-green-light)]">{paidPct.toFixed(1)}%</span>
           </div>
-          <div className="progress-track" style={{ height: 10 }}>
-            <div className="progress-fill gradient-green" style={{ width: `${Math.min(paidPct, 100)}%` }} />
+          <div className="progress-track h-[10px]">
+            <style>{`.debt-pct-fill{width:${Math.min(paidPct, 100).toFixed(2)}%}`}</style>
+            <div className="progress-fill gradient-green debt-pct-fill" />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('debts_paid_summary', { amount: (totalOriginal - totalRemaining).toFixed(0) })} {baseCurrency}</span>
-            <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{t('debts_original_label', { amount: totalOriginal.toFixed(0) })} {baseCurrency}</span>
+          <div className="flex justify-between mt-2">
+            <span className="text-[10px] text-[var(--text-muted)]">{t('debts_paid_summary', { amount: (totalOriginal - totalRemaining).toFixed(0) })} {baseCurrency}</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{t('debts_original_label', { amount: totalOriginal.toFixed(0) })} {baseCurrency}</span>
           </div>
         </div>
       )}
@@ -432,16 +436,19 @@ export default function DebtsPage() {
       ) : (
         <>
           {owedDebts.length > 0 && (
-            <button onClick={() => setShowOwed(p => !p)}
-              style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <button
+              type="button"
+              onClick={() => setShowOwed(p => !p)}
+              className="w-full px-4 py-3 rounded-2xl bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] text-[#EF4444] text-[13px] font-bold cursor-pointer font-[inherit] flex items-center justify-between mb-2"
+            >
               <span>💳 {t('debts_tab_owed')} ({owedDebts.length})</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {!showOwed && <span style={{ fontFamily: 'monospace', fontWeight: 900 }}>{totalOwed.toFixed(0)} {baseCurrency}</span>}
-                <span style={{ fontSize: 16 }}>{showOwed ? '▲' : '▼'}</span>
+              <div className="flex items-center gap-2">
+                {!showOwed && <span className="font-mono font-black">{totalOwed.toFixed(0)} {baseCurrency}</span>}
+                <span className="text-base">{showOwed ? '▲' : '▼'}</span>
               </div>
             </button>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="flex flex-col gap-2.5">
           {showOwed && owedDebts.map(debt => (
             <DebtCard
               key={debt.id}
@@ -467,53 +474,67 @@ export default function DebtsPage() {
 
       {/* ── قسم ديون لي ── */}
       {receivableDebts.length > 0 && (
-        <div style={{ marginTop: 16 }}>
-          <button onClick={() => setShowReceivable(p => !p)}
-            style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setShowReceivable(p => !p)}
+            className="w-full px-4 py-3 rounded-2xl bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.2)] text-[#10B981] text-[13px] font-bold cursor-pointer font-[inherit] flex items-center justify-between"
+          >
             <span>💰 {t('debts_tab_receivable')} ({receivableDebts.length})</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {!showReceivable && <span style={{ fontFamily: 'monospace', fontWeight: 900 }}>{totalReceivable.toFixed(0)} {baseCurrency}</span>}
-              <span style={{ fontSize: 16 }}>{showReceivable ? '▲' : '▼'}</span>
+            <div className="flex items-center gap-2">
+              {!showReceivable && <span className="font-mono font-black">{totalReceivable.toFixed(0)} {baseCurrency}</span>}
+              <span className="text-base">{showReceivable ? '▲' : '▼'}</span>
             </div>
           </button>
           {showReceivable && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
+            <div className="flex flex-col gap-2.5 mt-2">
               {receivableDebts.map(debt => {
                 return (
-                  <div key={debt.id} style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 18, padding: '16px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981', flexShrink: 0, marginTop: 4 }} />
+                  <div key={debt.id} className="bg-[rgba(16,185,129,0.04)] border border-[rgba(16,185,129,0.15)] rounded-[18px] p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#10B981] shrink-0 mt-1" />
                         <div>
-                          <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{debt.name}</div>
-                          {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{debt.notes}</div>}
+                          <div className="text-[15px] font-extrabold text-[var(--text-primary)]">{debt.name}</div>
+                          {debt.notes && <div className="text-[11px] text-[var(--text-muted)] mt-0.5">{debt.notes}</div>}
                           {debt.due_date && (
-                            <div style={{ fontSize: 11, color: '#10B981', marginTop: 4, fontWeight: 600 }}>
+                            <div className="text-[11px] text-[#10B981] mt-1 font-semibold">
                               {t('debts_receive_date_label', { date: new Date(debt.due_date).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') })}
                             </div>
                           )}
                         </div>
                       </div>
-                      <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 16, fontWeight: 900, color: '#10B981', fontFamily: 'monospace' }}>
+                      <div className="text-left">
+                        <div className="text-base font-black text-[#10B981] font-mono">
                           {Number(debt.remaining_amount).toFixed(0)} {debt.currency || 'JOD'}
                         </div>
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                        <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
                           {t('debts_original_label', { amount: Number(debt.original_amount).toFixed(0) })}
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                      <button onClick={() => receiveDebt(debt)}
-                        style={{ flex: 1, padding: '7px 14px', borderRadius: 8, background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', color: '#10B981', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    <div className="flex gap-2 mt-3">
+                      <button
+                        type="button"
+                        onClick={() => receiveDebt(debt)}
+                        className="flex-1 px-3.5 py-[7px] rounded-lg bg-[rgba(16,185,129,0.15)] border border-[rgba(16,185,129,0.3)] text-[#10B981] text-xs font-bold cursor-pointer font-[inherit]"
+                      >
                         ✅ {t('debts_receive_btn')}
                       </button>
-                      <button onClick={() => startEdit(debt)}
-                        style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(debt)}
+                        className="px-3.5 py-[7px] rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-muted)] text-xs cursor-pointer font-[inherit]"
+                        aria-label={t('toast_edited')}
+                      >
                         ✏️
                       </button>
-                      <button onClick={() => setConfirmDelete(debt.id)}
-                        style={{ padding: '7px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDelete(debt.id)}
+                        className="px-3.5 py-[7px] rounded-lg bg-[rgba(239,68,68,0.08)] border border-[rgba(239,68,68,0.2)] text-[#EF4444] text-xs cursor-pointer font-[inherit]"
+                        aria-label={t('debts_delete_title')}
+                      >
                         🗑️
                       </button>
                     </div>
@@ -527,26 +548,28 @@ export default function DebtsPage() {
 
       {/* ── تبويب الديون المسددة ── */}
       {paidDebts.length > 0 && (
-        <div style={{ marginTop: 24 }}>
+        <div className="mt-6">
           <button
+            type="button"
             onClick={() => setShowPaid(p => !p)}
-            style={{ width: '100%', padding: '12px 16px', borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            className="w-full px-4 py-3 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-secondary)] text-[13px] font-bold cursor-pointer font-[inherit] flex items-center justify-between"
+          >
             <span>✅ {t('debts_paid_title')} ({paidDebts.length})</span>
-            <span style={{ fontSize: 16 }}>{showPaid ? '▲' : '▼'}</span>
+            <span className="text-base">{showPaid ? '▲' : '▼'}</span>
           </button>
 
           {showPaid && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+            <div className="flex flex-col gap-2 mt-2">
               {paidDebts.map(debt => (
-                <div key={debt.id} style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ fontSize: 24 }}>✅</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{debt.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                <div key={debt.id} className="bg-[rgba(16,185,129,0.05)] border border-[rgba(16,185,129,0.15)] rounded-2xl px-4 py-3.5 flex items-center gap-3">
+                  <div className="text-2xl">✅</div>
+                  <div className="flex-1">
+                    <div className="text-[13px] font-bold text-[var(--text-primary)]">{debt.name}</div>
+                    <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
                       {debt.updated_at ? new Date(debt.updated_at).toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US') : ''}
                     </div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>
+                  <div className="text-sm font-black text-[var(--accent-green-light)] font-mono">
                     {Number(debt.original_amount).toFixed(0)} {baseCurrency}
                   </div>
                 </div>

@@ -131,45 +131,41 @@ async function weeklyReport() {
     .from('profiles').select('id, full_name, monthly_income, lesson_streak')
   if (!profiles?.length) return
 
-  for (const p of profiles) {
+  await Promise.allSettled(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = Number(p.monthly_income ?? 0)
 
-    // معاملات الأسبوع
-    const { data: thisWeek } = await supabase.from('transactions')
-      .select('amount, type, category').eq('user_id', p.id)
-      .gte('transaction_date', daysAgo(7)).lte('transaction_date', today())
+    const [thisWeekRes, lastWeekRes, debtsRes] = await Promise.all([
+      supabase.from('transactions').select('amount, type, category').eq('user_id', p.id)
+        .gte('transaction_date', daysAgo(7)).lte('transaction_date', today()),
+      supabase.from('transactions').select('amount').eq('user_id', p.id).eq('type', 'expense')
+        .gte('transaction_date', daysAgo(14)).lt('transaction_date', daysAgo(7)),
+      supabase.from('debts').select('remaining_amount, monthly_payment').eq('user_id', p.id).eq('is_paid', false),
+    ])
 
-    const { data: lastWeek } = await supabase.from('transactions')
-      .select('amount').eq('user_id', p.id).eq('type', 'expense')
-      .gte('transaction_date', daysAgo(14)).lt('transaction_date', daysAgo(7))
+    const thisWeek = thisWeekRes.data ?? []
+    const lastWeek = lastWeekRes.data ?? []
+    const debts = debtsRes.data ?? []
 
-    const thisExpenses = (thisWeek ?? []).filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-    const thisSavings = (thisWeek ?? []).filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0) - thisExpenses
-    const lastTotal = (lastWeek ?? []).reduce((a, t) => a + Number(t.amount), 0)
-    const txCount = (thisWeek ?? []).length
+    const thisExpenses = thisWeek.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
+    const thisSavings = thisWeek.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0) - thisExpenses
+    const lastTotal = lastWeek.reduce((a, t) => a + Number(t.amount), 0)
+    const txCount = thisWeek.length
     const diff = Math.abs(thisExpenses - lastTotal).toFixed(0)
 
-    // أكبر فئة إنفاق
     const catMap: Record<string, number> = {}
-    for (const t of (thisWeek ?? []).filter(t => t.type === 'expense')) {
+    for (const t of thisWeek.filter(t => t.type === 'expense')) {
       catMap[t.category] = (catMap[t.category] ?? 0) + Number(t.amount)
     }
     const topCat = Object.entries(catMap).sort((a, b) => b[1] - a[1])[0]
 
-    // الديون والمرحلة
-    const { data: debts } = await supabase.from('debts')
-      .select('remaining_amount, monthly_payment').eq('user_id', p.id).eq('is_paid', false)
-    const totalDebt = (debts ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
-    const totalMonthly = (debts ?? []).reduce((a, d) => a + Number(d.monthly_payment), 0)
-    const debtRatio = income > 0 ? (totalMonthly / income) * 100 : 0
+    const totalDebt = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
+    const totalMonthly = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
 
-    // تحديد المرحلة
     const stage = totalDebt > 0 ? 'سداد الديون' :
                   thisSavings < income * 0.1 ? 'بناء صندوق الطوارئ' :
                   'الاستثمار والثروة'
 
-    // الخطوة التالية
     const nextStep = totalDebt > 0
       ? `سدّد ${Math.min(totalMonthly, totalDebt).toFixed(0)} JOD من ديونك هذا الشهر`
       : thisSavings < 0
@@ -177,8 +173,6 @@ async function weeklyReport() {
         : `استمر في الادخار — أنت على الطريق الصحيح`
 
     const streak = Number(p.lesson_streak ?? 0)
-
-    // بناء الرسالة
     const title = `تقريرك الأسبوعي ${name} 🌅`
     let body = `سجّلت ${txCount} معاملة`
 
@@ -195,23 +189,17 @@ async function weeklyReport() {
     if (streak > 0) body += ` | سلسلة الدروس: ${streak} يوم 🔥`
     body += ` | ${nextStep}`
 
-    await sendPushToUser(p.id, title, body, '/dashboard', 'weekly')
-
-    // أضف تنبيه داخلي مفصّل
-    await supabase.from('alerts').insert({
-      user_id: p.id,
-      type: thisExpenses < lastTotal ? 'achievement' : 'info',
-      title: `تقريرك الأسبوعي 📊`,
-      message: `سجّلت ${txCount} معاملة هذا الأسبوع.
-💸 الإنفاق: ${thisExpenses.toFixed(0)} JOD${topCat ? ` (أكثر فئة: ${topCat[0]})` : ''}
-📍 مرحلتك: ${stage}
-🎯 الخطوة التالية: ${nextStep}${streak > 0 ? `
-🔥 سلسلة الدروس: ${streak} يوم` : ''}`,
-      frequency: 'weekly',
-      is_read: false,
-      is_active: true,
-    })
-  }
+    await Promise.allSettled([
+      sendPushToUser(p.id, title, body, '/dashboard', 'weekly'),
+      supabase.from('alerts').insert({
+        user_id: p.id,
+        type: thisExpenses < lastTotal ? 'achievement' : 'info',
+        title: `تقريرك الأسبوعي 📊`,
+        message: `سجّلت ${txCount} معاملة هذا الأسبوع.\n💸 الإنفاق: ${thisExpenses.toFixed(0)} JOD${topCat ? ` (أكثر فئة: ${topCat[0]})` : ''}\n📍 مرحلتك: ${stage}\n🎯 الخطوة التالية: ${nextStep}${streak > 0 ? `\n🔥 سلسلة الدروس: ${streak} يوم` : ''}`,
+        frequency: 'weekly', is_read: false, is_active: true,
+      }),
+    ])
+  }))
 }
 
 
@@ -228,7 +216,7 @@ async function wealthGuidanceAlert() {
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 
-  for (const p of profiles) {
+  await Promise.allSettled(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = Number(p.monthly_income ?? 0)
     const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
@@ -317,7 +305,7 @@ async function wealthGuidanceAlert() {
     const dayOfMonth = now.getUTCDate()
     const lesson = getLessonForStage(stage, dayOfMonth, userLang)
     await sendPushToUser(p.id, lesson.title, lesson.body, lesson.url, 'lesson')
-  }
+  }))
 }
 
 // ── 6 ص: تذكير موعد الديون التي لك ─────────────────
@@ -382,11 +370,10 @@ async function smartNudge() {
 
   if (!profiles?.length) return
 
-  for (const p of profiles) {
+  await Promise.allSettled(profiles.map(async (p) => {
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
 
-    // تحقق إذا سجل معاملة في آخر 3 أيام
     const { count } = await supabase
       .from('transactions')
       .select('id', { count: 'exact', head: true })
@@ -403,7 +390,7 @@ async function smartNudge() {
 
       await sendPushToUser(p.id, title, body, '/dashboard?quick=1', 'nudge')
     }
-  }
+  }))
 }
 
 export async function GET(request: NextRequest) {

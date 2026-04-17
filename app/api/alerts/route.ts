@@ -5,17 +5,17 @@ import { verifyCronAuth } from '@/lib/cron-auth'
 
 const supabase = createAdminClient()
 
-async function alreadyExists(userId: string, title: string, withinHours = 24): Promise<boolean> {
-  const since = new Date(Date.now() - withinHours * 60 * 60 * 1000).toISOString()
-  const { count } = await supabase
-    .from('alerts').select('id', { count: 'exact', head: true })
-    .eq('user_id', userId).eq('title', title).gte('created_at', since)
-  return (count ?? 0) > 0
-}
-
-async function pushAlert(list: Record<string, unknown>[], userId: string, type: string, title: string, message: string, withinHours = 20) {
-  const exists = await alreadyExists(userId, title, withinHours)
-  if (!exists) list.push({ user_id: userId, type, title, message, frequency: 'daily', is_read: false, is_active: true })
+function pushAlert(
+  list: Record<string, unknown>[],
+  existingTitles: Set<string>,
+  userId: string,
+  type: string,
+  title: string,
+  message: string,
+) {
+  if (!existingTitles.has(title)) {
+    list.push({ user_id: userId, type, title, message, frequency: 'daily', is_read: false, is_active: true })
+  }
 }
 
 async function generateAlerts(userId?: string) {
@@ -26,6 +26,19 @@ async function generateAlerts(userId?: string) {
   const query = supabase.from('profiles').select('id, monthly_income, full_name')
   const { data: profiles } = userId ? await query.eq('id', userId) : await query
   if (!profiles?.length) return 0
+
+  // pre-fetch existing alerts for all users in one query to avoid per-user checks
+  const since20h = new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString()
+  const profileIds = profiles.map(p => p.id)
+  const { data: recentAlerts } = await supabase
+    .from('alerts').select('user_id, title')
+    .in('user_id', profileIds).gte('created_at', since20h)
+  const existingByUser = new Map<string, Set<string>>()
+  for (const a of recentAlerts ?? []) {
+    if (!existingByUser.has(a.user_id)) existingByUser.set(a.user_id, new Set())
+    existingByUser.get(a.user_id)!.add(a.title)
+  }
+
   const toInsert: Record<string, unknown>[] = []
   for (const profile of profiles) {
     const uid = profile.id
@@ -34,6 +47,7 @@ async function generateAlerts(userId?: string) {
     const n = profile.full_name?.split(' ')[0] ?? 'Friend'
     const ar = true
     const firstOfMonth = `${now.getFullYear()}-${String(month).padStart(2,'0')}-01`
+    const existingTitles = existingByUser.get(uid) ?? new Set<string>()
     const [txRes, debtRes, invRes, goalRes] = await Promise.all([
       supabase.from('transactions').select('type,amount,transaction_date').eq('user_id', uid).gte('transaction_date', firstOfMonth),
       supabase.from('debts').select('name,remaining_amount,original_amount,monthly_payment').eq('user_id', uid).eq('is_paid', false),
@@ -54,31 +68,31 @@ async function generateAlerts(userId?: string) {
     const effectiveIncome = monthIncome || income
     if (effectiveIncome > 0) {
       const ratio = monthExpenses / effectiveIncome
-      if (ratio > 0.9) await pushAlert(toInsert, uid, 'warning', ar ? '🚨 تجاوزت 90% من دخلك!' : '🚨 You exceeded 90% of income!', ar ? `مصاريفك ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% من دخلك.` : `Expenses ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% of income.`)
-      else if (ratio > 0.75) await pushAlert(toInsert, uid, 'warning', ar ? '⚠️ مصاريفك تجاوزت 75% من دخلك' : '⚠️ Expenses exceeded 75% of income', ar ? `أنفقت ${monthExpenses.toFixed(0)} JOD من أصل ${effectiveIncome.toFixed(0)} JOD.` : `Spent ${monthExpenses.toFixed(0)} JOD of ${effectiveIncome.toFixed(0)} JOD.`)
-      else if (ratio < 0.5 && monthExpenses > 0) await pushAlert(toInsert, uid, 'achievement', ar ? '🏆 ادخرت أكثر من 50% من دخلك!' : '🏆 Saved over 50% of income!', ar ? `رائع يا ${name}! مصاريفك فقط ${(ratio*100).toFixed(0)}% من دخلك. استثمر الفائض!` : `Great ${n}! Expenses only ${(ratio*100).toFixed(0)}% of income. Invest the rest!`)
+      if (ratio > 0.9) pushAlert(toInsert, existingTitles, uid, 'warning', ar ? '🚨 تجاوزت 90% من دخلك!' : '🚨 You exceeded 90% of income!', ar ? `مصاريفك ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% من دخلك.` : `Expenses ${monthExpenses.toFixed(0)} JOD = ${(ratio*100).toFixed(0)}% of income.`)
+      else if (ratio > 0.75) pushAlert(toInsert, existingTitles, uid, 'warning', ar ? '⚠️ مصاريفك تجاوزت 75% من دخلك' : '⚠️ Expenses exceeded 75% of income', ar ? `أنفقت ${monthExpenses.toFixed(0)} JOD من أصل ${effectiveIncome.toFixed(0)} JOD.` : `Spent ${monthExpenses.toFixed(0)} JOD of ${effectiveIncome.toFixed(0)} JOD.`)
+      else if (ratio < 0.5 && monthExpenses > 0) pushAlert(toInsert, existingTitles, uid, 'achievement', ar ? '🏆 ادخرت أكثر من 50% من دخلك!' : '🏆 Saved over 50% of income!', ar ? `رائع يا ${name}! مصاريفك فقط ${(ratio*100).toFixed(0)}% من دخلك. استثمر الفائض!` : `Great ${n}! Expenses only ${(ratio*100).toFixed(0)}% of income. Invest the rest!`)
     }
     if (debts.length > 0) {
-      if (dayOfMonth >= 23 && dayOfMonth <= 25) await pushAlert(toInsert, uid, 'reminder', ar ? '📅 تذكير: أقساط الشهر القادم' : '📅 Reminder: Next month installments', ar ? `إجمالي أقساطك ${totalMonthly.toFixed(0)} JOD.` : `Total installments: ${totalMonthly.toFixed(0)} JOD.`, 48)
+      if (dayOfMonth >= 23 && dayOfMonth <= 25) pushAlert(toInsert, existingTitles, uid, 'reminder', ar ? '📅 تذكير: أقساط الشهر القادم' : '📅 Reminder: Next month installments', ar ? `إجمالي أقساطك ${totalMonthly.toFixed(0)} JOD.` : `Total installments: ${totalMonthly.toFixed(0)} JOD.`)
       const nearlyPaid = debts.find(d => { const pct = (Number(d.original_amount) - Number(d.remaining_amount)) / Number(d.original_amount); return pct >= 0.8 && pct < 1 })
-      if (nearlyPaid) await pushAlert(toInsert, uid, 'achievement', ar ? `🎯 اقتربت من سداد "${nearlyPaid.name}"!` : `🎯 Almost paid off "${nearlyPaid.name}"!`, ar ? `تبقى فقط ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD!` : `Only ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD left!`, 168)
-      if (effectiveIncome > 0 && totalDebt > effectiveIncome * 6) await pushAlert(toInsert, uid, 'warning', ar ? '💳 ديونك تجاوزت 6 أضعاف دخلك' : '💳 Debts exceed 6x your income', ar ? `إجمالي ديونك ${totalDebt.toFixed(0)} JOD.` : `Total debts: ${totalDebt.toFixed(0)} JOD.`, 168)
+      if (nearlyPaid) pushAlert(toInsert, existingTitles, uid, 'achievement', ar ? `🎯 اقتربت من سداد "${nearlyPaid.name}"!` : `🎯 Almost paid off "${nearlyPaid.name}"!`, ar ? `تبقى فقط ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD!` : `Only ${Number(nearlyPaid.remaining_amount).toFixed(0)} JOD left!`)
+      if (effectiveIncome > 0 && totalDebt > effectiveIncome * 6) pushAlert(toInsert, existingTitles, uid, 'warning', ar ? '💳 ديونك تجاوزت 6 أضعاف دخلك' : '💳 Debts exceed 6x your income', ar ? `إجمالي ديونك ${totalDebt.toFixed(0)} JOD.` : `Total debts: ${totalDebt.toFixed(0)} JOD.`)
     }
     if (invs.length > 0) {
-      if (invPnl > 0) await pushAlert(toInsert, uid, 'achievement', ar ? `📈 محفظتك في المنطقة الخضراء +${(invPnl/invCost*100).toFixed(1)}%` : `📈 Portfolio in the green +${(invPnl/invCost*100).toFixed(1)}%`, ar ? `قيمة محفظتك $${invValue.toFixed(0)} مقابل تكلفة $${invCost.toFixed(0)}.` : `Portfolio value $${invValue.toFixed(0)} vs cost $${invCost.toFixed(0)}.`, 168)
-      else if (invPnl < -invCost * 0.1) await pushAlert(toInsert, uid, 'reminder', ar ? '📉 انخفاض مؤقت في محفظتك' : '📉 Temporary portfolio dip', ar ? 'لا تتسرع في البيع — الاستثمار طويل الأمد مصمم لتحمل التذبذبات.' : "Don't rush to sell — long-term investing is designed to weather volatility.", 168)
-      if (dayOfMonth <= 3 && [1,4,7,10].includes(month)) await pushAlert(toInsert, uid, 'reminder', ar ? '🗓️ وقت الشراء الربعي لـ SPUS' : '🗓️ Quarterly buy time for SPUS', ar ? 'أضف دفعتك الاستثمارية الربعية للاستفادة من متوسط التكلفة.' : 'Add your quarterly investment to benefit from dollar-cost averaging.', 168)
+      if (invPnl > 0) pushAlert(toInsert, existingTitles, uid, 'achievement', ar ? `📈 محفظتك في المنطقة الخضراء +${(invPnl/invCost*100).toFixed(1)}%` : `📈 Portfolio in the green +${(invPnl/invCost*100).toFixed(1)}%`, ar ? `قيمة محفظتك $${invValue.toFixed(0)} مقابل تكلفة $${invCost.toFixed(0)}.` : `Portfolio value $${invValue.toFixed(0)} vs cost $${invCost.toFixed(0)}.`)
+      else if (invPnl < -invCost * 0.1) pushAlert(toInsert, existingTitles, uid, 'reminder', ar ? '📉 انخفاض مؤقت في محفظتك' : '📉 Temporary portfolio dip', ar ? 'لا تتسرع في البيع — الاستثمار طويل الأمد مصمم لتحمل التذبذبات.' : "Don't rush to sell — long-term investing is designed to weather volatility.")
+      if (dayOfMonth <= 3 && [1,4,7,10].includes(month)) pushAlert(toInsert, existingTitles, uid, 'reminder', ar ? '🗓️ وقت الشراء الربعي لـ SPUS' : '🗓️ Quarterly buy time for SPUS', ar ? 'أضف دفعتك الاستثمارية الربعية للاستفادة من متوسط التكلفة.' : 'Add your quarterly investment to benefit from dollar-cost averaging.')
     }
     if (goals.length > 0) {
       const almostGoal = goals.find(g => { const pct = Number(g.current_amount) / Number(g.target_amount); return pct >= 0.9 && pct < 1 })
-      if (almostGoal) await pushAlert(toInsert, uid, 'achievement', ar ? `🎯 كدت تحقق هدف "${almostGoal.name}"!` : `🎯 Almost reached goal "${almostGoal.name}"!`, ar ? `تبقى ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD فقط!` : `Only ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD left!`, 168)
+      if (almostGoal) pushAlert(toInsert, existingTitles, uid, 'achievement', ar ? `🎯 كدت تحقق هدف "${almostGoal.name}"!` : `🎯 Almost reached goal "${almostGoal.name}"!`, ar ? `تبقى ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD فقط!` : `Only ${(Number(almostGoal.target_amount) - Number(almostGoal.current_amount)).toFixed(0)} JOD left!`)
       const stagnant = goals.find(g => Number(g.current_amount) === 0)
-      if (stagnant) await pushAlert(toInsert, uid, 'reminder', ar ? `⏰ هدف "${stagnant.name}" ينتظرك` : `⏰ Goal "${stagnant.name}" is waiting`, ar ? `حتى ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD شهرياً يصنع فارقاً.` : `Even ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD/month makes a difference.`, 168)
+      if (stagnant) pushAlert(toInsert, existingTitles, uid, 'reminder', ar ? `⏰ هدف "${stagnant.name}" ينتظرك` : `⏰ Goal "${stagnant.name}" is waiting`, ar ? `حتى ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD شهرياً يصنع فارقاً.` : `Even ${(Number(stagnant.target_amount)*0.01).toFixed(0)} JOD/month makes a difference.`)
     }
     if (dayOfWeek === 0) {
       const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7)
       const { count } = await supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('user_id', uid).gte('transaction_date', weekAgo.toISOString().split('T')[0])
-      if ((count ?? 0) === 0) await pushAlert(toInsert, uid, 'reminder', ar ? '⏰ لم تسجل أي معاملات هذا الأسبوع' : '⏰ No transactions recorded this week', ar ? 'سجّل مصاريفك بانتظام — التتبع اليومي هو أقوى أداة للوعي المالي.' : 'Track your expenses regularly — daily tracking is the most powerful financial awareness tool.', 168)
+      if ((count ?? 0) === 0) pushAlert(toInsert, existingTitles, uid, 'reminder', ar ? '⏰ لم تسجل أي معاملات هذا الأسبوع' : '⏰ No transactions recorded this week', ar ? 'سجّل مصاريفك بانتظام — التتبع اليومي هو أقوى أداة للوعي المالي.' : 'Track your expenses regularly — daily tracking is the most powerful financial awareness tool.')
     }
     const motivations = ar ? [
       { title: '💪 خطوة صغيرة تصنع فارقاً كبيراً', message: `يا ${name}، كل دينار تدخره اليوم هو استثمار في حريتك المالية غداً.` },
@@ -98,8 +112,10 @@ async function generateAlerts(userId?: string) {
       { title: '💡 Financial knowledge is the best investment', message: 'Every minute tracking your money is worth many times over in the long run.' },
     ]
     for (const mot of motivations) {
-      const exists = await alreadyExists(uid, mot.title, 20)
-      if (!exists) { toInsert.push({ user_id: uid, type: 'motivation', title: mot.title, message: mot.message, frequency: 'daily', is_read: false, is_active: true }); break }
+      if (!existingTitles.has(mot.title)) {
+        toInsert.push({ user_id: uid, type: 'motivation', title: mot.title, message: mot.message, frequency: 'daily', is_read: false, is_active: true })
+        break
+      }
     }
   }
   // sendPushToUser يكتب في notification_history → Edge Function تتولى

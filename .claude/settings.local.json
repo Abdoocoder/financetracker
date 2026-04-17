@@ -147,7 +147,10 @@
       "mcp__task-master-ai__next_task",
       "Bash(gh run *)",
       "Bash(gh api *)",
-      "Bash(python -c \"import sys,json; jobs=json.load\\(sys.stdin\\)['jobs']; [print\\(j['name'], j['conclusion'], j['html_url']\\) for j in jobs]\")"
+      "Bash(python -c \"import sys,json; jobs=json.load\\(sys.stdin\\)['jobs']; [print\\(j['name'], j['conclusion'], j['html_url']\\) for j in jobs]\")",
+      "Bash(task-master show *)",
+      "PowerShell(cd c:\\\\Users\\\\user\\\\Projects\\\\financetracker && npm test -- --testPathPattern=\"alerts\" 2>&1 | Select-String \"●|FAIL|PASS|expect|received\" | Select-Object -First 20)",
+      "PowerShell(cd c:\\\\Users\\\\user\\\\Projects\\\\financetracker && npm test -- --testPathPattern=\"alerts\" 2>&1 | Select-Object -Last 40)"
     ]
   }
 }
