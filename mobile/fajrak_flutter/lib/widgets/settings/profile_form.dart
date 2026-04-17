@@ -61,7 +61,9 @@ class _ProfileFormState extends State<ProfileForm> {
   }
 
   Future<void> _saveProfile() async {
-    setState(() => _savingProfile = true);
+    if (_savingProfile) return;
+    _savingProfile = true;
+    setState(() {});
     try {
       final user = Supabase.instance.client.auth.currentUser!;
       await Supabase.instance.client.from('profiles').upsert({

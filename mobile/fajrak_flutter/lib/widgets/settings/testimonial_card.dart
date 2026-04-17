@@ -61,11 +61,13 @@ class _TestimonialCardState extends State<TestimonialCard> {
   }
 
   Future<void> _submit() async {
+    if (_saving) return;
     if (_nameCtrl.text.isEmpty || _textCtrl.text.length < 20) return;
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
-    setState(() => _saving = true);
+    _saving = true;
+    setState(() {});
     try {
       final data = {
         'user_id': user.id,

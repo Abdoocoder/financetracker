@@ -13,6 +13,7 @@ class RecurringScreen extends StatefulWidget {
 class _RecurringScreenState extends State<RecurringScreen> {
   List<Map<String, dynamic>> _list = [];
   bool _loading = true;
+  bool _saving = false;
   String _currency = 'JOD';
 
   @override
@@ -40,24 +41,40 @@ class _RecurringScreenState extends State<RecurringScreen> {
   }
 
   Future<void> _toggleActive(Map<String, dynamic> rec) async {
-    final newVal = !(rec['is_active'] as bool? ?? true);
-    await Supabase.instance.client
-        .from('recurring_transactions')
-        .update({'is_active': newVal}).eq('id', rec['id']);
-    setState(() {
-      final idx = _list.indexWhere((r) => r['id'] == rec['id']);
-      if (idx >= 0) _list[idx] = {...rec, 'is_active': newVal};
-    });
+    if (_saving) return;
+    _saving = true;
+    setState(() {});
+    try {
+      final newVal = !(rec['is_active'] as bool? ?? true);
+      await Supabase.instance.client
+          .from('recurring_transactions')
+          .update({'is_active': newVal}).eq('id', rec['id']);
+      if (mounted) {
+        setState(() {
+          final idx = _list.indexWhere((r) => r['id'] == rec['id']);
+          if (idx >= 0) _list[idx] = {...rec, 'is_active': newVal};
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   Future<void> _delete(String id) async {
-    await Supabase.instance.client
-        .from('recurring_transactions').delete().eq('id', id);
-    setState(() => _list.removeWhere((r) => r['id'] == id));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('toast_deleted'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-      );
+    if (_saving) return;
+    _saving = true;
+    setState(() {});
+    try {
+      await Supabase.instance.client
+          .from('recurring_transactions').delete().eq('id', id);
+      if (mounted) {
+        setState(() => _list.removeWhere((r) => r['id'] == id));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('toast_deleted'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 

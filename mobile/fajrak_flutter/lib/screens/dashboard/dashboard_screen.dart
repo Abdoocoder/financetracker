@@ -37,6 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _accountsLoading = true;
   bool _loading = true;
   bool _hasError = false;
+  bool _saving = false;
   double _income = 0, _expenses = 0, _net = 0, _monthlyDebtCommitments = 0;
   double _totalAccountsBalance = 0;
   List<Map<String, dynamic>> _accounts = [];
@@ -237,8 +238,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _quickAdd(String type, double amount, String category, {double? originalAmount, String? originalCurrency, double? exchangeRate}) async {
+    if (_saving) return;
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
+    _saving = true;
+    setState(() {});
     HapticFeedback.mediumImpact();
     try {
       await Supabase.instance.client.from('transactions').insert({
@@ -264,6 +268,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: cs.error));
       }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 

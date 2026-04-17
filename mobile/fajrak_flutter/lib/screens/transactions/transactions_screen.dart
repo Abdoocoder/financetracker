@@ -31,6 +31,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   bool _loading = true;
   bool _loadingMore = false;
   bool _hasError = false;
+  bool _saving = false;
   int _limit = 20;
   bool _hasMore = true;
 
@@ -310,8 +311,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Future<void> _delete(String id) async {
-    await Supabase.instance.client.from('transactions').delete().eq('id', id);
-    setState(() => _transactions.removeWhere((t) => t['id'] == id));
+    if (_saving) return;
+    _saving = true;
+    setState(() {});
+    try {
+      await Supabase.instance.client.from('transactions').delete().eq('id', id);
+      if (mounted) setState(() => _transactions.removeWhere((t) => t['id'] == id));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   void _showAddDialog({Map<String, dynamic>? existing}) {

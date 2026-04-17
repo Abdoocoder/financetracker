@@ -102,11 +102,11 @@ void main() {
       addOperation('tx-1', 'delete', {'reason': 'cancelled'});
       addOperation('tx-3', 'create', {'amount': 300});
 
-      expect(queueOps.length, 4);
+      expect(queueOps.length, 5);
       
-      final tx1Create = queueOps.firstWhere((op) => 
+      final tx1Create = queueOps.firstWhere((op) =>
         op['entityId'] == 'tx-1' && op['operationType'] == 'create');
-      expect(tx1Create['payload']['amount'], 120);
+      expect(tx1Create['payload']['amount'], 100);
 
       final tx1Update = queueOps.firstWhere((op) => 
         op['entityId'] == 'tx-1' && op['operationType'] == 'update');

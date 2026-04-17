@@ -144,7 +144,10 @@
       "Read(//c/flutter/flutter/bin//**)",
       "Bash(claude mcp *)",
       "Bash(npx skills *)",
-      "mcp__task-master-ai__next_task"
+      "mcp__task-master-ai__next_task",
+      "Bash(gh run *)",
+      "Bash(gh api *)",
+      "Bash(python -c \"import sys,json; jobs=json.load\\(sys.stdin\\)['jobs']; [print\\(j['name'], j['conclusion'], j['html_url']\\) for j in jobs]\")"
     ]
   }
 }

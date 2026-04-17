@@ -23,6 +23,7 @@ class InvestmentsScreen extends StatefulWidget {
 class _InvestmentsScreenState extends State<InvestmentsScreen> {
   List<Map<String, dynamic>> _investments = [];
   bool _loading = true;
+  bool _saving = false;
   bool _showInUsd = true;
   double _usdToLocalRate = 0.709;
   String _currency = 'JOD';
@@ -191,8 +192,15 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         });
 
     if (confirm == true) {
-      await Supabase.instance.client.from('investments').delete().eq('id', id);
-      await _load();
+      if (_saving) return;
+      _saving = true;
+      setState(() {});
+      try {
+        await Supabase.instance.client.from('investments').delete().eq('id', id);
+        await _load();
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
   }
 

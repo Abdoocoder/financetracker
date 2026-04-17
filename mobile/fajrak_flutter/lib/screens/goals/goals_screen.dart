@@ -20,6 +20,7 @@ class GoalsScreen extends StatefulWidget {
 class _GoalsScreenState extends State<GoalsScreen> {
   List<Map<String, dynamic>> _goals = [];
   bool _loading = true;
+  bool _saving = false;
   String _currency = 'JOD';
 
   static final _goalIcons = [
@@ -121,8 +122,15 @@ class _GoalsScreenState extends State<GoalsScreen> {
       ),
     );
     if (confirm == true) {
-      await Supabase.instance.client.from('savings_goals').delete().eq('id', id);
-      await _load();
+      if (_saving) return;
+      _saving = true;
+      setState(() {});
+      try {
+        await Supabase.instance.client.from('savings_goals').delete().eq('id', id);
+        await _load();
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
   }
 

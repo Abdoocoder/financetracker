@@ -32,6 +32,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
   List<Map<String, dynamic>> _paidDebts = [];
   List<Map<String, dynamic>> _debtAlerts = [];
   bool _loading = true;
+  bool _saving = false;
   bool _showPaid = false;
   bool _showOwed = true;
   bool _showReceivable = true;
@@ -109,11 +110,18 @@ class _DebtsScreenState extends State<DebtsScreen> {
   }
 
   Future<void> _dismissAlert(String id) async {
-    await Supabase.instance.client
-        .from('alerts')
-        .update({'is_read': true})
-        .eq('id', id);
-    if (mounted) setState(() => _debtAlerts.removeWhere((a) => a['id'] == id));
+    if (_saving) return;
+    _saving = true;
+    setState(() {});
+    try {
+      await Supabase.instance.client
+          .from('alerts')
+          .update({'is_read': true})
+          .eq('id', id);
+      if (mounted) setState(() => _debtAlerts.removeWhere((a) => a['id'] == id));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   void _showCelebration(String name) {
@@ -142,8 +150,15 @@ class _DebtsScreenState extends State<DebtsScreen> {
       ),
     );
     if (confirm == true) {
-      await Supabase.instance.client.from('debts').delete().eq('id', id);
-      await _load();
+      if (_saving) return;
+      _saving = true;
+      setState(() {});
+      try {
+        await Supabase.instance.client.from('debts').delete().eq('id', id);
+        await _load();
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
   }
 
@@ -168,23 +183,29 @@ class _DebtsScreenState extends State<DebtsScreen> {
       ),
     );
     if (confirm != true) return;
+    if (_saving) return;
 
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
 
-    await Supabase.instance.client.from('debts').update({'is_paid': true}).eq('id', debt['id']);
-    await Supabase.instance.client.from('transactions').insert({
-      'user_id': user.id,
-      'type': 'income',
-      'amount': debt['remaining_amount'],
-      'category': 'دين مستلم',
-      'description': 'استلام دين: ${debt['name']}',
-      'transaction_date': DateTime.now().toIso8601String().split('T')[0],
-    });
-
-    if (mounted) {
-      _showCelebration(debt['name']);
-      await _load();
+    _saving = true;
+    setState(() {});
+    try {
+      await Supabase.instance.client.from('debts').update({'is_paid': true}).eq('id', debt['id']);
+      await Supabase.instance.client.from('transactions').insert({
+        'user_id': user.id,
+        'type': 'income',
+        'amount': debt['remaining_amount'],
+        'category': 'دين مستلم',
+        'description': 'استلام دين: ${debt['name']}',
+        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+      });
+      if (mounted) {
+        _showCelebration(debt['name']);
+        await _load();
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
     }
   }
 

@@ -56,7 +56,9 @@ class _AssetsFormState extends State<AssetsForm> {
   }
 
   Future<void> _saveAssets() async {
-    setState(() => _savingAssets = true);
+    if (_savingAssets) return;
+    _savingAssets = true;
+    setState(() {});
     try {
       final user = Supabase.instance.client.auth.currentUser!;
       await Supabase.instance.client.from('profiles').upsert({
