@@ -3,22 +3,20 @@ import { headers, cookies } from 'next/headers'
 import { ar } from './locales/ar'
 import { en } from './locales/en'
 
-export async function getServerLang() {
-  const cookieStore = await cookies()
-  const langCookie = cookieStore.get('lang')?.value
+export async function getServerLang(): Promise<'ar' | 'en'> {
+  try {
+    const cookieStore = await cookies()
+    const langCookie = cookieStore.get('lang')?.value
+    if (langCookie === 'ar' || langCookie === 'en') return langCookie
+  } catch {}
 
-  if (langCookie === 'ar' || langCookie === 'en') {
-    return langCookie as 'ar' | 'en'
-  }
+  try {
+    const headerList = await headers()
+    const acceptLanguage = headerList.get('accept-language') || ''
+    if (acceptLanguage.toLowerCase().includes('en')) return 'en'
+  } catch {}
 
-  const headerList = await headers()
-  const acceptLanguage = headerList.get('accept-language') || ''
-  
-  if (acceptLanguage.toLowerCase().includes('en')) {
-    return 'en'
-  }
-
-  return 'ar' // Default to Arabic
+  return 'ar'
 }
 
 export function getTranslation(lang: 'ar' | 'en') {
@@ -26,19 +24,25 @@ export function getTranslation(lang: 'ar' | 'en') {
 }
 
 export async function getServerTranslation() {
-  const lang = await getServerLang()
-  const translations = getTranslation(lang)
-  
-  return {
-    t: (key: string, params?: Record<string, string | number>) => {
-      let str = (translations as any)[key] || (ar as any)[key] || key
-      if (params) {
-        Object.entries(params).forEach(([k, v]) => {
-          str = str.replace(`{${k}}`, String(v))
-        })
-      }
-      return str
-    },
-    lang
+  try {
+    const lang = await getServerLang()
+    const translations = getTranslation(lang)
+    return {
+      t: (key: string, params?: Record<string, string | number>) => {
+        let str = (translations as any)[key] || (ar as any)[key] || key
+        if (params) {
+          Object.entries(params).forEach(([k, v]) => {
+            str = str.replace(`{${k}}`, String(v))
+          })
+        }
+        return str
+      },
+      lang,
+    }
+  } catch {
+    return {
+      t: (key: string) => (ar as any)[key] || key,
+      lang: 'ar' as const,
+    }
   }
 }
