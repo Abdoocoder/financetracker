@@ -6,13 +6,17 @@ import { en } from './locales/en'
 export async function getServerLang(): Promise<'ar' | 'en'> {
   try {
     const cookieStore = await cookies()
-    const langCookie = cookieStore.get('lang')?.value
+    const langCookie = typeof cookieStore?.get === 'function'
+      ? cookieStore.get('lang')?.value
+      : undefined
     if (langCookie === 'ar' || langCookie === 'en') return langCookie
   } catch {}
 
   try {
     const headerList = await headers()
-    const acceptLanguage = headerList.get('accept-language') || ''
+    const acceptLanguage = typeof headerList?.get === 'function'
+      ? headerList.get('accept-language') ?? ''
+      : ''
     if (acceptLanguage.toLowerCase().includes('en')) return 'en'
   } catch {}
 
