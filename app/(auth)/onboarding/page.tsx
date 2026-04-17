@@ -18,17 +18,25 @@ const CATEGORIES_INCOME  = ['راتب','عمل حر','استثمار','هدية'
 function ProgressBar({ step }: { step: Step }) {
   const pct = ((step - 1) / 2) * 100
   return (
-    <div style={{ height: 3, background: 'var(--border)', borderRadius: 2, marginBottom: 28, overflow: 'hidden' }}>
-      <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg, var(--accent-blue), var(--accent-green))', borderRadius: 2, transition: 'width 0.5s ease' }} />
+    <div className="h-[3px] bg-[var(--border)] rounded-sm mb-7 overflow-hidden">
+      <style>{`.ob-prog{width:${pct}%}`}</style>
+      <div className="ob-prog h-full bg-gradient-to-r from-[var(--accent-blue)] to-[var(--accent-green)] rounded-sm transition-[width] duration-500 ease-in-out" />
     </div>
   )
 }
 
 function StepDots({ current }: { current: Step }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 28 }}>
+    <div className="flex items-center justify-center gap-2 mb-7">
       {([1, 2, 3] as Step[]).map(s => (
-        <div key={s} style={{ height: 6, width: current === s ? 24 : 6, borderRadius: 3, background: current === s ? 'var(--accent-blue)' : current > s ? 'var(--accent-green)' : 'var(--border)', transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)' }} />
+        <div
+          key={s}
+          className={`h-[6px] rounded-full transition-all duration-[350ms] cubic-bezier-bounce ${
+            current === s ? 'w-6 bg-[var(--accent-blue)]' :
+            current > s  ? 'w-[6px] bg-[var(--accent-green)]' :
+                           'w-[6px] bg-[var(--border)]'
+          }`}
+        />
       ))}
     </div>
   )
@@ -36,8 +44,8 @@ function StepDots({ current }: { current: Step }) {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)' }}>{label}</label>
+    <div className="flex flex-col gap-2">
+      <label className="text-[13px] font-bold text-[var(--text-secondary)]">{label}</label>
       {children}
     </div>
   )
@@ -45,43 +53,44 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function StyledInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
-    <input {...props} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', transition: 'border-color 0.15s', ...props.style }}
-      onFocus={e => e.currentTarget.style.borderColor = 'var(--accent-blue)'}
-      onBlur={e => e.currentTarget.style.borderColor = 'var(--border)'}
+    <input
+      {...props}
+      className={`w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-[15px] outline-none font-[inherit] box-border transition-[border-color] duration-150 focus:border-[var(--accent-blue)] ${props.className ?? ''}`}
     />
   )
 }
 
 function StyledSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select {...props} style={{ width: '100%', padding: '12px 16px', borderRadius: 12, border: '1px solid var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)', fontSize: 15, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', cursor: 'pointer', ...props.style }} />
+    <select
+      {...props}
+      className={`w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-[15px] outline-none font-[inherit] box-border cursor-pointer ${props.className ?? ''}`}
+    />
   )
 }
 
 function BudgetPreview({ income, t }: { income: number; t: any }) {
-  const { lang } = useI18n()
-  const ar = lang === 'ar'
   if (income <= 0) return null
-  const needs = Math.round(income * 0.5)
-  const wants = Math.round(income * 0.3)
+  const needs   = Math.round(income * 0.5)
+  const wants   = Math.round(income * 0.3)
   const savings = Math.round(income * 0.2)
   return (
-    <div style={{ marginTop: 12, padding: 12, background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)', animation: 'fadeSlideIn 0.3s ease' }}>
-      <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', marginBottom: 8, textAlign: 'center' }}>
+    <div className="mt-3 p-3 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border)] animate-[fadeSlideIn_0.3s_ease]">
+      <div className="text-[11px] font-extrabold text-[var(--text-muted)] mb-2 text-center">
         {t('onboard_suggested_budget')}
       </div>
-      <div style={{ display: 'flex', gap: 6 }}>
-        <div style={{ flex: 1, textAlign: 'center', padding: 6, background: 'var(--accent-blue-dim)', borderRadius: 8 }}>
-          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-blue-light)', fontFamily: 'monospace' }}>{needs}</div>
-          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>{t('onboard_needs')}</div>
+      <div className="flex gap-[6px]">
+        <div className="flex-1 text-center p-[6px] bg-[var(--accent-blue-dim)] rounded-lg">
+          <div className="text-[13px] font-black text-[var(--accent-blue-light)] font-mono">{needs}</div>
+          <div className="text-[9px] text-[var(--text-muted)] font-bold">{t('onboard_needs')}</div>
         </div>
-        <div style={{ flex: 1, textAlign: 'center', padding: 6, background: 'var(--accent-purple-dim)', borderRadius: 8 }}>
-          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-purple-light)', fontFamily: 'monospace' }}>{wants}</div>
-          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>{t('onboard_wants')}</div>
+        <div className="flex-1 text-center p-[6px] bg-[var(--accent-purple-dim)] rounded-lg">
+          <div className="text-[13px] font-black text-[var(--accent-purple-light)] font-mono">{wants}</div>
+          <div className="text-[9px] text-[var(--text-muted)] font-bold">{t('onboard_wants')}</div>
         </div>
-        <div style={{ flex: 1, textAlign: 'center', padding: 6, background: 'var(--accent-green-dim)', borderRadius: 8 }}>
-          <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--accent-green-light)', fontFamily: 'monospace' }}>{savings}</div>
-          <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 700 }}>{t('onboard_savings')}</div>
+        <div className="flex-1 text-center p-[6px] bg-[var(--accent-green-dim)] rounded-lg">
+          <div className="text-[13px] font-black text-[var(--accent-green-light)] font-mono">{savings}</div>
+          <div className="text-[9px] text-[var(--text-muted)] font-bold">{t('onboard_savings')}</div>
         </div>
       </div>
     </div>
@@ -89,29 +98,31 @@ function BudgetPreview({ income, t }: { income: number; t: any }) {
 }
 
 // ── Step 1: الملف الشخصي ─────────────────────────────
-function Step1({ profile, setProfile, onNext, loading, t, detectedInfo }: {
+function Step1({ profile, setProfile, onNext, loading, saving, t, detectedInfo }: {
   profile: Profile
   setProfile: React.Dispatch<React.SetStateAction<Profile>>
   onNext: () => void
   loading: boolean
+  saving: boolean
   t: any
   detectedInfo: DetectionResult | null
 }) {
-  const { lang } = useI18n()
-  const ar = lang === 'ar'
   if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {[80, 56, 56, 56].map((h, i) => <div key={i} className="skeleton" style={{ height: h, borderRadius: 12 }} />)}
+    <div className="flex flex-col gap-5">
+      <div className="skeleton h-[80px] rounded-xl" />
+      <div className="skeleton h-[56px] rounded-xl" />
+      <div className="skeleton h-[56px] rounded-xl" />
+      <div className="skeleton h-[56px] rounded-xl" />
     </div>
   )
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div style={{ textAlign: 'center', marginBottom: 8 }}>
-        <div style={{ width: 64, height: 64, borderRadius: 20, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 16px' }}>👋</div>
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
+    <div className="flex flex-col gap-5">
+      <div className="text-center mb-2">
+        <div className="w-16 h-16 rounded-[20px] bg-[var(--accent-blue-dim)] border border-[rgba(59,126,246,0.25)] flex items-center justify-center text-[28px] mx-auto mb-4">👋</div>
+        <h2 className="text-[22px] font-black text-[var(--text-primary)] m-0">
           {t('onboarding_welcome_title')}
         </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>
+        <p className="text-[14px] text-[var(--text-muted)] mt-[6px]">
           {t('onboarding_welcome_subtitle')}
         </p>
       </div>
@@ -145,11 +156,12 @@ function Step1({ profile, setProfile, onNext, loading, t, detectedInfo }: {
       </Field>
 
       <button
+        type="button"
         onClick={onNext}
-        disabled={profile.fullName.trim().length === 0}
-        style={{ width: '100%', padding: '14px', borderRadius: 14, border: 'none', background: 'var(--accent-blue)', color: 'white', fontSize: 15, fontWeight: 700, cursor: profile.fullName.trim() ? 'pointer' : 'not-allowed', fontFamily: 'inherit', marginTop: 8, opacity: profile.fullName.trim() ? 1 : 0.5, transition: 'opacity 0.15s' }}
+        disabled={saving || profile.fullName.trim().length === 0}
+        className={`w-full py-[14px] rounded-[14px] border-none bg-[var(--accent-blue)] text-white text-[15px] font-bold font-[inherit] mt-2 transition-opacity duration-150 ${saving || !profile.fullName.trim() ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}
       >
-        {t('onboard_next_arrow')}
+        {saving ? '⏳ ...' : t('onboard_next_arrow')}
       </button>
     </div>
   )
@@ -165,26 +177,38 @@ function Step2({ tx, setTx, onNext, onBack, saving, t, tCategory }: {
   t: any
   tCategory: (c: string) => string
 }) {
-  const { lang } = useI18n()
-  const ar = lang === 'ar'
   const categories = tx.type === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE
+  const isIncome = tx.type === 'income'
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <div style={{ textAlign: 'center', marginBottom: 8 }}>
-        <div style={{ width: 64, height: 64, borderRadius: 20, background: tx.type === 'income' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', border: `1px solid ${tx.type === 'income' ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, margin: '0 auto 16px', transition: 'all 0.3s' }}>
-          {tx.type === 'income' ? '💰' : '💸'}
+    <div className="flex flex-col gap-5">
+      <div className="text-center mb-2">
+        <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center text-[28px] mx-auto mb-4 transition-all duration-300 border ${
+          isIncome
+            ? 'bg-[var(--accent-green-dim)] border-[rgba(16,185,129,0.25)]'
+            : 'bg-[var(--accent-red-dim)]  border-[rgba(239,68,68,0.2)]'
+        }`}>
+          {isIncome ? '💰' : '💸'}
         </div>
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
+        <h2 className="text-[22px] font-black text-[var(--text-primary)] m-0">
           {t('onboard_first_tx_title')}
         </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 6 }}>
+        <p className="text-[14px] text-[var(--text-muted)] mt-[6px]">
           {t('onboard_first_tx_subtitle')}
         </p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, padding: 4, borderRadius: 14, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
+      <div className="flex gap-2 p-1 rounded-[14px] bg-[var(--bg-secondary)] border border-[var(--border)]">
         {(['income', 'expense'] as const).map(type => (
-          <button key={type} onClick={() => setTx(t => ({ ...t, type, category: '' }))} style={{ flex: 1, padding: '10px', borderRadius: 11, border: 'none', background: tx.type === type ? (type === 'income' ? 'var(--accent-green)' : 'var(--accent-red)') : 'transparent', color: tx.type === type ? 'white' : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s' }}>
+          <button
+            key={type}
+            type="button"
+            onClick={() => setTx(t => ({ ...t, type, category: '' }))}
+            className={`flex-1 py-[10px] rounded-[11px] border-none text-[13px] font-bold cursor-pointer font-[inherit] transition-all duration-200 ${
+              tx.type === type
+                ? type === 'income' ? 'bg-[var(--accent-green)] text-white' : 'bg-[var(--accent-red)] text-white'
+                : 'bg-transparent text-[var(--text-muted)]'
+            }`}
+          >
             {type === 'income' ? t('onboard_income_label') : t('onboard_expense_label')}
           </button>
         ))}
@@ -206,21 +230,36 @@ function Step2({ tx, setTx, onNext, onBack, saving, t, tCategory }: {
           type="text"
           value={tx.description}
           onChange={e => setTx(t => ({ ...t, description: e.target.value }))}
-          placeholder={tx.type === 'income' 
+          placeholder={tx.type === 'income'
             ? (t('onboard_income_label').includes('income') ? 'e.g. March salary' : 'مثال: راتب شهر مارس')
             : (t('onboard_expense_label').includes('expense') ? 'e.g. Electricity bill' : 'مثال: فاتورة الكهرباء')}
         />
       </Field>
 
-      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
-        <button onClick={onBack} style={{ padding: '14px 20px', borderRadius: 14, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+      <div className="flex gap-[10px] mt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-5 py-[14px] rounded-[14px] border border-[var(--border)] bg-transparent text-[var(--text-secondary)] text-[14px] font-bold cursor-pointer font-[inherit]"
+        >
           {t('onboard_back_arrow')}
         </button>
-        <button onClick={onNext} disabled={saving || !tx.amount || !tx.category} style={{ flex: 1, padding: '14px', borderRadius: 14, border: 'none', background: tx.type === 'income' ? 'var(--accent-green)' : 'var(--accent-blue)', color: 'white', fontSize: 15, fontWeight: 700, cursor: saving || !tx.amount || !tx.category ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: saving || !tx.amount || !tx.category ? 0.5 : 1, transition: 'opacity 0.15s' }}>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={saving || !tx.amount || !tx.category}
+          className={`flex-1 py-[14px] rounded-[14px] border-none text-white text-[15px] font-bold font-[inherit] transition-opacity duration-150 ${
+            isIncome ? 'bg-[var(--accent-green)]' : 'bg-[var(--accent-blue)]'
+          } ${saving || !tx.amount || !tx.category ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer'}`}
+        >
           {saving ? '⏳' : t('onboard_save_continue')}
         </button>
       </div>
-      <button onClick={onNext} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', fontFamily: 'inherit', textAlign: 'center', padding: '4px' }}>
+      <button
+        type="button"
+        onClick={onNext}
+        className="bg-transparent border-none text-[var(--text-muted)] text-[13px] cursor-pointer underline font-[inherit] text-center py-1"
+      >
         {t('onboard_skip_now')}
       </button>
     </div>
@@ -232,74 +271,74 @@ function Step3({ onGo, t, name }: { onGo: () => void; t: any; name: string }) {
   const firstName = name.split(' ')[0] || (t('onboard_income_label').includes('income') ? 'you' : 'بك')
 
   const journey = [
-    { icon: '🌱', level: t('onboard_journey_beginner'),      desc: t('onboard_journey_beginner_desc'),             active: true },
-    { icon: '💪', level: t('onboard_journey_saver'),           desc: t('onboard_journey_saver_desc'),       active: false },
-    { icon: '📈', level: t('onboard_journey_investor'),      desc: t('onboard_journey_investor_desc'),            active: false },
-    { icon: '👑', level: t('onboard_journey_free'),        desc: t('onboard_journey_free_desc'), active: false },
+    { icon: '🌱', level: t('onboard_journey_beginner'), active: true },
+    { icon: '💪', level: t('onboard_journey_saver'),    active: false },
+    { icon: '📈', level: t('onboard_journey_investor'), active: false },
+    { icon: '👑', level: t('onboard_journey_free'),     active: false },
   ]
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="flex flex-col gap-5">
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 4 }}>
-        <div style={{ fontSize: 48, marginBottom: 12, animation: 'pop 0.5s ease' }}>🎉</div>
-        <h2 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
+      <div className="text-center mb-1">
+        <div className="text-[48px] mb-3 animate-[pop_0.5s_ease]">🎉</div>
+        <h2 className="text-[22px] font-black text-[var(--text-primary)] m-0">
           {t('onboard_welcome_named').replace('{}', firstName)}
         </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.6 }}>
+        <p className="text-[14px] text-[var(--text-muted)] mt-[6px] leading-[1.6]">
           {t('onboard_ready_desc')}
         </p>
       </div>
 
       {/* رحلة الثروة */}
-      <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.06), rgba(16,185,129,0.04))', border: '1px solid rgba(59,126,246,0.15)', borderRadius: 16, padding: '14px 16px' }}>
-        <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+      <div className="bg-[linear-gradient(135deg,rgba(59,126,246,0.06),rgba(16,185,129,0.04))] border border-[rgba(59,126,246,0.15)] rounded-2xl px-4 py-[14px]">
+        <div className="text-[11px] font-extrabold text-[var(--text-muted)] tracking-[0.08em] uppercase mb-3">
           {t('onboard_journey_title')}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+        <div className="flex items-center justify-between gap-1">
           {journey.map((j, i) => (
-            <div key={i} style={{ flex: 1, textAlign: 'center' }}>
-              <div style={{ fontSize: 20, marginBottom: 4, opacity: j.active ? 1 : 0.35 }}>{j.icon}</div>
-              <div style={{ fontSize: 10, fontWeight: 800, color: j.active ? 'var(--accent-blue-light)' : 'var(--text-muted)' }}>{j.level}</div>
-              {i < journey.length - 1 && (
-                <div style={{ position: 'absolute' }} />
-              )}
+            <div key={i} className="flex-1 text-center">
+              <div className={`text-[20px] mb-1 ${j.active ? 'opacity-100' : 'opacity-35'}`}>{j.icon}</div>
+              <div className={`text-[10px] font-extrabold ${j.active ? 'text-[var(--accent-blue-light)]' : 'text-[var(--text-muted)]'}`}>{j.level}</div>
             </div>
           ))}
         </div>
         {/* شريط التقدم */}
-        <div style={{ height: 4, background: 'var(--bg-elevated)', borderRadius: 99, marginTop: 10, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: '5%', background: 'var(--accent-blue)', borderRadius: 99 }} />
+        <div className="h-1 bg-[var(--bg-elevated)] rounded-full mt-[10px] overflow-hidden">
+          <div className="h-full w-[5%] bg-[var(--accent-blue)] rounded-full" />
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, textAlign: 'center' }}>
+        <div className="text-[11px] text-[var(--text-muted)] mt-[6px] text-center">
           {t('onboard_journey_tip')}
         </div>
       </div>
 
       {/* طلب الإشعارات */}
-      <div style={{ padding: '14px 16px', borderRadius: 14, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.15)', display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span style={{ fontSize: 24 }}>🔔</span>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>
+      <div className="px-4 py-[14px] rounded-[14px] bg-[rgba(59,126,246,0.06)] border border-[rgba(59,126,246,0.15)] flex items-center gap-[14px]">
+        <span className="text-[24px]">🔔</span>
+        <div className="flex-1">
+          <div className="text-[13px] font-extrabold text-[var(--text-primary)] mb-0.5">
             {t('onboard_notifications_title')}
           </div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+          <div className="text-[11px] text-[var(--text-muted)] leading-[1.5]">
             {t('onboard_notifications_desc')}
           </div>
         </div>
-        <button onClick={async () => {
-          try { if ('Notification' in window) await Notification.requestPermission() } catch {}
-        }} style={{ padding: '8px 14px', borderRadius: 10, border: 'none', background: 'var(--accent-blue)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }}>
+        <button
+          type="button"
+          onClick={async () => {
+            try { if ('Notification' in window) await Notification.requestPermission() } catch {}
+          }}
+          className="px-[14px] py-2 rounded-[10px] border-none bg-[var(--accent-blue)] text-white text-[12px] font-bold cursor-pointer font-[inherit] whitespace-nowrap"
+        >
           {t('onboard_allow')}
         </button>
       </div>
 
       {/* زر الدخول */}
       <button
+        type="button"
         onClick={onGo}
-        style={{ width: '100%', padding: '15px', borderRadius: 14, border: 'none', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', color: 'white', fontSize: 16, fontWeight: 900, cursor: 'pointer', fontFamily: 'inherit', transition: 'transform 0.15s', marginTop: 4 }}
-        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+        className="w-full py-[15px] rounded-[14px] border-none bg-gradient-to-br from-[var(--accent-blue)] to-[var(--accent-green)] text-white text-[16px] font-black cursor-pointer font-[inherit] transition-transform duration-150 mt-1 hover:scale-[1.02] active:scale-[1]"
       >
         {t('onboard_start_journey')}
       </button>
@@ -310,7 +349,7 @@ function Step3({ onGo, t, name }: { onGo: () => void; t: any; name: string }) {
 // ── Main ─────────────────────────────────────────────
 export default function OnboardingPage() {
   const router = useRouter()
-  const { lang, t, tCategory, hydrated } = useI18n()
+  const { lang, t, tCategory } = useI18n()
   const supabase = useMemo(() => createClient(), [])
   const [step, setStep] = useState<Step>(1)
   const [saving, setSaving] = useState(false)
@@ -326,14 +365,12 @@ export default function OnboardingPage() {
       if (!user) { setLoadingProfile(false); return }
       const meta = user.user_metadata
       const { data } = await supabase.from('profiles').select('full_name,monthly_income,currency').eq('id', user.id).single()
-      // اكتشاف العملة تلقائياً للمستخدمين الجدد فقط
       const detected = detectCurrency()
-      const savedCurrency = data?.currency
       setDetectedInfo(detected)
       setProfile({
         fullName: data?.full_name ?? meta?.full_name ?? '',
         monthlyIncome: data?.monthly_income?.toString() ?? meta?.monthly_income?.toString() ?? '',
-        currency: savedCurrency ?? detected.currency,
+        currency: data?.currency ?? detected.currency,
       })
       setLoadingProfile(false)
     }
@@ -341,46 +378,38 @@ export default function OnboardingPage() {
   }, [supabase])
 
   async function handleStep1() {
-    const { data: { user }, error: authErr } = await supabase.auth.getUser()
-    if (authErr) { alert('Auth error: ' + authErr.message); return }
-    if (!user) { alert('No user found!'); return }
-    const { error: upsertErr } = await supabase.from('profiles').upsert({ 
-      id: user.id, 
-      full_name: profile.fullName, 
-      monthly_income: profile.monthlyIncome ? parseFloat(profile.monthlyIncome) : null, 
-      currency: profile.currency, 
-      onboarding_done: false 
-    })
-    if (upsertErr) { alert('خطأ في حفظ البيانات: ' + upsertErr.message); return }
-    // إضافة الراتب كمعاملة دخل تلقائياً
-    if (profile.monthlyIncome && parseFloat(profile.monthlyIncome) > 0) {
-      // حذف الراتب القديم لهذا المستخدم لمنع التكرار في حال دخل الصفحة مرتين
-      await supabase.from('transactions')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('category', 'راتب')
-
-      await supabase.from('transactions').insert({
-        user_id: user.id,
-        type: 'income',
-        amount: parseFloat(profile.monthlyIncome),
-        category: 'راتب',
-        description: profile.fullName ? `راتب ${profile.fullName}` : 'الراتب الشهري',
-        transaction_date: new Date().toISOString().split('T')[0]
+    if (saving) return
+    setSaving(true)
+    try {
+      const { data: { user }, error: authErr } = await supabase.auth.getUser()
+      if (authErr) { alert('Auth error: ' + authErr.message); return }
+      if (!user) { alert('No user found!'); return }
+      const { error: upsertErr } = await supabase.from('profiles').upsert({
+        id: user.id,
+        full_name: profile.fullName,
+        monthly_income: profile.monthlyIncome ? parseFloat(profile.monthlyIncome) : null,
+        currency: profile.currency,
+        onboarding_done: false,
       })
+      if (upsertErr) { alert('خطأ في حفظ البيانات: ' + upsertErr.message); return }
+      if (profile.monthlyIncome && parseFloat(profile.monthlyIncome) > 0) {
+        await supabase.from('transactions').delete().eq('user_id', user.id).eq('category', 'راتب')
+        await supabase.from('transactions').insert({
+          user_id: user.id,
+          type: 'income',
+          amount: parseFloat(profile.monthlyIncome),
+          category: 'راتب',
+          description: profile.fullName ? `راتب ${profile.fullName}` : 'الراتب الشهري',
+          transaction_date: new Date().toISOString().split('T')[0],
+        })
+      }
+      setStep(2)
+    } finally {
+      setSaving(false)
     }
-    setStep(2)
   }
 
   async function handleStep2() {
-
-// تحقق من تكرار الراتب
-    if (tx.category === 'راتب' && tx.type === 'income' && profile.monthlyIncome && parseFloat(tx.amount) === parseFloat(profile.monthlyIncome)) {
-      const confirmed = window.confirm(`أضفنا راتبك ${profile.monthlyIncome} بالفعل. هل تريد إضافة راتب آخر؟`)
-      if (!confirmed) { setStep(3); return }
-    }
-
-
     if (tx.amount && tx.category) {
       setSaving(true)
       const { data: { user } } = await supabase.auth.getUser()
@@ -396,7 +425,6 @@ export default function OnboardingPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       await supabase.from('profiles').update({ onboarding_done: true }).eq('id', user.id)
-      // تهيئة الـ gamification
       try {
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.access_token) {
@@ -418,19 +446,19 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px', direction: ar ? 'rtl' : 'ltr' }}>
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(59,126,246,0.08) 0%, transparent 70%)', zIndex: 0 }} />
-      <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
-        <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 18, margin: '0 auto 8px' }}>ف</div>
-          <span style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
+    <div className={`min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-4 py-6 ${ar ? 'rtl' : 'ltr'}`}>
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(59,126,246,0.08)_0%,transparent_70%)] z-0" />
+      <div className="w-full max-w-[420px] relative z-[1]">
+        <div className="text-center mb-7">
+          <div className="w-10 h-10 rounded-xl bg-[var(--accent-blue)] flex items-center justify-center text-white font-black text-[18px] mx-auto mb-2">ف</div>
+          <span className="text-[13px] text-[var(--text-muted)] font-semibold">
             {t('onboard_step_count').replace('{}', step.toString())}
           </span>
         </div>
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 24, padding: '28px 24px', boxShadow: '0 8px 40px rgba(0,0,0,0.25)' }}>
+        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[24px] px-6 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.25)]">
           <ProgressBar step={step} />
           <StepDots current={step} />
-          {step === 1 && <Step1 profile={profile} setProfile={setProfile} onNext={handleStep1} loading={loadingProfile} t={t} detectedInfo={detectedInfo} />}
+          {step === 1 && <Step1 profile={profile} setProfile={setProfile} onNext={handleStep1} loading={loadingProfile} saving={saving} t={t} detectedInfo={detectedInfo} />}
           {step === 2 && <Step2 tx={tx} setTx={setTx} onNext={handleStep2} onBack={() => setStep(1)} saving={saving} t={t} tCategory={tCategory} />}
           {step === 3 && <Step3 onGo={handleDone} t={t} name={profile.fullName} />}
         </div>
