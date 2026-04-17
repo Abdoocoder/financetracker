@@ -1,3 +1,4 @@
+import 'server-only'
 import { headers, cookies } from 'next/headers'
 import { ar } from './locales/ar'
 import { en } from './locales/en'
