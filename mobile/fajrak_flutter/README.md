@@ -479,6 +479,15 @@ flutter build apk --release --split-per-abi
 
 ## 📝 سجل التغييرات
 
+### v3.32.11 — 2026-04-18 *(إصلاحات وإمكانية الوصول)*
+
+| التغيير | الوصف |
+|:--------|:------|
+| 🐛 **إصلاح Rage Click** | زر "التالي" في الخطوة الأولى من Onboarding يُظهر الآن حالة تحميل ويُعطَّل أثناء حفظ البيانات. |
+| 🔒 **تحصين i18n-server** | معالجة أعطال Turbopack في `getServerLang` و`getServerTranslation`. |
+| ♿ **إصلاح ARIA** | تصحيح `aria-pressed="{expression}"` في صفحة الميزانيات. |
+| 🎨 **إزالة الأنماط المضمّنة** | تحويل `style={{}}` إلى Tailwind في `budgets/page.tsx` و`onboarding/page.tsx`. |
+
 ### v3.32.10 — 2026-04-16 *(إصلاحات UI/UX في Flutter)*
 
 | التغيير | الوصف |

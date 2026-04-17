@@ -578,6 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.11 — 2026-04-18 *(Bug Fixes & Accessibility)*
+
+| Change | Description |
+|:-------|:------------|
+| 🐛 **Rage Click Fix** | Onboarding Step 1 "Next" button now shows loading state and is disabled during DB submission — prevents duplicate profile/transaction inserts on slow connections. |
+| 🔒 **i18n-server Hardening** | `getServerLang` and `getServerTranslation` now guard against Turbopack dev-mode `cookieStore.get is not a function` and `ReferenceError: getServerLang is not defined` crashes. |
+| ♿ **ARIA Fix** | Fixed `aria-pressed="{expression}"` warnings on month-selector and category buttons in budgets page — now renders literal `"true"`/`"false"` strings. |
+| 🎨 **No Inline Styles** | Converted all `style={{}}` props to Tailwind in `budgets/page.tsx` and `onboarding/page.tsx`. |
+
 ### v3.32.10 — 2026-04-16 *(Flutter UI/UX Fixes)*
 
 | Change | Description |
