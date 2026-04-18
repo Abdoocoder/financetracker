@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -154,15 +154,8 @@
 <a name='L89'></a><a href='#L89'>89</a>
 <a name='L90'></a><a href='#L90'>90</a>
 <a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a>
-<a name='L96'></a><a href='#L96'>96</a>
-<a name='L97'></a><a href='#L97'>97</a>
-<a name='L98'></a><a href='#L98'>98</a>
-<a name='L99'></a><a href='#L99'>99</a>
-<a name='L100'></a><a href='#L100'>100</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -174,15 +167,6 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -265,6 +249,7 @@
 import Link from <span class="cstat-no" title="statement not covered" >'next/link'</span>
 import { useI18n } from <span class="cstat-no" title="statement not covered" >'@/lib/i18n'</span>
 import { Globe } from <span class="cstat-no" title="statement not covered" >'lucide-react'</span>
+import styles from <span class="cstat-no" title="statement not covered" >'./download.module.css'</span>
 &nbsp;
 export default function <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >DownloadPage() {</span></span>
   const { t, lang, setLang } = <span class="cstat-no" title="statement not covered" >useI18n()</span>
@@ -276,84 +261,75 @@ export default function <span class="cstat-no" title="statement not covered" ><s
   }
 &nbsp;
   return (
-    &lt;div style={{ background: 'var(--bg-primary)', minHeight: '100vh', direction: lang === 'ar' ? 'rtl' : 'ltr', fontFamily: 'inherit' }}&gt;
-      &lt;nav style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', background: 'rgba(10,12,18,0.85)' }}&gt;
-        &lt;div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}&gt;
-          &lt;Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}&gt;
-            &lt;div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 16 }}&gt;{t('app_name')[0]}&lt;/div&gt;
-            &lt;span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)' }}&gt;{t('app_name')}&lt;/span&gt;
+    &lt;div className={`${styles.page} ${lang === 'ar' ? styles.rtl : styles.ltr}`}&gt;
+      &lt;nav className={styles.nav}&gt;
+        &lt;div className={styles.navInner}&gt;
+          &lt;Link href="/" className={styles.navLogo}&gt;
+            &lt;div className={styles.logoIcon}&gt;{t('app_name')[0]}&lt;/div&gt;
+            &lt;span className={styles.logoText}&gt;{t('app_name')}&lt;/span&gt;
           &lt;/Link&gt;
-          &lt;div style={{ display: 'flex', alignItems: 'center', gap: 8 }}&gt;
-            &lt;button 
-              onClick={handleLangToggle}
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 10, 
-                background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
-                color: 'var(--text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                fontFamily: 'inherit'
-              }}
-            &gt;
+          &lt;div className={styles.navActions}&gt;
+            &lt;button onClick={handleLangToggle} className={styles.langBtn}&gt;
               &lt;Globe size={16} /&gt;
               {lang === 'ar' ? 'English' : 'العربية'}
             &lt;/button&gt;
-            &lt;Link href="/register" style={{ padding: '8px 18px', borderRadius: 10, background: 'var(--accent-blue)', color: 'white', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}&gt;{t('land_start_btn')}&lt;/Link&gt;
+            &lt;Link href="/register" className={styles.navCta}&gt;{t('land_start_btn')}&lt;/Link&gt;
           &lt;/div&gt;
         &lt;/div&gt;
       &lt;/nav&gt;
 &nbsp;
-      &lt;section style={{ maxWidth: 600, margin: '0 auto', padding: 'clamp(60px, 10vw, 100px) 24px', textAlign: 'center' }}&gt;
-        &lt;div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', fontSize: 36 }}&gt;📱&lt;/div&gt;
+      &lt;section className={styles.hero}&gt;
+        &lt;div className={styles.appIcon}&gt;📱&lt;/div&gt;
 &nbsp;
-        &lt;div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 100, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', marginBottom: 20 }}&gt;
-          &lt;span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} /&gt;
-          &lt;span style={{ fontSize: 12, fontWeight: 700, color: '#10B981' }}&gt;{t('down_status')}&lt;/span&gt;
+        &lt;div className={styles.statusBadge}&gt;
+          &lt;span className={styles.statusDot} /&gt;
+          &lt;span className={styles.statusText}&gt;{t('down_status')}&lt;/span&gt;
         &lt;/div&gt;
 &nbsp;
-        &lt;h1 style={{ fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1.1, margin: '0 0 16px', letterSpacing: '-0.03em' }}&gt;
+        &lt;h1 className={styles.title}&gt;
           {t('down_title_part1')}
           &lt;br /&gt;
-          &lt;span style={{ background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-blue-light))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}&gt;Android&lt;/span&gt;
+          &lt;span className={styles.titleGradient}&gt;Android&lt;/span&gt;
         &lt;/h1&gt;
 &nbsp;
-        &lt;p style={{ fontSize: 16, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 40 }}&gt;
-          {t('down_desc')}
-        &lt;/p&gt;
+        &lt;p className={styles.desc}&gt;{t('down_desc')}&lt;/p&gt;
 &nbsp;
-        &lt;div style={{ marginBottom: 40 }}&gt;
+        &lt;div className={styles.ctaWrap}&gt;
           &lt;a
-            href="/fajrak-v3.32.6.apk"
-            download
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 12, padding: '16px 40px', borderRadius: 16, background: 'var(--accent-blue)', color: 'white', fontSize: 18, fontWeight: 900, textDecoration: 'none', boxShadow: '0 10px 30px rgba(59,126,246,0.3)' }}
+            href="https://play.google.com/store/apps/details?id=com.fajrak.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.ctaBtn}
           &gt;
             {t('down_btn')}
           &lt;/a&gt;
-          &lt;div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}&gt;
-             {[
-               { icon: '🛡️', label: t('down_safe') },
-               { icon: '✨', label: t('down_version') }
-             ].map(<span class="fstat-no" title="function not covered" >(b</span>, i) =&gt; (
-<span class="cstat-no" title="statement not covered" >               &lt;span key={i} s</span>tyle={{ fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}&gt;
-                 &lt;span&gt;{b.icon}&lt;/span&gt; {b.label}
-               &lt;/span&gt;
-             ))}
+          &lt;div className={styles.badges}&gt;
+            {[
+              { icon: '🛡️', label: t('down_safe') },
+              { icon: '✨', label: t('down_version') }
+            ].map(<span class="fstat-no" title="function not covered" >(b</span>, i) =&gt; (
+<span class="cstat-no" title="statement not covered" >              &lt;span key={i} c</span>lassName={styles.badge}&gt;
+                &lt;span&gt;{b.icon}&lt;/span&gt; {b.label}
+              &lt;/span&gt;
+            ))}
           &lt;/div&gt;
         &lt;/div&gt;
 &nbsp;
-        &lt;div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 40 }}&gt;
+        &lt;div className={styles.features}&gt;
           {[
             { icon: '🔔', label: t('down_f1') },
             { icon: '⚡', label: t('down_f2') },
             { icon: '📴', label: t('down_f3') },
           ].map(<span class="fstat-no" title="function not covered" >(f</span>, i) =&gt; (
-<span class="cstat-no" title="statement not covered" >            &lt;div key={i} s</span>tyle={{ padding: '16px 12px', borderRadius: 14, background: 'var(--bg-card)', border: '1px solid var(--border)', textAlign: 'center' }}&gt;
-              &lt;div style={{ fontSize: 24, marginBottom: 8 }}&gt;{f.icon}&lt;/div&gt;
-              &lt;div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}&gt;{f.label}&lt;/div&gt;
+<span class="cstat-no" title="statement not covered" >            &lt;div key={i} c</span>lassName={styles.featureCard}&gt;
+              &lt;div className={styles.featureIcon}&gt;{f.icon}&lt;/div&gt;
+              &lt;div className={styles.featureLabel}&gt;{f.label}&lt;/div&gt;
             &lt;/div&gt;
           ))}
         &lt;/div&gt;
 &nbsp;
-        &lt;p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}&gt;{t('down_web_hint')}&lt;/p&gt;
-        &lt;Link href="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', borderRadius: 12, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}&gt;
+        &lt;p className={styles.webHint}&gt;{t('down_web_hint')}&lt;/p&gt;
+        &lt;Link href="/register" className={styles.webBtn}&gt;
           {t('down_web_btn')}
         &lt;/Link&gt;
       &lt;/section&gt;
@@ -367,7 +343,7 @@ export default function <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T23:50:24.850Z
+                at 2026-04-18T04:50:47.180Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
