@@ -150,7 +150,13 @@
       "Bash(python -c \"import sys,json; jobs=json.load\\(sys.stdin\\)['jobs']; [print\\(j['name'], j['conclusion'], j['html_url']\\) for j in jobs]\")",
       "Bash(task-master show *)",
       "PowerShell(cd c:\\\\Users\\\\user\\\\Projects\\\\financetracker && npm test -- --testPathPattern=\"alerts\" 2>&1 | Select-String \"●|FAIL|PASS|expect|received\" | Select-Object -First 20)",
-      "PowerShell(cd c:\\\\Users\\\\user\\\\Projects\\\\financetracker && npm test -- --testPathPattern=\"alerts\" 2>&1 | Select-Object -Last 40)"
+      "PowerShell(cd c:\\\\Users\\\\user\\\\Projects\\\\financetracker && npm test -- --testPathPattern=\"alerts\" 2>&1 | Select-Object -Last 40)",
+      "mcp__ruflo__system_status",
+      "mcp__ruflo__system_health",
+      "mcp__ruflo__swarm_init",
+      "mcp__ruflo__config_set",
+      "mcp__ruflo__performance_profile",
+      "mcp__ruflo__performance_report"
     ]
   }
 }
