@@ -98,6 +98,7 @@
   "trans_add_note_hint": "Add a note (optional)",
   "trans_date": "Date",
   "help_email_error": "Sorry, we couldn't open the email app. Please email us at support@fajrak.com",
+  "error_no_internet": "Check your internet connection and try again.",
   "error_generic": "Something went wrong. Please try again.",
   "error_details": "Details",
   "error_dialog_title": "Error Details",

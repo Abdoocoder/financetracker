@@ -69,6 +69,8 @@ function setupMock({
         { user_id: 'u1', title: '🚨 تجاوزت 90% من دخلك!' },
         { user_id: 'u1', title: '⚠️ مصاريفك تجاوزت 75% من دخلك' },
         { user_id: 'u1', title: '🏆 ادخرت أكثر من 50% من دخلك!' },
+        { user_id: 'u1', title: '⏰ لم تسجل أي معاملات هذا الأسبوع' },
+        { user_id: 'u1', title: '⏰ No transactions recorded this week' },
         { user_id: 'u1', title: '💪 خطوة صغيرة تصنع فارقاً كبيراً' },
         { user_id: 'u1', title: '🌟 الانضباط المالي عادة لا موهبة' },
         { user_id: 'u1', title: '📊 راجع ميزانيتك الأسبوع القادم' },

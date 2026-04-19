@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useI18n } from '@/lib/i18n'
 
 interface Props { lang: string; data: any; net: number; income: number; expenses: number }
@@ -13,14 +13,21 @@ export function ChallengesCard({ lang, data, net, income, expenses }: Props) {
     { id: 3, icon: '📉', title: lang === 'en' ? 'Spend Less Than Last Month' : 'أنفق أقل من الشهر الماضي', days: 30 },
     { id: 4, icon: '🎯', title: lang === 'en' ? 'Zero Extra Spending'        : 'صفر مصاريف غير ضرورية',     days: 14 },
   ]
-  function getProgress(id: number): number {
-    if (!data) return 0
-    if (id === 1) { const f = (data.categories ?? []).find(([c]: [string,number]) => c === 'طعام')?.[1] ?? 0; return f === 0 ? 100 : Math.max(0, 100 - (f / 50 * 100)) }
-    if (id === 2) { const t = income * 0.1; return t > 0 ? Math.min(100, (net / t) * 100) : 0 }
-    if (id === 3) { const p = data?.prevExpenses ?? 0; return p > 0 ? Math.min(100, ((p - expenses) / p) * 100) : 0 }
-    if (id === 4) { const e = (data.categories ?? []).find(([c]: [string,number]) => c === 'ترفيه')?.[1] ?? 0; return e === 0 ? 100 : 0 }
-    return 0
-  }
+  const progress = useMemo(() => {
+    if (!data) return [0, 0, 0, 0]
+    const food = (data.categories ?? []).find(([c]: [string, number]) => c === 'طعام')?.[1] ?? 0
+    const entertainment = (data.categories ?? []).find(([c]: [string, number]) => c === 'ترفيه')?.[1] ?? 0
+    const savingsTarget = income * 0.1
+    const prevExp = data?.prevExpenses ?? 0
+    return [
+      food === 0 ? 100 : Math.max(0, 100 - (food / 50 * 100)),
+      savingsTarget > 0 ? Math.min(100, (net / savingsTarget) * 100) : 0,
+      prevExp > 0 ? Math.min(100, ((prevExp - expenses) / prevExp) * 100) : 0,
+      entertainment === 0 ? 100 : 0,
+    ]
+  }, [data, income, net, expenses])
+
+  function getProgress(id: number): number { return progress[id - 1] ?? 0 }
   const active = challenges.find(c => c.id === activeChallenge)
   return (
     <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>

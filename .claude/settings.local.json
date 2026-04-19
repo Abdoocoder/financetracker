@@ -156,7 +156,10 @@
       "mcp__ruflo__swarm_init",
       "mcp__ruflo__config_set",
       "mcp__ruflo__performance_profile",
-      "mcp__ruflo__performance_report"
+      "mcp__ruflo__performance_report",
+      "mcp__ruflo__system_info",
+      "mcp__ruflo__guidance_capabilities",
+      "Bash(npx jest *)"
     ]
   }
 }

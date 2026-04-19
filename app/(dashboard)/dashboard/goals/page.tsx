@@ -1,5 +1,4 @@
 'use client'
-export const dynamic = 'force-dynamic'
 import { clearUserCache } from '@/lib/cache'
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'

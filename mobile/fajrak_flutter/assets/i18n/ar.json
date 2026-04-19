@@ -98,6 +98,7 @@
   "trans_add_note_hint": "أضف ملاحظة (اختياري)",
   "trans_date": "التاريخ",
   "help_email_error": "عذراً، لا يمكن فتح تطبيق البريد الإلكتروني. يرجى مراسلتنا على support@fajrak.com",
+  "error_no_internet": "تحقق من اتصالك بالإنترنت وحاول مجدداً.",
   "error_generic": "حدث خطأ ما. يرجى المحاولة لاحقاً.",
   "error_details": "التفاصيل",
   "error_dialog_title": "تفاصيل الخطأ",

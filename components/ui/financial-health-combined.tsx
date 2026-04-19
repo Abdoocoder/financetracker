@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
@@ -172,17 +172,18 @@ export function FinancialHealthCombined(props: Props) {
   }, [tab])
 
   // ── الألوان ──
-  const scoreColor = score >= 75 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444'
-  const scoreLabel = score >= 80
-    ? (ar ? 'ممتاز 🌟' : 'Excellent 🌟')
-    : score >= 60 ? (ar ? 'جيد 💪' : 'Good 💪')
-    : score >= 40 ? (ar ? 'متوسط ⚡' : 'Fair ⚡')
-    : (ar ? 'يحتاج تحسين 🔴' : 'Needs Improvement 🔴')
-
-  const stageNames = ar
-    ? ['', 'الوعي المالي', 'التحكم المالي', 'الاحتياطي المالي', 'بناء الثروة', 'الحرية المالية']
-    : ['', 'Awareness', 'Control', 'Reserve', 'Wealth Building', 'Financial Freedom']
-  const stageColors = ['', '#6B7280', '#F59E0B', '#3B82F6', '#8B5CF6', '#10B981']
+  const { scoreColor, scoreLabel, stageNames, stageColors } = useMemo(() => ({
+    scoreColor: score >= 75 ? '#10B981' : score >= 50 ? '#F59E0B' : '#EF4444',
+    scoreLabel: score >= 80
+      ? (ar ? 'ممتاز 🌟' : 'Excellent 🌟')
+      : score >= 60 ? (ar ? 'جيد 💪' : 'Good 💪')
+      : score >= 40 ? (ar ? 'متوسط ⚡' : 'Fair ⚡')
+      : (ar ? 'يحتاج تحسين 🔴' : 'Needs Improvement 🔴'),
+    stageNames: ar
+      ? ['', 'الوعي المالي', 'التحكم المالي', 'الاحتياطي المالي', 'بناء الثروة', 'الحرية المالية']
+      : ['', 'Awareness', 'Control', 'Reserve', 'Wealth Building', 'Financial Freedom'],
+    stageColors: ['', '#6B7280', '#F59E0B', '#3B82F6', '#8B5CF6', '#10B981'],
+  }), [score, ar])
 
   // ── الدائرة ──
   const radius = 70
@@ -190,13 +191,13 @@ export function FinancialHealthCombined(props: Props) {
   const dash = (score / 100) * circumference
 
   // ── الأشرطة ──
-  const bars = [
-    { key: 'savings',   label: ar ? t('health_savings') : 'Savings',   max: 30, val: props.income > 0 ? Math.min(30, Math.round((Math.max(0, props.income - props.expenses) / props.income) * 150)) : 0, color: '#10B981' },
-    { key: 'debt',      label: ar ? t('health_debt') : 'Debt',         max: 25, val: props.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((props.totalDebt / Math.max(props.income * 12, 1)) * 25)), color: '#3B7EF6' },
+  const bars = useMemo(() => [
+    { key: 'savings',   label: ar ? t('health_savings') : 'Savings',    max: 30, val: props.income > 0 ? Math.min(30, Math.round((Math.max(0, props.income - props.expenses) / props.income) * 150)) : 0, color: '#10B981' },
+    { key: 'debt',      label: ar ? t('health_debt') : 'Debt',          max: 25, val: props.totalDebt === 0 ? 25 : Math.max(0, 25 - Math.round((props.totalDebt / Math.max(props.income * 12, 1)) * 25)), color: '#3B7EF6' },
     { key: 'emergency', label: ar ? t('health_emergency') : 'Emergency', max: 20, val: Math.min(20, Math.round((props.goalsSaved / Math.max(props.income * 3, 1)) * 20)), color: '#8B5CF6' },
     { key: 'investing', label: ar ? t('health_investing') : 'Investing', max: 15, val: props.invValue > 0 ? 15 : 0, color: '#F59E0B' },
     { key: 'tracking',  label: ar ? t('health_tracking') : 'Tracking',  max: 10, val: Math.min(10, props.txCount), color: '#EC4899' },
-  ]
+  ], [ar, t, props.income, props.expenses, props.totalDebt, props.goalsSaved, props.invValue, props.txCount])
 
   const stage = roadmap?.stage ?? 1
 

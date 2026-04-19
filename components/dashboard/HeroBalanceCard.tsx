@@ -1,6 +1,9 @@
 'use client'
+import { useMemo } from 'react'
 import { useCountUp } from '@/lib/use-count-up'
 import type { Account } from '@/types'
+
+const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
 export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBalance, prevMonthNet }: {
   monthlyNet: number; currency: string; lang: string
@@ -12,9 +15,10 @@ export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBal
   const animatedHero = useCountUp(Math.abs(heroValue), 900)
   const isPositive = heroValue >= 0
   const color = isPositive ? '#10B981' : '#EF4444'
-  const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
-  const trend = prevMonthNet !== 0 ? ((monthlyNet - prevMonthNet) / Math.abs(prevMonthNet)) * 100 : 0
-  const hasTrend = prevMonthNet !== 0
+  const { trend, hasTrend } = useMemo(() => ({
+    trend: prevMonthNet !== 0 ? ((monthlyNet - prevMonthNet) / Math.abs(prevMonthNet)) * 100 : 0,
+    hasTrend: prevMonthNet !== 0,
+  }), [monthlyNet, prevMonthNet])
 
   return (
     <div style={{

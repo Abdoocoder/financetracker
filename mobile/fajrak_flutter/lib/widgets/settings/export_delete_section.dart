@@ -103,15 +103,11 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
     setState(() => _loggingOut = true);
     try {
       await Supabase.instance.client.auth.signOut();
+    } catch (_) {
+      // Ignore network errors — local session is cleared regardless
+    } finally {
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _loggingOut = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('error_generic'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-        );
       }
     }
   }

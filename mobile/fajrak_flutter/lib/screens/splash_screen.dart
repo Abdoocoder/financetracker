@@ -4,6 +4,7 @@ import '../services/analytics_service.dart';
 import '../utils/error_handler.dart';
 import 'package:provider/provider.dart';
 import '../app_state.dart';
+import 'dart:io';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -60,7 +61,24 @@ class _SplashScreenState extends State<SplashScreen>
         }
       }
     } catch (e) {
-      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Splash CheckUser');
+      // Network error while user is already logged in → go to main (offline mode)
+      final isNetwork = e is SocketException ||
+          e.toString().toLowerCase().contains('socketexception') ||
+          e.toString().toLowerCase().contains('failed host lookup') ||
+          e.toString().toLowerCase().contains('authretryablefetchexception');
+
+      if (mounted) {
+        final user = Supabase.instance.client.auth.currentUser;
+        if (isNetwork && user != null) {
+          Navigator.pushReplacementNamed(context, '/main');
+        } else {
+          ErrorHandler.handle(e, context: context, developerMessage: 'Splash CheckUser');
+          if (user == null) {
+            await Future.delayed(const Duration(seconds: 2));
+            if (mounted) Navigator.pushReplacementNamed(context, '/login');
+          }
+        }
+      }
     }
   }
 
