@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,8 +8,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../database/app_database.dart';
 import '../../services/analytics_service.dart';
 import '../../services/pdf_report_service.dart';
+import '../../services/sync_service.dart';
 import '../../utils/error_handler.dart';
 import '../../widgets/transactions/add_transaction_dialog.dart';
 import '../../widgets/transactions/month_year_picker_dialog.dart';
@@ -35,6 +38,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   int _limit = 20;
   bool _hasMore = true;
 
+  // Sync queue monitoring
+  StreamSubscription<List<TransactionsTableData>>? _syncSubscription;
+  Map<String, String> _syncStatuses = {}; // txId → syncStatus
+  int _pendingCount = 0;
+
   String _filter = 'all';
   String _search = '';
   String _currency = 'JOD';
@@ -51,10 +59,31 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     _scrollController.addListener(_onScroll);
     AnalyticsService.logScreenView('Transactions');
     _load();
+    _watchSyncQueue();
+  }
+
+  void _watchSyncQueue() {
+    final db = AppDatabase.instance;
+    _syncSubscription = (db.select(db.transactionsTable)
+          ..where((t) => t.syncStatus.isNotValue('synced')))
+        .watch()
+        .listen((rows) {
+      if (!mounted) return;
+      setState(() {
+        _syncStatuses = {for (final r in rows) r.id: r.syncStatus};
+        _pendingCount = rows.length;
+      });
+    });
+  }
+
+  Future<void> _triggerSync() async {
+    await SyncService.fullSync();
+    if (mounted) _load(reset: true);
   }
 
   @override
   void dispose() {
+    _syncSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -396,6 +425,23 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ],
         ),
         actions: [
+          if (_pendingCount > 0)
+            Tooltip(
+              message: '$_pendingCount قيد المزامنة — اسحب للتحديث',
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Badge(
+                  label: Text(_pendingCount.toString(),
+                      style: const TextStyle(fontSize: 10)),
+                  backgroundColor: Colors.orange[600],
+                  child: IconButton(
+                    onPressed: _triggerSync,
+                    icon: const Icon(Icons.cloud_upload_outlined),
+                    color: Colors.orange[600],
+                  ),
+                ),
+              ),
+            ),
           IconButton(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RecurringScreen())),
             icon: Icon(Icons.repeat, color: colorScheme.onSurfaceVariant),
@@ -500,7 +546,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         ),
                       )
                     : RefreshIndicator(
-                        onRefresh: () => _load(reset: true),
+                        onRefresh: _triggerSync,
                         child: ListView.builder(
                           controller: _scrollController,
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -513,13 +559,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                       child: CircularProgressIndicator(
                                           color: colorScheme.primary)));
                             }
+                            final tx = filtered[index];
                             return TransactionListItem(
-                              key: ValueKey(filtered[index]['id']),
-                              transaction: filtered[index],
+                              key: ValueKey(tx['id']),
+                              transaction: tx,
                               currency: _currency,
                               colorScheme: colorScheme,
                               onDelete: _delete,
-                              onTap: (tx) => _showAddDialog(existing: tx),
+                              onTap: (t) => _showAddDialog(existing: t),
+                              syncStatus: _syncStatuses[tx['id']],
                             );
                           },
                         ),

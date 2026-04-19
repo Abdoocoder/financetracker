@@ -7,6 +7,7 @@ class TransactionListItem extends StatelessWidget {
   final ColorScheme colorScheme;
   final Function(String) onDelete;
   final Function(Map<String, dynamic>) onTap;
+  final String? syncStatus;
 
   const TransactionListItem({
     super.key,
@@ -15,13 +16,38 @@ class TransactionListItem extends StatelessWidget {
     required this.colorScheme,
     required this.onDelete,
     required this.onTap,
+    this.syncStatus,
   });
+
+  Widget? _buildSyncBadge() {
+    switch (syncStatus) {
+      case 'pending_create':
+      case 'pending_update':
+        return Tooltip(
+          message: 'قيد المزامنة',
+          child: Icon(Icons.cloud_upload_outlined, size: 14, color: Colors.orange[600]),
+        );
+      case 'pending_delete':
+        return Tooltip(
+          message: 'حذف قيد المزامنة',
+          child: Icon(Icons.delete_outline, size: 14, color: Colors.red[400]),
+        );
+      case 'failed':
+        return Tooltip(
+          message: 'فشلت المزامنة',
+          child: Icon(Icons.error_outline, size: 14, color: Colors.red),
+        );
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final isIncome = transaction['type'] == 'income';
     final amount = (transaction['amount'] as num).toDouble();
     final color = isIncome ? AppColors.success : AppColors.error;
+    final syncBadge = _buildSyncBadge();
 
     return Dismissible(
       key: Key(transaction['id'].toString()),
@@ -81,13 +107,22 @@ class TransactionListItem extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    '${isIncome ? '+' : '-'}${amount.toStringAsFixed(0)} $currency',
-                    style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 15,
-                        fontFamily: 'Cairo'),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (syncBadge != null) ...[
+                        syncBadge,
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        '${isIncome ? '+' : '-'}${amount.toStringAsFixed(0)} $currency',
+                        style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15,
+                            fontFamily: 'Cairo'),
+                      ),
+                    ],
                   ),
                   if (transaction['original_currency'] != null && transaction['original_currency'] != currency)
                     Text(
