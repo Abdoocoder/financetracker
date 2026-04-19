@@ -50,38 +50,10 @@ class ErrorHandler {
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           duration: const Duration(seconds: 4),
-          action: isNetwork
-              ? null
-              : SnackBarAction(
-                  label: 'error_details'.tr(),
-                  textColor: Colors.white,
-                  onPressed: () {
-                    _showErrorDialog(context, errorMessage);
-                  },
-                ),
+          action: null,
         ),
       );
     }
   }
 
-  static void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface2,
-        title: Text('error_dialog_title'.tr(),
-            style: const TextStyle(color: Colors.white, fontFamily: 'Cairo')),
-        content: SingleChildScrollView(
-          child: Text(message,
-              style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Cairo', fontSize: 13)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('error_close'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-          ),
-        ],
-      ),
-    );
-  }
 }

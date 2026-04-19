@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
+import '../../widgets/common/auth_error_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -140,21 +141,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       fontFamily: 'Cairo')),
               const SizedBox(height: 32),
               if (_error != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: colorScheme.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: colorScheme.error.withValues(alpha: 0.3)),
-                  ),
-                  child: Text(_error!,
-                      style: TextStyle(
-                          color: colorScheme.error,
-                          fontFamily: 'Cairo',
-                          fontSize: 13),
-                      textAlign: TextAlign.center),
-                ),
+                AuthErrorBanner(message: _error!),
                 const SizedBox(height: 16),
               ],
               TextFormField(

@@ -163,7 +163,17 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
           title: 'share_title'.tr(),
           child: Column(
             children: [
-              Icon(Icons.landscape_outlined, size: 40, color: colorScheme.primary),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? 'assets/images/app_icon.png'
+                      : 'assets/images/app_icon_light.png',
+                  width: 72,
+                  height: 72,
+                  fit: BoxFit.cover,
+                ),
+              ),
               const SizedBox(height: 10),
               Text(
                 'share_subtitle'.tr(),
