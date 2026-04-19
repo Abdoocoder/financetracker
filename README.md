@@ -578,6 +578,15 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.12 — 2026-04-19 *(Performance & Sync Badges)*
+
+| Change | Description |
+|:-------|:------------|
+| ⚡ **Dashboard Performance** | Removed `force-dynamic` from 9 client pages, added `useMemo` to expensive components (`ChallengesCard`, `FinancialHealthCombined`, `HeroBalanceCard`). |
+| 🔄 **Dashboard RPC** | Consolidated 3 separate Supabase queries (alerts count, goals target, debt commitments) into `get_financial_dashboard` RPC — 3 fewer network requests per dashboard load. |
+| 📶 **Sync Status Badges** | Flutter transactions screen now shows real-time sync status badges (🟠 pending, 🔴 failed) per transaction, with pending count in AppBar and pull-to-refresh triggering full sync. |
+| 🧪 **Test Fix** | Fixed failing alerts duplicate-prevention test — mock data was missing the "no transactions this week" alert title. |
+
 ### v3.32.11 — 2026-04-18 *(Bug Fixes & Accessibility)*
 
 | Change | Description |
