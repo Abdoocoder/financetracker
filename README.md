@@ -578,6 +578,16 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.13 — 2026-04-19 *(UX & Error Handling)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔔 **User-Friendly Errors** | Auth errors (wrong credentials, unconfirmed email, rate limit) now show friendly inline messages instead of raw exception text. Removed "Error Details" button that exposed technical error strings to users. |
+| 🎨 **Error Banner** | New `AuthErrorBanner` widget with Material 3 error colors and icon — used in Login and Register screens. |
+| 🖼️ **Settings Share Icon** | Share section in Settings now shows the actual app logo (with rounded corners, dark/light adaptive) instead of a generic landscape icon. |
+| 🔗 **Share Link** | Updated share message link to `https://fajrak.com/download` in both Arabic and English. |
+| 📦 **Package Updates** | `supabase_flutter` → 2.12.4, `dart_jsonwebtoken` → 3.4.1. |
+
 ### v3.32.12 — 2026-04-19 *(Performance & Sync Badges)*
 
 | Change | Description |
