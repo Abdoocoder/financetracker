@@ -19,7 +19,8 @@
       "Bash(node -e ':*)",
       "Bash(grep:*)",
       "Bash(/c/flutter/flutter/bin/flutter.bat analyze:*)",
-      "Bash(cmd:*)"
+      "Bash(cmd:*)",
+      "mcp__task-master-ai__next_task"
     ]
   }
 }
