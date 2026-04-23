@@ -578,6 +578,12 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.32.14 — 2026-04-23 *(Package Updates)*
+
+| Change | Description |
+|:-------|:------------|
+| 📦 **Package Updates** | Updated 10 Flutter packages: `build_runner` 2.14.0, `flutter_dotenv` 6.0.1, `package_info_plus` 10.1.0, `share_plus` 13.1.0, and others. Flutter engine upgraded to 3.41.7. |
+
 ### v3.32.13 — 2026-04-19 *(UX & Error Handling)*
 
 | Change | Description |
