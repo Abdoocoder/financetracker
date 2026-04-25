@@ -182,10 +182,11 @@ function AccountModal({ account, lang, onSave, onClose }: {
 
         {/* الاسم */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+          <label htmlFor="account-name" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
             {lang === 'en' ? 'Account Name' : 'اسم الحساب'}
           </label>
           <input
+            id="account-name"
             autoFocus
             value={name} onChange={e => setName(e.target.value)}
             placeholder={lang === 'en' ? 'e.g. Arab Bank' : 'مثال: البنك العربي'}
@@ -195,11 +196,13 @@ function AccountModal({ account, lang, onSave, onClose }: {
 
         {/* الرصيد الابتدائي */}
         <div style={{ marginBottom: 14 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+          <label htmlFor="account-balance" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
             {lang === 'en' ? 'Opening Balance' : 'الرصيد الابتدائي'}
           </label>
           <input
+            id="account-balance"
             type="number" min="0" step="0.01"
+            placeholder="0"
             value={openingBalance} onChange={e => setOpeningBalance(e.target.value)}
             style={{ width: '100%', padding: '11px 14px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
           />
@@ -213,6 +216,7 @@ function AccountModal({ account, lang, onSave, onClose }: {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {PRESET_COLORS.map(c => (
               <button key={c} onClick={() => setColor(c)}
+                aria-label={c}
                 style={{ width: 28, height: 28, borderRadius: '50%', background: c, border: `3px solid ${color === c ? 'var(--text-primary)' : 'transparent'}`, cursor: 'pointer', padding: 0 }} />
             ))}
           </div>
@@ -261,32 +265,32 @@ function TransferModal({ accounts, lang, onSave, onClose }: {
         </div>
 
         <div style={{ marginBottom: 12 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'From' : 'من'}</label>
-          <select value={fromId} onChange={e => setFromId(e.target.value)} style={selectStyle}>
+          <label htmlFor="transfer-from" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'From' : 'من'}</label>
+          <select id="transfer-from" value={fromId} onChange={e => setFromId(e.target.value)} style={selectStyle}>
             {accounts.map(a => <option key={a.id} value={a.id}>{a.icon} {a.name}</option>)}
           </select>
         </div>
 
         <div style={{ marginBottom: 12 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'To' : 'إلى'}</label>
-          <select value={toId} onChange={e => setToId(e.target.value)} style={selectStyle}>
+          <label htmlFor="transfer-to" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'To' : 'إلى'}</label>
+          <select id="transfer-to" value={toId} onChange={e => setToId(e.target.value)} style={selectStyle}>
             {accounts.filter(a => a.id !== fromId).map(a => <option key={a.id} value={a.id}>{a.icon} {a.name}</option>)}
           </select>
         </div>
 
         <div style={{ marginBottom: 12 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Amount' : 'المبلغ'}</label>
-          <input type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" style={selectStyle} />
+          <label htmlFor="transfer-amount" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Amount' : 'المبلغ'}</label>
+          <input id="transfer-amount" type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" style={selectStyle} />
         </div>
 
         <div style={{ marginBottom: 12 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Date' : 'التاريخ'}</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} style={selectStyle} />
+          <label htmlFor="transfer-date" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Date' : 'التاريخ'}</label>
+          <input id="transfer-date" type="date" value={date} onChange={e => setDate(e.target.value)} style={selectStyle} />
         </div>
 
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Note (optional)' : 'ملاحظة (اختياري)'}</label>
-          <input value={note} onChange={e => setNote(e.target.value)} style={selectStyle} />
+          <label htmlFor="transfer-note" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Note (optional)' : 'ملاحظة (اختياري)'}</label>
+          <input id="transfer-note" value={note} onChange={e => setNote(e.target.value)} placeholder={lang === 'en' ? 'Optional note' : 'ملاحظة اختيارية'} style={selectStyle} />
         </div>
 
         <button onClick={handleSave} disabled={saving || !amount || fromId === toId}

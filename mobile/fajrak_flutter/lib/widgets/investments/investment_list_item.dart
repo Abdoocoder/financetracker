@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/currency_service.dart';
 import 'investment_transaction_history.dart';
 import 'add_investment_dialog.dart';
 
@@ -195,6 +196,9 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
     final user = Supabase.instance.client.auth.currentUser!;
 
     try {
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final currency = widget.inv['currency'] as String? ?? 'USD';
+
       await Supabase.instance.client.from('investment_transactions').insert({
         'investment_id': widget.inv['id'],
         'user_id': user.id,
@@ -202,7 +206,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
         'shares': shares,
         'price': price,
         'commission': commission,
-        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+        'transaction_date': today,
       });
 
       final newShares = ownedShares - shares;
@@ -210,7 +214,30 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
         'shares': newShares,
       }).eq('id', widget.inv['id']);
 
-      final currency = widget.inv['currency'] as String? ?? 'USD';
+      // إضافة معاملة دخل تلقائياً عند البيع
+      final profileRes = await Supabase.instance.client
+          .from('profiles')
+          .select('currency')
+          .eq('id', user.id)
+          .single();
+      final userCurrency = profileRes['currency'] as String? ?? 'USD';
+
+      double convertedProceeds = proceeds;
+      if (currency != userCurrency) {
+        final rate = await CurrencyService.fetchExchangeRate(currency, userCurrency);
+        if (rate != null) convertedProceeds = proceeds * rate;
+      }
+
+      await Supabase.instance.client.from('transactions').insert({
+        'user_id': user.id,
+        'type': 'income',
+        'category': 'استثمار',
+        'amount': convertedProceeds,
+        'description':
+            'بيع $shares وحدة من ${widget.inv['symbol']} بسعر \$$price${currency != userCurrency ? ' (${proceeds.toStringAsFixed(2)} $currency)' : ''}',
+        'transaction_date': today,
+      });
+
       await Supabase.instance.client.rpc('upsert_investment_cash', params: {
         'p_user_id': user.id,
         'p_currency': currency,

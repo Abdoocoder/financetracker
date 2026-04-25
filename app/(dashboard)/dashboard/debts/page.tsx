@@ -327,6 +327,20 @@ export default function DebtsPage() {
       return
     }
 
+    if ((debt.debt_type ?? 'owed') === 'owed') {
+      await supabase.from('transactions').insert({
+        user_id: currentUser.id,
+        type: 'expense',
+        amount: amountInBaseCurrency,
+        original_amount: payAmount,
+        original_currency: paymentCurrency,
+        exchange_rate: rateToBaseCurrency,
+        category: 'ديون',
+        description: `المسدد: ${debt.name}`,
+        transaction_date: new Date().toISOString().split('T')[0],
+      })
+    }
+
     // تعليم تنبيه الدين كمقروء تلقائياً
     const paidDebt = debts.find(d => d.id === debtId)
     if (paidDebt) {

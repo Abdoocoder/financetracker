@@ -420,9 +420,25 @@ export default function InvestmentsPage() {
     })
     const newShares = inv.shares - shares
     await supabase.from('investments').update({ shares: newShares }).eq('id', inv.id)
+    // تحويل مبلغ البيع إلى عملة المستخدم إذا لزم
+    const invCurrency = inv.currency ?? 'USD'
+    let convertedProceeds = proceeds
+    if (invCurrency !== userCurrency) {
+      const rate = await fetchRate(invCurrency, userCurrency)
+      if (rate) convertedProceeds = proceeds * rate
+    }
+    // إضافة معاملة دخل تلقائياً عند البيع
+    await supabase.from('transactions').insert({
+      user_id: currentUser.id,
+      type: 'income',
+      category: 'استثمار',
+      amount: convertedProceeds,
+      description: `بيع ${shares} وحدة من ${inv.symbol} بسعر $${price}${invCurrency !== userCurrency ? ` (${proceeds.toFixed(2)} ${invCurrency})` : ''}`,
+      transaction_date: sellForm.date,
+    })
     await supabase.rpc('upsert_investment_cash', {
       p_user_id: currentUser.id,
-      p_currency: inv.currency ?? 'USD',
+      p_currency: invCurrency,
       p_amount: proceeds,
     })
     clearUserCache(currentUser.id)
