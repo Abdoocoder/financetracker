@@ -578,6 +578,17 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.33.0 — 2026-04-26 *(Dashboard UI Redesign)*
+
+| Change | Description |
+|:-------|:------------|
+| 🎨 **Dashboard UI Redesign** | Rebuilt `Cards`, `HeroBalanceCard`, and `NetWorthCard` components with modular CSS — cleaner structure and maintainable styles. |
+| 🏠 **Landing Page Redesign** | Complete overhaul of `LandingPageClient` with new layout and modular CSS architecture. |
+| 📄 **New Pages** | Added Debts and Investments dashboard pages with initial routing setup. |
+| 🔐 **Supabase Middleware** | Added Supabase session middleware for secure authenticated route handling. |
+| 📱 **Mobile: Investment Widget** | Enhanced `investment_list_item` with improved layout and clearer data display. |
+| 🔧 **Proxy Refactor** | Updated proxy implementation for improved type safety. |
+
 ### v3.32.14 — 2026-04-23 *(Package Updates)*
 
 | Change | Description |
