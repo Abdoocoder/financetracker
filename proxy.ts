@@ -1,9 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = [
-  '/login', '/register', '/forgot-password', '/reset-password',
-  '/api/', // كل الـ API routes تتحقق من الصلاحية داخلياً
+// المسارات التي تتطلب تسجيل دخول
+const PROTECTED_PATHS = [
+  '/dashboard',
+  '/transactions',
+  '/debts',
+  '/investments',
+  '/alerts',
+  '/budgets',
+  '/goals',
+  '/settings',
 ]
 
 export async function proxy(request: NextRequest) {
@@ -29,10 +36,10 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p))
+  const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p))
 
   // مستخدم غير مسجّل يحاول الوصول لصفحة محمية
-  if (!user && !isPublic) {
+  if (!user && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
