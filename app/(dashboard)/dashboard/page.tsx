@@ -15,8 +15,9 @@ import { useAccounts } from '@/hooks/useAccounts'
 import nextDynamic from 'next/dynamic'
 import { useQueryClient } from '@tanstack/react-query'
 
-// New Hooks & Components
-import { useDashboardData, type DashboardData } from '@/hooks/useDashboardData'
+
+import styles from './dashboard.module.css'
+import { useDashboardData } from '@/hooks/useDashboardData'
 import { Section } from '@/components/dashboard/Section'
 import { DashSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { HeroBalanceCard } from '@/components/dashboard/HeroBalanceCard'
@@ -24,15 +25,15 @@ import { MonthSummaryBanner } from '@/components/dashboard/MonthSummaryBanner'
 import { DashboardCustomizer } from '@/components/dashboard/DashboardCustomizer'
 import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 
-const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 156, borderRadius: 16 }} /> })
-const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
+const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonChart}`} /> })
+const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonSmall}`} /> })
 const ChallengesCard = nextDynamic(
   () => import('@/components/dashboard/ChallengesCard').then(m => ({ default: m.ChallengesCard })),
-  { ssr: false, loading: () => <div className="skeleton" style={{ height: 140, borderRadius: 16 }} /> }
+  { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonMedium}`} /> }
 )
 
 const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
-const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className="skeleton" style={{ height: 120, borderRadius: 16 }} /> })
+const GamificationCard = nextDynamic(() => import('@/components/dashboard/GamificationCard').then(m => ({ default: m.GamificationCard })), { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonSmall}`} /> })
 
 
 export default function DashboardPage() {
@@ -89,24 +90,24 @@ export default function DashboardPage() {
   const firstName = name.split(' ')[0]
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className={`animate-fade-in ${styles.pageContent}`}>
 
       {/* ── 1. HEADER ──────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className={styles.pageHeader}>
         <div>
-          <h1 suppressHydrationWarning style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.01em' }}>
+          <h1 suppressHydrationWarning className={styles.pageTitle}>
             {!hydrated ? t('dash_title') : (firstName ? t('dash_greeting', { name: firstName }) : t('dash_title'))}
           </h1>
-          <p suppressHydrationWarning style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+          <p suppressHydrationWarning className={styles.pageDate}>
             {hydrated && new Date().toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
             {hydrated && data?.lastUpdated && (
-              <span style={{ margin: '0 8px', opacity: 0.5 }}>
+              <span className={styles.separator}>
                 • {t('dash_updated_at', { date: data.lastUpdated })}
               </span>
             )}
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className={styles.headerActions}>
           {streakInfo && streakInfo.streak >= 3 && (
             <button 
               onClick={() => streakInfo.loggedToday ? document.getElementById('gamification')?.scrollIntoView({ behavior: 'smooth' }) : document.getElementById('quick-add-trigger')?.click()}
@@ -116,7 +117,7 @@ export default function DashboardPage() {
             </button>
           )}
           {(data?.unreadAlerts ?? 0) > 0 && (
-            <Link href="/dashboard/alerts" style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 10, textDecoration: 'none', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 13, fontWeight: 800 }}>
+            <Link href="/dashboard/alerts" className={styles.alertsBadge}>
               🔔 {data?.unreadAlerts}
             </Link>
           )}
@@ -129,7 +130,7 @@ export default function DashboardPage() {
 
       {/* ── 3. HERO BALANCE CARD ───────────────────────── */}
       {show('hero_balance') && (accountsLoading && !accounts.length
-        ? <div className="skeleton" style={{ height: 128, borderRadius: 24 }} />
+        ? <div className={`skeleton ${styles.skeletonHero}`} />
         : <HeroBalanceCard
             monthlyNet={net}
             currency={currency}
@@ -141,7 +142,7 @@ export default function DashboardPage() {
       )}
 
       {/* ── 4. MONTHLY STATS ── */}
-      {show('monthly_stats') && <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+      {show('monthly_stats') && <div className={styles.statsGrid}>
         {[
           { label: t('dash_income'),   value: `+${fmt(income)}`,   color: 'var(--accent-green-light)', bg: 'var(--accent-green-dim)', border: 'rgba(16,185,129,0.15)', icon: '↑', sub: null },
           { label: t('dash_expenses'), value: fmt(realExpenses > 0 ? realExpenses : expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓', sub: null },
@@ -155,27 +156,27 @@ export default function DashboardPage() {
             sub: `${t('dash_month')}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,
           },
         ].map(s => (
-          <div key={s.label} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: '10px 6px', textAlign: 'center' }}>
-            <div style={{ fontSize: 10, color: s.color, fontWeight: 900, opacity: 0.6, marginBottom: 2 }}>{s.icon}</div>
-            <div style={{ fontSize: 15, fontWeight: 900, color: s.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2, fontWeight: 700 }}>{s.label}</div>
-            {s.sub && <div style={{ fontSize: 8, color: 'var(--text-muted)', marginTop: 2, fontWeight: 600, opacity: 0.8 }}>{s.sub}</div>}
+          <div key={s.label} className={styles.statBox} style={{ background: s.bg, border: `1px solid ${s.border}` }}>
+            <div className={styles.statIcon} style={{ color: s.color }}>{s.icon}</div>
+            <div className={styles.statValue} style={{ color: s.color }}>{s.value}</div>
+            <div className={styles.statLabel}>{s.label}</div>
+            {s.sub && <div className={styles.statSub}>{s.sub}</div>}
           </div>
         ))}
       </div>}
 
       {show('debt_row') && (monthlyDebtCommitments > 0 || debtPayments > 0) && (
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className={styles.debtRow}>
           {debtPayments > 0 && (
-            <div style={{ flex: 1, padding: '8px 12px', borderRadius: 10, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: '#3B7EF6', fontWeight: 700 }}>💳 {t('dash_debt_payments')}</span>
-              <span style={{ fontSize: 13, fontWeight: 900, color: '#3B7EF6', fontFamily: 'monospace' }}>{fmt(debtPayments)}</span>
+            <div className={`${styles.debtBox} ${styles.debtBoxBlue}`}>
+              <span className={`${styles.debtLabel} ${styles.debtColorBlue}`}>💳 {t('dash_debt_payments')}</span>
+              <span className={`${styles.debtValue} ${styles.debtColorBlue}`}>{fmt(debtPayments)}</span>
             </div>
           )}
           {monthlyDebtCommitments > 0 && (
-            <div style={{ flex: 1, padding: '8px 12px', borderRadius: 10, background: netAfterDebts >= 0 ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', border: `1px solid ${netAfterDebts >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, color: '#3B7EF6', fontWeight: 700 }}>⚡ {t('dash_after_debts')}</span>
-              <span style={{ fontSize: 13, fontWeight: 900, color: netAfterDebts >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</span>
+            <div className={styles.debtBox} style={{ background: netAfterDebts >= 0 ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', border: `1px solid ${netAfterDebts >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}` }}>
+              <span className={`${styles.debtLabel} ${styles.debtColorBlue}`}>⚡ {t('dash_after_debts')}</span>
+              <span className={styles.debtValue} style={{ color: netAfterDebts >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</span>
             </div>
           )}
         </div>
@@ -205,7 +206,7 @@ export default function DashboardPage() {
 
       {show('health') && (
         <Section id="health" defaultOpen={false} icon="💊" title={`${t('dash_health_title')} — ${data?.healthScore ?? 0}%`}>
-          <div style={{ padding: '12px 0 8px' }}>
+          <div className={styles.sectionContent}>
             <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
           </div>
         </Section>
@@ -213,13 +214,13 @@ export default function DashboardPage() {
 
       {show('achievements') && (
         <Section id="gamification" defaultOpen={false} icon="🏆" title={t('dash_achievements_title')}>
-          <div style={{ padding: '12px 0 8px' }}><GamificationCard /></div>
+          <div className={styles.sectionContent}><GamificationCard /></div>
         </Section>
       )}
 
       {show('charts') && (
         <Section id="charts" defaultOpen={false} icon="📊" title={t('dash_charts_title')}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 0 8px' }}>
+          <div className={styles.sectionContentCol}>
             <MonthCompareCard income={income} expenses={expenses} prevIncome={data?.prevIncome ?? 0} prevExpenses={data?.prevExpenses ?? 0} />
             {data && data.months6.some((m: any) => m.income > 0 || m.expense > 0) && <MiniBarChart data={data.months6} lang={lang} />}
             {data && data.categories.length > 0 && <CategoryBars categories={data.categories} lang={lang} />}
@@ -229,13 +230,13 @@ export default function DashboardPage() {
 
       {show('simulator') && (
         <Section id="simulator" defaultOpen={false} icon="💰" title={t('dash_simulator_title')}>
-          <div style={{ padding: '12px 0 8px' }}><WealthSimulatorCard net={net} lang={lang} /></div>
+          <div className={styles.sectionContent}><WealthSimulatorCard net={net} lang={lang} /></div>
         </Section>
       )}
 
       {show('challenges') && (
         <Section id="challenges" defaultOpen={false} icon="🎯" title={t('dash_challenges_title')}>
-          <div style={{ padding: '12px 0 8px' }}><ChallengesCard lang={lang} data={data || null} net={net} income={income} expenses={expenses} /></div>
+          <div className={styles.sectionContent}><ChallengesCard lang={lang} data={data || null} net={net} income={income} expenses={expenses} /></div>
         </Section>
       )}
 

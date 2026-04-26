@@ -1,0 +1,306 @@
+.skeletonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.skeletonHero {
+  height: 100px;
+  border-radius: 20px;
+}
+
+.skeletonRow {
+  display: flex;
+  gap: 10px;
+}
+
+.skeletonButton {
+  flex: 1;
+  height: 46px;
+  border-radius: 14px;
+}
+
+.skeletonItem {
+  height: 80px;
+  border-radius: 18px;
+}
+
+/* Dialogs & Modals */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.confirmDialog {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.modalContent {
+  background: var(--bg-card);
+  border-radius: 24px 24px 0 0;
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.dialogEmoji {
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.dialogTitle {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.dialogText {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modalTitle {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+/* Account Card */
+.card {
+  background: var(--bg-card);
+  border-radius: 18px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.accountInfo {
+  flex: 1;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.accountName {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.defaultBadge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 100px;
+}
+
+.accountType {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.balanceRow {
+  text-align: right;
+}
+
+.balanceAmount {
+  font-size: 16px;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+.balanceCurrency {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  margin-left: 4px;
+}
+
+.actionButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* Forms */
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.input, .select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.presetColors {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.colorButton {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Page sections */
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.heroBalanceCard {
+  border-radius: 20px;
+  padding: 20px 22px;
+  text-align: center;
+}
+
+.heroLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.heroAmount {
+  font-size: 36px;
+  font-weight: 900;
+  font-family: monospace;
+  letter-spacing: -0.02em;
+}
+
+.heroCurrency {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 10px;
+}
+
+.primaryButton {
+  flex: 1;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.secondaryButton {
+  flex: 1;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.accountList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

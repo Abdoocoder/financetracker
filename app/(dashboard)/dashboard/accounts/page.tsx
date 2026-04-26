@@ -5,18 +5,19 @@ import { useI18n } from '@/lib/i18n'
 import { useAccounts } from '@/hooks/useAccounts'
 import type { Account, AccountType } from '@/types'
 import { PageHeader } from '@/components/ui/page-header'
+import styles from './accounts.module.css'
 
 // ── Skeleton للتحميل ─────────────────────────────────
 function AccountsSkeleton() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div className="skeleton" style={{ height: 100, borderRadius: 20 }} />
-      <div style={{ display: 'flex', gap: 10 }}>
-        <div className="skeleton" style={{ flex: 1, height: 46, borderRadius: 14 }} />
-        <div className="skeleton" style={{ flex: 1, height: 46, borderRadius: 14 }} />
+    <div className={styles.skeletonContainer}>
+      <div className={`skeleton ${styles.skeletonHero}`} />
+      <div className={styles.skeletonRow}>
+        <div className={`skeleton ${styles.skeletonButton}`} />
+        <div className={`skeleton ${styles.skeletonButton}`} />
       </div>
       {[1, 2, 3].map(i => (
-        <div key={i} className="skeleton" style={{ height: 80, borderRadius: 18 }} />
+        <div key={i} className={`skeleton ${styles.skeletonItem}`} />
       ))}
     </div>
   )
@@ -25,20 +26,20 @@ function AccountsSkeleton() {
 // ── Dialog تأكيد الحذف ───────────────────────────────
 function ConfirmArchiveDialog({ lang, onConfirm, onCancel }: { lang: string; onConfirm: () => void; onCancel: () => void }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }} onClick={onCancel}>
-      <div style={{ background: 'var(--bg-card)', borderRadius: 20, padding: 24, width: '100%', maxWidth: 360 }} onClick={e => e.stopPropagation()}>
-        <div style={{ fontSize: 36, textAlign: 'center', marginBottom: 12 }}>📦</div>
-        <h3 style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 8px', textAlign: 'center' }}>
+    <div className={styles.overlay} onClick={onCancel}>
+      <div className={styles.confirmDialog} onClick={e => e.stopPropagation()}>
+        <div className={styles.dialogEmoji}>📦</div>
+        <h3 className={styles.dialogTitle}>
           {lang === 'en' ? 'Archive Account?' : 'أرشفة الحساب؟'}
         </h3>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', margin: '0 0 20px', lineHeight: 1.5 }}>
+        <p className={styles.dialogText}>
           {lang === 'en' ? 'The account will be hidden but all its transactions will be preserved.' : 'سيُخفى الحساب مع الاحتفاظ بجميع معاملاته.'}
         </p>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button onClick={onCancel} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+        <div className={styles.buttonRow}>
+          <button onClick={onCancel} className={styles.secondaryButton}>
             {lang === 'en' ? 'Cancel' : 'إلغاء'}
           </button>
-          <button onClick={onConfirm} style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--accent-red-light)', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button onClick={onConfirm} className={styles.primaryButton} style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--accent-red-light)' }}>
             {lang === 'en' ? 'Archive' : 'أرشفة'}
           </button>
         </div>
@@ -132,18 +133,16 @@ function AccountModal({ account, lang, onSave, onClose }: {
   onSave: (data: Partial<Account>) => Promise<void>
   onClose: () => void
 }) {
-  const info = account ? typeInfo(account.type) : ACCOUNT_TYPES[0]
   const [name, setName] = useState(account?.name ?? '')
   const [type, setType] = useState<AccountType>(account?.type ?? 'bank')
   const [openingBalance, setOpeningBalance] = useState(account?.opening_balance?.toString() ?? '0')
   const [color, setColor] = useState(account?.color ?? '#3B7EF6')
-  const [icon, setIcon] = useState(account?.icon ?? '🏦')
   const [saving, setSaving] = useState(false)
 
   async function handleSave() {
     if (!name.trim()) return
     setSaving(true)
-    await onSave({ name: name.trim(), type, opening_balance: parseFloat(openingBalance) || 0, color, icon })
+    await onSave({ name: name.trim(), type, opening_balance: parseFloat(openingBalance) || 0, color })
     setSaving(false)
     onClose()
   }
@@ -165,7 +164,7 @@ function AccountModal({ account, lang, onSave, onClose }: {
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {ACCOUNT_TYPES.map(t => (
-              <button key={t.type} onClick={() => { setType(t.type); setColor(t.color); setIcon(t.icon) }}
+              <button key={t.type} onClick={() => { setType(t.type); setColor(t.color) }}
                 style={{
                   padding: '10px 12px', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
                   background: type === t.type ? `${t.color}18` : 'var(--bg-elevated)',
@@ -180,23 +179,13 @@ function AccountModal({ account, lang, onSave, onClose }: {
           </div>
         </div>
 
-        {/* الاسم */}
-        <div style={{ marginBottom: 14 }}>
-          <label htmlFor="account-name" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
-            {lang === 'en' ? 'Account Name' : 'اسم الحساب'}
-          </label>
-          <input
-            id="account-name"
-            autoFocus
-            value={name} onChange={e => setName(e.target.value)}
-            placeholder={lang === 'en' ? 'e.g. Arab Bank' : 'مثال: البنك العربي'}
-            style={{ width: '100%', padding: '11px 14px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
-          />
+        <div className={styles.formGroup}>
+          <label htmlFor="account-name" className={styles.formLabel}>{lang === 'en' ? 'Name' : 'الاسم'}</label>
+          <input id="account-name" value={name} onChange={e => setName(e.target.value)} placeholder={lang === 'en' ? 'Account name' : 'اسم الحساب'} className={styles.input} />
         </div>
 
-        {/* الرصيد الابتدائي */}
-        <div style={{ marginBottom: 14 }}>
-          <label htmlFor="account-balance" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>
+        <div className={styles.formGroup}>
+          <label htmlFor="account-balance" className={styles.formLabel}>
             {lang === 'en' ? 'Opening Balance' : 'الرصيد الابتدائي'}
           </label>
           <input
@@ -204,26 +193,28 @@ function AccountModal({ account, lang, onSave, onClose }: {
             type="number" min="0" step="0.01"
             placeholder="0"
             value={openingBalance} onChange={e => setOpeningBalance(e.target.value)}
-            style={{ width: '100%', padding: '11px 14px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }}
+            className={styles.input}
           />
         </div>
 
         {/* اللون */}
-        <div style={{ marginBottom: 20 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
             {lang === 'en' ? 'Color' : 'اللون'}
           </label>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div className={styles.presetColors}>
             {PRESET_COLORS.map(c => (
               <button key={c} onClick={() => setColor(c)}
                 aria-label={c}
-                style={{ width: 28, height: 28, borderRadius: '50%', background: c, border: `3px solid ${color === c ? 'var(--text-primary)' : 'transparent'}`, cursor: 'pointer', padding: 0 }} />
+                className={styles.colorButton}
+                style={{ background: c, border: `3px solid ${color === c ? 'var(--text-primary)' : 'transparent'}` }} />
             ))}
           </div>
         </div>
 
         <button onClick={handleSave} disabled={saving || !name.trim()}
-          style={{ width: '100%', padding: 14, borderRadius: 14, background: color, border: 'none', color: 'white', fontSize: 15, fontWeight: 900, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1, fontFamily: 'inherit' }}>
+          className={styles.primaryButton}
+          style={{ width: '100%', padding: 14, background: color, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
           {saving ? '⏳ ...' : lang === 'en' ? 'Save' : 'حفظ'}
         </button>
       </div>
@@ -244,8 +235,6 @@ function TransferModal({ accounts, lang, onSave, onClose }: {
   const [note, setNote]     = useState('')
   const [saving, setSaving] = useState(false)
 
-  const selectStyle = { width: '100%', padding: '11px 14px', borderRadius: 12, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' as const }
-
   async function handleSave() {
     if (!fromId || !toId || fromId === toId || !amount) return
     setSaving(true)
@@ -255,46 +244,47 @@ function TransferModal({ accounts, lang, onSave, onClose }: {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: 'var(--bg-card)', borderRadius: '24px 24px 0 0', padding: 24, width: '100%', maxWidth: 480 }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>
             🔄 {lang === 'en' ? 'Transfer Between Accounts' : 'تحويل بين الحسابات'}
           </h2>
-          <button onClick={onClose} aria-label={lang === 'en' ? 'Close' : 'إغلاق'} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
+          <button onClick={onClose} aria-label={lang === 'en' ? 'Close' : 'إغلاق'} className={styles.closeButton}>✕</button>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label htmlFor="transfer-from" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'From' : 'من'}</label>
-          <select id="transfer-from" value={fromId} onChange={e => setFromId(e.target.value)} style={selectStyle}>
+        <div className={styles.formGroup}>
+          <label htmlFor="transfer-from" className={styles.formLabel}>{lang === 'en' ? 'From' : 'من'}</label>
+          <select id="transfer-from" value={fromId} onChange={e => setFromId(e.target.value)} className={styles.select}>
             {accounts.map(a => <option key={a.id} value={a.id}>{a.icon} {a.name}</option>)}
           </select>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label htmlFor="transfer-to" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'To' : 'إلى'}</label>
-          <select id="transfer-to" value={toId} onChange={e => setToId(e.target.value)} style={selectStyle}>
+        <div className={styles.formGroup}>
+          <label htmlFor="transfer-to" className={styles.formLabel}>{lang === 'en' ? 'To' : 'إلى'}</label>
+          <select id="transfer-to" value={toId} onChange={e => setToId(e.target.value)} className={styles.select}>
             {accounts.filter(a => a.id !== fromId).map(a => <option key={a.id} value={a.id}>{a.icon} {a.name}</option>)}
           </select>
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label htmlFor="transfer-amount" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Amount' : 'المبلغ'}</label>
-          <input id="transfer-amount" type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" style={selectStyle} />
+        <div className={styles.formGroup}>
+          <label htmlFor="transfer-amount" className={styles.formLabel}>{lang === 'en' ? 'Amount' : 'المبلغ'}</label>
+          <input id="transfer-amount" type="number" min="0" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className={styles.input} />
         </div>
 
-        <div style={{ marginBottom: 12 }}>
-          <label htmlFor="transfer-date" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Date' : 'التاريخ'}</label>
-          <input id="transfer-date" type="date" value={date} onChange={e => setDate(e.target.value)} style={selectStyle} />
+        <div className={styles.formGroup}>
+          <label htmlFor="transfer-date" className={styles.formLabel}>{lang === 'en' ? 'Date' : 'التاريخ'}</label>
+          <input id="transfer-date" type="date" value={date} onChange={e => setDate(e.target.value)} className={styles.input} />
         </div>
 
-        <div style={{ marginBottom: 20 }}>
-          <label htmlFor="transfer-note" style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>{lang === 'en' ? 'Note (optional)' : 'ملاحظة (اختياري)'}</label>
-          <input id="transfer-note" value={note} onChange={e => setNote(e.target.value)} placeholder={lang === 'en' ? 'Optional note' : 'ملاحظة اختيارية'} style={selectStyle} />
+        <div className={styles.formGroup}>
+          <label htmlFor="transfer-note" className={styles.formLabel}>{lang === 'en' ? 'Note (optional)' : 'ملاحظة (اختياري)'}</label>
+          <input id="transfer-note" value={note} onChange={e => setNote(e.target.value)} placeholder={lang === 'en' ? 'Optional note' : 'ملاحظة اختيارية'} className={styles.input} />
         </div>
 
         <button onClick={handleSave} disabled={saving || !amount || fromId === toId}
-          style={{ width: '100%', padding: 14, borderRadius: 14, background: '#3B7EF6', border: 'none', color: 'white', fontSize: 15, fontWeight: 900, cursor: 'pointer', opacity: saving ? 0.6 : 1, fontFamily: 'inherit' }}>
+          className={styles.primaryButton}
+          style={{ width: '100%', padding: 14, background: '#3B7EF6', opacity: saving ? 0.6 : 1 }}>
           {saving ? '⏳ ...' : lang === 'en' ? 'Transfer' : 'تحويل'}
         </button>
       </div>
@@ -319,40 +309,39 @@ export default function AccountsPage() {
   if (loading) return <AccountsSkeleton />
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div className={`animate-fade-in ${styles.pageContainer}`}>
       <PageHeader title={lang === 'en' ? '💰 Accounts' : '💰 الحسابات'} />
 
       {/* إجمالي الرصيد */}
-      <div style={{
+      <div className={styles.heroBalanceCard} style={{
         background: totalBalance >= 0 ? 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.04))' : 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.04))',
         border: `1px solid ${totalBalance >= 0 ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
-        borderRadius: 20, padding: '20px 22px', textAlign: 'center',
       }}>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+        <div className={styles.heroLabel}>
           {lang === 'en' ? 'Total Balance' : 'إجمالي الرصيد'}
         </div>
-        <div style={{ fontSize: 36, fontWeight: 900, color: totalBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace', letterSpacing: '-0.02em' }}>
+        <div className={styles.heroAmount} style={{ color: totalBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
           {totalBalance >= 0 ? '+' : '-'}{fmt(Math.abs(totalBalance))}
         </div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>{currency}</div>
+        <div className={styles.heroCurrency}>{currency}</div>
       </div>
 
       {/* أزرار */}
-      <div style={{ display: 'flex', gap: 10 }}>
+      <div className={styles.buttonRow}>
         <button onClick={() => setShowCreate(true)}
-          style={{ flex: 1, padding: '12px', borderRadius: 14, background: '#3B7EF6', border: 'none', color: 'white', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+          className={styles.primaryButton} style={{ background: '#3B7EF6' }}>
           + {lang === 'en' ? 'New Account' : 'حساب جديد'}
         </button>
         {accounts.length >= 2 && (
           <button onClick={() => setShowTransfer(true)}
-            style={{ flex: 1, padding: '12px', borderRadius: 14, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+            className={styles.secondaryButton}>
             🔄 {lang === 'en' ? 'Transfer' : 'تحويل'}
           </button>
         )}
       </div>
 
       {/* قائمة الحسابات */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className={styles.accountList}>
         {accounts.map(acc => (
           <AccountCard key={acc.id} acc={acc} currency={currency} lang={lang}
             onEdit={a => setEditAccount(a)}

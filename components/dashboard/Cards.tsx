@@ -3,24 +3,26 @@ import Link from 'next/link'
 import { useI18n } from '@/lib/i18n'
 import type { Transaction } from '@/types'
 
+import styles from './Cards.module.css'
+
 export function MonthCompareCard({ income, expenses, prevIncome, prevExpenses }: { income: number; expenses: number; prevIncome: number; prevExpenses: number }) {
   const { t, lang } = useI18n()
   if (!prevIncome && !prevExpenses) return null
   const incDiff = prevIncome > 0 ? ((income - prevIncome) / prevIncome * 100) : 0
   const expDiff = prevExpenses > 0 ? ((expenses - prevExpenses) / prevExpenses * 100) : 0
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
-      <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 12 }}>{t('dash_compare')}</div>
-      <div style={{ display: 'flex', gap: 10 }}>
-        <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: incDiff >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
-          <div style={{ fontSize: 18, marginBottom: 2 }}>{incDiff >= 0 ? '📈' : '📉'}</div>
-          <div style={{ fontSize: 13, fontWeight: 900, color: incDiff >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{incDiff >= 0 ? '+' : ''}{incDiff.toFixed(0)}%</div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{lang === 'en' ? 'Income' : 'الدخل'}</div>
+    <div className={styles.card}>
+      <div className={styles.title}>{t('dash_compare')}</div>
+      <div className={styles.compareGrid}>
+        <div className={styles.compareItem} style={{ background: incDiff >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)' }}>
+          <div className={styles.compareEmoji}>{incDiff >= 0 ? '📈' : '📉'}</div>
+          <div className={styles.compareValue} style={{ color: incDiff >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{incDiff >= 0 ? '+' : ''}{incDiff.toFixed(0)}%</div>
+          <div className={styles.compareLabel}>{lang === 'en' ? 'Income' : 'الدخل'}</div>
         </div>
-        <div style={{ flex: 1, padding: '10px', borderRadius: 12, background: expDiff <= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)', textAlign: 'center' }}>
-          <div style={{ fontSize: 18, marginBottom: 2 }}>{expDiff <= 0 ? '✅' : '⚠️'}</div>
-          <div style={{ fontSize: 13, fontWeight: 900, color: expDiff <= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>{expDiff > 0 ? '+' : ''}{expDiff.toFixed(0)}%</div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{lang === 'en' ? 'Expenses' : 'المصاريف'}</div>
+        <div className={styles.compareItem} style={{ background: expDiff <= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)' }}>
+          <div className={styles.compareEmoji}>{expDiff <= 0 ? '✅' : '⚠️'}</div>
+          <div className={styles.compareValue} style={{ color: expDiff <= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{expDiff > 0 ? '+' : ''}{expDiff.toFixed(0)}%</div>
+          <div className={styles.compareLabel}>{lang === 'en' ? 'Expenses' : 'المصاريف'}</div>
         </div>
       </div>
     </div>
@@ -33,17 +35,17 @@ export function BudgetProgressCard({ income, expenses, net, currency = 'JOD' }: 
   const spendPct = Math.min((expenses / income) * 100, 100)
   const spendColor = spendPct > 90 ? '#EF4444' : spendPct > 70 ? '#F59E0B' : '#10B981'
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{lang === 'en' ? 'Monthly Budget' : 'الميزانية الشهرية'}</span>
-        <span style={{ fontSize: 12, fontWeight: 900, color: spendColor, fontFamily: 'monospace' }}>{spendPct.toFixed(0)}% {lang === 'en' ? 'spent' : 'مُنفَق'}</span>
+    <div className={styles.card}>
+      <div className={styles.budgetHeader}>
+        <span className={styles.budgetLabel}>{lang === 'en' ? 'Monthly Budget' : 'الميزانية الشهرية'}</span>
+        <span className={styles.budgetPercent} style={{ color: spendColor }}>{spendPct.toFixed(0)}% {lang === 'en' ? 'spent' : 'مُنفَق'}</span>
       </div>
-      <div style={{ height: 8, borderRadius: 4, background: 'var(--bg-elevated)', overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${spendPct}%`, borderRadius: 4, background: spendColor, transition: 'width 0.5s ease' }} />
+      <div className={styles.progressBarContainer}>
+        <div className={styles.progressBarFill} style={{ width: `${spendPct}%`, background: spendColor }} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Income' : 'الدخل'}: {income.toFixed(0)} {currency}</span>
-        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: {Math.max(0, net).toFixed(0)} {currency}</span>
+      <div className={styles.budgetFooter}>
+        <span className={styles.budgetStat}>{lang === 'en' ? 'Income' : 'الدخل'}: {income.toFixed(0)} {currency}</span>
+        <span className={styles.budgetStat}>{lang === 'en' ? 'Remaining' : 'المتبقي'}: {Math.max(0, net).toFixed(0)} {currency}</span>
       </div>
     </div>
   )
@@ -59,14 +61,14 @@ export function QuickLinksCards({ totalDebt, invValue, goalsSaved, goalsTarget, 
   return (
     <>
       {cards.map((c, i) => (
-        <Link key={i} href={c.href} style={{ textDecoration: 'none' }}>
-          <div className="card-lift" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: c.bg, border: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: c.color }}>{c.icon}</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 3 }}>{c.label}</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: c.color, fontFamily: 'monospace', letterSpacing: '-0.02em' }}>{c.value}</div>
+        <Link key={i} href={c.href} className={styles.cardLink}>
+          <div className={`${styles.quickLinkCard} card-lift`}>
+            <div className={styles.iconBox} style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.color }}>{c.icon}</div>
+            <div className={styles.linkInfo}>
+              <div className={styles.linkLabel}>{c.label}</div>
+              <div className={styles.linkValue} style={{ color: c.color }}>{c.value}</div>
             </div>
-            <span style={{ color: 'var(--text-muted)', fontSize: 20 }}>›</span>
+            <span className={styles.linkArrow}>›</span>
           </div>
         </Link>
       ))}
@@ -86,22 +88,22 @@ export function WealthSimulatorCard({ net, lang }: { net: number; lang: string }
     { label: lang === 'en' ? '20 years' : 'بعد 20 سنة',   value: fmt(future20), color: '#F59E0B'                   },
   ]
   return (
-    <Link href="/dashboard/investments" style={{ textDecoration: 'none' }}>
-      <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))', border: '1px solid rgba(59,126,246,0.2)', borderRadius: 16, padding: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>📈 {lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-blue-light)', background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.2)', padding: '3px 10px', borderRadius: 100 }}>{lang === 'en' ? 'View' : 'افتح ←'}</span>
+    <Link href="/dashboard/investments" className={styles.cardLink}>
+      <div className={styles.simulatorCard}>
+        <div className={styles.simulatorHeader}>
+          <span className={styles.simulatorTitle}>📈 {lang === 'en' ? 'Wealth Simulator' : 'محاكي الثروة'}</span>
+          <span className={styles.viewBadge}>{lang === 'en' ? 'View' : 'افتح ←'}</span>
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>{lang === 'en' ? 'If you invest your monthly surplus:' : 'لو استثمرت فائضك الشهري:'}</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        <div className={styles.simulatorSubtitle}>{lang === 'en' ? 'If you invest your monthly surplus:' : 'لو استثمرت فائضك الشهري:'}</div>
+        <div className={styles.simulatorGrid}>
           {stats.map((s, i) => (
-            <div key={i} style={{ textAlign: 'center', padding: '10px 6px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 15, fontWeight: 900, color: s.color, fontFamily: 'monospace' }}>{s.value}</div>
-              <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
+            <div key={i} className={styles.simulatorItem}>
+              <div className={styles.simulatorValue} style={{ color: s.color }}>{s.value}</div>
+              <div className={styles.simulatorLabel}>{s.label}</div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, textAlign: 'center' }}>💡 {lang === 'en' ? 'Based on 7% annual return (S&P500 avg)' : 'بناءً على عائد 7% سنوياً (متوسط S&P500)'}</div>
+        <div className={styles.simulatorFooter}>💡 {lang === 'en' ? 'Based on 7% annual return (S&P500 avg)' : 'بناءً على عائد 7% سنوياً (متوسط S&P500)'}</div>
       </div>
     </Link>
   )
@@ -110,25 +112,25 @@ export function WealthSimulatorCard({ net, lang }: { net: number; lang: string }
 export function RecentTransactionsCard({ transactions, lang }: { transactions: Pick<Transaction, 'id' | 'type' | 'amount' | 'category' | 'description' | 'transaction_date'>[]; lang: string }) {
   const { t } = useI18n()
   return (
-    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 16, padding: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)' }}>{t('dash_recent')}</span>
-        <Link href="/dashboard/transactions" style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent-blue-light)', textDecoration: 'none' }}>{t('dash_view_all')}</Link>
+    <div className={styles.recentTxCard}>
+      <div className={styles.recentTxHeader}>
+        <span className={styles.recentTxTitle}>{t('dash_recent')}</span>
+        <Link href="/dashboard/transactions" className={styles.viewAllLink}>{t('dash_view_all')}</Link>
       </div>
       {transactions.length === 0 ? (
-        <p style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: 13 }}>{t('dash_no_transactions')}</p>
+        <p className={styles.noTxText}>{t('dash_no_transactions')}</p>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div className={styles.txList}>
           {transactions.map(tx => (
-            <div key={tx.id} className="tx-row" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 8px', borderRadius: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: tx.type === 'income' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
+            <div key={tx.id} className={`${styles.txRow} tx-row`}>
+              <div className={styles.txIconBox} style={{ background: tx.type === 'income' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.10)' }}>
                 {tx.type === 'income' ? '💰' : '💸'}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.description || tx.category || '—'}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{tx.transaction_date}</div>
+              <div className={styles.txInfo}>
+                <div className={styles.txDescription}>{tx.description || tx.category || '—'}</div>
+                <div className={styles.txDate}>{tx.transaction_date}</div>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 900, fontFamily: 'monospace', flexShrink: 0, color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+              <div className={styles.txAmount} style={{ color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
                 {tx.type === 'income' ? '+' : '−'}{Number(tx.amount).toFixed(0)}
               </div>
             </div>

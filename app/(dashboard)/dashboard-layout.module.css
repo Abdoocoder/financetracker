@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.main {
+  flex: 1;
+  padding: 20px 16px;
+  padding-bottom: 96px;
+  max-width: 100%;
+  overflow-x: hidden;
+  min-height: 100vh;
+}

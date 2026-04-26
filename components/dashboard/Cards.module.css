@@ -1,0 +1,291 @@
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.compareGrid {
+  display: flex;
+  gap: 10px;
+}
+
+.compareItem {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.compareEmoji {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.compareValue {
+  font-size: 13px;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+.compareLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* BudgetProgressCard */
+.budgetHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.budgetLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.budgetPercent {
+  font-size: 12px;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+.progressBarContainer {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.budgetFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.budgetStat {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* QuickLinksCards */
+.quickLinkCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.iconBox {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.linkInfo {
+  flex: 1;
+}
+
+.linkLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.linkValue {
+  font-size: 18px;
+  font-weight: 900;
+  font-family: monospace;
+  letter-spacing: -0.02em;
+}
+
+.linkArrow {
+  color: var(--text-muted);
+  font-size: 20px;
+}
+
+/* WealthSimulatorCard */
+.simulatorCard {
+  background: linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05));
+  border: 1px solid rgba(59,126,246,0.2);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.simulatorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.simulatorTitle {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.viewBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-blue-light);
+  background: rgba(59,126,246,0.1);
+  border: 1px solid rgba(59,126,246,0.2);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.simulatorSubtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.simulatorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.simulatorItem {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+}
+
+.simulatorValue {
+  font-size: 15px;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+.simulatorLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.simulatorFooter {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* RecentTransactionsCard */
+.recentTxCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.recentTxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.recentTxTitle {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.viewAllLink {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-blue-light);
+  text-decoration: none;
+}
+
+.noTxText {
+  text-align: center;
+  padding: 20px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.txList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.txRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 12px;
+}
+
+.txIconBox {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.txInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.txDescription {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.txDate {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.txAmount {
+  font-size: 14px;
+  font-weight: 900;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.cardLink {
+  text-decoration: none;
+}

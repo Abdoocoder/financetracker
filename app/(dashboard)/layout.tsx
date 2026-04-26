@@ -13,6 +13,8 @@ import { WelcomeModal } from '@/components/ui/welcome-modal'
 import { OnboardingTour } from '@/components/ui/onboarding-tour'
 import { GlobalFAB } from '@/components/ui/fab'
 
+import styles from './dashboard-layout.module.css'
+
 function TranslatedErrorBoundary({ children }: { children: React.ReactNode }) {
   const { t } = useI18n()
   return <ErrorBoundary t={t}>{children}</ErrorBoundary>
@@ -59,16 +61,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }, [user, pathname, fetchCount, fetchCountDebounced, supabase])
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+    <div className={styles.container} style={{ direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
       <Sidebar alertsCount={alertsCount} />
-      <main style={{
-        flex: 1,
-        padding: '20px 16px',
-        paddingBottom: '96px',
-        maxWidth: '100%',
-        overflowX: 'hidden',
-        minHeight: '100vh',
-      }}>
+      <main className={styles.main}>
         
       <PushPrompt />
       <InstallPrompt />

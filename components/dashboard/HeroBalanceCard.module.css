@@ -1,0 +1,76 @@
+.card {
+  border-radius: 24px;
+  padding: 20px 20px 16px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.heroRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.amount {
+  font-size: 42px;
+  font-weight: 900;
+  font-family: monospace;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.currency {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.thisMonthLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.thisMonthValue {
+  font-weight: 800;
+}
+
+.trendBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.accountChips {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.accountChip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+}

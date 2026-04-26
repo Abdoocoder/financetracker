@@ -1,0 +1,94 @@
+.card {
+  border-radius: 16px;
+}
+
+.headerButton {
+  width: 100%;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerEmoji {
+  font-size: 16px;
+}
+
+.headerLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.amountWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.amountValue {
+  font-size: 18px;
+  font-weight: 900;
+  font-family: monospace;
+  letter-spacing: -0.02em;
+}
+
+.currencyLabel {
+  font-size: 11px;
+  margin-right: 3px;
+  opacity: 0.7;
+}
+
+.arrowIcon {
+  font-size: 11px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.breakdownGrid {
+  padding: 0 16px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.breakdownItem {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 9px 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.itemIcon {
+  font-size: 14px;
+}
+
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemLabel {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.itemValue {
+  font-size: 13px;
+  font-weight: 900;
+  font-family: monospace;
+}

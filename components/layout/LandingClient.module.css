@@ -1,0 +1,41 @@
+.stickyBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: rgba(10, 12, 18, 0.97);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(59, 126, 246, 0.2);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: transform 0.4s ease;
+}
+
+.ctaTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.ctaSubtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.ctaButton {
+  padding: 12px 28px;
+  border-radius: 10px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 0 20px rgba(59, 126, 246, 0.4);
+}

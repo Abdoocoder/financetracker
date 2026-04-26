@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useI18n } from '@/lib/i18n'
 
+import styles from './LandingClient.module.css'
+
 export default function LandingClient() {
   const [showSticky, setShowSticky] = useState(false)
   const { t } = useI18n()
@@ -18,41 +20,18 @@ export default function LandingClient() {
 
   return (
     <div 
+      className={styles.stickyBar}
       style={{ 
-        position: 'fixed', 
-        bottom: 0, 
-        left: 0, 
-        right: 0, 
-        zIndex: 200, 
-        background: 'rgba(10,12,18,0.97)', 
-        backdropFilter: 'blur(20px)', 
-        borderTop: '1px solid rgba(59,126,246,0.2)', 
-        padding: '14px 32px', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between', 
-        gap: 16, 
         transform: showSticky ? 'translateY(0)' : 'translateY(100%)', 
-        transition: 'transform 0.4s ease' 
       }}
     >
       <div>
-        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>{t('land_cta_title')}</div>
-        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{t('land_cta_subtitle')}</div>
+        <div className={styles.ctaTitle}>{t('land_cta_title')}</div>
+        <div className={styles.ctaSubtitle}>{t('land_cta_subtitle')}</div>
       </div>
       <Link 
         href="/register" 
-        style={{ 
-          padding: '12px 28px', 
-          borderRadius: 10, 
-          background: 'var(--accent-blue)', 
-          color: 'white', 
-          fontSize: 15, 
-          fontWeight: 900, 
-          textDecoration: 'none', 
-          whiteSpace: 'nowrap', 
-          boxShadow: '0 0 20px rgba(59,126,246,0.4)' 
-        }}
+        className={styles.ctaButton}
       >
         {t('land_cta_btn')}
       </Link>

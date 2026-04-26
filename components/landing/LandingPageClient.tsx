@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useI18n } from '@/lib/i18n'
 import LandingClient from '@/components/layout/LandingClient'
 import { Globe } from 'lucide-react'
+import styles from './LandingPageClient.module.css'
 
 interface Testimonial {
   name: string
@@ -21,143 +22,135 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
   const { t, lang, setLang } = useI18n()
 
   return (
-    <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', direction: lang === 'ar' ? 'rtl' : 'ltr', fontFamily: 'inherit', overflowX: 'hidden' }}>
+    <div className={styles.container} style={{ direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
 
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
-        <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '60vw', height: '60vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%)' }} />
-        <div style={{ position: 'absolute', bottom: '10%', left: '-10%', width: '40vw', height: '40vw', borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,185,129,0.04) 0%, transparent 70%)' }} />
+      <div className={styles.glowContainer}>
+        <div className={styles.glowTopRight} />
+        <div className={styles.glowBottomLeft} />
       </div>
 
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', background: 'rgba(10,12,18,0.8)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/icon-512.png" style={{ width: 36, height: 36, borderRadius: 10 }} alt={t('land_app_name')} />
-            <span style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{t('land_app_name')}</span>
+      <nav className={styles.navbar}>
+        <div className={styles.navInner}>
+          <div className={styles.logoBox}>
+            <img src="/icon-512.png" className={styles.logoImg} alt={t('land_app_name')} />
+            <span className={styles.logoText}>{t('land_app_name')}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div className={styles.navActions}>
             <button 
               onClick={() => {
                 const newLang = lang === 'ar' ? 'en' : 'ar';
                 setLang(newLang);
-                // Set cookie for server-side detection on next reload
                 document.cookie = `lang=${newLang}; path=/; max-age=31536000`;
               }}
-              style={{ 
-                display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', borderRadius: 10, 
-                background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
-                color: 'var(--text-secondary)', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                fontFamily: 'inherit'
-              }}
+              className={styles.langBtn}
             >
               <Globe size={16} />
               {lang === 'ar' ? 'English' : 'العربية'}
             </button>
-            <Link href="/login" style={{ padding: '8px 18px', borderRadius: 10, color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>{t('land_login')}</Link>
-            <Link href="/register" style={{ padding: '6px 12px', borderRadius: 8, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 12, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>{t('land_start_btn')}</Link>
+            <Link href="/login" className={styles.loginLink}>{t('land_login')}</Link>
+            <Link href="/register" className={styles.startBtn}>{t('land_start_btn')}</Link>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', padding: 'clamp(60px, 10vw, 100px) 20px clamp(40px, 8vw, 80px)', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 100, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', marginBottom: 36 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#F59E0B', display: 'inline-block', animation: 'pulse 2s infinite' }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#FCD34D' }}>{t('land_badge')}</span>
+      <section className={styles.heroSection}>
+        <div className={styles.heroBadge}>
+          <span className={styles.heroDot} />
+          <span className={styles.heroBadgeText}>{t('land_badge')}</span>
         </div>
 
-        <div className="hero-line-1" style={{ fontSize: 'clamp(15px, 3vw, 19px)', color: 'var(--text-muted)', fontWeight: 600, marginBottom: 12, letterSpacing: '0.01em' }}>
+        <div className={styles.heroTease}>
           {t('land_hero_tease')}
         </div>
 
-        <h1 className="hero-line-2" style={{ fontSize: 'clamp(36px, 8vw, 76px)', fontWeight: 900, lineHeight: 1.05, margin: '0 0 6px', letterSpacing: '-0.04em' }}>
-          <span style={{ background: 'linear-gradient(135deg, #F59E0B 20%, #FBBF24 50%, #10B981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+        <h1 className={styles.heroTitle}>
+          <span className={styles.heroTitleGradient}>
             {t('land_hero_title')}
           </span>
         </h1>
 
-        <div className="hero-line-3" style={{ fontSize: 'clamp(16px, 3.5vw, 22px)', color: 'var(--text-secondary)', fontWeight: 700, margin: '10px 0 28px', letterSpacing: '-0.01em' }}>
-          <span style={{ color: '#10B981' }}>{t('app_name')}</span> {t('land_hero_answer')}
+        <div className={styles.heroAnswer}>
+          <span className={styles.heroAppName}>{t('app_name')}</span> {t('land_hero_answer')}
         </div>
 
-        <p className="hero-line-4" style={{ fontSize: 'clamp(14px, 3.5vw, 17px)', color: 'var(--text-muted)', lineHeight: 1.8, maxWidth: 480, margin: '0 auto 32px' }}>
+        <p className={styles.heroDesc}>
           {t('land_hero_desc')}
         </p>
-        <div className="hero-cta" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%', maxWidth: 400, margin: '0 auto' }}>
-          <Link href="/register" style={{ flex: 1, minWidth: 160, padding: '13px 20px', borderRadius: 14, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', textAlign: 'center', boxShadow: '0 0 30px rgba(245,158,11,0.4)' }}>{t('land_cta_start')}</Link>
-          <a href="#features" style={{ flex: 1, minWidth: 120, padding: '13px 20px', borderRadius: 14, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 15, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>{t('land_cta_how')}</a>
+        <div className={styles.heroCtaRow}>
+          <Link href="/register" className={styles.heroCtaPrimary}>{t('land_cta_start')}</Link>
+          <a href="#features" className={styles.heroCtaSecondary}>{t('land_cta_how')}</a>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 16, flexWrap: 'wrap' }}>
+        <div className={styles.heroFeatureRow}>
           {[t('land_feature_free'), t('land_feature_no_card'), t('land_feature_halal')].map((text, i) => (
-            <span key={i} style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}>{text}</span>
+            <span key={i} className={styles.heroFeatureItem}>{text}</span>
           ))}
         </div>
-        <div style={{ marginTop: 24, fontSize: 13, color: 'var(--text-muted)' }}>{t('land_designed_for')}</div>
+        <div className={styles.heroDesignedFor}>{t('land_designed_for')}</div>
 
-        <div style={{ marginTop: 28 }}>
-          <Link href="/download" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', borderRadius: 12, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', color: '#FCD34D', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
-            {t('land_download_android')}
-          </Link>
-        </div>
+        <Link href="/download" className={styles.heroDownloadBtn}>
+          {t('land_download_android')}
+        </Link>
       </section>
 
       {/* Dashboard Preview */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ borderRadius: 24, border: '1px solid var(--border)', overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.5)', background: 'var(--bg-card)' }}>
-          <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)' }}>
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#EF4444' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#F59E0B' }} />
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#10B981' }} />
-            <div style={{ flex: 1, height: 24, borderRadius: 6, background: 'var(--bg-elevated)', maxWidth: 300, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>fajrak.com/dashboard</span>
+      <section className={styles.previewSection}>
+        <div className={styles.browserWindow}>
+          <div className={styles.browserHeader}>
+            <div className={styles.browserDotRed} />
+            <div className={styles.browserDotYellow} />
+            <div className={styles.browserDotGreen} />
+            <div className={styles.browserUrlBar}>
+              <span className={styles.browserUrl}>fajrak.com/dashboard</span>
             </div>
           </div>
-          <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className={styles.browserContent}>
+            <div className={styles.previewTopRow}>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)' }}>{t('land_preview_title')}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('land_preview_subtitle')}</div>
+                <div className={styles.previewTitle}>{t('land_preview_title')}</div>
+                <div className={styles.previewSubtitle}>{t('land_preview_subtitle')}</div>
               </div>
-              <div style={{ padding: '6px 12px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#F87171', fontSize: 12, fontWeight: 700 }}>🔔 3</div>
+              <div className={styles.previewAlert}>🔔 3</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+            <div className={styles.previewStatsGrid}>
               {[
                 { label: t('dash_income'), value: '+2,400', color: '#10B981', bg: 'rgba(16,185,129,0.08)' },
                 { label: t('dash_expenses'), value: '1,250', color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
                 { label: t('dash_net'), value: '+1,150', color: '#3B7EF6', bg: 'rgba(59,126,246,0.08)' },
               ].map((s, i) => (
-                <div key={i} style={{ background: s.bg, borderRadius: 14, padding: '14px 10px', textAlign: 'center', border: `1px solid ${s.color}22` }}>
-                  <div style={{ fontSize: 18, fontWeight: 900, color: s.color, fontFamily: 'monospace' }}>{s.value}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{s.label}</div>
+                <div key={i} className={styles.previewStatBox} style={{ background: s.bg, border: `1px solid ${s.color}22` }}>
+                  <div className={styles.previewStatValue} style={{ color: s.color }}>{s.value}</div>
+                  <div className={styles.previewStatLabel}>{s.label}</div>
                 </div>
               ))}
             </div>
 
-            <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.07), rgba(16,185,129,0.05))', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 16, padding: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ fontSize: 13, fontWeight: 900, color: 'var(--text-primary)' }}>{t('land_roadmap_title')}</div>
-                <div style={{ padding: '3px 10px', borderRadius: 100, background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)', fontSize: 11, fontWeight: 700, color: '#F59E0B' }}>{t('land_roadmap_stage2')}</div>
+            <div className={styles.previewRoadmap}>
+              <div className={styles.previewRoadmapHeader}>
+                <div className={styles.previewRoadmapTitle}>{t('land_roadmap_title')}</div>
+                <div className={styles.previewRoadmapBadge}>{t('land_roadmap_stage2')}</div>
               </div>
-              <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+              <div className={styles.previewRoadmapBarContainer}>
                 {[t('stage1'), t('stage2'), t('stage3'), t('stage4')].map((stage, i) => (
-                  <div key={i} style={{ flex: 1, height: 6, borderRadius: 3, background: i <= 1 ? (i === 1 ? '#F59E0B' : '#10B981') : 'var(--bg-elevated)' }} />
+                  <div key={i} className={styles.previewRoadmapBar} style={{ background: i <= 1 ? (i === 1 ? '#F59E0B' : '#10B981') : 'var(--bg-elevated)' }} />
                 ))}
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: '#F59E0B', fontFamily: 'monospace' }}>72<span style={{ fontSize: 14 }}>/100</span></div>
-                <div style={{ textAlign: lang === 'ar' ? 'left' : 'right' }}>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>{t('land_roadmap_next')}</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)' }}>{t('land_roadmap_next_step')}</div>
+              <div className={styles.previewRoadmapFooter}>
+                <div className={styles.previewRoadmapProgress}>72<span className={styles.roadmapDenominator}>/100</span></div>
+                <div className={styles.previewRoadmapNextRow} style={{ textAlign: lang === 'ar' ? 'left' : 'right' }}>
+                  <div className={styles.previewRoadmapNextLabel}>{t('land_roadmap_next')}</div>
+                  <div className={styles.previewRoadmapNextStep}>{t('land_roadmap_next_step')}</div>
                 </div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--bg-secondary)', borderRadius: 16, padding: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>{t('land_chart_title')}</div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 60 }}>
+            <div className={styles.previewChart}>
+              <div className={styles.previewChartTitle}>{t('land_chart_title')}</div>
+              <div className={styles.previewChartBars}>
                 {[{i:40,e:30},{i:55,e:45},{i:35,e:50},{i:70,e:40},{i:60,e:35},{i:80,e:55}].map((bar, idx) => (
-                  <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, height: '100%', justifyContent: 'flex-end' }}>
-                    <div style={{ width: '45%', height: `${bar.i}%`, background: 'rgba(16,185,129,0.6)', borderRadius: '3px 3px 0 0' }} />
-                    <div style={{ width: '45%', height: `${bar.e}%`, background: 'rgba(239,68,68,0.5)', borderRadius: '3px 3px 0 0' }} />
+                  <div key={idx} className={styles.previewChartBarItem}>
+                    <div className={styles.previewChartBarIncome} style={{ height: `${bar.i}%` }} />
+                    <div className={styles.previewChartBarExpense} style={{ height: `${bar.e}%` }} />
                   </div>
                 ))}
               </div>
@@ -167,43 +160,41 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
       </section>
 
       {/* المشكلة */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--accent-blue-light)', textTransform: 'uppercase', marginBottom: 12 }}>{t('land_problem_tag')}</div>
-          <h2 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>{t('land_problem_title')}</h2>
-          <p style={{ fontSize: 16, color: 'var(--text-muted)', maxWidth: 480, margin: '0 auto' }}>{t('land_problem_desc')}</p>
+      <section className={styles.problemSection}>
+        <div className={styles.problemHeader}>
+          <div className={styles.problemTag}>{t('land_problem_tag')}</div>
+          <h2 className={styles.problemTitle}>{t('land_problem_title')}</h2>
+          <p className={styles.problemDesc}>{t('land_problem_desc')}</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+        <div className={styles.problemGrid}>
           {[
             { icon: '📱', title: t('land_prob1_title'), desc: t('land_prob1_desc') },
             { icon: '💸', title: t('land_prob2_title'), desc: t('land_prob2_desc') },
             { icon: '🌍', title: t('land_prob3_title'), desc: t('land_prob3_desc') },
             { icon: '🎯', title: t('land_prob4_title'), desc: t('land_prob4_desc') },
           ].map((p, i) => (
-            <div key={i} style={{ padding: 24, borderRadius: 16, background: 'var(--bg-card)', border: '1px solid var(--border)', position: 'relative' }}>
-              <div style={{ position: 'absolute', top: 14, left: lang === 'ar' ? 14 : 'auto', right: lang === 'en' ? 14 : 'auto', fontSize: 11, fontWeight: 700, color: '#10B981', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', padding: '3px 10px', borderRadius: 100 }}>{t('land_solved')}</div>
-              <div style={{ fontSize: 24, marginBottom: 12, marginTop: 8 }}>{p.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)', marginBottom: 8 }}>{p.title}</div>
-              <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{p.desc}</div>
+            <div key={i} className={styles.problemCard}>
+              <div className={styles.problemSolvedBadge} style={{ left: lang === 'ar' ? 14 : 'auto', right: lang === 'en' ? 14 : 'auto' }}>{t('land_solved')}</div>
+              <div className={styles.problemIcon}>{p.icon}</div>
+              <div className={styles.problemCardTitle}>{p.title}</div>
+              <div className={styles.problemCardDesc}>{p.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* رحلة الحرية المالية */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: '#F59E0B', textTransform: 'uppercase', marginBottom: 12 }}>{t('land_journey_tag')}</div>
-          <h2 style={{ fontSize: 'clamp(26px, 5vw, 42px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 16px', letterSpacing: '-0.02em' }}>
+      <section className={styles.journeySection}>
+        <div className={styles.journeyHeader}>
+          <div className={styles.journeyTag}>{t('land_journey_tag')}</div>
+          <h2 className={styles.journeyTitle}>
             {t('land_journey_title')}<br />
-            <span style={{ background: 'linear-gradient(135deg, #F59E0B, #10B981)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{t('land_journey_subtitle')}</span>
+            <span className={styles.journeySubtitle}>{t('land_journey_subtitle')}</span>
           </h2>
-          <p style={{ fontSize: 15, color: 'var(--text-muted)', maxWidth: 500, margin: '0 auto' }}>
-            {t('land_journey_desc')}
-          </p>
+          <p className={styles.journeyDesc}>{t('land_journey_desc')}</p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className={styles.journeyList}>
           {[
             { num: '01', icon: '🌱', stage: t('land_step1_title'), desc: t('land_step1_desc'), quote: t('land_step1_quote'), color: '#8B5CF6', active: false },
             { num: '02', icon: '💳', stage: t('land_step2_title'), desc: t('land_step2_desc'), quote: t('land_step2_quote'), color: '#EF4444', active: false },
@@ -211,42 +202,40 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
             { num: '04', icon: '📈', stage: t('land_step4_title'), desc: t('land_step4_desc'), quote: t('land_step4_quote'), color: '#10B981', active: false },
             { num: '05', icon: '👑', stage: t('land_step5_title'), desc: t('land_step5_desc'), quote: t('land_step5_quote'), color: '#3B7EF6', active: true },
           ].map((step, i) => (
-            <div key={i} style={{
-              display: 'flex', gap: 16, padding: '20px 24px', borderRadius: 16,
+            <div key={i} className={styles.journeyCard} style={{
               background: step.active ? 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))' : 'var(--bg-card)',
               border: `1px solid ${step.active ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
-              alignItems: 'flex-start',
             }}>
-              <div style={{ width: 48, height: 48, borderRadius: 14, flexShrink: 0, background: `${step.color}15`, border: `1px solid ${step.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+              <div className={styles.journeyIconBox} style={{ background: `${step.color}15`, border: `1px solid ${step.color}30` }}>
                 {step.icon}
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                  <span style={{ fontSize: 10, fontWeight: 900, color: step.color, background: `${step.color}15`, padding: '2px 8px', borderRadius: 100 }}>{step.num}</span>
-                  <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--text-primary)' }}>{step.stage}</span>
-                  {step.active && <span style={{ fontSize: 10, fontWeight: 700, color: '#3B7EF6', background: 'rgba(59,126,246,0.1)', padding: '2px 8px', borderRadius: 100 }}>🎯 {lang === 'ar' ? 'الهدف النهائي' : 'Ultimate Goal'}</span>}
+              <div className={styles.journeyInfo}>
+                <div className={styles.journeyTopRow}>
+                  <span className={styles.journeyNum} style={{ color: step.color, background: `${step.color}15` }}>{step.num}</span>
+                  <span className={styles.journeyStage}>{step.stage}</span>
+                  {step.active && <span className={styles.journeyFinalGoal}>🎯 {lang === 'ar' ? 'الهدف النهائي' : 'Ultimate Goal'}</span>}
                 </div>
-                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 8 }}>{step.desc}</div>
-                <div style={{ fontSize: 11, color: step.color, fontStyle: 'italic', opacity: 0.8 }}>{step.quote}</div>
+                <div className={styles.journeyCardDesc}>{step.desc}</div>
+                <div className={styles.journeyQuote} style={{ color: step.color }}>{step.quote}</div>
               </div>
             </div>
           ))}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <Link href="/register" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', borderRadius: 14, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: 'white', fontSize: 15, fontWeight: 900, textDecoration: 'none', boxShadow: '0 4px 24px rgba(245,158,11,0.4)' }}>
+        <div className={styles.journeyCta}>
+          <Link href="/register" className={styles.journeyCtaBtn}>
             {t('land_start_journey')}
           </Link>
         </div>
       </section>
 
       {/* الميزات */}
-      <section id="features" style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--accent-blue-light)', textTransform: 'uppercase', marginBottom: 12 }}>{t('land_features_tag')}</div>
-          <h2 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>{t('land_features_title')}</h2>
+      <section id="features" className={styles.featuresSection}>
+        <div className={styles.featuresHeader}>
+          <div className={styles.featuresTag}>{t('land_features_tag')}</div>
+          <h2 className={styles.featuresTitle}>{t('land_features_title')}</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+        <div className={styles.featuresGrid}>
           {[
             { icon: '🗺️', title: t('land_f_roadmap_title'), desc: t('land_f_roadmap_desc'), badge: lang === 'ar' ? 'أساسي' : 'Core', badgeColor: '#3B7EF6' },
             { icon: '🎮', title: t('land_f_journey_title'), desc: t('land_f_journey_desc'), badge: lang === 'ar' ? 'جديد' : 'New', badgeColor: '#8B5CF6' },
@@ -264,43 +253,43 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
             { icon: '📊', title: t('land_f_history_title'), desc: t('land_f_history_desc'), badge: lang === 'ar' ? 'جديد' : 'New', badgeColor: '#8B5CF6' },
             { icon: '📄', title: t('land_f_pdf_title'), desc: t('land_f_pdf_desc'), badge: lang === 'ar' ? 'جديد' : 'New', badgeColor: '#F59E0B' },
           ].map((f, i) => (
-            <div key={i} style={{ padding: 24, borderRadius: 16, background: 'var(--bg-card)', border: '1px solid var(--border)', position: 'relative' }}>
+            <div key={i} className={styles.featureCard}>
               {f.badge && (
-                <div style={{ position: 'absolute', top: 14, left: lang === 'ar' ? 14 : 'auto', right: lang === 'en' ? 14 : 'auto', padding: '3px 10px', borderRadius: 100, background: `${f.badgeColor}22`, border: `1px solid ${f.badgeColor}44`, fontSize: 11, fontWeight: 700, color: f.badgeColor }}>{f.badge}</div>
+                <div className={styles.featureBadge} style={{ left: lang === 'ar' ? 14 : 'auto', right: lang === 'en' ? 14 : 'auto', background: `${f.badgeColor}22`, border: `1px solid ${f.badgeColor}44`, color: f.badgeColor }}>{f.badge}</div>
               )}
-              <div style={{ fontSize: 28, marginBottom: 14, marginTop: f.badge ? 8 : 0 }}>{f.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)', marginBottom: 8 }}>{f.title}</div>
-              <div style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7 }}>{f.desc}</div>
+              <div className={styles.featureIcon} style={{ marginTop: f.badge ? 8 : 0 }}>{f.icon}</div>
+              <div className={styles.featureTitle}>{f.title}</div>
+              <div className={styles.featureDesc}>{f.desc}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* خارطة الثراء */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ borderRadius: 24, background: 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))', border: '1px solid rgba(59,126,246,0.2)', padding: 'clamp(32px, 5vw, 56px)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: 'rgba(59,126,246,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🗺️</div>
-            <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 10px', borderRadius: 100, background: 'rgba(59,126,246,0.1)', border: '1px solid rgba(59,126,246,0.25)', fontSize: 11, fontWeight: 700, color: 'var(--accent-blue-light)', marginBottom: 6 }}>{t('land_exclusive')}</div>
-              <h3 style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 900, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.02em' }}>{t('land_roadmap_full_title')}</h3>
+      <section className={styles.roadmapSection}>
+        <div className={styles.roadmapContainer}>
+          <div className={styles.roadmapHeader}>
+            <div className={styles.roadmapIcon}>🗺️</div>
+            <div className={styles.roadmapTitleRow}>
+              <div className={styles.roadmapExclusiveBadge}>{t('land_exclusive')}</div>
+              <h3 className={styles.roadmapTitle}>{t('land_roadmap_full_title')}</h3>
             </div>
           </div>
-          <p style={{ fontSize: 16, color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: 32, maxWidth: 600 }}>
+          <p className={styles.roadmapText}>
             {t('land_roadmap_full_desc')}
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+          <div className={styles.roadmapPointsGrid}>
             {[
               { icon: '🎯', title: t('land_roadmap_point1_title'), desc: t('land_roadmap_point1_desc') },
               { icon: '💯', title: t('land_roadmap_point2_title'), desc: t('land_roadmap_point2_desc') },
               { icon: '💪', title: t('land_roadmap_point3_title'), desc: t('land_roadmap_point3_desc') },
               { icon: '👣', title: t('land_roadmap_point4_title'), desc: t('land_roadmap_point4_desc') },
             ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: 12, padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 22, flexShrink: 0 }}>{item.icon}</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>{item.title}</div>
-                  <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{item.desc}</div>
+              <div key={i} className={styles.roadmapPointCard}>
+                <div className={styles.roadmapPointIcon}>{item.icon}</div>
+                <div className={styles.roadmapPointInfo}>
+                  <div className={styles.roadmapPointTitle}>{item.title}</div>
+                  <div className={styles.roadmapPointDesc}>{item.desc}</div>
                 </div>
               </div>
             ))}
@@ -309,25 +298,25 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
       </section>
 
       {/* شهادات المستخدمين */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 900, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 'clamp(24px, 4vw, 38px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>{t('land_testimonials_title')}</h2>
-          <p style={{ fontSize: 15, color: 'var(--text-muted)' }}>{t('land_testimonials_subtitle')}</p>
+      <section className={styles.testimonialsSection}>
+        <div className={styles.testimonialsHeader}>
+          <h2 className={styles.testimonialsTitle}>{t('land_testimonials_title')}</h2>
+          <p className={styles.testimonialsSubtitle}>{t('land_testimonials_subtitle')}</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+        <div className={styles.testimonialsGrid}>
           {testimonialsList.map((t, i) => (
-            <div key={i} style={{ padding: 24, borderRadius: 20, background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ display: 'flex', gap: 2 }}>
+            <div key={i} className={styles.testimonialCard}>
+              <div className={styles.starsRow}>
                 {Array(t.stars).fill(0).map((_, s) => (
-                  <span key={s} style={{ color: '#F59E0B', fontSize: 14 }}>★</span>
+                  <span key={s} className={styles.star}>★</span>
                 ))}
               </div>
-              <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0, flex: 1 }}>{t.text}</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-green))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 900, color: 'white' }}>{t.name[0]}</div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{t.name} {t.country}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t.role}</div>
+              <p className={styles.testimonialText}>{t.text}</p>
+              <div className={styles.userRow}>
+                <div className={styles.userAvatar}>{t.name[0]}</div>
+                <div className={styles.userNameRow}>
+                  <div className={styles.userName}>{t.name} {t.country}</div>
+                  <div className={styles.userRole}>{t.role}</div>
                 </div>
               </div>
             </div>
@@ -336,29 +325,29 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
       </section>
 
       {/* الأسعار */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto 100px', padding: '0 24px' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>{t('land_pricing_title')}</h2>
-          <p style={{ fontSize: 16, color: 'var(--text-muted)' }}>{t('land_pricing_subtitle')}</p>
+      <section className={styles.pricingSection}>
+        <div className={styles.pricingHeader}>
+          <h2 className={styles.pricingTitle}>{t('land_pricing_title')}</h2>
+          <p className={styles.pricingSubtitle}>{t('land_pricing_subtitle')}</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-          <div style={{ padding: 28, borderRadius: 20, background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('land_price_free')}</div>
-            <div style={{ fontSize: 40, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>$0</div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>{t('land_price_forever')}</div>
+        <div className={styles.pricingGrid}>
+          <div className={styles.pricingCard}>
+            <div className={styles.priceTag}>{t('land_price_free')}</div>
+            <div className={styles.priceAmount}>$0</div>
+            <div className={styles.priceSub}>{t('land_price_forever')}</div>
             {(t('land_pricing_features') as unknown as string[]).map((f, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <span style={{ color: '#10B981', fontSize: 14 }}>✓</span>
-                <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{f}</span>
+              <div key={i} className={styles.featureItem}>
+                <span className={styles.checkIcon}>✓</span>
+                <span className={styles.featureText}>{f}</span>
               </div>
             ))}
-            <Link href="/register" style={{ display: 'block', textAlign: 'center', marginTop: 24, padding: '12px', borderRadius: 12, border: '1px solid var(--border)', color: 'var(--text-secondary)', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>{t('land_cta_start')}</Link>
+            <Link href="/register" className={styles.pricingCta}>{t('land_cta_start')}</Link>
           </div>
-          <div style={{ padding: 28, borderRadius: 20, background: 'linear-gradient(135deg, rgba(59,126,246,0.06), rgba(139,92,246,0.06))', border: '1px solid rgba(59,126,246,0.2)', position: 'relative', overflow: 'hidden', opacity: 0.85 }}>
-            <div style={{ position: 'absolute', top: 16, left: lang === 'ar' ? 16 : 'auto', right: lang === 'en' ? 16 : 'auto', padding: '4px 10px', borderRadius: 100, background: 'rgba(139,92,246,0.15)', color: '#A78BFA', border: '1px solid rgba(139,92,246,0.3)', fontSize: 11, fontWeight: 800 }}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#A78BFA', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pro</div>
-            <div style={{ fontSize: 36, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
-            <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>{lang === 'ar' ? 'نعمل عليها الآن' : 'In the works'}</div>
+          <div className={styles.pricingCardPro} style={{ left: lang === 'ar' ? 16 : 'auto', right: lang === 'en' ? 16 : 'auto' }}>
+            <div className={styles.soonBadge}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
+            <div className={styles.proNote}>Pro</div>
+            <div className={styles.priceAmount}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
+            <div className={styles.priceSub}>{lang === 'ar' ? 'نعمل عليها الآن' : 'In the works'}</div>
             {[
               '🤖 AI Advisor',
               '📸 OCR Scanning',
@@ -367,15 +356,15 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
               '🔗 Bank Connections',
               '⭐ Priority Support',
             ].map((f, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <span style={{ color: '#A78BFA', fontSize: 14 }}>◇</span>
-                <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>{f}</span>
+              <div key={i} className={styles.featureItem}>
+                <span className={styles.proCheckIcon}>◇</span>
+                <span className={styles.proFeatureText}>{f}</span>
               </div>
             ))}
-            <div style={{ marginTop: 24, padding: '14px', borderRadius: 12, background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', textAlign: 'center' }}>
-              <div style={{ fontSize: 13, color: '#A78BFA', fontWeight: 900, marginBottom: 6 }}>🎁 Special Offer</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, lineHeight: 1.5 }}>50% discount for early adopters</div>
-              <Link href="/register" style={{ display: 'block', padding: '10px', borderRadius: 10, background: 'linear-gradient(135deg, #8B5CF6, #6366F1)', color: 'white', fontSize: 13, fontWeight: 800, textDecoration: 'none', boxShadow: '0 4px 16px rgba(139,92,246,0.3)' }}>
+            <div className={styles.proOffer}>
+              <div className={styles.offerTitle}>🎁 Special Offer</div>
+              <div className={styles.offerDesc}>50% discount for early adopters</div>
+              <Link href="/register" className={styles.proCta}>
                 {lang === 'ar' ? 'سجّل الآن واحجز مكانك ←' : 'Register & Reserve Your Spot →'}
               </Link>
             </div>
@@ -384,62 +373,46 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
       </section>
 
       {/* الرؤية */}
-      <section style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto 100px', padding: '0 24px', textAlign: 'center' }}>
-        <div style={{ background: 'linear-gradient(135deg, rgba(59,126,246,0.06), rgba(16,185,129,0.04))', border: '1px solid rgba(59,126,246,0.15)', borderRadius: 24, padding: 'clamp(32px, 6vw, 56px)' }}>
-          <div style={{ fontSize: 36, marginBottom: 16 }}>🌅</div>
-          <h2 style={{ fontSize: 'clamp(20px, 4vw, 28px)', fontWeight: 900, color: 'var(--text-primary)', marginBottom: 20, letterSpacing: '-0.02em' }}>
+      <section className={styles.visionSection}>
+        <div className={styles.visionContainer}>
+          <div className={styles.visionEmoji}>🌅</div>
+          <h2 className={styles.visionTitle}>
             {t('land_vision_title')}
           </h2>
-          <p style={{ fontSize: 'clamp(15px, 3vw, 18px)', color: 'var(--text-secondary)', lineHeight: 1.9, marginBottom: 28, maxWidth: 600, margin: '0 auto 28px' }}>
+          <p className={styles.visionDesc}>
             {t('land_vision_desc')}
           </p>
-          <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 20 }}>
+          <div className={styles.visionDivider} />
+          <div className={styles.visionGrid}>
             {[
               { icon: '🕌', title: t('land_v1_title'), desc: t('land_v1_desc') },
               { icon: '🎓', title: t('land_v2_title'), desc: t('land_v2_desc') },
               { icon: '🔒', title: t('land_v3_title'), desc: t('land_v3_desc') },
               { icon: '🆓', title: t('land_v4_title'), desc: t('land_v4_desc') },
             ].map((v, i) => (
-              <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>{v.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>{v.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{v.desc}</div>
+              <div key={i} className={styles.visionItem}>
+                <div className={styles.visionIcon}>{v.icon}</div>
+                <div className={styles.visionItemTitle}>{v.title}</div>
+                <div className={styles.visionItemDesc}>{v.desc}</div>
               </div>
             ))}
           </div>
-          <div style={{ height: 1, background: 'var(--border)', margin: '28px 0' }} />
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-            {lang === 'ar' ? '&quot;كل رحلة ثراء تبدأ بخطوة&quot; — بُني بـ ❤️ من الأردن للعالم العربي' : '&quot;Every wealth journey starts with a step&quot; — Built with ❤️ from Jordan for the Arab World'}
+          <div className={styles.visionDivider} />
+          <p className={styles.visionFooterText}>
+            {lang === 'ar' ? '"كل رحلة ثراء تبدأ بخطوة" — بُني بـ ❤️ من الأردن للعالم العربي' : '"Every wealth journey starts with a step" — Built with ❤️ from Jordan for the Arab World'}
           </p>
         </div>
       </section>
 
-      <footer style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--border)', padding: '32px 24px 100px', textAlign: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
-          <img src="/icon-512.png" style={{ width: 28, height: 28, borderRadius: 8 }} alt={t('app_name')} />
-          <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>{t('app_name')}</span>
+      <footer className={styles.footer}>
+        <div className={styles.footerLogoRow}>
+          <img src="/icon-512.png" className={styles.footerLogoImg} alt={t('app_name')} />
+          <span className={styles.footerLogoText}>{t('app_name')}</span>
         </div>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>© {new Date().getFullYear()} {t('land_footer_copy')}</p>
+        <p className={styles.footerCopy}>© {new Date().getFullYear()} {t('land_footer_copy')}</p>
       </footer>
 
       <LandingClient />
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
-        }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .hero-line-1 { animation: fadeUp 0.6s ease both; }
-        .hero-line-2 { animation: fadeUp 0.6s ease 0.25s both; }
-        .hero-line-3 { animation: fadeUp 0.6s ease 0.5s both; }
-        .hero-line-4 { animation: fadeUp 0.6s ease 0.75s both; }
-        .hero-cta    { animation: fadeUp 0.6s ease 1s both; }
-      `}</style>
     </div>
   )
 }
