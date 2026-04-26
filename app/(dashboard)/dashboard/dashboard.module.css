@@ -28,6 +28,8 @@
   border-radius: 14px;
   padding: 10px 6px;
   text-align: center;
+  background: var(--stat-bg, transparent);
+  border: 1px solid var(--stat-border, transparent);
 }
 
 .statIcon {
@@ -35,6 +37,7 @@
   font-weight: 900;
   opacity: 0.6;
   margin-bottom: 2px;
+  color: var(--stat-color);
 }
 
 .statValue {
@@ -42,6 +45,7 @@
   font-weight: 900;
   font-family: monospace;
   letter-spacing: -0.02em;
+  color: var(--stat-color);
 }
 
 .statLabel {
@@ -153,4 +157,27 @@
   flex-direction: column;
   gap: 12px;
   padding: 12px 0 8px;
+}
+
+.streakActive   { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #F59E0B; }
+.streakInactive { background: rgba(156,163,175,0.1); border: 1px solid rgba(156,163,175,0.3); color: #9CA3AF; }
+
+.debtBoxGreen   { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.15); }
+.debtBoxRed     { background: rgba(239,68,68,0.06);  border: 1px solid rgba(239,68,68,0.15); }
+.debtValueGreen { color: var(--accent-green-light); }
+.debtValueRed   { color: var(--accent-red-light); }
+
+.streakButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.streakButton:hover {
+  opacity: 0.8;
 }

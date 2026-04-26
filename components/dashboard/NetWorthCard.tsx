@@ -15,7 +15,6 @@ interface Props {
 export function NetWorthCard({ netWorth, invValue, goalsSaved, totalDebt, totalReceivable, currency, lang }: Props) {
   const [open, setOpen] = useState(false)
   const isPositive = netWorth >= 0
-  const mainColor = isPositive ? 'var(--accent-green-light)' : 'var(--accent-red-light)'
   const fmt = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: 0 })
 
   const items = [
@@ -26,12 +25,10 @@ export function NetWorthCard({ netWorth, invValue, goalsSaved, totalDebt, totalR
   ]
 
   return (
-    <div className={styles.card} style={{
-      background: `linear-gradient(135deg, ${isPositive ? 'rgba(16,185,129,0.07)' : 'rgba(239,68,68,0.05)'} 0%, var(--bg-card) 100%)`,
-      border: `1px solid ${isPositive ? 'rgba(16,185,129,0.18)' : 'rgba(239,68,68,0.18)'}`,
-    }}>
+    <div className={`${styles.card} ${isPositive ? styles.cardPositive : styles.cardNegative}`}>
       {/* ── Header (دائماً ظاهر) ── */}
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
         className={styles.headerButton}
       >
@@ -42,11 +39,11 @@ export function NetWorthCard({ netWorth, invValue, goalsSaved, totalDebt, totalR
           </span>
         </div>
         <div className={styles.amountWrapper}>
-          <span className={styles.amountValue} style={{ color: mainColor }}>
+          <span className={`${styles.amountValue} ${isPositive ? styles.amountPositive : styles.amountNegative}`}>
             {isPositive ? '+' : ''}{fmt(netWorth)}
             <span className={styles.currencyLabel}> {currency}</span>
           </span>
-          <span className={styles.arrowIcon} style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}>▼</span>
+          <span className={`${styles.arrowIcon} ${open ? styles.arrowOpen : ''}`}>▼</span>
         </div>
       </button>
 
@@ -58,7 +55,7 @@ export function NetWorthCard({ netWorth, invValue, goalsSaved, totalDebt, totalR
               <span className={styles.itemIcon}>{item.icon}</span>
               <div className={styles.itemInfo}>
                 <div className={styles.itemLabel}>{item.label}</div>
-                <div className={styles.itemValue} style={{ color: item.value >= 0 ? item.color : '#EF4444' }}>
+                <div className={`${styles.itemValue} ${item.value >= 0 ? styles[`itemColor${items.indexOf(item)}`] : styles.itemValueNegative}`}>
                   {item.value >= 0 ? '+' : ''}{fmt(Math.abs(item.value))}
                 </div>
               </div>

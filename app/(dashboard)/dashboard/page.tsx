@@ -109,10 +109,10 @@ export default function DashboardPage() {
         </div>
         <div className={styles.headerActions}>
           {streakInfo && streakInfo.streak >= 3 && (
-            <button 
+            <button
               onClick={() => streakInfo.loggedToday ? document.getElementById('gamification')?.scrollIntoView({ behavior: 'smooth' }) : document.getElementById('quick-add-trigger')?.click()}
               aria-label={`${t('dash_streak')}: ${streakInfo.streak}`}
-              style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 10px', borderRadius: 10, background: streakInfo.loggedToday ? 'rgba(245,158,11,0.1)' : 'rgba(156,163,175,0.1)', border: `1px solid ${streakInfo.loggedToday ? 'rgba(245,158,11,0.3)' : 'rgba(156,163,175,0.3)'}`, fontSize: 13, fontWeight: 800, color: streakInfo.loggedToday ? '#F59E0B' : '#9CA3AF', cursor: 'pointer' }}>
+              className={`${styles.streakButton} ${streakInfo.loggedToday ? styles.streakActive : styles.streakInactive}`}>
               {streakInfo.loggedToday ? '🔥' : '❄️'} {streakInfo.streak}
             </button>
           )}
@@ -156,9 +156,9 @@ export default function DashboardPage() {
             sub: `${t('dash_month')}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,
           },
         ].map(s => (
-          <div key={s.label} className={styles.statBox} style={{ background: s.bg, border: `1px solid ${s.border}` }}>
-            <div className={styles.statIcon} style={{ color: s.color }}>{s.icon}</div>
-            <div className={styles.statValue} style={{ color: s.color }}>{s.value}</div>
+          <div key={s.label} className={styles.statBox} style={{ '--stat-bg': s.bg, '--stat-border': s.border, '--stat-color': s.color } as React.CSSProperties}>
+            <div className={styles.statIcon}>{s.icon}</div>
+            <div className={styles.statValue}>{s.value}</div>
             <div className={styles.statLabel}>{s.label}</div>
             {s.sub && <div className={styles.statSub}>{s.sub}</div>}
           </div>
@@ -174,9 +174,9 @@ export default function DashboardPage() {
             </div>
           )}
           {monthlyDebtCommitments > 0 && (
-            <div className={styles.debtBox} style={{ background: netAfterDebts >= 0 ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)', border: `1px solid ${netAfterDebts >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}` }}>
+            <div className={`${styles.debtBox} ${netAfterDebts >= 0 ? styles.debtBoxGreen : styles.debtBoxRed}`}>
               <span className={`${styles.debtLabel} ${styles.debtColorBlue}`}>⚡ {t('dash_after_debts')}</span>
-              <span className={styles.debtValue} style={{ color: netAfterDebts >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</span>
+              <span className={`${styles.debtValue} ${netAfterDebts >= 0 ? styles.debtValueGreen : styles.debtValueRed}`}>{`${netAfterDebts >= 0 ? '+' : '-'}${fmt(Math.abs(netAfterDebts))}`}</span>
             </div>
           )}
         </div>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
       }} />
 
       {/* ── 7. RECENT TRANSACTIONS ────────────────────── */}
-      {show('recent_tx') && <RecentTransactionsCard transactions={data?.recentTx ?? []} lang={lang} />}
+      {show('recent_tx') && <RecentTransactionsCard transactions={data?.recentTx ?? []} />}
 
       {/* ── Secondary sections ── */}
       {show('budgets') && <BudgetProgressCard income={income} expenses={expenses} net={net} currency={currency} />}

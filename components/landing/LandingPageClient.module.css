@@ -363,6 +363,14 @@
   text-align: center;
 }
 
+.previewStatBox0 { background: rgba(16,185,129,0.08); border: 1px solid #10B98122; }
+.previewStatBox1 { background: rgba(239,68,68,0.08);  border: 1px solid #EF444422; }
+.previewStatBox2 { background: rgba(59,126,246,0.08); border: 1px solid #3B7EF622; }
+
+.previewStatValue0 { color: #10B981; }
+.previewStatValue1 { color: #EF4444; }
+.previewStatValue2 { color: #3B7EF6; }
+
 .previewStatValue {
   font-size: 18px;
   font-weight: 900;
@@ -415,7 +423,11 @@
   flex: 1;
   height: 6px;
   border-radius: 3px;
+  background: var(--bg-elevated);
 }
+
+.previewRoadmapBarFilled  { background: #10B981; }
+.previewRoadmapBarCurrent { background: #F59E0B; }
 
 .previewRoadmapFooter {
   display: flex;
@@ -431,6 +443,10 @@
 
 .previewRoadmapNextRow {
   text-align: right;
+}
+
+.previewRoadmapNextRowRtl {
+  text-align: left;
 }
 
 .previewRoadmapNextLabel {
@@ -551,6 +567,9 @@
   color: #10b981;
 }
 
+.badgeLtr { right: 14px; }
+.badgeRtl { left: 14px; }
+
 .problemIcon {
   font-size: 24px;
   margin-bottom: 12px;
@@ -627,7 +646,40 @@
   padding: 20px 24px;
   border-radius: 16px;
   align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
 }
+
+.journeyCardActive {
+  background: linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05));
+  border: 1px solid rgba(59,126,246,0.3);
+}
+
+/* Journey step index classes (colors match the 5 hardcoded steps) */
+.journeyIconBox0 { background: #8B5CF615; border: 1px solid #8B5CF630; }
+.journeyIconBox1 { background: #EF444415; border: 1px solid #EF444430; }
+.journeyIconBox2 { background: #F59E0B15; border: 1px solid #F59E0B30; }
+.journeyIconBox3 { background: #10B98115; border: 1px solid #10B98130; }
+.journeyIconBox4 { background: #3B7EF615; border: 1px solid #3B7EF630; }
+
+.journeyNum0 { color: #8B5CF6; background: #8B5CF615; }
+.journeyNum1 { color: #EF4444; background: #EF444415; }
+.journeyNum2 { color: #F59E0B; background: #F59E0B15; }
+.journeyNum3 { color: #10B981; background: #10B98115; }
+.journeyNum4 { color: #3B7EF6; background: #3B7EF615; }
+
+.journeyQuote0 { color: #8B5CF6; }
+.journeyQuote1 { color: #EF4444; }
+.journeyQuote2 { color: #F59E0B; }
+.journeyQuote3 { color: #10B981; }
+.journeyQuote4 { color: #3B7EF6; }
+
+/* Feature badge color classes — position via CSS logical property */
+.featureBadgeBlue   { background: #3B7EF622; border: 1px solid #3B7EF644; color: #3B7EF6; inset-inline-end: 14px; inset-inline-start: auto; }
+.featureBadgePurple { background: #8B5CF622; border: 1px solid #8B5CF644; color: #8B5CF6; inset-inline-end: 14px; inset-inline-start: auto; }
+.featureBadgeGreen  { background: #10B98122; border: 1px solid #10B98144; color: #10B981; inset-inline-end: 14px; inset-inline-start: auto; }
+.featureBadgeYellow { background: #F59E0B22; border: 1px solid #F59E0B44; color: #F59E0B; inset-inline-end: 14px; inset-inline-start: auto; }
+.featureBadgeRed    { background: #EF444422; border: 1px solid #EF444444; color: #EF4444; inset-inline-end: 14px; inset-inline-start: auto; }
 
 .journeyIconBox {
   width: 48px;
@@ -763,6 +815,8 @@
   font-size: 28px;
   margin-bottom: 14px;
 }
+
+.featureIconWithBadge { margin-top: 8px; }
 
 .featureTitle {
   font-weight: 700;
@@ -1091,6 +1145,9 @@
   font-size: 11px;
   font-weight: 800;
 }
+
+.soonBadgeLtr { right: 16px; }
+.soonBadgeRtl { left: 16px; }
 
 .proNote {
   font-size: 13px;

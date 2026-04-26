@@ -28,6 +28,10 @@
   color: var(--text-muted);
 }
 
+.stickyVisible {
+  transform: translateY(0);
+}
+
 .ctaButton {
   padding: 12px 28px;
   border-radius: 10px;

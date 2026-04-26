@@ -15,17 +15,13 @@ export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBal
   const heroValue = typeof totalBalance === 'number' ? totalBalance : monthlyNet
   const animatedHero = useCountUp(Math.abs(heroValue), 900)
   const isPositive = heroValue >= 0
-  const color = isPositive ? '#10B981' : '#EF4444'
   const { trend, hasTrend } = useMemo(() => ({
     trend: prevMonthNet !== 0 ? ((monthlyNet - prevMonthNet) / Math.abs(prevMonthNet)) * 100 : 0,
     hasTrend: prevMonthNet !== 0,
   }), [monthlyNet, prevMonthNet])
 
   return (
-    <div className={styles.card} style={{
-      background: `linear-gradient(135deg, ${isPositive ? 'rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04)' : 'rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.04)'} 100%)`,
-      border: `1px solid ${isPositive ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
-    }}>
+    <div className={`${styles.card} ${isPositive ? styles.cardPositive : styles.cardNegative}`}>
       {/* Label */}
       <div className={styles.label}>
         {lang === 'en' ? '🏦 Total Balance' : '🏦 إجمالي الرصيد'}
@@ -33,7 +29,7 @@ export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBal
 
       {/* Hero Number */}
       <div className={styles.heroRow}>
-        <span className={styles.amount} style={{ color }}>
+        <span className={`${styles.amount} ${isPositive ? styles.amountPositive : styles.amountNegative}`}>
           {isPositive ? '+' : '-'}{fmt(animatedHero)}
         </span>
         <span className={styles.currency}>{currency}</span>
@@ -43,12 +39,12 @@ export function HeroBalanceCard({ monthlyNet, currency, lang, accounts, totalBal
       <div className={styles.statsRow}>
         <span className={styles.thisMonthLabel}>
           {lang === 'en' ? 'This month:' : 'هذا الشهر:'}{' '}
-          <span className={styles.thisMonthValue} style={{ color: monthlyNet >= 0 ? '#10B981' : '#EF4444' }}>
+          <span className={`${styles.thisMonthValue} ${monthlyNet >= 0 ? styles.monthlyPositive : styles.monthlyNegative}`}>
             {monthlyNet >= 0 ? '+' : '-'}{fmt(Math.abs(monthlyNet))}
           </span>
         </span>
         {hasTrend && (
-          <span className={styles.trendBadge} style={{ color: trend >= 0 ? '#10B981' : '#EF4444', background: trend >= 0 ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)' }}>
+          <span className={`${styles.trendBadge} ${trend >= 0 ? styles.trendPositive : styles.trendNegative}`}>
             {trend >= 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(0)}% {lang === 'en' ? 'vs last month' : 'عن الشهر الماضي'}
           </span>
         )}

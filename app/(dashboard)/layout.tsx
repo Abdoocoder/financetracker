@@ -61,7 +61,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   }, [user, pathname, fetchCount, fetchCountDebounced, supabase])
 
   return (
-    <div className={styles.container} style={{ direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+    <div className={styles.container} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <Sidebar alertsCount={alertsCount} />
       <main className={styles.main}>
         

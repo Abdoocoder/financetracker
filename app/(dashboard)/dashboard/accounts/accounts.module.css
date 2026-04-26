@@ -304,3 +304,94 @@
   flex-direction: column;
   gap: 10px;
 }
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.typeButton {
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.textGreen { color: var(--accent-green-light); }
+.textRed   { color: var(--accent-red-light); }
+
+/* Account type button variants */
+.typeButtonBank       { --type-color: #3B7EF6; --type-color-dim: #3B7EF618; }
+.typeButtonCash       { --type-color: #10B981; --type-color-dim: #10B98118; }
+.typeButtonSavings    { --type-color: #8B5CF6; --type-color-dim: #8B5CF618; }
+.typeButtonCreditCard { --type-color: #EF4444; --type-color-dim: #EF444418; }
+
+.typeButtonSelected {
+  background: var(--type-color-dim);
+  border: 1px solid var(--type-color) !important;
+  color: var(--type-color);
+}
+.typeButtonUnselected {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* Preset color buttons */
+.colorBtn0 { background: #3B7EF6; }
+.colorBtn1 { background: #10B981; }
+.colorBtn2 { background: #8B5CF6; }
+.colorBtn3 { background: #F59E0B; }
+.colorBtn4 { background: #EF4444; }
+.colorBtn5 { background: #06B6D4; }
+.colorBtn6 { background: #EC4899; }
+.colorBtn7 { background: #64748B; }
+.colorBtnSelected   { border: 3px solid var(--text-primary); }
+.colorBtnUnselected { border: 3px solid transparent; }
+
+.heroPositive {
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.04));
+  border: 1px solid rgba(16,185,129,0.25);
+}
+.heroNegative {
+  background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.04));
+  border: 1px solid rgba(239,68,68,0.25);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dangerButton {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--accent-red-light);
+}
+
+.archiveButton {
+  color: var(--accent-red-light);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.modalScrollable {
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.blueButton {
+  background: #3B7EF6;
+}
+
+.fullButton {
+  width: 100%;
+  padding: 14px;
+}

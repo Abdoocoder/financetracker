@@ -19,12 +19,7 @@ export default function LandingClient() {
   }, [])
 
   return (
-    <div 
-      className={styles.stickyBar}
-      style={{ 
-        transform: showSticky ? 'translateY(0)' : 'translateY(100%)', 
-      }}
-    >
+    <div className={`${styles.stickyBar} ${showSticky ? styles.stickyVisible : ''}`}>
       <div>
         <div className={styles.ctaTitle}>{t('land_cta_title')}</div>
         <div className={styles.ctaSubtitle}>{t('land_cta_subtitle')}</div>

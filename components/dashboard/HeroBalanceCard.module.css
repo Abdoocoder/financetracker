@@ -65,6 +65,21 @@
   flex-wrap: wrap;
 }
 
+.cardPositive {
+  background: linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04) 100%);
+  border: 1px solid rgba(16,185,129,0.25);
+}
+.cardNegative {
+  background: linear-gradient(135deg, rgba(239,68,68,0.12) 0%, rgba(239,68,68,0.04) 100%);
+  border: 1px solid rgba(239,68,68,0.25);
+}
+.amountPositive  { color: #10B981; }
+.amountNegative  { color: #EF4444; }
+.monthlyPositive { color: #10B981; }
+.monthlyNegative { color: #EF4444; }
+.trendPositive   { color: #10B981; background: rgba(16,185,129,0.1); }
+.trendNegative   { color: #EF4444; background: rgba(239,68,68,0.1); }
+
 .accountChip {
   display: flex;
   align-items: center;

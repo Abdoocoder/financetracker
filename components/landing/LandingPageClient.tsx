@@ -18,11 +18,19 @@ interface LandingPageClientProps {
   testimonialsList: Testimonial[]
 }
 
+const BADGE_CLASS: Record<string, string> = {
+  '#3B7EF6': 'featureBadgeBlue',
+  '#8B5CF6': 'featureBadgePurple',
+  '#10B981': 'featureBadgeGreen',
+  '#F59E0B': 'featureBadgeYellow',
+  '#EF4444': 'featureBadgeRed',
+}
+
 export default function LandingPageClient({ testimonialsList }: LandingPageClientProps) {
   const { t, lang, setLang } = useI18n()
 
   return (
-    <div className={styles.container} style={{ direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+    <div className={styles.container} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
 
       <div className={styles.glowContainer}>
         <div className={styles.glowTopRight} />
@@ -118,8 +126,8 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
                 { label: t('dash_expenses'), value: '1,250', color: '#EF4444', bg: 'rgba(239,68,68,0.08)' },
                 { label: t('dash_net'), value: '+1,150', color: '#3B7EF6', bg: 'rgba(59,126,246,0.08)' },
               ].map((s, i) => (
-                <div key={i} className={styles.previewStatBox} style={{ background: s.bg, border: `1px solid ${s.color}22` }}>
-                  <div className={styles.previewStatValue} style={{ color: s.color }}>{s.value}</div>
+                <div key={i} className={`${styles.previewStatBox} ${styles[`previewStatBox${i}`]}`}>
+                  <div className={`${styles.previewStatValue} ${styles[`previewStatValue${i}`]}`}>{s.value}</div>
                   <div className={styles.previewStatLabel}>{s.label}</div>
                 </div>
               ))}
@@ -132,12 +140,12 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
               </div>
               <div className={styles.previewRoadmapBarContainer}>
                 {[t('stage1'), t('stage2'), t('stage3'), t('stage4')].map((stage, i) => (
-                  <div key={i} className={styles.previewRoadmapBar} style={{ background: i <= 1 ? (i === 1 ? '#F59E0B' : '#10B981') : 'var(--bg-elevated)' }} />
+                  <div key={i} className={`${styles.previewRoadmapBar} ${i === 0 ? styles.previewRoadmapBarFilled : i === 1 ? styles.previewRoadmapBarCurrent : ''}`} />
                 ))}
               </div>
               <div className={styles.previewRoadmapFooter}>
                 <div className={styles.previewRoadmapProgress}>72<span className={styles.roadmapDenominator}>/100</span></div>
-                <div className={styles.previewRoadmapNextRow} style={{ textAlign: lang === 'ar' ? 'left' : 'right' }}>
+                <div className={`${styles.previewRoadmapNextRow} ${lang === 'ar' ? styles.previewRoadmapNextRowRtl : ''}`}>
                   <div className={styles.previewRoadmapNextLabel}>{t('land_roadmap_next')}</div>
                   <div className={styles.previewRoadmapNextStep}>{t('land_roadmap_next_step')}</div>
                 </div>
@@ -174,7 +182,7 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
             { icon: '🎯', title: t('land_prob4_title'), desc: t('land_prob4_desc') },
           ].map((p, i) => (
             <div key={i} className={styles.problemCard}>
-              <div className={styles.problemSolvedBadge} style={{ left: lang === 'ar' ? 14 : 'auto', right: lang === 'en' ? 14 : 'auto' }}>{t('land_solved')}</div>
+              <div className={`${styles.problemSolvedBadge} ${lang === 'en' ? styles.badgeLtr : styles.badgeRtl}`}>{t('land_solved')}</div>
               <div className={styles.problemIcon}>{p.icon}</div>
               <div className={styles.problemCardTitle}>{p.title}</div>
               <div className={styles.problemCardDesc}>{p.desc}</div>
@@ -202,21 +210,18 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
             { num: '04', icon: '📈', stage: t('land_step4_title'), desc: t('land_step4_desc'), quote: t('land_step4_quote'), color: '#10B981', active: false },
             { num: '05', icon: '👑', stage: t('land_step5_title'), desc: t('land_step5_desc'), quote: t('land_step5_quote'), color: '#3B7EF6', active: true },
           ].map((step, i) => (
-            <div key={i} className={styles.journeyCard} style={{
-              background: step.active ? 'linear-gradient(135deg, rgba(59,126,246,0.08), rgba(16,185,129,0.05))' : 'var(--bg-card)',
-              border: `1px solid ${step.active ? 'rgba(59,126,246,0.3)' : 'var(--border)'}`,
-            }}>
-              <div className={styles.journeyIconBox} style={{ background: `${step.color}15`, border: `1px solid ${step.color}30` }}>
+            <div key={i} className={`${styles.journeyCard} ${step.active ? styles.journeyCardActive : ''}`}>
+              <div className={`${styles.journeyIconBox} ${styles[`journeyIconBox${i}`]}`}>
                 {step.icon}
               </div>
               <div className={styles.journeyInfo}>
                 <div className={styles.journeyTopRow}>
-                  <span className={styles.journeyNum} style={{ color: step.color, background: `${step.color}15` }}>{step.num}</span>
+                  <span className={`${styles.journeyNum} ${styles[`journeyNum${i}`]}`}>{step.num}</span>
                   <span className={styles.journeyStage}>{step.stage}</span>
                   {step.active && <span className={styles.journeyFinalGoal}>🎯 {lang === 'ar' ? 'الهدف النهائي' : 'Ultimate Goal'}</span>}
                 </div>
                 <div className={styles.journeyCardDesc}>{step.desc}</div>
-                <div className={styles.journeyQuote} style={{ color: step.color }}>{step.quote}</div>
+                <div className={`${styles.journeyQuote} ${styles[`journeyQuote${i}`]}`}>{step.quote}</div>
               </div>
             </div>
           ))}
@@ -255,9 +260,9 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
           ].map((f, i) => (
             <div key={i} className={styles.featureCard}>
               {f.badge && (
-                <div className={styles.featureBadge} style={{ left: lang === 'ar' ? 14 : 'auto', right: lang === 'en' ? 14 : 'auto', background: `${f.badgeColor}22`, border: `1px solid ${f.badgeColor}44`, color: f.badgeColor }}>{f.badge}</div>
+                <div className={`${styles.featureBadge} ${BADGE_CLASS[f.badgeColor ?? ''] ?? ''}`}>{f.badge}</div>
               )}
-              <div className={styles.featureIcon} style={{ marginTop: f.badge ? 8 : 0 }}>{f.icon}</div>
+              <div className={`${styles.featureIcon} ${f.badge ? styles.featureIconWithBadge : ''}`}>{f.icon}</div>
               <div className={styles.featureTitle}>{f.title}</div>
               <div className={styles.featureDesc}>{f.desc}</div>
             </div>
@@ -343,8 +348,8 @@ export default function LandingPageClient({ testimonialsList }: LandingPageClien
             ))}
             <Link href="/register" className={styles.pricingCta}>{t('land_cta_start')}</Link>
           </div>
-          <div className={styles.pricingCardPro} style={{ left: lang === 'ar' ? 16 : 'auto', right: lang === 'en' ? 16 : 'auto' }}>
-            <div className={styles.soonBadge}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
+          <div className={styles.pricingCardPro}>
+            <div className={`${styles.soonBadge} ${lang === 'en' ? styles.soonBadgeLtr : styles.soonBadgeRtl}`}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
             <div className={styles.proNote}>Pro</div>
             <div className={styles.priceAmount}>{lang === 'ar' ? 'قريباً' : 'Soon'}</div>
             <div className={styles.priceSub}>{lang === 'ar' ? 'نعمل عليها الآن' : 'In the works'}</div>

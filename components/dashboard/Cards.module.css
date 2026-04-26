@@ -289,3 +289,36 @@
 .cardLink {
   text-decoration: none;
 }
+
+/* MonthCompareCard */
+.compareItemGreen { background: var(--accent-green-dim); }
+.compareItemRed   { background: var(--accent-red-dim); }
+.compareValueGreen { color: var(--accent-green-light); }
+.compareValueRed   { color: var(--accent-red-light); }
+
+/* BudgetProgressCard */
+.budgetPercentGreen  { color: #10B981; }
+.budgetPercentYellow { color: #F59E0B; }
+.budgetPercentRed    { color: #EF4444; }
+.progressBarGreen    { background: #10B981; }
+.progressBarYellow   { background: #F59E0B; }
+.progressBarRed      { background: #EF4444; }
+
+/* WealthSimulatorCard */
+.simulatorValue0 { color: var(--accent-blue-light); }
+.simulatorValue1 { color: var(--accent-green-light); }
+.simulatorValue2 { color: #F59E0B; }
+
+/* RecentTransactionsCard */
+.txIconBoxIncome   { background: rgba(16,185,129,0.12); }
+.txIconBoxExpense  { background: rgba(239,68,68,0.10); }
+.txAmountIncome    { color: var(--accent-green-light); }
+.txAmountExpense   { color: var(--accent-red-light); }
+
+/* QuickLinksCards — 3 fixed items: debts(red), investments(green), goals(blue) */
+.quickLinkIcon0  { background: var(--accent-red-dim);   border: 1px solid rgba(239,68,68,0.15);  color: var(--accent-red-light);   }
+.quickLinkIcon1  { background: var(--accent-green-dim); border: 1px solid rgba(16,185,129,0.15); color: var(--accent-green-light); }
+.quickLinkIcon2  { background: var(--accent-blue-dim);  border: 1px solid rgba(59,126,246,0.15); color: var(--accent-blue-light);  }
+.quickLinkValue0 { color: var(--accent-red-light);   }
+.quickLinkValue1 { color: var(--accent-green-light); }
+.quickLinkValue2 { color: var(--accent-blue-light);  }

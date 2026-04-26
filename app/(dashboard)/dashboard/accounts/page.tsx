@@ -39,7 +39,7 @@ function ConfirmArchiveDialog({ lang, onConfirm, onCancel }: { lang: string; onC
           <button onClick={onCancel} className={styles.secondaryButton}>
             {lang === 'en' ? 'Cancel' : 'إلغاء'}
           </button>
-          <button onClick={onConfirm} className={styles.primaryButton} style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--accent-red-light)' }}>
+          <button onClick={onConfirm} className={`${styles.primaryButton} ${styles.dangerButton}`}>
             {lang === 'en' ? 'Archive' : 'أرشفة'}
           </button>
         </div>
@@ -73,52 +73,40 @@ function AccountCard({ acc, currency, lang, onEdit, onDelete }: {
   const fmt = (n: number) => n % 1 === 0 ? n.toFixed(0) : n.toFixed(2)
 
   return (
-    <div style={{
-      background: 'var(--bg-card)', borderRadius: 18,
-      border: `1px solid ${acc.color}33`,
-      padding: '16px 18px',
-      display: 'flex', alignItems: 'center', gap: 14,
-      boxShadow: 'var(--shadow-card)',
-    }}>
-      <div style={{
-        width: 48, height: 48, borderRadius: 14, flexShrink: 0,
-        background: `${acc.color}20`,
-        border: `1px solid ${acc.color}40`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 22,
-      }}>{acc.icon}</div>
+    <div className={styles.card} style={{ border: `1px solid ${acc.color}33` }}>
+      <div className={styles.iconBox} style={{ background: `${acc.color}20`, border: `1px solid ${acc.color}40` }}>
+        {acc.icon}
+      </div>
 
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>{acc.name}</span>
+      <div className={styles.accountInfo}>
+        <div className={styles.nameRow}>
+          <span className={styles.accountName}>{acc.name}</span>
           {acc.is_default && (
-            <span style={{ fontSize: 9, fontWeight: 700, color: acc.color, background: `${acc.color}18`, border: `1px solid ${acc.color}30`, padding: '1px 6px', borderRadius: 100 }}>
+            <span className={styles.defaultBadge} style={{ color: acc.color, background: `${acc.color}18`, border: `1px solid ${acc.color}30` }}>
               {lang === 'en' ? 'Default' : 'افتراضي'}
             </span>
           )}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+        <div className={styles.accountType}>
           {lang === 'en' ? info.labelEn : info.labelAr}
         </div>
       </div>
 
-      <div style={{ textAlign: 'end' }}>
-        <div style={{ fontSize: 20, fontWeight: 900, color: bal >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)', fontFamily: 'monospace' }}>
+      <div className={styles.balanceRow}>
+        <div className={`${styles.balanceAmount} ${bal >= 0 ? styles.textGreen : styles.textRed}`}>
           {bal >= 0 ? '+' : '-'}{fmt(Math.abs(bal))}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{currency}</div>
+        <div className={styles.balanceCurrency}>
+          <span className={styles.balanceCurrency}>{currency}</span>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-        <button onClick={() => onEdit(acc)} aria-label={lang === 'en' ? 'Edit account' : 'تعديل الحساب'}
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, padding: '5px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--text-secondary)', transition: 'opacity 0.15s' }}
-          onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
+      <div className={styles.actions}>
+        <button onClick={() => onEdit(acc)} aria-label={lang === 'en' ? 'Edit account' : 'تعديل الحساب'} className={styles.actionButton}>
           ✏️
         </button>
         {!acc.is_default && (
-          <button onClick={() => onDelete(acc)} aria-label={lang === 'en' ? 'Archive account' : 'أرشفة الحساب'}
-            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 8, padding: '5px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--accent-red-light)', transition: 'opacity 0.15s' }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')} onMouseLeave={e => (e.currentTarget.style.opacity = '1')}>
+          <button onClick={() => onDelete(acc)} aria-label={lang === 'en' ? 'Archive account' : 'أرشفة الحساب'} className={`${styles.actionButton} ${styles.archiveButton}`}>
             🗑️
           </button>
         )}
@@ -148,29 +136,28 @@ function AccountModal({ account, lang, onSave, onClose }: {
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: 'var(--bg-card)', borderRadius: '24px 24px 0 0', padding: 24, width: '100%', maxWidth: 480, maxHeight: '85vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 17, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={`${styles.modalContent} ${styles.modalScrollable}`} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>
             {account ? (lang === 'en' ? 'Edit Account' : 'تعديل الحساب') : (lang === 'en' ? 'New Account' : 'حساب جديد')}
           </h2>
-          <button onClick={onClose} aria-label={lang === 'en' ? 'Close' : 'إغلاق'} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: 'var(--text-muted)' }}>✕</button>
+          <button onClick={onClose} aria-label={lang === 'en' ? 'Close' : 'إغلاق'} className={styles.closeButton}>✕</button>
         </div>
 
         {/* نوع الحساب */}
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', display: 'block', marginBottom: 8 }}>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
             {lang === 'en' ? 'Account Type' : 'نوع الحساب'}
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div className={styles.typeGrid}>
             {ACCOUNT_TYPES.map(t => (
               <button key={t.type} onClick={() => { setType(t.type); setColor(t.color) }}
+                className={styles.typeButton}
                 style={{
-                  padding: '10px 12px', borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
                   background: type === t.type ? `${t.color}18` : 'var(--bg-elevated)',
                   border: `1px solid ${type === t.type ? t.color : 'var(--border)'}`,
                   color: type === t.type ? t.color : 'var(--text-muted)',
-                  fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8,
                 }}>
                 <span>{t.icon}</span>
                 <span>{lang === 'en' ? t.labelEn : t.labelAr}</span>
@@ -213,8 +200,8 @@ function AccountModal({ account, lang, onSave, onClose }: {
         </div>
 
         <button onClick={handleSave} disabled={saving || !name.trim()}
-          className={styles.primaryButton}
-          style={{ width: '100%', padding: 14, background: color, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>
+          className={`${styles.primaryButton} ${styles.fullButton}`}
+          style={{ background: color }}>
           {saving ? '⏳ ...' : lang === 'en' ? 'Save' : 'حفظ'}
         </button>
       </div>
@@ -283,8 +270,7 @@ function TransferModal({ accounts, lang, onSave, onClose }: {
         </div>
 
         <button onClick={handleSave} disabled={saving || !amount || fromId === toId}
-          className={styles.primaryButton}
-          style={{ width: '100%', padding: 14, background: '#3B7EF6', opacity: saving ? 0.6 : 1 }}>
+          className={`${styles.primaryButton} ${styles.blueButton} ${styles.fullButton}`}>
           {saving ? '⏳ ...' : lang === 'en' ? 'Transfer' : 'تحويل'}
         </button>
       </div>
@@ -295,7 +281,7 @@ function TransferModal({ accounts, lang, onSave, onClose }: {
 // ── الصفحة الرئيسية ───────────────────────────────────
 export default function AccountsPage() {
   const { user } = useUser()
-  const { t, lang } = useI18n()
+  const { lang } = useI18n()
   const { accounts, loading, totalBalance, createAccount, updateAccount, deleteAccount, transferBetween } = useAccounts(user?.id)
   const currency = accounts.find(a => a.is_default)?.currency ?? 'JOD'
 
@@ -313,14 +299,11 @@ export default function AccountsPage() {
       <PageHeader title={lang === 'en' ? '💰 Accounts' : '💰 الحسابات'} />
 
       {/* إجمالي الرصيد */}
-      <div className={styles.heroBalanceCard} style={{
-        background: totalBalance >= 0 ? 'linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.04))' : 'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.04))',
-        border: `1px solid ${totalBalance >= 0 ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)'}`,
-      }}>
+      <div className={`${styles.heroBalanceCard} ${totalBalance >= 0 ? styles.heroPositive : styles.heroNegative}`}>
         <div className={styles.heroLabel}>
           {lang === 'en' ? 'Total Balance' : 'إجمالي الرصيد'}
         </div>
-        <div className={styles.heroAmount} style={{ color: totalBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+        <div className={`${styles.heroAmount} ${totalBalance >= 0 ? styles.textGreen : styles.textRed}`}>
           {totalBalance >= 0 ? '+' : '-'}{fmt(Math.abs(totalBalance))}
         </div>
         <div className={styles.heroCurrency}>{currency}</div>
@@ -329,7 +312,7 @@ export default function AccountsPage() {
       {/* أزرار */}
       <div className={styles.buttonRow}>
         <button onClick={() => setShowCreate(true)}
-          className={styles.primaryButton} style={{ background: '#3B7EF6' }}>
+          className={`${styles.primaryButton} ${styles.blueButton}`}>
           + {lang === 'en' ? 'New Account' : 'حساب جديد'}
         </button>
         {accounts.length >= 2 && (

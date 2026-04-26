@@ -14,14 +14,14 @@ export function MonthCompareCard({ income, expenses, prevIncome, prevExpenses }:
     <div className={styles.card}>
       <div className={styles.title}>{t('dash_compare')}</div>
       <div className={styles.compareGrid}>
-        <div className={styles.compareItem} style={{ background: incDiff >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)' }}>
+        <div className={`${styles.compareItem} ${incDiff >= 0 ? styles.compareItemGreen : styles.compareItemRed}`}>
           <div className={styles.compareEmoji}>{incDiff >= 0 ? '📈' : '📉'}</div>
-          <div className={styles.compareValue} style={{ color: incDiff >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{incDiff >= 0 ? '+' : ''}{incDiff.toFixed(0)}%</div>
+          <div className={`${styles.compareValue} ${incDiff >= 0 ? styles.compareValueGreen : styles.compareValueRed}`}>{incDiff >= 0 ? '+' : ''}{incDiff.toFixed(0)}%</div>
           <div className={styles.compareLabel}>{lang === 'en' ? 'Income' : 'الدخل'}</div>
         </div>
-        <div className={styles.compareItem} style={{ background: expDiff <= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)' }}>
+        <div className={`${styles.compareItem} ${expDiff <= 0 ? styles.compareItemGreen : styles.compareItemRed}`}>
           <div className={styles.compareEmoji}>{expDiff <= 0 ? '✅' : '⚠️'}</div>
-          <div className={styles.compareValue} style={{ color: expDiff <= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>{expDiff > 0 ? '+' : ''}{expDiff.toFixed(0)}%</div>
+          <div className={`${styles.compareValue} ${expDiff <= 0 ? styles.compareValueGreen : styles.compareValueRed}`}>{expDiff > 0 ? '+' : ''}{expDiff.toFixed(0)}%</div>
           <div className={styles.compareLabel}>{lang === 'en' ? 'Expenses' : 'المصاريف'}</div>
         </div>
       </div>
@@ -33,15 +33,14 @@ export function BudgetProgressCard({ income, expenses, net, currency = 'JOD' }: 
   const { lang } = useI18n()
   if (!income) return null
   const spendPct = Math.min((expenses / income) * 100, 100)
-  const spendColor = spendPct > 90 ? '#EF4444' : spendPct > 70 ? '#F59E0B' : '#10B981'
   return (
     <div className={styles.card}>
       <div className={styles.budgetHeader}>
         <span className={styles.budgetLabel}>{lang === 'en' ? 'Monthly Budget' : 'الميزانية الشهرية'}</span>
-        <span className={styles.budgetPercent} style={{ color: spendColor }}>{spendPct.toFixed(0)}% {lang === 'en' ? 'spent' : 'مُنفَق'}</span>
+        <span className={`${styles.budgetPercent} ${spendPct > 90 ? styles.budgetPercentRed : spendPct > 70 ? styles.budgetPercentYellow : styles.budgetPercentGreen}`}>{spendPct.toFixed(0)}% {lang === 'en' ? 'spent' : 'مُنفَق'}</span>
       </div>
       <div className={styles.progressBarContainer}>
-        <div className={styles.progressBarFill} style={{ width: `${spendPct}%`, background: spendColor }} />
+        <div className={`${styles.progressBarFill} ${spendPct > 90 ? styles.progressBarRed : spendPct > 70 ? styles.progressBarYellow : styles.progressBarGreen}`} style={{ width: `${spendPct}%` }} />
       </div>
       <div className={styles.budgetFooter}>
         <span className={styles.budgetStat}>{lang === 'en' ? 'Income' : 'الدخل'}: {income.toFixed(0)} {currency}</span>
@@ -98,7 +97,7 @@ export function WealthSimulatorCard({ net, lang }: { net: number; lang: string }
         <div className={styles.simulatorGrid}>
           {stats.map((s, i) => (
             <div key={i} className={styles.simulatorItem}>
-              <div className={styles.simulatorValue} style={{ color: s.color }}>{s.value}</div>
+              <div className={`${styles.simulatorValue} ${styles[`simulatorValue${i}`]}`}>{s.value}</div>
               <div className={styles.simulatorLabel}>{s.label}</div>
             </div>
           ))}
@@ -109,7 +108,7 @@ export function WealthSimulatorCard({ net, lang }: { net: number; lang: string }
   )
 }
 
-export function RecentTransactionsCard({ transactions, lang }: { transactions: Pick<Transaction, 'id' | 'type' | 'amount' | 'category' | 'description' | 'transaction_date'>[]; lang: string }) {
+export function RecentTransactionsCard({ transactions }: { transactions: Pick<Transaction, 'id' | 'type' | 'amount' | 'category' | 'description' | 'transaction_date'>[] }) {
   const { t } = useI18n()
   return (
     <div className={styles.recentTxCard}>
@@ -123,14 +122,14 @@ export function RecentTransactionsCard({ transactions, lang }: { transactions: P
         <div className={styles.txList}>
           {transactions.map(tx => (
             <div key={tx.id} className={`${styles.txRow} tx-row`}>
-              <div className={styles.txIconBox} style={{ background: tx.type === 'income' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.10)' }}>
+              <div className={`${styles.txIconBox} ${tx.type === 'income' ? styles.txIconBoxIncome : styles.txIconBoxExpense}`}>
                 {tx.type === 'income' ? '💰' : '💸'}
               </div>
               <div className={styles.txInfo}>
                 <div className={styles.txDescription}>{tx.description || tx.category || '—'}</div>
                 <div className={styles.txDate}>{tx.transaction_date}</div>
               </div>
-              <div className={styles.txAmount} style={{ color: tx.type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)' }}>
+              <div className={`${styles.txAmount} ${tx.type === 'income' ? styles.txAmountIncome : styles.txAmountExpense}`}>
                 {tx.type === 'income' ? '+' : '−'}{Number(tx.amount).toFixed(0)}
               </div>
             </div>
