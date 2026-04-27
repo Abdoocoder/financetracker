@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/toast"
 import { useI18n } from "@/lib/i18n"
 import { useTheme } from "@/lib/theme-context"
+import { useQueryClient } from "@tanstack/react-query"
 import { PageHeader } from "@/components/ui/page-header"
 import { FormField, Input, Select, SaveButton } from "@/components/ui/form-field"
 import { CURRENCIES_BY_GROUP } from "@/lib/currencies"
@@ -590,10 +591,11 @@ function AccordionCard({
 }
 
 export default function SettingsPage() {
-  const { user: currentUser } = useUser()
+  const { user: currentUser, refreshProfile } = useUser()
   const supabase = useRef(createClient()).current
   const router = useRouter()
   const { t } = useI18n()
+  const queryClient = useQueryClient()
 
   const [profileForm, setProfileForm] = useState<ProfileFormData>({
     full_name: '', monthly_income: '', opening_balance: '', currency: 'JOD',
@@ -698,10 +700,11 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     const user = currentUser; if (!user) return
     setLoading('profile', true)
+    const newIncome = safeParseFloat(profileForm.monthly_income)
     const { error } = await supabase.from('profiles').upsert({
       id: user.id,
       full_name: profileForm.full_name,
-      monthly_income: safeParseFloat(profileForm.monthly_income),
+      monthly_income: newIncome,
       opening_balance: safeParseFloat(profileForm.opening_balance),
       currency: profileForm.currency,
       salary_day: safeParseInt(profileForm.salary_day),
@@ -710,8 +713,42 @@ export default function SettingsPage() {
       birth_date: profileForm.birth_date || null,
       updated_at: new Date().toISOString(),
     })
-    if (error) toast.error(t('toast_error_save'))
-    else toast.success(t('toast_saved'))
+    if (error) {
+      toast.error(t('toast_error_save'))
+    } else {
+      // Sync the auto-generated salary transaction for the current month
+      // The onboarding and auto-salary features create income transactions with category 'راتب'.
+      // If the user changes their salary in settings, those transactions must be updated too,
+      // otherwise the dashboard will still show the old amount (it reads from transactions first).
+      const now = new Date()
+      const firstDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
+      if (newIncome > 0) {
+        // Update existing salary transaction(s) for this month to the new amount
+        await supabase.from('transactions')
+          .update({ amount: newIncome })
+          .eq('user_id', user.id)
+          .eq('type', 'income')
+          .eq('category', 'راتب')
+          .gte('transaction_date', firstDay)
+          .lte('transaction_date', lastDay)
+      } else {
+        // If income set to 0, remove auto-generated salary transactions for this month
+        await supabase.from('transactions')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('type', 'income')
+          .eq('category', 'راتب')
+          .gte('transaction_date', firstDay)
+          .lte('transaction_date', lastDay)
+      }
+
+      toast.success(t('toast_saved'))
+      // Refresh the global profile context so all screens reflect the updated salary/income
+      await refreshProfile()
+      // Invalidate dashboard cache so home screen re-fetches fresh data
+      queryClient.invalidateQueries({ queryKey: ['dashboard', user.id] })
+    }
     setLoading('profile', false)
   }
 
