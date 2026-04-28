@@ -66,10 +66,12 @@ class _ProfileFormState extends State<ProfileForm> {
     setState(() {});
     try {
       final user = Supabase.instance.client.auth.currentUser!;
+      final newIncome = double.tryParse(_incomeCtrl.text) ?? 0;
+
       await Supabase.instance.client.from('profiles').upsert({
         'id': user.id,
         'full_name': _nameCtrl.text.trim(),
-        'monthly_income': double.tryParse(_incomeCtrl.text) ?? 0,
+        'monthly_income': newIncome,
         'opening_balance': double.tryParse(_openingBalanceCtrl.text) ?? 0,
         'currency': _currency,
         'job_title': _jobTitleCtrl.text.isEmpty ? null : _jobTitleCtrl.text,
@@ -78,6 +80,40 @@ class _ProfileFormState extends State<ProfileForm> {
         'salary_day': int.tryParse(_salaryDay) ?? 1,
         'updated_at': DateTime.now().toIso8601String(),
       });
+
+      // Sync the salary transaction for the current month with the new income
+      final now = DateTime.now();
+      final monthStart = '${now.year}-${now.month.toString().padLeft(2, '0')}-01';
+      final nextMonth = DateTime(now.year, now.month + 1, 1);
+      final nextMonthStart = '${nextMonth.year}-${nextMonth.month.toString().padLeft(2, '0')}-01';
+
+      final existing = await Supabase.instance.client
+          .from('transactions')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('type', 'income')
+          .inFilter('category', ['راتب', 'Salary'])
+          .gte('transaction_date', monthStart)
+          .lt('transaction_date', nextMonthStart)
+          .limit(1);
+
+      if ((existing as List).isNotEmpty) {
+        await Supabase.instance.client
+            .from('transactions')
+            .update({'amount': newIncome})
+            .eq('id', existing[0]['id']);
+      } else if (newIncome > 0) {
+        // لا توجد معاملة راتب هذا الشهر — أنشئ واحدة
+        await Supabase.instance.client.from('transactions').insert({
+          'user_id': user.id,
+          'type': 'income',
+          'amount': newIncome,
+          'category': 'cat_salary'.tr(),
+          'description': 'onboarding_income_desc'.tr(),
+          'transaction_date': '${now.year}-${now.month.toString().padLeft(2, '0')}-01',
+        });
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),

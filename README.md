@@ -578,6 +578,13 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.34.0 — 2026-04-28 *(Salary Sync Fix)*
+
+| Change | Description |
+|:-------|:------------|
+| 🐛 **Salary Sync Fix** | When updating salary in Settings, the existing salary transaction for the current month is now updated to match — fixing the stale income shown on the Dashboard after onboarding. |
+| 📱 **Flutter Parity** | Applied the same salary-sync fix to the Flutter app (`profile_form.dart`) — covers both Arabic and English categories, safe month-boundary calculation, and auto-creates a transaction if none exists for the current month. |
+
 ### v3.33.0 — 2026-04-26 *(Dashboard UI Redesign)*
 
 | Change | Description |
