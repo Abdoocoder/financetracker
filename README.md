@@ -578,6 +578,12 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.35.0 — 2026-04-30 *(Smart Debt Source)*
+
+| Change | Description |
+|:-------|:------------|
+| 💡 **Smart Debt Source** | When adding a new debt, users are now asked whether the amount was paid/received from their current account balance. If yes, a matching transaction is created automatically (expense for "receivable" debts, income for "owed" debts). Pre-app debts skip this and leave the balance unchanged. Available on both Web and Flutter. |
+
 ### v3.34.0 — 2026-04-28 *(Salary Sync Fix)*
 
 | Change | Description |

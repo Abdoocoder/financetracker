@@ -32,6 +32,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   late final TextEditingController _paymentDayCtrl;
   late int _priority;
   bool _receivedAmount = false;
+  bool _paidFromAccount = false;
   late bool _autoDeduct;
   String _debtType = 'owed';
   bool _saving = false;
@@ -170,7 +171,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           .eq('id', widget.existing!['id']);
     } else {
       await Supabase.instance.client.from('debts').insert(data);
-      if (_receivedAmount) {
+      if (_receivedAmount && _debtType == 'owed') {
         await Supabase.instance.client.from('transactions').insert({
           'user_id': user.id,
           'type': 'income',
@@ -180,6 +181,19 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           'exchange_rate': rate,
           'category': 'debt_received_cat'.tr(),
           'description': 'debt_received_desc'.tr(args: [_nameCtrl.text]),
+          'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+        });
+      }
+      if (_paidFromAccount && _debtType == 'receivable') {
+        await Supabase.instance.client.from('transactions').insert({
+          'user_id': user.id,
+          'type': 'expense',
+          'amount': origBase,
+          'original_amount': origForeign,
+          'original_currency': _selectedCurrency,
+          'exchange_rate': rate,
+          'category': 'debts_loan_given_cat'.tr(),
+          'description': 'debts_loan_given_desc'.tr(args: [_nameCtrl.text]),
           'transaction_date': DateTime.now().toIso8601String().split('T')[0],
         });
       }
@@ -454,7 +468,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             ]),
           ),
         ),
-        if (widget.existing == null) ...[
+        if (widget.existing == null && _debtType == 'owed') ...[
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () => setState(() => _receivedAmount = !_receivedAmount),
@@ -495,6 +509,56 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4, right: 30),
                         child: Text('debts_received_today_desc'.tr(),
+                            style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 11,
+                                fontFamily: 'Cairo')),
+                      ),
+                  ]),
+            ),
+          ),
+        ],
+        if (widget.existing == null && _debtType == 'receivable') ...[
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => setState(() => _paidFromAccount = !_paidFromAccount),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: _paidFromAccount
+                    ? const Color(0xFFEF4444).withValues(alpha: 0.08)
+                    : cs.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: _paidFromAccount
+                        ? const Color(0xFFEF4444).withValues(alpha: 0.35)
+                        : cs.outlineVariant),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Icon(
+                          _paidFromAccount
+                              ? Icons.check_circle
+                              : Icons.circle_outlined,
+                          color: _paidFromAccount
+                              ? const Color(0xFFEF4444)
+                              : const Color(0xFF64748B),
+                          size: 20),
+                      const SizedBox(width: 10),
+                      Text('debts_paid_from_account'.tr(),
+                          style: TextStyle(
+                              color: _paidFromAccount
+                                  ? const Color(0xFFEF4444)
+                                  : const Color(0xFF94A3B8),
+                              fontFamily: 'Cairo',
+                              fontWeight: FontWeight.w700)),
+                    ]),
+                    if (_paidFromAccount)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4, right: 30),
+                        child: Text('debts_paid_from_account_desc'.tr(),
                             style: const TextStyle(
                                 color: Color(0xFF64748B),
                                 fontSize: 11,

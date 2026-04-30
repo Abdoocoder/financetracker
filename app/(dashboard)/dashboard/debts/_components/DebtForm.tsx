@@ -1,7 +1,8 @@
 import { Modal } from '@/components/ui/modal'
-import { FormField, Input, Select, SaveButton } from '@/components/ui/form-field'
+import { FormField, Input, SaveButton } from '@/components/ui/form-field'
 import { CURRENCIES } from '@/lib/currency'
 import { useI18n } from '@/lib/i18n'
+import styles from './DebtForm.module.css'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
@@ -23,6 +24,7 @@ interface FormState {
   payment_day: string
   auto_deduct: boolean
   received_amount: boolean
+  paid_from_account: boolean
   currency: string
   exchange_rate: string
   debt_type: 'owed' | 'receivable'
@@ -41,31 +43,44 @@ interface Props {
 
 export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving, onSave, onClose }: Props) {
   const { t } = useI18n()
+
+  const owedActive = form.debt_type === 'owed'
+  const receivableActive = form.debt_type === 'receivable'
+
   return (
     <Modal title={editingId ? t('debts_edit') : t('debts_new')} onClose={onClose}>
-      {/* نوع الدين */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button onClick={() => setForm(f => ({ ...f, debt_type: 'owed' }))}
-          aria-label={t('debts_type_owed')}
-          style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
-            background: form.debt_type === 'owed' ? 'rgba(239,68,68,0.15)' : 'var(--bg-secondary)',
-            color: form.debt_type === 'owed' ? '#EF4444' : 'var(--text-muted)' }}>
+
+      {/* نوع الدين — two styled radio-like buttons */}
+      <div className={styles.typeRow} role="group" aria-label={t('debts_type_owed')}>
+        <label className={`${styles.typeBtn} ${owedActive ? styles.typeBtnOwed : ''}`}>
+          <input
+            type="radio"
+            name="debt_type"
+            value="owed"
+            checked={owedActive}
+            onChange={() => setForm(f => ({ ...f, debt_type: 'owed' }))}
+            className={styles.srOnly}
+          />
           💳 {t('debts_type_owed')}
-        </button>
-        <button onClick={() => setForm(f => ({ ...f, debt_type: 'receivable' }))}
-          aria-label={t('debts_type_receivable')}
-          style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 700,
-            background: form.debt_type === 'receivable' ? 'rgba(16,185,129,0.15)' : 'var(--bg-secondary)',
-            color: form.debt_type === 'receivable' ? '#10B981' : 'var(--text-muted)' }}>
+        </label>
+        <label className={`${styles.typeBtn} ${receivableActive ? styles.typeBtnReceivable : ''}`}>
+          <input
+            type="radio"
+            name="debt_type"
+            value="receivable"
+            checked={receivableActive}
+            onChange={() => setForm(f => ({ ...f, debt_type: 'receivable' }))}
+            className={styles.srOnly}
+          />
           💰 {t('debts_type_receivable')}
-        </button>
+        </label>
       </div>
 
       <FormField label={t('debts_name')}>
         <Input autoFocus placeholder={t('debts_name_hint')} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
       </FormField>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div className={styles.grid2}>
         <FormField label={t('trans_amount')}>
           <Input type="number" placeholder="0"
             value={form.currency === baseCurrency ? form.original_amount : form.original_amount_foreign}
@@ -74,20 +89,26 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
               : setForm(f => ({ ...f, original_amount_foreign: e.target.value }))} />
         </FormField>
         <FormField label={t('settings_currency')}>
-          <Select value={form.currency} onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}>
+          <select
+            title={t('settings_currency')}
+            aria-label={t('settings_currency')}
+            value={form.currency}
+            onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}
+            className="input-field"
+          >
             {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
-          </Select>
+          </select>
         </FormField>
       </div>
 
       {form.currency !== baseCurrency && (
-        <div style={{ background: 'var(--bg-secondary)', padding: 12, borderRadius: 12, marginBottom: 12, border: '1px dashed var(--border)' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div className={styles.fxBox}>
+          <div className={styles.grid2}>
             <FormField label={t('trans_exchange_rate') || 'سعر الصرف'}>
               <Input type="number" step="0.0001" value={form.exchange_rate} onChange={e => setForm(f => ({ ...f, exchange_rate: e.target.value }))} />
             </FormField>
             <FormField label={t('trans_equivalent')}>
-              <div style={{ padding: '10px', borderRadius: 8, background: 'var(--bg-card)', color: 'var(--accent-green-light)', fontWeight: 900, textAlign: 'center', fontSize: 13 }}>
+              <div className={styles.equivalent}>
                 {(parseFloat(form.original_amount_foreign) * parseFloat(form.exchange_rate) || 0).toFixed(2)} {baseCurrency}
               </div>
             </FormField>
@@ -95,7 +116,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div className={styles.grid2}>
         <FormField label={t('debts_monthly')}>
           <Input type="number" placeholder="0" value={form.monthly_payment} onChange={e => setForm(f => ({ ...f, monthly_payment: e.target.value }))} />
         </FormField>
@@ -105,45 +126,64 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
       </div>
 
       <FormField label={t('priority_title')}>
-        <Select value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
+        <select
+          title={t('priority_title')}
+          aria-label={t('priority_title')}
+          value={form.priority}
+          onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}
+          className="input-field"
+        >
           {PRIORITY_CONFIG.map((p, i) => (
             <option key={i + 1} value={i + 1}>{t(`priority_${i + 1}` as Parameters<typeof t>[0])}</option>
           ))}
-        </Select>
+        </select>
       </FormField>
 
-      {!editingId && (
+      {!editingId && form.debt_type === 'owed' && (
         <FormField label={t('debts_receive_confirm')}>
-          <button
-            type="button"
-            onClick={() => setForm(f => ({ ...f, received_amount: !f.received_amount }))}
-            aria-label={t('debts_receive_confirm_yes')}
-            aria-pressed={form.received_amount}
-            style={{
-              display: 'flex', alignItems: 'center', width: '100%', gap: 12, padding: '12px 16px',
-              borderRadius: 10, cursor: 'pointer',
-              background: form.received_amount ? 'rgba(16,185,129,0.1)' : 'var(--bg-elevated)',
-              border: `1px solid ${form.received_amount ? 'rgba(16,185,129,0.4)' : 'var(--border)'}`,
-              transition: 'all 0.2s',
-            }}
-          >
-            <div style={{
-              width: 20, height: 20, borderRadius: 6,
-              background: form.received_amount ? '#10B981' : 'transparent',
-              border: `2px solid ${form.received_amount ? '#10B981' : 'var(--border)'}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              {form.received_amount && <span style={{ color: 'white', fontSize: 12 }}>✓</span>}
+          <label className={`${styles.toggleBtn} ${form.received_amount ? styles.toggleBtnActiveGreen : ''}`}>
+            <input
+              type="checkbox"
+              checked={form.received_amount}
+              onChange={() => setForm(f => ({ ...f, received_amount: !f.received_amount }))}
+              className={styles.srOnly}
+            />
+            <div className={`${styles.checkBox} ${form.received_amount ? styles.checkBoxGreen : ''}`}>
+              {form.received_amount && <span className={styles.checkMark}>✓</span>}
             </div>
-            <div style={{ textAlign: lang === 'ar' ? 'right' : 'left' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: form.received_amount ? '#10B981' : 'var(--text-secondary)' }}>
+            <div className={lang === 'ar' ? styles.toggleTextRight : styles.toggleTextLeft}>
+              <div className={`${styles.toggleTitle} ${form.received_amount ? styles.toggleTitleGreen : ''}`}>
                 {t('debts_receive_confirm_yes')}
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+              <div className={styles.toggleDesc}>
                 {t('debts_receive_confirm_desc')}
               </div>
             </div>
-          </button>
+          </label>
+        </FormField>
+      )}
+
+      {!editingId && form.debt_type === 'receivable' && (
+        <FormField label={t('debts_lent_from_account')}>
+          <label className={`${styles.toggleBtn} ${form.paid_from_account ? styles.toggleBtnActiveRed : ''}`}>
+            <input
+              type="checkbox"
+              checked={form.paid_from_account}
+              onChange={() => setForm(f => ({ ...f, paid_from_account: !f.paid_from_account }))}
+              className={styles.srOnly}
+            />
+            <div className={`${styles.checkBox} ${form.paid_from_account ? styles.checkBoxRed : ''}`}>
+              {form.paid_from_account && <span className={styles.checkMark}>✓</span>}
+            </div>
+            <div className={lang === 'ar' ? styles.toggleTextRight : styles.toggleTextLeft}>
+              <div className={`${styles.toggleTitle} ${form.paid_from_account ? styles.toggleTitleRed : ''}`}>
+                {t('debts_lent_from_account_yes')}
+              </div>
+              <div className={styles.toggleDesc}>
+                {t('debts_lent_from_account_desc')}
+              </div>
+            </div>
+          </label>
         </FormField>
       )}
 
@@ -155,19 +195,22 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
       </FormField>
 
       <FormField label={t('debts_auto_deduct')}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
-          <button
-            type="button"
-            onClick={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
+        <label className={styles.autoDeductRow}>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={form.auto_deduct}
+            onChange={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
             aria-label={t('debts_auto_deduct')}
-            aria-pressed={form.auto_deduct}
-            style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: form.auto_deduct ? 'var(--accent-green)' : 'var(--bg-elevated)', transition: 'background 0.2s', position: 'relative', flexShrink: 0 }}>
-            <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'white', position: 'absolute', top: 3, transition: 'right 0.2s', right: form.auto_deduct ? 3 : 23 }} />
-          </button>
-          <span style={{ fontSize: 13, color: form.auto_deduct ? 'var(--accent-green-light)' : 'var(--text-muted)', fontWeight: 600 }}>
+            className={styles.srOnly}
+          />
+          <span className={`${styles.switchBtn} ${form.auto_deduct ? styles.switchBtnOn : ''}`} aria-hidden="true">
+            <span className={`${styles.switchThumb} ${form.auto_deduct ? styles.switchThumbOn : ''}`} />
+          </span>
+          <span className={`${styles.autoDeductLabel} ${form.auto_deduct ? styles.autoDeductLabelOn : ''}`}>
             {form.auto_deduct ? t('debts_auto_on') : t('debts_auto_off')}
           </span>
-        </div>
+        </label>
       </FormField>
 
       <SaveButton label={editingId ? t('debts_save_edit') : t('debts_save')} loading={saving} onClick={onSave} />

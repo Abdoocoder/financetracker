@@ -108,6 +108,7 @@ export default function DebtsPage() {
     payment_day: '1',
     auto_deduct: false,
     received_amount: false,
+    paid_from_account: false,
     currency: '',
     exchange_rate: '1',
     debt_type: 'owed' as 'owed' | 'receivable'
@@ -175,6 +176,7 @@ export default function DebtsPage() {
       payment_day: '1',
       auto_deduct: false,
       received_amount: false,
+      paid_from_account: false,
       currency: baseCurrency,
       exchange_rate: '1',
       debt_type: 'owed' as 'owed' | 'receivable',
@@ -196,6 +198,7 @@ export default function DebtsPage() {
       payment_day: d.payment_day?.toString() ?? '1',
       auto_deduct: d.auto_deduct ?? false,
       received_amount: false,
+      paid_from_account: false,
       currency: d.currency || baseCurrency,
       exchange_rate: d.exchange_rate?.toString() ?? '1',
       debt_type: (d.debt_type ?? 'owed') as 'owed' | 'receivable',
@@ -258,8 +261,8 @@ export default function DebtsPage() {
         monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0,
         due_date: form.due_date || null, priority: parseInt(form.priority), notes: form.notes || null, payment_day: parseInt(form.payment_day) || 1, auto_deduct: form.auto_deduct, debt_type: form.debt_type
       })
-      // إضافة معاملة دخل إذا استلم المبلغ
-      if (!error && form.received_amount) {
+      // إضافة معاملة دخل إذا استلم المبلغ (دين علي)
+      if (!error && form.received_amount && form.debt_type === 'owed') {
         await supabase.from('transactions').insert({
           user_id: currentUser.id,
           type: 'income',
@@ -269,6 +272,20 @@ export default function DebtsPage() {
           exchange_rate: rate,
           category: t('debts_loan_received_cat'),
           description: t('debts_loan_received_desc', { name: form.name }),
+          transaction_date: new Date().toISOString().split('T')[0],
+        })
+      }
+      // إضافة معاملة مصروف إذا أعطى المبلغ من حسابه الحالي (دين لي)
+      if (!error && form.paid_from_account && form.debt_type === 'receivable') {
+        await supabase.from('transactions').insert({
+          user_id: currentUser.id,
+          type: 'expense',
+          amount: origBase,
+          original_amount: isMulti ? origForeign : origBase,
+          original_currency: form.currency,
+          exchange_rate: rate,
+          category: t('debts_loan_given_cat'),
+          description: t('debts_loan_given_desc', { name: form.name }),
           transaction_date: new Date().toISOString().split('T')[0],
         })
       }

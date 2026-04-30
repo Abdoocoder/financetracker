@@ -20,7 +20,8 @@
       "Bash(grep:*)",
       "Bash(/c/flutter/flutter/bin/flutter.bat analyze:*)",
       "Bash(cmd:*)",
-      "mcp__task-master-ai__next_task"
+      "mcp__task-master-ai__next_task",
+      "Bash(npm run *)"
     ]
   }
 }
