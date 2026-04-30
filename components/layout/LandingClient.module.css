@@ -13,7 +13,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  transition: transform 0.4s ease;
+  transform: translateY(150%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ctaTitle {
@@ -42,4 +43,18 @@
   text-decoration: none;
   white-space: nowrap;
   box-shadow: 0 0 20px rgba(59, 126, 246, 0.4);
+}
+
+@media (max-width: 768px) {
+  .stickyBar {
+    flex-direction: column;
+    padding: 16px 20px;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .ctaButton {
+    width: 100%;
+    text-align: center;
+  }
 }
