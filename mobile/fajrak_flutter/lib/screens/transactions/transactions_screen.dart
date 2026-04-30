@@ -117,76 +117,67 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     }
 
     try {
-      final profile = await Supabase.instance.client
-          .from('profiles')
-          .select('currency, full_name')
-          .eq('id', user.id)
-          .single();
-      if (mounted) {
-        _currency = profile['currency'] as String? ?? 'JOD';
-        _userName = (profile['full_name'] as String? ?? '').split(' ').first;
-      }
+      // Build date range strings once (used by both paged + totals queries)
+      final String? start = (_filterMonth != null && _filterYear != null)
+          ? DateTime(_filterYear!, _filterMonth!, 1).toIso8601String().split('T')[0]
+          : null;
+      final String? end = (_filterMonth != null && _filterYear != null)
+          ? DateTime(_filterYear!, _filterMonth! + 1, 0).toIso8601String().split('T')[0]
+          : null;
 
-      PostgrestFilterBuilder<List<Map<String, dynamic>>> baseQ = Supabase.instance.client
+      // Build paged transactions query
+      var baseQ = Supabase.instance.client
           .from('transactions')
           .select('*')
           .eq('user_id', user.id);
-      
-      if (_filter != 'all') {
-        baseQ = baseQ.eq('type', _filter);
-      }
+      if (_filter != 'all') baseQ = baseQ.eq('type', _filter);
+      final rangedQ = (start != null && end != null)
+          ? baseQ.gte('transaction_date', start).lte('transaction_date', end)
+          : baseQ;
+      final pagedFuture = rangedQ
+          .order('transaction_date', ascending: false)
+          .range(reset ? 0 : _transactions.length,
+              (reset ? 0 : _transactions.length) + _limit - 1);
 
-      List data;
-      if (_filterMonth != null && _filterYear != null) {
-        final start = DateTime(_filterYear!, _filterMonth!, 1)
-            .toIso8601String()
-            .split('T')[0];
-        final end = DateTime(_filterYear!, _filterMonth! + 1, 0)
-            .toIso8601String()
-            .split('T')[0];
-        data = await baseQ
-            .gte('transaction_date', start)
-            .lte('transaction_date', end)
-            .order('transaction_date', ascending: false)
-            .range(reset ? 0 : _transactions.length, (reset ? 0 : _transactions.length) + _limit - 1);
-      } else {
-        data = await baseQ
-            .order('transaction_date', ascending: false)
-            .range(reset ? 0 : _transactions.length, (reset ? 0 : _transactions.length) + _limit - 1);
-      }
+      // Parallel: profile (only on reset — we already have it on load-more)
+      // + paged transactions + totals (only on reset)
+      if (reset) {
+        var totalsQ = Supabase.instance.client
+            .from('transactions')
+            .select('type, amount') // minimal fields for summary calculation
+            .eq('user_id', user.id);
+        final totalsFuture = (start != null && end != null)
+            ? totalsQ.gte('transaction_date', start).lte('transaction_date', end)
+            : totalsQ;
 
-      // Fetch totals for summary
-      PostgrestFilterBuilder<List<Map<String, dynamic>>> totalsQ = Supabase
-          .instance.client
-          .from('transactions')
-          .select('*')
-          .eq('user_id', user.id);
+        final results = await Future.wait<dynamic>([
+          Supabase.instance.client.from('profiles').select('currency, full_name').eq('id', user.id).single(),
+          pagedFuture,
+          totalsFuture,
+        ]);
 
-      List<Map<String, dynamic>> allDataForSummary;
-      if (_filterMonth != null && _filterYear != null) {
-        final start = DateTime(_filterYear!, _filterMonth!, 1)
-            .toIso8601String()
-            .split('T')[0];
-        final end = DateTime(_filterYear!, _filterMonth! + 1, 0)
-            .toIso8601String()
-            .split('T')[0];
-        allDataForSummary = await totalsQ
-            .gte('transaction_date', start)
-            .lte('transaction_date', end);
-      } else {
-        allDataForSummary = await totalsQ;
-      }
+        final profile = results[0] as Map<String, dynamic>;
+        final data = results[1] as List;
+        final allDataForSummary = (results[2] as List).cast<Map<String, dynamic>>();
 
-      if (mounted) {
-        setState(() {
-          _allTransactions = allDataForSummary;
-          if (reset) {
+        if (mounted) {
+          _currency = profile['currency'] as String? ?? 'JOD';
+          _userName = (profile['full_name'] as String? ?? '').split(' ').first;
+          setState(() {
+            _allTransactions = allDataForSummary;
             _transactions = List<Map<String, dynamic>>.from(data);
-          } else {
+            _hasMore = data.length == _limit;
+          });
+        }
+      } else {
+        // Load-more: only need the next page of transactions
+        final data = await pagedFuture;
+        if (mounted) {
+          setState(() {
             _transactions.addAll(List<Map<String, dynamic>>.from(data));
-          }
-          _hasMore = data.length == _limit;
-        });
+            _hasMore = data.length == _limit;
+          });
+        }
       }
     } catch (e) {
       if (mounted) setState(() => _hasError = true);

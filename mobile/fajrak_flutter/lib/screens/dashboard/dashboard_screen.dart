@@ -91,37 +91,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final firstDay = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
       final prevMonthStart = DateTime(now.year, now.month - 1, 1).toIso8601String().split('T')[0];
       final prevMonthEnd = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
+      final sixMonthsAgo = DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
 
+      // Single parallel batch — charts + monthly summary run alongside core queries
       final results = await Future.wait<dynamic>([
-        Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
-        Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
-        Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
-        Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type, auto_deduct').eq('user_id', user.id).eq('is_paid', false),
-        Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
-        Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
+        /* 0 */ Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
+        /* 1 */ Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
+        /* 2 */ Supabase.instance.client.from('transactions').select('id, type, amount, category, description, transaction_date').eq('user_id', user.id).order('transaction_date', ascending: false).limit(5),
+        /* 3 */ Supabase.instance.client.from('debts').select('remaining_amount, monthly_payment, debt_type, auto_deduct').eq('user_id', user.id).eq('is_paid', false),
+        /* 4 */ Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
+        /* 5 */ Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
+        /* 6 */ Supabase.instance.client.from('transactions').select('type, amount, category, transaction_date').eq('user_id', user.id).gte('transaction_date', sixMonthsAgo).order('transaction_date', ascending: true),
+        /* 7 */ FinanceService.fetchMonthlyFinancialSummary(year: now.year, month: now.month),
         // prev month totals for MonthSummaryCard (only fetched in first 7 days)
         if (now.day <= 7)
-          Supabase.instance.client.from('transactions').select('type, amount')
+          /* 8 */ Supabase.instance.client.from('transactions').select('type, amount')
               .eq('user_id', user.id).gte('transaction_date', prevMonthStart).lt('transaction_date', prevMonthEnd),
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
       final recent = results[2] as List;
       final debts = results[3] as List;
-      // investments is now handled via FinanceService.fetchFinancialDashboard
       final goals = results[5] as List;
+      final chartsList = results[6] as List;
+      final monthly = results[7] as Map<String, dynamic>;
 
-      // ── Charts data (6-month bar chart + category breakdown) ──
-      final sixMonthsAgo = DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
-      final chartsTxs = await Supabase.instance.client
-          .from('transactions')
-          .select('type, amount, category, transaction_date')
-          .eq('user_id', user.id)
-          .gte('transaction_date', sixMonthsAgo)
-          .order('transaction_date', ascending: true);
-
-      // Build 6-month aggregated data
-      final chartsList = chartsTxs as List;
+      // ── Build 6-month aggregated data from already-fetched chartsList ──
       final monthMap = <String, Map<String, double>>{};
       for (final tx in chartsList) {
         final date = tx['transaction_date'] as String;
@@ -140,7 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'expenses': e.value['expenses'] ?? 0.0,
       }).toList();
 
-      // Build category breakdown (current month expenses only)
+      // ── Build category breakdown (current month expenses only) ──
       final catMap = <String, double>{};
       for (final tx in chartsList) {
         if (tx['type'] == 'expense' && (tx['transaction_date'] as String).startsWith('${now.year}-${now.month.toString().padLeft(2, '0')}')) {
@@ -155,21 +150,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'percentage': totalCatExpenses > 0 ? (e.value / totalCatExpenses).clamp(0.0, 1.0) : 0.0,
       }).toList();
 
-      // Use centralized monthly summary RPC to match web logic exactly.
-      final monthly = await FinanceService.fetchMonthlyFinancialSummary(
-        year: now.year,
-        month: now.month,
-      );
       final income = (monthly['income'] as num?)?.toDouble() ?? 0.0;
       final txExpenses = (monthly['expenses'] as num?)?.toDouble() ?? 0.0;
       final net = (monthly['net'] as num?)?.toDouble() ?? (income - txExpenses);
-      
+
       final currency = (profile['currency'] as String? ?? 'JOD').toUpperCase();
+      // Exchange rate + financial dashboard (sequential: dashboard needs the rate)
       final usdToLocal = currency != 'USD'
           ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
           : 1.0;
-
-      // FIX: Use Centralized RPC for Net Worth components (Best Practice)
       final dash = await FinanceService.fetchFinancialDashboard(usdToLocal);
       
       final netWorth = (dash['net_worth'] as num).toDouble();
