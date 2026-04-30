@@ -177,6 +177,7 @@
   "debts_received_today_desc": "سيتم إضافته كدخل تلقائياً في معاملاتك",
   "debts_paid_from_account": "دفعته من حسابي الحالي",
   "debts_paid_from_account_desc": "سيُخصم تلقائياً كمصروف في معاملاتك",
+  "debts_not_paid_from_account_desc": "لن يُخصم من رصيدك — مناسب للديون القديمة قبل استخدام التطبيق",
   "debts_loan_given_cat": "قرض مُعطى",
   "debts_loan_given_desc": "قرض مُعطى: {}",
   "debts_paid_amount": "مدفوع: {} {}",

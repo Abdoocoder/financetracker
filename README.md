@@ -578,6 +578,17 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.35.1 — 2026-04-30 *(Debt Logic Parity & Bug Fixes)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔄 **Web Debt Parity** | Web debt form now matches Flutter: `auto_deduct` hidden for receivable debts; `paid_from_account` defaults to `true` for new receivable debts and resets correctly on type switch. |
+| 📝 **Old Debt Hint** | Both web and Flutter now show a clear description when `paid_from_account` is unchecked: "No deduction — suitable for old debts before using the app". |
+| 🐛 **Auto-Deduct Description** | `auto_deduct` toggle now shows a subtitle explaining it deducts monthly on the specified day (not immediately). |
+| 🔧 **FCM Web Fix** | Prevented 401 FCM error on Flutter web by short-circuiting `saveToken()` when running on web. |
+| 💥 **Splash Crash Fix** | Fixed `dependOnInheritedWidgetOfExactType` crash by deferring `_checkUser()` to `addPostFrameCallback`. |
+| ⚡ **Auto-Debt Cron Fix** | Receivable debt repayments now correctly create `income` transactions (was incorrectly `expense`). |
+
 ### v3.35.0 — 2026-04-30 *(Smart Debt Source)*
 
 | Change | Description |

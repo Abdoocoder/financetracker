@@ -58,7 +58,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
             name="debt_type"
             value="owed"
             checked={owedActive}
-            onChange={() => setForm(f => ({ ...f, debt_type: 'owed' }))}
+            onChange={() => setForm(f => ({ ...f, debt_type: 'owed', paid_from_account: false }))}
             className={styles.srOnly}
           />
           💳 {t('debts_type_owed')}
@@ -69,7 +69,7 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
             name="debt_type"
             value="receivable"
             checked={receivableActive}
-            onChange={() => setForm(f => ({ ...f, debt_type: 'receivable' }))}
+            onChange={() => setForm(f => ({ ...f, debt_type: 'receivable', paid_from_account: false }))}
             className={styles.srOnly}
           />
           💰 {t('debts_type_receivable')}
@@ -180,7 +180,9 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
                 {t('debts_lent_from_account_yes')}
               </div>
               <div className={styles.toggleDesc}>
-                {t('debts_lent_from_account_desc')}
+                {form.paid_from_account
+                  ? t('debts_lent_from_account_desc')
+                  : t('debts_not_paid_from_account_desc')}
               </div>
             </div>
           </label>
@@ -194,24 +196,29 @@ export function DebtForm({ form, setForm, editingId, baseCurrency, lang, saving,
         <Input type="number" placeholder="1" value={form.payment_day} onChange={e => setForm(f => ({ ...f, payment_day: e.target.value }))} />
       </FormField>
 
-      <FormField label={t('debts_auto_deduct')}>
-        <label className={styles.autoDeductRow}>
-          <input
-            type="checkbox"
-            role="switch"
-            checked={form.auto_deduct}
-            onChange={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
-            aria-label={t('debts_auto_deduct')}
-            className={styles.srOnly}
-          />
-          <span className={`${styles.switchBtn} ${form.auto_deduct ? styles.switchBtnOn : ''}`} aria-hidden="true">
-            <span className={`${styles.switchThumb} ${form.auto_deduct ? styles.switchThumbOn : ''}`} />
-          </span>
-          <span className={`${styles.autoDeductLabel} ${form.auto_deduct ? styles.autoDeductLabelOn : ''}`}>
-            {form.auto_deduct ? t('debts_auto_on') : t('debts_auto_off')}
-          </span>
-        </label>
-      </FormField>
+      {form.debt_type === 'owed' && (
+        <FormField label={t('debts_auto_deduct')}>
+          <label className={styles.autoDeductRow}>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={form.auto_deduct}
+              onChange={() => setForm(f => ({ ...f, auto_deduct: !f.auto_deduct }))}
+              aria-label={t('debts_auto_deduct')}
+              className={styles.srOnly}
+            />
+            <span className={`${styles.switchBtn} ${form.auto_deduct ? styles.switchBtnOn : ''}`} aria-hidden="true">
+              <span className={`${styles.switchThumb} ${form.auto_deduct ? styles.switchThumbOn : ''}`} />
+            </span>
+            <div>
+              <span className={`${styles.autoDeductLabel} ${form.auto_deduct ? styles.autoDeductLabelOn : ''}`}>
+                {form.auto_deduct ? t('debts_auto_on') : t('debts_auto_off')}
+              </span>
+              <div className={styles.toggleDesc}>{t('debts_auto_deduct_desc')}</div>
+            </div>
+          </label>
+        </FormField>
+      )}
 
       <SaveButton label={editingId ? t('debts_save_edit') : t('debts_save')} loading={saving} onClick={onSave} />
     </Modal>

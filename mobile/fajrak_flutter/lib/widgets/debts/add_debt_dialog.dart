@@ -58,9 +58,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     _priority = (widget.existing?['priority'] as int?) ?? 3;
     _autoDeduct = widget.existing?['auto_deduct'] as bool? ?? true;
     _debtType = widget.existing?['debt_type'] as String? ?? 'owed';
-    // For new receivable debts, default to recording the initial lending as an expense.
-    // The user almost always lends money from their account immediately — they can uncheck if it's historical.
-    _paidFromAccount = widget.existing == null && _debtType == 'receivable';
+    _paidFromAccount = false;
     _dueDate = widget.existing?['due_date'] as String? ?? '';
     
     _selectedCurrency = widget.existing?['currency'] ?? widget.baseCurrency;
@@ -281,7 +279,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           const SizedBox(width: 8),
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() { _debtType = 'receivable'; if (widget.existing == null) _paidFromAccount = true; }),
+              onTap: () => setState(() { _debtType = 'receivable'; if (widget.existing == null) _paidFromAccount = false; }),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
@@ -572,15 +570,20 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                               fontFamily: 'Cairo',
                               fontWeight: FontWeight.w700)),
                     ]),
-                    if (_paidFromAccount)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4, right: 30),
-                        child: Text('debts_paid_from_account_desc'.tr(),
-                            style: const TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 11,
-                                fontFamily: 'Cairo')),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4, right: 30),
+                      child: Text(
+                        _paidFromAccount
+                            ? 'debts_paid_from_account_desc'.tr()
+                            : 'debts_not_paid_from_account_desc'.tr(),
+                        style: TextStyle(
+                            color: _paidFromAccount
+                                ? const Color(0xFF64748B)
+                                : const Color(0xFF94A3B8),
+                            fontSize: 11,
+                            fontFamily: 'Cairo'),
                       ),
+                    ),
                   ]),
             ),
           ),

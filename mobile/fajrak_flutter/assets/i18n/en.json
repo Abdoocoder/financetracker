@@ -177,6 +177,7 @@
   "debts_received_today_desc": "It will be automatically added as income in your transactions",
   "debts_paid_from_account": "I paid this from my current account",
   "debts_paid_from_account_desc": "Will be automatically deducted as expense in your transactions",
+  "debts_not_paid_from_account_desc": "No deduction from your balance — suitable for old debts before using the app",
   "debts_loan_given_cat": "Loan Given",
   "debts_loan_given_desc": "Loan Given: {}",
   "debts_paid_amount": "Paid: {} {}",
