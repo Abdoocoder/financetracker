@@ -122,7 +122,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Image.asset(
                       context.read<AppState>().isDarkMode(context)
                           ? 'assets/images/app_icon.png'
-                          : 'assets/images/app_icon_light.png',
+                          : 'assets/images/app_icon_light.jpg',
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

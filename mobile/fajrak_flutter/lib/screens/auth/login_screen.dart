@@ -109,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Image.asset(
                     context.read<AppState>().isDarkMode(context)
                         ? 'assets/images/app_icon.png'
-                        : 'assets/images/app_icon_light.png',
+                        : 'assets/images/app_icon_light.jpg',
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,

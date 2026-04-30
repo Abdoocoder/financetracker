@@ -168,7 +168,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                 child: Image.asset(
                   Theme.of(context).brightness == Brightness.dark
                       ? 'assets/images/app_icon.png'
-                      : 'assets/images/app_icon_light.png',
+                      : 'assets/images/app_icon_light.jpg',
                   width: 72,
                   height: 72,
                   fit: BoxFit.cover,

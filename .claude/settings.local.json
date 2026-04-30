@@ -164,7 +164,9 @@
       "mcp__supabase__apply_migration",
       "Bash(make doctor *)",
       "Bash(xargs wc *)",
-      "Bash(grep -v \":0$\")"
+      "Bash(grep -v \":0$\")",
+      "PowerShell(Get-Command magick, pngquant, cwebp -ErrorAction SilentlyContinue)",
+      "PowerShell(python -c \"from PIL import Image; img = Image.open\\('C:/Users/user/Projects/financetracker/mobile/fajrak_flutter/assets/images/app_icon_light.png'\\); print\\(img.size, img.format, img.mode\\)\" 2>&1)"
     ]
   }
 }
