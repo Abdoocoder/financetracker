@@ -34,7 +34,9 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _controller.forward();
     AnalyticsService.logScreenView('Splash');
-    _checkUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _checkUser();
+    });
   }
 
   Future<void> _checkUser() async {
