@@ -39,7 +39,6 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _checkUser() async {
     try {
-      await Future.delayed(const Duration(seconds: 2));
       final user = Supabase.instance.client.auth.currentUser;
       if (mounted) {
         if (user == null) {

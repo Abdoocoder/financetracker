@@ -58,30 +58,32 @@ void main() async {
     EasyLocalization.ensureInitialized(),
   ]);
 
-  // Firebase init — must happen after dotenv (needs env vars on web)
-  if (kIsWeb) {
-    final projectId = dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1';
-    await Firebase.initializeApp(
-      options: FirebaseOptions(
-        apiKey: dotenv.env['FLUTTER_FIREBASE_API_KEY'] ?? '',
-        appId: dotenv.env['FLUTTER_FIREBASE_APP_ID'] ?? '',
-        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
-        projectId: projectId,
-        authDomain: '$projectId.firebaseapp.com',
-        storageBucket: '$projectId.appspot.com',
-      ),
-    );
-  } else {
-    await Firebase.initializeApp();
+  // Firebase + Supabase in parallel — they are independent of each other.
+  // Both need dotenv (loaded above), but not each other.
+  final firebaseFuture = kIsWeb
+      ? Firebase.initializeApp(
+          options: FirebaseOptions(
+            apiKey: dotenv.env['FLUTTER_FIREBASE_API_KEY'] ?? '',
+            appId: dotenv.env['FLUTTER_FIREBASE_APP_ID'] ?? '',
+            messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+            projectId: dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1',
+            authDomain: '${dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1'}.firebaseapp.com',
+            storageBucket: '${dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1'}.appspot.com',
+          ),
+        )
+      : Firebase.initializeApp();
+
+  await Future.wait([
+    firebaseFuture,
+    Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL'] ?? '',
+      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+    ),
+  ]);
+
+  if (!kIsWeb) {
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
-
-  // Supabase init — can run after Firebase since both are now sequential only
-  // where necessary; both use different services so order doesn't matter here.
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL'] ?? '',
-    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
-  );
 
   // Initialize local encrypted database.
   // Key: user's auth session token (or anonymous key before login).
