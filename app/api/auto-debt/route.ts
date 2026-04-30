@@ -16,7 +16,7 @@ async function processAutoDebts() {
   // جلب كل الديون التي auto_deduct=true ويوم الدفع = اليوم
   const { data: debts } = await supabase
     .from('debts')
-    .select('id, user_id, name, monthly_payment, remaining_amount, payment_day')
+    .select('id, user_id, name, monthly_payment, remaining_amount, payment_day, debt_type')
     .eq('auto_deduct', true)
     .eq('is_paid', false)
     .eq('payment_day', dayOfMonth)
@@ -101,13 +101,16 @@ async function processAutoDebts() {
       updated_at: new Date().toISOString(),
     }).eq('id', debt.id)
 
-    // إضافة معاملة مصروف
+    // إضافة معاملة (مصروف للديون المستحقة، دخل لاستلام أقساط الديون المقرضة)
+    const isReceivable = debt.debt_type === 'receivable'
     await supabase.from('transactions').insert({
       user_id: debt.user_id,
-      type: 'expense',
+      type: isReceivable ? 'income' : 'expense',
       amount: payment,
       category: 'ديون',
-      description: `دفعة ${debt.name} (تلقائي)`,
+      description: isReceivable
+        ? `استلام قسط ${debt.name} (تلقائي)`
+        : `دفعة ${debt.name} (تلقائي)`,
       transaction_date: dateStr,
     })
 
@@ -165,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     const { data: debts } = await supabase
       .from('debts')
-      .select('id, name, monthly_payment, remaining_amount')
+      .select('id, name, monthly_payment, remaining_amount, debt_type')
       .eq('user_id', user.id)
       .eq('auto_deduct', true)
       .eq('is_paid', false)
@@ -205,9 +208,15 @@ export async function POST(request: NextRequest) {
         is_paid: newRemaining === 0,
         updated_at: new Date().toISOString(),
       }).eq('id', debt.id)
+      const isReceivable = debt.debt_type === 'receivable'
       await supabase.from('transactions').insert({
-        user_id: user.id, type: 'expense', amount: payment,
-        category: 'ديون', description: `دفعة ${debt.name} (تلقائي)`,
+        user_id: user.id,
+        type: isReceivable ? 'income' : 'expense',
+        amount: payment,
+        category: 'ديون',
+        description: isReceivable
+          ? `استلام قسط ${debt.name} (تلقائي)`
+          : `دفعة ${debt.name} (تلقائي)`,
         transaction_date: dateStr,
       })
       count++

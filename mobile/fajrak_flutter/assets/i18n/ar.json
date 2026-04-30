@@ -170,6 +170,7 @@
   "debts_due_date_hint": "📅 تاريخ الاستحقاق (اختياري)",
   "debts_notes_hint": "ملاحظات (اختياري)",
   "debts_auto_deduct": "خصم تلقائي من الدخل",
+  "debts_auto_deduct_desc": "يخصم القسط الشهري تلقائياً في يوم الدفع المحدد",
   "debt_received_cat": "قرض مستلم",
   "debt_received_desc": "استلام قرض: {}",
   "debts_received_today": "💳 استلمت هذا المبلغ اليوم",

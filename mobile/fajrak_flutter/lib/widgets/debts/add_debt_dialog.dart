@@ -34,7 +34,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   bool _receivedAmount = false;
   bool _paidFromAccount = false;
   late bool _autoDeduct;
-  String _debtType = 'owed';
+  late String _debtType;
   bool _saving = false;
   late String _dueDate;
 
@@ -58,6 +58,9 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
     _priority = (widget.existing?['priority'] as int?) ?? 3;
     _autoDeduct = widget.existing?['auto_deduct'] as bool? ?? true;
     _debtType = widget.existing?['debt_type'] as String? ?? 'owed';
+    // For new receivable debts, default to recording the initial lending as an expense.
+    // The user almost always lends money from their account immediately — they can uncheck if it's historical.
+    _paidFromAccount = widget.existing == null && _debtType == 'receivable';
     _dueDate = widget.existing?['due_date'] as String? ?? '';
     
     _selectedCurrency = widget.existing?['currency'] ?? widget.baseCurrency;
@@ -254,7 +257,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         Row(children: [
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _debtType = 'owed'),
+              onTap: () => setState(() { _debtType = 'owed'; if (widget.existing == null) _paidFromAccount = false; }),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
@@ -278,7 +281,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
           const SizedBox(width: 8),
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _debtType = 'receivable'),
+              onTap: () => setState(() { _debtType = 'receivable'; if (widget.existing == null) _paidFromAccount = true; }),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
@@ -436,38 +439,52 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                         ),
                       ),
                     ))),
-        const SizedBox(height: 12),
-        GestureDetector(
-          onTap: () => setState(() => _autoDeduct = !_autoDeduct),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: _autoDeduct
-                  ? const Color(0xFF10B981).withValues(alpha: 0.1)
-                  : cs.outlineVariant,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                  color: _autoDeduct
-                      ? const Color(0xFF10B981).withValues(alpha: 0.4)
-                      : cs.outlineVariant),
+        // auto_deduct: only meaningful for owed debts (you control when you pay).
+        // For receivable debts, payments are tracked manually via the "Receive" button.
+        if (_debtType == 'owed') ...[
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: () => setState(() => _autoDeduct = !_autoDeduct),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: _autoDeduct
+                    ? const Color(0xFF10B981).withValues(alpha: 0.1)
+                    : cs.outlineVariant,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                    color: _autoDeduct
+                        ? const Color(0xFF10B981).withValues(alpha: 0.4)
+                        : cs.outlineVariant),
+              ),
+              child: Row(children: [
+                Icon(_autoDeduct ? Icons.toggle_on : Icons.toggle_off,
+                    color: _autoDeduct
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFF64748B),
+                    size: 24),
+                const SizedBox(width: 10),
+                Expanded(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('debts_auto_deduct'.tr(),
+                        style: TextStyle(
+                            color: _autoDeduct
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFF94A3B8),
+                            fontFamily: 'Cairo',
+                            fontWeight: FontWeight.w700)),
+                    Text('debts_auto_deduct_desc'.tr(),
+                        style: const TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 11,
+                            fontFamily: 'Cairo')),
+                  ],
+                )),
+              ]),
             ),
-            child: Row(children: [
-              Icon(_autoDeduct ? Icons.toggle_on : Icons.toggle_off,
-                  color: _autoDeduct
-                      ? const Color(0xFF10B981)
-                      : const Color(0xFF64748B),
-                  size: 24),
-              const SizedBox(width: 10),
-              Text('debts_auto_deduct'.tr(),
-                  style: TextStyle(
-                      color: _autoDeduct
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFF94A3B8),
-                      fontFamily: 'Cairo',
-                      fontWeight: FontWeight.w700)),
-            ]),
           ),
-        ),
+        ],
         if (widget.existing == null && _debtType == 'owed') ...[
           const SizedBox(height: 10),
           GestureDetector(
