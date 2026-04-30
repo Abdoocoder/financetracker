@@ -162,7 +162,9 @@
       "Bash(npx jest *)",
       "mcp__supabase__execute_sql",
       "mcp__supabase__apply_migration",
-      "Bash(make doctor *)"
+      "Bash(make doctor *)",
+      "Bash(xargs wc *)",
+      "Bash(grep -v \":0$\")"
     ]
   }
 }

@@ -446,15 +446,15 @@
   /* --- Glassmorphism --- */
   .glass-panel {
     background: var(--bg-glass) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     border: 1px solid var(--border-light) !important;
   }
 
   .glass-sidebar {
-    background: rgba(7, 11, 20, 0.7) !important;
-    backdrop-filter: blur(28px) !important;
-    -webkit-backdrop-filter: blur(28px) !important;
+    background: rgba(7, 11, 20, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     border-left: 1px solid rgba(255, 255, 255, 0.04) !important;
   }
 
@@ -822,4 +822,30 @@
 
 [data-theme="light"] .glow-blue {
   box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+}
+
+/* === MOBILE PERFORMANCE ============================
+   Disable expensive rendering on small screens     */
+@media (max-width: 768px) {
+  html {
+    text-rendering: auto;
+  }
+}
+
+/* === REDUCED MOTION ================================
+   Respect OS-level "reduce motion" setting         */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .skeleton,
+  .animate-shimmer {
+    animation: none !important;
+    background: var(--bg-elevated) !important;
+  }
 }

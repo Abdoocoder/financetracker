@@ -7,11 +7,13 @@ import Sidebar from '@/components/layout/Sidebar'
 import { ToastProvider } from '@/components/ui/toast'
 import { ErrorBoundary } from '@/components/ui/error-boundary'
 import { useI18n } from '@/lib/i18n'
-import { PushPrompt } from '@/components/ui/push-prompt'
-import { InstallPrompt } from '@/components/ui/install-prompt'
-import { WelcomeModal } from '@/components/ui/welcome-modal'
-import { OnboardingTour } from '@/components/ui/onboarding-tour'
+import dynamic from 'next/dynamic'
 import { GlobalFAB } from '@/components/ui/fab'
+
+const PushPrompt = dynamic(() => import('@/components/ui/push-prompt').then(m => ({ default: m.PushPrompt })), { ssr: false, loading: () => null })
+const InstallPrompt = dynamic(() => import('@/components/ui/install-prompt').then(m => ({ default: m.InstallPrompt })), { ssr: false, loading: () => null })
+const WelcomeModal = dynamic(() => import('@/components/ui/welcome-modal').then(m => ({ default: m.WelcomeModal })), { ssr: false, loading: () => null })
+const OnboardingTour = dynamic(() => import('@/components/ui/onboarding-tour').then(m => ({ default: m.OnboardingTour })), { ssr: false, loading: () => null })
 
 import styles from './dashboard-layout.module.css'
 
