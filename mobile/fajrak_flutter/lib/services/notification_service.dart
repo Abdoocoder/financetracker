@@ -1,5 +1,4 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
@@ -153,6 +152,8 @@ class NotificationService {
   }
 
   static Future<void> saveToken({String? newToken}) async {
+    // Web push is handled by the Next.js PWA — nothing to do on Flutter web.
+    if (kIsWeb) return;
     try {
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
@@ -162,23 +163,7 @@ class NotificationService {
         return;
       }
 
-      // vapidKey is only needed for Web. On Android/iOS, call getToken() with no argument.
-      // On Web, FCM may fail on localhost - treat as non-fatal.
-      final String? token;
-      if (kIsWeb) {
-        try {
-          token = newToken ??
-              await FirebaseMessaging.instance.getToken(
-                vapidKey: dotenv.env['FLUTTER_FIREBASE_VAPID_KEY'] ??
-                    'BAedHFDPNJEXs2a4caJUYyqdEGWYDLgafvnwFxcNIqhoauxEzu29fJi-OcJncP3U6LITiYRwIXzwbKzIWAQxXNO',
-              );
-        } catch (webErr) {
-          if (kDebugMode) debugPrint('[NotificationService] Web FCM token failed (expected on localhost): $webErr');
-          return; // Web push handled by the Next.js PWA instead
-        }
-      } else {
-        token = newToken ?? await FirebaseMessaging.instance.getToken();
-      }
+      final token = newToken ?? await FirebaseMessaging.instance.getToken();
 
       if (token == null) {
         if (kDebugMode) {

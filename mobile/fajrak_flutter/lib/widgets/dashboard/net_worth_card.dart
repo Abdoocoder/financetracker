@@ -94,7 +94,7 @@ class _NetWorthCardState extends State<NetWorthCard> {
               ? Padding(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                   child: Wrap(spacing: 8, runSpacing: 8, children: items.map((item) => SizedBox(
-                    width: (MediaQuery.of(context).size.width - 80) / 2,
+                    width: (MediaQuery.sizeOf(context).width - 80) / 2,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
                       decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(10)),

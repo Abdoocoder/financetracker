@@ -24,7 +24,11 @@ class _DashboardHealthScoreState extends State<DashboardHealthScore> {
   @override
   void initState() {
     super.initState();
-    _loadHistory();
+    // Defer until after the first frame so the dashboard renders before this
+    // extra query fires — otherwise it competes with the main render on slow devices.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadHistory();
+    });
   }
 
   Future<void> _loadHistory() async {

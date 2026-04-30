@@ -402,7 +402,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (!_loading) ...[
                 const SizedBox(height: 16),
                 if (layout.isVisible(DashCardId.netWorth) && _invValue + _goalsSaved + _totalDebt > 0)
-                  NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency),
+                  RepaintBoundary(child: NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency)),
                 if (layout.isVisible(DashCardId.healthScore))
                   RepaintBoundary(child: DashboardHealthScore(score: _healthScore, colorScheme: colorScheme)),
                 if (layout.isVisible(DashCardId.stage)) ...[
@@ -427,7 +427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
                 if (layout.isVisible(DashCardId.simulator)) ...[
                   const SizedBox(height: 16),
-                  WealthSimulatorCard(currency: _currency),
+                  RepaintBoundary(child: WealthSimulatorCard(currency: _currency)),
                 ],
                 if (layout.isVisible(DashCardId.challenges)) ...[
                   const SizedBox(height: 16),

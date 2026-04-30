@@ -25,6 +25,15 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    // Compute once — shared by all 3 sliders to avoid 3x widget-tree traversal.
+    final sliderTheme = SliderTheme.of(context).copyWith(
+      activeTrackColor: colorScheme.primary,
+      inactiveTrackColor: colorScheme.outlineVariant,
+      thumbColor: colorScheme.primary,
+      overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+      trackHeight: 4,
+    );
     // FV = P * (((1 + r)^n - 1) / r) + Principal accumulation
     final double r = (_expectedReturn / 100) / 12;
     final int n = (_years * 12).toInt();
@@ -81,23 +90,24 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
           _buildSlider('wealth_monthly_investment'.tr(), _monthlyContribution, 0, 5000,
               _monthlyContribution.toStringAsFixed(0), (val) {
             setState(() => _monthlyContribution = val);
-          }, colorScheme),
+          }, colorScheme, sliderTheme),
           _buildSlider(
               'wealth_expected_years'.tr(), _years, 1, 40, 'wealth_years_val'.tr(args: [_years.toStringAsFixed(0)]),
               (val) {
             setState(() => _years = val);
-          }, colorScheme),
+          }, colorScheme, sliderTheme),
           _buildSlider('wealth_expected_yield'.tr(), _expectedReturn, 1, 20,
               '${_expectedReturn.toStringAsFixed(1)}%', (val) {
             setState(() => _expectedReturn = val);
-          }, colorScheme),
+          }, colorScheme, sliderTheme),
         ],
       ),
     );
   }
 
   Widget _buildSlider(String label, double value, double min, double max,
-      String formattedValue, ValueChanged<double> onChanged, ColorScheme colorScheme) {
+      String formattedValue, ValueChanged<double> onChanged,
+      ColorScheme colorScheme, SliderThemeData sliderTheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,20 +128,8 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
           ],
         ),
         SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: colorScheme.primary,
-            inactiveTrackColor: colorScheme.outlineVariant,
-            thumbColor: colorScheme.primary,
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-            trackHeight: 4,
-          ),
-          child: Slider(
-            value: value,
-            min: min,
-            max: max,
-            onChanged: onChanged,
-          ),
+          data: sliderTheme,
+          child: Slider(value: value, min: min, max: max, onChanged: onChanged),
         ),
       ],
     );

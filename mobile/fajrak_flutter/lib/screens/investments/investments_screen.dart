@@ -36,9 +36,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   void initState() {
     super.initState();
     AnalyticsService.logScreenView('Investments');
-    _load();
-    // Background refresh for live prices
-    Future.microtask(() => _load(refreshPrices: true));
+    // Load data first, then refresh live prices only after the UI is ready.
+    // The old microtask pattern triggered two concurrent _load() calls,
+    // doubling Supabase queries and stalling low-end devices on screen open.
+    _load().then((_) {
+      if (mounted) _load(refreshPrices: true);
+    });
   }
 
   Future<void> _load({bool refreshPrices = false}) async {
