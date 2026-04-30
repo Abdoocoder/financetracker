@@ -10,6 +10,10 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/:path*.wasm',
+        headers: [{ key: 'Content-Type', value: 'application/wasm' }],
+      },
+      {
         source: '/sw.js',
         headers: [
           {
