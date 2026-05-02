@@ -578,6 +578,12 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.35.2 — 2026-05-03 *(Splash Screen Fix)*
+
+| Change | Description |
+|:-------|:------------|
+| 🐛 **Splash i18n Fix** | Fixed missing `easy_localization` import in `splash_screen.dart` that caused `tr()` to be undefined, breaking the app logo semantic label. |
+
 ### v3.35.1 — 2026-04-30 *(Debt Logic Parity & Bug Fixes)*
 
 | Change | Description |
