@@ -1431,18 +1431,75 @@
         "updatedAt": "2026-04-15T13:28:00.578Z"
       },
       {
-        "id": 19,
+        "id": "19",
         "title": "إضافة تسميات aria-label لجميع أزرار الرموز وخاصية aria-expanded للعناصر القابلة للطي",
         "description": "إضافة خاصيات accessibility الضرورية (aria-label و aria-expanded) لتحسين دعم قارئات الشاشة. الهدف: امتثال WCAG 4.1.2 Level A.",
         "details": "1. فحص جميع أزرار الرموز في components/transactions/TransactionFormModal.tsx (زر الإغلاق، أزرار تبديل النوع)\n2. إضافة aria-label وصفية لكل زر رمز في components/dashboard/DashboardCustomizer.tsx\n3. إضافة aria-expanded إلى أزرار التوسيع في components/dashboard/NetWorthCard.tsx\n4. إضافة aria-expanded إلى أزرار التوسيع في components/dashboard/Section.tsx\n5. فحص components/ui/financial-health-combined.tsx:318 وإضافة aria-expanded\n6. البحث عن أي أزرار رموز أخرى قابلة للاكتشاف وإضافة التسميات المناسبة\n7. التأكد من أن جميع عناصر التبديل والطي تحتوي على aria-expanded={boolean} لتوصيل الحالة المفتوحة/المغلقة",
         "testStrategy": "استخدام أداة فحص accessibility (axe DevTools) والتحقق من أن جميع أزرار الرموز تحتوي على aria-label وصفية. اختبار مع قارئ الشاشة (NVDA أو JAWS) للتحقق من قابلية الوصول.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "إضافة aria-label لأزرار TransactionFormModal",
+            "description": "إضافة aria-label وصفية لجميع أزرار الرموز في مكون TransactionFormModal.tsx",
+            "dependencies": [],
+            "details": "يجب فحص وإضافة aria-label لـ:\n1. أزرار تبديل النوع (expense/income) بسطر 32-36\n2. زر تبديل التكرار (is_recurring) بسطر 117-134\n3. أزرار نوع التكرار (auto/manual) بسطور 162-183\nكل زر يحتاج aria-label واضح يصف الغرض منه (مثلاً: 'معاملة الإنفاق' للزر الأول)",
+            "status": "done",
+            "testStrategy": "اختبار يدوي مع قارئ شاشة NVDA للتأكد من قراءة جميع الأزرار بوضوح",
+            "updatedAt": "2026-05-02T15:45:58.649Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "إضافة aria-label إلى أزرار DashboardCustomizer",
+            "description": "إضافة aria-label لجميع الأزرار الأيقونية في مكون DashboardCustomizer.tsx",
+            "dependencies": [],
+            "details": "يجب إضافة:\n1. زر الإغلاق (✕) بسطر 88-94 - له aria-label موجود بالفعل 'close'\n2. زر Reset بسطر 166-177 - يحتاج aria-label وصفي\n3. زر Done بسطر 178-189 - يحتاج aria-label وصفي\nالعناصر ذات role='switch' موجودة بالفعل بـ aria-label بسطر 140",
+            "status": "done",
+            "testStrategy": "التحقق من أن جميع الأزرار لها aria-label موجود ووصفي باستخدام axe DevTools",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T15:46:04.154Z"
+          },
+          {
+            "id": 3,
+            "title": "إضافة aria-expanded إلى NetWorthCard",
+            "description": "إضافة aria-expanded إلى زر التوسيع في مكون NetWorthCard.tsx",
+            "dependencies": [],
+            "details": "يجب تحديث زر التوسيع بسطور 30-48:\n1. إضافة aria-expanded={open} لتوصيل حالة الفتح/الإغلاق\n2. إضافة aria-label واضح مثل: \"عرض/إخفاء تفصيل صافي الثروة\"\n3. إضافة aria-controls={`nw-breakdown`} للارتباط مع العنصر المنتشر\n4. تحديث div الـ breakdown (سطر 52) بـ id=\"nw-breakdown\"",
+            "status": "done",
+            "testStrategy": "التحقق من قراءة قارئ الشاشة للحالة المفتوحة والمغلقة بشكل صحيح",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T15:46:12.935Z"
+          },
+          {
+            "id": 4,
+            "title": "التحقق والتحديث: Section.tsx aria-expanded",
+            "description": "التحقق من أن مكون Section.tsx به aria-expanded صحيح وإضافة أي خاصيات ناقصة",
+            "dependencies": [],
+            "details": "المكون الحالي لديه aria-expanded وaria-controls و aria-label بالفعل (سطور 34-36)، لكن يجب:\n1. التحقق من أن القيمة boolean صحيحة: aria-expanded={open} ✓\n2. التحقق من aria-controls يشير لـ id صحيح: id=\"section-{id}\" ✓\n3. التحقق من aria-label يتضمن عبارة واضحة\nهذا المكون يبدو أنه مقترب من المتطلبات، قد يحتاج فقط للتحقق الدقيق",
+            "status": "done",
+            "testStrategy": "فحص شامل مع axe DevTools للتأكد من الامتثال WCAG",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T15:46:22.660Z"
+          },
+          {
+            "id": 5,
+            "title": "إضافة aria-expanded إلى financial-health-combined.tsx",
+            "description": "إضافة aria-expanded لزر التفاصيل في مكون financial-health-combined.tsx",
+            "dependencies": [],
+            "details": "يجب تحديث زر 'Show full analysis' بسطر 318:\n1. إضافة aria-expanded={expanded} لتوصيل حالة الفتح/الإغلاق\n2. إضافة aria-label واضح مثل: \"عرض/إخفاء التحليل الكامل للصحة المالية\"\n3. إضافة aria-controls={`health-analysis`} للارتباط مع التفاصيل\n4. تحديث div المحتوى (سطر 323) بـ id=\"health-analysis\"",
+            "status": "done",
+            "testStrategy": "اختبار مع قارئ الشاشة والتحقق من إعلان حالة التوسيع بوضوح",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T15:46:30.333Z"
+          }
+        ],
+        "updatedAt": "2026-05-02T15:46:30.333Z"
       },
       {
-        "id": 20,
+        "id": "20",
         "title": "إزالة تأثيرات Gradient من النصوص واستبدال الألوان المشفرة بـ CSS Variables",
         "description": "إزالة فئات gradient النصية المحظورة واستبدال 147+ حالة من الألوان السادسة عشرية بـ CSS variables.",
         "details": "أولاً: إزالة Gradient Text:\n1. حذف فئة .titleGradient من app/download/download.module.css:144-149\n2. حذف فئة .heroTitleGradient من components/landing/LandingPageClient.module.css:169-174\n3. حذف فئة .journeySubtitle من components/landing/LandingPageClient.module.css:622-628\n4. استبدال النصوص بلون صلب مع استخدام font-weight أو font-size للتمييز\n\nثانياً: استبدال الألوان السادسة عشرية:\n- استبدال #10B981 بـ var(--accent-green)\n- استبدال #3B7EF6 بـ var(--accent-blue)\n- استبدال #EF4444 بـ var(--accent-red)\n- استبدال #F59E0B بـ var(--accent-amber)\n- استبدال #8B5CF6 بـ var(--accent-purple)\n- استبدال #9CA3AF بـ var(--text-secondary)\n- استبدال #DC2626 بـ var(--accent-red)\n- استبدال #059669 بـ var(--accent-green)\n\nالملفات ذات الأولوية:\n- app/privacy/page.tsx (8 ألوان hex في علامات h3)\n- components/dashboard/GamificationCard.tsx\n- components/dashboard/Charts.tsx\n\nثالثاً: إزالة شريط التنقل النشط:\n- حذف pseudo-element .nav-item-active::after من app/globals.css:490-500",
@@ -1453,7 +1510,7 @@
         "subtasks": []
       },
       {
-        "id": 21,
+        "id": "21",
         "title": "إصلاح الحركات - استبدال easing الـ bounce وتقييد الرسوم المتكررة بلا نهاية",
         "description": "إصلاح مسائل الحركة بما في ذلك easing غير الناعم والرسوم المتكررة بلا نهاية على العناصر الزخرفية.",
         "details": "1. استبدال cubic-bezier(0.34, 1.56, 0.64, 1) في .animate-scale-in من app/globals.css:524 بـ cubic-bezier(0.16, 1, 0.3, 1)\n2. البحث عن حركة fabSlideUp وتطبيق نفس الإصلاح\n3. فحص جميع استخدامات فئة .animate-glow-pulse في المشروع\n4. إزالة .animate-glow-pulse من العناصر الزخرفية وتقييدها على مؤشرات الحالة الحية فقط\n5. التحقق من أن الحركات لا تسبب بحث متكرر لا مبرر له\n\nPseudo-code:\n```css\n/* قبل */\n.animate-scale-in {\n  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;\n}\n\n/* بعد */\n.animate-scale-in {\n  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n```",
@@ -1464,7 +1521,7 @@
         "subtasks": []
       },
       {
-        "id": 22,
+        "id": "22",
         "title": "تعريف CSS variable --font-mono واستبدال جميع استخدامات الخط أحادي المسافة",
         "description": "إضافة متغير CSS --font-mono وتوحيد جميع استخدامات الخطوط أحادية المسافة (13+ حالة) في جميع أنحاء المشروع.",
         "details": "1. إضافة إلى قسم :root في app/globals.css:\n```css\n--font-mono: 'Courier Prime', 'Noto Sans Mono', ui-monospace, monospace;\n```\n\n2. استبدال في components/dashboard/Cards.module.css (الأسطر 35، 60، 123، 186، 285)\n3. استبدال في components/dashboard/HeroBalanceCard.module.css (السطر 25)\n4. استبدال في components/dashboard/ChallengesCard.tsx (أنماط مضمنة)\n5. استبدال في components/dashboard/Charts.tsx (أنماط مضمنة)\n6. استبدال في components/dashboard/GamificationCard.tsx (أنماط مضمنة)\n7. استبدال في components/dashboard/MonthSummaryBanner.tsx (أنماط مضمنة)\n8. البحث عن أي حالات إضافية من font-family: monospace أو fontFamily: 'monospace'\n\nالاستبدال:\n- في CSS: من font-family: monospace إلى font-family: var(--font-mono)\n- في JSX inline: من fontFamily: 'monospace' إلى fontFamily: 'var(--font-mono)'",
@@ -1475,7 +1532,7 @@
         "subtasks": []
       },
       {
-        "id": 23,
+        "id": "23",
         "title": "تحسين التلميع - إزالة glassmorphism والأنماط المضمنة وإضافة متغيرات z-index",
         "description": "تنظيف التصميم من خلال إزالة تأثيرات glassmorphism غير الضرورية، استخراج الأنماط المضمنة، وتوحيد مقياس z-index.",
         "details": "1. إزالة Glassmorphism من Sidebar:\n   - حذف backdrop-filter: blur(8px) من .glass-sidebar في app/globals.css:454-459\n   - الاحتفاظ بـ background opacity\n\n2. استخراج الأنماط المضمنة:\n   - components/transactions/TransactionFormModal.tsx:33 (أزرار تبديل النوع) → إلى CSS module\n   - components/transactions/TransactionFilters.tsx:59 (أزرار التصفية) → إلى CSS module أو فئات Tailwind\n   - components/transactions/RecurringList.tsx:182 (أزرار تبديل النوع) → إلى CSS module\n\n3. إضافة scrollbar style لـ Firefox في html selector:\n```css\nscrollbar-width: thin;\nscrollbar-color: rgba(255, 255, 255, 0.08) transparent;\n```\n\n4. إضافة متغيرات z-index إلى :root:\n```css\n--z-dropdown: 200;\n--z-sticky: 300;\n--z-overlay: 1000;\n--z-modal: 1100;\n```\n\n5. استبدال جميع قيم z-index الرقمية بهذه المتغيرات في جميع أنحاء CSS و inline styles",
@@ -1486,7 +1543,7 @@
         "subtasks": []
       },
       {
-        "id": 24,
+        "id": "24",
         "title": "تحسين تسلسل هرمية تخطيط لوحة التحكم - كسر شبكة البطاقات الموحدة",
         "description": "تعديل تخطيط لوحة التحكم لإنشاء تسلسل هرمي بصري من خلال تنويع أحجام البطاقات ووضعها.",
         "details": "في app/(dashboard)/dashboard/page.tsx:\n\n1. جعل HeroBalanceCard يمتد على العرض الكامل في الأعلى\n2. جعل RecentTransactions و MonthlySummary أثقل بصرياً (أكبر حجماً) من Budget و Challenges\n3. استخدام CSS grid-template-areas أو column spans المتنوعة لكسر نمط الشبكة المتطابقة\n4. التأكد من أن هناك فرقاً واضحاً في الحجم بين البطاقات لإنشاء إيقاع بصري\n\nPseudo-code:\n```css\n/* قبل: جميع البطاقات بنفس الحجم */\n.grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }\n\n/* بعد: تسلسل هرمي */\n.grid {\n  grid-template-areas:\n    \"hero hero\"\n    \"transactions transactions\"\n    \"monthly monthly\"\n    \"budget challenges\";\n  grid-template-columns: 1fr 1fr;\n}\n.hero { grid-area: hero; }\n.transactions { grid-area: transactions; }\n.monthly { grid-area: monthly; }\n.budget { grid-area: budget; }\n.challenges { grid-area: challenges; }\n```",
@@ -1497,7 +1554,7 @@
         "subtasks": []
       },
       {
-        "id": 25,
+        "id": "25",
         "title": "إعادة تصميم HeroBalanceCard - الخروج من قالب KPI النموذجي",
         "description": "إعادة تصميم بطاقة الرصيد الرئيسية لتتوافق مع مفهوم العلامة التجارية 'dawn' وإضافة سياق معنوي.",
         "details": "في components/dashboard/HeroBalanceCard.tsx و HeroBalanceCard.module.css:\n\n1. استبدال خلفية gradient الحالية بمعالجة بصرية أكثر قصداً (مثل: نمط ميني أو عنصر رسومي معتدل)\n2. الاحتفاظ بـ animated count-up (هذا يعمل بشكل جيد)\n3. إضافة إطار سياقي:\n   - تسمية فترة زمنية (مثل 'رصيد إجمالي' مع تاريخ محدث)\n   - أو: sparkline بسيط بـ 6 أشهر من رصيد الشهر تحت الرقم الكبير\n4. إزالة emoji (🏦) من التسمية - استخدام أيقونة مناسبة أو لا تستخدم أيقونة\n5. التأكد من أن البطاقة تشعر بأنها مقررة ومفيدة، وليست مجرد أداة KPI\n\nملاحظات التصميم:\n- تجنب الألوان الزاهية جداً\n- استخدم typography weight/size للتمييز بدلاً من اللون\n- اختبر في الوضع الفاتح والداكن",
@@ -1508,69 +1565,69 @@
         "subtasks": []
       },
       {
-        "id": 26,
+        "id": "26",
         "title": "إضافة العلامات aria-label لصور Sidebar والتحقق من Light Mode",
         "description": "إضافة خاصية sizes إلى مكون Image في Sidebar وتحقق شامل من rendering في Light Mode.",
         "details": "1. في components/layout/Sidebar.tsx:58:\n   - إضافة sizes=\"42px\" إلى مكون Image لشعار Sidebar\n   - هذا يحسن من LCP (Largest Contentful Paint)\n\n2. فحص شامل لـ Light Mode:\n   - فتح تطبيق في Light Mode (toggle في إعدادات المستخدم)\n   - التحقق من أن جميع ألوان token replacement تبدو صحيحة\n   - اختبار contrast للنص على الخلفيات المختلفة\n   - التحقق من أن الرموز والأيقونات مرئية بوضوح\n   - فحص البطاقات والحدود والظلال\n\n3. اختبار accessibility إضافي:\n   - فحص focus states\n   - اختبار مع NVDA أو قارئ شاشة آخر\n   - التحقق من عدم وجود contrast issues",
         "testStrategy": "اختبار بصري في Light Mode و Dark Mode. استخدام Chrome DevTools contrast checker. التحقق من أن LCP يتحسن بعد إضافة sizes. اختبار على أجهزة مختلفة.",
         "priority": "high",
         "dependencies": [
-          19
+          "19"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 27,
+        "id": "27",
         "title": "التحقق من RTL layout والحركات في reduced-motion",
         "description": "اختبار شامل للـ RTL layout والتحقق من أن جميع الحركات تحترم تفضيل reduced-motion.",
         "details": "1. التحقق من RTL Layout:\n   - فتح التطبيق في الوضع العربي (RTL)\n   - فحص جميع الصفحات والمكونات للتأكد من أن العناصر معكوسة بشكل صحيح\n   - التحقق من محاذاة النصوص والأيقونات والأزرار\n   - اختبار الـ scrolling والـ overflow في RTL\n   - التحقق من margin و padding للعناصر في RTL\n\n2. اختبار Reduced Motion:\n   - تفعيل 'Prefers reduced motion' في نظام التشغيل\n   - التحقق من أن جميع الحركات معطلة أو مقللة\n   - اختبار أن prefers-reduced-motion في app/globals.css:837 يعمل بشكل صحيح\n   - التحقق من أن الفترات الزمنية قصيرة جداً عند تفعيل reduced motion\n\n3. اختبار الاختلافات:\n   - فتح أدوات المطور وفحص media queries\n   - اختبار في أجهزة مختلفة تدعم reduced-motion",
         "testStrategy": "اختبار يدوي في وضع RTL على جميع الصفحات. فحص الـ grid alignment وـ flexbox direction. اختبار reduced-motion بتفعيل الإعداد في Windows/macOS. التقاط لقطات قبل وبعد للمقارنة.",
         "priority": "high",
         "dependencies": [
-          20,
-          21,
-          24
+          "20",
+          "21",
+          "24"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 28,
+        "id": "28",
         "title": "تشغيل أدوات الفحص والتحقق من عدم وجود انحدار",
         "description": "تشغيل typecheck و lint و tests للتأكد من عدم وجود مشاكل في الكود بعد جميع التغييرات.",
         "details": "تشغيل الأوامر التالية بالترتيب:\n\n1. npm run typecheck\n   - التأكد من عدم وجود أخطاء TypeScript\n   - التحقق من جميع المتغيرات والدوال\n\n2. npm run lint\n   - تشغيل ESLint للتحقق من معايير الكود\n   - إصلاح مشاكل تنسيق الكود تلقائياً إن أمكن\n\n3. npm run test:coverage\n   - تشغيل جميع اختبارات Jest\n   - التحقق من أن coverage لم تنخفض\n   - إصلاح أي اختبارات مكسورة\n\n4. npm run build\n   - بناء المشروع للإنتاج\n   - التحقق من عدم وجود أخطاء البناء\n   - فحص حجم الـ bundle\n\n5. npm run doctor (اختياري)\n   - تشغيل جميع الفحوصات مرة واحدة",
         "testStrategy": "تشغيل كل أمر وتوثيق النتائج. إصلاح أي أخطاء واختبار المشروع محلياً. التحقق من أن جميع الفحوصات تمر بنجاح قبل الإطلاق.",
         "priority": "high",
         "dependencies": [
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 29,
+        "id": "29",
         "title": "مراجعة نهائية وفحص الجودة الشامل",
         "description": "فحص نهائي شامل لضمان أن جميع المهام قد تم إنجازها وأن الجودة الإجمالية محسّنة.",
         "details": "1. التحقق من جميع مهام Accessibility:\n   - ✓ جميع أزرار الرموز لها aria-label\n   - ✓ جميع عناصر التوسيع لها aria-expanded\n   - ✓ الفرق اللوني كافٍ للقراءة\n   - ✓ focus states واضحة\n\n2. التحقق من جميع مهام التصميم:\n   - ✓ لا توجد gradient text\n   - ✓ جميع الألوان تستخدم CSS variables\n   - ✓ الحركات ناعمة وخالية من bounce\n   - ✓ الخطوط أحادية المسافة موحدة\n   - ✓ glassmorphism مزالة\n   - ✓ z-index موحد\n   - ✓ تخطيط لوحة التحكم محسّن\n   - ✓ HeroBalanceCard معاد تصميمه\n\n3. التحقق من الأداء:\n   - ✓ لا توجد تحذيرات TypeScript\n   - ✓ لا توجد أخطاء Lint\n   - ✓ الاختبارات تمر\n   - ✓ البناء ناجح\n\n4. التحقق من التوافق:\n   - ✓ Light Mode يعمل بشكل صحيح\n   - ✓ RTL layout صحيح\n   - ✓ reduced-motion يتم احترامه\n   - ✓ responsive على جميع أحجام الشاشات\n\n5. توثيق النتائج:\n   - ✓ أنشئ تقرير بجميع التغييرات\n   - ✓ سجل أي مشاكل تم اكتشافها وحلها\n   - ✓ أضف ملاحظات للمطورين المستقبليين",
         "testStrategy": "فحص يدوي شامل على جميع الصفحات والمكونات. اختبار على أجهزة وأحجام شاشات مختلفة. اختبار في جميع الأوضاع (dark, light, RTL, LTR). توثيق أي مشاكل متبقية.",
         "priority": "high",
         "dependencies": [
-          28
+          "28"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 30,
+        "id": "30",
         "title": "إضافة Semantics و Tooltips لإمكانية الوصول الكاملة",
         "description": "تمرير شامل لإضافة Semantics widgets و tooltip للأيقونات وsemantic labels للصور في تطبيق Flutter. تتضمن إصلاح فشل reader الشاشة الكامل (TalkBack و VoiceOver).",
         "details": "1. إضافة tooltip لكل IconButton باستخدام strings من AppLocalizations (lib/widgets/main_screen/nav_item_widget.dart و lib/screens/accounts/accounts_screen.dart:59-67 وجميع الشاشات ذات الأزرار)\n2. إضافة semanticLabel لكل Image.asset() - أولوية: lib/screens/auth/login_screen.dart:109-116 و lib/screens/splash_screen.dart:122-129\n3. إضافة Semantics wrapper مع label و value على widgets البيانات المالية المعقدة (balance cards, progress bars, investment values)\n4. إضافة Semantics(expanded: isExpanded) على جميع الأقسام القابلة للطي\n\nترتيب الأولويات: items التنقل → أزرار الحركة → الصور → widgets البيانات المالية\n\nNote: استخدام context.tr() من easy_localization لجميع strings التوطين",
@@ -1581,7 +1638,7 @@
         "subtasks": []
       },
       {
-        "id": 31,
+        "id": "31",
         "title": "إعادة هيكلة dashboard_screen.dart - تقسيم build method بـ 500 سطر",
         "description": "استخراج مكونات dashboard الفردية إلى StatelessWidget منفصلة مع const constructors. تقليل nesting من 8 مستويات إلى أقل من 100 سطر في build method الرئيسي.",
         "details": "استخراج كل dashboard card إلى widget StatelessWidget منفصل:\n1. HeroBalanceSectionWidget (current balance hero)\n2. MonthSummaryWidget (income/expense month comparison)\n3. QuickLinksWidget (debts/investments/goals shortcuts)\n4. ChartsWidget (bar/pie charts - يحتوي بالفعل على RepaintBoundary، احفظه)\n5. RecentTransactionsWidget (آخر 5 معاملات)\n6. BudgetProgressWidget (budget cards)\n7. ChallengesWidget (gamification)\n\nتوجيهات:\n- كل widget يتلقى البيانات كـ constructor parameters (لا BuildContext drilling)\n- لا تغير السلوك أو الإخراج المرئي - refactor هيكلي فقط\n- بعد الاستخراج، build method الرئيسي يجب أن يكون أقل من 100 سطر\n- إضافة RepaintBoundary حول ثلاثة AnimatedSwitcher widgets في dashboard_screen.dart بالأسطر 358، 368، 388",
@@ -1592,7 +1649,7 @@
         "subtasks": []
       },
       {
-        "id": 32,
+        "id": "32",
         "title": "إصلاح العمليات الثقيلة داخل build() methods",
         "description": "نقل الحسابات الثقيلة التي تعمل على كل render إلى initState أو didUpdateWidget وحفظ النتائج في متغيرات محلية.",
         "details": "معالجة ثلاث hotspots أداء:\n\n1. lib/screens/dashboard/dashboard_screen.dart:141 - .startsWith() check في حلقة على كل معاملة\n   - نقل هذا filter إلى _loadData() أو initState()\n   - حفظ النتيجة في متغير instance وإعادة استخدامه\n\n2. lib/widgets/investments/portfolio_chart_card.dart:47-61 - .indexOf() في حلقة = O(n²)\n   - استبدال بـ Map lookup مبني خارج الحلقة مرة واحدة\n   - إنشاء Map<int, Color> colorMap = {for (int i = 0; i < investments.length; i++) i: _colors[i % _colors.length]}\n   - استخدام colorMap[investments.indexOf(inv)] بدلاً من _colors[investments.indexOf(inv) % _colors.length]\n\n3. lib/screens/goals/goals_screen.dart:141-142 - .fold() aggregations على goals list في كل render\n   - نقل إلى initState() أو didUpdateWidget()\n   - حفظ في متغيرات instance (_totalGoals, _targetAmount, etc)\n\nأيضاً: إضافة RepaintBoundary حول ثلاثة AnimatedSwitcher widgets في dashboard_screen.dart بالأسطر 358، 368، 388",
@@ -1603,7 +1660,7 @@
         "subtasks": []
       },
       {
-        "id": 33,
+        "id": "33",
         "title": "استبدال جميع Colors.* violations بـ AppColors constants",
         "description": "استبدال 8 حالات من استخدام Flutter color مباشرة بـ AppColors centralized system من lib/utils/app_colors.dart. إضافة constants ناقصة إن لزم الأمر.",
         "details": "استبدال هذه الحالات تحديداً:\n1. lib/screens/accounts/accounts_screen.dart:109 - Colors.red → AppColors.error\n2. lib/screens/auth/register_screen.dart:235 - Colors.green.shade400 → AppColors.success\n3. lib/screens/transactions/recurring_screen.dart:264,269 - Colors.red.shade700 → AppColors.error\n4. lib/widgets/debts/add_debt_dialog.dart:104 - Colors.red.shade700 → AppColors.error\n5. lib/widgets/transactions/transaction_list_item.dart:28 - Colors.red → AppColors.error\n6. lib/widgets/transactions/transaction_list_item.dart:33 - Colors.red[400] → AppColors.errorLight\n7. lib/widgets/transactions/transaction_list_item.dart:38 - Colors.orange[600] → AppColors.warning\n\nإذا كانت AppColors.errorLight أو AppColors.warning غير موجودة:\n- التحقق من lib/utils/app_colors.dart\n- إضافتها إلى abstract final class AppColors إذا كانت ناقصة\n- التأكد من compatibility مع الثيم الحالي",
@@ -1614,7 +1671,7 @@
         "subtasks": []
       },
       {
-        "id": 34,
+        "id": "34",
         "title": "نقل Arabic strings المحددة بشكل ثابت إلى i18n files",
         "description": "ترجمة strings العربية المحددة بشكل ثابت إلى نظام easy_localization بحيث تتحدث مع تبديل اللغة من قبل المستخدم.",
         "details": "نقل هذه الملفات والstrings:\n\n1. lib/screens/dashboard/dashboard_screen.dart:343-346 - Arabic month names array\n   - إضافة keys للأشهر إلى assets/i18n/ar.json و en.json\n   - مثال: \"month_jan\": \"يناير\", \"month_feb\": \"فبراير\", etc\n   - استبدال array المحدث بـ [for (int i = 1; i <= 12; i++) 'month_${_monthKey(i)}'.tr()]\n\n2. lib/widgets/investments/investment_cash_card.dart:134 - Arabic error message\n   - إضافة key جديد (مثل \"inv_cash_error\") إلى assets/i18n/ar.json و en.json\n   - استبدال hardcoded message بـ 'inv_cash_error'.tr()\n\n3. lib/widgets/transactions/transaction_list_item.dart:26-39 - Tooltip strings بالعربية\n   - إضافة keys للـ tooltips (مثل \"tx_tooltip_income\", \"tx_tooltip_expense\")\n   - استبدال hardcoded strings بـ context.tr('key')\n\n4. lib/widgets/debts/add_debt_dialog.dart - أي validation messages محددة بالعربية\n   - إضافة keys (مثل \"debt_validation_amount_required\")\n   - استبدال strings\n\nخطوات لكل string:\n1. إضافة key إلى assets/i18n/ar.json\n2. إضافة الترجمة الإنجليزية إلى assets/i18n/en.json\n3. استبدال hardcoded string بـ context.tr('key') أو 'key'.tr()",
@@ -1625,7 +1682,7 @@
         "subtasks": []
       },
       {
-        "id": 35,
+        "id": "35",
         "title": "إضافة cacheWidth/cacheHeight إلى جميع Image.asset() calls",
         "description": "تقليل الذاكرة المستخدمة بواسطة الصور بإضافة قيود على الذاكرة (cache width/height) بدلاً من تحميل الصور بدقة كاملة.",
         "details": "صيغة: cacheWidth و cacheHeight يجب أن يكون حجم العرض × device pixel ratio (استخدم 2× كقيمة آمنة افتراضية)\n\nمعالجة هذه الحالات:\n1. lib/screens/auth/login_screen.dart:109-116 - App icon بـ 72×72\n   - إضافة: cacheWidth: 144, cacheHeight: 144\n\n2. lib/screens/splash_screen.dart:122-129 - App icon بـ 100×100\n   - إضافة: cacheWidth: 200, cacheHeight: 200\n\n3. Audit أي Image.asset() calls أخرى في codebase:\n   - grep -r \"Image\\.asset\" على lib/\n   - حساب display size من BoxConstraints أو محدد الحجم\n   - إضافة cacheWidth و cacheHeight لكل صورة\n\nمثال:\nImage.asset(\n  'assets/images/icon.png',\n  width: 72,\n  height: 72,\n  cacheWidth: 144,  // 2× للـ retina\n  cacheHeight: 144,\n)",
@@ -1636,7 +1693,7 @@
         "subtasks": []
       },
       {
-        "id": 36,
+        "id": "36",
         "title": "استخراج accounts_screen.dart dialogs إلى separate widget files",
         "description": "تقسيم lib/screens/accounts/accounts_screen.dart (350+ سطر) بنقل محتوى dialog و bottom sheet إلى widgets منفصلة. تقليل الملف إلى أقل من 100 سطر.",
         "details": "استخراج محتوى inline dialogs/bottom sheets:\n\n1. استخراج \"Add Account\" dialog content إلى lib/widgets/accounts/add_account_dialog.dart\n   - نسخ كل محتوى dialog من inline\n   - إنشاء widget StatefulWidget منفصل\n   - تمرير parameters (callbacks للـ save/cancel)\n\n2. استخراج \"Transfer\" dialog content إلى lib/widgets/accounts/transfer_dialog.dart\n   - نفس النمط كـ add_account_dialog\n\n3. استخراج account detail view إلى lib/widgets/accounts/account_detail_sheet.dart\n   - نقل كل محتوى bottom sheet الحالي\n   - استقلالي عن الشاشة الرئيسية\n\nبعد الاستخراج:\n- accounts_screen.dart يجب أن يكون أقل من 100 سطر\n- الملف الرئيسي يستورد widgets الجديدة\n- لا تغيير في behavior أو visual output\n\nمثال من النتيجة:\nclass AccountsScreen extends StatefulWidget {\n  @override\n  Widget build(BuildContext context) {\n    // UI logic (short)\n    if (_showAddDialog) return AddAccountDialog(...); // مستورد\n    // ...\n  }\n}",
@@ -1647,7 +1704,7 @@
         "subtasks": []
       },
       {
-        "id": 37,
+        "id": "37",
         "title": "استبدال Curves.elasticOut في debt_celebration_dialog.dart",
         "description": "استبدال Curves.elasticOut بـ Curves.easeOutBack في lib/widgets/debts/debt_celebration_dialog.dart:144 لرسم animation أكثر احترافية وحداثة.",
         "details": "تفاصيل التغيير:\n\n1. فتح lib/widgets/debts/debt_celebration_dialog.dart\n\n2. البحث عن Curves.elasticOut في السطر 144\n\n3. الاستبدال:\n   - البديل الموصى به: Curves.easeOutBack\n     * يوفر overshoot طفيف (مثل elasticOut لكن محكوم وحديث)\n     * بدون oscillations متعددة\n     * مناسب للاحتفالات (debt paid off)\n   \n   - البديل البديل (إذا كان أكثر طاقة مرغوب): Curves.easeOutExpo\n     * clean و modern\n     * أكثر طاقة من easeOutBack\n\n4. الاختبار:\n   - flutter run على جهاز\n   - محاكاة الوضع الذي يعرض dialog (دفع الدين بالكامل)\n   - مراقبة animation والتحقق من smoothness\n   - التحقق من عدم bounce/overshoot السيء",
@@ -1658,7 +1715,7 @@
         "subtasks": []
       },
       {
-        "id": 38,
+        "id": "38",
         "title": "إضافة اختبارات وحدة شاملة للـ utility functions",
         "description": "كتابة unit tests شاملة للـ utility functions المهمة (app_colors, finance_utils, detect_currency) للتحقق من السلوك الصحيح.",
         "details": "كتابة اختبارات unit لـ:\n\n1. lib/utils/app_colors.dart\n   - اختبار أن جميع colors معرفة وليست null\n   - اختبار أن colors opacity صحيح\n   - اختبار account palette palette length و order\n\n2. lib/utils/finance_utils.dart\n   - اختبار format numbers بشكل صحيح\n   - اختبار currency conversions\n   - اختبار رounding و precision\n\n3. lib/utils/detect_currency.dart\n   - اختبار detection logic\n   - اختبار default values\n\n4. إضافة mock data إذا لزم الأمر\n\nملفات الاختبار:\n- test/utils/app_colors_test.dart\n- test/utils/finance_utils_test.dart (إضافة tests إلى الموجود)\n- test/utils/detect_currency_test.dart\n\nنمط الاختبار:\ntest('should format number correctly', () {\n  expect(fmt(1234.5), equals('1,234.50'));\n  expect(fmt(0), equals('0'));\n});\n\nتشغيل:\nflutter test test/utils/ --coverage",
@@ -1669,43 +1726,47 @@
         "subtasks": []
       },
       {
-        "id": 39,
+        "id": "39",
         "title": "تحسين أداء goals_screen.dart - caching aggregations",
         "description": "نقل حسابات fold() aggregations على goals list إلى initState أو didUpdateWidget وحفظها لتجنب إعادة الحساب في كل render.",
         "details": "معالجة goals_screen.dart:141-142 aggregations:\n\n1. تحديد aggregations الحالية:\n   - total goals amount\n   - total goal target\n   - any other fold() calls\n\n2. نقل إلى initState():\nclass _GoalsScreenState extends State<GoalsScreen> {\n  double _totalGoalsSaved = 0;\n  double _totalGoalsTarget = 0;\n  \n  @override\n  void initState() {\n    super.initState();\n    _calculateAggregations();\n  }\n  \n  void _calculateAggregations() {\n    _totalGoalsSaved = _goals.fold(0.0, (a, g) => a + (g['saved'] as num).toDouble());\n    _totalGoalsTarget = _goals.fold(0.0, (a, g) => a + (g['target'] as num).toDouble());\n  }\n  \n  @override\n  void didUpdateWidget(GoalsScreen oldWidget) {\n    super.didUpdateWidget(oldWidget);\n    _calculateAggregations();\n  }\n}\n\n3. استخدام المتغيرات المحفوظة في build()\n4. التحقق من عدم وجود state issues",
         "testStrategy": "1. flutter analyze للتحقق من التحذيرات\n2. اختبار أداء:\n   - devtools Performance tab\n   - مراقبة build time قبل وبعد\n3. اختبار يدوي مع أهداف كثيرة (50+ goals)\n4. اختبار التحديثات:\n   - إضافة goal جديد والتحقق من تحديث الـ aggregations\n   - حذف goal والتحقق من التحديث\n   - تعديل goal والتحقق من التحديث\n5. اختبار أداء: devtools Timeline",
         "priority": "medium",
         "dependencies": [
-          32
+          "32"
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 40,
+        "id": "40",
         "title": "إنشاء documentation شامل لمعايير الترميز والأداء",
         "description": "توثيق معايير الترميز والأداء والأفضليات التي تم إصلاحها في هذا الـ audit بحيث يتجنبها الفريق في المستقبل.",
         "details": "إنشاء documentation شاملة:\n\n1. mobile/fajrak_flutter/PERFORMANCE.md\n   - Best practices للأداء\n   - تجنب العمليات الثقيلة في build()\n   - استخدام const constructors\n   - استخدام RepaintBoundary للـ expensive widgets\n   - caching للحسابات\n\n2. mobile/fajrak_flutter/ACCESSIBILITY.md\n   - إضافة Semantics widgets\n   - إضافة tooltips لـ icon-only buttons\n   - إضافة semanticLabels للصور\n   - testing مع screen readers\n\n3. mobile/fajrak_flutter/CODE_STANDARDS.md\n   - استخدام AppColors بدلاً من Colors.*\n   - استخدام i18n لجميع strings\n   - caching للصور (cacheWidth/cacheHeight)\n   - widget extraction للملفات الكبيرة (>200 سطر)\n\n4. تحديث README.md في mobile/fajrak_flutter/\n   - إضافة أقسام للمعايير الجديدة\n   - إضافة links إلى documentation\n\n5. إنشاء lint rules custom (إذا أمكن) في analysis_options.yaml\n   - تحذير من Colors.* usage\n   - تحذير من hardcoded strings\n   - تحذير من build methods الكبيرة",
         "testStrategy": "1. التحقق من أن documentation واضحة وسهلة الفهم\n2. عرض documentation على team للتعليقات\n3. التحقق من أن examples في documentation تطابق الكود الفعلي\n4. testing: اتباع guidelines من قبل developer جديد والتحقق من الوضوح\n5. الحفاظ على documentation محدثة مع تطور المشروع",
         "priority": "low",
         "dependencies": [
-          30,
-          31,
-          32,
-          33,
-          34,
-          35,
-          36,
-          37
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37"
         ],
         "status": "pending",
         "subtasks": []
       }
     ],
     "metadata": {
-      "created": "2026-05-02T14:48:53.388Z",
-      "updated": "2026-05-02T15:11:18.177Z",
-      "description": "Tasks for master context"
+      "version": "1.0.0",
+      "lastModified": "2026-05-02T15:46:30.333Z",
+      "taskCount": 38,
+      "completedCount": 17,
+      "tags": [
+        "master"
+      ]
     }
   }
 }

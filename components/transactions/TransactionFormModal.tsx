@@ -29,11 +29,11 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
   return (
     <Modal title={editingId ? t('trans_edit') : `+ ${t('trans_add')}`} onClose={onClose}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        {(['expense','income'] as const).map(type => (
-          <button key={type} onClick={() => onChange({ type, category: '' })} style={{ flex: 1, padding: '11px', borderRadius: 12, background: form.type === type ? (type === 'income' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)') : 'var(--bg-card)', border: `1px solid ${form.type === type ? (type === 'income' ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)') : 'var(--border)'}`, color: form.type === type ? (type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)') : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
-            {type === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
-          </button>
-        ))}
+{(['expense','income'] as const).map(type => (
+           <button key={type} onClick={() => onChange({ type, category: '' })} aria-label={type === 'income' ? t('trans_income') : t('trans_expense')} style={{ flex: 1, padding: '11px', borderRadius: 12, background: form.type === type ? (type === 'income' ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)') : 'var(--bg-card)', border: `1px solid ${form.type === type ? (type === 'income' ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)') : 'var(--border)'}`, color: form.type === type ? (type === 'income' ? 'var(--accent-green-light)' : 'var(--accent-red-light)') : 'var(--text-muted)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
+             {type === 'income' ? `💰 ${t('trans_income')}` : `💸 ${t('trans_expense')}`}
+           </button>
+         ))}
       </div>
 
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', marginBottom: 16 }}>
@@ -114,9 +114,11 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
               {t('trans_auto_execute')}
             </div>
           </div>
-          <button
-            onClick={() => onChange({ is_recurring: !form.is_recurring })}
-            style={{
+<button
+             onClick={() => onChange({ is_recurring: !form.is_recurring })}
+             aria-label={form.is_recurring ? t('trans_recurring_on') : t('trans_recurring_off')}
+             aria-pressed={form.is_recurring}
+             style={{
               width: 48, height: 28, borderRadius: 14,
               background: form.is_recurring ? 'var(--accent-green-light)' : 'var(--bg-elevated)',
               border: '1px solid var(--border)',
@@ -159,9 +161,10 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
                 {t('trans_payment_type')}
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button
-                  onClick={() => onChange({ recurring_auto: true })}
-                  style={{
+<button
+                   onClick={() => onChange({ recurring_auto: true })}
+                   aria-label={t('trans_auto_bank')}
+                   style={{
                     flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
                     border: '1px solid ' + (form.recurring_auto !== false ? 'var(--accent-blue)' : 'var(--border)'),
                     background: form.recurring_auto !== false ? 'var(--accent-blue-dim)' : 'var(--bg-card)',
@@ -170,9 +173,10 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
                   }}>
                   🏦 {t('trans_auto_bank')}
                 </button>
-                <button
-                  onClick={() => onChange({ recurring_auto: false })}
-                  style={{
+<button
+                   onClick={() => onChange({ recurring_auto: false })}
+                   aria-label={t('trans_needs_conf')}
+                   style={{
                     flex: 1, padding: '10px 8px', borderRadius: 10, cursor: 'pointer',
                     border: '1px solid ' + (form.recurring_auto === false ? 'var(--accent-amber)' : 'var(--border)'),
                     background: form.recurring_auto === false ? 'rgba(245,158,11,0.1)' : 'var(--bg-card)',

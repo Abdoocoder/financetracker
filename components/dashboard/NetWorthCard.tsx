@@ -30,6 +30,9 @@ export function NetWorthCard({ netWorth, invValue, goalsSaved, totalDebt, totalR
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        aria-controls="nw-breakdown"
+        aria-label={lang === 'en' ? (open ? 'Hide net worth breakdown' : 'Show net worth breakdown') : (open ? 'إخفاء تفصيل صافي الثروة' : 'عرض تفصيل صافي الثروة')}
         className={styles.headerButton}
       >
         <div className={styles.headerInfo}>
@@ -49,7 +52,7 @@ export function NetWorthCard({ netWorth, invValue, goalsSaved, totalDebt, totalR
 
       {/* ── Breakdown (يظهر عند الفتح) ── */}
       {open && (
-        <div className={styles.breakdownGrid}>
+        <div id="nw-breakdown" className={styles.breakdownGrid}>
           {items.map(item => (
             <div key={item.label} className={styles.breakdownItem}>
               <span className={styles.itemIcon}>{item.icon}</span>

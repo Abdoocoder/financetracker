@@ -315,13 +315,13 @@ export function FinancialHealthCombined(props: Props) {
           </div>
 
           {/* تفاصيل */}
-          <button onClick={() => setExpanded(!expanded)} style={{ width: '100%', padding: '12px 20px', background: 'none', border: 'none', borderBottom: expanded ? '1px solid var(--border)' : 'none', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <button onClick={() => setExpanded(!expanded)} aria-expanded={expanded} aria-controls="health-analysis" aria-label={ar ? (expanded ? 'إخفاء التحليل الكامل' : 'عرض التحليل الكامل') : (expanded ? 'Hide full analysis' : 'Show full analysis')} style={{ width: '100%', padding: '12px 20px', background: 'none', border: 'none', borderBottom: expanded ? '1px solid var(--border)' : 'none', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>{ar ? 'عرض التحليل الكامل' : 'Show full analysis'}</span>
             <span>{expanded ? '▲' : '▼'}</span>
           </button>
 
-          {expanded && (
-            <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+{expanded && (
+             <div id="health-analysis" style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
               {roadmap.strengths.length > 0 && (
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 800, color: '#10B981', marginBottom: 8 }}>✅ {ar ? 'نقاط القوة' : 'Strengths'}</div>

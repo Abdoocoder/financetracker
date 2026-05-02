@@ -163,9 +163,10 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
 
             {/* Footer */}
             <div style={{ display: 'flex', gap: 8, paddingTop: 4 }}>
-              <button
-                onClick={onReset}
-                style={{
+<button
+                 onClick={onReset}
+                 aria-label={t('dash_reset')}
+                 style={{
                   flex: 1, padding: '9px 0', borderRadius: 10,
                   background: 'var(--bg-secondary)',
                   border: '1px solid var(--border)',
@@ -175,9 +176,10 @@ export function DashboardCustomizer({ visibility, onToggle, onReset, lang }: Pro
               >
                 {t('dash_reset')}
               </button>
-              <button
-                onClick={() => setOpen(false)}
-                style={{
+<button
+                 onClick={() => setOpen(false)}
+                 aria-label={t('dash_done')}
+                 style={{
                   flex: 2, padding: '9px 0', borderRadius: 10,
                   background: 'rgba(99,102,241,0.12)',
                   border: '1px solid rgba(99,102,241,0.3)',
