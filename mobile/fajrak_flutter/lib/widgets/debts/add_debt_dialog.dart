@@ -31,7 +31,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
   late final TextEditingController _notesCtrl;
   late final TextEditingController _paymentDayCtrl;
   late int _priority;
-  bool _receivedAmount = false;
+  bool _receivedAmount = true;
   bool _paidFromAccount = false;
   late bool _autoDeduct;
   late String _debtType;

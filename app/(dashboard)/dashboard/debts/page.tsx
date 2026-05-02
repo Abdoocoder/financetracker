@@ -175,7 +175,7 @@ export default function DebtsPage() {
       notes: '',
       payment_day: '1',
       auto_deduct: false,
-      received_amount: false,
+      received_amount: true,
       paid_from_account: false,
       currency: baseCurrency,
       exchange_rate: '1',
@@ -388,9 +388,9 @@ export default function DebtsPage() {
   const { owedDebts, receivableDebts, totalRemaining, totalOriginal, totalMonthly, totalOwed, totalReceivable, paidPct } = useMemo(() => {
     const owed = debts.filter(d => (d.debt_type ?? 'owed') === 'owed' && !d.is_paid)
     const recv = debts.filter(d => d.debt_type === 'receivable' && !d.is_paid)
-    const tRem = debts.reduce((a, d) => a + Number(d.remaining_amount), 0)
-    const tOri = debts.reduce((a, d) => a + Number(d.original_amount), 0)
-    const tMon = debts.reduce((a, d) => a + Number(d.monthly_payment), 0)
+    const tRem = owed.reduce((a, d) => a + Number(d.remaining_amount), 0)
+    const tOri = owed.reduce((a, d) => a + Number(d.original_amount), 0)
+    const tMon = owed.reduce((a, d) => a + Number(d.monthly_payment), 0)
     return {
       owedDebts: owed,
       receivableDebts: recv,

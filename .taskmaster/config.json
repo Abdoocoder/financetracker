@@ -1,11 +1,10 @@
 {
   "models": {
     "main": {
-      "provider": "ollama",
-      "modelId": "qwen3-coder:30b",
+      "provider": "claude-code",
+      "modelId": "haiku",
       "maxTokens": 200000,
-      "temperature": 0.2,
-      "baseURL": "http://localhost:11434/api"
+      "temperature": 0.2
     },
     "research": {
       "provider": "claude-code",
