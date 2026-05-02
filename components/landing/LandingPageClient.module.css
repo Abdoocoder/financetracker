@@ -167,10 +167,7 @@
 }
 
 .heroTitleGradient {
-  background: linear-gradient(135deg, #f59e0b 20%, #fbbf24 50%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent-amber);
 }
 
 .heroAnswer {
@@ -183,7 +180,7 @@
 }
 
 .heroAppName {
-  color: #10b981;
+  color: var(--accent-green);
 }
 
 .heroDesc {
@@ -621,10 +618,7 @@
 }
 
 .journeySubtitle {
-  background: linear-gradient(135deg, #f59e0b, #10b981);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent-amber);
 }
 
 .journeyDesc {

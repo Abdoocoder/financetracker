@@ -13,7 +13,7 @@ export default function PrivacyPage() {
   }
 
   return (
-    <div style={{ background: "#070B14", minHeight: "100vh", direction: lang === 'ar' ? 'rtl' : 'ltr', color: "#e2e8f0", fontFamily: 'inherit' }}>
+    <div style={{ background: "var(--bg-primary)", minHeight: "100vh", direction: lang === 'ar' ? 'rtl' : 'ltr', color: "var(--text-primary)", fontFamily: 'inherit' }}>
        <nav style={{ position: 'sticky', top: 0, zIndex: 100, borderBottom: '1px solid var(--border)', backdropFilter: 'blur(20px)', background: 'rgba(10,12,18,0.85)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
@@ -39,14 +39,14 @@ export default function PrivacyPage() {
 
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px" }}>
         <h1 style={{ fontSize: 32, fontWeight: 900, marginBottom: 8 }}>{t('priv_title')}</h1>
-        <p style={{ color: "#64748b", marginBottom: 32 }}>{t('priv_last_updated')}</p>
+        <p style={{ color: "var(--text-secondary)", marginBottom: 32 }}>{t('priv_last_updated')}</p>
 
-        <section style={{ marginBottom: 32, padding: '24px', borderRadius: 16, background: 'rgba(59,126,246,0.06)', border: '1px solid rgba(59,126,246,0.2)' }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#10B981", marginBottom: 12 }}>{t('priv_s_who_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
+        <section style={{ marginBottom: 32, padding: '24px', borderRadius: 16, background: 'var(--accent-blue-dim)', border: '1px solid var(--accent-blue-border)' }}>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-green)", marginBottom: 12 }}>{t('priv_s_who_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>
             {t('priv_s_who_desc')}
           </p>
-          <ul style={{ lineHeight: 2, color: "#94a3b8", paddingRight: lang === 'ar' ? 20 : 0, paddingLeft: lang === 'en' ? 20 : 0, marginTop: 12 }}>
+          <ul style={{ lineHeight: 2, color: "var(--text-secondary)", paddingRight: lang === 'ar' ? 20 : 0, paddingLeft: lang === 'en' ? 20 : 0, marginTop: 12 }}>
             <li>{t('priv_s_who_l1')}</li>
             <li>{t('priv_s_who_l2')}</li>
             <li>{t('priv_s_who_l3')}</li>
@@ -56,55 +56,55 @@ export default function PrivacyPage() {
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s1_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s1_desc')}</p>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s1_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s1_desc')}</p>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s2_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s2_desc')}</p>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s2_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s2_desc')}</p>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s3_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s3_desc')}</p>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s3_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s3_desc')}</p>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s4_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s4_desc')}</p>
-          <ul style={{ lineHeight: 2, color: "#94a3b8", paddingRight: lang === 'ar' ? 20 : 0, paddingLeft: lang === 'en' ? 20 : 0, marginTop: 12 }}>
-            <li>🔹 <strong style={{ color: '#cbd5e1' }}>Supabase</strong> — {t('priv_s4_l1')}</li>
-            <li>🔹 <strong style={{ color: '#cbd5e1' }}>Firebase (Google)</strong> — {t('priv_s4_l2')}</li>
-            <li>🔹 <strong style={{ color: '#cbd5e1' }}>Vercel</strong> — {t('priv_s4_l3')}</li>
-            <li>🔹 <strong style={{ color: '#cbd5e1' }}>CoinGecko</strong> — {t('priv_s4_l4')}</li>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s4_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s4_desc')}</p>
+          <ul style={{ lineHeight: 2, color: "var(--text-secondary)", paddingRight: lang === 'ar' ? 20 : 0, paddingLeft: lang === 'en' ? 20 : 0, marginTop: 12 }}>
+            <li>🔹 <strong style={{ color: 'var(--text-primary)' }}>Supabase</strong> — {t('priv_s4_l1')}</li>
+            <li>🔹 <strong style={{ color: 'var(--text-primary)' }}>Firebase (Google)</strong> — {t('priv_s4_l2')}</li>
+            <li>🔹 <strong style={{ color: 'var(--text-primary)' }}>Vercel</strong> — {t('priv_s4_l3')}</li>
+            <li>🔹 <strong style={{ color: 'var(--text-primary)' }}>CoinGecko</strong> — {t('priv_s4_l4')}</li>
           </ul>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s5_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s5_desc')}</p>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s5_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s5_desc')}</p>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s6_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s6_desc')}</p>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s6_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s6_desc')}</p>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s7_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>{t('priv_s7_desc')}</p>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s7_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>{t('priv_s7_desc')}</p>
         </section>
 
         <section style={{ marginBottom: 32 }}>
-          <h3 style={{ fontSize: 18, fontWeight: 800, color: "#3B7EF6", marginBottom: 12 }}>{t('priv_s8_title')}</h3>
-          <p style={{ lineHeight: 1.8, color: "#cbd5e1" }}>
-            {t('priv_s8_desc')}: <a href="mailto:support@fajrak.com" style={{ color: "#3B7EF6" }}>support@fajrak.com</a>
+          <h3 style={{ fontSize: 18, fontWeight: 800, color: "var(--accent-blue)", marginBottom: 12 }}>{t('priv_s8_title')}</h3>
+          <p style={{ lineHeight: 1.8, color: "var(--text-muted)" }}>
+            {t('priv_s8_desc')}: <a href="mailto:support@fajrak.com" style={{ color: "var(--accent-blue)" }}>support@fajrak.com</a>
           </p>
         </section>
 
-        <div style={{ borderTop: "1px solid #1e293b", paddingTop: 24, color: "#475569", fontSize: 13 }}>
-          <Link href="/" style={{ color: "#3B7EF6", textDecoration: "none" }}>{t('priv_back')}</Link>
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 24, color: "var(--text-secondary)", fontSize: 13 }}>
+          <Link href="/" style={{ color: "var(--accent-blue)", textDecoration: "none" }}>{t('priv_back')}</Link>
         </div>
       </div>
     </div>

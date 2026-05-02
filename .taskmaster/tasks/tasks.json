@@ -1506,8 +1506,70 @@
         "testStrategy": "التحقق البصري من أن جميع الألوان تعرض بشكل صحيح في الوضع الداكن والفاتح. استخدام DevTools لفحص القيم المحسوبة والتأكد من استخدام CSS variables. اختبار الشريط النشط للتحقق من أن الخلفية وحدها كافية للإشارة إلى الحالة النشطة.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "حذف فئات Gradient النصية من ملفات CSS",
+            "description": "إزالة جميع فئات تأثير Gradient من النصوص (.titleGradient و .heroTitleGradient و .journeySubtitle) واستبدال النصوص بألوان صلبة بـ CSS variables",
+            "dependencies": [],
+            "details": "الخطوات:\n1. حذف فئة .titleGradient من app/download/download.module.css:144-149 (الخطوط الست)\n2. حذف فئة .heroTitleGradient من components/landing/LandingPageClient.module.css:169-174\n3. حذف فئة .journeySubtitle من components/landing/LandingPageClient.module.css:623-628\n4. استبدال النصوص المستخدمة لهذه الفئات بـ color: var(--accent-blue) وإضافة font-weight أو letter-spacing للتمييز البصري\n5. التحقق من أن جميع النصوص السابقة محمية بـ CSS variables بدلاً من gradients",
+            "status": "done",
+            "testStrategy": "التحقق البصري من أن العناوين تعرض بألوان صلبة في الوضع الداكن والفاتح بدون تأثيرات gradient. فحص DevTools للتأكد من إزالة كل قيم -webkit-background-clip و -webkit-text-fill-color",
+            "updatedAt": "2026-05-02T19:46:00.384Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "استبدال الألوان السادسة عشرية في ملف LandingPageClient.module.css",
+            "description": "استبدال 28+ حالة من الألوان hex بـ CSS variables في ملف landing page الرئيسي",
+            "dependencies": [],
+            "details": "الخطوات:\n1. استبدال #10B981 بـ var(--accent-green) في الأسطر: 124، 131، 140، 186، 248، 301، 366، 429 وغيرها\n2. استبدال #3B7EF6 بـ var(--accent-blue) في الأسطر: 299، 372، 678 وغيرها\n3. استبدال #EF4444 بـ var(--accent-red) في الأسطر: 299، 367، 371 وغيرها\n4. استبدال #F59E0B بـ var(--accent-amber) و #FCD34D بـ var(--accent-amber-light)\n5. استبدال #8B5CF6 بـ var(--accent-purple) و #A78BFA بـ var(--accent-purple-light)\n6. استبدال #9CA3AF و #64748b بـ var(--text-muted) أو var(--text-secondary)\n7. الاهتمام بالقيم الشفافة (rgba) واستبدالها بـ var(--accent-X-dim) أو var(--accent-X-glow)",
+            "status": "done",
+            "testStrategy": "البحث عن جميع الألوان hex المتبقية في الملف بـ Grep للتأكد من عدم وجود قيم مفقودة. فحص الوضع الداكن والفاتح للتأكد من التطابق البصري. التحقق من أن CSS variables تنطبق بشكل صحيح في كلا الوضعين",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T19:50:13.640Z"
+          },
+          {
+            "id": 3,
+            "title": "استبدال الألوان السادسة عشرية في ملف app/privacy/page.tsx وملفات dashboard",
+            "description": "استبدال 50+ حالة من الألوان hex في صفحات خاصة وbadges و charts في components/dashboard",
+            "dependencies": [],
+            "details": "الخطوات:\n1. في app/privacy/page.tsx:\n   - استبدال #10B981 بـ var(--accent-green) في علامات h3 (السطر 45 وغيره)\n   - استبدال #070B14 بـ var(--bg-primary)\n   - استبدال جميع القيم الثابتة بـ CSS variables\n2. في components/dashboard/GamificationCard.tsx:\n   - استبدال LEVEL_COLORS array بـ variables (السطر 28)\n   - استبدال #6B7280 بـ var(--text-muted)، #F59E0B بـ var(--accent-amber)، إلخ\n3. في components/dashboard/Charts.tsx:\n   - استبدال جميع الألوان في بيانات charts\n4. في components/dashboard/Cards.module.css:\n   - استبدال جميع الألوان hex بـ CSS variables",
+            "status": "done",
+            "testStrategy": "فحص صفحة الخصوصية والـ dashboard بصرياً في الوضعين. استخدام Grep للبحث عن الألوان hex المتبقية في الملفات. التحقق من أن الرموز والـ badges تعرض بالألوان الصحيحة في السياق الداكن والفاتح",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T19:50:07.932Z"
+          },
+          {
+            "id": 4,
+            "title": "حذف شريط التنقل النشط وتحديث أنماط nav-item",
+            "description": "حذف pseudo-element .nav-item-active::after من app/globals.css واستبدال مؤشر الحالة النشطة بـ background color فقط",
+            "dependencies": [],
+            "details": "الخطوات:\n1. فتح app/globals.css والبحث عن .nav-item-active::after بالقرب من السطر 490-500\n2. حذف القاعدة بأكملها (جميع الخصائص: content، width، height، background، position، إلخ)\n3. التحقق من وجود قاعدة .nav-item-active نفسها وتأكيد أن background-color كافي للإشارة للحالة النشطة\n4. التحقق من عدم وجود استخدام آخر لـ ::after مع nav items في الملفات الأخرى\n5. حفظ الملف والتحقق من عدم إحداث أي أخطاء أثناء البناء",
+            "status": "done",
+            "testStrategy": "التحقق البصري من navigation عند الانتقال بين الصفحات. التأكد من أن background color كافية لتمييز العنصر النشط. فحص DevTools للتأكد من عدم وجود قواعس ::after في nav items. اختبار في الجوال والويب معاً",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T19:47:00.206Z"
+          },
+          {
+            "id": 5,
+            "title": "البحث والتحقق من الألوان hex المتبقية واختبار شامل",
+            "description": "عمل فحص شامل للتأكد من استبدال جميع الألوان hex (147+ حالة) بـ CSS variables والتحقق من الأداء البصري",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "الخطوات:\n1. تشغيل Grep للبحث عن جميع الألوان hex في جميع ملفات CSS و TSX:\n   - البحث عن pattern #[0-9A-Fa-f]{3,6} للعثور على أي hex colors متبقية\n   - تسجيل جميع النتائج في ملف txt\n2. مراجعة كل نتيجة وتقييم ما إذا كانت تحتاج استبدال:\n   - الألوان في gradients المسموح بها (مثل radial-gradient للـ glow effects)\n   - الألوان في comments أو documentation\n   - الألوان في assets أو images\n3. اختبار بصري شامل:\n   - فتح عدة صفحات في الوضع الداكن والفاتح\n   - فحص جودة التباين والقراءة\n   - التحقق من عدم كسر أي styles\n4. اختبار في أجهزة مختلفة (desktop، tablet، mobile)\n5. تشغيل npm run build للتأكد من عدم وجود أخطاء TypeScript أو CSS",
+            "status": "done",
+            "testStrategy": "Grep search شامل للـ hex colors بـ pattern #[0-9A-Fa-f]{3,6}. اختبار بصري عبر تصفح الموقع. فحص DevTools Console للتحقق من عدم وجود تحذيرات CSS. بناء الإنتاج (npm run build) للتحقق من عدم وجود أخطاء. اختبار الأداء بـ Lighthouse",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-02T19:50:21.268Z"
+          }
+        ],
+        "updatedAt": "2026-05-02T19:50:21.268Z"
       },
       {
         "id": "21",
@@ -1761,9 +1823,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-05-02T15:46:30.333Z",
+      "lastModified": "2026-05-02T19:50:21.268Z",
       "taskCount": 38,
-      "completedCount": 17,
+      "completedCount": 18,
       "tags": [
         "master"
       ]

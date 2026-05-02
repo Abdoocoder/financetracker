@@ -42,7 +42,7 @@ export default function DownloadPage() {
         <h1 className={styles.title}>
           {t('down_title_part1')}
           <br />
-          <span className={styles.titleGradient}>Android</span>
+          <span className={styles.titleAccent}>Android</span>
         </h1>
 
         <p className={styles.desc}>{t('down_desc')}</p>

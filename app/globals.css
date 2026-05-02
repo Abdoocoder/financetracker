@@ -30,11 +30,14 @@
     --accent-blue-light: #6BA3FF;
     --accent-blue-glow: rgba(59, 126, 246, 0.25);
     --accent-blue-dim: rgba(59, 126, 246, 0.12);
+    --accent-blue-border: rgba(59, 126, 246, 0.2);
+    --accent-blue-shadow: rgba(59, 126, 246, 0.3);
 
     --accent-green: #10B981;
     --accent-green-light: #34D399;
     --accent-green-glow: rgba(16, 185, 129, 0.2);
     --accent-green-dim: rgba(16, 185, 129, 0.1);
+    --accent-green-border: rgba(16, 185, 129, 0.2);
 
     --accent-red: #EF4444;
     --accent-red-light: #F87171;
@@ -111,15 +114,18 @@
   --text-secondary: #475569;
   --text-muted: #94A3B8;
 
-  --accent-blue: #2563EB;
-  --accent-blue-light: #3B7EF6;
-  --accent-blue-glow: rgba(37, 99, 235, 0.2);
-  --accent-blue-dim: rgba(37, 99, 235, 0.08);
+--accent-blue: #2563EB;
+   --accent-blue-light: #3B7EF6;
+   --accent-blue-glow: rgba(37, 99, 235, 0.2);
+   --accent-blue-dim: rgba(37, 99, 235, 0.08);
+   --accent-blue-border: rgba(37, 99, 235, 0.2);
+   --accent-blue-shadow: rgba(37, 99, 235, 0.25);
 
-  --accent-green: #059669;
-  --accent-green-light: #10B981;
-  --accent-green-glow: rgba(5, 150, 105, 0.2);
-  --accent-green-dim: rgba(5, 150, 105, 0.08);
+   --accent-green: #059669;
+   --accent-green-light: #10B981;
+   --accent-green-glow: rgba(5, 150, 105, 0.2);
+   --accent-green-dim: rgba(5, 150, 105, 0.08);
+   --accent-green-border: rgba(5, 150, 105, 0.2);
 
   --accent-red: #DC2626;
   --accent-red-light: #EF4444;
@@ -162,11 +168,14 @@
     --accent-blue-light: #3B7EF6;
     --accent-blue-glow: rgba(37, 99, 235, 0.2);
     --accent-blue-dim: rgba(37, 99, 235, 0.08);
+    --accent-blue-border: rgba(37, 99, 235, 0.2);
+    --accent-blue-shadow: rgba(37, 99, 235, 0.25);
 
     --accent-green: #059669;
     --accent-green-light: #10B981;
     --accent-green-glow: rgba(5, 150, 105, 0.2);
     --accent-green-dim: rgba(5, 150, 105, 0.08);
+    --accent-green-border: rgba(5, 150, 105, 0.2);
 
     --accent-red: #DC2626;
     --accent-red-light: #EF4444;
@@ -482,21 +491,9 @@
   .nav-item-active {
     background: var(--accent-blue-dim) !important;
     color: var(--accent-blue-light) !important;
-    border: 1px solid rgba(59, 126, 246, 0.2) !important;
+    border: 1px solid var(--accent-blue-border) !important;
     transform: translateX(-4px) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  }
-
-  .nav-item-active::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 20%;
-    bottom: 20%;
-    width: 3px;
-    background: var(--accent-blue);
-    border-radius: 2px 0 0 2px;
-    box-shadow: 0 0 10px var(--accent-blue);
   }
 
   /* --- Glowing Avatars/Icons --- */

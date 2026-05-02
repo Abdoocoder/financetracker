@@ -96,8 +96,8 @@
   width: 80px;
   height: 80px;
   border-radius: 24px;
-  background: rgba(59, 126, 246, 0.1);
-  border: 1px solid rgba(59, 126, 246, 0.2);
+  background: var(--accent-blue-dim);
+  border: 1px solid var(--accent-blue-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,8 +112,8 @@
   gap: 8px;
   padding: 5px 14px;
   border-radius: 100px;
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: var(--accent-green-dim);
+  border: 1px solid var(--accent-green-border);
   margin-bottom: 20px;
 }
 
@@ -121,14 +121,14 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10B981;
+  background: var(--accent-green);
   display: inline-block;
 }
 
 .statusText {
   font-size: 12px;
   font-weight: 700;
-  color: #10B981;
+  color: var(--accent-green);
 }
 
 /* ── Title ── */
@@ -141,11 +141,9 @@
   letter-spacing: -0.03em;
 }
 
-.titleGradient {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.titleAccent {
+  color: var(--accent-blue);
+  font-weight: 900;
 }
 
 .desc {
@@ -171,7 +169,7 @@
   font-size: 18px;
   font-weight: 900;
   text-decoration: none;
-  box-shadow: 0 10px 30px rgba(59, 126, 246, 0.3);
+  box-shadow: 0 10px 30px var(--accent-blue-shadow);
 }
 
 .badges {
