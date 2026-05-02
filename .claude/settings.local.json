@@ -177,7 +177,9 @@
       "WebFetch(domain:verygood.ventures)",
       "WebFetch(domain:dcm.dev)",
       "Bash(C:/flutter/flutter/bin/dart.bat --version)",
-      "PowerShell(& \"C:\\\\flutter\\\\flutter\\\\bin\\\\dart.bat\" --version 2>&1)"
+      "PowerShell(& \"C:\\\\flutter\\\\flutter\\\\bin\\\\dart.bat\" --version 2>&1)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(k\\) for k in d.keys\\(\\)]\")",
+      "mcp__dart__analyze_files"
     ]
   }
 }

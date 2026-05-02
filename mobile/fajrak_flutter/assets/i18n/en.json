@@ -882,5 +882,15 @@
   "dash_card_challenges": "Challenges",
   "error_load_failed": "Failed to load data",
   "error_check_connection": "Check your internet connection and try again",
-  "btn_retry": "Retry"
+  "btn_retry": "Retry",
+  "accounts_add": "Add Account",
+  "budget_add": "Add Budget",
+  "tooltip_close": "Close",
+  "tooltip_dismiss_alert": "Dismiss Alert",
+  "tooltip_sync": "Sync Data",
+  "tooltip_export_csv": "Export CSV",
+  "tooltip_export_pdf": "Export PDF",
+  "tooltip_show_password": "Show Password",
+  "tooltip_hide_password": "Hide Password",
+  "app_logo_label": "Fajrak Logo"
 }

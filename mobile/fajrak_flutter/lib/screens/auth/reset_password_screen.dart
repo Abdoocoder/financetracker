@@ -163,6 +163,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
                         color: colorScheme.onSurfaceVariant),
+                    tooltip: _obscure ? 'tooltip_show_password'.tr() : 'tooltip_hide_password'.tr(),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),

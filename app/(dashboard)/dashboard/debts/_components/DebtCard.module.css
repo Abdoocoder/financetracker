@@ -1,0 +1,273 @@
+/* ── Card shell ── */
+/* Priority colors are applied via data-priority attribute selectors below */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+/* data-priority values: 1=Very High, 2=High, 3=Medium, 4=Low, 5=Deferred */
+.card[data-priority="1"] { border-right: 3px solid #EF4444; }
+.card[data-priority="2"] { border-right: 3px solid #F59E0B; }
+.card[data-priority="3"] { border-right: 3px solid #3B7EF6; }
+.card[data-priority="4"] { border-right: 3px solid #8B9CC8; }
+.card[data-priority="5"] { border-right: 3px solid #4A5568; }
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.priorityIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card[data-priority="1"] .priorityIcon { background: rgba(239,68,68,0.09);    border: 1px solid rgba(239,68,68,0.19); }
+.card[data-priority="2"] .priorityIcon { background: rgba(245,158,11,0.09);   border: 1px solid rgba(245,158,11,0.19); }
+.card[data-priority="3"] .priorityIcon { background: rgba(59,126,246,0.09);   border: 1px solid rgba(59,126,246,0.19); }
+.card[data-priority="4"] .priorityIcon { background: rgba(139,156,200,0.09);  border: 1px solid rgba(139,156,200,0.19); }
+.card[data-priority="5"] .priorityIcon { background: rgba(74,85,104,0.09);    border: 1px solid rgba(74,85,104,0.19); }
+
+.priorityDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.card[data-priority="1"] .priorityDot { background: #EF4444; box-shadow: 0 0 8px #EF4444; }
+.card[data-priority="2"] .priorityDot { background: #F59E0B; box-shadow: 0 0 8px #F59E0B; }
+.card[data-priority="3"] .priorityDot { background: #3B7EF6; box-shadow: 0 0 8px #3B7EF6; }
+.card[data-priority="4"] .priorityDot { background: #8B9CC8; box-shadow: 0 0 8px #8B9CC8; }
+.card[data-priority="5"] .priorityDot { background: #4A5568; box-shadow: 0 0 8px #4A5568; }
+
+.headerMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.debtName {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.debtNotes {
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badges {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.badgeBlue {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(59, 126, 246, 0.12);
+  color: var(--accent-blue-light);
+  font-weight: 700;
+}
+
+.badgeRed {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--accent-red-light);
+  font-weight: 700;
+}
+
+.badgeAmber {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-amber-light);
+  font-weight: 700;
+}
+
+.badgeMuted {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ── Amount block ── */
+.amountBlock {
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.amountPrimary {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--accent-red-light);
+  font-family: monospace;
+}
+
+.amountCurrency {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+
+.amountSecondary {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.monthlyPayment {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* ── Action buttons ── */
+.actionButtons {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btnEdit {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--accent-blue-dim);
+  border: 1px solid rgba(59, 126, 246, 0.2);
+  color: var(--accent-blue-light);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnDelete {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--accent-red-dim);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: var(--accent-red-light);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Progress bar ── */
+.progressTrack {
+  margin-bottom: 10px;
+}
+
+/* Width is set imperatively via ref in the component to avoid inline style warnings */
+.progressFill {
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.paidLabel {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* ── Payment row ── */
+.paymentRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paymentSelect {
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+}
+
+.paymentInput {
+  width: 70px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  text-align: center;
+}
+
+.btnConfirm {
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: var(--accent-green);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.btnConfirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnCancel {
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btnStartPayment {
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: var(--accent-green-dim);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--accent-green-light);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}

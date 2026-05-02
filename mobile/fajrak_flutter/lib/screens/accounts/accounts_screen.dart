@@ -63,6 +63,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             ),
           IconButton(
             icon: const Icon(Icons.add),
+            tooltip: 'accounts_add'.tr(),
             onPressed: () => _showAccountDialog(),
           ),
         ],

@@ -235,12 +235,14 @@ export default function DebtsPage() {
     const origBase = isMulti ? (origForeign * rate) : parseFloat(form.original_amount.replace(",", "."))
 
     if (editingId) {
+      const remBase = parseFloat(form.remaining_amount.replace(",", ".")) || 0
+      const remForeign = isMulti && rate > 0 ? remBase / rate : remBase
       const { error } = await supabase.from('debts').update({
         name: form.name,
         original_amount: origBase,
         original_amount_foreign: isMulti ? origForeign : origBase,
-        remaining_amount: isMulti ? (origForeign * rate) : parseFloat(form.remaining_amount.replace(",", ".")),
-        remaining_amount_foreign: isMulti ? origForeign : origBase,
+        remaining_amount: remBase,
+        remaining_amount_foreign: remForeign,
         currency: form.currency,
         exchange_rate: rate,
         monthly_payment: parseFloat(form.monthly_payment.replace(",", ".")) || 0,
@@ -491,7 +493,7 @@ export default function DebtsPage() {
               payingSaving={payingSaving}
               onEdit={startEdit}
               onDelete={setConfirmDelete}
-              onStartPayment={id => { setPaymentDebtId(id); setPaymentAmount('') }}
+              onStartPayment={id => { const d = debts.find(x => x.id === id); setPaymentDebtId(id); setPaymentAmount(''); setPaymentCurrency(d?.currency || baseCurrency) }}
               onCancelPayment={() => { setPaymentDebtId(null); setPaymentAmount(''); setPaymentCurrency('') }}
               onConfirmPayment={makePayment}
               onPaymentAmountChange={setPaymentAmount}

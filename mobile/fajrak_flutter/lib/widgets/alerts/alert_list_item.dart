@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 
@@ -96,6 +97,7 @@ class AlertListItem extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.close, size: 16),
               color: AppColors.error.withValues(alpha: 0.7),
+              tooltip: 'tooltip_dismiss_alert'.tr(),
               onPressed: onDelete,
             )
           ],

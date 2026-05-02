@@ -154,6 +154,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         actions: [
           IconButton(
               icon: Icon(Icons.add, color: colorScheme.primary),
+              tooltip: 'goals_add'.tr(),
               onPressed: () => _showAddDialog())
         ],
       ),

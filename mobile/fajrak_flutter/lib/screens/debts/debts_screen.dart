@@ -266,6 +266,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
         actions: [
           IconButton(
               icon: Icon(Icons.add, color: cs.primary),
+              tooltip: 'debts_add'.tr(),
               onPressed: () => _showAddDialog(labels: priorityLabels))
         ],
       ),

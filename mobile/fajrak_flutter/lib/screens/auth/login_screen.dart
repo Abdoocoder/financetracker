@@ -113,6 +113,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 72,
                     height: 72,
                     fit: BoxFit.cover,
+                    cacheWidth: 144,
+                    cacheHeight: 144,
+                    semanticLabel: 'app_logo_label'.tr(),
                   ),
                 ),
               ),
@@ -158,6 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
                         color: colorScheme.onSurfaceVariant),
+                    tooltip: _obscure ? 'tooltip_show_password'.tr() : 'tooltip_hide_password'.tr(),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   ),
                 ),

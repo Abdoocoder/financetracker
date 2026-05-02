@@ -24,7 +24,11 @@ class NavItemWidget extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return GestureDetector(
+    return Semantics(
+      label: label,
+      selected: isSelected,
+      button: true,
+      child: GestureDetector(
       onTap: () => onTap(index),
       behavior: HitTestBehavior.opaque,
       child: Column(
@@ -74,6 +78,6 @@ class NavItemWidget extends StatelessWidget {
             ),
         ],
       ),
-    );
+    ));
   }
 }

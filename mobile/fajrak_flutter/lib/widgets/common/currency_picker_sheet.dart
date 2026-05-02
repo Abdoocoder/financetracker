@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../services/currency_service.dart';
 
@@ -105,6 +106,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
               const SizedBox(width: 8),
               IconButton(
                 icon: Icon(Icons.close, color: cs.onSurfaceVariant),
+                tooltip: 'tooltip_close'.tr(),
                 onPressed: () => Navigator.pop(context),
               ),
             ]),

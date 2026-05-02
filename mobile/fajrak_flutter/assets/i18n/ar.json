@@ -882,5 +882,15 @@
   "dash_card_challenges": "التحديات",
   "error_load_failed": "فشل تحميل البيانات",
   "error_check_connection": "تحقق من اتصالك بالإنترنت وحاول مجدداً",
-  "btn_retry": "إعادة المحاولة"
+  "btn_retry": "إعادة المحاولة",
+  "accounts_add": "إضافة حساب",
+  "budget_add": "إضافة ميزانية",
+  "tooltip_close": "إغلاق",
+  "tooltip_dismiss_alert": "رفض التنبيه",
+  "tooltip_sync": "مزامنة البيانات",
+  "tooltip_export_csv": "تصدير CSV",
+  "tooltip_export_pdf": "تصدير PDF",
+  "tooltip_show_password": "إظهار كلمة المرور",
+  "tooltip_hide_password": "إخفاء كلمة المرور",
+  "app_logo_label": "شعار فجرك"
 }

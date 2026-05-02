@@ -429,6 +429,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     onPressed: _triggerSync,
                     icon: const Icon(Icons.cloud_upload_outlined),
                     color: Colors.orange[600],
+                    tooltip: 'tooltip_sync'.tr(),
                   ),
                 ),
               ),
@@ -441,7 +442,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           IconButton(
             onPressed: _exportCSV,
             icon: Icon(Icons.download, color: colorScheme.onSurfaceVariant),
-            tooltip: 'CSV',
+            tooltip: 'tooltip_export_csv'.tr(),
           ),
           _generatingPdf
               ? Padding(
@@ -455,7 +456,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               : IconButton(
                   onPressed: _generatePdf,
                   icon: Icon(Icons.picture_as_pdf, color: colorScheme.primary),
-                  tooltip: 'PDF',
+                  tooltip: 'tooltip_export_pdf'.tr(),
                 ),
           const SizedBox(width: 4),
         ],

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/analytics_service.dart';
 import '../utils/error_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../app_state.dart';
 import 'dart:io';
 
@@ -126,6 +127,9 @@ class _SplashScreenState extends State<SplashScreen>
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,
+                      cacheWidth: 200,
+                      cacheHeight: 200,
+                      semanticLabel: 'app_logo_label'.tr(),
                     ),
                   ),
                 ),

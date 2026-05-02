@@ -1,7 +1,8 @@
-import { memo } from 'react'
+import { memo, useRef, useEffect } from 'react'
 import type { Debt } from '@/types'
 import { CURRENCIES } from '@/lib/currency'
 import { useI18n } from '@/lib/i18n'
+import styles from './DebtCard.module.css'
 
 const PRIORITY_CONFIG = [
   { color: '#EF4444', ar: 'عالية جداً', en: 'Very High' },
@@ -35,6 +36,7 @@ export const DebtCard = memo(function DebtCard({
   onPaymentAmountChange, onPaymentCurrencyChange,
 }: Props) {
   const { t } = useI18n()
+  const fillRef = useRef<HTMLDivElement>(null)
   const pct = Number(debt.original_amount) > 0
     ? ((Number(debt.original_amount) - Number(debt.remaining_amount)) / Number(debt.original_amount) * 100)
     : 0
@@ -49,76 +51,94 @@ export const DebtCard = memo(function DebtCard({
     : null
   const isOverdue = debt.due_date ? new Date(debt.due_date) < todayDate : false
   const isPaying = paymentDebtId === debt.id
+  const priority = debt.priority ?? 3
+  const pctClamped = Math.min(pct, 100)
+
+  useEffect(() => {
+    if (fillRef.current) {
+      fillRef.current.style.width = `${pctClamped}%`
+    }
+  }, [pctClamped])
 
   return (
-    <div style={{
-      background: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: 18, padding: '16px',
-      borderRight: `3px solid ${pri.color}`,
-    }}>
+    <div
+      className={styles.card}
+      data-priority={priority}
+    >
       {/* ── Header ── */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: `${pri.color}18`, border: `1px solid ${pri.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: pri.color, boxShadow: `0 0 8px ${pri.color}` }} />
+      <div className={styles.header}>
+        <div className={styles.priorityIcon}>
+          <div className={styles.priorityDot} />
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 2 }}>{debt.name}</div>
-          {debt.notes && <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{debt.notes}</div>}
+        <div className={styles.headerMain}>
+          <div className={styles.debtName}>{debt.name}</div>
+          {debt.notes && <div className={styles.debtNotes}>{debt.notes}</div>}
           {(debt.auto_deduct || isOverdue || daysUntil !== null) && (
-            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+            <div className={styles.badges}>
               {debt.auto_deduct && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(59,126,246,0.12)', color: 'var(--accent-blue-light)', fontWeight: 700 }}>⚡ {t('debts_auto_deduct')}</span>
+                <span className={styles.badgeBlue}>⚡ {t('debts_auto_deduct')}</span>
               )}
               {isOverdue && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(239,68,68,0.12)', color: 'var(--accent-red-light)', fontWeight: 700 }}>🔴 {t('debts_overdue')}</span>
+                <span className={styles.badgeRed}>🔴 {t('debts_overdue')}</span>
               )}
               {daysUntil === 0 && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(245,158,11,0.15)', color: 'var(--accent-amber-light)', fontWeight: 700 }}>🔔 {t('debts_today')}</span>
+                <span className={styles.badgeAmber}>🔔 {t('debts_today')}</span>
               )}
               {daysUntil !== null && daysUntil > 0 && (
-                <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 5, background: 'rgba(100,116,139,0.1)', color: 'var(--text-muted)', fontWeight: 600 }}>📅 {t('debts_after_days', { n: daysUntil })}</span>
+                <span className={styles.badgeMuted}>📅 {t('debts_after_days', { n: daysUntil })}</span>
               )}
             </div>
           )}
         </div>
-        <div style={{ textAlign: 'left', flexShrink: 0 }}>
-          <div style={{ fontSize: 16, fontWeight: 900, color: 'var(--accent-red-light)', fontFamily: 'monospace' }}>
-            {Number(debt.remaining_amount_foreign || debt.remaining_amount).toFixed(0)}
-            <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 2 }}> {debt.currency || baseCurrency}</span>
+        <div className={styles.amountBlock}>
+          <div className={styles.amountPrimary}>
+            {Number(
+              (debt.currency && debt.currency !== baseCurrency)
+                ? (debt.remaining_amount_foreign || debt.remaining_amount)
+                : debt.remaining_amount
+            ).toFixed(0)}
+            <span className={styles.amountCurrency}> {debt.currency || baseCurrency}</span>
           </div>
           {debt.currency && debt.currency !== baseCurrency && (
-            <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>≈ {Number(debt.remaining_amount).toFixed(0)} {baseCurrency}</div>
+            <div className={styles.amountSecondary}>≈ {Number(debt.remaining_amount).toFixed(0)} {baseCurrency}</div>
           )}
-          {debt.monthly_payment > 0 && <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{Number(debt.monthly_payment).toFixed(0)}{t('debts_per_month')}</div>}
+          {debt.monthly_payment > 0 && <div className={styles.monthlyPayment}>{Number(debt.monthly_payment).toFixed(0)}{t('debts_per_month')}</div>}
         </div>
-        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <div className={styles.actionButtons}>
           <button
             onClick={() => onEdit(debt)}
             aria-label={t('edit_item', { name: debt.name })}
             title={t('edit_item', { name: debt.name })}
-            style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-blue-dim)', border: '1px solid rgba(59,126,246,0.2)', color: 'var(--accent-blue-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✎</button>
+            className={styles.btnEdit}
+          >✎</button>
           <button
             onClick={() => onDelete(debt.id)}
             aria-label={t('delete_item', { name: debt.name })}
             title={t('delete_item', { name: debt.name })}
-            style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--accent-red-dim)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--accent-red-light)', fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            className={styles.btnDelete}
+          >✕</button>
         </div>
       </div>
 
       {/* ── Progress ── */}
-      <div className="progress-track" style={{ marginBottom: 10 }}>
-        <div className="progress-fill gradient-green" style={{ width: `${Math.min(pct, 100)}%` }} />
+      <div className={`progress-track ${styles.progressTrack}`}>
+        <div
+          ref={fillRef}
+          className={`progress-fill gradient-green ${styles.progressFill}`}
+        />
       </div>
 
       {/* ── Footer ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>{t('debts_paid_status', { pct: pct.toFixed(0) })}</span>
+      <div className={styles.footer}>
+        <span className={styles.paidLabel}>{t('debts_paid_status', { pct: pct.toFixed(0) })}</span>
         {isPaying ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div className={styles.paymentRow}>
             <select
               value={paymentCurrency || debt.currency || baseCurrency}
               onChange={e => onPaymentCurrencyChange(e.target.value)}
-              style={{ padding: '6px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 11, fontFamily: 'inherit', outline: 'none' }}
+              className={styles.paymentSelect}
+              aria-label={t('trans_currency')}
+              title={t('trans_currency')}
             >
               {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.value}</option>)}
             </select>
@@ -129,23 +149,27 @@ export const DebtCard = memo(function DebtCard({
               placeholder={t('trans_amount')}
               autoFocus
               onKeyDown={e => e.key === 'Enter' && onConfirmPayment(debt.id)}
-              style={{ width: 70, padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 12, fontFamily: 'inherit', outline: 'none', textAlign: 'center' }}
+              className={styles.paymentInput}
             />
             <button
               onClick={() => onConfirmPayment(debt.id)}
               disabled={payingSaving}
               aria-label={t('confirm_payment')}
-              style={{ padding: '7px 12px', borderRadius: 8, background: 'var(--accent-green)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', fontFamily: 'inherit', opacity: payingSaving ? 0.5 : 1 }}>
+              className={styles.btnConfirm}
+            >
               {payingSaving ? '⏳' : '✓'}
             </button>
             <button
               onClick={onCancelPayment}
               aria-label={t('cancel_payment')}
-              style={{ padding: '7px 10px', borderRadius: 8, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit' }}>✕</button>
+              className={styles.btnCancel}
+            >✕</button>
           </div>
         ) : (
-          <button onClick={() => onStartPayment(debt.id)}
-            style={{ padding: '7px 14px', borderRadius: 8, background: 'var(--accent-green-dim)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--accent-green-light)', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+          <button
+            onClick={() => onStartPayment(debt.id)}
+            className={styles.btnStartPayment}
+          >
             {t('debts_add_payment_btn')}
           </button>
         )}

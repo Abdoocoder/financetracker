@@ -265,6 +265,7 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
           ),
           IconButton(
               icon: Icon(Icons.add, color: colorScheme.primary),
+              tooltip: 'inv_add'.tr(),
               onPressed: _showAddDialog),
         ],
       ),

@@ -287,6 +287,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
         actions: [
           IconButton(
               icon: Icon(Icons.add, color: colorScheme.primary),
+              tooltip: 'budget_add'.tr(),
               onPressed: () => _showAddDialog())
         ],
       ),
