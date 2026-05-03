@@ -33,14 +33,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  // Only set icon brightness — avoid setStatusBarColor / setNavigationBarColor
-  // which are deprecated in Android 15 (API 35). Transparency is handled by
-  // enableEdgeToEdge() in MainActivity via WindowInsetsController.
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarIconBrightness: Brightness.light,
-    statusBarBrightness: Brightness.dark,
-    systemNavigationBarIconBrightness: Brightness.light,
-  ));
 
   // Global Error Handling — set up before anything async
   FlutterError.onError = (details) {
