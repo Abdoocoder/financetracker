@@ -95,7 +95,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final prevMonthEnd = DateTime(now.year, now.month, 1).toIso8601String().split('T')[0];
       final sixMonthsAgo = DateTime(now.year, now.month - 5, 1).toIso8601String().split('T')[0];
 
-      // Single parallel batch — charts + monthly summary run alongside core queries
+      // Parallel batch — base table queries only (RPC calls handled separately with fallbacks)
       final results = await Future.wait<dynamic>([
         /* 0 */ Supabase.instance.client.from('profiles').select('full_name, monthly_income, currency').eq('id', user.id).single(),
         /* 1 */ Supabase.instance.client.from('transactions').select('type, amount').eq('user_id', user.id).gte('transaction_date', firstDay),
@@ -104,19 +104,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         /* 4 */ Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         /* 5 */ Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
         /* 6 */ Supabase.instance.client.from('transactions').select('type, amount, category, transaction_date').eq('user_id', user.id).gte('transaction_date', sixMonthsAgo).order('transaction_date', ascending: true),
-        /* 7 */ FinanceService.fetchMonthlyFinancialSummary(year: now.year, month: now.month),
         // prev month totals for MonthSummaryCard (only fetched in first 7 days)
         if (now.day <= 7)
-          /* 8 */ Supabase.instance.client.from('transactions').select('type, amount')
+          /* 7 */ Supabase.instance.client.from('transactions').select('type, amount')
               .eq('user_id', user.id).gte('transaction_date', prevMonthStart).lt('transaction_date', prevMonthEnd),
       ]);
 
       final profile = results[0] as Map<String, dynamic>;
+      final currentMonthTxs = results[1] as List;
       final recent = results[2] as List;
       final debts = results[3] as List;
       final goals = results[5] as List;
       final chartsList = results[6] as List;
-      final monthly = results[7] as Map<String, dynamic>;
 
       // ── Build 6-month aggregated data from already-fetched chartsList ──
       final monthMap = <String, Map<String, double>>{};
@@ -152,16 +151,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'percentage': totalCatExpenses > 0 ? (e.value / totalCatExpenses).clamp(0.0, 1.0) : 0.0,
       }).toList();
 
+      // Monthly summary via RPC — fallback to calculating from already-fetched transactions
+      Map<String, dynamic> monthly;
+      try {
+        monthly = await FinanceService.fetchMonthlyFinancialSummary(year: now.year, month: now.month);
+      } catch (_) {
+        final inc = currentMonthTxs.where((t) => t['type'] == 'income').fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
+        final exp = currentMonthTxs.where((t) => t['type'] == 'expense').fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
+        monthly = {'income': inc, 'expenses': exp, 'debt_payments': 0.0, 'net': inc - exp};
+      }
+
       final income = (monthly['income'] as num?)?.toDouble() ?? 0.0;
       final txExpenses = (monthly['expenses'] as num?)?.toDouble() ?? 0.0;
       final net = (monthly['net'] as num?)?.toDouble() ?? (income - txExpenses);
 
       final currency = (profile['currency'] as String? ?? 'JOD').toUpperCase();
-      // Exchange rate + financial dashboard (sequential: dashboard needs the rate)
       final usdToLocal = currency != 'USD'
           ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
           : 1.0;
-      final dash = await FinanceService.fetchFinancialDashboard(usdToLocal);
+      // Financial dashboard via RPC — fallback to zeros if function not available
+      Map<String, dynamic> dash;
+      try {
+        dash = await FinanceService.fetchFinancialDashboard(usdToLocal);
+      } catch (_) {
+        dash = {
+          'net_worth': 0.0, 'total_accounts_balance': 0.0,
+          'investments_value_local': 0.0, 'goals_saved': 0.0,
+          'total_debt_owed': 0.0, 'total_receivable': 0.0,
+          'monthly_debt_commitments': 0.0, 'health_score': 0,
+        };
+      }
       
       final netWorth = (dash['net_worth'] as num).toDouble();
       final totalDebt = (dash['total_debt_owed'] as num).toDouble();
@@ -188,8 +207,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
       // ── prev month summary ──
       double prevIncome = 0, prevExpenses = 0;
-      if (now.day <= 7 && results.length > 6) {
-        final prevTxs = results[6] as List;
+      if (now.day <= 7 && results.length > 7) {
+        final prevTxs = results[7] as List;
         for (final tx in prevTxs) {
           if (tx['type'] == 'income') {
             prevIncome += (tx['amount'] as num).toDouble();
@@ -224,6 +243,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (e) {
+      debugPrint('Dashboard _loadPhase2 error: $e');
       if (mounted) setState(() { _loading = false; _hasError = true; });
     }
   }

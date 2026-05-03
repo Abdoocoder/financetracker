@@ -88,6 +88,13 @@ export default function DashboardPage() {
   const currency = profile?.currency ?? 'JOD'
   const name = data?.name || currentUser?.user_metadata?.full_name || ''
   const firstName = name.split(' ')[0]
+  // Use accounts balance only when at least one account has a real (non-zero) balance.
+  // If all accounts show 0 (e.g., no transactions linked or opening_balance = 0),
+  // fall back to monthly net so the dashboard shows a meaningful number.
+  const hasAccounts = accounts.length > 0
+  const anyAccountHasBalance = accounts.some(acc => (acc.balance ?? 0) !== 0)
+  const hasUsableAccountBalance = hasAccounts && anyAccountHasBalance
+  const effectiveBalance = hasUsableAccountBalance ? accountsTotalBalance : net
 
   return (
     <div className={`animate-fade-in ${styles.pageContent}`}>
@@ -136,7 +143,7 @@ export default function DashboardPage() {
             currency={currency}
             lang={lang}
             accounts={accounts}
-            totalBalance={accountsTotalBalance}
+            totalBalance={hasUsableAccountBalance ? accountsTotalBalance : undefined}
             prevMonthNet={(data?.prevIncome ?? 0) - (data?.prevExpenses ?? 0)}
           />
       )}
@@ -148,12 +155,12 @@ export default function DashboardPage() {
           { label: t('dash_expenses'), value: fmt(realExpenses > 0 ? realExpenses : expenses), color: 'var(--accent-red-light)', bg: 'var(--accent-red-dim)', border: 'rgba(239,68,68,0.15)', icon: '↓', sub: null },
           {
             label: t('dash_net'),
-            value: `${(accountsTotalBalance ?? net) >= 0 ? '+' : '-'}${fmt(Math.abs(accountsTotalBalance ?? net))}`,
-            color: (accountsTotalBalance ?? net) >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
-            bg: (accountsTotalBalance ?? net) >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)',
-            border: (accountsTotalBalance ?? net) >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+            value: `${effectiveBalance >= 0 ? '+' : '-'}${fmt(Math.abs(effectiveBalance))}`,
+            color: effectiveBalance >= 0 ? 'var(--accent-green-light)' : 'var(--accent-red-light)',
+            bg: effectiveBalance >= 0 ? 'var(--accent-green-dim)' : 'var(--accent-red-dim)',
+            border: effectiveBalance >= 0 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
             icon: '🏦',
-            sub: `${t('dash_month')}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}`,
+            sub: hasUsableAccountBalance ? `${t('dash_month')}: ${net >= 0 ? '+' : '-'}${fmt(Math.abs(net))}` : null,
           },
         ].map(s => (
           <div key={s.label} className={styles.statBox} style={{ '--stat-bg': s.bg, '--stat-border': s.border, '--stat-color': s.color } as React.CSSProperties}>

@@ -19,6 +19,12 @@ class AddTransactionDialog extends StatefulWidget {
   State<AddTransactionDialog> createState() => _AddTransactionDialogState();
 }
 
+const _incomeCategories  = ['راتب','عمل حر','استثمار','مكافأة','هدية','أخرى'];
+const _expenseCategories = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','إيجار','اشتراكات','عناية','سفر','دين','ديون','أخرى'];
+
+List<String> _categoriesFor(String type) =>
+    type == 'income' ? _incomeCategories : _expenseCategories;
+
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
   late final ValueNotifier<String> _typeController;
   late final TextEditingController _amountController;
@@ -38,22 +44,19 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _amountController = TextEditingController(text: widget.existing?['amount']?.toString() ?? '');
     _descController = TextEditingController(text: widget.existing?['description'] ?? '');
     _catController = TextEditingController(text: widget.existing?['category'] ?? '');
-    
-    final initialCategories = _typeController.value == 'income' 
-        ? ['راتب','عمل حر','استثمار','مكافأة','أخرى']
-        : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','إيجار','اشتراكات','عناية','سفر','دين','أخرى'];
-    if (!initialCategories.contains(_catController.text)) {
-      _catController.text = initialCategories.first;
+
+    // Only reset category for new transactions — when editing, keep the original value.
+    if (widget.existing == null) {
+      final cats = _categoriesFor(_typeController.value);
+      if (!cats.contains(_catController.text)) _catController.text = cats.first;
     }
 
     _typeController.addListener(() {
-      final categories = _typeController.value == 'income' 
-          ? ['راتب','عمل حر','استثمار','مكافأة','أخرى']
-          : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','إيجار','اشتراكات','عناية','سفر','دين','أخرى'];
-      if (!categories.contains(_catController.text)) {
-        setState(() => _catController.text = categories.first);
+      final cats = _categoriesFor(_typeController.value);
+      if (!cats.contains(_catController.text)) {
+        setState(() => _catController.text = cats.first);
       } else {
-        setState(() {}); // trigger rebuild for dropdown options update
+        setState(() {});
       }
     });
 
@@ -409,10 +412,15 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             ValueListenableBuilder<String>(
               valueListenable: _typeController,
               builder: (ctx, type, _) {
-                final categories = type == 'income' 
-                    ? ['راتب','عمل حر','استثمار','هدية','أخرى']
-                    : ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','أخرى'];
-                
+                final base = _categoriesFor(type);
+                // Include existing category even if not in the standard list (e.g. auto-added 'ديون').
+                final categories = base.contains(_catController.text)
+                    ? base
+                    : [...base, _catController.text];
+                final currentValue = categories.contains(_catController.text)
+                    ? _catController.text
+                    : categories.first;
+
                 return Container(
                   height: 56,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -422,7 +430,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
-                      value: categories.contains(_catController.text) ? _catController.text : categories.first,
+                      value: currentValue,
                       icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
                       dropdownColor: theme.colorScheme.surface,
                       isExpanded: true,

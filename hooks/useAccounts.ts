@@ -11,7 +11,7 @@ export function useAccounts(userId: string | undefined) {
     if (!userId) return
 
     // جلب الحسابات والأرصدة بالتوازي — نفس منطق Flutter (get_account_balances RPC)
-    const [{ data }, { data: balances }] = await Promise.all([
+    const [{ data }, { data: balances, error: balancesError }] = await Promise.all([
       supabase
         .from('accounts')
         .select('*')
@@ -21,6 +21,7 @@ export function useAccounts(userId: string | undefined) {
         .order('created_at'),
       supabase.rpc('get_account_balances', { p_user_id: userId }),
     ])
+    if (balancesError) console.error('[useAccounts] get_account_balances RPC failed:', balancesError.message)
 
     if (!data) { setLoading(false); return }
 
