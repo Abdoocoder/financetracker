@@ -60,13 +60,16 @@ class LevelCard extends StatelessWidget {
           ),
         ]),
         const SizedBox(height: 16),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: progress.clamp(0.0, 1.0),
-            backgroundColor: colorScheme.outlineVariant,
-            valueColor: AlwaysStoppedAnimation(colorScheme.primary),
-            minHeight: 8,
+        Semantics(
+          value: '${(progress.clamp(0.0, 1.0) * 100).toStringAsFixed(0)}%',
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress.clamp(0.0, 1.0),
+              backgroundColor: colorScheme.outlineVariant,
+              valueColor: AlwaysStoppedAnimation(colorScheme.primary),
+              minHeight: 8,
+            ),
           ),
         ),
         const SizedBox(height: 8),

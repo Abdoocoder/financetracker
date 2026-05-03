@@ -56,13 +56,16 @@ class BudgetProgressCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: percentage,
-              backgroundColor: colorScheme.outlineVariant,
-              color: progressColor,
-              minHeight: 10,
+          Semantics(
+            value: '${(percentage * 100).toStringAsFixed(0)}%',
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: percentage,
+                backgroundColor: colorScheme.outlineVariant,
+                color: progressColor,
+                minHeight: 10,
+              ),
             ),
           ),
           const SizedBox(height: 12),

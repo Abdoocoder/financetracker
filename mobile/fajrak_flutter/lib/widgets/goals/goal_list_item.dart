@@ -82,14 +82,17 @@ class GoalListItem extends StatelessWidget {
                       color: AppColors.error, size: 14))),
         ]),
         const SizedBox(height: 12),
-        ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: colorScheme.outlineVariant,
-              valueColor: AlwaysStoppedAnimation(color),
-              minHeight: 10,
-            )),
+        Semantics(
+          value: '${(progress * 100).toStringAsFixed(0)}%',
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: colorScheme.outlineVariant,
+                valueColor: AlwaysStoppedAnimation(color),
+                minHeight: 10,
+              )),
+        ),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('goals_progress_percent'.tr(args: [(progress * 100).toStringAsFixed(0)]),

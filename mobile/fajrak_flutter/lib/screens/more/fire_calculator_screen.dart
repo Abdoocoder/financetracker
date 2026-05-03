@@ -176,9 +176,12 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
                 Text('${progress.toStringAsFixed(1)}%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: color)),
               ]),
               const SizedBox(height: 6),
-              ClipRRect(borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(value: progress / 100, backgroundColor: cs.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation(color), minHeight: 8)),
+              Semantics(
+                value: '${progress.toStringAsFixed(1)}%',
+                child: ClipRRect(borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(value: progress / 100, backgroundColor: cs.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation(color), minHeight: 8)),
+              ),
               const SizedBox(height: 14),
               Row(children: [
                 Expanded(child: _StatBox(label: 'current_net_worth'.tr(), value: fmt(_currentNetWorth), currency: _currency, color: AppColors.success, cs: cs)),

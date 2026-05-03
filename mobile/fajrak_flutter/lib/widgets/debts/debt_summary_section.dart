@@ -124,13 +124,16 @@ class DebtSummarySection extends StatelessWidget {
                       fontFamily: 'Cairo')),
             ]),
             const SizedBox(height: 8),
-            ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: LinearProgressIndicator(
-                    value: (paidPct / 100).clamp(0.0, 1.0),
-                    backgroundColor: cs.outlineVariant,
-                    color: AppColors.success,
-                    minHeight: 10)),
+            Semantics(
+              value: '${paidPct.toStringAsFixed(0)}%',
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: LinearProgressIndicator(
+                      value: (paidPct / 100).clamp(0.0, 1.0),
+                      backgroundColor: cs.outlineVariant,
+                      color: AppColors.success,
+                      minHeight: 10)),
+            ),
             const SizedBox(height: 6),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(

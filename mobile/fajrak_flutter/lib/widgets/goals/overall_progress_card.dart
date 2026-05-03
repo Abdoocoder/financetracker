@@ -41,14 +41,17 @@ class OverallProgressCard extends StatelessWidget {
                   fontSize: 12)),
         ]),
         const SizedBox(height: 8),
-        ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: colorScheme.outlineVariant,
-              valueColor: AlwaysStoppedAnimation(colorScheme.secondary),
-              minHeight: 10,
-            )),
+        Semantics(
+          value: '${(progress * 100).toStringAsFixed(0)}%',
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: colorScheme.outlineVariant,
+                valueColor: AlwaysStoppedAnimation(colorScheme.secondary),
+                minHeight: 10,
+              )),
+        ),
       ]),
     );
   }

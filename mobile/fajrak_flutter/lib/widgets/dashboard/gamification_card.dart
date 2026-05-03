@@ -85,13 +85,16 @@ class GamificationCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: colorScheme.outlineVariant,
-                    color: color,
-                    minHeight: 6,
+                Semantics(
+                  value: '${(progress * 100).toStringAsFixed(0)}%',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: colorScheme.outlineVariant,
+                      color: color,
+                      minHeight: 6,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),

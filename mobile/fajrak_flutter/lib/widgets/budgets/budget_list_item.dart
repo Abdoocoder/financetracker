@@ -115,13 +115,16 @@ class BudgetListItem extends StatelessWidget {
                       color: AppColors.error, size: 14))),
         ]),
         const SizedBox(height: 10),
-        ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: LinearProgressIndicator(
-                value: pct,
-                backgroundColor: colorScheme.outlineVariant,
-                color: color,
-                minHeight: 8)),
+        Semantics(
+          value: '${(pct * 100).toStringAsFixed(0)}%',
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: LinearProgressIndicator(
+                  value: pct,
+                  backgroundColor: colorScheme.outlineVariant,
+                  color: color,
+                  minHeight: 8)),
+        ),
         const SizedBox(height: 6),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Row(children: [

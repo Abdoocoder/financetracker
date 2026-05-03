@@ -56,7 +56,10 @@ class _NetWorthCardState extends State<NetWorthCard> {
       ),
       child: Column(children: [
         // ── Header ──
-        InkWell(
+        Semantics(
+          button: true,
+          expanded: _expanded,
+          child: InkWell(
           onTap: () => setState(() => _expanded = !_expanded),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
@@ -84,7 +87,7 @@ class _NetWorthCardState extends State<NetWorthCard> {
               ),
             ]),
           ),
-        ),
+        )),
 
         // ── Breakdown ──
         AnimatedSize(

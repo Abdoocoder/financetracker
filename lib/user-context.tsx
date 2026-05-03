@@ -31,23 +31,16 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [user, fetchProfile])
 
   useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      if (user) {
-        await fetchProfile(user.id)
-      }
-      setLoading(false)
-    }
-    load()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       const newUser = session?.user ?? null
       setUser(newUser)
       if (newUser) {
         await fetchProfile(newUser.id)
       } else {
         setProfile(null)
+      }
+      if (event === 'INITIAL_SESSION') {
+        setLoading(false)
       }
     })
     return () => subscription.unsubscribe()

@@ -129,13 +129,16 @@ class _ChallengesCardState extends State<ChallengesCard> {
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
           const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: pct / 100,
-              backgroundColor: colorScheme.outlineVariant,
-              color: colorScheme.primary,
-              minHeight: 8,
+          Semantics(
+            value: '${pct.toStringAsFixed(0)}%',
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: pct / 100,
+                backgroundColor: colorScheme.outlineVariant,
+                color: colorScheme.primary,
+                minHeight: 8,
+              ),
             ),
           ),
           const SizedBox(height: 6),
@@ -191,13 +194,16 @@ class _ChallengesCardState extends State<ChallengesCard> {
                     maxLines: 2,
                 ),
                 const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
-                  child: LinearProgressIndicator(
-                    value: pct / 100,
-                    backgroundColor: colorScheme.outlineVariant,
-                    color: color,
-                    minHeight: 4,
+                Semantics(
+                  value: '${pct.toStringAsFixed(0)}%',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: pct / 100,
+                      backgroundColor: colorScheme.outlineVariant,
+                      color: color,
+                      minHeight: 4,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 4),

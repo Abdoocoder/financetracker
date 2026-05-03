@@ -37,6 +37,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   final _exchangeRateController = TextEditingController(text: '1.0');
   bool _isRateManual = false;
 
+  bool _isRecurring = false;
+  late int _recurringDay;
+
   @override
   void initState() {
     super.initState();
@@ -63,7 +66,13 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     _dateController = ValueNotifier<DateTime>(widget.existing != null
         ? DateTime.parse(widget.existing!['transaction_date'])
         : DateTime.now());
-    
+
+    _isRecurring = widget.existing?['is_recurring'] == true;
+    _recurringDay = (widget.existing?['recurring_day'] as int?) ??
+        (widget.existing != null
+            ? DateTime.parse(widget.existing!['transaction_date']).day
+            : DateTime.now().day);
+
     _selectedCurrency = widget.existing?['original_currency'] ?? widget.baseCurrency;
     _exchangeRate = (widget.existing?['exchange_rate'] as num?)?.toDouble() ?? 1.0;
     _exchangeRateController.text = _exchangeRate.toString();
@@ -120,6 +129,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       'category': _catController.text,
       'description': _descController.text.isEmpty ? null : _descController.text,
       'transaction_date': _dateController.value.toIso8601String().split('T')[0],
+      'is_recurring': _isRecurring,
+      'recurring_day': _isRecurring ? _recurringDay : null,
     };
 
     try {
@@ -469,6 +480,103 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 fillColor: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.7),
               ),
             ),
+            const SizedBox(height: 20),
+
+            // Recurring Toggle
+            GestureDetector(
+              onTap: () => setState(() => _isRecurring = !_isRecurring),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: _isRecurring
+                      ? const Color(0xFF3B7EF6).withValues(alpha: 0.12)
+                      : theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.6),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _isRecurring
+                        ? const Color(0xFF3B7EF6).withValues(alpha: 0.5)
+                        : theme.colorScheme.outlineVariant,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Text('📅', style: TextStyle(fontSize: 20)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'tx_recurring'.tr(),
+                            style: TextStyle(
+                              color: _isRecurring
+                                  ? const Color(0xFF3B7EF6)
+                                  : theme.colorScheme.onSurface,
+                              fontFamily: 'Cairo',
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                          if (_isRecurring)
+                            Text(
+                              'tx_recurring_note'.tr(),
+                              style: const TextStyle(
+                                color: Color(0xFF3B7EF6),
+                                fontFamily: 'Cairo',
+                                fontSize: 12,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: _isRecurring,
+                      onChanged: (v) => setState(() => _isRecurring = v),
+                      activeThumbColor: const Color(0xFF3B7EF6),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            if (_isRecurring) ...[
+              const SizedBox(height: 16),
+              _buildLabel('tx_recurring_day'.tr()),
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: isDark ? 0.3 : 0.7),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: _recurringDay,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF94A3B8)),
+                    dropdownColor: theme.colorScheme.surface,
+                    isExpanded: true,
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A),
+                      fontFamily: 'Cairo',
+                      fontWeight: FontWeight.bold,
+                    ),
+                    items: List.generate(
+                      28,
+                      (i) => DropdownMenuItem(
+                        value: i + 1,
+                        child: Text('${i + 1}'),
+                      ),
+                    ),
+                    onChanged: (v) {
+                      if (v != null) setState(() => _recurringDay = v);
+                    },
+                  ),
+                ),
+              ),
+            ],
+
             const SizedBox(height: 32),
 
             // Save Button with Gradient

@@ -40,13 +40,16 @@ class CategorySpendingItem extends StatelessWidget {
                   fontSize: 12)),
         ]),
         const SizedBox(height: 6),
-        ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-                value: percentage / 100,
-                backgroundColor: colorScheme.outlineVariant,
-                color: colorScheme.primary,
-                minHeight: 5)),
+        Semantics(
+          value: '${percentage.toStringAsFixed(0)}%',
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(3),
+              child: LinearProgressIndicator(
+                  value: percentage / 100,
+                  backgroundColor: colorScheme.outlineVariant,
+                  color: colorScheme.primary,
+                  minHeight: 5)),
+        ),
       ]),
     );
   }

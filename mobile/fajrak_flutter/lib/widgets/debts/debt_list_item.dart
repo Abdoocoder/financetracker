@@ -268,13 +268,16 @@ class _DebtListItemState extends State<DebtListItem> {
                       color: AppColors.error, size: 14))),
         ]),
         const SizedBox(height: 10),
-        ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: LinearProgressIndicator(
-                value: (pct / 100).clamp(0.0, 1.0),
-                backgroundColor: cs.outlineVariant,
-                color: AppColors.success,
-                minHeight: 8)),
+        Semantics(
+          value: '${pct.toStringAsFixed(0)}%',
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: LinearProgressIndicator(
+                  value: (pct / 100).clamp(0.0, 1.0),
+                  backgroundColor: cs.outlineVariant,
+                  color: AppColors.success,
+                  minHeight: 8)),
+        ),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('debts_paid_pct'.tr(args: [pct.toStringAsFixed(0)]),

@@ -82,17 +82,22 @@ class BudgetSummaryCard extends StatelessWidget {
                     fontFamily: 'Cairo')),
           ]),
           const SizedBox(height: 6),
-          ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                  value: totalBudgeted > 0
-                      ? (totalSpent / totalBudgeted).clamp(0.0, 1.0)
-                      : 0,
-                  backgroundColor: colorScheme.outlineVariant,
-                  color: totalSpent > totalBudgeted
-                      ? colorScheme.error
-                      : colorScheme.primary,
-                  minHeight: 8)),
+          Semantics(
+            value: totalBudgeted > 0
+                ? '${(totalSpent / totalBudgeted * 100).clamp(0.0, 100.0).toStringAsFixed(0)}%'
+                : '0%',
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                    value: totalBudgeted > 0
+                        ? (totalSpent / totalBudgeted).clamp(0.0, 1.0)
+                        : 0,
+                    backgroundColor: colorScheme.outlineVariant,
+                    color: totalSpent > totalBudgeted
+                        ? colorScheme.error
+                        : colorScheme.primary,
+                    minHeight: 8)),
+          ),
         ],
       ]),
     );

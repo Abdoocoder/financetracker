@@ -1696,8 +1696,9 @@
         "testStrategy": "1. تشغيل Flutter analyze لتجنب التحذيرات\n2. اختبار يدوي مع TalkBack (Android) و VoiceOver (iOS) للتحقق من القراءة الصحيحة\n3. التحقق من أن جميع الأيقونات لها tooltip وصفي\n4. التحقق من أن جميع الصور لها semanticLabel\n5. اختبار الشاشات على أجهزة قديمة للتحقق من عدم تدهور الأداء",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2026-05-03T17:03:18.821Z"
       },
       {
         "id": "31",
@@ -1823,9 +1824,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-05-02T19:50:21.268Z",
+      "lastModified": "2026-05-03T17:03:18.822Z",
       "taskCount": 38,
-      "completedCount": 18,
+      "completedCount": 19,
       "tags": [
         "master"
       ]

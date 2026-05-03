@@ -420,14 +420,19 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
           ],
         ),
         const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: cost > 0 ? (value / (cost * 2)).clamp(0.0, 1.0) : 0,
-            backgroundColor: colorScheme.outlineVariant,
-            valueColor: AlwaysStoppedAnimation(
-                gain >= 0 ? AppColors.success : colorScheme.error),
-            minHeight: 4,
+        Semantics(
+          value: cost > 0
+              ? '${((value / cost - 1) * 100).toStringAsFixed(1)}%'
+              : '0%',
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: cost > 0 ? (value / (cost * 2)).clamp(0.0, 1.0) : 0,
+              backgroundColor: colorScheme.outlineVariant,
+              valueColor: AlwaysStoppedAnimation(
+                  gain >= 0 ? AppColors.success : colorScheme.error),
+              minHeight: 4,
+            ),
           ),
         ),
         const SizedBox(height: 12),

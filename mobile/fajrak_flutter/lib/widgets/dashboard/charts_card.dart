@@ -190,13 +190,16 @@ class ChartsCard extends StatelessWidget {
                   ),
                   Expanded(
                     flex: 5,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: cat['percentage'],
-                        backgroundColor: colorScheme.outlineVariant,
-                        color: colorScheme.primary,
-                        minHeight: 8,
+                    child: Semantics(
+                      value: '${((cat['percentage'] as double) * 100).toStringAsFixed(0)}%',
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: cat['percentage'],
+                          backgroundColor: colorScheme.outlineVariant,
+                          color: colorScheme.primary,
+                          minHeight: 8,
+                        ),
                       ),
                     ),
                   ),
