@@ -1,5 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { toast } from '@/components/ui/toast'
@@ -68,6 +69,7 @@ export function useTransactions() {
   const { user: currentUser, profile } = useUser()
   const { t, lang } = useI18n()
   const supabase = useMemo(() => createClient(), [])
+  const queryClient = useQueryClient()
 
   function parseNumber(value: string | number | undefined, fallback = 0): number {
     if (value === undefined || value === null || value === '') return fallback;
@@ -205,6 +207,7 @@ export function useTransactions() {
     }
     clearUserCache(user.id)
     try { sessionStorage.removeItem(`transactions_${user.id}`) } catch {}
+    queryClient.invalidateQueries({ queryKey: ['dashboard', user.id] })
     closeForm()
     setSaving(false)
     load()
@@ -235,7 +238,11 @@ export function useTransactions() {
     setDeletingId(id)
     await supabase.from('transactions').delete().eq('id', id)
     setTransactions(prev => prev.filter(t => t.id !== id))
-    if (user) { clearUserCache(user.id); try { sessionStorage.removeItem(`transactions_${user.id}`) } catch {} }
+    if (user) {
+      clearUserCache(user.id)
+      try { sessionStorage.removeItem(`transactions_${user.id}`) } catch {}
+      queryClient.invalidateQueries({ queryKey: ['dashboard', user.id] })
+    }
     toast.success(t('toast_deleted'))
     setDeletingId(null)
   }

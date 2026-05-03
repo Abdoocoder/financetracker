@@ -21,7 +21,11 @@
       "Bash(/c/flutter/flutter/bin/flutter.bat analyze:*)",
       "Bash(cmd:*)",
       "mcp__task-master-ai__next_task",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(flutter *)",
+      "PowerShell(flutter *)",
+      "PowerShell(Get-Process *)",
+      "PowerShell(git *)"
     ]
   }
 }

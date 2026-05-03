@@ -115,6 +115,7 @@ export function useDashboardData() {
         healthScore: Number(dashData?.health_score ?? 0),
       };
     },
-    staleTime: 5 * 60 * 1000, // Show cached data for 5 minutes
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }

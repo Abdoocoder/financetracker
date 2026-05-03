@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { usePush } from '@/lib/use-push'
 import { toast } from '@/components/ui/toast'
 import { useI18n } from '@/lib/i18n'
@@ -13,15 +13,15 @@ export function PushPrompt() {
   const [show, setShow] = useState(false)
   const { lang } = useI18n()
   const { user } = useUser()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     if (!supported || subscribed) return
     async function checkAndShow() {
       try {
         const shown = localStorage.getItem(PROMPT_KEY)
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone
-        if (shown === 'true') return
+        // If user already allowed or dismissed before → never show again
+        if (shown === 'true' || shown === 'dismissed') return
         if (user?.id) {
           const { count } = await supabase
             .from('push_subscriptions')
@@ -31,13 +31,12 @@ export function PushPrompt() {
             if (Notification.permission === 'granted') {
               subscribe()
               try { localStorage.setItem(PROMPT_KEY, 'true') } catch {}
-              return
             }
-            setShow(true)
+            // Has subscription on another device — don't re-prompt
             return
           }
         }
-        if (shown === 'dismissed' && !isStandalone) return
+        // First time ever → show after 3 seconds
         const timer = setTimeout(() => setShow(true), 3000)
         return () => clearTimeout(timer)
       } catch {}

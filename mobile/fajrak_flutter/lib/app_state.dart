@@ -8,8 +8,15 @@ class AppState extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   String? _languageCode; // null means follow system
   int _unreadAlerts = 0;
+  int _transactionVersion = 0;
 
   ThemeMode get themeMode => _themeMode;
+  int get transactionVersion => _transactionVersion;
+
+  void notifyTransactionChanged() {
+    _transactionVersion++;
+    notifyListeners();
+  }
   
   // For legacy support or simple checks
   bool isDarkMode(BuildContext context) {

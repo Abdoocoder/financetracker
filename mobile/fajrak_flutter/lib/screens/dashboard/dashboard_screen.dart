@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../app_state.dart';
 import '../../services/currency_service.dart';
 import '../../services/accounts_service.dart';
 import '../../widgets/dashboard/charts_card.dart';
@@ -52,6 +53,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   DateTime? _lastUpdated;
   final double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
+  int _loadedTransactionVersion = 0;
 
   @override
   void initState() { super.initState(); _load(); }
@@ -264,6 +266,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final txVersion = context.watch<AppState>().transactionVersion;
+    if (txVersion != _loadedTransactionVersion) {
+      _loadedTransactionVersion = txVersion;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_loading) _load();
+      });
+    }
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final layout = context.watch<DashboardLayoutProvider>();

@@ -13,6 +13,8 @@ import '../../services/analytics_service.dart';
 import '../../services/pdf_report_service.dart';
 import '../../services/sync_service.dart';
 import '../../utils/error_handler.dart';
+import '../../app_state.dart';
+import 'package:provider/provider.dart';
 import '../../widgets/transactions/add_transaction_dialog.dart';
 import '../../widgets/transactions/month_year_picker_dialog.dart';
 import '../../widgets/transactions/transaction_filters.dart';
@@ -336,7 +338,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     setState(() {});
     try {
       await Supabase.instance.client.from('transactions').delete().eq('id', id);
-      if (mounted) setState(() => _transactions.removeWhere((t) => t['id'] == id));
+      if (mounted) {
+        setState(() => _transactions.removeWhere((t) => t['id'] == id));
+        context.read<AppState>().notifyTransactionChanged();
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
