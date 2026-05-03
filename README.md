@@ -578,6 +578,17 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.35.3 — 2026-05-03 *(Data Sync & UX Fixes)*
+
+| Change | Description |
+|:-------|:------------|
+| 🐛 **Web Balance 0 Fix** | Dashboard now falls back to monthly net when all accounts show 0 balance (unlinked transactions or no opening balance), instead of displaying a misleading +0. |
+| 🐛 **RPC Broken Column Fix** | Migration 038 ensures `deleted_at` columns exist on `transactions` and `accounts` before `get_account_balances` references them — fixes "column t.deleted_at does not exist" error. |
+| 🔔 **Push Prompt Fix** | Notification banner no longer reappears after the user clicks "Later" — `useMemo` stabilises the Supabase client reference and the dismissed check runs first. |
+| 📱 **Flutter Dashboard Resilience** | `fetchMonthlyFinancialSummary` extracted from `Future.wait` with a local fallback — a failing RPC no longer crashes the entire dashboard load. |
+| ✏️ **Flutter Transaction Edit** | Auto-added transactions (e.g. recurring/debt) are now editable: added a visible edit icon, replaced `GestureDetector` with `InkWell` for tap feedback, and unified category lists so custom categories are preserved on edit. |
+| 🔧 **RPC Error Logging** | `useAccounts` now logs `get_account_balances` failures to the console for easier debugging. |
+
 ### v3.35.2 — 2026-05-03 *(Splash Screen Fix)*
 
 | Change | Description |
