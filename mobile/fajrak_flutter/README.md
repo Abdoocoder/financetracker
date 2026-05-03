@@ -479,6 +479,13 @@ flutter build apk --release --split-per-abi
 
 ## 📝 سجل التغييرات
 
+### v3.35.4 — 2026-05-03 *(إصلاح قفل المصادقة)*
+
+| التغيير | الوصف |
+|:--------|:------|
+| 🔒 **Supabase Client Singleton** | `createClient()` تُعيد نسخة واحدة مشتركة لمنع تنافس `GoTrueClient` على Navigator Lock. |
+| 🔒 **إصلاح قفل سياق المصادقة** | حذف `getUser()` الزائد في `UserProvider` والاعتماد على `INITIAL_SESSION` فقط. |
+
 ### v3.35.3 — 2026-05-03 *(إصلاحات المزامنة والتجربة)*
 
 | التغيير | الوصف |

@@ -578,6 +578,13 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.35.4 — 2026-05-03 *(Auth Lock Fix)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔒 **Supabase Client Singleton** | `createClient()` now returns a single shared instance, preventing multiple `GoTrueClient` initializations from racing over the Navigator Lock on page load. |
+| 🔒 **Auth Context Lock Fix** | Removed redundant `getUser()` call in `UserProvider` that competed with `onAuthStateChange` for the same auth lock; initial session is now sourced exclusively from the `INITIAL_SESSION` event. |
+
 ### v3.35.3 — 2026-05-03 *(Data Sync & UX Fixes)*
 
 | Change | Description |
