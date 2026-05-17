@@ -182,7 +182,21 @@
       "mcp__dart__analyze_files",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\user\\\\Projects\\\\financetracker\\\\mobile\\\\fajrak_flutter\" -Recurse -Directory)",
       "Bash(Select-Object -First 20)",
-      "PowerShell(flutter *)"
+      "PowerShell(flutter *)",
+      "Skill(vercel:env)",
+      "Bash(vercel --version)",
+      "Bash(vercel link *)",
+      "Bash(vercel env *)",
+      "Bash(vercel teams *)",
+      "Bash(vercel whoami *)",
+      "Read(//home/abdullah/.local/share/com.vercel.cli/**)",
+      "Read(//home/abdullah/.vercel/**)",
+      "Bash(vercel ls *)",
+      "Bash(vercel project *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('userId:', d.get\\('userId','?'\\)\\)\")",
+      "Bash(python3 *)",
+      "Bash(node *)",
+      "Skill(using-superpowers)"
     ]
   }
 }
