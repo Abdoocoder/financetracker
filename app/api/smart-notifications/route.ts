@@ -4,8 +4,6 @@ import { sendPushToUser } from '@/lib/push-send'
 import { getLessonForStage, determineStage } from '@/lib/daily-lessons'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 // ── helpers ──────────────────────────────────────────
 function getLocalHour() {
   return new Date(new Date().getTime() + 3 * 60 * 60 * 1000).getUTCHours()
@@ -24,6 +22,7 @@ function daysAgo(n: number) {
 
 // ── 6 ص: تذكير صباحي + ميزانية اليوم ───────────────
 async function dailyMorningReminder() {
+  const supabase = createAdminClient()
   const now = new Date(new Date().getTime() + 3 * 60 * 60 * 1000)
   const year = now.getUTCFullYear()
   const month = now.getUTCMonth() + 1
@@ -102,6 +101,7 @@ async function autoRecurring() {
 
 // ── 6 م: تذكير مسائي ─────────────────────────────────
 async function eveningReminder() {
+  const supabase = createAdminClient()
   const todayStr = today()
   const { data: profiles } = await supabase
     .from('profiles').select('id, full_name')
@@ -127,6 +127,7 @@ async function eveningReminder() {
 
 // ── الجمعة 8 ص: تقرير أسبوعي ────────────────────────
 async function weeklyReport() {
+  const supabase = createAdminClient()
   const { data: profiles } = await supabase
     .from('profiles').select('id, full_name, monthly_income, lesson_streak')
   if (!profiles?.length) return
@@ -211,6 +212,7 @@ async function wealthGuidanceAlert() {
   const firstDay = `${year}-${String(month).padStart(2,'0')}-01`
   const todayStr = today()
 
+  const supabase = createAdminClient()
   const { data: profiles } = await supabase
     .from('profiles').select('id, full_name, monthly_income, lang')
     .gt('monthly_income', 0)
@@ -310,6 +312,7 @@ async function wealthGuidanceAlert() {
 
 // ── 6 ص: تذكير موعد الديون التي لك ─────────────────
 async function receivableDebtReminder() {
+  const supabase = createAdminClient()
   const todayStr = today()
   const tomorrow = new Date(new Date().getTime() + 3 * 60 * 60 * 1000 + 86400000)
     .toISOString().split('T')[0]
@@ -365,6 +368,7 @@ async function receivableDebtReminder() {
 
 // ── Smart Nudge: مستخدمين غير نشطين 3 أيام ─────────
 async function smartNudge() {
+  const supabase = createAdminClient()
   const { data: profiles } = await supabase
     .from('profiles').select('id, full_name, lang')
 

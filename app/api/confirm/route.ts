@@ -1,10 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function safeNext(next: string | null): string {
+  if (!next) return '/dashboard'
+  if ((next.startsWith('/') && !next.startsWith('//')) || next === '/') return next
+  return '/dashboard'
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
+  const next = safeNext(searchParams.get('next'))
 
   if (code) {
     const cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[] = []
@@ -23,11 +29,18 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error && data.session?.access_token) {
       const redirectUrl = new URL(next, request.url)
-      redirectUrl.searchParams.set('t', data.session.access_token)
       const response = NextResponse.redirect(redirectUrl)
       cookiesToSet.forEach(({ name, value, options }) =>
         response.cookies.set(name, value, options as Parameters<typeof response.cookies.set>[2])
       )
+      // Store recovery token in HttpOnly cookie — never in the URL
+      response.cookies.set('sb-recovery-token', data.session.access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 3600,
+        path: '/',
+      })
       return response
     }
   }

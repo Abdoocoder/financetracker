@@ -71,29 +71,25 @@ class DebtSummarySection extends StatelessWidget {
                 Text('debts_total_paid_life'.tr(),
                     style: TextStyle(
                         color: cs.onSurfaceVariant,
-                        fontSize: 12,
-                        fontFamily: 'Cairo')),
+                        fontSize: 12)),
                 Text('${lifeTimePaid.toStringAsFixed(0)} $currency',
                     style: const TextStyle(
                         color: AppColors.successLight,
                         fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo')),
+                        fontWeight: FontWeight.w900)),
               ]),
               const Spacer(),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text('debts_paid_count'.tr(),
                     style: TextStyle(
                         color: cs.onSurfaceVariant,
-                        fontSize: 11,
-                        fontFamily: 'Cairo')),
+                        fontSize: 11)),
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Text('$paidCount ',
                       style: const TextStyle(
                           color: AppColors.successLight,
                           fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          fontFamily: 'Cairo')),
+                          fontWeight: FontWeight.w900)),
                   const Icon(Icons.check_circle_outline, size: 16, color: AppColors.successLight),
                 ]),
               ]),
@@ -114,14 +110,12 @@ class DebtSummarySection extends StatelessWidget {
                   style: TextStyle(
                       color: cs.onSurfaceVariant,
                       fontSize: 12,
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w700)),
               Text('${paidPct.toStringAsFixed(1)}%',
                   style: const TextStyle(
                       color: AppColors.successLight,
                       fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'Cairo')),
+                      fontWeight: FontWeight.w900)),
             ]),
             const SizedBox(height: 8),
             Semantics(
@@ -143,15 +137,13 @@ class DebtSummarySection extends StatelessWidget {
                   ]),
                   style: TextStyle(
                       color: cs.onSurfaceVariant,
-                      fontSize: 10,
-                      fontFamily: 'Cairo')),
+                      fontSize: 10)),
               Text(
                   'debts_original_amount_label'
                       .tr(args: [totalOriginal.toStringAsFixed(0), currency]),
                   style: TextStyle(
                       color: cs.onSurfaceVariant,
-                      fontSize: 10,
-                      fontFamily: 'Cairo')),
+                      fontSize: 10)),
             ]),
           ]),
         ),
@@ -171,12 +163,11 @@ class DebtSummarySection extends StatelessWidget {
             style: TextStyle(
                 color: color,
                 fontSize: 14,
-                fontWeight: FontWeight.w900,
-                fontFamily: 'Cairo')),
+                fontWeight: FontWeight.w900)),
         const SizedBox(height: 4),
         Text(label,
             style: TextStyle(
-                color: cs.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo'),
+                color: cs.onSurfaceVariant, fontSize: 10),
             textAlign: TextAlign.center),
       ]),
     );

@@ -22,8 +22,7 @@ class BadgeGrid extends StatelessWidget {
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                  fontFamily: 'Cairo'))),
+                  fontSize: 16))),
       const SizedBox(height: 12),
       Wrap(
         spacing: 10,
@@ -61,15 +60,13 @@ class BadgeGrid extends StatelessWidget {
                                 ? colorScheme.onSurface
                                 : colorScheme.onSurfaceVariant,
                             fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Cairo'),
+                            fontWeight: FontWeight.w700),
                         textAlign: TextAlign.center,
                         maxLines: 2),
                     Text(info.$3,
                         style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
-                            fontSize: 9,
-                            fontFamily: 'Cairo')),
+                            fontSize: 11)),
                   ]),
             ),
           );

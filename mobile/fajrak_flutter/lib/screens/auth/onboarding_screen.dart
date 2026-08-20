@@ -146,7 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               _currentStep == 3 
                                 ? 'onboarding_start'.tr()
                                 : 'continue'.tr(),
-                              style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16),
+                              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                             ),
                     ),
                   ),
@@ -156,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeInOut,
                       ),
-                      child: Text('back'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                      child: Text('back'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant)),
                     ),
                 ],
               ),
@@ -198,13 +198,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             'onboarding_welcome_title'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+            style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 16),
           Text(
             'onboarding_welcome_subtitle'.tr(),
             textAlign: TextAlign.center,
-            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16, fontFamily: 'Cairo', height: 1.6),
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16, height: 1.6),
           ),
         ],
       ),
@@ -221,7 +221,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         controller: _incomeController,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         textAlign: TextAlign.center,
-        style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+        style: TextStyle(color: colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.w900),
         decoration: InputDecoration(
           hintText: '0',
           hintStyle: TextStyle(color: colorScheme.outlineVariant),
@@ -244,7 +244,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Text(
             'onboarding_day_value'.tr(args: [_salaryDay.toString()]),
-            style: TextStyle(color: colorScheme.primary, fontSize: 40, fontWeight: FontWeight.w900, fontFamily: 'Cairo'),
+            style: TextStyle(color: colorScheme.primary, fontSize: 40, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 20),
           SliderTheme(
@@ -291,11 +291,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
                 info?['labelAr'] as String? ?? _currency,
-                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 15, fontWeight: FontWeight.w700),
+                style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w700),
               ),
               Text(
                 _currency,
-                style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'monospace', fontSize: 12),
+                style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
               ),
             ])),
             TextButton(
@@ -306,7 +306,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onSelected: (code) => setState(() => _currency = code),
                 );
               },
-              child: Text('تغيير', style: TextStyle(color: colorScheme.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              child: Text('تغيير', style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w700)),
             ),
           ]),
         ),
@@ -314,7 +314,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 10),
           Text(
             '📍 اكتشفنا أنك في ${_detected!.countryName}',
-            style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12),
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
             textAlign: TextAlign.center,
           ),
         ],
@@ -330,9 +330,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           Icon(icon, size: 50, color: colorScheme.primary),
           const SizedBox(height: 20),
-          Text(title, style: TextStyle(color: colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+          Text(title, style: TextStyle(color: colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
-          Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14, fontFamily: 'Cairo')),
+          Text(subtitle, textAlign: TextAlign.center, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
           const SizedBox(height: 40),
           Container(
             padding: const EdgeInsets.all(24),

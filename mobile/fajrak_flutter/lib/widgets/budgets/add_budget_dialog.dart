@@ -69,7 +69,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('budget_category_exists'.tr(),
-                    style: const TextStyle(fontFamily: 'Cairo')),
+                    style: const TextStyle()),
                 backgroundColor: const Color(0xFFF59E0B)));
           }
           return;
@@ -87,7 +87,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text(e.toString(), style: const TextStyle())),
         );
       }
     } finally {
@@ -117,8 +117,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: colorScheme.onSurface,
-                fontFamily: 'Cairo')),
+                color: colorScheme.onSurface)),
         const SizedBox(height: 20),
         if (widget.existing == null) ...[
           Align(
@@ -126,8 +125,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
               child: Text('budget_category'.tr(),
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                      fontFamily: 'Cairo'))),
+                      fontSize: 12))),
           const SizedBox(height: 8),
           GridView.count(
               crossAxisCount: 4,
@@ -162,7 +160,6 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
                                       ? colorScheme.primary
                                       : colorScheme.onSurfaceVariant,
                                   fontSize: 10,
-                                  fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w700),
                               textAlign: TextAlign.center),
                         ]),
@@ -175,11 +172,11 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
           controller: _limitCtrl,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textAlign: TextAlign.right,
-          style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+          style: TextStyle(color: colorScheme.onSurface),
           decoration: InputDecoration(
             labelText: 'budget_monthly_limit'.tr(args: [widget.currency]),
             labelStyle: TextStyle(
-                color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+                color: colorScheme.onSurfaceVariant),
             filled: true,
             fillColor: colorScheme.surface,
             border: OutlineInputBorder(
@@ -202,7 +199,7 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
                       borderRadius: BorderRadius.circular(12))),
               child: Text(widget.existing != null ? 'save'.tr() : 'add'.tr(),
                   style: const TextStyle(
-                      fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                      fontWeight: FontWeight.w900)),
             )),
         const SizedBox(height: 16),
       ]),

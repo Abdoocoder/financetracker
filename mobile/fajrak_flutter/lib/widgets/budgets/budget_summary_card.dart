@@ -35,7 +35,6 @@ class BudgetSummaryCard extends StatelessWidget {
             style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontSize: 12,
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900)),
         const SizedBox(height: 12),
         _summaryRow(
@@ -52,16 +51,14 @@ class BudgetSummaryCard extends StatelessWidget {
           Text('dash_available_spending'.tr(),
               style: TextStyle(
                   color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo')),
+                  fontWeight: FontWeight.w900)),
           Text('${available.toStringAsFixed(0)} $currency',
               style: TextStyle(
                   color: available >= 0
                       ? AppColors.successLight
                       : AppColors.errorLight,
                   fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                  fontFamily: 'Cairo')),
+                  fontSize: 18)),
         ]),
         if (totalBudgeted > 0) ...[
           const SizedBox(height: 10),
@@ -69,8 +66,7 @@ class BudgetSummaryCard extends StatelessWidget {
             Text('dash_spent_from_categories'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 11,
-                    fontFamily: 'Cairo')),
+                    fontSize: 11)),
             Text(
                 '${totalSpent.toStringAsFixed(0)} / ${totalBudgeted.toStringAsFixed(0)} $currency',
                 style: TextStyle(
@@ -78,8 +74,7 @@ class BudgetSummaryCard extends StatelessWidget {
                         ? colorScheme.error
                         : colorScheme.onSurfaceVariant,
                     fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Cairo')),
+                    fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 6),
           Semantics(
@@ -110,14 +105,12 @@ class BudgetSummaryCard extends StatelessWidget {
         Text(label,
             style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
-                fontSize: 13,
-                fontFamily: 'Cairo')),
+                fontSize: 13)),
         Text(value,
             style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.w700,
-                fontSize: 13,
-                fontFamily: 'Cairo')),
+                fontSize: 13)),
       ]),
     );
   }

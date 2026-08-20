@@ -1,6 +1,6 @@
 {
   "name": "fajrak",
-  "version": "3.35.4",
+  "version": "3.36.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -23,7 +23,7 @@
     "@tanstack/react-query": "^5.96.2",
     "@vercel/speed-insights": "^2.0.0",
     "firebase": "^12.10.0",
-    "firebase-admin": "^13.7.0",
+    "firebase-admin": "^14.3.0",
     "lucide-react": "^0.577.0",
     "next": "^16.2.3",
     "react": "^19.2.4",
@@ -33,8 +33,12 @@
     "task-master-ai": "^0.43.1",
     "web-push": "^3.6.7"
   },
+  "overrides": {
+    "@sentry/cli": "^3.4.2"
+  },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@tanstack/react-query-devtools": "^5.96.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
@@ -43,7 +47,6 @@
     "@types/react-dom": "^19.2.3",
     "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.4.20",
-    "@tanstack/react-query-devtools": "^5.96.2",
     "eslint": "^9",
     "eslint-config-next": "^16.2.1",
     "jest": "^30.3.0",

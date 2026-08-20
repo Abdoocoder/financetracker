@@ -41,7 +41,6 @@ class PortfolioSummaryCard extends StatelessWidget {
         Text('inv_total_value'.tr(),
             style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
-                fontFamily: 'Cairo',
                 fontSize: 13)),
         const SizedBox(height: 8),
         Text(
@@ -51,8 +50,7 @@ class PortfolioSummaryCard extends StatelessWidget {
           style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 32,
-              fontWeight: FontWeight.w900,
-              fontFamily: 'Cairo'),
+              fontWeight: FontWeight.w900),
         ),
         const SizedBox(height: 8),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -67,7 +65,6 @@ class PortfolioSummaryCard extends StatelessWidget {
                   color: gain >= 0
                       ? AppColors.success
                       : AppColors.error,
-                  fontFamily: 'Cairo',
                   fontWeight: FontWeight.w700)),
         ]),
         const SizedBox(height: 12),
@@ -93,12 +90,10 @@ class PortfolioSummaryCard extends StatelessWidget {
           style: TextStyle(
               color: color,
               fontWeight: FontWeight.w900,
-              fontFamily: 'Cairo',
               fontSize: 16)),
       Text(label,
           style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
-              fontFamily: 'Cairo',
               fontSize: 11)),
     ]);
   }

@@ -38,12 +38,10 @@ class LevelCard extends StatelessWidget {
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    fontFamily: 'Cairo')),
+                    fontSize: 22)),
             Text('المستوى $level',
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontFamily: 'Cairo',
                     fontSize: 13)),
           ]),
           Container(
@@ -55,8 +53,7 @@ class LevelCard extends StatelessWidget {
             child: Text('$points نقطة',
                 style: TextStyle(
                     color: colorScheme.primary,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo')),
+                    fontWeight: FontWeight.w900)),
           ),
         ]),
         const SizedBox(height: 16),
@@ -77,14 +74,12 @@ class LevelCard extends StatelessWidget {
           Text('$points نقطة',
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 11,
-                  fontFamily: 'Cairo')),
+                  fontSize: 11)),
           if (nextLevel < 9999)
             Text('gamif_points_to_next'.tr(namedArgs: {'points': nextLevel.toString()}),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 11,
-                    fontFamily: 'Cairo')),
+                    fontSize: 11)),
         ]),
       ]),
     );

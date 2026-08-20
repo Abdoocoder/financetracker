@@ -51,7 +51,6 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                       style: TextStyle(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
-                          fontFamily: 'Cairo',
                           fontSize: 14))),
               Icon(
                   _showSimulator
@@ -98,20 +97,17 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                   Text('inv_sim_after_years'.tr(args: [_years.toString()]),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo',
                           fontSize: 12)),
                   Text('${fv.toStringAsFixed(0)} ${widget.currency}',
                       style: TextStyle(
                           color: colorScheme.secondary,
                           fontWeight: FontWeight.w900,
-                          fontSize: 28,
-                          fontFamily: 'Cairo')),
+                          fontSize: 28)),
                   Text(
                       '${'youInvested'.tr()}: ${totalInvested.toStringAsFixed(0)} ${widget.currency} | ${'inv_profit'.tr()}: ${(fv - totalInvested).toStringAsFixed(0)} ${widget.currency}',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 11,
-                          fontFamily: 'Cairo')),
+                          fontSize: 11)),
                 ]),
               ),
             ]),
@@ -129,12 +125,10 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
         Text(label,
             style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
-                fontFamily: 'Cairo',
                 fontSize: 12)),
         Text(value,
             style: TextStyle(
                 color: colorScheme.onSurface,
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w700,
                 fontSize: 12)),
       ]),

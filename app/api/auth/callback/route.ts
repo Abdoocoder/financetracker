@@ -2,10 +2,16 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function safeNext(next: string | null): string {
+  if (!next) return '/dashboard'
+  if ((next.startsWith('/') && !next.startsWith('//')) || next === '/') return next
+  return '/dashboard'
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
+  const next = safeNext(searchParams.get('next'))
 
   if (code) {
     const cookieStore = await cookies()
@@ -24,13 +30,8 @@ export async function GET(request: NextRequest) {
       }
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    console.log('callback error:', error, 'code:', code?.slice(0,20))
     if (!error) {
-      const redirectUrl = new URL(next, request.url)
-      if (next === '/reset-password') {
-        redirectUrl.searchParams.set('verified', '1')
-      }
-      return NextResponse.redirect(redirectUrl)
+      return NextResponse.redirect(new URL(next, request.url))
     }
   }
 

@@ -139,7 +139,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text('alerts_generate_success'.tr(),
-                  style: const TextStyle(fontFamily: 'Cairo'))));
+                  style: const TextStyle())));
           _load();
           context.read<AppState>().loadUnreadAlerts();
         } else {
@@ -219,7 +219,6 @@ class _AlertsScreenState extends State<AlertsScreen> {
       appBar: AppBar(
           title: Text('alerts_title'.tr(),
               style: TextStyle(
-                  fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface)),
           iconTheme: IconThemeData(color: colorScheme.onSurface)),
@@ -285,7 +284,6 @@ class _AlertsScreenState extends State<AlertsScreen> {
                             Text('alerts_empty'.tr(),
                                 style: TextStyle(
                                     color: colorScheme.onSurfaceVariant,
-                                    fontFamily: 'Cairo',
                                     fontSize: 14)),
                           ]),
                         ))

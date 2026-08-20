@@ -63,15 +63,13 @@ class TransactionSummary extends StatelessWidget {
               style: const TextStyle(
                   color: color,
                   fontWeight: FontWeight.w900,
-                  fontSize: 15,
-                  fontFamily: 'Cairo'),
+                  fontSize: 15),
             ),
           ),
           Text('trans_total_expenses'.tr(),
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 10,
-                  fontFamily: 'Cairo')),
+                  fontSize: 10)),
           if (debtPayments > 0) ...[
             const SizedBox(height: 4),
             Container(
@@ -84,16 +82,14 @@ class TransactionSummary extends StatelessWidget {
                 Text('💳 ${'dash_debt_payments'.tr()}',
                     style: const TextStyle(
                         color: AppColors.primary,
-                        fontSize: 8,
-                        fontFamily: 'Cairo',
+                        fontSize: 11,
                         fontWeight: FontWeight.w700)),
                 FittedBox(
                   child: Text(debtPayments.toStringAsFixed(0),
                       style: const TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w900,
-                          fontSize: 11,
-                          fontFamily: 'Cairo')),
+                          fontSize: 11)),
                 ),
               ]),
             ),
@@ -126,15 +122,13 @@ class TransactionSummary extends StatelessWidget {
               style: TextStyle(
                   color: color,
                   fontWeight: FontWeight.w900,
-                  fontSize: 15,
-                  fontFamily: 'Cairo'),
+                  fontSize: 15),
             ),
           ),
           Text(label,
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 10,
-                  fontFamily: 'Cairo')),
+                  fontSize: 10)),
         ],
       ),
     );

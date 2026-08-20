@@ -3,8 +3,8 @@
  */
 var mockFrom = jest.fn()
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
+jest.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: jest.fn(() => ({
     from: (t: string) => mockFrom(t),
     auth: { getUser: jest.fn() }
   })),

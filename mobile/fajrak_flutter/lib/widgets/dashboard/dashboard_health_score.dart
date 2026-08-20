@@ -67,14 +67,14 @@ class _DashboardHealthScoreState extends State<DashboardHealthScore> {
         Row(children: [
           SizedBox(width: 64, height: 64, child: Stack(alignment: Alignment.center, children: [
             CircularProgressIndicator(value: widget.score / 100, color: color, backgroundColor: widget.colorScheme.outlineVariant, strokeWidth: 6),
-            Text('${widget.score}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18, fontFamily: 'Cairo')),
+            Text('${widget.score}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18)),
           ])),
           const SizedBox(width: 16),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('health_score'.tr(), style: TextStyle(color: widget.colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+            Text('health_score'.tr(), style: TextStyle(color: widget.colorScheme.onSurfaceVariant, fontSize: 11)),
             const SizedBox(height: 4),
-            Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo')),
-            Text('dash_points_per_100'.tr(), style: TextStyle(color: widget.colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+            Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text('dash_points_per_100'.tr(), style: TextStyle(color: widget.colorScheme.onSurfaceVariant, fontSize: 11)),
           ])),
         ]),
         // Mini sparkline chart if history is available
@@ -101,7 +101,7 @@ class _DashboardHealthScoreState extends State<DashboardHealthScore> {
             ),
           )),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('health_history_trend'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: widget.colorScheme.onSurfaceVariant)),
+            Text('health_history_trend'.tr(), style: TextStyle(fontSize: 10, color: widget.colorScheme.onSurfaceVariant)),
           ]),
         ],
       ]),

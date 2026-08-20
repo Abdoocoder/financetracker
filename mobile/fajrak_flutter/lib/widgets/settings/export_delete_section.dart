@@ -46,7 +46,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
         setState(() => _loading = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('settings_no_export'.tr(),
-                style: const TextStyle(fontFamily: 'Cairo'))));
+                style: const TextStyle())));
       }
       return;
     }
@@ -93,7 +93,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
       if (mounted) {
         setState(() => _deleting = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('error_generic'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text('error_generic'.tr(), style: const TextStyle())),
         );
       }
     }
@@ -130,7 +130,6 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                 style: const TextStyle(
                   color: AppColors.textMuted,
                   fontSize: 12,
-                  fontFamily: 'Cairo',
                   height: 1.6,
                 ),
               ),
@@ -142,7 +141,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                   icon: const Icon(Icons.file_download_outlined, size: 20),
                   label: Text(
                     'settings_export'.tr(),
-                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900),
+                    style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.surface,
@@ -183,7 +182,6 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo',
                   fontSize: 14,
                 ),
               ),
@@ -194,7 +192,6 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                 style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
                   fontSize: 12,
-                  fontFamily: 'Cairo',
                 ),
               ),
               const SizedBox(height: 20),
@@ -210,7 +207,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                   ),
                   child: Text(
                     'share_btn'.tr(),
-                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900),
+                    style: const TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
               ),
@@ -247,7 +244,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                         )
                       : Text(
                           'settings_logout'.tr(),
-                          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
                         ),
                 ),
               ),
@@ -265,7 +262,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                     ),
                     child: Text(
                       'delete'.tr(),
-                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 12),
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                     ),
                   ),
                 )
@@ -276,7 +273,6 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                   style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
-                    fontFamily: 'Cairo',
                     height: 1.6,
                   ),
                 ),
@@ -284,10 +280,10 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                 TextField(
                   controller: _deleteInputCtrl,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: 'delete_account_confirmation_text'.tr(),
-                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     filled: true,
                     fillColor: colorScheme.surface,
                     border: OutlineInputBorder(
@@ -319,7 +315,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                               )
                             : Text(
                                 'confirm_delete'.tr(),
-                                style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+                                style: const TextStyle(fontWeight: FontWeight.w700),
                               ),
                       ),
                     ),
@@ -338,7 +334,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
-                        child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                        child: Text('cancel'.tr(), style: const TextStyle()),
                       ),
                     ),
                   ],

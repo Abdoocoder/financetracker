@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const supabase = createAdminClient()
-
 const TROY_OZ_TO_GRAM = 31.1035
 
 async function getYahooPrice(symbol: string): Promise<number | null> {
@@ -44,6 +42,7 @@ async function getExchangeRate(target: string): Promise<number> {
 }
 
 export async function GET(request: NextRequest) {
+  const supabase = createAdminClient()
   const authHeader = request.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

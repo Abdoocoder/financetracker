@@ -3,9 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 export async function GET(request: NextRequest) {
+  const supabase = createAdminClient()
   if (!verifyCronAuth(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const now = new Date()

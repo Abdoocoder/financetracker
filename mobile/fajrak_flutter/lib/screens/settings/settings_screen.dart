@@ -116,7 +116,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: Text(
           'settings_title'.tr(),
           style: TextStyle(
-            fontFamily: 'Cairo',
             fontWeight: FontWeight.w900,
             color: colorScheme.onSurface,
           ),
@@ -156,7 +155,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'Cairo',
                       ),
                     ),
                   ),

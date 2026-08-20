@@ -167,14 +167,12 @@ class _DebtCelebrationDialogState extends State<DebtCelebrationDialog>
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo')),
+                    fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
             Text('"${widget.name}"',
                 style: const TextStyle(
                     color: Color(0xFF10B981),
                     fontWeight: FontWeight.w700,
-                    fontFamily: 'Cairo',
                     fontSize: 16)),
             const SizedBox(height: 12),
             Container(
@@ -187,7 +185,6 @@ class _DebtCelebrationDialogState extends State<DebtCelebrationDialog>
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                     color: Color(0xFF94A3B8),
-                    fontFamily: 'Cairo',
                     fontSize: 12,
                     height: 1.6),
               ),
@@ -205,7 +202,7 @@ class _DebtCelebrationDialogState extends State<DebtCelebrationDialog>
                   onPressed: () => Navigator.pop(context),
                   child: Text('debts_celebration_btn'.tr(),
                       style: const TextStyle(
-                          fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                          fontWeight: FontWeight.w900)),
                 )),
             const SizedBox(height: 8),
           ]),

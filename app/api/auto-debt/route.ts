@@ -3,9 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 async function processAutoDebts() {
+  const supabase = createAdminClient()
   const now = new Date()
   const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
   const dayOfMonth = localNow.getUTCDate()
@@ -153,6 +152,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createAdminClient()
     const authHeader = request.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const token = authHeader.replace('Bearer ', '')
@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ ok: true, message: `تم معالجة ${count} دفعة تلقائية ✅` })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

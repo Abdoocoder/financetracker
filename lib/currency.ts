@@ -12,7 +12,14 @@ export interface ExchangeRateResponse {
 
 export async function fetchExchangeRate(base: string, target: string): Promise<number | null> {
   try {
-    const res = await fetch(`/api/exchange-rate?base=${base}&target=${target}`)
+    const { createClient } = await import('@/lib/supabase/client')
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session?.access_token) return null
+
+    const res = await fetch(`/api/exchange-rate?base=${base}&target=${target}`, {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
     if (!res.ok) return null
     const data: ExchangeRateResponse = await res.json()
     return data.rate

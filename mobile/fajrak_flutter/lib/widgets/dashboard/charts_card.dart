@@ -51,7 +51,6 @@ class ChartsCard extends StatelessWidget {
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo',
                   fontSize: 14)),
           const SizedBox(height: 24),
           RepaintBoundary(
@@ -76,8 +75,7 @@ class ChartsCard extends StatelessWidget {
                               months6Data[value.toInt()]['month'],
                               style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
-                                  fontSize: 10,
-                                  fontFamily: 'Cairo'),
+                                  fontSize: 10),
                             ),
                           );
                         }
@@ -152,7 +150,7 @@ class ChartsCard extends StatelessWidget {
         const SizedBox(width: 6),
         Text(label,
             style: TextStyle(
-                color: colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
+                color: colorScheme.onSurfaceVariant, fontSize: 12)),
       ],
     );
   }
@@ -172,7 +170,6 @@ class ChartsCard extends StatelessWidget {
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo',
                   fontSize: 14)),
           const SizedBox(height: 16),
           ...categoryData.map((cat) {
@@ -185,8 +182,7 @@ class ChartsCard extends StatelessWidget {
                     child: Text(cat['category'],
                         style: TextStyle(
                             color: colorScheme.onSurface,
-                            fontSize: 13,
-                            fontFamily: 'Cairo')),
+                            fontSize: 13)),
                   ),
                   Expanded(
                     flex: 5,
@@ -211,8 +207,7 @@ class ChartsCard extends StatelessWidget {
                       style: TextStyle(
                           color: colorScheme.onSurface,
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Cairo'),
+                          fontWeight: FontWeight.w700),
                       textAlign: TextAlign.left,
                     ),
                   ),

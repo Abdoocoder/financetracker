@@ -87,7 +87,6 @@ class _ChallengesCardState extends State<ChallengesCard> {
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Cairo',
                       fontSize: 14)),
               if (_activeChallenge != null)
                 GestureDetector(
@@ -95,8 +94,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
                   child: Text('trans_all'.tr(),
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 12,
-                          fontFamily: 'Cairo')),
+                          fontSize: 12)),
                 )
             ],
           ),
@@ -122,12 +120,11 @@ class _ChallengesCardState extends State<ChallengesCard> {
               style: TextStyle(
                   color: colorScheme.onSurface,
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Cairo')),
+                  fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text('${active['days']} ${"learn_streak_day".tr()}',
               style: TextStyle(
-                  color: colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
+                  color: colorScheme.onSurfaceVariant, fontSize: 12)),
           const SizedBox(height: 12),
           Semantics(
             value: '${pct.toStringAsFixed(0)}%',
@@ -146,8 +143,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
               style: TextStyle(
                   color: isDark ? AppColors.success : colorScheme.primary,
                   fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'monospace')),
+                  fontWeight: FontWeight.w900)),
         ],
       ),
     );
@@ -188,7 +184,6 @@ class _ChallengesCardState extends State<ChallengesCard> {
                         color: colorScheme.onSurface,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'Cairo',
                         height: 1.3),
                     textAlign: TextAlign.right,
                     maxLines: 2,
@@ -214,8 +209,7 @@ class _ChallengesCardState extends State<ChallengesCard> {
                           ? (isDark ? AppColors.successLight : colorScheme.primary)
                           : (isDark ? colorScheme.secondary : colorScheme.primary),
                       fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      fontFamily: 'monospace'),
+                      fontWeight: FontWeight.w900),
                 ),
               ],
             ),

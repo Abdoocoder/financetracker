@@ -134,7 +134,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
     if (shares == null || shares <= 0 || price == null || price <= 0) return;
     if (shares > ownedShares) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('inv_sell_exceeds_shares'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+        SnackBar(content: Text('inv_sell_exceeds_shares'.tr(), style: const TextStyle())),
       );
       return;
     }
@@ -150,7 +150,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
         backgroundColor: Theme.of(ctx).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('inv_sell_confirm_btn'.tr(),
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900,
+            style: TextStyle(fontWeight: FontWeight.w900,
                 color: Theme.of(ctx).colorScheme.onSurface)),
         content: Column(mainAxisSize: MainAxisSize.min, children: [
           _summaryRow(ctx, 'inv_sell_avg_buy'.tr(),
@@ -175,7 +175,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text('inv_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+            child: Text('inv_cancel'.tr(), style: const TextStyle()),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -184,7 +184,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             child: Text('inv_sell_confirm_btn'.tr(),
-                style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                style: const TextStyle(fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -260,9 +260,9 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
 
   Widget _summaryRow(BuildContext ctx, String label, String value, Color valueColor) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 13,
+      Text(label, style: TextStyle(fontSize: 13,
           color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
-      Text(value, style: TextStyle(fontFamily: 'Cairo', fontSize: 13,
+      Text(value, style: TextStyle(fontSize: 13,
           fontWeight: FontWeight.w900, color: valueColor)),
     ]);
   }
@@ -275,12 +275,11 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
       keyboardType: type,
       textAlign: TextAlign.center,
       style: TextStyle(
-          color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 12),
+          color: colorScheme.onSurface, fontSize: 12),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
             color: colorScheme.onSurfaceVariant,
-            fontFamily: 'Cairo',
             fontSize: 10),
         filled: true,
         fillColor: colorScheme.surface,
@@ -327,7 +326,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                     style: TextStyle(
                         color: colorScheme.primary,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo',
                         fontSize: 18))),
           ),
           const SizedBox(width: 12),
@@ -340,7 +338,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                       style: TextStyle(
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
-                          fontFamily: 'Cairo',
                           fontSize: 14)),
                   if (isHalal) ...[
                     const SizedBox(width: 6),
@@ -351,22 +348,19 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                     '${shares.toStringAsFixed(4)} ${"inv_shares_suffix".tr()} • \$${currentPrice.toStringAsFixed(2)}',
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
-                        fontSize: 11,
-                        fontFamily: 'Cairo')),
+                        fontSize: 11)),
               ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('\$${value.toStringAsFixed(2)}',
                 style: TextStyle(
                     color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo')),
+                    fontWeight: FontWeight.w900)),
             Text('${gain >= 0 ? '+' : ''}${gainPct.toStringAsFixed(1)}%',
                 style: TextStyle(
                     color: gain >= 0
                         ? AppColors.success
                         : AppColors.error,
                     fontSize: 12,
-                    fontFamily: 'Cairo',
                     fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(width: 8),
@@ -404,8 +398,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
               '${"inv_sell_avg_buy".tr()}: \$${avgPrice.toStringAsFixed(2)}',
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 10,
-                  fontFamily: 'Cairo'),
+                  fontSize: 10),
             ),
             Text(
               '${'inv_roi_label'.tr()}: ${gain >= 0 ? "+" : ""}\$${gain.toStringAsFixed(2)}',
@@ -414,7 +407,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                       ? AppColors.success
                       : AppColors.error,
                   fontSize: 10,
-                  fontFamily: 'Cairo',
                   fontWeight: FontWeight.w700),
             ),
           ],
@@ -448,7 +440,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                     borderRadius: BorderRadius.circular(8))),
             child: Text('inv_tx_history'.tr(),
                 style: TextStyle(
-                    fontFamily: 'Cairo',
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           )),
@@ -468,7 +459,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                     borderRadius: BorderRadius.circular(8))),
             child: Text('inv_record_buy'.tr(),
                 style: TextStyle(
-                    fontFamily: 'Cairo',
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           )),
@@ -490,7 +480,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                     borderRadius: BorderRadius.circular(8))),
             child: Text('inv_record_sell'.tr(),
                 style: TextStyle(
-                    fontFamily: 'Cairo',
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           ),
@@ -535,7 +524,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                                 strokeWidth: 2, color: Colors.white))
                         : Text('inv_submit_btn'.tr(),
                             style: TextStyle(
-                                fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w900,
                                 fontSize: 12)),
                   )),
@@ -568,7 +556,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
               Text(
                 '${'inv_sell_max_shares'.tr()}: ${shares.toStringAsFixed(4)} ${'inv_shares_suffix'.tr()}',
                 style: TextStyle(
-                    fontFamily: 'Cairo',
                     fontSize: 10,
                     color: colorScheme.onSurfaceVariant),
               ),
@@ -591,7 +578,6 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                                 strokeWidth: 2, color: Colors.white))
                         : Text('inv_sell_confirm_btn'.tr(),
                             style: TextStyle(
-                                fontFamily: 'Cairo',
                                 fontWeight: FontWeight.w900,
                                 fontSize: 12)),
                   )),

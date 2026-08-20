@@ -191,7 +191,6 @@ class _HelpScreenState extends State<HelpScreen> {
         elevation: 0,
         title: Text('help_title'.tr(),
             style: TextStyle(
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: cs.onSurface)),
         iconTheme: IconThemeData(color: cs.onSurface),
@@ -209,11 +208,11 @@ class _HelpScreenState extends State<HelpScreen> {
                   border: Border.all(color: cs.outlineVariant)),
               child: TextField(
                 onChanged: (v) => setState(() => _search = v),
-                style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
+                style: TextStyle(color: cs.onSurface),
                 decoration: InputDecoration(
                   hintText: 'help_search_hint'.tr(),
                   prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant),
-                  hintStyle: TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.6), fontFamily: 'Cairo'),
+                  hintStyle: TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.6)),
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: InputBorder.none,
@@ -268,12 +267,10 @@ class _HelpScreenState extends State<HelpScreen> {
                               style: TextStyle(
                                   color: cs.onSurface,
                                   fontWeight: FontWeight.w900,
-                                  fontFamily: 'Cairo',
                                   fontSize: 13)),
                           Text('help_contact_subtitle'.tr(),
                               style: TextStyle(
                                   color: cs.onSurfaceVariant,
-                                  fontFamily: 'Cairo',
                                   fontSize: 11)),
                         ],
                       ),
@@ -296,7 +293,6 @@ class _HelpScreenState extends State<HelpScreen> {
                           style: const TextStyle(
                               color: AppColors.textMuted,
                               fontWeight: FontWeight.w900,
-                              fontFamily: 'Cairo',
                               fontSize: 13,
                               letterSpacing: 1.1)),
                     ),
@@ -347,7 +343,6 @@ class _FAQItemState extends State<_FAQItem> {
                 style: TextStyle(
                     color: _open ? cs.onSurface : cs.onSurfaceVariant,
                     fontWeight: _open ? FontWeight.w900 : FontWeight.w700,
-                    fontFamily: 'Cairo',
                     fontSize: 13)),
             trailing: AnimatedRotation(
               duration: const Duration(milliseconds: 200),
@@ -362,7 +357,6 @@ class _FAQItemState extends State<_FAQItem> {
               child: Text(widget.a,
                   style: TextStyle(
                       color: cs.onSurfaceVariant,
-                      fontFamily: 'Cairo',
                       fontSize: 12,
                       height: 1.6)),
             ),

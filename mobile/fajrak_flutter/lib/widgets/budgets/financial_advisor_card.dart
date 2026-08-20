@@ -32,8 +32,7 @@ class FinancialAdvisorCard extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
-                    color: colorScheme.onSurface,
-                    fontFamily: 'Cairo')),
+                    color: colorScheme.onSurface)),
           ]),
         ),
         Divider(color: colorScheme.outlineVariant, height: 1),
@@ -57,8 +56,7 @@ class FinancialAdvisorCard extends StatelessWidget {
                         style: TextStyle(
                             color: color,
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Cairo'))),
+                            fontWeight: FontWeight.w700))),
               ]),
             );
           }).toList()),

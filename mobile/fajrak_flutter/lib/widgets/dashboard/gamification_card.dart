@@ -74,14 +74,12 @@ class GamificationCard extends StatelessWidget {
                         style: TextStyle(
                             color: color,
                             fontWeight: FontWeight.w900,
-                            fontFamily: 'Cairo',
                             fontSize: 13)),
                     Text('$score ${"gamif_points".tr()}',
                         style: TextStyle(
                             color: colorScheme.onSurface,
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Cairo')),
+                            fontWeight: FontWeight.w700)),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -104,8 +102,7 @@ class GamificationCard extends StatelessWidget {
                         : 'gamif_next_level_tip'.tr(),
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
-                        fontSize: 10,
-                        fontFamily: 'Cairo')),
+                        fontSize: 10)),
               ],
             ),
           ),
