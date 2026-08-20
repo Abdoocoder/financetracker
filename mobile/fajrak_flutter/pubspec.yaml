@@ -1,7 +1,7 @@
 name: fajrak
 description: فجرك - تطبيق إدارة مالية ذكي
 publish_to: 'fajrak.com'
-version: 3.35.4+46
+version: 3.36.0+47
 
 environment:
   sdk: '>=3.11.0 <4.0.0'
@@ -67,6 +67,16 @@ flutter:
     - assets/images/
     - assets/i18n/
   fonts:
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700
     - family: Cairo
       fonts:
         - asset: assets/fonts/Cairo-Regular.ttf

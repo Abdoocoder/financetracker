@@ -107,17 +107,17 @@ class _GoalsScreenState extends State<GoalsScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: colorScheme.surface,
         title: Text('goals_delete_title'.tr(),
-            style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo')),
+            style: TextStyle(color: colorScheme.onSurface)),
         content: Text('confirm_delete'.tr(),
-            style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+            style: TextStyle(color: colorScheme.onSurfaceVariant)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+              child: Text('cancel'.tr(), style: const TextStyle())),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text('delete'.tr(),
-                  style: TextStyle(color: Theme.of(context).colorScheme.error, fontFamily: 'Cairo'))),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error))),
         ],
       ),
     );
@@ -147,7 +147,6 @@ class _GoalsScreenState extends State<GoalsScreen> {
       appBar: AppBar(
         title: Text('goals_title'.tr(),
             style: TextStyle(
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: colorScheme.onSurface)),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
@@ -197,11 +196,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         Icon(Icons.track_changes, size: 48, color: colorScheme.onSurfaceVariant),
                         const SizedBox(height: 12),
                         Text('goals_empty'.tr(),
-                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 15)),
+                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 15)),
                         const SizedBox(height: 16),
                         ElevatedButton(
                             onPressed: () => _showAddDialog(),
-                            child: Text('goals_add_first'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+                            child: Text('goals_add_first'.tr(), style: const TextStyle())),
                       ]),
                     )
                   else

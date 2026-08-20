@@ -7,9 +7,8 @@ import { verifyCronAuth } from '@/lib/cron-auth'
 // المنطق الفعلي ينفّذه المنظّم الرئيسي /api/smart-notifications عند hour === 6.
 // تأكد من عدم تشغيل cron-job.org لهذا المسار تلقائياً لتجنب الإشعارات المكررة.
 
-const supabase = createAdminClient()
-
 async function sendDailyReminders() {
+  const supabase = createAdminClient()
   const now = new Date()
   const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
   const year = localNow.getUTCFullYear()

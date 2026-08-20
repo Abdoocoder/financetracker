@@ -199,15 +199,13 @@ class _DebtListItemState extends State<DebtListItem> {
                     style: TextStyle(
                         color: cs.onSurface,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo',
                         fontSize: 14)),
                 if (widget.debt['notes'] != null &&
                     (widget.debt['notes'] as String).isNotEmpty)
                   Text(widget.debt['notes'],
                       style: TextStyle(
                           color: cs.onSurfaceVariant,
-                          fontSize: 11,
-                          fontFamily: 'Cairo'),
+                          fontSize: 11),
                       overflow: TextOverflow.ellipsis),
                 if (autoDeduct || isOverdue)
                   Padding(
@@ -220,7 +218,7 @@ class _DebtListItemState extends State<DebtListItem> {
                               color: AppColors.primary.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(5)),
                           child: const Text('⚡ تلقائي',
-                              style: TextStyle(color: AppColors.primary, fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                              style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.w700)),
                         ),
                       if (isOverdue)
                         Container(
@@ -229,7 +227,7 @@ class _DebtListItemState extends State<DebtListItem> {
                               color: AppColors.error.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(5)),
                           child: const Text('🔴 متأخر',
-                              style: TextStyle(color: AppColors.error, fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                              style: TextStyle(color: AppColors.error, fontSize: 11, fontWeight: FontWeight.w700)),
                         ),
                     ]),
                   ),
@@ -238,7 +236,6 @@ class _DebtListItemState extends State<DebtListItem> {
               style: const TextStyle(
                   color: AppColors.error,
                   fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo',
                   fontSize: 15)),
           const SizedBox(width: 8),
           GestureDetector(
@@ -282,14 +279,13 @@ class _DebtListItemState extends State<DebtListItem> {
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('debts_paid_pct'.tr(args: [pct.toStringAsFixed(0)]),
               style: TextStyle(
-                  color: cs.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+                  color: cs.onSurfaceVariant, fontSize: 11)),
           Row(children: [
             if ((widget.debt['monthly_payment'] as num).toDouble() > 0)
               Text('${(widget.debt['monthly_payment'] as num).toStringAsFixed(0)}${'debts_per_month'.tr()}',
                   style: TextStyle(
                       color: cs.onSurfaceVariant,
-                      fontSize: 11,
-                      fontFamily: 'Cairo')),
+                      fontSize: 11)),
             if (widget.debt['payment_day'] != null) ...[
               const SizedBox(width: 6),
               Container(
@@ -301,7 +297,6 @@ class _DebtListItemState extends State<DebtListItem> {
                     style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 10,
-                        fontFamily: 'Cairo',
                         fontWeight: FontWeight.w700)),
               ),
               if (daysUntil != null) ...[
@@ -318,7 +313,6 @@ class _DebtListItemState extends State<DebtListItem> {
                     style: TextStyle(
                         color: daysUntil == 0 ? AppColors.warning : AppColors.textSecondary,
                         fontSize: 10,
-                        fontFamily: 'Cairo',
                         fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -336,7 +330,6 @@ class _DebtListItemState extends State<DebtListItem> {
                         style: const TextStyle(
                             color: AppColors.warning,
                             fontSize: 10,
-                            fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700)),
                   ],
                 ),
@@ -356,7 +349,7 @@ class _DebtListItemState extends State<DebtListItem> {
                   child: TextField(
                     controller: _paymentCtrl,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    style: TextStyle(color: cs.onSurface, fontSize: 13, fontFamily: 'Cairo'),
+                    style: TextStyle(color: cs.onSurface, fontSize: 13),
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                         hintText: 'trans_amount'.tr(),
@@ -406,7 +399,7 @@ class _DebtListItemState extends State<DebtListItem> {
                   padding: const EdgeInsets.only(top: 4, left: 4),
                   child: Text(
                     'Rate: ${_paymentExchangeRate.toStringAsFixed(4)} | ≈ ${((double.tryParse(_paymentCtrl.text) ?? 0) * _paymentExchangeRate).toStringAsFixed(2)} ${widget.currency}',
-                    style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.7), fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+                    style: TextStyle(color: AppColors.textMuted.withValues(alpha: 0.7), fontSize: 11, fontWeight: FontWeight.bold),
                   ),
                 ),
             ],
@@ -433,8 +426,7 @@ class _DebtListItemState extends State<DebtListItem> {
                       style: TextStyle(
                           color: AppColors.successLight,
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Cairo'))),
+                          fontWeight: FontWeight.w700))),
             ),
           ),
             ]),

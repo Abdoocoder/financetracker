@@ -7,7 +7,11 @@ import { createClient } from '../../lib/supabase/client'
 const mockSupabase = {
   auth: {
     getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
-    onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+    onAuthStateChange: jest.fn((cb: any) => {
+      // Fire INITIAL_SESSION synchronously so UserProvider resolves loading
+      setTimeout(() => cb('INITIAL_SESSION', null), 0)
+      return { data: { subscription: { unsubscribe: jest.fn() } } }
+    }),
   },
   from: jest.fn().mockReturnThis(),
   select: jest.fn().mockReturnThis(),
@@ -59,7 +63,11 @@ describe('UserProvider', () => {
     const mockUser = { id: 'u1', email: 'test@example.com' }
     const mockProfile = { id: 'u1', full_name: 'Test User' }
 
-    ;(mockSupabase.auth.getUser as jest.Mock).mockResolvedValueOnce({ data: { user: mockUser }, error: null })
+    // Override onAuthStateChange to fire with a real session
+    ;(mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementationOnce((cb: any) => {
+      setTimeout(() => cb('INITIAL_SESSION', { user: mockUser }), 0)
+      return { data: { subscription: { unsubscribe: jest.fn() } } }
+    })
     ;(mockSupabase.single as jest.Mock).mockResolvedValueOnce({ data: mockProfile, error: null })
 
     render(
@@ -78,6 +86,8 @@ describe('UserProvider', () => {
     let stateChangeCallback: any
     ;(mockSupabase.auth.onAuthStateChange as jest.Mock).mockImplementationOnce((cb: any) => {
       stateChangeCallback = cb
+      // Fire INITIAL_SESSION first to resolve loading
+      setTimeout(() => cb('INITIAL_SESSION', null), 0)
       return { data: { subscription: { unsubscribe: jest.fn() } } }
     })
 

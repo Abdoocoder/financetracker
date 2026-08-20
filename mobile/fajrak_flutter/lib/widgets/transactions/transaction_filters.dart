@@ -82,7 +82,6 @@ class TransactionFilters extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo',
                         color: colorScheme.onSurface,
                       ),
                     ),
@@ -104,7 +103,7 @@ class TransactionFilters extends StatelessWidget {
                 child: TextFormField(
                   initialValue: currentSearch,
                   onChanged: onSearchChanged,
-                  style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                  style: TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: 'search_hint'.tr(),
                     prefixIcon: Icon(Icons.search, color: colorScheme.onSurfaceVariant),
@@ -152,7 +151,6 @@ class TransactionFilters extends StatelessWidget {
         child: Text(label,
             style: TextStyle(
                 color: selected ? Colors.white : colorScheme.onSurfaceVariant,
-                fontFamily: 'Cairo',
                 fontSize: 12,
                 fontWeight: FontWeight.bold)),
       ),

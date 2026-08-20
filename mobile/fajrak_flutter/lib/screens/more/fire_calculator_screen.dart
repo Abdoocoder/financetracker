@@ -125,7 +125,7 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('fire_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: cs.onSurface)),
+        title: Text('fire_title'.tr(), style: TextStyle(fontWeight: FontWeight.w900, color: cs.onSurface)),
         backgroundColor: cs.surface,
         elevation: 0,
         iconTheme: IconThemeData(color: cs.onSurface),
@@ -149,7 +149,7 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(label, textAlign: TextAlign.center,
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 12,
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12,
                       color: active ? Colors.white : cs.onSurfaceVariant)),
                 ),
               ));
@@ -162,18 +162,18 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('fire_number_label'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: cs.onSurfaceVariant)),
+              Text('fire_number_label'.tr(), style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
               const SizedBox(height: 4),
               Row(children: [
-                Text(fmt(fireNumber), style: TextStyle(fontFamily: 'Cairo', fontSize: 32, fontWeight: FontWeight.w900, color: color)),
+                Text(fmt(fireNumber), style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: color)),
                 const SizedBox(width: 6),
-                Text(_currency, style: TextStyle(fontFamily: 'Cairo', fontSize: 14, color: cs.onSurfaceVariant)),
+                Text(_currency, style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
               ]),
               const SizedBox(height: 16),
               // Progress
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('fire_progress'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: cs.onSurfaceVariant)),
-                Text('${progress.toStringAsFixed(1)}%', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: color)),
+                Text('fire_progress'.tr(), style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant)),
+                Text('${progress.toStringAsFixed(1)}%', style: TextStyle(fontWeight: FontWeight.w900, color: color)),
               ]),
               const SizedBox(height: 6),
               Semantics(
@@ -198,14 +198,14 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
                 ),
                 child: years == null
                   ? Text('fire_increase_contrib'.tr(), textAlign: TextAlign.center,
-                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.error))
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.error))
                   : years == 0
                     ? Text('fire_already_there'.tr(), textAlign: TextAlign.center,
-                        style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.success))
+                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: AppColors.success))
                     : Column(children: [
-                        Text('fire_time_label'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: cs.onSurfaceVariant)),
+                        Text('fire_time_label'.tr(), style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
                         const SizedBox(height: 4),
-                        Text('$years ${'fire_years'.tr()}', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 26, color: years <= 10 ? AppColors.success : cs.primary)),
+                        Text('$years ${'fire_years'.tr()}', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 26, color: years <= 10 ? AppColors.success : cs.primary)),
                       ]),
               ),
             ]),
@@ -217,7 +217,7 @@ class _FIRECalculatorScreenState extends State<FIRECalculatorScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('settings'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+              Text('settings'.tr(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
               const SizedBox(height: 16),
               _Slider(label: '${'monthly_expenses'.tr()} ($_currency)', value: _monthlyExpenses, min: 100, max: 5000, divisions: 98, onChanged: (v) => setState(() => _monthlyExpenses = v)),
               _Slider(label: '${'monthly_contrib'.tr()} ($_currency)', value: _monthlyContrib, min: 0, max: 3000, divisions: 60, onChanged: (v) => setState(() => _monthlyContrib = v)),
@@ -242,9 +242,9 @@ class _StatBox extends StatelessWidget {
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(12)),
     child: Column(children: [
-      Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant), textAlign: TextAlign.center),
+      Text(label, style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant), textAlign: TextAlign.center),
       const SizedBox(height: 4),
-      Text(value, style: TextStyle(fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w900, color: color)),
+      Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: color)),
     ]),
   );
 }
@@ -260,8 +260,8 @@ class _Slider extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
     return Padding(padding: const EdgeInsets.only(bottom: 14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Expanded(child: Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: cs.onSurfaceVariant))),
-        Text(value.toStringAsFixed(value % 1 == 0 ? 0 : 1), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 13, color: cs.onSurface)),
+        Expanded(child: Text(label, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant))),
+        Text(value.toStringAsFixed(value % 1 == 0 ? 0 : 1), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: cs.onSurface)),
       ]),
       Slider(value: value, min: min, max: max, divisions: divisions, activeColor: cs.primary, onChanged: onChanged),
     ]));

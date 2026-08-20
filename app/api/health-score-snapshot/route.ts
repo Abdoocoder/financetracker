@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 async function snapshotScores(userId?: string) {
+  const supabase = createAdminClient()
   const today = new Date().toISOString().split('T')[0]
   const query = supabase.from('profiles').select('id, monthly_income')
   const { data: profiles } = userId ? await query.eq('id', userId) : await query
@@ -55,7 +55,8 @@ export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const userId = request.nextUrl.searchParams.get('userId') ?? undefined
+  const rawId = request.nextUrl.searchParams.get('userId')
+  const userId = rawId && UUID_RE.test(rawId) ? rawId : undefined
   const saved = await snapshotScores(userId)
   return NextResponse.json({ ok: true, saved })
 }

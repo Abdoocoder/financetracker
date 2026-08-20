@@ -273,12 +273,11 @@ class _LearnScreenState extends State<LearnScreen> {
                         style: TextStyle(
                             color: cs.primary,
                             fontWeight: FontWeight.w900,
-                            fontSize: 22,
-                            fontFamily: 'Cairo')),
+                            fontSize: 22)),
                     const SizedBox(height: 8),
                     Text('learn_streak_congrats'.tr(),
                         style: TextStyle(
-                            color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
+                            color: cs.onSurfaceVariant),
                         textAlign: TextAlign.center),
                     const SizedBox(height: 16),
                     ElevatedButton(
@@ -290,7 +289,7 @@ class _LearnScreenState extends State<LearnScreen> {
                               borderRadius: BorderRadius.circular(12))),
                       child: Text('learn_streak_continue'.tr(),
                           style: const TextStyle(
-                              fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                              fontWeight: FontWeight.w900)),
                     ),
                   ]),
                 ));
@@ -359,7 +358,6 @@ class _LearnScreenState extends State<LearnScreen> {
       // 4. App Name (Fajrak)
       final titleParagraphStyle = ui.ParagraphStyle(
         textAlign: TextAlign.center,
-        fontFamily: 'Cairo',
         fontSize: 52,
         fontWeight: FontWeight.bold,
         textDirection: ui.TextDirection.rtl,
@@ -391,7 +389,6 @@ class _LearnScreenState extends State<LearnScreen> {
       // 6. Lesson Title
       final lessonTitleStyle = ui.ParagraphStyle(
         textAlign: TextAlign.center,
-        fontFamily: 'Cairo',
         fontSize: 52,
         fontWeight: FontWeight.bold,
         textDirection: ui.TextDirection.rtl,
@@ -408,7 +405,6 @@ class _LearnScreenState extends State<LearnScreen> {
       // 7. Lesson Body
       final lessonBodyStyle = ui.ParagraphStyle(
         textAlign: TextAlign.center,
-        fontFamily: 'Cairo',
         fontSize: 36,
         textDirection: ui.TextDirection.rtl,
       );
@@ -427,7 +423,6 @@ class _LearnScreenState extends State<LearnScreen> {
       // 9. Bottom Link
       final linkStyle = ui.ParagraphStyle(
         textAlign: TextAlign.center,
-        fontFamily: 'Cairo',
         fontSize: 34,
       );
       final linkBuilder = ui.ParagraphBuilder(linkStyle)
@@ -510,14 +505,12 @@ class _LearnScreenState extends State<LearnScreen> {
                   Text('learn_stage_label'.tr(),
                       style: TextStyle(
                           color: cs.onSurfaceVariant.withValues(alpha: 0.7),
-                          fontSize: 10,
-                          fontFamily: 'Cairo')),
+                          fontSize: 10)),
                   Text(info.$2,
                       style: TextStyle(
                           color: info.$3,
                           fontWeight: FontWeight.w900,
-                          fontSize: 13,
-                          fontFamily: 'Cairo')),
+                          fontSize: 13)),
                 ]),
               ]),
             )),
@@ -542,13 +535,11 @@ class _LearnScreenState extends State<LearnScreen> {
                             ? AppColors.textDisabled
                             : cs.primary,
                         fontWeight: FontWeight.w900,
-                        fontSize: 18,
-                        fontFamily: 'Cairo')),
+                        fontSize: 18)),
                 Text('learn_streak_day'.tr(),
                     style: TextStyle(
                         color: cs.onSurfaceVariant.withValues(alpha: 0.7),
-                        fontSize: 10,
-                        fontFamily: 'Cairo')),
+                        fontSize: 10)),
               ]),
             ),
           ]),
@@ -575,14 +566,12 @@ class _LearnScreenState extends State<LearnScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: cs.onSurface,
-                      fontFamily: 'Cairo',
                       height: 1.4)),
               const SizedBox(height: 16),
               Text(_lesson['body'] ?? '',
                   style: TextStyle(
                       fontSize: 14,
                       color: cs.onSurfaceVariant,
-                      fontFamily: 'Cairo',
                       height: 1.7)),
               const SizedBox(height: 20),
               Row(
@@ -600,7 +589,6 @@ class _LearnScreenState extends State<LearnScreen> {
                             ),
                             child: Text('learn_complete_lesson'.tr(),
                                 style: const TextStyle(
-                                    fontFamily: 'Cairo',
                                     fontWeight: FontWeight.w900,
                                     fontSize: 15)),
                           )
@@ -617,7 +605,6 @@ class _LearnScreenState extends State<LearnScreen> {
                                 child: Text('learn_completed_msg'.tr(),
                                     style: const TextStyle(
                                         color: AppColors.success,
-                                        fontFamily: 'Cairo',
                                         fontWeight: FontWeight.w900,
                                         fontSize: 15))),
                           ),
@@ -669,14 +656,12 @@ class _LearnScreenState extends State<LearnScreen> {
                       style: TextStyle(
                           color: cs.primary,
                           fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                          fontFamily: 'Cairo')),
+                          fontSize: 12)),
                   const SizedBox(height: 6),
                   Text('learn_did_you_know_msg'.tr(),
                       style: TextStyle(
                           color: cs.onSurfaceVariant,
                           fontSize: 12,
-                          fontFamily: 'Cairo',
                           height: 1.6)),
                 ]),
           ),

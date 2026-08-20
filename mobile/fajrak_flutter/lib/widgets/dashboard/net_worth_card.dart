@@ -67,16 +67,16 @@ class _NetWorthCardState extends State<NetWorthCard> {
             child: Row(children: [
               Icon(isPositive ? Icons.account_balance : Icons.warning_amber_rounded, color: mainColor, size: 18),
               const SizedBox(width: 8),
-              Text('net_worth_title'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w600)),
+              Text('net_worth_title'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
               const Spacer(),
               RichText(text: TextSpan(children: [
                 TextSpan(
                   text: '${isPositive ? '+' : '-'}${fmt(widget.netWorth)} ',
-                  style: TextStyle(color: mainColor, fontFamily: 'monospace', fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+                  style: TextStyle(color: mainColor, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: -0.5),
                 ),
                 TextSpan(
                   text: widget.currency,
-                  style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11),
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11),
                 ),
               ])),
               const SizedBox(width: 8),
@@ -105,10 +105,10 @@ class _NetWorthCardState extends State<NetWorthCard> {
                         Icon(item.icon, size: 16, color: item.value >= 0 ? item.color : AppColors.error),
                         const SizedBox(width: 8),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(item.label, style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 9, fontWeight: FontWeight.w600)),
+                          Text(item.label, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11, fontWeight: FontWeight.w600)),
                           Text(
                             '${item.value >= 0 ? '+' : '-'}${fmt(item.value)}',
-                            style: TextStyle(color: item.value >= 0 ? item.color : AppColors.error, fontFamily: 'monospace', fontSize: 13, fontWeight: FontWeight.w900),
+                            style: TextStyle(color: item.value >= 0 ? item.color : AppColors.error, fontSize: 13, fontWeight: FontWeight.w900),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ])),

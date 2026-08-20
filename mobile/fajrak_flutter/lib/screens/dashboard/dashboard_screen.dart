@@ -271,13 +271,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         final cs = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: cs.primary));
+          SnackBar(content: Text('toast_saved'.tr(), style: const TextStyle()), backgroundColor: cs.primary));
       }
     } catch (e) {
       if (mounted) {
         final cs = Theme.of(context).colorScheme;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: cs.error));
+          SnackBar(content: Text('toast_error_save'.tr(), style: const TextStyle()), backgroundColor: cs.error));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -313,14 +313,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Icon(Icons.wifi_off_rounded, size: 56, color: colorScheme.onSurface.withValues(alpha: 0.3)),
                       const SizedBox(height: 16),
-                      Text('error_load_failed'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface), textAlign: TextAlign.center),
+                      Text('error_load_failed'.tr(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface), textAlign: TextAlign.center),
                       const SizedBox(height: 8),
-                      Text('error_check_connection'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
+                      Text('error_check_connection'.tr(), style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
                       const SizedBox(height: 24),
                       FilledButton.icon(
                         onPressed: _load,
                         icon: const Icon(Icons.refresh_rounded),
-                        label: Text('btn_retry'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                        label: Text('btn_retry'.tr(), style: const TextStyle(fontWeight: FontWeight.w700)),
                       ),
                     ]),
                   ),
@@ -349,7 +349,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         const SizedBox(width: 4),
                         Text(
                           'dash_customize'.tr(),
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: colorScheme.primary, fontFamily: 'Cairo'),
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: colorScheme.primary),
                         ),
                       ]),
                     ),
@@ -495,14 +495,14 @@ class _AccountsBalanceCard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('dash_accounts_total'.tr(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
+            Text('dash_accounts_total'.tr(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: cs.onSurfaceVariant)),
             const SizedBox(height: 2),
-            Text('dash_accounts_all'.tr(), style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
+            Text('dash_accounts_all'.tr(), style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant)),
           ])),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('${isPositive ? '+' : '-'}${_fmt(totalBalance)}',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color, fontFamily: 'monospace')),
-            Text(currency, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
+            Text(currency, style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
           ]),
         ]),
         if (accounts.length > 1) ...[
@@ -517,9 +517,9 @@ class _AccountsBalanceCard extends StatelessWidget {
               child: Row(children: [
                 Text(acc['icon'] as String? ?? '🏦', style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 6),
-                Expanded(child: Text(acc['name'] as String? ?? '', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, fontFamily: 'Cairo'))),
+                Expanded(child: Text(acc['name'] as String? ?? '', style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant))),
                 Text('${bal >= 0 ? '+' : '-'}${_fmt(bal)}',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: balColor, fontFamily: 'monospace')),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: balColor)),
               ]),
             );
           }),

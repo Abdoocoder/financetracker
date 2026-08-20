@@ -39,8 +39,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo')),
+                  fontWeight: FontWeight.w900)),
           const SizedBox(height: 20),
           Row(
             children: [
@@ -48,7 +47,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
                 child: DropdownButtonFormField<int>(
                   dropdownColor: const Color(0xFF1E293B),
                   initialValue: _selectedMonth,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                       labelText: 'month'.tr(),
                       filled: true,
@@ -65,7 +64,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
                 child: DropdownButtonFormField<int>(
                   dropdownColor: const Color(0xFF1E293B),
                   initialValue: _selectedYear,
-                  style: const TextStyle(color: Colors.white, fontFamily: 'Cairo'),
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                       labelText: 'year'.tr(),
                       filled: true,
@@ -90,7 +89,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
                   },
                   child: Text('cancel_filter'.tr(),
                       style: const TextStyle(
-                          color: Color(0xFFEF4444), fontFamily: 'Cairo')),
+                          color: Color(0xFFEF4444))),
                 ),
               ),
               Expanded(
@@ -103,7 +102,7 @@ class _MonthYearPickerDialogState extends State<MonthYearPickerDialog> {
                       backgroundColor: const Color(0xFF3B7EF6)),
                   child: Text('apply'.tr(),
                       style: const TextStyle(
-                          color: Colors.white, fontFamily: 'Cairo')),
+                          color: Colors.white)),
                 ),
               ),
             ],

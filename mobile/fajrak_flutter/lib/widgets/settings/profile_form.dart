@@ -116,7 +116,7 @@ class _ProfileFormState extends State<ProfileForm> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+          content: Text('toast_saved'.tr(), style: const TextStyle()),
           backgroundColor: AppColors.success,
         ));
       }
@@ -166,7 +166,6 @@ class _ProfileFormState extends State<ProfileForm> {
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
                         fontSize: 16,
-                        fontFamily: 'Cairo',
                       ),
                     ),
                   ),
@@ -182,7 +181,6 @@ class _ProfileFormState extends State<ProfileForm> {
                           color: colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
-                          fontFamily: 'Cairo',
                         ),
                       ),
                       Text(
@@ -190,7 +188,6 @@ class _ProfileFormState extends State<ProfileForm> {
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 11,
-                          fontFamily: 'Cairo',
                         ),
                       ),
                     ],
@@ -203,8 +200,7 @@ class _ProfileFormState extends State<ProfileForm> {
                       'settings_member'.tr(),
                       style: const TextStyle(
                         color: AppColors.textSecondary,
-                        fontSize: 9,
-                        fontFamily: 'Cairo',
+                        fontSize: 11,
                       ),
                     ),
                     Text(
@@ -213,7 +209,6 @@ class _ProfileFormState extends State<ProfileForm> {
                         color: colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w800,
                         fontSize: 11,
-                        fontFamily: 'Cairo',
                       ),
                     ),
                   ],
@@ -256,7 +251,6 @@ class _ProfileFormState extends State<ProfileForm> {
                     _birthDate.isNotEmpty ? _birthDate : 'settings_birth_date'.tr(),
                     style: TextStyle(
                       color: _birthDate.isNotEmpty ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo',
                     ),
                   ),
                   const Spacer(),
@@ -275,7 +269,6 @@ class _ProfileFormState extends State<ProfileForm> {
             'settings_currency'.tr(),
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
-              fontFamily: 'Cairo',
               fontSize: 13,
             ),
           ),
@@ -304,11 +297,11 @@ class _ProfileFormState extends State<ProfileForm> {
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
                     CurrencyService.findByCode(_currency)?['labelAr'] as String? ?? _currency,
-                    style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                   Text(
                     _currency,
-                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'monospace', fontSize: 11),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11),
                   ),
                 ])),
                 Icon(Icons.arrow_drop_down, color: colorScheme.onSurfaceVariant),
@@ -334,7 +327,7 @@ class _ProfileFormState extends State<ProfileForm> {
                     )
                   : Text(
                       'save'.tr(),
-                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15),
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
                     ),
             ),
           ),
@@ -350,7 +343,6 @@ class _ProfileFormState extends State<ProfileForm> {
         title,
         style: TextStyle(
           color: colorScheme.onSurfaceVariant,
-          fontFamily: 'Cairo',
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
@@ -369,10 +361,10 @@ class _ProfileFormState extends State<ProfileForm> {
       controller: ctrl,
       keyboardType: type,
       textAlign: TextAlign.right,
-      style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         prefixIcon: Icon(icon, color: colorScheme.onSurfaceVariant, size: 20),
         filled: true,
         fillColor: colorScheme.surface,

@@ -578,6 +578,20 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.36.0 — 2026-08-20 *(Security Hardening & Flutter Theme Extraction)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔒 **API Auth Enforcement** | Exchange-rate, stock-price, and zakat-prices routes now require a valid Bearer token; unauthenticated requests return 401. |
+| 🔒 **Currency Code Validation** | All currency parameters validated with strict `[A-Z]{3}` regex before hitting external APIs. |
+| 🔒 **Recovery Token in Cookie** | Password-reset flow stores the recovery token in an `httpOnly` cookie instead of a URL parameter, preventing token leakage via referrer headers. |
+| 🧹 **Supabase Admin Consistency** | API routes and tests now import from `@/lib/supabase/admin` (`createAdminClient`) instead of directly from `@supabase/supabase-js`. |
+| 🧹 **Test Mock Hygiene** | `useTransactions` tests wrapped with `QueryClientProvider`; `firebase-admin` placeholder deleted; `console.error` silenced in `firebase.test.ts` and `push-send.test.ts`. |
+| ⚡ **Turbopack Root Fix** | `next.config.mjs` uses `__dirname` instead of hardcoded `.`, eliminating the `turbopack.root` warning. |
+| 📱 **Flutter Theme Extraction** | 100-line inline `_buildTheme()` moved to `core/theme/app_theme.dart` for reuse and maintainability. |
+| 📱 **Arabic Date Formatting** | `initializeDateFormatting('ar')` called at startup so `Intl` date patterns render Arabic day/month names correctly. |
+| 📱 **Web Database Guard** | `AppDatabase.initialize()` skipped on web platform (`kIsWeb`) to avoid unsupported SQLite calls. |
+
 ### v3.35.4 — 2026-05-03 *(Auth Lock Fix)*
 
 | Change | Description |

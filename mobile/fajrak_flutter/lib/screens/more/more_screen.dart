@@ -57,7 +57,6 @@ class _MoreScreenState extends State<MoreScreen> {
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: colorScheme.onSurface,
-                fontFamily: 'Cairo',
               ),
             ),
           ),

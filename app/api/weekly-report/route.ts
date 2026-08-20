@@ -3,9 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 async function sendWeeklyReports() {
+  const supabase = createAdminClient()
   const now = new Date()
   const today = now.toISOString().split('T')[0]
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]

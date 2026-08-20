@@ -1,16 +1,14 @@
 'use client'
 import { Suspense, useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n'
-import { updatePassword, exchangeCode } from './actions'
+import { updatePassword, exchangeCode, storeRecoveryToken } from './actions'
 
 function ResetPasswordForm() {
   const { t } = useI18n()
   const router = useRouter()
-  const searchParams = useSearchParams()
 
-  const [token, setToken] = useState(searchParams.get('t') ?? '')
-  const [tokenReady, setTokenReady] = useState(!!searchParams.get('t'))
+  const [tokenReady, setTokenReady] = useState(false)
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
@@ -18,31 +16,28 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    if (tokenReady) return
     async function resolve() {
       // 1. Check URL hash: #access_token=XXX&type=recovery (implicit flow)
       const hash = window.location.hash.slice(1)
       const hashParams = new URLSearchParams(hash)
       const hashToken = hashParams.get('access_token')
       if (hashToken && hashParams.get('type') === 'recovery') {
-        setToken(hashToken)
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
+        await storeRecoveryToken(hashToken)
         setTokenReady(true)
         return
       }
       // 2. Check for PKCE code: ?code=XXX — exchange server-side
       const code = new URLSearchParams(window.location.search).get('code')
       if (code) {
-        const result = await exchangeCode(code)
-        if (result.token) {
-          setToken(result.token)
-          window.history.replaceState(null, '', window.location.pathname)
-        }
+        window.history.replaceState(null, '', window.location.pathname)
+        await exchangeCode(code)
       }
+      // 3. Otherwise token was set by confirm redirect (cookie already present)
       setTokenReady(true)
     }
     resolve()
-  }, [tokenReady])
+  }, [])
 
   if (!tokenReady) {
     return (
@@ -52,19 +47,11 @@ function ResetPasswordForm() {
     )
   }
 
-  if (!token) {
-    return (
-      <div className="p-8 rounded-2xl border text-center" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-        <p className="text-sm" style={{ color: '#EF4444' }}>انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق</p>
-      </div>
-    )
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password !== confirm) { setError(t('reset_mismatch')); return }
     setLoading(true); setError('')
-    const result = await updatePassword(password, token)
+    const result = await updatePassword(password)
     if (result.error) {
       setError(result.error === 'session'
         ? 'انتهت صلاحية الرابط، يرجى طلب رابط جديد من التطبيق'
@@ -82,7 +69,7 @@ function ResetPasswordForm() {
       {error && <div className="p-3 rounded-lg text-sm text-center" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>{error}</div>}
       <div>
         <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('reset_new')}</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} autoFocus
           className="w-full px-4 py-3 rounded-xl text-sm outline-none"
           style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
       </div>

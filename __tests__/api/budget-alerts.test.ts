@@ -7,9 +7,8 @@ var mockEq = jest.fn()
 var mockGte = jest.fn()
 var mockLte = jest.fn()
 
-// Define a central mock client that route files will pick up
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn(() => ({
+jest.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: jest.fn(() => ({
     from: (table: string) => mockFrom(table),
     auth: { getUser: jest.fn() }
   })),

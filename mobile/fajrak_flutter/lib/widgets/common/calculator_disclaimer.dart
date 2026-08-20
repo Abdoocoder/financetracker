@@ -64,7 +64,6 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.warningDark,
-                    fontFamily: 'Cairo',
                     height: 1.5,
                   ),
                 ),
@@ -78,7 +77,6 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.warningDark,
-                          fontFamily: 'Cairo',
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -91,7 +89,6 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
                         style: TextStyle(
                           fontSize: 11,
                           color: colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo',
                         ),
                       ),
                     ),

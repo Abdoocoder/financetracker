@@ -97,7 +97,6 @@ class _MonthSummaryCardState extends State<MonthSummaryCard> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo',
                   color: cs.onSurface,
                 ),
               ),
@@ -150,7 +149,6 @@ class _MonthSummaryCardState extends State<MonthSummaryCard> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'Cairo',
                   color: accentColor,
                 ),
               ),
@@ -190,7 +188,6 @@ class _StatBox extends StatelessWidget {
               style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  fontFamily: 'Cairo',
                   color: cs.onSurfaceVariant),
               textAlign: TextAlign.center),
           const SizedBox(height: 4),
@@ -199,13 +196,11 @@ class _StatBox extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'monospace',
                     color: color)),
           ),
           Text(currency,
               style: TextStyle(
-                  fontSize: 9,
-                  fontFamily: 'Cairo',
+                  fontSize: 11,
                   color: cs.onSurfaceVariant)),
         ]),
       ),

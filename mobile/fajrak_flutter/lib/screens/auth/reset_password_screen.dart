@@ -63,7 +63,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text('auth_reset_password_title'.tr(),
-            style: TextStyle(fontFamily: 'Cairo', color: colorScheme.onSurface)),
+            style: TextStyle(color: colorScheme.onSurface)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: colorScheme.onSurface),
@@ -91,14 +91,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
-                      color: colorScheme.onSurface,
-                      fontFamily: 'Cairo')),
+                      color: colorScheme.onSurface)),
               const SizedBox(height: 8),
               Text('auth_reset_password_desc'.tr(),
                   style: TextStyle(
                       fontSize: 14,
-                      color: colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo'),
+                      color: colorScheme.onSurfaceVariant),
                   textAlign: TextAlign.center),
               const SizedBox(height: 32),
               if (_success) ...[
@@ -123,7 +121,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           color: theme.brightness == Brightness.dark
                               ? AppColors.success
                               : AppColors.successDark,
-                          fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),
                 ),
@@ -142,7 +139,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   child: Text(_error!,
                       style: TextStyle(
                           color: colorScheme.error,
-                          fontFamily: 'Cairo',
                           fontSize: 13),
                       textAlign: TextAlign.center),
                 ),
@@ -152,7 +148,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 controller: _passwordController,
                 obscureText: _obscure,
                 style:
-                    TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                    TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'auth_new_password'.tr(),
                   prefixIcon:
@@ -173,7 +169,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 controller: _confirmController,
                 obscureText: _obscure,
                 style:
-                    TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                    TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'auth_confirm_password'.tr(),
                   prefixIcon:

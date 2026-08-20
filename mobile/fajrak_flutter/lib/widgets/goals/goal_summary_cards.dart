@@ -49,13 +49,11 @@ class GoalSummaryCards extends StatelessWidget {
             style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.w900,
-                fontSize: 16,
-                fontFamily: 'Cairo')),
+                fontSize: 16)),
         Text(label,
             style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
-                fontSize: 10,
-                fontFamily: 'Cairo')),
+                fontSize: 10)),
       ]),
     );
   }

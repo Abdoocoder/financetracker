@@ -35,7 +35,6 @@ class MoreMenuItem extends StatelessWidget {
                 title,
                 style: TextStyle(
                   color: colorScheme.onSurface,
-                  fontFamily: 'Cairo',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),

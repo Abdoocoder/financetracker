@@ -30,13 +30,11 @@ class OverallProgressCard extends StatelessWidget {
           Text('goals_overall_progress'.tr(),
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontFamily: 'Cairo',
                   fontSize: 12)),
           Text(
               '${totalSaved.toStringAsFixed(0)} / ${totalTarget.toStringAsFixed(0)} $currency',
               style: TextStyle(
                   color: colorScheme.onSurface,
-                  fontFamily: 'Cairo',
                   fontWeight: FontWeight.w700,
                   fontSize: 12)),
         ]),

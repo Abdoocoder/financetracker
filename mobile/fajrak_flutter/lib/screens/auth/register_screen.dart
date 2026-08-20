@@ -123,22 +123,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            fontFamily: 'Cairo'))),
+                            color: Colors.white))),
               ),
               const SizedBox(height: 24),
               Text('auth_register_title'.tr(),
                   style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
-                      color: colorScheme.onSurface,
-                      fontFamily: 'Cairo')),
+                      color: colorScheme.onSurface)),
               const SizedBox(height: 8),
               Text('auth_register_subtitle'.tr(),
                   style: TextStyle(
                       fontSize: 14,
-                      color: colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo')),
+                      color: colorScheme.onSurfaceVariant)),
               const SizedBox(height: 32),
               if (_error != null) ...[
                 AuthErrorBanner(message: _error!),
@@ -147,7 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: _nameController,
                 autofocus: true,
-                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                     labelText: 'auth_full_name'.tr(),
                     prefixIcon:
@@ -157,7 +154,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                     labelText: 'auth_email'.tr(),
                     prefixIcon:
@@ -167,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'auth_password'.tr(),
                   prefixIcon:
@@ -204,14 +201,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Text('auth_have_account'.tr(),
                       style: TextStyle(
-                          color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                          color: colorScheme.onSurfaceVariant)),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/login'),
                     child: Text('auth_login_now'.tr(),
                         style: TextStyle(
                             color: colorScheme.primary,
-                            fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700)),
                   ),
                 ],
@@ -330,7 +326,7 @@ class _Req extends StatelessWidget {
         Flexible(
           child: Text(
             label,
-            style: TextStyle(fontSize: 11, color: color, fontFamily: 'Cairo'),
+            style: TextStyle(fontSize: 11, color: color),
             overflow: TextOverflow.ellipsis,
           ),
         ),

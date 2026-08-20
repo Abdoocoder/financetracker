@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rate-limit'
 
-const supabase = createAdminClient()
-
 export async function POST(request: NextRequest) {
   const rl = rateLimit(request, { limit: 10, windowMs: 60_000, identifier: 'push-subscribe' })
   if (!rl.ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429, headers: rl.headers })
@@ -13,6 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const token = authHeader.replace('Bearer ', '')
+    const supabase = createAdminClient()
     const { data: { user }, error } = await supabase.auth.getUser(token)
     if (error || !user) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
@@ -45,8 +44,8 @@ export async function POST(request: NextRequest) {
     }, { onConflict: 'user_id,endpoint' })
 
     return NextResponse.json({ ok: true, type: 'webpush' })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -59,6 +58,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const token = authHeader.replace('Bearer ', '')
+    const supabase = createAdminClient()
     const { data: { user } } = await supabase.auth.getUser(token)
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -69,7 +69,7 @@ export async function DELETE(request: NextRequest) {
       .eq('endpoint', endpoint)
 
     return NextResponse.json({ ok: true })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -69,14 +69,12 @@ class BudgetListItem extends StatelessWidget {
                 Text(budget['category'] as String,
                     style: TextStyle(
                         color: colorScheme.onSurface,
-                        fontFamily: 'Cairo',
                         fontWeight: FontWeight.w800,
                         fontSize: 14)),
                 Text(
                     '${spent.toStringAsFixed(0)} / ${limit.toStringAsFixed(0)} $currency${over ? ' ⚠ تجاوزت!' : warn ? ' ◼ اقتربت' : ''}',
                     style: TextStyle(
                         color: color,
-                        fontFamily: 'Cairo',
                         fontSize: 12,
                         fontWeight: FontWeight.w700)),
               ])),
@@ -85,8 +83,7 @@ class BudgetListItem extends StatelessWidget {
                   color:
                       over ? AppColors.errorLight : AppColors.successLight,
                   fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                  fontFamily: 'Cairo')),
+                  fontSize: 16)),
           const SizedBox(width: 8),
           GestureDetector(
               onTap: () => onEdit(budget),
@@ -131,22 +128,19 @@ class BudgetListItem extends StatelessWidget {
             Text('budget_remaining_label'.tr(),
                 style: const TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 11,
-                    fontFamily: 'Cairo')),
+                    fontSize: 11)),
             Text('${remaining.toStringAsFixed(0)} $currency',
                 style: TextStyle(
                     color: over
                         ? AppColors.errorLight
                         : AppColors.successLight,
                     fontWeight: FontWeight.w700,
-                    fontSize: 11,
-                    fontFamily: 'Cairo'))
+                    fontSize: 11))
           ]),
           Text('budget_limit_label'.tr(namedArgs: {'amount': limit.toStringAsFixed(0), 'currency': currency}),
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontSize: 11,
-                  fontFamily: 'Cairo')),
+                  fontSize: 11)),
         ]),
       ]),
     );

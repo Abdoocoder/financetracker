@@ -13,11 +13,18 @@ jest.mock('../../lib/supabase/admin', () => ({
 import { sendPushToUser } from '../../lib/push-send'
 
 describe('sendPushToUser', () => {
+  let consoleErrorSpy: jest.SpyInstance
+
   beforeEach(() => {
     jest.clearAllMocks()
     process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
     mockSupabaseInstance.from.mockReturnThis()
     mockSupabaseInstance.insert.mockReturnThis()
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+  })
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore()
   })
 
   it('should insert notification history and return 1 on success', async () => {

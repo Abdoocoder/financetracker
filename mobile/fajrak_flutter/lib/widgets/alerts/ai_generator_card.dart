@@ -48,12 +48,10 @@ class AIGeneratorCard extends StatelessWidget {
                     style: TextStyle(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo',
                         fontSize: 14)),
                 Text('alerts_ai_subtitle'.tr(),
                     style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
-                        fontFamily: 'Cairo',
                         fontSize: 12)),
               ])),
         ]),
@@ -76,7 +74,7 @@ class AIGeneratorCard extends StatelessWidget {
                           strokeWidth: 2, color: Colors.white))
                   : Text('alerts_ai_generate'.tr(),
                       style: const TextStyle(
-                          fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                          fontWeight: FontWeight.w900)),
             )),
       ]),
     );
