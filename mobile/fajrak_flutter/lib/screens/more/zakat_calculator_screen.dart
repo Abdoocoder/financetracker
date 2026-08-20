@@ -214,15 +214,15 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
     final cs = Theme.of(context).colorScheme;
     return Padding(padding: const EdgeInsets.only(bottom: 14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700, color: cs.onSurfaceVariant)),
-        if (hint != null) Text(hint, style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant)),
+        Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: cs.onSurfaceVariant)),
+        if (hint != null) Text(hint, style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant)),
       ]),
       const SizedBox(height: 6),
       TextFormField(
         controller: ctrl,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         onChanged: (_) => setState(() {}),
-        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, color: cs.onSurface),
+        style: TextStyle(fontWeight: FontWeight.w700, color: cs.onSurface),
         decoration: InputDecoration(
           filled: true, fillColor: cs.surfaceContainerHighest,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
@@ -240,7 +240,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('zakat_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, color: cs.onSurface)),
+        title: Text('zakat_title'.tr(), style: TextStyle(fontWeight: FontWeight.w900, color: cs.onSurface)),
         backgroundColor: cs.surface, elevation: 0,
         iconTheme: IconThemeData(color: cs.onSurface),
       ),
@@ -255,7 +255,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
               decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text('zakat_haul_title'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                  Text('zakat_haul_title'.tr(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
                   GestureDetector(
                     onTap: _load,
                     child: Container(
@@ -264,7 +264,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.refresh, size: 14, color: cs.onSurfaceVariant),
                         const SizedBox(width: 4),
-                        Text('zakat_refresh'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w700, color: cs.onSurfaceVariant)),
+                        Text('zakat_refresh'.tr(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: cs.onSurfaceVariant)),
                       ]),
                     ),
                   ),
@@ -286,14 +286,14 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                     child: Row(children: [
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(inv['symbol'] as String? ?? inv['name'] as String? ?? 'استثمار',
-                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
                         Text('${_fmt(invValue)} $_currency · ${'zakat_haul_due'.tr(namedArgs: {'date': due})}',
-                          style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant)),
+                          style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant)),
                       ])),
                       Column(children: [
                         Text(overdue ? 'zakat_overdue'.tr() : '$days',
-                          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 20, color: color)),
-                        if (!overdue) Text('zakat_days'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: color, fontWeight: FontWeight.w700)),
+                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: color)),
+                        if (!overdue) Text('zakat_days'.tr(), style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w700)),
                       ]),
                     ]),
                   );
@@ -305,7 +305,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Icon(Icons.lightbulb_outline, size: 14, color: AppColors.warning),
                     const SizedBox(width: 6),
-                    Expanded(child: Text('zakat_haul_purchase_tip'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant, height: 1.5))),
+                    Expanded(child: Text('zakat_haul_purchase_tip'.tr(), style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant, height: 1.5))),
                   ]),
                 ),
               ]),
@@ -323,16 +323,16 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
             ),
             child: Column(children: [
               Text(_eligible ? 'zakat_due_msg'.tr() : 'zakat_below_nisab'.tr(),
-                style: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700,
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700,
                   color: _eligible ? AppColors.success : cs.onSurfaceVariant)),
               const SizedBox(height: 8),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(_fmt(_zakatDue), style: TextStyle(fontFamily: 'Cairo', fontSize: 36, fontWeight: FontWeight.w900,
+                Text(_fmt(_zakatDue), style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900,
                   color: _eligible ? AppColors.success : cs.onSurfaceVariant)),
                 const SizedBox(width: 8),
-                Text(_currency, style: TextStyle(fontFamily: 'Cairo', fontSize: 14, color: cs.onSurfaceVariant)),
+                Text(_currency, style: TextStyle(fontSize: 14, color: cs.onSurfaceVariant)),
               ]),
-              Text('zakat_percentage'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: cs.onSurfaceVariant)),
+              Text('zakat_percentage'.tr(), style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
               const SizedBox(height: 14),
               Row(children: [
                 Expanded(child: _InfoBox(label: 'zakat_total_zakatable'.tr(), value: _fmt(_totalZakatable), currency: _currency, cs: cs)),
@@ -349,13 +349,13 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
             decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text('zakat_enter_assets'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                Text('zakat_enter_assets'.tr(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
                 TextButton.icon(
                   onPressed: _fetchingPrices ? null : _fetchLivePrices,
                   icon: _fetchingPrices
                       ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: cs.primary))
                       : Icon(Icons.refresh, size: 16, color: cs.primary),
-                  label: Text('zakat_fetch_prices'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700, color: cs.primary)),
+                  label: Text('zakat_fetch_prices'.tr(), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: cs.primary)),
                   style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
                 ),
               ]),
@@ -376,7 +376,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                 ),
                 child: Text(
                   _saved ? 'zakat_saved'.tr() : _saving ? 'saving'.tr() : 'zakat_save'.tr(),
-                  style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 14, color: Colors.white),
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Colors.white),
                 ),
               )),
             ]),
@@ -389,7 +389,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('zakat_history'.tr(), style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
+                Text('zakat_history'.tr(), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
                 const SizedBox(height: 14),
                 ..._history.map((record) => Container(
                   margin: const EdgeInsets.only(bottom: 8),
@@ -402,16 +402,16 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                   child: Row(children: [
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text('${record['year']} — ${_fmt((record['zakat_due'] as num?)?.toDouble() ?? 0)} $_currency',
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, color: cs.onSurface)),
+                        style: TextStyle(fontWeight: FontWeight.w800, color: cs.onSurface)),
                       Text('zakat_zakatable_label'.tr(namedArgs: {'amount': _fmt((record['total_zakatable'] as num?)?.toDouble() ?? 0)}),
-                        style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: cs.onSurfaceVariant)),
+                        style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant)),
                     ])),
                     TextButton(
                       onPressed: () => _togglePaid(record['id'] as String, record['is_paid'] as bool),
                       style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
                       child: Text(
                         record['is_paid'] == true ? 'zakat_paid'.tr() : 'zakat_unpaid'.tr(),
-                        style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 11,
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11,
                           color: record['is_paid'] == true ? AppColors.success : AppColors.warning),
                       ),
                     ),
@@ -430,7 +430,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.warning.withValues(alpha: 0.2)),
             ),
-            child: Text('zakat_note'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.warning, height: 1.6)),
+            child: Text('zakat_note'.tr(), style: const TextStyle(fontSize: 12, color: AppColors.warning, height: 1.6)),
           ),
           const SizedBox(height: 80),
         ]),
@@ -448,9 +448,9 @@ class _InfoBox extends StatelessWidget {
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(12)),
     child: Column(children: [
-      Text(label, style: TextStyle(fontFamily: 'Cairo', fontSize: 10, color: cs.onSurfaceVariant), textAlign: TextAlign.center),
+      Text(label, style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant), textAlign: TextAlign.center),
       const SizedBox(height: 4),
-      Text(value, style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w900, color: cs.onSurface)),
+      Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: cs.onSurface)),
     ]),
   );
 }

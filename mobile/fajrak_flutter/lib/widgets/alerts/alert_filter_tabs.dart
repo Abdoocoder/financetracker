@@ -48,7 +48,6 @@ class AlertFilterTabs extends StatelessWidget {
             child: Text(label,
                 style: TextStyle(
                     color: currentFilter == key ? Colors.white : colorScheme.onSurfaceVariant,
-                    fontFamily: 'Cairo',
                     fontSize: 12,
                     fontWeight: FontWeight.w700)),
           ),

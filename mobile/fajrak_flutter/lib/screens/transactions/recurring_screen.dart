@@ -70,7 +70,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
       if (mounted) {
         setState(() => _list.removeWhere((r) => r['id'] == id));
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('toast_deleted'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text('toast_deleted'.tr(), style: const TextStyle())),
         );
       }
     } finally {
@@ -100,8 +100,8 @@ class _RecurringScreenState extends State<RecurringScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('recurring_title'.tr(), style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 18)),
-          Text('recurring_subtitle'.tr(args: [_list.length.toString()]), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')),
+          Text('recurring_title'.tr(), style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w900, fontSize: 18)),
+          Text('recurring_subtitle'.tr(args: [_list.length.toString()]), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12)),
         ]),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -109,7 +109,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
         backgroundColor: cs.primary,
         foregroundColor: cs.onPrimary,
         icon: const Icon(Icons.add),
-        label: Text('recurring_add'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+        label: Text('recurring_add'.tr(), style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: _loading
           ? const Padding(
@@ -120,7 +120,7 @@ class _RecurringScreenState extends State<RecurringScreen> {
               ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Icon(Icons.repeat, size: 48, color: cs.onSurfaceVariant),
                   const SizedBox(height: 12),
-                  Text('recurring_empty'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 15), textAlign: TextAlign.center),
+                  Text('recurring_empty'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 15), textAlign: TextAlign.center),
                 ]))
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
@@ -151,15 +151,15 @@ class _RecurringScreenState extends State<RecurringScreen> {
                             backgroundColor: color.withValues(alpha: 0.12),
                             child: Icon(isIncome ? Icons.trending_up : Icons.trending_down, color: color, size: 20),
                           ),
-                          title: Text(rec['name'] ?? '', style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 14)),
+                          title: Text(rec['name'] ?? '', style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 14)),
                           subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('${rec['category']} · $freqLabel', style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11)),
-                            Text('${'recurring_next'.tr()}: ${rec['next_date'] ?? ''}', style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 10)),
+                            Text('${rec['category']} · $freqLabel', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
+                            Text('${'recurring_next'.tr()}: ${rec['next_date'] ?? ''}', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10)),
                           ]),
                           trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                             Text(
                               '${(rec['amount'] as num? ?? 0).toStringAsFixed(0)} ${rec['currency'] ?? _currency}',
-                              style: TextStyle(color: color, fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 14),
+                              style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14),
                             ),
                             const SizedBox(width: 6),
                             PopupMenuButton<String>(
@@ -170,9 +170,9 @@ class _RecurringScreenState extends State<RecurringScreen> {
                                 if (action == 'delete') _delete(rec['id'] as String);
                               },
                               itemBuilder: (_) => [
-                                PopupMenuItem(value: 'toggle', child: Text(isActive ? 'recurring_pause'.tr() : 'recurring_resume'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-                                PopupMenuItem(value: 'edit', child: Text('btn_edit'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-                                PopupMenuItem(value: 'delete', child: Text('btn_delete'.tr(), style: TextStyle(fontFamily: 'Cairo', color: cs.error))),
+                                PopupMenuItem(value: 'toggle', child: Text(isActive ? 'recurring_pause'.tr() : 'recurring_resume'.tr(), style: const TextStyle())),
+                                PopupMenuItem(value: 'edit', child: Text('btn_edit'.tr(), style: const TextStyle())),
+                                PopupMenuItem(value: 'delete', child: Text('btn_delete'.tr(), style: TextStyle(color: cs.error))),
                               ],
                             ),
                           ]),
@@ -261,12 +261,12 @@ class _RecurringFormState extends State<_RecurringForm> {
 
   Future<void> _save() async {
     if (_nameCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('debt_name_required'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.red.shade700));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('debt_name_required'.tr(), style: const TextStyle()), backgroundColor: Colors.red.shade700));
       return;
     }
     final amount = double.tryParse(_amountCtrl.text.replaceAll(',', '.')) ?? 0;
     if (amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('debt_amount_positive'.tr(), style: const TextStyle(fontFamily: 'Cairo')), backgroundColor: Colors.red.shade700));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('debt_amount_positive'.tr(), style: const TextStyle()), backgroundColor: Colors.red.shade700));
       return;
     }
     if (_saving) return;
@@ -301,7 +301,7 @@ class _RecurringFormState extends State<_RecurringForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text(e.toString(), style: const TextStyle())),
         );
       }
     } finally {
@@ -320,7 +320,7 @@ class _RecurringFormState extends State<_RecurringForm> {
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 16), decoration: BoxDecoration(color: cs.outlineVariant, borderRadius: BorderRadius.circular(2)))),
-          Text(isEdit ? 'recurring_edit'.tr() : 'recurring_add'.tr(), style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 18, fontWeight: FontWeight.w900), textAlign: TextAlign.center),
+          Text(isEdit ? 'recurring_edit'.tr() : 'recurring_add'.tr(), style: TextStyle(color: cs.onSurface, fontSize: 18, fontWeight: FontWeight.w900), textAlign: TextAlign.center),
           const SizedBox(height: 20),
 
           // النوع
@@ -339,7 +339,7 @@ class _RecurringFormState extends State<_RecurringForm> {
                     border: Border.all(color: selected ? color : cs.outlineVariant),
                   ),
                   child: Text(tp == 'income' ? '\u2191 ${'trans_income'.tr()}' : '\u2193 ${'trans_expense'.tr()}',
-                    style: TextStyle(color: selected ? color : cs.onSurfaceVariant, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13),
+                    style: TextStyle(color: selected ? color : cs.onSurfaceVariant, fontWeight: FontWeight.w700, fontSize: 13),
                     textAlign: TextAlign.center),
                 ),
               ),
@@ -372,9 +372,9 @@ class _RecurringFormState extends State<_RecurringForm> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 decoration: BoxDecoration(color: cs.surfaceContainerHighest, borderRadius: BorderRadius.circular(10), border: Border.all(color: cs.outlineVariant)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('recurring_next'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
+                  Text('recurring_next'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10)),
                   const SizedBox(height: 2),
-                  Text(_nextDate.toIso8601String().split('T')[0], style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 13, fontWeight: FontWeight.w700)),
+                  Text(_nextDate.toIso8601String().split('T')[0], style: TextStyle(color: cs.onSurface, fontSize: 13, fontWeight: FontWeight.w700)),
                 ]),
               ),
             )),
@@ -389,7 +389,7 @@ class _RecurringFormState extends State<_RecurringForm> {
             style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             child: _saving
                 ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                : Text(isEdit ? 'btn_save'.tr() : 'recurring_add'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 15)),
+                : Text(isEdit ? 'btn_save'.tr() : 'recurring_add'.tr(), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
           ),
         ]),
       ),
@@ -400,9 +400,9 @@ class _RecurringFormState extends State<_RecurringForm> {
     return TextField(
       controller: ctrl,
       keyboardType: keyboard,
-      style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 14),
+      style: TextStyle(color: cs.onSurface, fontSize: 14),
       decoration: InputDecoration(
-        hintText: hint, hintStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
+        hintText: hint, hintStyle: TextStyle(color: cs.onSurfaceVariant),
         filled: true, fillColor: cs.surfaceContainerHighest,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -415,13 +415,13 @@ class _RecurringFormState extends State<_RecurringForm> {
       initialValue: items.contains(value) ? value : items.first,
       onChanged: onChanged,
       decoration: InputDecoration(
-        labelText: label, labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11),
+        labelText: label, labelStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 11),
         filled: true, fillColor: cs.surfaceContainerHighest,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       ),
       dropdownColor: cs.surface,
-      style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 13),
+      style: TextStyle(color: cs.onSurface, fontSize: 13),
       items: items.map((v) => DropdownMenuItem(value: v, child: Text(labelBuilder != null ? labelBuilder(v) : v))).toList(),
     );
   }

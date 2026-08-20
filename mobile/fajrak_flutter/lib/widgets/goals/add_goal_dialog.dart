@@ -65,7 +65,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
         content: Row(children: [
           const Icon(Icons.warning_amber_rounded, color: Colors.white),
           const SizedBox(width: 10),
-          Expanded(child: Text(message, style: const TextStyle(fontFamily: 'Cairo'))),
+          Expanded(child: Text(message, style: const TextStyle())),
         ]),
         backgroundColor: const Color(0xFFF59E0B),
         behavior: SnackBarBehavior.floating,
@@ -137,16 +137,14 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: colorScheme.onSurface,
-                fontFamily: 'Cairo')),
+                color: colorScheme.onSurface)),
         const SizedBox(height: 20),
         Align(
             alignment: Alignment.centerRight,
             child: Text('goals_choose_icon'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 12,
-                    fontFamily: 'Cairo'))),
+                    fontSize: 12))),
         const SizedBox(height: 8),
         SizedBox(
           height: 120,
@@ -218,7 +216,6 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
                     color: _deadlineDate.isNotEmpty
                         ? colorScheme.onSurface
                         : colorScheme.onSurfaceVariant,
-                    fontFamily: 'Cairo',
                     fontSize: 13),
               ),
             ]),
@@ -238,7 +235,6 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
               child: Text(
                   widget.existing != null ? 'goals_save_edit'.tr() : 'goals_save'.tr(),
                   style: const TextStyle(
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w900,
                       fontSize: 15)),
             )),
@@ -253,10 +249,10 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
       controller: ctrl,
       keyboardType: type,
       textAlign: TextAlign.right,
-      style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         filled: true,
         fillColor: colorScheme.outlineVariant,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),

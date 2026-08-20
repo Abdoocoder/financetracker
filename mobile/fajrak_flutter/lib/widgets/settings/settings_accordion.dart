@@ -51,7 +51,6 @@ class SettingsAccordion extends StatelessWidget {
               style: TextStyle(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'Cairo',
                 fontSize: 13,
               ),
             ),
@@ -70,9 +69,8 @@ class SettingsAccordion extends StatelessWidget {
                   badge!,
                   style: TextStyle(
                     color: colorScheme.primary,
-                    fontSize: 9,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'Cairo',
                   ),
                 ),
               ),

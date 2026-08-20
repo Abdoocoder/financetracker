@@ -64,7 +64,6 @@ class _DashboardCustomizerSheet extends StatelessWidget {
                               fontSize: 17,
                               fontWeight: FontWeight.w900,
                               color: colorScheme.onSurface,
-                              fontFamily: 'Cairo',
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -75,7 +74,6 @@ class _DashboardCustomizerSheet extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 12,
                               color: colorScheme.onSurfaceVariant,
-                              fontFamily: 'Cairo',
                             ),
                           ),
                         ],
@@ -91,7 +89,6 @@ class _DashboardCustomizerSheet extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           color: colorScheme.primary,
-                          fontFamily: 'Cairo',
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -141,7 +138,6 @@ class _DashboardCustomizerSheet extends StatelessWidget {
                     child: Text(
                       'dash_customize_done'.tr(),
                       style: const TextStyle(
-                        fontFamily: 'Cairo',
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                       ),
@@ -205,7 +201,6 @@ class _CardToggleTile extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: isOn ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo',
                     ),
                   ),
                   if (isRequired) ...[
@@ -215,7 +210,6 @@ class _CardToggleTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 11,
                         color: colorScheme.onSurfaceVariant,
-                        fontFamily: 'Cairo',
                       ),
                     ),
                   ],

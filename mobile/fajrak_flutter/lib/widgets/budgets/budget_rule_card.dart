@@ -38,7 +38,6 @@ class BudgetRuleCard extends StatelessWidget {
                     style: TextStyle(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo',
                         fontSize: 13))),
             GestureDetector(
               onTap: onApply,
@@ -52,7 +51,6 @@ class BudgetRuleCard extends StatelessWidget {
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
-                          fontFamily: 'Cairo',
                           fontWeight: FontWeight.w700))),
             ),
           ]),
@@ -98,19 +96,16 @@ class BudgetRuleCard extends StatelessWidget {
             style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.w900,
-                fontSize: 16,
-                fontFamily: 'Cairo')),
+                fontSize: 16)),
         Text(amount.toStringAsFixed(0),
             style: TextStyle(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
-                fontSize: 10,
-                fontFamily: 'Cairo')),
+                fontSize: 10)),
         Text(label,
             style: TextStyle(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                fontSize: 9,
-                fontFamily: 'Cairo'),
+                fontSize: 11),
             textAlign: TextAlign.center),
       ]),
     );

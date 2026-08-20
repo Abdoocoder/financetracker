@@ -1,5 +1,16 @@
 import { formatAmount, CURRENCIES, fetchExchangeRate } from '@/lib/currency'
 
+jest.mock('@/lib/supabase/client', () => ({
+  createClient: jest.fn(() => ({
+    auth: {
+      getSession: jest.fn().mockResolvedValue({
+        data: { session: { access_token: 'mock-token' } },
+        error: null,
+      }),
+    },
+  })),
+}))
+
 describe('lib/currency', () => {
     describe('CURRENCIES', () => {
         it('should have correct number of supported currencies', () => {
@@ -93,7 +104,7 @@ describe('lib/currency', () => {
         })
 
         afterEach(() => {
-            jest.resetAllMocks()
+            jest.clearAllMocks()
         })
 
         it('should return rate when fetch is successful', async () => {
@@ -105,7 +116,9 @@ describe('lib/currency', () => {
 
             const rate = await fetchExchangeRate('USD', 'JOD')
             expect(rate).toBe(mockRate)
-            expect(global.fetch).toHaveBeenCalledWith('/api/exchange-rate?base=USD&target=JOD')
+            expect(global.fetch).toHaveBeenCalledWith('/api/exchange-rate?base=USD&target=JOD', {
+              headers: { Authorization: 'Bearer mock-token' },
+            })
         })
 
         it('should return null when fetch fails (not ok)', async () => {

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const supabase = createAdminClient()
-
 export async function POST(req: NextRequest) {
+  const supabase = createAdminClient()
   try {
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
@@ -59,6 +58,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = createAdminClient()
   const { searchParams } = new URL(req.url)
   const user_id = searchParams.get('user_id')
   if (!user_id) return NextResponse.json(null)

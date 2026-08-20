@@ -70,7 +70,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         backgroundColor: colorScheme.surface,
         title: Text('auth_forgot_password_title'.tr(),
             style: TextStyle(
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: colorScheme.onSurface)),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
@@ -85,30 +84,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     style: TextStyle(
                         color: colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
-                        fontSize: 24,
-                        fontFamily: 'Cairo')),
+                        fontSize: 24)),
                 const SizedBox(height: 12),
                 Text('auth_sent_subtitle'.tr(),
                     style: TextStyle(
-                        color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+                        color: colorScheme.onSurfaceVariant),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 32),
                 ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     child:  Text('auth_back_to_login'.tr(),
-                        style: const TextStyle(fontFamily: 'Cairo'))),
+                        style: const TextStyle())),
               ])
             : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Text('auth_forgot_password_desc'.tr(),
                     style: TextStyle(
-                        color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+                        color: colorScheme.onSurfaceVariant),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 32),
                 TextField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   style:
-                      TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                      TextStyle(color: colorScheme.onSurface),
                   decoration: InputDecoration(
                       labelText: 'auth_email'.tr(),
                       prefixIcon:
@@ -122,10 +120,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           color: colorScheme.onPrimary, strokeWidth: 2)
                       : _cooldown > 0
                           ? Text('انتظر $_cooldown ث',
-                              style: const TextStyle(fontFamily: 'Cairo'))
+                              style: const TextStyle())
                           : Text('auth_send_reset_link'.tr(),
                               style: const TextStyle(
-                                  fontFamily: 'Cairo',
                                   fontWeight: FontWeight.w900)),
                 ),
               ]),

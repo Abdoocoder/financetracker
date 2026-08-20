@@ -137,15 +137,15 @@ class _DebtsScreenState extends State<DebtsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('debts_delete_title'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-        content: Text('confirm_delete'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        title: Text('debts_delete_title'.tr(), style: const TextStyle()),
+        content: Text('confirm_delete'.tr(), style: const TextStyle()),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+              child: Text('cancel'.tr(), style: const TextStyle())),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text('delete'.tr(), style: TextStyle(color: cs.error, fontFamily: 'Cairo'))),
+              child: Text('delete'.tr(), style: TextStyle(color: cs.error))),
         ],
       ),
     );
@@ -167,18 +167,18 @@ class _DebtsScreenState extends State<DebtsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('debts_receive_btn'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        title: Text('debts_receive_btn'.tr(), style: const TextStyle()),
         content: Text(
             '${'debts_tab_receivable'.tr()}: ${debt['name']}\n${(debt['remaining_amount'] as num).toStringAsFixed(0)} $_currency',
-            style: const TextStyle(fontFamily: 'Cairo')),
+            style: const TextStyle()),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
+              child: Text('cancel'.tr(), style: const TextStyle())),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
               child: Text('debts_receive_btn'.tr(),
-                  style: TextStyle(color: cs.primary, fontFamily: 'Cairo'))),
+                  style: TextStyle(color: cs.primary))),
         ],
       ),
     );
@@ -332,14 +332,12 @@ class _DebtsScreenState extends State<DebtsScreen> {
                                     style: TextStyle(
                                         color: color,
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Cairo')),
+                                        fontWeight: FontWeight.w700)),
                                 if ((alert['message'] ?? '').toString().isNotEmpty)
                                   Text(alert['message'],
                                       style: TextStyle(
                                           color: cs.onSurfaceVariant,
-                                          fontSize: 11,
-                                          fontFamily: 'Cairo'),
+                                          fontSize: 11),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis),
                               ],
@@ -370,15 +368,15 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           Icon(Icons.credit_card, size: 16, color: cs.error),
                           const SizedBox(width: 6),
                           Expanded(child: Text('debts_tab_owed'.tr(),
-                            style: TextStyle(color: cs.error, fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                            style: TextStyle(color: cs.error, fontWeight: FontWeight.w700))),
                           if (!_showOwed)
                             Text('${totalRemaining.toStringAsFixed(0)} $_currency',
-                              style: TextStyle(color: cs.error, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                              style: TextStyle(color: cs.error, fontWeight: FontWeight.w900, fontSize: 13)),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                             decoration: BoxDecoration(color: cs.error.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
-                            child: Text('${_debts.length}', style: TextStyle(color: cs.error, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
+                            child: Text('${_debts.length}', style: TextStyle(color: cs.error, fontWeight: FontWeight.w900, fontSize: 12)),
                           ),
                           const SizedBox(width: 6),
                           Icon(_showOwed ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: cs.error),
@@ -417,15 +415,15 @@ class _DebtsScreenState extends State<DebtsScreen> {
                           Icon(Icons.account_balance_wallet, size: 16, color: cs.primary),
                           const SizedBox(width: 6),
                           Expanded(child: Text('debts_tab_receivable'.tr(),
-                            style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w700))),
+                            style: TextStyle(color: cs.primary, fontWeight: FontWeight.w700))),
                           if (!_showReceivable)
                             Text('${totalReceivable.toStringAsFixed(0)} $_currency',
-                              style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                              style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontSize: 13)),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                             decoration: BoxDecoration(color: cs.primary.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
-                            child: Text('${_receivableDebts.length}', style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 12)),
+                            child: Text('${_receivableDebts.length}', style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontSize: 12)),
                           ),
                           const SizedBox(width: 6),
                           Icon(_showReceivable ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, color: cs.primary),
@@ -453,7 +451,7 @@ class _DebtsScreenState extends State<DebtsScreen> {
                         Icon(Icons.celebration, size: 48, color: cs.primary),
                         const SizedBox(height: 12),
                         Text('debts_no_active'.tr(),
-                          style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Cairo', fontSize: 15)),
+                          style: const TextStyle(color: AppColors.textMuted, fontSize: 15)),
                       ])),
                   const SizedBox(height: 16),
 
@@ -471,13 +469,11 @@ class _DebtsScreenState extends State<DebtsScreen> {
                               child: Text('debts_show_paid'.tr(),
                                   style: TextStyle(
                                       color: cs.onSurface,
-                                      fontFamily: 'Cairo',
                                       fontWeight: FontWeight.w700))),
                           Text('${_paidDebts.length}',
                               style: TextStyle(
                                   color: cs.primary,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'Cairo')),
+                                  fontWeight: FontWeight.w900)),
                           const SizedBox(width: 8),
                           Icon(
                               _showPaid
@@ -538,13 +534,13 @@ class _ReceivableDebtCard extends StatelessWidget {
           Icon(Icons.circle, color: cs.primary, size: 10),
           const SizedBox(width: 10),
           Expanded(child: Text(debt['name'] ?? '',
-            style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 15))),
+            style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 15))),
           Text('$amount $currency',
-            style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
+            style: TextStyle(color: cs.primary, fontWeight: FontWeight.w900, fontSize: 16)),
         ]),
         if (debt['notes'] != null && (debt['notes'] as String).isNotEmpty) ...[
           const SizedBox(height: 4),
-          Text(debt['notes'], style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12)),
+          Text(debt['notes'], style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12)),
         ],
         if (dueDate != null) ...[
           const SizedBox(height: 6),
@@ -553,7 +549,7 @@ class _ReceivableDebtCard extends StatelessWidget {
               Icon(Icons.calendar_today, size: 12, color: cs.primary),
               const SizedBox(width: 4),
               Text("${'debts_due_date'.tr()}: $dueDate",
-                style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: cs.primary, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
         ],
@@ -570,7 +566,7 @@ class _ReceivableDebtCard extends StatelessWidget {
                   border: Border.all(color: cs.primary.withValues(alpha: 0.3)),
                 ),
                 child: Center(child: Text('debts_receive_btn'.tr(),
-                  style: TextStyle(color: cs.primary, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13))),
+                  style: TextStyle(color: cs.primary, fontWeight: FontWeight.w700, fontSize: 13))),
               ),
             ),
           ),

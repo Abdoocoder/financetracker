@@ -71,7 +71,7 @@ class _AssetsFormState extends State<AssetsForm> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('toast_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+          content: Text('toast_saved'.tr(), style: const TextStyle()),
           backgroundColor: AppColors.success,
         ));
       }
@@ -114,7 +114,6 @@ class _AssetsFormState extends State<AssetsForm> {
                   style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
                     fontSize: 12,
-                    fontFamily: 'Cairo',
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -125,7 +124,6 @@ class _AssetsFormState extends State<AssetsForm> {
                     color: displayedNetWorth >= 0 ? AppColors.success : AppColors.error,
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo',
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -174,7 +172,7 @@ class _AssetsFormState extends State<AssetsForm> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                     )
-                  : Text('save'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+                  : Text('save'.tr(), style: const TextStyle(fontWeight: FontWeight.w900)),
             ),
           ),
         ],
@@ -187,11 +185,11 @@ class _AssetsFormState extends State<AssetsForm> {
       children: [
         Text(
           value.toStringAsFixed(0),
-          style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 12, fontFamily: 'Cairo'),
+          style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 12),
         ),
         Text(
           label,
-          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 9, fontFamily: 'Cairo'),
+          style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11),
         ),
       ],
     );
@@ -203,10 +201,10 @@ class _AssetsFormState extends State<AssetsForm> {
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       textAlign: TextAlign.right,
       onChanged: (_) => setState(() {}),
-      style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 13),
+      style: TextStyle(color: colorScheme.onSurface, fontSize: 13),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12),
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 12),
         filled: true,
         fillColor: colorScheme.surface,
         border: OutlineInputBorder(

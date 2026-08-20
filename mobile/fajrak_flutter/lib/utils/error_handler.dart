@@ -41,7 +41,7 @@ class ErrorHandler {
               Expanded(
                 child: Text(
                   isNetwork ? 'error_no_internet'.tr() : 'error_generic'.tr(),
-                  style: const TextStyle(fontFamily: 'Cairo'),
+                  style: const TextStyle(),
                 ),
               ),
             ],

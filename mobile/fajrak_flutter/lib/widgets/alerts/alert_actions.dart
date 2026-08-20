@@ -27,7 +27,6 @@ class AlertActions extends StatelessWidget {
             child: Text('alerts_mark_all_read'.tr(),
                 style: TextStyle(
                     color: colorScheme.primary,
-                    fontFamily: 'Cairo',
                     fontSize: 12,
                     fontWeight: FontWeight.w900))),
       if (hasAlerts)
@@ -36,7 +35,6 @@ class AlertActions extends StatelessWidget {
             child: Text('alerts_delete_all'.tr(),
                 style: const TextStyle(
                     color: AppColors.error,
-                    fontFamily: 'Cairo',
                     fontSize: 12,
                     fontWeight: FontWeight.w900))),
     ]);

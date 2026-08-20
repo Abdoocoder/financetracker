@@ -45,14 +45,12 @@ class BudgetProgressCard extends StatelessWidget {
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Cairo',
                       fontSize: 14)),
               Text(
                   '${percentage >= 1 ? 0 : remaining.toStringAsFixed(0)} $currency ${"goals_remaining".tr()}',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: 12,
-                      fontFamily: 'Cairo')),
+                      fontSize: 12)),
             ],
           ),
           const SizedBox(height: 16),
@@ -75,13 +73,11 @@ class BudgetProgressCard extends StatelessWidget {
               Text('${"trans_expense".tr()}: ${expenses.toStringAsFixed(0)} $currency',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: 11,
-                      fontFamily: 'Cairo')),
+                      fontSize: 11)),
               Text('${"trans_income".tr()}: ${income.toStringAsFixed(0)} $currency',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
-                      fontSize: 11,
-                      fontFamily: 'Cairo')),
+                      fontSize: 11)),
             ],
           ),
         ],

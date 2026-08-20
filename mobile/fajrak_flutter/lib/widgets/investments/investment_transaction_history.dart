@@ -69,8 +69,7 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontFamily: 'Cairo')),
+                  color: Theme.of(context).colorScheme.onSurface)),
           const SizedBox(height: 20),
           if (_txHistory.isEmpty)
             Center(
@@ -79,8 +78,7 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                     child: Text('inv_empty'.tr(),
                         style: TextStyle(
                             color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontFamily: 'Cairo'))))
+                                Theme.of(context).colorScheme.onSurfaceVariant))))
           else
             SizedBox(
               height: 300,
@@ -128,7 +126,6 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                                 style: TextStyle(
                                     color:
                                         Theme.of(context).colorScheme.onSurface,
-                                    fontFamily: 'Cairo',
                                     fontWeight: FontWeight.w700,
                                     fontSize: 13)),
                             Text(
@@ -137,7 +134,6 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSurfaceVariant,
-                                    fontFamily: 'Cairo',
                                     fontSize: 11)),
                           ])),
                       Column(
@@ -148,7 +144,6 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                                 style: TextStyle(
                                     color: color,
                                     fontWeight: FontWeight.w900,
-                                    fontFamily: 'monospace',
                                     fontSize: 13)),
                             if (comm > 0)
                               Text(
@@ -158,8 +153,7 @@ class _InvestmentTxHistoryModalState extends State<InvestmentTxHistoryModal> {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurfaceVariant,
-                                      fontSize: 10,
-                                      fontFamily: 'Cairo')),
+                                      fontSize: 10)),
                           ]),
                     ]),
                   );

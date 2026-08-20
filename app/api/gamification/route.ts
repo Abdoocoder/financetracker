@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const supabase = createAdminClient()
-
 // ── تعريف الشارات ──────────────────────────────────────
 const BADGES = [
   // شارات التتبع
@@ -43,6 +41,7 @@ function getLevel(points: number) {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = createAdminClient()
   try {
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
@@ -179,6 +178,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const supabase = createAdminClient()
   const authHeader = req.headers.get('authorization')
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

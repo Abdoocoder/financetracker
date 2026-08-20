@@ -62,15 +62,13 @@ class QuickLinksCards extends StatelessWidget {
                 style: TextStyle(
                     color: color,
                     fontWeight: FontWeight.w900,
-                    fontSize: 14,
-                    fontFamily: 'Cairo'),
+                    fontSize: 14),
               ),
             ),
             Text(title,
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 10,
-                    fontFamily: 'Cairo')),
+                    fontSize: 10)),
           ],
         ),
       ),

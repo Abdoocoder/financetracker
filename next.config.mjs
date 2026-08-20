@@ -1,4 +1,8 @@
+import { fileURLToPath } from 'node:url'
+import path from 'node:path'
 import { withSentryConfig } from '@sentry/nextjs'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -6,31 +10,31 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'recharts'],
   },
   serverExternalPackages: ['firebase-admin'],
-  turbopack: {},
+  turbopack: { root: __dirname },
   async headers() {
     return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
       {
         source: '/:path*.wasm',
         headers: [{ key: 'Content-Type', value: 'application/wasm' }],
       },
       {
         source: '/sw.js',
-        headers: [
-          {
-            key: 'Service-Worker-Allowed',
-            value: '/'
-          }
-        ]
+        headers: [{ key: 'Service-Worker-Allowed', value: '/' }],
       },
       {
         source: '/firebase-messaging-sw.js',
-        headers: [
-          {
-            key: 'Service-Worker-Allowed',
-            value: '/'
-          }
-        ]
-      }
+        headers: [{ key: 'Service-Worker-Allowed', value: '/' }],
+      },
     ]
   },
 }

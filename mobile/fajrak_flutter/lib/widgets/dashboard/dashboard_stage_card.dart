@@ -32,8 +32,8 @@ class DashboardStageCard extends StatelessWidget {
         Icon(s.$1, size: 24, color: s.$3),
         const SizedBox(width: 12),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('stage'.tr(), style: const TextStyle(color: AppColors.textMuted, fontSize: 10, fontFamily: 'Cairo')),
-          Text('learn_stage_$stage'.tr(), style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+          Text('stage'.tr(), style: const TextStyle(color: AppColors.textMuted, fontSize: 10)),
+          Text('learn_stage_$stage'.tr(), style: TextStyle(color: s.$3, fontWeight: FontWeight.w900, fontSize: 14)),
         ]),
       ]),
     );

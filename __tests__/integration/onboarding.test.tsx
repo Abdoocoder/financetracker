@@ -85,7 +85,6 @@ describe('Onboarding integration', () => {
   })
 
   it('completes the full onboarding flow', async () => {
-    console.log('Starting full onboarding flow test...')
     await act(async () => {
       render(
         <I18nProvider>

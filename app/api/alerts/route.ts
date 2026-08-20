@@ -3,8 +3,6 @@ import { sendPushToUser } from '@/lib/push-send'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 function pushAlert(
   list: Record<string, unknown>[],
   existingTitles: Set<string>,
@@ -19,6 +17,7 @@ function pushAlert(
 }
 
 async function generateAlerts(userId?: string) {
+  const supabase = createAdminClient()
   const now = new Date()
   const dayOfWeek = now.getDay()
   const dayOfMonth = now.getDate()
@@ -149,11 +148,12 @@ export async function POST(request: NextRequest) {
     const authHeader = request.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const token = authHeader.replace('Bearer ', '')
+    const supabase = createAdminClient()
     const { data: { user }, error } = await supabase.auth.getUser(token)
     if (error || !user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     const count = await generateAlerts(user.id)
     return NextResponse.json({ ok: true, generated: count, message: count > 0 ? `✅ تم توليد ${count} تنبيه جديد` : 'ℹ️ لا تنبيهات جديدة — كل شيء محدّث' })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

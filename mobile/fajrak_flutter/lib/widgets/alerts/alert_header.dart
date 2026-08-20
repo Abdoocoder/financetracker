@@ -23,7 +23,6 @@ class AlertHeader extends StatelessWidget {
           Text('alerts_count'.tr(args: [totalCount.toString()]),
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontFamily: 'Cairo',
                   fontSize: 13)),
           if (unreadCount > 0) ...[
             const SizedBox(width: 8),
@@ -36,8 +35,7 @@ class AlertHeader extends StatelessWidget {
                     style: const TextStyle(
                         color: AppColors.error,
                         fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo'))),
+                        fontWeight: FontWeight.w900))),
           ]
         ]),
       ],

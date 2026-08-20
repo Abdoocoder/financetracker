@@ -104,7 +104,6 @@ class ConfirmDialog extends StatelessWidget {
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w900,
-              fontFamily: 'Cairo',
             ),
           ),
           const SizedBox(height: 12),
@@ -114,7 +113,6 @@ class ConfirmDialog extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               color: colorScheme.onSurfaceVariant,
-              fontFamily: 'Cairo',
               height: 1.6,
             ),
           ),

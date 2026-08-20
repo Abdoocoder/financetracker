@@ -26,7 +26,6 @@ class AuthErrorBanner extends StatelessWidget {
               message,
               style: TextStyle(
                 color: colorScheme.onErrorContainer,
-                fontFamily: 'Cairo',
                 fontSize: 13,
                 height: 1.5,
               ),

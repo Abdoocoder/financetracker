@@ -41,7 +41,6 @@ class MonthSelector extends StatelessWidget {
                       color: selectedMonth == i + 1
                           ? Colors.white
                           : colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo',
                       fontSize: 12,
                       fontWeight: FontWeight.w700)),
             ),

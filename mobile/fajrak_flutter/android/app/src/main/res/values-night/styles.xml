@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Launch theme: shown while Flutter engine initializes (dark mode) -->
-    <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
+    <style name="LaunchTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/launch_background</item>
         <item name="android:windowLayoutInDisplayCutoutMode">always</item>
     </style>
 
     <!-- Normal theme: applied once Flutter draws its first frame.
-         windowTranslucentStatus/Navigation removed — enableEdgeToEdge() handles insets. -->
-    <style name="NormalTheme" parent="@android:style/Theme.Black.NoTitleBar">
+         enableEdgeToEdge() in MainActivity handles system bar insets. -->
+    <style name="NormalTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">?android:colorBackground</item>
         <item name="android:windowLayoutInDisplayCutoutMode">always</item>
     </style>

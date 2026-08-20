@@ -80,13 +80,11 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo',
                     color: Theme.of(ctx).colorScheme.onSurface)),
             const SizedBox(height: 8),
             Text(
                 '${'inv_cash_available'.tr()}: ${widget.balance.toStringAsFixed(2)} ${widget.currency}',
                 style: TextStyle(
-                    fontFamily: 'Cairo',
                     fontSize: 13,
                     color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 20),
@@ -97,18 +95,15 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
               textAlign: TextAlign.center,
               onChanged: (_) => setModalState(() {}),
               style: TextStyle(
-                  fontFamily: 'Cairo',
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                   color: Theme.of(ctx).colorScheme.onSurface),
               decoration: InputDecoration(
                 hintText: 'inv_cash_transfer_amount_hint'.tr(),
                 hintStyle: TextStyle(
-                    fontFamily: 'Cairo',
                     color: Theme.of(ctx).colorScheme.onSurfaceVariant),
                 suffix: Text(widget.currency,
                     style: TextStyle(
-                        fontFamily: 'Cairo',
                         fontSize: 14,
                         color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
                 filled: true,
@@ -132,26 +127,24 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
                             color: Theme.of(ctx).colorScheme.primary)))
                     : _exchangeRate == null
                         ? Text('تعذر جلب سعر الصرف',
-                            style: TextStyle(fontFamily: 'Cairo', fontSize: 12,
+                            style: TextStyle(fontSize: 12,
                                 color: Theme.of(ctx).colorScheme.error))
                         : () {
                             final enteredAmount = double.tryParse(_amountCtrl.text) ?? 0;
                             final converted = enteredAmount * _exchangeRate!;
                             return Column(children: [
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                Text('سعر الصرف', style: TextStyle(fontFamily: 'Cairo',
-                                    fontSize: 12, color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+                                Text('سعر الصرف', style: TextStyle(fontSize: 12, color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
                                 Text('1 ${widget.currency} = ${_exchangeRate!.toStringAsFixed(4)} ${widget.accountCurrency}',
-                                    style: TextStyle(fontFamily: 'Cairo', fontSize: 12,
+                                    style: TextStyle(fontSize: 12,
                                         fontWeight: FontWeight.w700,
                                         color: Theme.of(ctx).colorScheme.onSurface)),
                               ]),
                               const SizedBox(height: 6),
                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                Text('ستستلم', style: TextStyle(fontFamily: 'Cairo',
-                                    fontSize: 12, color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
+                                Text('ستستلم', style: TextStyle(fontSize: 12, color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
                                 Text('${converted.toStringAsFixed(2)} ${widget.accountCurrency}',
-                                    style: const TextStyle(fontFamily: 'Cairo', fontSize: 14,
+                                    style: const TextStyle(fontSize: 14,
                                         fontWeight: FontWeight.w900, color: AppColors.success)),
                               ]),
                             ]);
@@ -179,7 +172,6 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
                             strokeWidth: 2, color: Colors.white))
                     : Text('inv_cash_transfer_confirm'.tr(),
                         style: const TextStyle(
-                            fontFamily: 'Cairo',
                             fontWeight: FontWeight.w900,
                             fontSize: 15)),
               ),
@@ -197,7 +189,7 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
     if (amount > widget.balance) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('inv_cash_transfer_exceeds'.tr(),
-              style: const TextStyle(fontFamily: 'Cairo'))));
+              style: const TextStyle())));
       return;
     }
 
@@ -231,7 +223,7 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('inv_cash_transfer_success'.tr(),
-                style: const TextStyle(fontFamily: 'Cairo')),
+                style: const TextStyle()),
             backgroundColor: AppColors.success));
       }
     } catch (e) {
@@ -258,7 +250,6 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
         Row(children: [
           Text('inv_cash_title'.tr(),
               style: TextStyle(
-                  fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,
                   fontSize: 15,
                   color: colorScheme.onSurface)),
@@ -272,7 +263,6 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
                   borderRadius: BorderRadius.circular(8)),
               child: Text(widget.currency,
                   style: const TextStyle(
-                      fontFamily: 'Cairo',
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppColors.success)),
@@ -282,13 +272,11 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
         if (!hasBalance)
           Text('inv_cash_empty'.tr(),
               style: TextStyle(
-                  fontFamily: 'Cairo',
                   fontSize: 12,
                   color: colorScheme.onSurfaceVariant))
         else ...[
           Text('\$${widget.balance.toStringAsFixed(2)}',
               style: const TextStyle(
-                  fontFamily: 'Cairo',
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
                   color: AppColors.success)),
@@ -300,7 +288,6 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
               icon: const Icon(Icons.arrow_forward, size: 16),
               label: Text('inv_cash_transfer_btn'.tr(),
                   style: const TextStyle(
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w700,
                       fontSize: 13)),
               style: OutlinedButton.styleFrom(

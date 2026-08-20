@@ -24,8 +24,11 @@ const mockInitializeApp = initializeApp as jest.Mock
 const mockRegister = jest.fn()
 
 describe('getFCMToken', () => {
+  let consoleErrorSpy: jest.SpyInstance
+
   beforeEach(() => {
     jest.clearAllMocks()
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
     mockGetApps.mockReturnValue([])
     mockGetMessaging.mockReturnValue({})
     Object.defineProperty(window, 'navigator', {
@@ -36,6 +39,10 @@ describe('getFCMToken', () => {
       writable: true,
       configurable: true,
     })
+  })
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore()
   })
 
   it('returns a token when getToken succeeds', async () => {

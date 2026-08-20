@@ -28,22 +28,19 @@ class PaidDebtItem extends StatelessWidget {
               Text(debt['name'] ?? '',
                   style: TextStyle(
                       color: cs.onSurface,
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w700,
                       fontSize: 13)),
               if (debt['updated_at'] != null)
                 Text(debt['updated_at'].toString().substring(0, 10),
                     style: TextStyle(
                         color: cs.onSurfaceVariant,
-                        fontSize: 11,
-                        fontFamily: 'Cairo')),
+                        fontSize: 11)),
             ])),
         Text(
             '${(debt['original_amount'] as num).toStringAsFixed(0)} $currency',
             style: const TextStyle(
                 color: AppColors.successLight,
-                fontWeight: FontWeight.w900,
-                fontFamily: 'Cairo')),
+                fontWeight: FontWeight.w900)),
       ]),
     );
   }

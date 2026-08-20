@@ -95,7 +95,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           SnackBar(
             content: Text(
               'testimonial_success'.tr(),
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(),
             ),
             backgroundColor: AppColors.success,
           ),
@@ -107,7 +107,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           SnackBar(
             content: Text(
               'testimonial_error'.tr(),
-              style: const TextStyle(fontFamily: 'Cairo'),
+              style: const TextStyle(),
             ),
             backgroundColor: AppColors.error,
           ),
@@ -156,7 +156,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 'testimonial_share_title'.tr(),
                 style: TextStyle(
                   color: colorScheme.onSurface,
-                  fontFamily: 'Cairo',
                   fontWeight: FontWeight.w900,
                   fontSize: 13,
                 ),
@@ -174,7 +173,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 color: colorScheme.primary,
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Cairo',
               ),
             ),
           ),
@@ -209,7 +207,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
             style: const TextStyle(
               color: AppColors.success,
               fontWeight: FontWeight.w800,
-              fontFamily: 'Cairo',
               fontSize: 14,
             ),
           ),
@@ -226,7 +223,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
           'testimonial_approval_notice'.tr(),
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
-            fontFamily: 'Cairo',
             fontSize: 12,
             height: 1.7,
           ),
@@ -239,7 +235,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Cairo',
             fontSize: 12,
           ),
         ),
@@ -277,7 +272,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Cairo',
                       fontSize: 12,
                     ),
                   ),
@@ -297,7 +291,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Cairo',
                       fontSize: 12,
                     ),
                   ),
@@ -338,7 +331,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
           style: TextStyle(
             color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Cairo',
             fontSize: 12,
           ),
         ),
@@ -355,7 +347,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
               style: TextStyle(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Cairo',
                 fontSize: 12,
               ),
             ),
@@ -363,7 +354,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
               '${_textCtrl.text.length}/20+',
               style: TextStyle(
                 color: _textCtrl.text.length < 20 ? colorScheme.error : AppColors.success,
-                fontFamily: 'Cairo',
                 fontSize: 12,
               ),
             ),
@@ -374,10 +364,10 @@ class _TestimonialCardState extends State<TestimonialCard> {
           controller: _textCtrl,
           onChanged: (v) => setState(() {}),
           maxLines: 4,
-          style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 13),
+          style: TextStyle(color: colorScheme.onSurface, fontSize: 13),
           decoration: InputDecoration(
             hintText: 'testimonial_review_hint'.tr(),
-            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 13),
+            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
             filled: true,
             fillColor: colorScheme.outlineVariant,
             border: OutlineInputBorder(
@@ -409,7 +399,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
                 : Text(
                     _existing ? 'testimonial_update_btn'.tr() : 'testimonial_submit_btn'.tr(),
                     style: const TextStyle(
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w800,
                       fontSize: 14,
                     ),
@@ -424,7 +413,6 @@ class _TestimonialCardState extends State<TestimonialCard> {
               'testimonial_existing_notice'.tr(),
               style: const TextStyle(
                 color: AppColors.warning,
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
               ),
@@ -439,10 +427,10 @@ class _TestimonialCardState extends State<TestimonialCard> {
     return TextField(
       controller: ctrl,
       onChanged: (v) => setState(() {}),
-      style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo', fontSize: 13),
+      style: TextStyle(color: colorScheme.onSurface, fontSize: 13),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 13),
+        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13),
         filled: true,
         fillColor: colorScheme.outlineVariant,
         border: OutlineInputBorder(

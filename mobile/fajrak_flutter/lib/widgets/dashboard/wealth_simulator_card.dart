@@ -64,7 +64,6 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Cairo',
                       fontSize: 14)),
             ],
           ),
@@ -75,16 +74,14 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
               style: TextStyle(
                   color: isDark ? AppColors.success : colorScheme.primary,
                   fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  fontFamily: 'Cairo'),
+                  fontWeight: FontWeight.w900),
             ),
           ),
           Center(
             child: Text('wealth_simulator_subtitle'.tr(),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 11,
-                    fontFamily: 'Cairo')),
+                    fontSize: 11)),
           ),
           const SizedBox(height: 24),
           _buildSlider('wealth_monthly_investment'.tr(), _monthlyContribution, 0, 5000,
@@ -117,14 +114,12 @@ class _WealthSimulatorCardState extends State<WealthSimulatorCard> {
             Text(label,
                 style: TextStyle(
                     color: colorScheme.onSurface,
-                    fontSize: 12,
-                    fontFamily: 'Cairo')),
+                    fontSize: 12)),
             Text(formattedValue,
                 style: TextStyle(
                     color: colorScheme.primary,
                     fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Cairo')),
+                    fontWeight: FontWeight.bold)),
           ],
         ),
         SliderTheme(

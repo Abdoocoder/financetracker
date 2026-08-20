@@ -97,13 +97,11 @@ class TransactionListItem extends StatelessWidget {
                           style: TextStyle(
                               color: colorScheme.onSurface,
                               fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              fontFamily: 'Cairo')),
+                              fontSize: 14)),
                       Text(transaction['category'] ?? '',
                           style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
-                              fontSize: 11,
-                              fontFamily: 'Cairo')),
+                              fontSize: 11)),
                     ],
                   ),
                 ),
@@ -122,8 +120,7 @@ class TransactionListItem extends StatelessWidget {
                           style: TextStyle(
                               color: color,
                               fontWeight: FontWeight.w900,
-                              fontSize: 15,
-                              fontFamily: 'Cairo'),
+                              fontSize: 15),
                         ),
                         const SizedBox(width: 6),
                         Icon(Icons.edit_outlined, size: 14, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
@@ -136,15 +133,13 @@ class TransactionListItem extends StatelessWidget {
                           color: color.withValues(alpha: 0.6),
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Cairo'
                         ),
                       ),
                     Text(
                       transaction['transaction_date'] ?? '',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
-                          fontSize: 10,
-                          fontFamily: 'Cairo'),
+                          fontSize: 10),
                     ),
                   ],
                 ),

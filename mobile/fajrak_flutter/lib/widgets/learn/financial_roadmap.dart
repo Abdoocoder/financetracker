@@ -82,8 +82,7 @@ class FinancialRoadmap extends StatelessWidget {
                           color: color,
                           fontSize: 10,
                           fontWeight:
-                              isCurrent ? FontWeight.w900 : FontWeight.w500,
-                          fontFamily: 'Cairo')),
+                              isCurrent ? FontWeight.w900 : FontWeight.w500)),
                 ],
               );
             }),

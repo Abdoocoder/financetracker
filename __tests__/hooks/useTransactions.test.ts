@@ -39,10 +39,20 @@ jest.mock('@/lib/currency', () => ({
   fetchExchangeRate: jest.fn().mockResolvedValue(null),
 }))
 
+import React from 'react'
 import { renderHook, waitFor, act } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useTransactions } from '../../hooks/useTransactions'
 import { toast } from '@/components/ui/toast'
 import { clearUserCache } from '@/lib/cache'
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(QueryClientProvider, { client: queryClient }, children)
+
+beforeEach(() => {
+  queryClient.clear()
+})
 
 // Proxy chain: supports any method chaining; resolves to `data` when awaited
 function chainProxy(data: any) {
@@ -75,32 +85,32 @@ describe('useTransactions — initialization', () => {
   beforeEach(() => setupMock())
 
   it('starts with loading=true', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     expect(result.current.loading).toBe(true)
     await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('starts with showForm=false', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     expect(result.current.showForm).toBe(false)
     await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('starts with empty errors', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     expect(result.current.errors).toEqual({})
     await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('starts with filter=all and empty search', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     expect(result.current.filter).toBe('all')
     expect(result.current.search).toBe('')
     await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('exposes current month and year', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     const now = new Date()
     expect(result.current.filterMonth).toBe(now.getMonth() + 1)
     expect(result.current.filterYear).toBe(now.getFullYear())
@@ -108,7 +118,7 @@ describe('useTransactions — initialization', () => {
   })
 
   it('loads transactions after mount', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.transactions).toHaveLength(3)
   })
@@ -118,7 +128,7 @@ describe('useTransactions — form management', () => {
   beforeEach(() => setupMock())
 
   it('openAdd opens the form', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.openAdd())
     expect(result.current.showForm).toBe(true)
@@ -126,7 +136,7 @@ describe('useTransactions — form management', () => {
   })
 
   it('closeForm closes the form and clears errors', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.openAdd())
     expect(result.current.showForm).toBe(true)
@@ -136,7 +146,7 @@ describe('useTransactions — form management', () => {
   })
 
   it('startEdit sets editingId and populates form', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     const tx = result.current.transactions[0]
     act(() => result.current.startEdit(tx as any))
@@ -147,7 +157,7 @@ describe('useTransactions — form management', () => {
   })
 
   it('setForm updates form field', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setForm(f => ({ ...f, category: 'new-cat' })))
     expect(result.current.form.category).toBe('new-cat')
@@ -158,7 +168,7 @@ describe('useTransactions — filtering and searching', () => {
   beforeEach(() => setupMock())
 
   it('setFilter changes the active filter', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setFilter('income'))
     expect(result.current.filter).toBe('income')
@@ -166,14 +176,14 @@ describe('useTransactions — filtering and searching', () => {
   })
 
   it('setFilter("expense") shows only expenses', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setFilter('expense'))
     expect(result.current.filtered.every(t => t.type === 'expense')).toBe(true)
   })
 
   it('setSearch filters by description', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSearch('راتب'))
     expect(result.current.filtered).toHaveLength(1)
@@ -181,7 +191,7 @@ describe('useTransactions — filtering and searching', () => {
   })
 
   it('setSearch with empty string shows all', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSearch('x'))
     act(() => result.current.setSearch(''))
@@ -189,14 +199,14 @@ describe('useTransactions — filtering and searching', () => {
   })
 
   it('setSearch filters by category', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSearch('food'))
     expect(result.current.filtered[0].id).toBe('tx2')
   })
 
   it('setSearch filters by amount string', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSearch('1000'))
     expect(result.current.filtered).toHaveLength(1)
@@ -204,7 +214,7 @@ describe('useTransactions — filtering and searching', () => {
   })
 
   it('setSearch is case-insensitive', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSearch('FOOD'))
     expect(result.current.filtered).toHaveLength(1)
@@ -216,7 +226,7 @@ describe('useTransactions — sorting', () => {
   beforeEach(() => setupMock())
 
   it('sorts by date desc by default', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     // Dates: tx1 (15th), tx2 (10th), tx3 (5th)
     expect(result.current.filtered[0].id).toBe('tx1')
@@ -225,7 +235,7 @@ describe('useTransactions — sorting', () => {
   })
 
   it('sorts by date asc', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSortOrder('asc'))
     expect(result.current.filtered[0].id).toBe('tx3')
@@ -234,7 +244,7 @@ describe('useTransactions — sorting', () => {
   })
 
   it('sorts by amount desc', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSortBy('amount'))
     act(() => result.current.setSortOrder('desc'))
@@ -245,7 +255,7 @@ describe('useTransactions — sorting', () => {
   })
 
   it('sorts by amount asc', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setSortBy('amount'))
     act(() => result.current.setSortOrder('asc'))
@@ -259,31 +269,31 @@ describe('useTransactions — computed totals', () => {
   beforeEach(() => setupMock())
 
   it('computes totalIncome', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.totalIncome).toBe(1000)
   })
 
   it('computes totalExpense', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.totalExpense).toBe(250)  // 200 + 50
   })
 
   it('computes totalDebtPayments for debt categories', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.totalDebtPayments).toBe(50)  // only 'ديون' category
   })
 
   it('computes totalRealExpense = totalExpense - totalDebtPayments', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.totalRealExpense).toBe(200)  // 250 - 50
   })
 
   it('computes net = income - expense', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.net).toBe(750)  // 1000 - 250
   })
@@ -293,7 +303,7 @@ describe('useTransactions — saveTransaction validation', () => {
   beforeEach(() => setupMock())
 
   it('sets errors when amount and category missing', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.openAdd())
     await act(async () => {
@@ -304,7 +314,7 @@ describe('useTransactions — saveTransaction validation', () => {
   })
 
   it('sets error when only category missing', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.openAdd())
     act(() => result.current.setForm(f => ({ ...f, amount: '100' })))
@@ -320,7 +330,7 @@ describe('useTransactions — deleteTransaction', () => {
   beforeEach(() => setupMock())
 
   it('removes transaction from local state', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.transactions).toHaveLength(3)
 
@@ -338,7 +348,7 @@ describe('useTransactions — month/year navigation', () => {
   beforeEach(() => setupMock())
 
   it('setFilterMonth updates filterMonth', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setFilterMonth(3))
     expect(result.current.filterMonth).toBe(3)
@@ -347,7 +357,7 @@ describe('useTransactions — month/year navigation', () => {
   })
 
   it('setFilterYear updates filterYear', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     act(() => result.current.setFilterYear(2023))
     expect(result.current.filterYear).toBe(2023)
@@ -366,7 +376,7 @@ describe('useTransactions — currency logic', () => {
     const { fetchExchangeRate } = require('@/lib/currency')
     fetchExchangeRate.mockResolvedValue(3.1)
     
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -379,7 +389,7 @@ describe('useTransactions — currency logic', () => {
   })
 
   it('sets exchange_rate to 1 when original_currency matches profile currency', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -393,7 +403,7 @@ describe('useTransactions — currency logic', () => {
   })
 
   it('automatically updates amount based on original_amount and exchange_rate', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {
@@ -410,7 +420,7 @@ describe('useTransactions — saveTransaction integration', () => {
   beforeEach(() => setupMock())
 
   it('calls supabase.insert on saveTransaction when not editing', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     act(() => {
@@ -434,7 +444,7 @@ describe('useTransactions — saveTransaction integration', () => {
   })
 
   it('calls supabase.update on saveTransaction when editing', async () => {
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     const tx = mockTxData[0]
@@ -464,7 +474,7 @@ describe('useTransactions — monthToDateNet and advanced totals', () => {
     ]
     setupMock(customData as any)
 
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     
     // MTD Net should be 1000 - 200 = 800
@@ -484,7 +494,7 @@ describe('useTransactions — pagination and export', () => {
     }))
     setupMock(twentyItems as any)
 
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.hasMore).toBe(true)
     
@@ -506,7 +516,7 @@ describe('useTransactions — pagination and export', () => {
     ]
     setupMock(customData as any)
 
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     
     expect(result.current.totalExpense).toBe(700)
@@ -528,7 +538,7 @@ describe('useTransactions — pagination and export', () => {
       return realCreateElement.call(document, tagName)
     })
 
-    const { result } = renderHook(() => useTransactions())
+    const { result } = renderHook(() => useTransactions(), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     await act(async () => {

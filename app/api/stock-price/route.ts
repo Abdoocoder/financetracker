@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const supabase = createAdminClient()
+const SYMBOL_RE = /^[A-Z0-9=.^-]{1,20}$/
 
 // خريطة العملات الرقمية الشائعة
 const CRYPTO_IDS: Record<string, string> = {
@@ -65,12 +65,14 @@ export async function GET(request: NextRequest) {
   if (!authHeader?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const supabase = createAdminClient()
   const { data: { user }, error } = await supabase.auth.getUser(authHeader.slice(7))
   if (error || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
   const symbol = (searchParams.get('symbol') ?? '').toUpperCase()
   if (!symbol) return NextResponse.json({ error: 'symbol required' }, { status: 400 })
+  if (!SYMBOL_RE.test(symbol)) return NextResponse.json({ error: 'Invalid symbol' }, { status: 400 })
 
   // ١. جرّب crypto أولاً
   const cryptoPrice = await getCryptoPrice(symbol)

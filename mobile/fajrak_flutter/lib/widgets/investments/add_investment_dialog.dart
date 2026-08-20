@@ -131,12 +131,11 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
       keyboardType: type,
       textAlign: TextAlign.right,
       style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface, fontFamily: 'Cairo'),
+          color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            fontFamily: 'Cairo'),
+            color: Theme.of(context).colorScheme.onSurfaceVariant),
         filled: true,
         fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
@@ -169,8 +168,7 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: Theme.of(context).colorScheme.onSurface,
-                fontFamily: 'Cairo')),
+                color: Theme.of(context).colorScheme.onSurface)),
         const SizedBox(height: 20),
         Row(children: [
           Expanded(child: _field(_symbolCtrl, 'inv_symbol_hint'.tr(), TextInputType.text)),
@@ -223,7 +221,6 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
                   color: _purchaseDate != null
                       ? Theme.of(context).colorScheme.onSurface
                       : Theme.of(context).colorScheme.onSurfaceVariant,
-                  fontFamily: 'Cairo',
                 ),
               )),
               if (_purchaseDate != null)
@@ -267,7 +264,6 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
                       color: _isHalal
                           ? const Color(0xFF10B981)
                           : const Color(0xFF94A3B8),
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w700)),
             ]),
           ),
@@ -289,7 +285,6 @@ class _AddInvestmentDialogState extends State<AddInvestmentDialog> {
                       strokeWidth: 2)
                   : Text('inv_save'.tr(),
                       style: const TextStyle(
-                          fontFamily: 'Cairo',
                           fontWeight: FontWeight.w900,
                           fontSize: 15)),
             )),

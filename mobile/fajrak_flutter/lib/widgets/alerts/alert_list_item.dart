@@ -62,7 +62,6 @@ class AlertListItem extends StatelessWidget {
                                     ? colorScheme.onSurfaceVariant
                                     : colorScheme.onSurface,
                                 fontWeight: isRead ? FontWeight.w700 : FontWeight.w900,
-                                fontFamily: 'Cairo',
                                 fontSize: 14))),
                     if (!isRead)
                       Container(
@@ -82,14 +81,12 @@ class AlertListItem extends StatelessWidget {
                           color: isRead
                               ? colorScheme.onSurfaceVariant.withValues(alpha: 0.7)
                               : colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo',
                           fontSize: 12,
                           height: 1.6)),
                   const SizedBox(height: 8),
                   Text(date,
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo',
                           fontSize: 10)),
                 ],
               ),

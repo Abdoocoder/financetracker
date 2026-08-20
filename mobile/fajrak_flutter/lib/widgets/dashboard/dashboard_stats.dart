@@ -23,9 +23,9 @@ class DashboardStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Expanded(child: _statCard('dash_income'.tr(), income, AppColors.success, '↑', colorScheme)),
+      Expanded(child: _statCard('dash_income'.tr(), income, AppColors.success, Icons.arrow_upward_rounded, colorScheme)),
       const SizedBox(width: 8),
-      Expanded(child: _statCard('dash_expenses'.tr(), expenses, AppColors.error, '↓', colorScheme)),
+      Expanded(child: _statCard('dash_expenses'.tr(), expenses, AppColors.error, Icons.arrow_downward_rounded, colorScheme)),
       const SizedBox(width: 8),
       Expanded(child: _netCard(colorScheme)),
     ]);
@@ -47,15 +47,14 @@ class DashboardStats extends StatelessWidget {
         border: Border.all(color: balColor.withValues(alpha: 0.2)),
       ),
       child: Column(children: [
-        Text('🏦', style: TextStyle(color: balColor, fontSize: 12)),
+        Icon(Icons.account_balance_rounded, color: balColor, size: 16),
         const SizedBox(height: 4),
         FittedBox(child: Text(
           (totalBalance < 0 ? '-' : '') + totalBalance.abs().toStringAsFixed(0),
-          style: TextStyle(color: balColor, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'),
+          style: TextStyle(color: balColor, fontWeight: FontWeight.w900, fontSize: 16),
         )),
-        Text('dash_net'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
+        Text('dash_net'.tr(), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10)),
         const SizedBox(height: 4),
-        // صافي الشهر كمعلومة إضافية صغيرة
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
@@ -65,12 +64,12 @@ class DashboardStats extends StatelessWidget {
           ),
           child: Column(children: [
             Text('${'dash_monthly'.tr()}: ${monthlyNet >= 0 ? '+' : '-'}${monthlyNet.abs().toStringAsFixed(0)}',
-              style: TextStyle(color: monthlyNetColor, fontSize: 8, fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+              style: TextStyle(color: monthlyNetColor, fontSize: 11, fontWeight: FontWeight.w700),
               textAlign: TextAlign.center,
             ),
             if (hasCommitments) ...[
-              Text('⚡ ${'dash_after_debts'.tr()}: ${netAfterDebts >= 0 ? '+' : '-'}${netAfterDebts.abs().toStringAsFixed(0)}',
-                style: TextStyle(color: netAfterColor, fontSize: 8, fontFamily: 'Cairo', fontWeight: FontWeight.w700),
+              Text('${'dash_after_debts'.tr()}: ${netAfterDebts >= 0 ? '+' : '-'}${netAfterDebts.abs().toStringAsFixed(0)}',
+                style: TextStyle(color: netAfterColor, fontSize: 11, fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -80,7 +79,7 @@ class DashboardStats extends StatelessWidget {
     );
   }
 
-  Widget _statCard(String label, double value, Color color, String icon, ColorScheme colorScheme) {
+  Widget _statCard(String label, double value, Color color, IconData icon, ColorScheme colorScheme) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -89,10 +88,10 @@ class DashboardStats extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(children: [
-        Text(icon, style: TextStyle(color: color, fontSize: 12)),
+        Icon(icon, color: color, size: 16),
         const SizedBox(height: 4),
-        FittedBox(child: Text(value.abs().toStringAsFixed(0), style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16, fontFamily: 'Cairo'))),
-        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
+        FittedBox(child: Text(value.abs().toStringAsFixed(0), style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 16))),
+        Text(label, style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10)),
       ]),
     );
   }

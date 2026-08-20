@@ -30,13 +30,11 @@ class CategorySpendingItem extends StatelessWidget {
           Text(category,
               style: TextStyle(
                   color: colorScheme.onSurface,
-                  fontFamily: 'Cairo',
                   fontSize: 13)),
           Text(
               '${amount.toStringAsFixed(0)} $currency (${percentage.toStringAsFixed(0)}%)',
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontFamily: 'Cairo',
                   fontSize: 12)),
         ]),
         const SizedBox(height: 6),

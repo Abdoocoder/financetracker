@@ -211,11 +211,11 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
         controller: ctrl,
         keyboardType: type,
         textAlign: TextAlign.right,
-        style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
+        style: TextStyle(color: cs.onSurface),
         decoration: InputDecoration(
             hintText: hint,
             hintStyle:
-                TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.6), fontFamily: 'Cairo'),
+                TextStyle(color: cs.onSurfaceVariant.withValues(alpha: 0.6)),
             filled: true,
             fillColor: cs.surfaceContainerHigh,
             border: OutlineInputBorder(
@@ -248,8 +248,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
-                color: cs.onSurface,
-                fontFamily: 'Cairo')),
+                color: cs.onSurface)),
         const SizedBox(height: 20),
         // نوع الدين
         Row(children: [
@@ -269,8 +268,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                     const Icon(Icons.credit_card, size: 16, color: Color(0xFFEF4444)),
                     const SizedBox(width: 6),
                     Text('debts_tab_owed'.tr(),
-                      style: TextStyle(color: _debtType == 'owed' ? const Color(0xFFEF4444) : const Color(0xFF94A3B8),
-                        fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13)),
+                      style: TextStyle(color: _debtType == 'owed' ? const Color(0xFFEF4444) : const Color(0xFF94A3B8), fontWeight: FontWeight.w700, fontSize: 13)),
                   ],
                 ),
               ),
@@ -293,8 +291,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                     const Icon(Icons.account_balance_wallet, size: 16, color: Color(0xFF10B981)),
                     const SizedBox(width: 6),
                     Text('debts_tab_receivable'.tr(),
-                      style: TextStyle(color: _debtType == 'receivable' ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
-                        fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13)),
+                      style: TextStyle(color: _debtType == 'receivable' ? const Color(0xFF10B981) : const Color(0xFF94A3B8), fontWeight: FontWeight.w700, fontSize: 13)),
                   ],
                 ),
               ),
@@ -316,7 +313,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
               child: DropdownButton<String>(
                 value: _selectedCurrency,
                 dropdownColor: cs.surface,
-                style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 13),
+                style: TextStyle(color: cs.onSurface, fontSize: 13),
                 items: ['JOD','USD','SAR','AED','EGP','TRY','EUR'].map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                 onChanged: (v) { if (v != null) { setState(() => _selectedCurrency = v); _fetchRate(); } },
               ),
@@ -331,11 +328,11 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             Expanded(child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('trans_equivalent'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
+                Text('trans_equivalent'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10)),
                 const SizedBox(height: 4),
                 Text(
                   '${((double.tryParse(_originalCtrl.text.replaceAll(',', '.')) ?? 0) * (double.tryParse(_exchangeRateCtrl.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
-                  style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 13, fontFamily: 'Cairo'),
+                  style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ],
             )),
@@ -389,7 +386,6 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                     color: _dueDate.isNotEmpty
                         ? cs.onSurface
                         : cs.onSurfaceVariant,
-                    fontFamily: 'Cairo',
                     fontSize: 13),
               ),
             ]),
@@ -403,8 +399,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
             child: Text('debts_priority'.tr(),
                 style: TextStyle(
                     color: cs.onSurfaceVariant,
-                    fontSize: 12,
-                    fontFamily: 'Cairo'))),
+                    fontSize: 12))),
         const SizedBox(height: 8),
         Row(
             children: List.generate(
@@ -430,8 +425,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                               child: Text(widget.priorityLabels[i],
                                   style: TextStyle(
                                       color: widget.priorityColors[i],
-                                      fontSize: 9,
-                                      fontFamily: 'Cairo',
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w700),
                                   textAlign: TextAlign.center)),
                         ),
@@ -470,13 +464,11 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                             color: _autoDeduct
                                 ? const Color(0xFF10B981)
                                 : const Color(0xFF94A3B8),
-                            fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700)),
                     Text('debts_auto_deduct_desc'.tr(),
                         style: const TextStyle(
                             color: Color(0xFF64748B),
-                            fontSize: 11,
-                            fontFamily: 'Cairo')),
+                            fontSize: 11)),
                   ],
                 )),
               ]),
@@ -517,7 +509,6 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                               color: _receivedAmount
                                   ? const Color(0xFF3B7EF6)
                                   : const Color(0xFF94A3B8),
-                              fontFamily: 'Cairo',
                               fontWeight: FontWeight.w700)),
                     ]),
                     if (_receivedAmount)
@@ -526,8 +517,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                         child: Text('debts_received_today_desc'.tr(),
                             style: const TextStyle(
                                 color: Color(0xFF64748B),
-                                fontSize: 11,
-                                fontFamily: 'Cairo')),
+                                fontSize: 11)),
                       ),
                   ]),
             ),
@@ -567,7 +557,6 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                               color: _paidFromAccount
                                   ? const Color(0xFFEF4444)
                                   : const Color(0xFF94A3B8),
-                              fontFamily: 'Cairo',
                               fontWeight: FontWeight.w700)),
                     ]),
                     Padding(
@@ -580,8 +569,7 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                             color: _paidFromAccount
                                 ? const Color(0xFF64748B)
                                 : const Color(0xFF94A3B8),
-                            fontSize: 11,
-                            fontFamily: 'Cairo'),
+                            fontSize: 11),
                       ),
                     ),
                   ]),
@@ -604,7 +592,6 @@ class _AddDebtDialogState extends State<AddDebtDialog> {
                       ? 'debts_save_edit'.tr()
                       : 'debts_save'.tr(),
                   style: const TextStyle(
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w900,
                       fontSize: 15)),
             )),

@@ -147,7 +147,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text(e.toString(), style: const TextStyle())),
         );
       }
     } finally {
@@ -193,7 +193,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                   color: theme.colorScheme.onSurface,
-                  fontFamily: 'Cairo',
                 ),
               ),
             ),
@@ -266,7 +265,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                         DateFormat('yyyy-MM-dd').format(date),
                         style: TextStyle(
                           color: theme.colorScheme.onSurface, 
-                          fontFamily: 'Cairo',
                           fontSize: 16,
                         ),
                       ),
@@ -292,7 +290,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     style: TextStyle(
                       color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
-                      fontFamily: 'Cairo', 
                       fontSize: 24, 
                       fontWeight: FontWeight.w900
                     ),
@@ -324,7 +321,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                         isExpanded: true,
                         style: TextStyle(
                           color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
-                          fontFamily: 'Cairo', 
                           fontWeight: FontWeight.w900
                         ),
                         items: ['JOD','USD','SAR','AED','EGP','TRY','EUR']
@@ -368,7 +364,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             style: TextStyle(
                               color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
                               fontSize: 16, 
-                              fontFamily: 'Cairo', 
                               fontWeight: FontWeight.bold
                             ),
                             decoration: InputDecoration(
@@ -397,7 +392,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('trans_equivalent'.tr(), 
-                                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 10, fontFamily: 'Cairo')),
+                                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 10)),
                               const SizedBox(height: 4),
                               Text(
                                 '${((double.tryParse(_amountController.text) ?? 0) * (double.tryParse(_exchangeRateController.text) ?? 1.0)).toStringAsFixed(2)} ${widget.baseCurrency}',
@@ -405,7 +400,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                                   color: theme.colorScheme.secondary, 
                                   fontWeight: FontWeight.bold, 
                                   fontSize: 16,
-                                  fontFamily: 'Cairo'
                                 ),
                               ),
                             ],
@@ -447,7 +441,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                       isExpanded: true,
                       style: TextStyle(
                         color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
-                        fontFamily: 'Cairo', 
                         fontWeight: FontWeight.bold
                       ),
                       items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
@@ -469,7 +462,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               maxLines: 2,
               style: TextStyle(
                 color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A), 
-                fontFamily: 'Cairo', 
                 fontWeight: FontWeight.bold
               ),
               decoration: InputDecoration(
@@ -513,7 +505,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                               color: _isRecurring
                                   ? const Color(0xFF3B7EF6)
                                   : theme.colorScheme.onSurface,
-                              fontFamily: 'Cairo',
                               fontWeight: FontWeight.w700,
                               fontSize: 15,
                             ),
@@ -523,7 +514,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                               'tx_recurring_note'.tr(),
                               style: const TextStyle(
                                 color: Color(0xFF3B7EF6),
-                                fontFamily: 'Cairo',
                                 fontSize: 12,
                               ),
                             ),
@@ -559,7 +549,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     isExpanded: true,
                     style: TextStyle(
                       color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0F172A),
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.bold,
                     ),
                     items: List.generate(
@@ -612,7 +601,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo',
                     color: Colors.white,
                   ),
                 ),
@@ -634,7 +622,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           color: Color(0xFF94A3B8),
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Cairo',
         ),
       ),
     );
@@ -664,7 +651,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               label,
               style: TextStyle(
                 color: isSelected ? Colors.white : const Color(0xFF94A3B8),
-                fontFamily: 'Cairo',
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
                 fontSize: 16,
               ),

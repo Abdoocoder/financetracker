@@ -4,7 +4,7 @@ export const enDownload = {
     down_desc: 'Enjoy a faster experience, instant notifications, and full offline support via our native app.',
     down_btn: 'Get it on Google Play',
     down_safe: 'Safe & Official Version',
-    down_version: 'v3.35.4',
+    down_version: 'v3.36.0',
     down_f1: 'Native Notifications',
     down_f2: 'Faster Performance',
     down_f3: 'Works Offline',

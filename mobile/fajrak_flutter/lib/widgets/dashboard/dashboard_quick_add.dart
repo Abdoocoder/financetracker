@@ -83,7 +83,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: widget.colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: widget.colorScheme.outlineVariant)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('quick_add_title'.tr(), style: TextStyle(color: widget.colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14, fontFamily: 'Cairo')),
+        Text('quick_add_title'.tr(), style: TextStyle(color: widget.colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: GestureDetector(onTap: () {
@@ -96,7 +96,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
           },
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(color: _txType == 'income' ? AppColors.success.withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'income' ? AppColors.success : widget.colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: AppColors.success, fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              child: Center(child: Text('trans_income'.tr(), style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.w700)))))),
           const SizedBox(width: 8),
           Expanded(child: GestureDetector(onTap: () {
             setState(() {
@@ -108,7 +108,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
           },
             child: Container(padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(color: _txType == 'expense' ? AppColors.error.withValues(alpha: 0.2) : Colors.transparent, borderRadius: BorderRadius.circular(8), border: Border.all(color: _txType == 'expense' ? AppColors.error : widget.colorScheme.outlineVariant)),
-              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: AppColors.error, fontFamily: 'Cairo', fontWeight: FontWeight.w700)))))),
+              child: Center(child: Text('trans_expense'.tr(), style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w700)))))),
         ]),
         const SizedBox(height: 12),
         SizedBox(height: 40, child: ListView.builder(scrollDirection: Axis.horizontal, itemCount: categories.length,
@@ -116,12 +116,12 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
             return GestureDetector(onTap: () => setState(() => _selectedCategory = cat),
               child: Container(margin: const EdgeInsets.only(left: 8), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(color: selected ? widget.colorScheme.primary.withValues(alpha: 0.2) : widget.colorScheme.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: selected ? widget.colorScheme.primary : widget.colorScheme.outlineVariant)),
-                child: Text(_getCategoryName(cat), style: TextStyle(color: selected ? widget.colorScheme.primary : widget.colorScheme.onSurfaceVariant, fontSize: 12, fontFamily: 'Cairo')))); })),
+                child: Text(_getCategoryName(cat), style: TextStyle(color: selected ? widget.colorScheme.primary : widget.colorScheme.onSurfaceVariant, fontSize: 12)))); })),
         const SizedBox(height: 12),
         Row(children: [
           Expanded(child: TextField(controller: _amountController, keyboardType: TextInputType.number, textAlign: TextAlign.right,
-            style: TextStyle(color: widget.colorScheme.onSurface, fontFamily: 'Cairo'),
-            decoration: InputDecoration(hintText: 'trans_amount'.tr(), hintStyle: TextStyle(color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontFamily: 'Cairo'), filled: true, fillColor: widget.colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: widget.colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: widget.colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)))),
+            style: TextStyle(color: widget.colorScheme.onSurface),
+            decoration: InputDecoration(hintText: 'trans_amount'.tr(), hintStyle: TextStyle(color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)), filled: true, fillColor: widget.colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: widget.colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: widget.colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)))),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -158,7 +158,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
             }
           },
             child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14), decoration: BoxDecoration(color: widget.colorScheme.primary, borderRadius: BorderRadius.circular(10)),
-              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontFamily: 'Cairo')))),
+              child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)))),
         ]),
         if (_selectedCurrency != widget.currency) 
           Padding(padding: const EdgeInsets.only(top: 4), child: Text('Rate: ${_exchangeRate.toStringAsFixed(4)} | ≈ ${(double.tryParse(_amountController.text) ?? 0 * _exchangeRate).toStringAsFixed(2)} ${widget.currency}', style: TextStyle(fontSize: 10, color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.6), fontWeight: FontWeight.bold))),

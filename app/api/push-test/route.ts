@@ -3,9 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { rateLimit } from '@/lib/rate-limit'
 
-const supabase = createAdminClient()
-
 export async function POST(request: NextRequest) {
+  const supabase = createAdminClient()
   const rl = rateLimit(request, { limit: 5, windowMs: 60_000, identifier: 'push-test' })
   if (!rl.ok) return NextResponse.json({ error: 'Too many requests' }, { status: 429, headers: rl.headers })
 

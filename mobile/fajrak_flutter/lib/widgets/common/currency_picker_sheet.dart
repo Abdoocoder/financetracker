@@ -91,10 +91,10 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                   controller: _searchController,
                   onChanged: (v) => setState(() => _query = v),
                   autofocus: true,
-                  style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
+                  style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
                     hintText: 'ابحث عن عملة...',
-                    hintStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 14),
+                    hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
                     prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant, size: 20),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -125,7 +125,6 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                         groupLabels[groupKey]!,
                         style: TextStyle(
                           color: cs.onSurfaceVariant,
-                          fontFamily: 'Cairo',
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.5,
@@ -147,7 +146,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                   Padding(
                     padding: const EdgeInsets.all(40),
                     child: Center(
-                      child: Text('لا توجد نتائج', style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo')),
+                      child: Text('لا توجد نتائج', style: TextStyle(color: cs.onSurfaceVariant)),
                     ),
                   ),
                 const SizedBox(height: 24),
@@ -184,11 +183,11 @@ class _CurrencyTile extends StatelessWidget {
       ),
       title: Text(
         currency['labelAr'] as String? ?? currency['value'] as String,
-        style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600),
+        style: TextStyle(color: cs.onSurface, fontSize: 14, fontWeight: FontWeight.w600),
       ),
       subtitle: Text(
         currency['labelEn'] as String? ?? '',
-        style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11),
+        style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11),
       ),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         Container(
@@ -199,7 +198,7 @@ class _CurrencyTile extends StatelessWidget {
           ),
           child: Text(
             currency['value'] as String,
-            style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w700),
+            style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700),
           ),
         ),
         if (isSelected) ...[

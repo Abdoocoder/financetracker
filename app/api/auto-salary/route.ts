@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 async function addMonthlySalaries() {
+  const supabase = createAdminClient()
   const now = new Date()
   // استخدام توقيت UTC+3 (الأردن/السعودية/الخليج)
   const localNow = new Date(now.getTime() + (Number(process.env.TIMEZONE_OFFSET_HOURS) || 3) * 60 * 60 * 1000)
@@ -59,6 +58,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = createAdminClient()
     const authHeader = request.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const token = authHeader.replace('Bearer ', '')
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ ok: true, message: 'تم إضافة الراتب بنجاح' })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

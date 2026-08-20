@@ -51,7 +51,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text('accounts_title'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+        title: Text('accounts_title'.tr(), style: const TextStyle(fontWeight: FontWeight.w900)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         actions: [
@@ -59,7 +59,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             TextButton.icon(
               onPressed: () => _showTransferDialog(),
               icon: const Icon(Icons.swap_horiz, size: 18),
-              label: Text('accounts_transfer'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              label: Text('accounts_transfer'.tr(), style: const TextStyle(fontWeight: FontWeight.w700)),
             ),
           IconButton(
             icon: const Icon(Icons.add),
@@ -86,13 +86,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
                       border: Border.all(color: _totalBalance >= 0 ? AppColors.success.withValues(alpha: 0.25) : AppColors.error.withValues(alpha: 0.25)),
                     ),
                     child: Column(children: [
-                      Text('accounts_total_balance'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
+                      Text('accounts_total_balance'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 6),
                       Text(
                         '${_totalBalance >= 0 ? '+' : '-'}${_fmt(_totalBalance)} $_currency',
                         style: TextStyle(
-                          color: _totalBalance >= 0 ? AppColors.success : AppColors.error,
-                          fontFamily: 'monospace', fontSize: 32, fontWeight: FontWeight.w900,
+                          color: _totalBalance >= 0 ? AppColors.success : AppColors.error, fontSize: 32, fontWeight: FontWeight.w900,
                         ),
                       ),
                     ]),
@@ -103,11 +102,11 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     onEdit: () => _showAccountDialog(account: acc),
                     onDelete: acc['is_default'] == true ? null : () async {
                       final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
-                        title: Text('accounts_archive_title'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
-                        content: Text('accounts_archive_confirm'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+                        title: Text('accounts_archive_title'.tr(), style: const TextStyle()),
+                        content: Text('accounts_archive_confirm'.tr(), style: const TextStyle()),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('accounts_archive_cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('accounts_archive'.tr(), style: const TextStyle(fontFamily: 'Cairo', color: Colors.red))),
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('accounts_archive_cancel'.tr(), style: const TextStyle())),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('accounts_archive'.tr(), style: const TextStyle(color: Colors.red))),
                         ],
                       ));
                       if (ok == true) { await AccountsService.archiveAccount(acc['id'] as String); _load(); }
@@ -173,24 +172,24 @@ class _AccountCard extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(acc['name'] as String? ?? '', style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 14)),
+            Text(acc['name'] as String? ?? '', style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 14)),
             if (acc['is_default'] == true) ...[
               const SizedBox(width: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(100), border: Border.all(color: color.withValues(alpha: 0.3))),
-                child: Text('accounts_default'.tr(), style: TextStyle(color: color, fontSize: 9, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                child: Text('accounts_default'.tr(), style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
               ),
             ]
           ]),
-          Text((info['labelKey'] as String).tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 11)),
+          Text((info['labelKey'] as String).tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
         ])),
         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(
             '${bal >= 0 ? '+' : '-'}${fmt(bal)}',
-            style: TextStyle(color: bal >= 0 ? AppColors.success : AppColors.error, fontFamily: 'monospace', fontWeight: FontWeight.w900, fontSize: 18),
+            style: TextStyle(color: bal >= 0 ? AppColors.success : AppColors.error, fontWeight: FontWeight.w900, fontSize: 18),
           ),
-          Text(currency, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+          Text(currency, style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
         ]),
         const SizedBox(width: 8),
         Column(children: [
@@ -270,7 +269,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('${'accounts_error_save'.tr()}: ${e.toString()}',
-              style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+              style: const TextStyle(fontSize: 13)),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ));
@@ -285,9 +284,9 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(widget.account == null ? 'accounts_new'.tr() : 'accounts_edit'.tr(),
-          style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 17)),
+          style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w900, fontSize: 17)),
         const SizedBox(height: 16),
-        Text('accounts_type'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo', fontSize: 12, fontWeight: FontWeight.w700)),
+        Text('accounts_type'.tr(), style: TextStyle(color: cs.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), childAspectRatio: 3.5, crossAxisSpacing: 8, mainAxisSpacing: 8, children: _accountTypes.map((t) {
           final selected = _type == t['type'];
@@ -303,7 +302,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Text(t['icon'] as String, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 6),
-                Text((t['labelKey'] as String).tr(), style: TextStyle(color: selected ? tColor : cs.onSurfaceVariant, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 13)),
+                Text((t['labelKey'] as String).tr(), style: TextStyle(color: selected ? tColor : cs.onSurfaceVariant, fontWeight: FontWeight.w700, fontSize: 13)),
               ]),
             ),
           );
@@ -313,10 +312,10 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
           controller: _nameCtrl,
           textAlign: TextAlign.right,
           autofocus: true,
-          style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
+          style: TextStyle(color: cs.onSurface),
           decoration: InputDecoration(
             labelText: 'accounts_name_hint'.tr(),
-            labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
+            labelStyle: TextStyle(color: cs.onSurfaceVariant),
             filled: true, fillColor: cs.surface,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: cs.outlineVariant)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -326,10 +325,10 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
         TextField(
           controller: _balanceCtrl,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'),
+          style: TextStyle(color: cs.onSurface),
           decoration: InputDecoration(
             labelText: 'accounts_opening_balance'.tr(),
-            labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
+            labelStyle: TextStyle(color: cs.onSurfaceVariant),
             filled: true, fillColor: cs.surface,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: cs.outlineVariant)),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -346,7 +345,7 @@ class _AccountFormSheetState extends State<_AccountFormSheet> {
           style: ElevatedButton.styleFrom(backgroundColor: _color, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
           child: _saving
               ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : Text('accounts_save'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+              : Text('accounts_save'.tr(), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
         )),
         const SizedBox(height: 12),
       ]),
@@ -398,7 +397,7 @@ class _TransferSheetState extends State<_TransferSheet> {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('${'accounts_error_transfer'.tr()}: ${e.toString()}',
-              style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+              style: const TextStyle(fontSize: 13)),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ));
@@ -412,7 +411,7 @@ class _TransferSheetState extends State<_TransferSheet> {
     final avail = widget.accounts.where((a) => a['id'] != _fromId).toList();
 
     InputDecoration inputDec(String label) => InputDecoration(
-      labelText: label, labelStyle: TextStyle(color: cs.onSurfaceVariant, fontFamily: 'Cairo'),
+      labelText: label, labelStyle: TextStyle(color: cs.onSurfaceVariant),
       filled: true, fillColor: cs.surface,
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: cs.outlineVariant)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -421,31 +420,31 @@ class _TransferSheetState extends State<_TransferSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('accounts_transfer_title'.tr(), style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 17)),
+        Text('accounts_transfer_title'.tr(), style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w900, fontSize: 17)),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           initialValue: _fromId, decoration: inputDec('accounts_transfer_from'.tr()),
-          items: widget.accounts.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle(fontFamily: 'Cairo')))).toList(),
+          items: widget.accounts.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle()))).toList(),
           onChanged: (v) => setState(() { _fromId = v!; if (_toId == _fromId) _toId = widget.accounts.firstWhere((a) => a['id'] != _fromId)['id'] as String; }),
         ),
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
           initialValue: avail.any((a) => a['id'] == _toId) ? _toId : avail.first['id'] as String,
           decoration: inputDec('accounts_transfer_to'.tr()),
-          items: avail.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle(fontFamily: 'Cairo')))).toList(),
+          items: avail.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle()))).toList(),
           onChanged: (v) => setState(() => _toId = v!),
         ),
         const SizedBox(height: 10),
-        TextField(controller: _amountCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'), decoration: inputDec('accounts_transfer_amount'.tr())),
+        TextField(controller: _amountCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: cs.onSurface), decoration: inputDec('accounts_transfer_amount'.tr())),
         const SizedBox(height: 10),
-        TextField(controller: _noteCtrl, style: TextStyle(color: cs.onSurface, fontFamily: 'Cairo'), decoration: inputDec('accounts_transfer_note'.tr())),
+        TextField(controller: _noteCtrl, style: TextStyle(color: cs.onSurface), decoration: inputDec('accounts_transfer_note'.tr())),
         const SizedBox(height: 20),
         SizedBox(width: double.infinity, child: ElevatedButton(
           onPressed: _saving ? null : _save,
           style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
           child: _saving
               ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : Text('accounts_transfer'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+              : Text('accounts_transfer'.tr(), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
         )),
         const SizedBox(height: 12),
       ]),

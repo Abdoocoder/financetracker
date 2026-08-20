@@ -44,7 +44,7 @@ class _AddAmountDialogState extends State<AddAmountDialog> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString(), style: const TextStyle(fontFamily: 'Cairo'))),
+          SnackBar(content: Text(e.toString(), style: const TextStyle())),
         );
       }
     } finally {
@@ -73,17 +73,16 @@ class _AddAmountDialogState extends State<AddAmountDialog> {
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
-                color: colorScheme.onSurface,
-                fontFamily: 'Cairo')),
+                color: colorScheme.onSurface)),
         const SizedBox(height: 20),
         TextField(
           controller: _amountCtrl,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           textAlign: TextAlign.right,
-          style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+          style: TextStyle(color: colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: 'goals_amount_to_add'.tr(),
-            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo'),
+            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
             filled: true,
             fillColor: colorScheme.outlineVariant,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
@@ -103,7 +102,6 @@ class _AddAmountDialogState extends State<AddAmountDialog> {
                       borderRadius: BorderRadius.circular(12))),
               child: Text('goals_save'.tr(),
                   style: const TextStyle(
-                      fontFamily: 'Cairo',
                       fontWeight: FontWeight.w900,
                       fontSize: 15)),
             )),

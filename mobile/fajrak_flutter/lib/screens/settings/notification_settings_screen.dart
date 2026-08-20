@@ -73,7 +73,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       appBar: AppBar(
         title: const Text(
           'إعدادات الإشعارات',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: _loading
@@ -99,7 +99,6 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       child: Text(
         title,
         style: TextStyle(
-          fontFamily: 'Cairo',
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Theme.of(context).colorScheme.primary,
@@ -117,8 +116,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SwitchListTile(
         secondary: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(label, style: const TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600)),
-        subtitle: Text('تلقي تنبيهات متعلقة بـ $label', style: const TextStyle(fontFamily: 'Cairo', fontSize: 11)),
+        title: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle: Text('تلقي تنبيهات متعلقة بـ $label', style: const TextStyle(fontSize: 11)),
         value: pref.enabled,
         onChanged: (val) => _updatePreference(pref, enabled: val),
       ),
@@ -135,8 +134,8 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SwitchListTile(
         secondary: const Icon(Icons.privacy_tip, color: Colors.orange),
-        title: const Text('إخفاء البيانات الحساسة', style: TextStyle(fontFamily: 'Cairo', fontSize: 14, fontWeight: FontWeight.w600)),
-        subtitle: const Text('إخفاء المبالغ المالية من الإشعارات في شاشة القفل', style: TextStyle(fontFamily: 'Cairo', fontSize: 11)),
+        title: const Text('إخفاء البيانات الحساسة', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle: const Text('إخفاء المبالغ المالية من الإشعارات في شاشة القفل', style: TextStyle(fontSize: 11)),
         value: pref.maskSensitiveData,
         onChanged: (val) {
           for (var p in _preferences) {
@@ -161,7 +160,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
           Expanded(
             child: Text(
               'هذه الإعدادات تساعدك على البقاء على اطلاع بوضعك المالي دون إزعاج.',
-              style: TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Theme.of(context).colorScheme.onPrimaryContainer),
+              style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
           ),
         ],

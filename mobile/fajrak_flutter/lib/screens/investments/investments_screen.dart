@@ -174,22 +174,21 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
             backgroundColor: colorScheme.surface,
             title: Text('inv_delete_title'.tr(),
                 style: TextStyle(
-                    color: colorScheme.onSurface, fontFamily: 'Cairo')),
+                    color: colorScheme.onSurface)),
             content: Text('confirm_delete'.tr(),
                 style: TextStyle(
-                    color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                    color: colorScheme.onSurfaceVariant)),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context, false),
                   child: Text('cancel'.tr(),
                       style: TextStyle(
-                          color: colorScheme.onSurfaceVariant,
-                          fontFamily: 'Cairo'))),
+                          color: colorScheme.onSurfaceVariant))),
               TextButton(
                   onPressed: () => Navigator.pop(context, true),
                   child: Text('delete'.tr(),
                       style: TextStyle(
-                          color: colorScheme.error, fontFamily: 'Cairo'))),
+                          color: colorScheme.error))),
             ],
           );
         });
@@ -230,7 +229,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
         backgroundColor: colorScheme.surface,
         title: Text('inv_title'.tr(),
             style: TextStyle(
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: colorScheme.onSurface)),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
@@ -250,7 +248,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontSize: 11,
-                    fontFamily: 'Cairo',
                     fontWeight: FontWeight.w700),
               ),
             ),
@@ -316,13 +313,12 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                         Text('inv_empty'.tr(),
                             style: TextStyle(
                                 color: colorScheme.onSurfaceVariant,
-                                fontFamily: 'Cairo',
                                 fontSize: 15)),
                         const SizedBox(height: 16),
                         ElevatedButton(
                             onPressed: _showAddDialog,
                             child: Text('inv_add_first'.tr(),
-                                style: const TextStyle(fontFamily: 'Cairo'))),
+                                style: const TextStyle())),
                       ]),
                     )
                   else ...[
@@ -333,7 +329,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                             style: TextStyle(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
-                                fontFamily: 'Cairo',
                                 fontSize: 15)),
                         PopupMenuButton<String>(
                           initialValue: _sortBy,
@@ -354,16 +349,15 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                               Text('inv_sort_by'.tr(),
                                   style: TextStyle(
                                       fontSize: 11,
-                                      fontFamily: 'Cairo',
                                       color: colorScheme.onSurfaceVariant)),
                             ]),
                           ),
                           itemBuilder: (_) => [
-                            PopupMenuItem(value: 'none', child: Text('inv_sort_none'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
-                            PopupMenuItem(value: 'gain', child: Text('inv_sort_gain'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
-                            PopupMenuItem(value: 'loss', child: Text('inv_sort_loss'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
-                            PopupMenuItem(value: 'value', child: Text('inv_sort_value'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
-                            PopupMenuItem(value: 'name', child: Text('inv_sort_name'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontSize: 13))),
+                            PopupMenuItem(value: 'none', child: Text('inv_sort_none'.tr(), style: const TextStyle(fontSize: 13))),
+                            PopupMenuItem(value: 'gain', child: Text('inv_sort_gain'.tr(), style: const TextStyle(fontSize: 13))),
+                            PopupMenuItem(value: 'loss', child: Text('inv_sort_loss'.tr(), style: const TextStyle(fontSize: 13))),
+                            PopupMenuItem(value: 'value', child: Text('inv_sort_value'.tr(), style: const TextStyle(fontSize: 13))),
+                            PopupMenuItem(value: 'name', child: Text('inv_sort_name'.tr(), style: const TextStyle(fontSize: 13))),
                           ],
                         ),
                       ],
@@ -394,7 +388,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                                   'inv_filter_$f'.tr(),
                                   style: TextStyle(
                                     fontSize: 12,
-                                    fontFamily: 'Cairo',
                                     fontWeight: FontWeight.w700,
                                     color: _filterType == f
                                         ? colorScheme.onPrimary
@@ -431,7 +424,6 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
                               'inv_halal_tip'.tr(),
                               style: TextStyle(
                                   color: colorScheme.onSurfaceVariant,
-                                  fontFamily: 'Cairo',
                                   fontSize: 12))),
                     ]),
                   ),

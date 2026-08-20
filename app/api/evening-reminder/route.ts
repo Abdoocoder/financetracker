@@ -3,9 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 async function sendEveningReminders(userId?: string) {
+  const supabase = createAdminClient()
   // استخدام توقيت UTC+3 (الأردن/الخليج) لتجنب خطأ اليوم
   const today = new Date(new Date().getTime() + (Number(process.env.TIMEZONE_OFFSET_HOURS) || 3) * 60 * 60 * 1000).toISOString().split('T')[0]
 
@@ -48,7 +49,8 @@ export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const userId = request.nextUrl.searchParams.get('userId') ?? undefined
+  const rawId = request.nextUrl.searchParams.get('userId')
+  const userId = rawId && UUID_RE.test(rawId) ? rawId : undefined
   const sent = await sendEveningReminders(userId)
   return NextResponse.json({ ok: true, sent })
 }

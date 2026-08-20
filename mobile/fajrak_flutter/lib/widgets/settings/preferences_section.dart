@@ -31,7 +31,6 @@ class _PreferencesSectionState extends State<PreferencesSection> {
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 13,
-              fontFamily: 'Cairo',
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -54,7 +53,6 @@ class _PreferencesSectionState extends State<PreferencesSection> {
             style: TextStyle(
               color: colorScheme.onSurfaceVariant,
               fontSize: 13,
-              fontFamily: 'Cairo',
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -79,7 +77,6 @@ class _PreferencesSectionState extends State<PreferencesSection> {
             style: TextStyle(
               color: colorScheme.onSurface,
               fontSize: 14,
-              fontFamily: 'Cairo',
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -149,7 +146,6 @@ class _PreferencesSectionState extends State<PreferencesSection> {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: textColor,
-          fontFamily: 'Cairo',
           fontSize: 12,
           fontWeight: FontWeight.w700,
         ),
@@ -175,7 +171,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     // ignore: use_build_context_synchronously
     messenger.showSnackBar(
       SnackBar(
-        content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        content: Text('toast_settings_saved'.tr(), style: const TextStyle()),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),
@@ -191,7 +187,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
     // ignore: use_build_context_synchronously
     messenger.showSnackBar(
       SnackBar(
-        content: Text('toast_settings_saved'.tr(), style: const TextStyle(fontFamily: 'Cairo')),
+        content: Text('toast_settings_saved'.tr(), style: const TextStyle()),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
       ),

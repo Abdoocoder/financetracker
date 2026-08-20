@@ -3,8 +3,6 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
-const supabase = createAdminClient()
-
 function localDate(offsetDays = 0): string {
   const offset = (Number(process.env.TIMEZONE_OFFSET_HOURS) || 3) * 60 * 60 * 1000
   const d = new Date(Date.now() + offset - offsetDays * 86400000)
@@ -12,6 +10,7 @@ function localDate(offsetDays = 0): string {
 }
 
 async function sendStreakAlerts() {
+  const supabase = createAdminClient()
   const today = localDate(0)
   const yesterday = localDate(1)
 

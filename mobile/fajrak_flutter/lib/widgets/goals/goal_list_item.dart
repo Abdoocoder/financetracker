@@ -52,7 +52,6 @@ class GoalListItem extends StatelessWidget {
                   style: TextStyle(
                       color: colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
-                      fontFamily: 'Cairo',
                       fontSize: 15))),
           if (isDone) Icon(Icons.check_circle_outline, size: 18, color: color),
           const SizedBox(width: 8),
@@ -98,13 +97,11 @@ class GoalListItem extends StatelessWidget {
           Text('goals_progress_percent'.tr(args: [(progress * 100).toStringAsFixed(0)]),
               style: TextStyle(
                   color: color,
-                  fontFamily: 'Cairo',
                   fontSize: 12,
                   fontWeight: FontWeight.w700)),
           Text('goals_remaining_value'.tr(args: [remaining.toStringAsFixed(0), currency]),
               style: TextStyle(
                   color: colorScheme.onSurfaceVariant,
-                  fontFamily: 'Cairo',
                   fontSize: 12)),
         ]),
         if (!isDone) ...[
@@ -121,7 +118,7 @@ class GoalListItem extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10))),
                 child: Text('goals_add_saving'.tr(),
                     style: const TextStyle(
-                        fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                        fontWeight: FontWeight.w700)),
               )),
         ],
       ]),

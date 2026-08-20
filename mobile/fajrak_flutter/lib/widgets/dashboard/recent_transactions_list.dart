@@ -33,7 +33,7 @@ class RecentTransactionsList extends StatelessWidget {
     if (transactions.isEmpty) return const SizedBox();
     
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('dash_recent'.tr(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface, fontFamily: 'Cairo')),
+      Text('dash_recent'.tr(), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: colorScheme.onSurface)),
       const SizedBox(height: 10),
       ...transactions.map((tx) {
         final isIncome = tx['type'] == 'income';
@@ -52,21 +52,20 @@ class RecentTransactionsList extends StatelessWidget {
               child: Center(child: Icon(isIncome ? Icons.arrow_downward : Icons.arrow_upward, size: 16, color: color))),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tx['description'] ?? _getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontFamily: 'Cairo', fontSize: 13)),
-              Text(_getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11, fontFamily: 'Cairo')),
+              Text(tx['description'] ?? _getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w600, fontSize: 13)),
+              Text(_getCategoryName(tx['category'] ?? ''), style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 11)),
             ])),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13)),
+                Text('${isIncome ? '+' : '−'}${amount.toStringAsFixed(0)} $currency', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 13)),
                 if (tx['original_currency'] != null && tx['original_currency'] != currency)
                     Text(
                       '${(tx['original_amount'] as num).toDouble().toStringAsFixed(0)} ${tx['original_currency']}',
                       style: TextStyle(
                         color: color.withValues(alpha: 0.6),
-                        fontSize: 9,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Cairo'
                       ),
                     ),
               ],

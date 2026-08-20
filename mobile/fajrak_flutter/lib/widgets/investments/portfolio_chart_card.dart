@@ -38,7 +38,6 @@ class PortfolioChartCard extends StatelessWidget {
             style: TextStyle(
                 color: colorScheme.onSurface,
                 fontWeight: FontWeight.w900,
-                fontFamily: 'Cairo',
                 fontSize: 14)),
         const SizedBox(height: 12),
         ClipRRect(
@@ -79,19 +78,16 @@ class PortfolioChartCard extends StatelessWidget {
                   child: Text(inv['symbol'] ?? '',
                       style: TextStyle(
                           color: colorScheme.onSurface,
-                          fontFamily: 'Cairo',
                           fontWeight: FontWeight.w700,
                           fontSize: 13))),
               Text('${pct.toStringAsFixed(1)}%',
                   style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo',
                       fontSize: 12)),
               const SizedBox(width: 8),
               Text('\$${val.toStringAsFixed(0)}',
                   style: TextStyle(
                       color: colorScheme.onSurface,
-                      fontFamily: 'monospace',
                       fontWeight: FontWeight.w900,
                       fontSize: 13)),
             ]),

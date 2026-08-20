@@ -129,7 +129,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         title: const Text('الإنجازات',
-            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+            style: TextStyle(fontWeight: FontWeight.w900)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

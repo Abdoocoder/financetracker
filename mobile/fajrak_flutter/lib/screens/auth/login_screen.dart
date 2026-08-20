@@ -124,14 +124,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
-                      color: colorScheme.onSurface,
-                      fontFamily: 'Cairo')),
+                      color: colorScheme.onSurface)),
                const SizedBox(height: 8),
               Text('auth_login_subtitle'.tr(),
                   style: TextStyle(
                       fontSize: 14,
-                      color: colorScheme.onSurfaceVariant,
-                      fontFamily: 'Cairo')),
+                      color: colorScheme.onSurfaceVariant)),
               const SizedBox(height: 40),
               if (_error != null) ...[
                 AuthErrorBanner(message: _error!),
@@ -140,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                     labelText: 'auth_email'.tr(),
                     prefixIcon:
@@ -150,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscure,
-                style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo'),
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'auth_password'.tr(),
                   prefixIcon:
@@ -174,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.pushNamed(context, '/forgot-password'),
                   child: Text('auth_forgot_password'.tr(),
                       style: TextStyle(
-                          color: colorScheme.primary, fontFamily: 'Cairo')),
+                          color: colorScheme.primary)),
                 ),
               ),
               const SizedBox(height: 24),
@@ -194,14 +192,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Text('auth_no_account'.tr(),
                       style: TextStyle(
-                          color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                          color: colorScheme.onSurfaceVariant)),
                   TextButton(
                     onPressed: () =>
                         Navigator.pushReplacementNamed(context, '/register'),
                     child: Text('auth_register_now'.tr(),
                         style: TextStyle(
                             color: colorScheme.primary,
-                            fontFamily: 'Cairo',
                             fontWeight: FontWeight.w700)),
                   ),
                 ],

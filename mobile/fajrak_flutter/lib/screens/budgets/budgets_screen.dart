@@ -173,7 +173,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('budget_apply_success'.tr(),
-              style: const TextStyle(fontFamily: 'Cairo')),
+              style: const TextStyle()),
           backgroundColor: Theme.of(context).colorScheme.primary));
     }
   }
@@ -280,7 +280,6 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
       appBar: AppBar(
         title: Text('nav_budgets'.tr(),
             style: TextStyle(
-                fontFamily: 'Cairo',
                 fontWeight: FontWeight.w900,
                 color: colorScheme.onSurface)),
         iconTheme: IconThemeData(color: colorScheme.onSurface),
@@ -347,12 +346,12 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                                 builder: (_) => AlertDialog(
                                       backgroundColor: colorScheme.surface,
                                       title: Text('dash_rule_confirm_title'.tr(),
-                                          style: TextStyle(color: colorScheme.onSurface, fontFamily: 'Cairo')),
+                                          style: TextStyle(color: colorScheme.onSurface)),
                                       content: Text('dash_rule_confirm_body'.tr(),
-                                          style: TextStyle(color: colorScheme.onSurfaceVariant, fontFamily: 'Cairo')),
+                                          style: TextStyle(color: colorScheme.onSurfaceVariant)),
                                       actions: [
-                                        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('cancel'.tr(), style: const TextStyle(fontFamily: 'Cairo'))),
-                                        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('تطبيق', style: TextStyle(color: colorScheme.primary, fontFamily: 'Cairo'))),
+                                        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('cancel'.tr(), style: const TextStyle())),
+                                        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('تطبيق', style: TextStyle(color: colorScheme.primary))),
                                       ],
                                     ));
                             if (confirm == true) await _apply502030();
@@ -363,7 +362,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
                       if (_budgets.isNotEmpty) ...[
                         Text('dash_my_budgets'.tr(),
-                            style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 15)),
+                            style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                         const SizedBox(height: 10),
                         ..._budgets.map((b) => BudgetListItem(
                           key: ValueKey(b['id']),
@@ -380,7 +379,7 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
 
                       if (_spending.isNotEmpty) ...[
                         Text('dash_spending_by_category'.tr(),
-                            style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 15)),
+                            style: TextStyle(color: colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                         const SizedBox(height: 10),
                         ..._spending.entries.map((e) {
                           final totalExpenses = _spending.values.fold(0.0, (a, b) => a + b);

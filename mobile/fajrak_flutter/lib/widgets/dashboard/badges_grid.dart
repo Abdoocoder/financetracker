@@ -75,7 +75,6 @@ class BadgesGrid extends StatelessWidget {
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w700,
-                  fontFamily: 'Cairo',
                   fontSize: 13)),
         ),
         Wrap(
@@ -110,14 +109,12 @@ class BadgesGrid extends StatelessWidget {
                         style: TextStyle(
                             color: isDone ? Colors.white : AppColors.textSecondary,
                             fontWeight: FontWeight.w700,
-                            fontSize: 10,
-                            fontFamily: 'Cairo')),
+                            fontSize: 10)),
                     Text(b['desc'] as String,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                             color: AppColors.textTertiary,
-                            fontSize: 8,
-                            fontFamily: 'Cairo')),
+                            fontSize: 11)),
                   ],
                 ),
               ),

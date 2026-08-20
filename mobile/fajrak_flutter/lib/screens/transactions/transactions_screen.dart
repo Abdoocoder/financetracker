@@ -201,7 +201,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text('settings_exporting'.tr(),
-              style: const TextStyle(fontFamily: 'Cairo')),
+              style: const TextStyle()),
           duration: const Duration(seconds: 2)),
     );
 
@@ -218,7 +218,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content: Text('settings_no_export'.tr(),
-                    style: const TextStyle(fontFamily: 'Cairo'))),
+                    style: const TextStyle())),
           );
         }
         return;
@@ -314,7 +314,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('حدث خطأ أثناء إنشاء التقرير',
-              style: const TextStyle(fontFamily: 'Cairo')),
+              style: const TextStyle()),
           backgroundColor: Theme.of(context).colorScheme.error,
         ));
       }
@@ -411,13 +411,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 style: TextStyle(
                     color: colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
-                    fontFamily: 'Cairo',
                     fontSize: 18)),
             Text('trans_count'.tr(args: [filtered.length.toString()]),
                 style: TextStyle(
                     color: colorScheme.onSurfaceVariant,
-                    fontSize: 12,
-                    fontFamily: 'Cairo')),
+                    fontSize: 12)),
           ],
         ),
         actions: [
@@ -509,14 +507,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
                         Icon(Icons.wifi_off_rounded, size: 56, color: colorScheme.onSurface.withValues(alpha: 0.3)),
                         const SizedBox(height: 16),
-                        Text('error_load_failed'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface), textAlign: TextAlign.center),
+                        Text('error_load_failed'.tr(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: colorScheme.onSurface), textAlign: TextAlign.center),
                         const SizedBox(height: 8),
-                        Text('error_check_connection'.tr(), style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
+                        Text('error_check_connection'.tr(), style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant), textAlign: TextAlign.center),
                         const SizedBox(height: 24),
                         FilledButton.icon(
                           onPressed: () => _load(reset: true),
                           icon: const Icon(Icons.refresh_rounded),
-                          label: Text('btn_retry'.tr(), style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                          label: Text('btn_retry'.tr(), style: const TextStyle(fontWeight: FontWeight.w700)),
                         ),
                       ]),
                     ),
@@ -537,8 +535,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 style: TextStyle(
                                     color: colorScheme.onSurface,
                                     fontSize: 18,
-                                    fontWeight: FontWeight.w900,
-                                    fontFamily: 'Cairo')),
+                                    fontWeight: FontWeight.w900)),
                           ],
                         ),
                       )

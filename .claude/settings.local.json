@@ -196,7 +196,26 @@
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('userId:', d.get\\('userId','?'\\)\\)\")",
       "Bash(python3 *)",
       "Bash(node *)",
-      "Skill(using-superpowers)"
+      "Skill(using-superpowers)",
+      "Bash(npm view *)",
+      "Bash(curl -s --max-time 10 \"https://fonts.gstatic.com/s/ibmplexsansarabic/v9/Qw3MZRtWGQH0FLEtk-xSL9Wz5d5LKYK2l00C3R0.ttf\" -o /tmp/test_font.ttf)",
+      "Read(//tmp/**)",
+      "Bash(curl -s --max-time 15 -H \"User-Agent: Mozilla/5.0 \\(X11; Linux x86_64\\)\" \"https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700\")",
+      "Bash(ls ~/Android/Sdk/)",
+      "Read(//home/abdullah/Android/Sdk/**)",
+      "Bash(curl -s --max-time 60 \"https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip\" -o /tmp/cmdline-tools.zip)",
+      "Bash(mkdir -p ~/Android/Sdk/cmdline-tools)",
+      "Bash(unzip -q /tmp/cmdline-tools.zip -d /tmp/cmdline-tools-extracted)",
+      "Bash(mv /tmp/cmdline-tools-extracted/cmdline-tools ~/Android/Sdk/cmdline-tools/latest)",
+      "Bash(java -version)",
+      "Read(//usr/lib/**)",
+      "Bash(find /usr -name \"java\" -type f 2>/dev/null | head -5 && ls /usr/lib/jvm 2>/dev/null)",
+      "Read(//usr/**)",
+      "Bash(sudo apt-get install -y openjdk-17-jdk)",
+      "Bash(grep -n \"ANDROID_HOME\\\\|ANDROID_SDK_ROOT\\\\|JAVA_HOME\" ~/.bashrc ~/.zshrc 2>/dev/null | head -10)",
+      "Read(//home/abdullah/**)",
+      "Skill(context7-mcp)",
+      "Skill(context7-mcp:*)"
     ]
   }
 }

@@ -139,7 +139,6 @@ class _SplashScreenState extends State<SplashScreen>
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
                     color: colorScheme.onSurface,
-                    fontFamily: 'Cairo',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -148,7 +147,6 @@ class _SplashScreenState extends State<SplashScreen>
                   style: TextStyle(
                     fontSize: 16,
                     color: colorScheme.onSurfaceVariant,
-                    fontFamily: 'Cairo',
                   ),
                 ),
                 const SizedBox(height: 60),
