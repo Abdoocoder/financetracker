@@ -60,3 +60,5 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .claude/settings.local.json
+
+mobile/fajrak_flutter/android/build/
