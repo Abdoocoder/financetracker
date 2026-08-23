@@ -54,3 +54,9 @@ dev-debug.log
 # Task files
 # tasks.json
 # tasks/ 
+
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.claude/settings.local.json
