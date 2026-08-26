@@ -107,6 +107,31 @@ export const enHelp = {
     help_faq_alerts_a1: 'AI analyzes your data daily and generates personalized alerts — warnings when you exceed 75% of income, achievements when saving, and reminders for installments.',
     help_faq_alerts_q2: 'How do I enable notifications?',
     help_faq_alerts_a2: 'Go to Settings and enable "Phone Notifications". Allow the app to send notifications and alerts will arrive daily.',
+
+    // FAQ sections — PDF Reports
+    help_faq_pdf_title: '📄 PDF Reports',
+    help_faq_pdf_q1: 'How do I export a PDF report?',
+    help_faq_pdf_a1: 'Go to the "PDF Reports" page, select the time period and accounts to include, then tap "Export PDF". A print-ready file will download.',
+    help_faq_pdf_q2: 'What does the report include?',
+    help_faq_pdf_a2: 'A summary of transactions, budget, goals, debts, and investment data for the selected period — everything in one organized file.',
+
+    // FAQ sections — API Keys
+    help_faq_apikeys_title: '🔗 API Keys',
+    help_faq_apikeys_q1: 'What are API Keys?',
+    help_faq_apikeys_a1: 'API Keys let you connect Fajrak to AI assistants like ChatGPT, Claude, or custom apps. You create a key in Settings, then use it to send natural language commands that Fajrak converts into transactions automatically.',
+    help_faq_apikeys_q2: 'How do I create an API Key?',
+    help_faq_apikeys_a2: 'Go to Settings → API Keys, type a descriptive name for your key, and click Create. The full key is shown only once — copy it immediately and store it securely.',
+    help_faq_apikeys_q3: 'What can I do with API Keys?',
+    help_faq_apikeys_a3: 'Three capabilities: Create Transactions (send natural language to log expenses/income), Read Transactions (query your transaction history), and Read Balances (check account balances). You can mix and match per key.',
+    help_faq_apikeys_q4: 'Is the Conversational Ledger safe?',
+    help_faq_apikeys_a4: 'Yes. Every request requires your API key and is rate-limited. Only you can see your own data. All API activity is logged in an audit trail.',
+
+    // FAQ sections — Settings
+    help_faq_settings_title: '⚙️ Settings',
+    help_faq_settings_q1: 'How do I change the currency?',
+    help_faq_settings_a1: 'Go to Settings and select your preferred currency from the dropdown. New transactions will use the selected currency.',
+    help_faq_settings_q2: 'How do I enable dark mode?',
+    help_faq_settings_a2: 'Go to Settings and toggle the Dark Mode switch. The app will instantly switch to a dark color scheme.',
     faqs: [
         {
             section: '🏠 Dashboard',
@@ -201,6 +226,38 @@ export const enHelp = {
             items: [
                 { q: 'How do I export a PDF report?', a: 'Go to the "PDF Reports" page, select the time period and accounts to include, then tap "Export PDF". A print-ready file will download.' },
                 { q: 'What does the report include?', a: 'A summary of transactions, budget, goals, debts, and investment data for the selected period — everything in one organized file.' },
+            ],
+        },
+        {
+            section: '🔗 API Keys',
+            items: [
+                { q: 'What are API Keys?', a: 'API Keys let you connect Fajrak to AI assistants like ChatGPT, Claude, or custom apps. You create a key in Settings, then use it to send natural language commands (like "Add lunch expense 5 KWD") that Fajrak converts into transactions automatically.' },
+                { q: 'How do I create an API Key?', a: 'Go to Settings → API Keys, type a descriptive name for your key (e.g., "My ChatGPT"), and click Create. The full key is shown only once — copy it immediately and store it securely.' },
+                { q: 'What can I do with API Keys?', a: 'There are three capabilities: Create Transactions (send natural language to log expenses/income), Read Transactions (query your transaction history), and Read Balances (check account balances). You can mix and match these per key.' },
+                { q: 'Is the Conversational Ledger safe?', a: 'Yes. Every request requires your API key and is rate-limited. Only you can see your own data (enforced by database security). All API activity is logged in an audit trail so you can review what was accessed and when.' },
+            ],
+        },
+        {
+            section: '📄 PDF Reports',
+            items: [
+                { q: 'How do I export a PDF report?', a: 'Go to the "PDF Reports" page, select the time period and accounts to include, then tap "Export PDF". A print-ready file will download.' },
+                { q: 'What does the report include?', a: 'A summary of transactions, budget, goals, debts, and investment data for the selected period — everything in one organized file.' },
+            ],
+        },
+        {
+            section: '🔗 API Keys',
+            items: [
+                { q: 'What are API Keys?', a: 'API Keys let you connect Fajrak to AI assistants like ChatGPT, Claude, or custom apps. You create a key in Settings, then use it to send natural language commands (like "Add lunch expense 5 KWD") that Fajrak converts into transactions automatically.' },
+                { q: 'How do I create an API Key?', a: 'Go to Settings → API Keys, type a descriptive name for your key (e.g., "My ChatGPT"), and click Create. The full key is shown only once — copy it immediately and store it securely.' },
+                { q: 'What can I do with API Keys?', a: 'There are three capabilities: Create Transactions (send natural language to log expenses/income), Read Transactions (query your transaction history), and Read Balances (check account balances). You can mix and match these per key.' },
+                { q: 'Is the Conversational Ledger safe?', a: 'Yes. Every request requires your API key and is rate-limited. Only you can see your own data (enforced by database security). All API activity is logged in an audit trail so you can review what was accessed and when.' },
+            ],
+        },
+        {
+            section: '⚙️ Settings',
+            items: [
+                { q: 'How do I change the currency?', a: 'Go to Settings and select your preferred currency from the dropdown. All existing amounts continue to display in their original currency; new transactions will use the selected currency.' },
+                { q: 'How do I enable dark mode?', a: 'Go to Settings and toggle the Dark Mode switch. The app will instantly switch to a dark color scheme.' },
             ],
         },
     ]
