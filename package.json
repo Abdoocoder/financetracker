@@ -31,7 +31,8 @@
     "react-swipeable": "^7.0.2",
     "recharts": "^3.8.0",
     "task-master-ai": "^0.43.1",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "zod": "^4.4.3"
   },
   "overrides": {
     "@sentry/cli": "^3.4.2"

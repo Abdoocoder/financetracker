@@ -228,3 +228,16 @@ export const INCOME_CATEGORIES = [
   'مكافأة',
   'أخرى',
 ] as const
+
+export interface ApiKeyRecord {
+  id: string
+  user_id: string
+  name: string
+  key_prefix: string
+  scopes: string[]
+  rate_limit_per_min: number
+  is_active: boolean
+  last_used_at: string | null
+  expires_at: string | null
+  created_at: string
+}
