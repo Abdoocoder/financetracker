@@ -1,12 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Transaction Management', () => {
-  // We skip authentication setup for now and assume the page can be rendered (or logic tested)
-  // or that we are using a dev environment where auth can be bypassed.
-  
+  // TODO: These tests require a logged-in user. Add auth setup via storageState
+  // (e.g. a shared auth fixture that logs in and saves cookies) before enabling.
+  test.skip(true, 'Requires authenticated session — add auth fixture before enabling');
+
   test.beforeEach(async ({ page }) => {
-    // In a real scenario, we would use page.addInitScript to mock the user session
-    // Or use playwright.config storageState.
+    await page.addInitScript(() => {
+      localStorage.setItem('lang', 'ar');
+    });
     await page.goto('/dashboard/transactions');
   });
 

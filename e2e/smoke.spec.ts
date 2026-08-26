@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Landing Page Smoke Test', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('lang', 'ar');
+    });
+  });
+
   test('should load the landing page and show key brand elements', async ({ page }) => {
     // Go to the home page
     await page.goto('/');
@@ -10,7 +16,7 @@ test.describe('Landing Page Smoke Test', () => {
     await expect(brandName).toBeVisible();
 
     // Check for the main hero heading
-    const heroHeading = page.getByRole('heading', { name: 'كلنا نحلم بالثراء' });
+    const heroHeading = page.getByRole('heading', { name: 'وين راح الراتب؟' });
     await expect(heroHeading).toBeVisible();
 
     // Check for the "تسجيل الدخول" (Login) button
@@ -18,7 +24,7 @@ test.describe('Landing Page Smoke Test', () => {
     await expect(loginBtn).toBeVisible();
 
     // Check for "ابدأ مجاناً" (Start for free) CTA
-    const startBtn = page.getByRole('link', { name: 'ابدأ مجاناً ←' });
+    const startBtn = page.getByRole('link', { name: 'ابدأ مجاناً ←' }).first();
     await expect(startBtn).toBeVisible();
   });
 
