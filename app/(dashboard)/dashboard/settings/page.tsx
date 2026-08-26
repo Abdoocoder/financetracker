@@ -14,6 +14,7 @@ import { CURRENCIES_BY_GROUP } from "@/lib/currencies"
 import { PushToggle } from "@/components/ui/push-toggle"
 import { TestimonialSection } from "@/components/ui/testimonial-section"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
+import { ApiKeysSection } from "@/components/settings/api-keys-section"
 
 interface ProfileFormData {
   full_name: string
@@ -844,6 +845,10 @@ export default function SettingsPage() {
           danger={true}
         />
       )}
+
+      <AccordionCard icon="🔑" title={t('settings_api_keys')}>
+        <ApiKeysSection />
+      </AccordionCard>
 
       <AccordionCard icon="📥" title={t('settings_data')}>
         <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
