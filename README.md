@@ -100,6 +100,13 @@ on this journey.
 
 ## 🚀 Features
 
+### 🤖 AI Assistant Integration
+Connect AI assistants (ChatGPT, Claude, custom bots) for conversational finance tracking:
+- **Conversational Ledger Webhook**: Create transactions and read balances via natural language
+- **Secure API Key Management**: Scoped API keys with read/write permissions
+- **Audit Logging**: All API operations logged for security
+- **Rate Limiting**: Protects against abuse with configurable limits
+
 ### 🏠 Dashboard
 
 The command center of your financial life.
@@ -577,6 +584,17 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 ---
 
 ## 📝 Changelog
+
+### v3.37.0 — 2026-08-26 *(AI Assistant Integration & Security Enhancements)*
+
+| Change | Description |
+|:-------|:------------|
+| 🤖 **AI Assistant Integration** | Added conversational ledger webhook for creating transactions and reading balances via natural language |
+| 🔑 **Secure API Key Management** | Implemented scoped API key system with create_transaction, read_transactions, and read_balances scopes |
+| 📝 **API Key Display Safeguard** | API key prefixes now truncated for security (shows first 12 chars + ... if longer than 20 chars) |
+| ⚡ **AutoFocus Enhancement** | Added autoFocus to API key input field for better UX |
+| 🔐 **Migration 039** | Added user_api_keys and api_audit_log tables with RLS policies |
+| 🧪 **Comprehensive Testing** | Added 111 new tests covering API routes, webhook handlers, and library functions |
 
 ### v3.36.0 — 2026-08-20 *(Security Hardening & Flutter Theme Extraction)*
 
