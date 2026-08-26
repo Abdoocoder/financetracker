@@ -138,7 +138,7 @@ export function ApiKeysSection() {
               </button>
             </div>
             <div style={{ fontSize: 12, color: "var(--text-muted)", fontFamily: "monospace", marginBottom: 6 }}>
-              {key.key_prefix}
+              {key.key_prefix.length > 20 ? key.key_prefix.slice(0, 12) + '...' : key.key_prefix}
             </div>
             <div style={{ display: "flex", gap: 16, fontSize: 11, color: "var(--text-muted)" }}>
               <span>{t("settings_api_keys_created_at")}: {formatDate(key.created_at)}</span>
@@ -215,6 +215,7 @@ export function ApiKeysSection() {
             value={newKeyName}
             onChange={e => setNewKeyName(e.target.value)}
             placeholder={t("settings_api_keys_name_placeholder")}
+            autoFocus
             onKeyDown={e => e.key === "Enter" && handleGenerate()}
             style={{
               flex: 1, padding: "11px 14px", borderRadius: 12,
