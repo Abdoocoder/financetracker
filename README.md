@@ -538,6 +538,25 @@ npm run test:coverage
 
 Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Library.
 
+### E2E tests (Playwright)
+
+```bash
+npm run test:e2e
+```
+
+Run against a real backend. The authenticated `transaction-management` specs (opening the add
+transaction form, empty-save validation, and search filtering through the UI) need a test account —
+put these in `.env.local` first:
+
+```bash
+E2E_TEST_EMAIL=you@example.com
+E2E_TEST_PASSWORD=your-password
+```
+
+`globalSetup` logs that account in (loading `.env.local` via `dotenv`) and caches the session to
+`e2e/.auth/user.json`, which keeps the tests hermetic once the fixture exists. Test files live in
+[`e2e/`](e2e/).
+
 ---
 
 ## 🗺️ Roadmap
