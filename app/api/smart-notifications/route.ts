@@ -3,27 +3,27 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { getLessonForStage, determineStage } from '@/lib/daily-lessons'
 import { verifyCronAuth } from '@/lib/cron-auth'
+import { getLocalNow } from '@/lib/timezone'
 
 // ── helpers ──────────────────────────────────────────
 function getLocalHour() {
-  return new Date(new Date().getTime() + 3 * 60 * 60 * 1000).getUTCHours()
+  return getLocalNow().getUTCHours()
 }
 function getLocalDay() {
-  return new Date(new Date().getTime() + 3 * 60 * 60 * 1000).getUTCDay() // 0=Sun,5=Fri
+  return getLocalNow().getUTCDay() // 0=Sun,5=Fri
 }
 function today() {
-  const d = new Date(new Date().getTime() + 3 * 60 * 60 * 1000)
-  return d.toISOString().split('T')[0]
+  return getLocalNow().toISOString().split('T')[0]
 }
 function daysAgo(n: number) {
-  const d = new Date(new Date().getTime() + 3 * 60 * 60 * 1000 - n * 86400000)
+  const d = new Date(getLocalNow().getTime() - n * 86400000)
   return d.toISOString().split('T')[0]
 }
 
 // ── 6 ص: تذكير صباحي + ميزانية اليوم ───────────────
 async function dailyMorningReminder() {
   const supabase = createAdminClient()
-  const now = new Date(new Date().getTime() + 3 * 60 * 60 * 1000)
+  const now = getLocalNow()
   const year = now.getUTCFullYear()
   const month = now.getUTCMonth() + 1
   const day = now.getUTCDate()
@@ -206,7 +206,7 @@ async function weeklyReport() {
 
 // ── 7 م: توجيه بناء الثروة ────────────────────────────
 async function wealthGuidanceAlert() {
-  const now = new Date(new Date().getTime() + 3 * 60 * 60 * 1000)
+  const now = getLocalNow()
   const year = now.getUTCFullYear()
   const month = now.getUTCMonth() + 1
   const firstDay = `${year}-${String(month).padStart(2,'0')}-01`
@@ -314,7 +314,7 @@ async function wealthGuidanceAlert() {
 async function receivableDebtReminder() {
   const supabase = createAdminClient()
   const todayStr = today()
-  const tomorrow = new Date(new Date().getTime() + 3 * 60 * 60 * 1000 + 86400000)
+  const tomorrow = new Date(getLocalNow().getTime() + 86400000)
     .toISOString().split('T')[0]
 
   const { data: profiles } = await supabase

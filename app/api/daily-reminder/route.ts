@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
+import { getLocalNow } from '@/lib/timezone'
 
 // ⚠️  هذا المسار موجود للاختبار اليدوي فقط.
 // المنطق الفعلي ينفّذه المنظّم الرئيسي /api/smart-notifications عند hour === 6.
@@ -9,8 +10,7 @@ import { verifyCronAuth } from '@/lib/cron-auth'
 
 async function sendDailyReminders() {
   const supabase = createAdminClient()
-  const now = new Date()
-  const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+  const localNow = getLocalNow()
   const year = localNow.getUTCFullYear()
   const month = localNow.getUTCMonth() + 1
   const day = localNow.getUTCDate()
