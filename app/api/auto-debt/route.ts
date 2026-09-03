@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
+import { getLocalNow } from '@/lib/timezone'
 
 async function processAutoDebts() {
   const supabase = createAdminClient()
-  const now = new Date()
-  const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+  const localNow = getLocalNow()
   const dayOfMonth = localNow.getUTCDate()
   const year = localNow.getUTCFullYear()
   const month = localNow.getUTCMonth() + 1
@@ -159,8 +159,7 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser(token)
     if (error || !user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
 
-    const now = new Date()
-    const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+    const localNow = getLocalNow()
     const year = localNow.getUTCFullYear()
     const month = localNow.getUTCMonth() + 1
     const day = localNow.getUTCDate()
@@ -182,9 +181,8 @@ export async function POST(request: NextRequest) {
       const newRemaining = Math.max(0, debt.remaining_amount - payment)
 
       // تحقق يدوي من وجود دفعة تلقائية لهذا الدين في نفس الشهر
-      const now2 = new Date(now.getTime() + 3 * 60 * 60 * 1000)
-      const y2 = now2.getUTCFullYear()
-      const m2 = now2.getUTCMonth() + 1
+      const y2 = year
+      const m2 = month
       const { count: existingPay } = await supabase
         .from('debt_payments')
         .select('id', { count: 'exact', head: true })

@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
+import { getLocalNow } from '@/lib/timezone'
 
 export async function GET(request: NextRequest) {
   const supabase = createAdminClient()
   if (!verifyCronAuth(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const now = new Date()
-  const localNow = new Date(now.getTime() + 3 * 60 * 60 * 1000)
+  const localNow = getLocalNow()
   const year = localNow.getUTCFullYear()
   const month = localNow.getUTCMonth() + 1
   const firstDay = `${year}-${String(month).padStart(2,'0')}-01`
