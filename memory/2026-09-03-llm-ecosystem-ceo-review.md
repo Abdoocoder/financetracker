@@ -4,6 +4,20 @@
 **Mode:** HOLD SCOPE — the two-feature scope (A: BYOK chat; B: MCP server) is accepted as-is and made bulletproof. No silent scope changes.
 **Verdict:** DONE_WITH_CONCERNS — every concern below is resolved with an explicit decision and an in-scope fix. No open blockers.
 
+> **⚠️ AD-4 CORRECTION (2026-09-04):** the "server-held symmetric KEK" model below
+> was **corrected to an asymmetric RSA-OAEP envelope** during implementation.
+> Rationale: a symmetric KEK the client must wrap-under would have to ship to the
+> browser as `NEXT_PUBLIC_*` — i.e. inside the bundle where anyone can read it,
+> defeating the security goal. Final contract:
+> `payload = AES-GCM(provider_key, ephemeral_envelope_key)` `[12B IV prefixed]`,
+> `env = RSA-OAEP(ephemeral_envelope_key, BYOK_RSA_PUBLIC)`; only the RSA **public**
+> key reaches the client; the server unwraps with its **private** key
+> (`BYOK_PRIVATE_KEY`, env/secret-manager). Env vars are now
+> `BYOK_PRIVATE_KEY` (server) + `NEXT_PUBLIC_BYOK_PUBLIC_KEY` + `NEXT_PUBLIC_BYOK_KEK_ID`
+> (client). The `BYOK_KEK`/AES-KW-`BYOK_KEK_ID` values previously set in Vercel are
+> **superseded** — replace them with an RSA keypair. Everything below that says
+> "KEK"/"AES-KW" reflects the original (pre-correction) plan.
+
 ---
 
 ## Accepted scope (unchanged)
