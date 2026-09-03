@@ -17,6 +17,7 @@
     "doctor": "npx next info && npm audit --omit=dev --audit-level=high && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
   },
   "dependencies": {
+    "@modelcontextprotocol/server": "^2.0.0",
     "@sentry/nextjs": "^10.46.0",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
