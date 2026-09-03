@@ -598,11 +598,21 @@ E2E_TEST_PASSWORD=your-password
 ### 📋 In Progress
 
 - [ ] Subscription System (Paddle/Stripe)
-- [ ] AI Financial Advisor (GPT integration)
+- [ ] AI Financial Advisor (in-app curated — BYOK core shipped as v3.39.0; remaining: guided advisor UX & mobile)
 
 ---
 
 ## 📝 Changelog
+
+### v3.39.0 — 2026-09-04 *(LLM Ecosystem: BYOK Chat + Financial MCP Server)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔑 **BYOK Chat Assistant (Feature A)** | Bring-Your-Own-Key LLM chat — provider key stays on the user's device, each request is encrypted (RSA-OAEP envelope + AES-GCM) and decrypted only in-memory by the server (`/api/byok/proxy`); key is destroyed after every call |
+| 🔐 **Thin Streaming Proxy** | Stateless forwarder to allowlisted providers, no client-supplied auth, per-user atomic rate limit (30/min), key-free logging (body size + sha-256 hash only) |
+| 🤖 **Financial MCP Server (Feature B)** | Model Context Protocol server over Streamable HTTP (`@modelcontextprotocol/server` v2) with `get_balances`, `get_cashflow_summary`, `create_transaction` tools |
+| 🎫 **PAT Auth on MCP** | MCP uses existing `fjk_live_...` PAT system — SHA-256-hashed, flat scopes, per-key rate limiting, `api_audit_log` per call |
+| 📚 **API Documentation** | `API_DOCS.md` now documents the full PAT auth system, REST webhook, /api/mcp, and /api/byok/proxy endpoints with curl examples |
 
 ### v3.38.0 — 2026-09-03 *(Dependency Fixes & Code Quality)*
 
