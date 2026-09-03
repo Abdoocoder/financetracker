@@ -5,6 +5,14 @@
  *       - app/api/** route handlers
  *       - lib/cron-* utilities (called from cron API routes only)
  */
+
+if (typeof window !== 'undefined') {
+  throw new Error(
+    'lib/supabase/admin.ts must not be imported in client code. ' +
+    'It exposes the service-role key and bypasses all RLS.'
+  )
+}
+
 import { createClient } from '@supabase/supabase-js'
 
 /**
