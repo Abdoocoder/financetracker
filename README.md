@@ -585,6 +585,18 @@ Tests are located in [`__tests__/`](__tests__/) and use Jest + React Testing Lib
 
 ## 📝 Changelog
 
+### v3.38.0 — 2026-09-03 *(Dependency Fixes & Code Quality)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔒 **Dependency Fixes** | Patched 48+ transitive vulnerabilities via npm overrides (`uuid`, `googleapis-common`) |
+| ⚡ **TanStack Query Migration** | Migrated `useAccounts` hook from manual state to TanStack Query for consistency |
+| 🛡️ **Admin Import Guard** | Added client-side import protection to `lib/supabase/admin.ts` |
+| 🧹 **Timezone Centralization** | Created `lib/timezone.ts` with shared `getLocalNow()` UTC+3 helper |
+| 🐛 **Jest Worker Leak** | Fixed timer leak in `lib/rate-limit.ts` with `stopCleanupTimer()` + `afterAll` cleanup |
+| 🔧 **E2E Stability** | Added health check endpoint (`/api/health`), Playwright retries, and readiness URL |
+| 📱 **Unused Import** | Removed dead `getTimezoneOffsetMs` import from smart-notifications route |
+
 ### v3.37.0 — 2026-08-26 *(AI Assistant Integration & Security Enhancements)*
 
 | Change | Description |
