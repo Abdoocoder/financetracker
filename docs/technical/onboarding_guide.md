@@ -96,7 +96,7 @@ lib/supabase/
 ## 9. Testing
 
 - **Jest 30 / jsdom** — 32 suites / 358 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing.
-- **Playwright** — `e2e/` (smoke + auth-flow passing; `transaction-management` **skipped — needs auth fixture**).
+- **Playwright** — `e2e/` (smoke + auth-flow + `transaction-management` all passing). Authenticated specs need a test account via `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in `.env.local`; `globalSetup` builds `e2e/.auth/user.json` automatically.
 - **Flutter** — `make doctor` (analyze + test, zero issues required).
 - Shared Supabase mock: `chainProxy` pattern in `__tests__/helpers/`.
 
