@@ -10,8 +10,14 @@ jest.mock('@/lib/supabase/client', () => ({
   })),
 }))
 
+import React from 'react'
 import { renderHook, waitFor, act } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useAccounts } from '../../hooks/useAccounts'
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(QueryClientProvider, { client: queryClient }, children)
 
 // Proxy chain: supports infinite chaining; when awaited resolves to `resolveWith`
 function chainProxy(resolveWith: any) {
@@ -95,30 +101,31 @@ function setupMock(accountData = mockAccounts, txData = mockTxs) {
 describe('useAccounts', () => {
   beforeEach(() => {
     setupMock()
+    queryClient.clear()
   })
 
   it('starts with loading=true and empty accounts', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     expect(result.current.loading).toBe(true)
     expect(result.current.accounts).toEqual([])
     await waitFor(() => expect(result.current.loading).toBe(false))
   })
 
   it('keeps loading=true and empty state when userId is undefined', () => {
-    const { result } = renderHook(() => useAccounts(undefined))
+    const { result } = renderHook(() => useAccounts(undefined), { wrapper })
     expect(result.current.loading).toBe(true)
     expect(result.current.accounts).toEqual([])
     expect(result.current.totalBalance).toBe(0)
   })
 
   it('loads accounts and computes balances', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.accounts).toHaveLength(2)
   })
 
   it('computes balance for acc1 correctly', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     const acc1 = result.current.accounts.find(a => a.id === 'acc1')!
     // opening=1000, income=200, expense=50, xferOut=100, xferIn=0
@@ -127,7 +134,7 @@ describe('useAccounts', () => {
   })
 
   it('computes balance for acc2 correctly', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     const acc2 = result.current.accounts.find(a => a.id === 'acc2')!
     // opening=500, income=300, expense=0, xferIn (from acc1)=100 + (from null)=100 = 200, xferOut=0
@@ -136,20 +143,20 @@ describe('useAccounts', () => {
   })
 
   it('computes totalBalance', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.totalBalance).toBe(2050)  // 1050 + 1000
   })
 
   it('handles null accounts data', async () => {
     mockFrom.mockImplementation(() => chainProxy({ data: null, error: null }))
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.accounts).toEqual([])
   })
 
   it('createAccount inserts and refetches', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     mockFrom.mockClear()
     await act(async () => {
@@ -166,7 +173,7 @@ describe('useAccounts', () => {
   })
 
   it('createAccount does nothing when userId is undefined', async () => {
-    const { result } = renderHook(() => useAccounts(undefined))
+    const { result } = renderHook(() => useAccounts(undefined), { wrapper })
     mockFrom.mockClear()
     await act(async () => {
       await result.current.createAccount({ name: 'X', opening_balance: 0 } as any)
@@ -175,7 +182,7 @@ describe('useAccounts', () => {
   })
 
   it('updateAccount calls update and refetches', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     mockFrom.mockClear()
     await act(async () => {
@@ -185,7 +192,7 @@ describe('useAccounts', () => {
   })
 
   it('deleteAccount soft-deletes and refetches', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     mockFrom.mockClear()
     await act(async () => {
@@ -195,7 +202,7 @@ describe('useAccounts', () => {
   })
 
   it('transferBetween inserts a transfer transaction', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     mockFrom.mockClear()
     await act(async () => {
@@ -205,7 +212,7 @@ describe('useAccounts', () => {
   })
 
   it('transferBetween does nothing when userId is undefined', async () => {
-    const { result } = renderHook(() => useAccounts(undefined))
+    const { result } = renderHook(() => useAccounts(undefined), { wrapper })
     mockFrom.mockClear()
     await act(async () => {
       await result.current.transferBetween('acc1', 'acc2', 50, '2024-06-01')
@@ -214,7 +221,7 @@ describe('useAccounts', () => {
   })
 
   it('transferBetween works without optional note', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     mockFrom.mockClear()
     await act(async () => {
@@ -224,7 +231,7 @@ describe('useAccounts', () => {
   })
 
   it('exposes fetchAccounts function', async () => {
-    const { result } = renderHook(() => useAccounts('user1'))
+    const { result } = renderHook(() => useAccounts('user1'), { wrapper })
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(typeof result.current.fetchAccounts).toBe('function')
     mockFrom.mockClear()
