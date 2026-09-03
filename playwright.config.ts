@@ -5,6 +5,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+
+  /* Run global-setup once to build the authenticated storageState. */
+  globalSetup: './e2e/setup/global-setup.ts',
   /* Maximum time one test can run for. */
   timeout: 30 * 1000,
   expect: {

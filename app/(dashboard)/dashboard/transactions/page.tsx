@@ -164,6 +164,7 @@ export default function TransactionsPage() {
           editingId={tx.editingId}
           form={tx.form}
           saving={tx.saving}
+          errors={tx.errors}
           onClose={tx.closeForm}
           onSave={tx.saveTransaction}
           onChange={(updates) => tx.setForm(prev => ({ ...prev, ...updates }))}

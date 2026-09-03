@@ -14,12 +14,13 @@ interface Props {
   editingId: string | null
   form: TransactionForm
   saving: boolean
+  errors: Record<string, string>
   onClose: () => void
   onSave: () => void
   onChange: (updates: Partial<TransactionForm>) => void
 }
 
-export function TransactionFormModal({ editingId, form, saving, onClose, onSave, onChange }: Props) {
+export function TransactionFormModal({ editingId, form, saving, errors, onClose, onSave, onChange }: Props) {
   const { t, tCategory } = useI18n()
   const { profile, user } = useUser()
   const baseCurrency = profile?.currency || 'JOD'
@@ -38,7 +39,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
 
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', marginBottom: 16 }}>
         <div style={{ flex: 2 }}>
-          <FormField label={t('trans_amount')}>
+          <FormField label={t('trans_amount')} error={errors.amount}>
             <Input 
               type="number" 
               placeholder="0.00" 
@@ -77,7 +78,7 @@ export function TransactionFormModal({ editingId, form, saving, onClose, onSave,
         </div>
       )}
 
-      <FormField label={t('trans_category')}>
+      <FormField label={t('trans_category')} error={errors.category}>
         <Select value={form.category} onChange={e => onChange({ category: e.target.value })}>
           <option value="">{t('trans_select_cat')}</option>
           {(form.type === 'income' ? CATEGORIES_INCOME : CATEGORIES_EXPENSE).map(c => (
