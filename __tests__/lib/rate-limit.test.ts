@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { rateLimit } from '@/lib/rate-limit'
+import { rateLimit, stopCleanupTimer } from '@/lib/rate-limit'
 
 let ipCounter = 0
 
@@ -22,6 +22,10 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.useRealTimers()
+})
+
+afterAll(() => {
+  stopCleanupTimer()
 })
 
 describe('rateLimit', () => {
