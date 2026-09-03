@@ -19,13 +19,22 @@ interface RateLimitRecord {
 const store = new Map<string, RateLimitRecord>()
 
 // Clean up expired entries every 5 minutes to avoid memory leaks
+let cleanupTimer: ReturnType<typeof setInterval> | null = null
+
 if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
+  cleanupTimer = setInterval(() => {
     const now = Date.now()
     for (const [key, record] of store) {
       if (record.resetAt < now) store.delete(key)
     }
   }, 5 * 60 * 1000)
+}
+
+export function stopCleanupTimer() {
+  if (cleanupTimer !== null) {
+    clearInterval(cleanupTimer)
+    cleanupTimer = null
+  }
 }
 
 interface RateLimitOptions {
