@@ -1,7 +1,7 @@
 name: fajrak
 description: فجرك - تطبيق إدارة مالية ذكي
 publish_to: 'fajrak.com'
-version: 3.37.0+47
+version: 3.38.0+48
 
 environment:
   sdk: '>=3.11.0 <4.0.0'
@@ -18,11 +18,11 @@ dependencies:
   # Firebase - إصدارات متوافقة مع بعض
   firebase_core: ^4.5.0
   firebase_messaging: ^16.1.2
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.3.0
 
   # UI
   fl_chart: ^1.1.0
-  shimmer: ^3.0.0
+  shimmer: ^4.0.0
 
   # Utils
   intl: ^0.20.2

@@ -479,6 +479,17 @@ flutter build apk --release --split-per-abi
 
 ## 📝 سجل التغييرات
 
+### v3.38.0 — 2026-09-03 *(إصلاحات التبعيات وجودة الكود)*
+
+| التغيير | الوصف |
+|:--------|:------|
+| 🔒 **إصلاح التبعيات** | سدّ 48+ ثغرة تبعية عبر npm overrides (`uuid`، `googleapis-common`) |
+| ⚡ **ترحيل TanStack Query** | ترحيل `useAccounts` من الحالة اليدوية إلى TanStack Query للاتساق |
+| 🛡️ **حماية استيراد Admin** | حماية استيراد `lib/supabase/admin.ts` على جانب العميل |
+| 🧹 **توحيد المنطقة الزمنية** | إنشاء `lib/timezone.ts` مع دالة `getLocalNow()` مشتركة UTC+3 |
+| 🐛 **تسريب عمال Jest** | إصلاح تسريب المؤقتات في `lib/rate-limit.ts` بـ `stopCleanupTimer()` + `afterAll` |
+| 🔧 **استقرار E2E** | إضافة نقطة فحص صحة (`/api/health`) وخيارات إعادة محاولة Playwright |
+
 ### v3.37.0 — 2026-08-26 *(تكامل المساعد الذكي وتعزيزات الأمان)*
 
 | التغيير | الوصف |
