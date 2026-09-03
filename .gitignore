@@ -64,4 +64,7 @@ test-results/
 *.tsbuildinfo
 .claude/settings.local.json
 
+# Playwright authenticated session (contains real session tokens — never commit)
+e2e/.auth/
+
 mobile/fajrak_flutter/android/build/
