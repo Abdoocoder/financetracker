@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  BYOK (Ollama) — Feature A: السماح بالاتصال المحلي cleartext لخدمة Ollama فقط
+  على الاستثناءات التالية. كل الشبكة الأخرى تبقى HTTPS إجبارياً (منع أي cleartext عام).
+  المحاكي: 10.0.2.2  |  الجهاز الحقيقي: localhost + شبكة LAN (يُعدَّل يدوياً حسب الحاجة).
+-->
+<network-security-config>
+    <!-- إبقاء Policy العام صارماً: HTTPS فقط افتراضياً -->
+    <base-config cleartextTrafficPermitted="false" />
+
+    <!-- محاكي Android → localhost للمضيف -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">10.0.2.2</domain>
+    </domain-config>
+
+    <!-- جهاز محلي / استثناء شبكة محلية لأجهزة LAN حقيقية -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>
