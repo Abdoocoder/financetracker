@@ -913,5 +913,24 @@
   "settings_api_keys_usage_method": "POST",
   "settings_api_keys_usage_url": "/api/webhook/transaction",
   "settings_api_keys_usage_header": "Authorization: Bearer fjk_live_...",
-  "settings_api_keys_usage_body": "{ \"type\": \"expense\", \"amount\": 15, \"category\": \"مواصلات\", \"description\": \"بنزين\", \"transaction_date\": \"2026-08-26\" }"
-}
+  "settings_api_keys_usage_body": "{ \\\"type\\\": \\\"expense\\\", \\\"amount\\\": 15, \\\"category\\\": \\\"مواصلات\\\", \\\"description\\\": \\\"بنزين\\\", \\\"transaction_date\\\": \\\"2026-08-26\\\" }",
+    "settings_byok_keys": "مفاتيح مزودي الذكاء الاصطناعي (BYOK)",
+    "settings_byok_keys_desc": "مفاتيح API لمزودي نماذج اللغة (NVIDIA، OpenAI، Anthropic، Gemini، OpenRouter). المفاتيح تُشفّر في متصفحك ولا تُرسل لخوادمنا أبداً. تُستخدم لكل طلب عبر البروكسي لتجاوز قيود CORS.",
+    "settings_byok_providers_title": "المزودون المدعومون",
+    "settings_byok_keys_none": "لا توجد مفاتيح BYOK مضافة بعد. أضف واحدة بالأسفل لبدء الدردشة مع الذكاء الاصطناعي.",
+    "settings_byok_keys_select_provider": "اختر المزود",
+    "settings_byok_keys_name_placeholder": "اسم المفتاح (مثال: مفتاح NVIDIA الخاص بي)",
+    "settings_byok_keys_value_placeholder": "ألصق مفتاح API الخاص بالمزود",
+    "settings_byok_keys_add": "إضافة المفتاح",
+    "settings_byok_keys_created": "تم حفظ مفتاح BYOK",
+    "settings_byok_keys_revoked": "تم حذف المفتاح",
+    "settings_byok_keys_revoke": "حذف",
+    "settings_byok_keys_test": "اختبار",
+    "settings_byok_keys_testing": "جاري اختبار المفتاح...",
+    "settings_byok_keys_test_ok": "المفتاح يعمل بشكل صحيح!",
+    "settings_byok_keys_test_fail": "فشل الاختبار، تحقق من المفتاح",
+    "settings_byok_keys_created_at": "أضيف في",
+    "settings_byok_keys_last_used": "آخر استخدام",
+    "settings_byok_keys_never": "لم يُستخدم",
+    "settings_byok_keys_add_new": "إضافة مفتاح BYOK جديد"
+  }
