@@ -1,0 +1,112 @@
+name: Supabase Validate (dry-run, prod-safe)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: Migration structure guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Block real db push across all workflows
+        run: |
+          set -euo pipefail
+          cmd="supabase db ""push"
+          dry="--dry-run"
+          offenders=""
+          for f in .github/workflows/*.yml; do
+            [ "$f" = ".github/workflows/supabase-validate.yml" ] && continue
+            if rg -q "supabase[[:space:]]+db[[:space:]]+push" "$f"; then
+              # Allow only --dry-run. A real push can alter/drop production objects.
+              if ! rg -q "supabase[[:space:]]+db[[:space:]]+push[[:space:]]+$dry" "$f"; then
+                echo "::error file=$f::Real $cmd (without $dry) is forbidden — prod safety."
+                offenders="$offenders $f"
+              fi
+            fi
+          done
+          if [ -n "$offenders" ]; then
+            echo "::error::Aborting: a real db push was found in:$offenders"
+            exit 1
+          fi
+          echo "OK: no workflow performs a real db push."
+
+      - name: Validate top-level migration naming contract
+        run: |
+          set -euo pipefail
+          cd supabase/migrations
+          shopt -s nullglob
+          files=(./[0-9]*.sql)
+          seen_prefixes=""
+          for f in "${files[@]}"; do
+            base="${f#./}"
+            case "$base" in
+              [0-9][0-9][0-9]_*) ;;
+              *)
+                echo "::error file=supabase/migrations/$base::Invalid name. Expected <NNN>_<snake_case>.sql"
+                exit 1
+                ;;
+            esac
+            prefix="${base%%_*}"
+            if printf '%s\n' "$seen_prefixes" | rg -qx "$prefix"; then
+              echo "::error file=supabase/migrations/$base::Duplicate numeric prefix '$prefix' — migrations collide on replay. Renumber uniquely."
+              exit 1
+            fi
+            seen_prefixes="$(printf '%s\n%s' "$seen_prefixes" "$prefix")"
+            echo "  ok: $base"
+          done
+          echo "OK: $((${#files[@]})) top-level migration(s) conform."
+
+      - name: Verify legacy archive integrity
+        run: |
+          set -euo pipefail
+          count="$(find supabase/migrations/legacy -maxdepth 1 -name '*.sql' | wc -l | tr -d ' ')"
+          echo "Archived migrations: $count"
+          if [ "$count" -ne 42 ]; then
+            echo "::warning::Expected 42 archived migrations, found $count. Legacy deck may have drifted."
+          fi
+
+  validate-sql:
+    name: Isolated SQL lint (local stack)
+    runs-on: ubuntu-latest
+    needs: guard
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Count replayable migrations
+        id: count
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(supabase/migrations/[0-9]*.sql)
+          echo "count=${#files[@]}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Supabase CLI
+        if: steps.count.outputs.count != '0'
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start isolated local database
+        if: steps.count.outputs.count != '0'
+        run: supabase db start
+
+      - name: Lint migrations against throwaway local DB only
+        if: steps.count.outputs.count != '0'
+        run: supabase db lint --local --fail-on error
+
+      - name: Report
+        if: steps.count.outputs.count == '0'
+        run: echo "No top-level migrations to lint (all 42 are archived under supabase/migrations/legacy/). Skipping isolated lint."
