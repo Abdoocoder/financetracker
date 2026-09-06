@@ -47,7 +47,7 @@ class _ApiKeysSectionState extends State<ApiKeysSection> {
 
       if (mounted) {
         setState(() {
-          _keys = List<Map<String, dynamic>>.from(data ?? []);
+          _keys = List<Map<String, dynamic>>.from(data);
           _loading = false;
         });
       }

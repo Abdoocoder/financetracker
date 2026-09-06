@@ -1,7 +1,7 @@
 name: fajrak
 description: فجرك - تطبيق إدارة مالية ذكي
 publish_to: 'fajrak.com'
-version: 3.38.0+48
+version: 3.39.0+49
 
 environment:
   sdk: '>=3.11.0 <4.0.0'
@@ -44,6 +44,9 @@ dependencies:
   drift: ^2.18.0
   sqlcipher_flutter_libs: ^0.7.0  # SQLCipher encryption — mobile/desktop only
   path: ^1.9.0
+
+  # BYOK — device-only provider keys (Keychain / Android Keystore) — Feature A
+  flutter_secure_storage: ^11.0.0
 
 dev_dependencies:
   flutter_test:
