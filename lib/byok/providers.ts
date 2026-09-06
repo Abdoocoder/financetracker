@@ -92,6 +92,15 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     auth: { kind: 'x-goog-api-key' },
     authHeaderName: 'x-goog-api-key',
   },
+  ollama: {
+    id: 'ollama',
+    name: 'Ollama (Local Engine)',
+    kind: 'clientDirect',
+    baseUrl: 'http://localhost:11434/v1',
+    defaultModel: 'llama3.1',
+    auth: { kind: 'none' },
+    authHeaderName: '',
+  },
 }
 
 /** Resolve a provider by id. Returns undefined if unknown/unsupported. */
