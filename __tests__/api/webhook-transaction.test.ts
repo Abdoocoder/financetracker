@@ -232,6 +232,26 @@ describe('POST /api/webhook/transaction — category validation', () => {
     }))
     expect(res.status).toBe(200)
   })
+
+  it('returns 400 for income category on expense', async () => {
+    const res = await POST(makePostRequest({
+      type: 'expense', amount: 10, category: 'راتب',
+      transaction_date: '2026-01-01',
+    }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Invalid category')
+  })
+
+  it('returns 400 for expense category on income', async () => {
+    const res = await POST(makePostRequest({
+      type: 'income', amount: 100, category: 'مواصلات',
+      transaction_date: '2026-01-01',
+    }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Invalid category')
+  })
 })
 
 describe('POST /api/webhook/transaction — description sanitization', () => {

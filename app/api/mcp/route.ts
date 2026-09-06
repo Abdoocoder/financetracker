@@ -54,8 +54,6 @@ const createTransactionSchema = z.object({
   account_id: z.string().uuid().optional().nullable(),
 })
 
-const VALID_CATEGORIES: Set<string> = new Set([...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES])
-
 // ══════════════════════════════════════════════════════════
 // Helpers
 // ══════════════════════════════════════════════════════════
@@ -105,6 +103,59 @@ function audit(
   payload?: Record<string, unknown>
 ): void {
   writeAuditLog({ apiKeyId: keyId, userId, action, payload }).catch(() => {})
+}
+
+// Required scope per tool — enforced at the HTTP layer (PRD §5.4: a key missing
+// the scope for the invoked tool must receive 403 Forbidden, not a tool error).
+const TOOL_SCOPES: Record<string, string> = {
+  get_balances: 'read_balances',
+  get_cashflow_summary: 'read_transactions',
+  create_transaction: 'create_transaction',
+}
+
+/**
+ * HTTP-level scope gate. Reads (a clone of) the JSON-RPC payload and, for every
+ * `tools/call`, denies the request with 403 when the key lacks the required
+ * scope. Unparseable bodies, non-POST methods, discovery methods and unknown
+ * tools pass through to the SDK which returns its own JSON-RPC errors.
+ */
+async function enforceToolScope(
+  request: NextRequest,
+  scopes: string[]
+): Promise<{ ok: boolean; status?: number; body?: unknown }> {
+  if (request.method !== 'POST') return { ok: true }
+  const body = await request.clone().text()
+  if (!body) return { ok: true }
+
+  let payload: unknown
+  try {
+    payload = JSON.parse(body)
+  } catch {
+    return { ok: true }
+  }
+
+  const calls = Array.isArray(payload) ? payload : [payload]
+  for (const call of calls) {
+    if (!call || typeof call !== 'object') continue
+    const rpc = call as Record<string, unknown>
+    const name = (rpc.params as Record<string, unknown> | undefined)?.name
+    if (rpc.method !== 'tools/call' || typeof name !== 'string') continue
+
+    const required = TOOL_SCOPES[name]
+    if (required && !scopes.includes(required)) {
+      return {
+        ok: false,
+        status: 403,
+        body: {
+          error: 'insufficient_scope',
+          message: `API key lacks required scope "${required}" for tool "${name}"`,
+          required_scope: required,
+          tool: name,
+        },
+      }
+    }
+  }
+  return { ok: true }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -209,7 +260,12 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
     async (args, ctx) => {
       const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'create_transaction')
 
-      if (!VALID_CATEGORIES.has(args.category)) {
+      // Match the category against the set that belongs to the transaction type
+      // (an income category on an expense, or vice versa, is invalid — the union
+      // check alone would let 'راتب' pass on an expense).
+      const validForType =
+        args.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+      if (!(validForType as readonly string[]).includes(args.category)) {
         return {
           content: [
             {
@@ -288,6 +344,13 @@ async function handle(request: NextRequest): Promise<Response> {
     })
     if (!rl.ok) {
       return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429, headers: rl.headers })
+    }
+
+    // 2.5 HTTP-level scope enforcement — a key without the required scope gets
+    // 403 Forbidden before the request reaches the MCP handler (PRD §5.4 / QA).
+    const scopeGate = await enforceToolScope(request, keyData.scopes)
+    if (!scopeGate.ok) {
+      return NextResponse.json(scopeGate.body, { status: scopeGate.status ?? 403 })
     }
 
     // 3. Thread verified identity into the MCP handler as AuthInfo

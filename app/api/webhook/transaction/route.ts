@@ -20,11 +20,6 @@ const transactionSchema = z.object({
 
 type TransactionBody = z.infer<typeof transactionSchema>
 
-const VALID_CATEGORIES: Set<string> = new Set([
-  ...EXPENSE_CATEGORIES,
-  ...INCOME_CATEGORIES,
-])
-
 function sanitizeDescription(desc: string | null | undefined): string | null {
   if (!desc) return null
   return desc
@@ -210,8 +205,9 @@ export async function POST(request: NextRequest) {
 
     const data: TransactionBody = parsed.data
 
-    // ── 6. Validate category ──────────────────────────
-    if (!VALID_CATEGORIES.has(data.category)) {
+    // ── 6. Validate category (must match the transaction type) ──
+    const validForType = data.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+    if (!(validForType as readonly string[]).includes(data.category)) {
       return NextResponse.json(
         {
           error: 'Invalid category',
