@@ -105,6 +105,22 @@ function makeRequest(method = 'POST', key: string | null = VALID_KEY) {
   })
 }
 
+/** A JSON-RPC `tools/call` request targeting a specific tool name. */
+function makeToolCall(toolName: string, key: string | null = VALID_KEY) {
+  const headers: Record<string, string> = { 'content-type': 'application/json' }
+  if (key) headers['authorization'] = `Bearer ${key}`
+  return new NextRequest('http://localhost/api/mcp', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: { name: toolName, arguments: {} },
+    }),
+  })
+}
+
 /** Helpful: invoke a registered tool callback with the server-context the SDK would pass. */
 function invokeTool(name: string, args: any, authInfo?: any) {
   const { cb } = registeredTools[name]
@@ -184,6 +200,85 @@ describe('POST /api/mcp — authentication', () => {
   })
 })
 
+describe('HTTP-level scope gate (PRD §5.4 — 403 Forbidden)', () => {
+  it('returns 403 Forbidden when a read-only key calls create_transaction', async () => {
+    ;(verifyApiKey as jest.Mock).mockResolvedValue({
+      ...mockKeyData,
+      scopes: ['read_transactions', 'read_balances'],
+    })
+    const res = await POST(makeToolCall('create_transaction'))
+    expect(res.status).toBe(403)
+    const body = await res.json()
+    expect(body.error).toBe('insufficient_scope')
+    expect(body.required_scope).toBe('create_transaction')
+    expect(mcpFetch).not.toHaveBeenCalled()
+  })
+
+  it('returns 403 when a key lacks read_balances for get_balances', async () => {
+    ;(verifyApiKey as jest.Mock).mockResolvedValue({
+      ...mockKeyData,
+      scopes: ['read_transactions'],
+    })
+    const res = await POST(makeToolCall('get_balances'))
+    expect(res.status).toBe(403)
+    expect(mcpFetch).not.toHaveBeenCalled()
+  })
+
+  it('blocks a batch where any tools/call lacks the scope', async () => {
+    ;(verifyApiKey as jest.Mock).mockResolvedValue({
+      ...mockKeyData,
+      scopes: ['read_balances'],
+    })
+    const req = new NextRequest('http://localhost/api/mcp', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${VALID_KEY}`, 'content-type': 'application/json' },
+      body: JSON.stringify([
+        { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'get_balances', arguments: {} } },
+        { jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'create_transaction', arguments: {} } },
+      ]),
+    })
+    const res = await POST(req)
+    expect(res.status).toBe(403)
+    expect((await res.json()).tool).toBe('create_transaction')
+    expect(mcpFetch).not.toHaveBeenCalled()
+  })
+
+  it('passes tools/call through when the key has the required scope', async () => {
+    const res = await POST(makeToolCall('get_balances'))
+    expect(res.status).toBe(200)
+    expect(mcpFetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('ignores discovery and non-tool methods (initialize, tools/list)', async () => {
+    for (const method of ['initialize', 'tools/list']) {
+      mcpFetch.mockClear()
+      const req = new NextRequest('http://localhost/api/mcp', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${VALID_KEY}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method }),
+      })
+      const res = await POST(req)
+      expect(res.status).toBe(200)
+      expect(mcpFetch).toHaveBeenCalledTimes(1)
+    }
+  })
+
+  it('passes unknown tool names through to the SDK (its own -32602 error)', async () => {
+    const res = await POST(makeToolCall('not_a_real_tool'))
+    expect(res.status).toBe(200)
+    expect(mcpFetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not gate GET / OPTIONS / DELETE (no JSON-RPC body)', async () => {
+    for (const method of ['GET', 'OPTIONS', 'DELETE']) {
+      mcpFetch.mockClear()
+      const res = await POST(makeRequest(method, VALID_KEY))
+      expect(res.status).toBe(200)
+      expect(mcpFetch).toHaveBeenCalledTimes(1)
+    }
+  })
+})
+
 describe('registerTool surface', () => {
   it('registers exactly the three required tools with names', () => {
     expect(Object.keys(registeredTools).sort()).toEqual([
@@ -259,6 +354,28 @@ describe('scope gating in tool callbacks', () => {
     const result = await invokeTool(
       'create_transaction',
       { type: 'expense', amount: 50, category: 'not-a-real-category', transaction_date: '2026-01-01' },
+      { ...fullAuth }
+    )
+    expect(result.isError).toBe(true)
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('create_transaction rejects income category on expense', async () => {
+    mockFrom.mockReturnValue(chain())
+    const result = await invokeTool(
+      'create_transaction',
+      { type: 'expense', amount: 50, category: 'راتب', transaction_date: '2026-01-01' },
+      { ...fullAuth }
+    )
+    expect(result.isError).toBe(true)
+    expect(mockFrom).not.toHaveBeenCalled()
+  })
+
+  it('create_transaction rejects expense category on income', async () => {
+    mockFrom.mockReturnValue(chain())
+    const result = await invokeTool(
+      'create_transaction',
+      { type: 'income', amount: 50, category: 'مواصلات', transaction_date: '2026-01-01' },
       { ...fullAuth }
     )
     expect(result.isError).toBe(true)
