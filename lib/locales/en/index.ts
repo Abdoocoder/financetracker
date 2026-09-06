@@ -15,6 +15,7 @@ import { enHelp } from './help'
 import { enLanding } from './landing'
 import { enPolicies } from './policies'
 import { enDownload } from './download'
+import { enChat } from './chat'
 
 export const en = {
     ...enCommon,
@@ -34,6 +35,7 @@ export const en = {
     ...enLanding,
     ...enPolicies,
     ...enDownload,
+    ...enChat,
 } as const
 
 export type En = typeof en

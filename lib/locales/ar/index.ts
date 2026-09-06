@@ -15,6 +15,7 @@ import { arHelp } from './help'
 import { arLanding } from './landing'
 import { arPolicies } from './policies'
 import { arDownload } from './download'
+import { arChat } from './chat'
 
 export const ar = {
     ...arCommon,
@@ -34,6 +35,7 @@ export const ar = {
     ...arLanding,
     ...arPolicies,
     ...arDownload,
+    ...arChat,
 } as const
 
 export type Ar = typeof ar

@@ -48,6 +48,7 @@ export const enCommon = {
     nav_transactions: 'Transactions',
     nav_accounts: 'Accounts',
     nav_debts: 'Debts',
+    nav_chat: 'AI Assistant',
     nav_investments: 'Investments',
     nav_goals: 'Goals',
     nav_alerts: 'Alerts',

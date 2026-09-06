@@ -48,6 +48,7 @@ export const arCommon = {
     nav_transactions: 'المعاملات',
     nav_accounts: 'الحسابات',
     nav_debts: 'الديون',
+    nav_chat: 'المساعد الذكي',
     nav_investments: 'الاستثمار',
     nav_goals: 'الأهداف',
     nav_alerts: 'التنبيهات',

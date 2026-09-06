@@ -8,7 +8,7 @@ import {
   LayoutDashboard, ArrowUpDown, CreditCard,
   TrendingUp, Target, Bell, Settings, Globe,
   ChevronLeft, ChevronRight, MoreHorizontal, PieChart, BookOpen, HelpCircle,
-  Flame, Star, FileText, Wallet
+  Flame, Star, FileText, Wallet, Bot
 } from 'lucide-react'
 
 const MAIN_NAV = [
@@ -16,6 +16,7 @@ const MAIN_NAV = [
   { href: '/dashboard/transactions', Icon: ArrowUpDown,     key: 'nav_transactions' },
   { href: '/dashboard/accounts',     Icon: Wallet,          key: 'nav_accounts'     },
   { href: '/dashboard/debts',        Icon: CreditCard,      key: 'nav_debts'        },
+  { href: '/dashboard/chat',         Icon: Bot,             key: 'nav_chat'         },
 ]
 
 const MORE_NAV = [

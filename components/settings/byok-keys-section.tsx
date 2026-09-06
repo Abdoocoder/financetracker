@@ -6,31 +6,24 @@ import { useUser } from "@/lib/user-context"
 import { useI18n } from "@/lib/i18n"
 import { toast } from "@/components/ui/toast"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
-import { getProvider, SUPPORTED_PROVIDERS, type ByokProvider } from "@/lib/byok/providers"
+import { getProvider, SUPPORTED_PROVIDERS } from "@/lib/byok/providers"
+import { saveProviderKey, getProviderKey, deleteProviderKey, hasProviderKey } from "@/lib/byok/vault"
 
 interface BYOKKeyRecord {
   id: string
   provider_id: string
   key_name: string
-  encrypted_key: string
   key_prefix: string
   created_at: string
   last_used_at: string | null
   is_active: boolean
+  /** True when this browser's vault holds the decrypted ciphertext for this key. */
+  hasKey: boolean
 }
 
-// DB row type (missing encrypted_key - stored in localStorage only)
-interface BYOKKeyDbRow {
-  id: string
-  provider_id: string
-  key_name: string
-  key_prefix: string
-  created_at: string
-  last_used_at: string | null
-  is_active: boolean
-}
-
-// Get only proxy providers (kind === 'proxy')
+// Get only proxy providers (kind === 'proxy') — clientDirect providers
+// (e.g. Local Ollama) dial the LLM directly from the browser and never
+// store a key here.
 const PROXY_PROVIDERS = Object.values(SUPPORTED_PROVIDERS).filter(p => p.kind === 'proxy')
 
 export function BYOKKeysSection() {
@@ -41,11 +34,13 @@ export function BYOKKeysSection() {
   const [keys, setKeys] = useState<BYOKKeyRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [testingId, setTestingId] = useState<string | null>(null)
   const [newKeyName, setNewKeyName] = useState("")
-  const [newKeyProvider, setNewKeyProvider] = useState<string>("")
+  const [newKeyProvider, setNewKeyProvider] = useState("")
   const [newKeyValue, setNewKeyValue] = useState("")
   const [showKey, setShowKey] = useState(false)
   const [revokeId, setRevokeId] = useState<string | null>(null)
+  const [vaultUnavailable, setVaultUnavailable] = useState(false)
 
   const loadKeys = useCallback(async () => {
     if (!user) return
@@ -56,36 +51,22 @@ export function BYOKKeysSection() {
         .select("id, provider_id, key_name, key_prefix, created_at, last_used_at, is_active")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-      if (!error) setKeys((data ?? []).map(r => ({ ...r, encrypted_key: "" })))
-    } catch {
-      const stored = localStorage.getItem(`fajrak_byok_keys_${user.id}`)
-      if (stored) {
-        try { setKeys(JSON.parse(stored)) } catch {}
-      }
+      if (error) throw error
+      const rows = data ?? []
+      // Fast presence check against the local vault (never decrypts).
+      const vaulted = await Promise.all(rows.map(r => hasProviderKey(r.id)))
+      setKeys(rows.map((r, i) => ({ ...r, hasKey: vaulted[i] })))
+      setVaultUnavailable(false)
+    } catch (err) {
+      setVaultUnavailable(true)
+      // Fail silently on table-missing (migration not applied yet) but still
+      // surface non-RLS errors.
+      console.error("BYOK keys load failed:", err)
     }
     setLoading(false)
   }, [user, supabase])
 
   useEffect(() => { loadKeys() }, [loadKeys])
-
-  const saveKeysToStorage = async (updatedKeys: BYOKKeyRecord[]) => {
-    if (!user) return
-    setKeys(updatedKeys)
-    localStorage.setItem(`fajrak_byok_keys_${user.id}`, JSON.stringify(updatedKeys))
-    try {
-      await supabase.from("user_byok_keys").upsert(
-        updatedKeys.map(k => ({
-          user_id: user.id,
-          provider_id: k.provider_id,
-          key_name: k.key_name,
-          key_prefix: k.key_prefix,
-          created_at: k.created_at,
-          last_used_at: k.last_used_at,
-          is_active: k.is_active,
-        }))
-      )
-    } catch {}
-  }
 
   const getKeyPrefix = (providerId: string, fullKey: string): string => {
     const provider = getProvider(providerId)
@@ -99,64 +80,110 @@ export function BYOKKeysSection() {
   }
 
   const handleSave = async () => {
-    if (!user || !newKeyName.trim() || !newKeyProvider || !newKeyValue.trim()) return
+    if (!user) return
+    if (saving) return
+    if (!newKeyName.trim() || !newKeyProvider || !newKeyValue.trim()) return
     setSaving(true)
+    const keyId = crypto.randomUUID()
+    const rawKey = newKeyValue.trim()
     try {
-      const now = new Date().toISOString()
-      const prefix = getKeyPrefix(newKeyProvider, newKeyValue.trim())
-      const newKey: BYOKKeyRecord = {
-        id: crypto.randomUUID(),
+      // 1. Encrypt into the local IndexedDB vault FIRST (AD-3: browser-only).
+      await saveProviderKey(keyId, rawKey)
+
+      // 2. Persist metadata only to Supabase — never the key itself.
+      const { error } = await supabase
+        .from("user_byok_keys")
+        .insert({
+          id: keyId,
+          user_id: user.id,
+          provider_id: newKeyProvider,
+          key_name: newKeyName.trim(),
+          key_prefix: getKeyPrefix(newKeyProvider, rawKey),
+          is_active: true,
+        })
+      if (error) {
+        await deleteProviderKey(keyId) // roll back the orphaned ciphertext
+        throw error
+      }
+
+      setKeys(prev => [{
+        id: keyId,
         provider_id: newKeyProvider,
         key_name: newKeyName.trim(),
-        encrypted_key: "",
-        key_prefix: prefix,
-        created_at: now,
+        key_prefix: getKeyPrefix(newKeyProvider, rawKey),
+        created_at: new Date().toISOString(),
         last_used_at: null,
         is_active: true,
-      }
-      await saveKeysToStorage([...keys, newKey])
+        hasKey: true,
+      }, ...prev])
       toast.success(t("settings_byok_keys_created") || "BYOK key saved")
       setNewKeyName("")
       setNewKeyProvider("")
       setNewKeyValue("")
       setShowKey(false)
     } catch (err) {
-      toast.error(t("error_generic") || "Failed to save key")
+      toast.error((err as Error).message || t("error_generic") || "Failed to save key")
     }
     setSaving(false)
   }
 
   const handleRevoke = async (keyId: string) => {
-    const updated = keys.filter(k => k.id !== keyId)
-    await saveKeysToStorage(updated)
-    toast.success(t("settings_byok_keys_revoked") || "Key removed")
-    setRevokeId(null)
+    if (saving) return
+    setSaving(true)
+    try {
+      const { error } = await supabase.from("user_byok_keys").delete().eq("id", keyId)
+      if (error) throw error
+      await deleteProviderKey(keyId)
+      setKeys(prev => prev.filter(k => k.id !== keyId))
+      toast.success(t("settings_byok_keys_revoked") || "Key removed")
+      setRevokeId(null)
+    } catch (err) {
+      toast.error((err as Error).message || t("error_generic") || "Failed to remove key")
+    }
+    setSaving(false)
   }
 
   const handleTestKey = async (key: BYOKKeyRecord) => {
+    if (testingId) return
+    setTestingId(key.id)
     toast.info(t("settings_byok_keys_testing") || "Testing key...")
     try {
+      // Recover the raw key ON DEMAND from the browser vault only.
+      const providerKey = await getProviderKey(key.id)
+      if (!providerKey) {
+        toast.error(t("settings_byok_keys_no_local") || "Key not stored in this browser. Re-add it here to test.")
+        return
+      }
       const { byokChat } = await import("@/lib/byok/client")
+      const { buildChatBody } = await import("@/lib/byok/chat")
       const provider = getProvider(key.provider_id)
       if (!provider) throw new Error("Unknown provider")
 
-      const testBody = JSON.stringify({
-        model: provider.defaultModel,
-        messages: [{ role: "user", content: "Hi" }],
-        max_tokens: 5,
-      })
+      // Provider-native body (openai-compatible / anthropic / gemini shapes)
+      // so the Test button works for every provider, not just OpenAI-compatible.
+      const testBody = JSON.stringify(
+        buildChatBody(provider, "", [{ role: "user", content: "Hi" }], provider.defaultModel, false)
+      )
 
       const response = await byokChat({
         providerId: key.provider_id,
-        providerKey: key.encrypted_key || "",
+        providerKey,
         body: testBody,
         stream: false,
       })
-      if (response.ok) toast.success(t("settings_byok_keys_test_ok") || "Key works!")
-      else toast.error(t("settings_byok_keys_test_fail") || "Test failed")
+      if (response.ok) {
+        toast.success(t("settings_byok_keys_test_ok") || "Key works!")
+        // Best-effort last_used_at stamp (metadata only).
+        await supabase.from("user_byok_keys").update({ last_used_at: new Date().toISOString() }).eq("id", key.id)
+        setKeys(prev => prev.map(k => k.id === key.id ? { ...k, last_used_at: new Date().toISOString() } : k))
+      } else {
+        const body = await response.json().catch(() => null)
+        toast.error(body?.error || t("settings_byok_keys_test_fail") || "Test failed")
+      }
     } catch (err) {
       toast.error((err as Error).message || t("settings_byok_keys_test_fail") || "Test failed")
     }
+    setTestingId(null)
   }
 
   const formatDate = (d: string | null) => {
@@ -169,8 +196,18 @@ export function BYOKKeysSection() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.7 }}>
-        {t("settings_byok_keys_desc") || "Your LLM provider keys (BYOK). Keys are encrypted in your browser and never sent to our servers. They are used per-request via our proxy to bypass CORS."}
+        {t("settings_byok_keys_desc") || "Your LLM provider keys (BYOK). Keys are encrypted in your browser (IndexedDB) and never sent to our servers. They are used per-request via our proxy to bypass CORS."}
       </p>
+
+      {vaultUnavailable && (
+        <div style={{
+          padding: "10px 14px", borderRadius: 10,
+          background: "var(--accent-red-dim)", border: "1px solid rgba(239,68,68,0.2)",
+          color: "var(--accent-red-light)", fontSize: 12, lineHeight: 1.6,
+        }}>
+          {t("settings_byok_keys_vault_unavailable") || "The local key vault could not be opened (private browsing / unsupported browser). Saving or testing keys is disabled."}
+        </div>
+      )}
 
       <details style={{ marginBottom: 8 }}>
         <summary style={{ fontSize: 12, fontWeight: 700, color: "var(--text-secondary)", cursor: "pointer", padding: "8px 0" }}>
@@ -224,16 +261,16 @@ export function BYOKKeysSection() {
                 <div style={{ display: "flex", gap: 6 }}>
                   <button
                     onClick={() => handleTestKey(key)}
-                    disabled={saving}
+                    disabled={!!testingId}
                     aria-label={t("settings_byok_keys_test") || "Test key"}
                     style={{
                       padding: "6px 10px", borderRadius: 8,
                       background: "rgba(59,126,246,0.1)", border: "1px solid rgba(59,126,246,0.2)",
                       color: "var(--accent-blue-light)", fontSize: 11, fontWeight: 700,
-                      cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit",
+                      cursor: testingId ? "not-allowed" : "pointer", fontFamily: "inherit",
                     }}
                   >
-                    {t("settings_byok_keys_test") || "Test"}
+                    {testingId === key.id ? "⏳" : t("settings_byok_keys_test") || "Test"}
                   </button>
                   <button
                     onClick={() => setRevokeId(key.id)}
@@ -256,7 +293,7 @@ export function BYOKKeysSection() {
                 <span>{t("settings_byok_keys_created_at") || "Added"}: {formatDate(key.created_at)}</span>
                 <span>{t("settings_byok_keys_last_used") || "Last used"}: {formatDate(key.last_used_at)}</span>
               </div>
-              <div style={{ marginTop: 8 }}>
+              <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{
                   padding: "3px 8px", borderRadius: 6,
                   background: "rgba(59,126,246,0.1)", border: "1px solid rgba(59,126,246,0.2)",
@@ -264,6 +301,23 @@ export function BYOKKeysSection() {
                 }}>
                   {provider?.name || key.provider_id}
                 </span>
+                {key.hasKey ? (
+                  <span style={{
+                    padding: "3px 8px", borderRadius: 6,
+                    background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
+                    color: "var(--accent-green-light)", fontSize: 10, fontWeight: 700,
+                  }}>
+                    {t("settings_byok_keys_local") || "Key stored on this device"}
+                  </span>
+                ) : (
+                  <span style={{
+                    padding: "3px 8px", borderRadius: 6,
+                    background: "var(--bg-secondary)", border: "1px solid var(--border)",
+                    color: "var(--text-muted)", fontSize: 10, fontWeight: 700,
+                  }}>
+                    {t("settings_byok_keys_not_local") || "Not stored on this device"}
+                  </span>
+                )}
               </div>
             </div>
           )
@@ -307,6 +361,7 @@ export function BYOKKeysSection() {
               value={newKeyValue}
               onChange={e => setNewKeyValue(e.target.value)}
               placeholder={t("settings_byok_keys_value_placeholder") || "Paste your provider API key"}
+              autoFocus
               style={{
                 flex: 1, padding: "11px 14px", borderRadius: 12,
                 background: "var(--bg-secondary)", border: "1px solid var(--border)",
