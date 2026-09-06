@@ -14,7 +14,7 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "task-master": "task-master",
-    "doctor": "npx next info && npm audit --omit=dev --audit-level=high && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
+    "doctor": "npx next info && npm_config_allow_scripts= npm audit --omit=dev --audit-level=high && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
@@ -60,5 +60,15 @@
     "task-master-ai": "^0.43.1",
     "ts-jest": "^29.4.6",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "node-pty@1.1.0": true,
+    "@sentry/cli@3.6.2": true,
+    "@anthropic-ai/claude-code@2.1.259": true,
+    "@firebase/util@1.15.3": true,
+    "tldjs@2.3.2": true,
+    "unrs-resolver@1.12.2": true,
+    "tree-sitter-bash@0.25.1": true,
+    "protobufjs@7.6.5": true
   }
 }
