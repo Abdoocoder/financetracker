@@ -388,7 +388,8 @@ server.registerTool(
 - `app/api/byok/proxy/route.ts` — وكيل BYOK (Web).
 - `lib/byok/providers.ts` — `SUPPORTED_PROVIDERS` (مشترك).
 - `lib/byok/client.ts` — عميل استدعاء (Web).
-- `@fajrak/mcp-server/` — خادم MCP (Feature B).
+- `app/api/mcp/route.ts` — خادم MCP (Feature B) مُقدَّم كـ Next.js route بدلاً من حزمة مستقلة (انظر §9 ف4).
+- `__tests__/api/mcp-route.test.ts` — اختبارات المصادقة 401 وحدود المعدل 429 وبوابة الصلاحيات 403 وأدوات Feature B.
 - `mobile/.../services/llm_service.dart` — عميل فلاتر.
 - `mobile/.../android/app/src/main/res/xml/network_security_config.xml` + تعديل `AndroidManifest.xml`.
 - `mobile/.../ios/Runner/Info.plist` — `NSAllowsLocalNetworking`.
@@ -417,3 +418,12 @@ server.registerTool(
 3. هل يوجد حساب/فلترة للمحتوى (moderation) لمخرجات LLM قبل عرضها للمستخدم؟
    — **الالتزام:** يبقى باباً مفتوحاً صراحةً، ويُراجع مع ضوابط مهارة
    `llm-trading-agent-security` في §6.3 قبل أي خروج للعرض (لا يُسقَط صامتاً).
+4. **حُسم أثناء التنفيذ (Feature B):** خادم MCP **لا يُسلَّم كحزمة مستقلة**
+   `@fajrak/mcp-server/` كما ورد في §8 بل كـ **Next.js route** (`app/api/mcp/route.ts`)
+   يعمل بنفس `@modelcontextprotocol/server` v2 (`createMcpHandler`) على طبقة
+   Streamable HTTP. السبب: وحدة نشر واحدة مع بقية مسارات REST، ووصول مباشر
+   لنفس بنية PAT/حدود المعدل/السجل الموجود في `lib/api-keys.ts` (الـ SDK لا
+   يتحقق من الرمز بنفسه — ويتكامل المسار هنا مع `verifyApiKey` + `rateLimit` +
+   `writeAuditLog` + بوابة 403 في §5.4). **لا تغيير في النطاق:** نفس الأدوات
+   الثلاث، ونفس vocabulary الصلاحيات بأسلوب التطبيق (`read_balances` /
+   `read_transactions` / `create_transaction`) وليس أسلوب النقطتين في §5.3.

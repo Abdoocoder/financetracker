@@ -5,7 +5,7 @@ export const arDownload = {
     down_desc: 'استمتع بتجربة أسرع، إشعارات فورية، ودعم كامل للعمل بدون إنترنت عبر تطبيقنا الأصلي (Native App).',
     down_btn: 'تحميل من Google Play',
     down_safe: 'آمن ونسخة رسمية',
-    down_version: 'v3.37.0',
+    down_version: 'v3.39.0',
     down_f1: 'إشعارات Native',
     down_f2: 'أداء أسرع',
     down_f3: 'يعمل offline',
