@@ -127,6 +127,34 @@ export async function sendPushToUser(
 
   const finalUrl = url || CATEGORY_DEFAULT_URL[category] || '/dashboard/alerts'
 
+  // ── فلترة مسبقة قبل الـ insert (تقلّل webhook/Edge calls) ─────────────
+  // 1) تفضيل الفئة + المنطقة الزمنية (سطر واحد عبر join)
+  const { data: prefRows, error: prefError } = await supabase
+    .from('notification_preferences')
+    .select('enabled, quiet_start, quiet_end, profiles(timezone)')
+    .eq('user_id', userId)
+    .eq('category', category)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+
+  const pref = prefError ? undefined : prefRows?.[0]
+
+  if (pref?.enabled === false) return 0 // الفئة معطّلة
+
+  if (pref?.quiet_start && pref?.quiet_end) {
+    const timeZone = (pref as any)?.profiles?.timezone ?? 'Asia/Amman'
+    const nowHHMM  = getHHMMInTimeZone(new Date(), timeZone)
+    if (isInQuietHours(pref.quiet_start, pref.quiet_end, nowHHMM)) return 0 // ساعات هادئة
+  }
+
+  // 2) يجب أن يملك المستخدم اشتراك push واحد على الأقل
+  const { count: subCount, error: subError } = await supabase
+    .from('push_subscriptions')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+
+  if (!subError && subCount === 0) return 0 // لا يوجد جهاز للإشعار
+
   // فحص مسبق للـ fingerprint قبل insert — يمنع رحلة insert فاشلة
   // (23505) عندما يكون الإشعار قد أُرسل اليوم بالفعل. الـ UNIQUE index
   // يبقى الحارس النهائي ضد حالات السباق.
