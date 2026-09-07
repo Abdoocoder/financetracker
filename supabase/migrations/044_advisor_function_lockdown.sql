@@ -77,10 +77,25 @@ REVOKE EXECUTE ON FUNCTION public.get_account_balances(uuid)
 GRANT EXECUTE ON FUNCTION public.get_account_balances(uuid)
   TO authenticated;
 
-REVOKE EXECUTE ON FUNCTION public.get_financial_dashboard(uuid, double precision)
-  FROM anon;
-GRANT EXECUTE ON FUNCTION public.get_financial_dashboard(uuid, double precision)
-  TO authenticated;
+-- get_financial_dashboard and delete_user_account may be absent in
+-- seed-only/fresh DBs: legacy 035 DROPs the dashboard and its LANGUAGE sql
+-- re-create errors on debts.debt_type (a prod SQL-editor column added only by
+-- migration 047), and delete_user_account is a prod SQL-editor function the
+-- legacy deck only ever ALTERs (005). Both are recreated as plpgsql by 046,
+-- so guard all their ACL statements here; 047 re-asserts the lockdown for
+-- the functions 046 re-creates.
+DO $guard$
+BEGIN
+  IF to_regprocedure('public.get_financial_dashboard(uuid, double precision)') IS NOT NULL THEN
+    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.get_financial_dashboard(uuid, double precision) FROM anon';
+    EXECUTE 'GRANT EXECUTE ON FUNCTION public.get_financial_dashboard(uuid, double precision) TO authenticated';
+  END IF;
+  IF to_regprocedure('public.delete_user_account(uuid)') IS NOT NULL THEN
+    EXECUTE 'REVOKE EXECUTE ON FUNCTION public.delete_user_account(uuid) FROM anon';
+    EXECUTE 'GRANT EXECUTE ON FUNCTION public.delete_user_account(uuid) TO authenticated';
+  END IF;
+END
+$guard$;
 
 REVOKE EXECUTE ON FUNCTION public.get_monthly_financial_summary(uuid, int, int)
   FROM anon;
@@ -93,11 +108,6 @@ REVOKE EXECUTE ON FUNCTION public.get_zakat_summary(
 GRANT EXECUTE ON FUNCTION public.get_zakat_summary(
   uuid, double precision, double precision, double precision
 ) TO authenticated;
-
-REVOKE EXECUTE ON FUNCTION public.delete_user_account(uuid)
-  FROM anon;
-GRANT EXECUTE ON FUNCTION public.delete_user_account(uuid)
-  TO authenticated;
 
 REVOKE EXECUTE ON FUNCTION public.upsert_investment_cash(uuid, text, numeric)
   FROM anon;
