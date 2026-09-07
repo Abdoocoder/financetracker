@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
     // ── تحقق من تفضيلات المستخدم ──────────────────────────────
     const { data: pref } = await supabase
       .from('notification_preferences')
-      .select('enabled, quiet_start, quiet_end, mask_sensitive_data')
+      .select('enabled, quiet_start, quiet_end, mask_sensitive_data, profiles(timezone)')
       .eq('user_id', user_id)
       .eq('category', category)
       .maybeSingle()
@@ -91,10 +91,18 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ skipped: 'disabled' }), { status: 200 })
     }
 
-    // تحقق من الساعات الهادئة
+    // تحقق من الساعات الهادئة — حسب المنطقة الزمنية للمستخدم (وليس UTC)
     if (pref?.quiet_start && pref?.quiet_end) {
-      const now = new Date()
-      const hhmm = now.getUTCHours() * 60 + now.getUTCMinutes()
+      const timeZone = (pref as any)?.profiles?.timezone ?? 'Asia/Amman'
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hourCycle: 'h23',
+      }).formatToParts(new Date())
+      const hh   = Number(parts.find((p: any) => p.type === 'hour')?.value ?? '0')
+      const mm   = Number(parts.find((p: any) => p.type === 'minute')?.value ?? '0')
+      const hhmm = hh * 60 + mm
       const [qsh, qsm] = pref.quiet_start.split(':').map(Number)
       const [qeh, qem] = pref.quiet_end.split(':').map(Number)
       const quietStart = qsh * 60 + qsm
