@@ -6,6 +6,7 @@ export const arChat = {
     chat_auto_model: 'تلقائي (OpenRouter)',
     chat_key: 'مفتاح API',
     chat_key_none: 'لا يوجد مفتاح محفوظ لـ {provider}',
+    chat_key_not_local: 'مفاتيح موجودة لكن ليس على هذا الجهاز. أعد إدخالها في الإعدادات.',
     chat_key_select: 'اختر مفتاحًا محفوظًا',
     chat_ollama_no_key: 'Ollama يعمل محليًا — لا يحتاج مفتاحًا',
     chat_setup_keys: 'إضافة مفاتيح BYOK',
