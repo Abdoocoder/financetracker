@@ -10,7 +10,7 @@
 - **Web** — Next.js 16 (App Router) + React 19 + TypeScript (strict)
 - **Mobile** — Flutter (`mobile/fajrak_flutter/`), name *Fajrak*
 
-Current version: `3.38.0` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency **KWD** (per-user overridable via `profiles`).
+Current version: `3.39.1+50` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency **KWD** (per-user overridable via `profiles`).
 
 ## 2. High-level architecture
 
@@ -79,26 +79,26 @@ lib/supabase/
 
 ## 6. Web surface map
 
-- **18 pages** across `(auth)` + `(dashboard)`: dashboard, transactions, debts, investments, alerts, budgets, goals, settings, etc.
-- **26 API routes** under `app/api/`: `alerts/`, `cron/*`, `push/*`, `gamification`, `webhook`, `api-keys`, etc.
-- `proxy.ts` matcher excludes `_next/static`, `_next/image`, icons, `manifest.json`, `sw.js`, `api/cron`.
+- **24 pages** (`app/**/page.tsx`): landing `/`, `download`, `privacy`, `terms`; 5 auth pages (`onboarding`, `login`, `register`, `forgot-password`, `reset-password`); 15 dashboard pages (`dashboard`, `transactions`, `debts`, `investments`, `goals`, `budgets`, `alerts`, `settings`, `accounts`, `zakat`, `chat`, `help`, `learn`, `fire`, `pdf-report`).
+- **29 API routes** under `app/api/` (Route Handlers): `alerts/`, cron jobs (`auto-debt`, `auto-recurring`, `auto-salary`, `budget-alerts`, `daily-reminder`, `evening-reminder`, `zakat-reminder`, `streak-alert`, `weekly-report`, `new-user-nudge`, `smart-notifications`), push (`push-send`, `push-subscribe`, `push-test`), `exchange-rate`, `stock-price`, `health`, `health-score-snapshot`, `gamification`, `testimonials`, `confirm`, `auth/callback`, `api-keys/{create,revoke}`, `byok/proxy`, `mcp`, `webhook/transaction`, `zakat/prices`.
+- `proxy.ts` matcher excludes `_next/static`, `_next/image`, favicon/icons, `manifest.json`, `sw.js`, `api/cron`.
 
 ## 7. Mobile surface map (`mobile/fajrak_flutter/lib/`)
 
-- **24 screens** — accounts, dashboard, transactions, debts, investments, goals, budgets, alerts, settings, help.
-- **9 services** — `AccountsService`, `InvestmentsService`, `CurrencyService`, etc.
-- **67 widgets** — organized per feature (`widgets/dashboard/`, `widgets/transactions/`, …, `widgets/common/`).
+- **25 screens** (`lib/screens/`) — accounts, dashboard, transactions (`transactions/`, `transactions/recurring`), debts, investments, goals, budgets, alerts, settings (`settings/`, `settings/notification_settings`), help, learn, chat, achievements, splash, main_screen, more (`more/`, `more/fire_calculator`, `more/zakat_calculator`), auth (`login`, `register`, `onboarding`, `forgot_password`, `reset_password`).
+- **9 services** (`lib/services/`) — `AccountsService`, `FinanceService`, `CurrencyService`, `InvestmentsService`, `AnalyticsService`, `LlmService`, `NotificationService`, `PdfReportService`, `SyncService`. Plus nested `services/byok/` (BYOK chat/vault/envelope/providers) and `services/repositories/` — **15** `.dart` files total.
+- **70 widgets** — organized per feature (`widgets/dashboard/`, `widgets/transactions/`, …, `widgets/common/`).
 
 ## 8. Database map
 
-19 tables via 40 numbered migrations in `supabase/migrations/`. Migrations are **sequentially numbered — add a new one, never edit existing**.
+19 tables (verified against `create table` occurrences in migrations). Migrations live in `supabase/migrations/` — **10 top-level files (`042`–`051`)** plus a `legacy/` folder holding the older `001`–`041` set (**42 files**). Migrations are **sequentially numbered — add a new one, never edit existing**.
 
 ## 9. Testing
 
-- **Jest 30 / jsdom** — 32 suites / 358 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing.
+- **Jest 30 / jsdom** — 37 suites / 443 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing. Coverage ≈31.9% statements.
 - **Playwright** — `e2e/` (smoke + auth-flow + `transaction-management` all passing). Authenticated specs need a test account via `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in `.env.local`; `globalSetup` builds `e2e/.auth/user.json` automatically.
 - **Flutter** — `make doctor` (analyze + test, zero issues required).
-- Shared Supabase mock: `chainProxy` pattern in `__tests__/helpers/`.
+- Shared Supabase mock: `chainProxy` pattern in `__tests__/hooks/`.
 
 ## 10. Conventions (recap — full list in `CLAUDE.md`)
 
@@ -140,3 +140,5 @@ make doctor
 | Cron config | `vercel.json` |
 | Mobile | `mobile/fajrak_flutter/lib/{screens,widgets,services}` |
 | Styling tokens | CSS vars `--text-*`, `--bg-*`, `--border`, `--accent-*`, `--shadow-card` |
+
+> `docs/technical/structure.md` is **stale** — it still references `middleware.ts`, `lib/utils.ts`, and `001_initial.sql`, all of which were superseded (auth gate is now `proxy.ts`). Prefer this guide and `CLAUDE.md` over it.
