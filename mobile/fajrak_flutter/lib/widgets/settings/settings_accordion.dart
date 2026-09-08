@@ -38,7 +38,7 @@ class SettingsAccordion extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: Material(
-        type: MaterialType.transparency,
+        color: colorScheme.surface,
         child: Theme(
           data: theme.copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
