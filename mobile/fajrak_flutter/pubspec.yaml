@@ -47,6 +47,7 @@ dependencies:
 
   # BYOK — device-only provider keys (Keychain / Android Keystore) — Feature A
   flutter_secure_storage: ^11.0.0
+  webcrypto: ^0.6.0
 
 dev_dependencies:
   flutter_test:

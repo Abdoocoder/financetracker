@@ -11,6 +11,7 @@ import '../learn/learn_screen.dart';
 import '../alerts/alerts_screen.dart';
 import '../settings/settings_screen.dart';
 import '../help/help_screen.dart';
+import '../chat/chat_screen.dart';
 import 'fire_calculator_screen.dart';
 import 'zakat_calculator_screen.dart';
 
@@ -94,6 +95,11 @@ class _MoreScreenState extends State<MoreScreen> {
               icon: Icons.menu_book_outlined,
               title: 'nav_learn'.tr(),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LearnScreen())),
+              colorScheme: colorScheme),
+          MoreMenuItem(
+              icon: Icons.assistant_outlined,
+              title: 'more_ai_chat'.tr(),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatScreen())),
               colorScheme: colorScheme),
           MoreMenuItem(
               icon: Icons.notifications_none,

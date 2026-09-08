@@ -4,6 +4,11 @@
  * Design decisions (see docs/projects/llm-ecosystem_prd.md):
  *   - C1  : protected by a valid Supabase SESSION — the RPC below runs as the
  *           user (SECURITY INVOKER) so auth.uid() resolves to them (+ RLS).
+ *   - D1  : web uses session cookies; the cookie-less Flutter client sends its
+ *           Supabase JWT as `Authorization: Bearer <jwt>` (no cookies). The jwt
+ *           is passed to createClient() so getUser() and the RPC run as that
+ *           user. Requests with neither a cookie session NOR a bearer token are
+ *           rejected.
  *   - AD-5: per-user atomic rate counter (proxy_usage). Calls bump_proxy_usage()
  *           which does INSERT ... ON CONFLICT DO UPDATE count=count+1 RETURNING
  *           count. If count > 30/min -> fail-fast 429 (x-byok-origin: proxy).
@@ -46,11 +51,21 @@ function json(body: ByokProxyError | Record<string, unknown>, status: number, ex
 export async function POST(request: NextRequest) {
   const started = Date.now()
 
-  // ---- 1. Session auth (C1) ------------------------------------------------
-  const supabase = await createClient()
+  // ---- 1. Session auth (C1 / D1) -------------------------------------------
+  // Web (C1): createClient() reads the request's session cookies.
+  // Flutter (D1): a cookie-less client sends `Authorization: Bearer <jwt>` —
+  // parse it (case-insensitive) and pass the token so getUser() and the RPC
+  // run as that user. Header value may be empty after 'bearer ' -> treat as
+  // absent (cookie path).
+  let bearerToken: string | undefined
+  const authHeader = request.headers.get('authorization')
+  if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+    bearerToken = authHeader.slice('bearer '.length).trim() || undefined
+  }
+  const supabase = await createClient(bearerToken)
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser(bearerToken)
   if (!user) {
     return json({ error: 'Unauthorized: a valid session is required' }, 401)
   }
