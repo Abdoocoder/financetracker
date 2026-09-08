@@ -229,6 +229,7 @@ export default function PDFReportPage() {
       <style>{`
         @media print {
           .no-print { display: none !important; }
+          .desktop-sidebar, .mobile-nav, .global-fab { display: none !important; }
           body { background: white !important; color: black !important; }
         }
       `}</style>
