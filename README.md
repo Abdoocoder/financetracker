@@ -604,6 +604,12 @@ E2E_TEST_PASSWORD=your-password
 
 ## 📝 Changelog
 
+### v3.39.1 — 2026-09-08 *(Flutter UI Fix)*
+
+| Change | Description |
+|:-------|:------------|
+| 🎨 **Settings accordion ripple fix (Flutter)** | Fixed the ListTile-painted-on-DecoratedBox warning in the settings accordion by moving the surface color onto the Material ancestor — tap ink ripples on settings sections (Preferences, BYOK Keys, Assets, Profile, Export/Delete, API Keys) now render correctly |
+
 ### v3.39.0 — 2026-09-04 *(LLM Ecosystem: BYOK Chat + Financial MCP Server)*
 
 | Change | Description |
