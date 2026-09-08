@@ -6,6 +6,7 @@ export const enChat = {
     chat_auto_model: 'Auto (OpenRouter)',
     chat_key: 'API key',
     chat_key_none: 'No saved key for {provider}',
+    chat_key_not_local: 'Keys exist but not on this device. Re-enter in Settings.',
     chat_key_select: 'Select a saved key',
     chat_ollama_no_key: 'Ollama runs locally — no key needed',
     chat_setup_keys: 'Add BYOK keys',
