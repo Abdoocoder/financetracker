@@ -138,9 +138,17 @@ describe('POST /api/byok/proxy — validation guardrails', () => {
   })
 
   it('returns 500 when the proxy KEK is not configured', async () => {
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     mockIsKekConfigured.mockReturnValueOnce(false)
     const res = await POST(makeProxyRequest({}))
     expect(res.status).toBe(500)
+    const body = await res.json()
+    expect(body.error).toContain('BYOK_PRIVATE_KEY')
+    expect(body.error).toContain('BYOK_KEK_ID')
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[byok/proxy] KEK not configured: BYOK_PRIVATE_KEY=MISSING, BYOK_KEK_ID=')
+    )
+    errorSpy.mockRestore()
   })
 
   it('returns 400 on invalid JSON body', async () => {
