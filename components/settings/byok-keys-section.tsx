@@ -40,6 +40,8 @@ export function BYOKKeysSection() {
   const [newKeyValue, setNewKeyValue] = useState("")
   const [showKey, setShowKey] = useState(false)
   const [revokeId, setRevokeId] = useState<string | null>(null)
+  const [reenterId, setReenterId] = useState<string | null>(null)
+  const [reenterValue, setReenterValue] = useState("")
   const [vaultUnavailable, setVaultUnavailable] = useState(false)
 
   const loadKeys = useCallback(async () => {
@@ -139,6 +141,34 @@ export function BYOKKeysSection() {
       setRevokeId(null)
     } catch (err) {
       toast.error((err as Error).message || t("error_generic") || "Failed to remove key")
+    }
+    setSaving(false)
+  }
+
+  // Re-binds a raw key to an EXISTING metadata row whose ciphertext is not in
+  // this browser's vault (e.g. a legacy row created before the vault shipped,
+  // or a key added on another device). No new row is created — the key value
+  // never touches Supabase.
+  const handleReEnterKey = async (key: BYOKKeyRecord) => {
+    if (saving) return
+    const rawKey = reenterValue.trim()
+    if (!rawKey) return
+    setSaving(true)
+    try {
+      // 1. Overwrite the ciphertext in the local vault under the existing id.
+      await saveProviderKey(key.id, rawKey)
+      // 2. Best-effort metadata refresh only — the row already exists.
+      const prefix = getKeyPrefix(key.provider_id, rawKey)
+      await supabase
+        .from("user_byok_keys")
+        .update({ key_prefix: prefix })
+        .eq("id", key.id)
+      setKeys(prev => prev.map(k => k.id === key.id ? { ...k, hasKey: true, key_prefix: prefix } : k))
+      toast.success(t("settings_byok_keys_reentered") || "Key re-entered on this device")
+      setReenterId(null)
+      setReenterValue("")
+    } catch (err) {
+      toast.error((err as Error).message || t("error_generic") || "Failed to re-enter key")
     }
     setSaving(false)
   }
@@ -319,6 +349,43 @@ export function BYOKKeysSection() {
                   </span>
                 )}
               </div>
+              {!key.hasKey && !vaultUnavailable && reenterId !== key.id && (
+                <button
+                  onClick={() => { setReenterId(key.id); setReenterValue("") }}
+                  aria-label={t("settings_byok_keys_reenter") || "Re-enter key"}
+                  style={{ marginTop: 8, padding: 0, background: "none", border: "none", color: "var(--accent-blue-light)", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}
+                >
+                  {t("settings_byok_keys_reenter") || "Re-enter key"}
+                </button>
+              )}
+              {reenterId === key.id && (
+                <div style={{ marginTop: 10, display: "flex", gap: 6 }}>
+                  <input
+                    type="password"
+                    value={reenterValue}
+                    onChange={e => setReenterValue(e.target.value)}
+                    placeholder={t("settings_byok_keys_value_placeholder") || "Paste your provider API key"}
+                    autoFocus
+                    style={{ flex: 1, padding: "9px 12px", borderRadius: 10, background: "var(--bg-secondary)", border: "1px solid var(--border)", color: "var(--text-primary)", fontSize: 13, fontFamily: "inherit", outline: "none" }}
+                  />
+                  <button
+                    onClick={() => handleReEnterKey(key)}
+                    disabled={saving || !reenterValue.trim()}
+                    aria-label={t("settings_byok_keys_reenter") || "Re-enter key"}
+                    style={{ padding: "8px 14px", borderRadius: 10, background: saving || !reenterValue.trim() ? "var(--bg-secondary)" : "var(--accent-blue-dim)", border: `1px solid ${saving || !reenterValue.trim() ? "var(--border)" : "rgba(59,126,246,0.3)"}`, color: saving || !reenterValue.trim() ? "var(--text-muted)" : "var(--accent-blue-light)", fontSize: 12, fontWeight: 700, cursor: saving || !reenterValue.trim() ? "not-allowed" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
+                  >
+                    {saving ? "⏳" : t("settings_byok_keys_reenter") || "Re-enter key"}
+                  </button>
+                  <button
+                    onClick={() => { setReenterId(null); setReenterValue("") }}
+                    disabled={saving}
+                    aria-label={t("goals_cancel") || "Cancel"}
+                    style={{ padding: "8px 14px", borderRadius: 10, background: "var(--bg-secondary)", border: "1px solid var(--border)", color: "var(--text-muted)", fontSize: 12, fontWeight: 700, cursor: saving ? "not-allowed" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap" }}
+                  >
+                    {t("goals_cancel") || "Cancel"}
+                  </button>
+                </div>
+              )}
             </div>
           )
         })
