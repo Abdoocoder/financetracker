@@ -90,7 +90,20 @@ export async function POST(request: NextRequest) {
     return json({ error: 'Missing envelope fields (env/payload/body)' }, 400)
   }
   if (!isKekConfigured()) {
-    return json({ error: 'Proxy KEK is not configured on the server' }, 500)
+    // Fail loudly: a misconfigured deployment (missing BYOK_PRIVATE_KEY /
+    // BYOK_KEK_ID) must be immediately visible in the function logs, not just
+    // surfaced as an opaque 500 to the client. The specific env-var names are
+    // logged so an operator can act without digging through stack traces.
+    console.error(
+      '[byok/proxy] KEK not configured: BYOK_PRIVATE_KEY=' +
+        (process.env.BYOK_PRIVATE_KEY ? 'set' : 'MISSING') +
+        ', BYOK_KEK_ID=' +
+        (process.env.BYOK_KEK_ID ? 'set' : 'MISSING')
+    )
+    return json(
+      { error: 'Proxy KEK is not configured on the server. Check BYOK_PRIVATE_KEY / BYOK_KEK_ID in the deployment environment.' },
+      500
+    )
   }
 
   // ---- 3. Per-user rate counter (AD-5) — fail-fast 429 --------------------
