@@ -12,6 +12,7 @@ import '../../widgets/settings/assets_form.dart';
 import '../../widgets/settings/preferences_section.dart';
 import '../../widgets/settings/export_delete_section.dart';
 import '../../widgets/settings/api_keys_section.dart';
+import '../../widgets/settings/byok_keys_section.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -147,6 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   const ExportDeleteSection(),
                   const ApiKeysSection(),
+                  const ByokKeysSection(),
                   const SizedBox(height: 12),
                   const TestimonialCard(),
                   const SizedBox(height: 40),
