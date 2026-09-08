@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { usePathname } from 'next/navigation'
 import { useUser } from '@/lib/user-context'
 import { createClient } from '@/lib/supabase/client'
 import Sidebar from '@/components/layout/Sidebar'
@@ -26,7 +25,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
   const { lang } = useI18n()
   const [alertsCount, setAlertsCount] = useState(0)
-  const pathname = usePathname()
   const supabase = useMemo(() => createClient(), [])
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -60,7 +58,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       if (debounceRef.current) clearTimeout(debounceRef.current)
       supabase.removeChannel(channel)
     }
-  }, [user, pathname, fetchCount, fetchCountDebounced, supabase])
+  }, [user, fetchCount, fetchCountDebounced, supabase])
 
   return (
     <div className={styles.container} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
