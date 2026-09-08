@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useAccounts } from '@/hooks/useAccounts'
 import { SUPPORTED_PROVIDERS, type ByokProvider } from '@/lib/byok/providers'
 import { byokChat } from '@/lib/byok/client'
-import { getProviderKey, isVaultUnavailable } from '@/lib/byok/vault'
+import { getProviderKey, hasProviderKey, isVaultUnavailable } from '@/lib/byok/vault'
 import { buildChatBody, readStream, type ChatMsg } from '@/lib/byok/chat'
 import { formatAmount } from '@/lib/currency'
 
@@ -15,6 +15,7 @@ interface ByokKeyRow {
     id: string
     provider_id: string
     key_name: string | null
+    hasKey?: boolean
 }
 
 const PROVIDERS = Object.values(SUPPORTED_PROVIDERS)
@@ -51,7 +52,12 @@ export default function ChatAssistant() {
             .eq('user_id', user.id)
             .eq('is_active', true)
             .order('created_at')
-            .then(({ data }) => setByokKeys(data ?? []))
+            .then(async ({ data }) => {
+                const rows = data ?? []
+                // Fast presence check against the local vault (never decrypts).
+                const vaulted = await Promise.all(rows.map(r => hasProviderKey(r.id)))
+                setByokKeys(rows.map((r, i) => ({ ...r, hasKey: vaulted[i] })))
+            })
 
         const today = new Date()
         const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
@@ -76,7 +82,7 @@ export default function ChatAssistant() {
     }, [user, supabase])
 
     const providerKeys = useMemo(
-        () => byokKeys.filter(k => k.provider_id === providerId),
+        () => byokKeys.filter(k => k.provider_id === providerId && k.hasKey),
         [byokKeys, providerId]
     )
 
@@ -257,7 +263,9 @@ export default function ChatAssistant() {
                                 </select>
                             ) : (
                                 <span style={{ fontSize: 12, color: 'var(--accent-red-light)' }}>
-                                    {t('chat_key_none').replace('{provider}', provider.name)}{' '}
+                                    {byokKeys.some(k => k.provider_id === providerId) && !providerKeys.length
+                                        ? t('chat_key_not_local')
+                                        : t('chat_key_none').replace('{provider}', provider.name)}{' '}
                                     <Link href="/dashboard/settings" style={{ color: 'var(--accent-blue)' }}>{t('chat_setup_keys')}</Link>
                                 </span>
                             )}
