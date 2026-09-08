@@ -604,6 +604,13 @@ E2E_TEST_PASSWORD=your-password
 
 ## 📝 Changelog
 
+### v3.39.2 — 2026-09-08 *(BYOK UX Polish)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔑 **BYOK Re-enter Key Flow** | Added per-row "Re-enter key" button in Settings → BYOK Keys for keys not stored on this device (legacy rows or cross-device) — binds the raw key to the existing metadata row via the local IndexedDB vault without creating duplicate rows |
+| 💬 **Chat Vault-Aware Key Filtering** | AI Chat now filters BYOK keys by local vault availability — only shows keys with ciphertext present in this browser; displays "Keys exist but not on this device. Re-enter in Settings." when DB keys exist but none are locally available |
+
 ### v3.39.1 — 2026-09-08 *(Flutter UI Fix)*
 
 | Change | Description |
