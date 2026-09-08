@@ -110,5 +110,7 @@ export const enSettings = {
     settings_byok_keys_local: 'Key stored on this device',
     settings_byok_keys_not_local: 'Not stored on this device',
     settings_byok_keys_no_local: 'Key not stored in this browser. Re-add it here to test.',
+    settings_byok_keys_reenter: 'Re-enter key',
+    settings_byok_keys_reentered: 'Key re-entered on this device',
     settings_byok_keys_vault_unavailable: 'The local key vault could not be opened (private browsing / unsupported browser). Saving or testing keys is disabled.',
 } as const
