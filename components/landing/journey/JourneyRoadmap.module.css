@@ -1,0 +1,119 @@
+.journey {
+  padding: 80px 24px;
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.track::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  right: 28px;
+  height: 2px;
+  background: var(--border);
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  min-width: 160px;
+}
+
+.stepNum {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+  border: 2px solid;
+  transition: transform 0.2s;
+}
+
+.step:hover .stepNum {
+  transform: scale(1.1);
+}
+
+.stepNumActive {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+}
+
+.stepNumInactive {
+  background: var(--bg-card);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.stepIcon {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.stepTitle {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+}
+
+.stepDesc {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .journey {
+    padding: 60px 16px;
+  }
+
+  .track {
+    flex-direction: column;
+    gap: 32px;
+    padding-left: 32px;
+  }
+
+  .track::before {
+    top: 0;
+    bottom: 0;
+    left: 50px;
+    right: auto;
+    width: 2px;
+    height: auto;
+  }
+
+  .step {
+    flex-direction: row;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .stepNum {
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .stepIcon {
+    margin-bottom: 0;
+  }
+}

@@ -1,0 +1,150 @@
+.footer {
+  padding: 80px 24px 40px;
+  border-top: 1px solid var(--border);
+}
+
+.ctaBlock {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 64px;
+}
+
+.ctaTitle {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin: 0 0 12px 0;
+}
+
+.ctaDesc {
+  font-size: var(--fs-lg);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 28px 0;
+}
+
+.ctaActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary {
+  padding: 14px 32px;
+  border-radius: 12px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctaPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--accent-blue-shadow);
+}
+
+.ctaSecondary {
+  padding: 14px 32px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.ctaSecondary:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.footerBottom {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.footerBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footerLogo {
+  font-size: 18px;
+}
+
+.footerAppName {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.footerTagline {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.footerLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.footerLink {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footerLink:hover {
+  color: var(--text-primary);
+}
+
+.footerCopy {
+  text-align: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 60px 16px 32px;
+  }
+
+  .ctaTitle {
+    font-size: 24px;
+  }
+
+  .ctaDesc {
+    font-size: var(--fs-base);
+  }
+
+  .footerBottom {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .footerLinks {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+}

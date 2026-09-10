@@ -1,0 +1,122 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(7, 11, 20, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navInner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logoBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logoImg {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.logoText {
+  font-weight: 900;
+  font-size: 18px;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.langBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.langBtn:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.loginLink {
+  padding: 8px 18px;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.loginLink:hover {
+  color: var(--text-primary);
+}
+
+.startBtn {
+  padding: 8px 20px;
+  border-radius: 10px;
+  background: var(--accent-blue);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.startBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-blue-shadow);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .navInner {
+    padding: 0 16px;
+    height: 56px;
+  }
+
+  .logoText {
+    font-size: 16px;
+  }
+
+  .loginLink {
+    display: none;
+  }
+
+  .langBtn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .startBtn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}
