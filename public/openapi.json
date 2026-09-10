@@ -1,0 +1,594 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Fajrak Finance API",
+    "description": "External API for AI assistants, bots, and integrations. Authenticate with Personal Access Tokens (PAT) prefixed with `fjk_live_`.",
+    "version": "1.1.0",
+    "contact": {
+      "name": "Fajrak Support",
+      "url": "https://fajrak.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://fajrak.com",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development"
+    }
+  ],
+  "security": [
+    {
+      "BearerPAT": []
+    }
+  ],
+  "paths": {
+    "/api/webhook/transaction": {
+      "get": {
+        "operationId": "readTransactions",
+        "summary": "Read transactions or account balances",
+        "description": "Fetch transactions with optional filters, or retrieve account balances. Requires a PAT with the appropriate read scope.",
+        "tags": ["Transactions"],
+        "parameters": [
+          {
+            "name": "action",
+            "in": "query",
+            "description": "Which data to retrieve",
+            "schema": {
+              "type": "string",
+              "enum": ["transactions", "balances"],
+              "default": "transactions"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of transactions to return (1-50)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter by transaction type",
+            "schema": {
+              "type": "string",
+              "enum": ["income", "expense"]
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by exact category name (Arabic)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Start date filter (inclusive, YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "End date filter (inclusive, YYYY-MM-DD)",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "description": "Transactions response",
+                      "properties": {
+                        "ok": { "const": true },
+                        "transactions": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/Transaction" }
+                        },
+                        "count": { "type": "integer" }
+                      },
+                      "required": ["ok", "transactions", "count"]
+                    },
+                    {
+                      "type": "object",
+                      "description": "Balances response",
+                      "properties": {
+                        "ok": { "const": true },
+                        "accounts": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/AccountBalance" }
+                        }
+                      },
+                      "required": ["ok", "accounts"]
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": { "$ref": "#/components/headers/X-RateLimit-Limit" },
+              "X-RateLimit-Remaining": { "$ref": "#/components/headers/X-RateLimit-Remaining" },
+              "X-RateLimit-Reset": { "$ref": "#/components/headers/X-RateLimit-Reset" }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      },
+      "post": {
+        "operationId": "createTransaction",
+        "summary": "Create a transaction",
+        "description": "Create a new income or expense transaction. Requires a PAT with `create_transaction` scope.",
+        "tags": ["Transactions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTransactionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "const": true },
+                    "message": { "type": "string" },
+                    "transaction": { "$ref": "#/components/schemas/Transaction" }
+                  },
+                  "required": ["ok", "message", "transaction"]
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": { "$ref": "#/components/headers/X-RateLimit-Limit" },
+              "X-RateLimit-Remaining": { "$ref": "#/components/headers/X-RateLimit-Remaining" }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "413": {
+            "description": "Payload too large (max 1024 bytes)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/mcp": {
+      "get": {
+        "operationId": "mcpDiscovery",
+        "summary": "MCP server discovery",
+        "description": "Returns MCP server metadata. Used by clients to discover available tools.",
+        "tags": ["MCP"],
+        "responses": {
+          "200": {
+            "description": "MCP server info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string", "const": "fajrak" },
+                    "version": { "type": "string" },
+                    "capabilities": {
+                      "type": "object",
+                      "properties": {
+                        "tools": { "type": "object" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "post": {
+        "operationId": "mcpToolCall",
+        "summary": "Invoke an MCP tool",
+        "description": "Execute an MCP tool via JSON-RPC. Supports `initialize`, `tools/list`, and `tools/call` methods.",
+        "tags": ["MCP"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "JSON-RPC 2.0 request",
+                "type": "object",
+                "required": ["jsonrpc", "method", "id"],
+                "properties": {
+                  "jsonrpc": { "const": "2.0" },
+                  "method": {
+                    "type": "string",
+                    "enum": ["initialize", "tools/list", "tools/call"]
+                  },
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "name": { "type": "string", "description": "Tool name (for tools/call)" },
+                      "arguments": { "type": "object", "description": "Tool arguments (for tools/call)" }
+                    }
+                  },
+                  "id": { "description": "Request ID" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JSON-RPC response with MCP tool result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "JSON-RPC 2.0 response"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": {
+            "description": "Insufficient scope for requested tool",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "const": "insufficient_scope" },
+                    "message": { "type": "string" },
+                    "required_scope": { "type": "string" },
+                    "tool": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "429": { "$ref": "#/components/responses/RateLimited" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/api-keys/create": {
+      "post": {
+        "operationId": "createApiKey",
+        "summary": "Create a PAT",
+        "description": "Generate a new Personal Access Token. Requires an active Supabase session.",
+        "tags": ["API Keys"],
+        "security": [
+          { "SessionAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Human-readable name for this key"
+                  },
+                  "scopes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["create_transaction", "read_transactions", "read_balances"]
+                    },
+                    "default": ["create_transaction", "read_transactions", "read_balances"],
+                    "description": "Permission scopes for this key"
+                  },
+                  "rateLimitPerMin": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 10,
+                    "description": "Max requests per minute"
+                  },
+                  "expiresAt": {
+                    "type": ["string", "null"],
+                    "format": "date-time",
+                    "description": "Expiration timestamp (null = never)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Key created (full key shown only once)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string", "format": "uuid" },
+                    "name": { "type": "string" },
+                    "full_key": {
+                      "type": "string",
+                      "description": "The PAT — shown only at creation, never retrievable again"
+                    },
+                    "key_prefix": { "type": "string" },
+                    "scopes": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "rate_limit_per_min": { "type": "integer" },
+                    "expires_at": { "type": ["string", "null"] },
+                    "created_at": { "type": "string" }
+                  },
+                  "required": ["id", "name", "full_key", "key_prefix", "scopes", "rate_limit_per_min", "expires_at", "created_at"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "409": {
+            "description": "Max active keys reached (5 per user)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/api/api-keys/revoke": {
+      "post": {
+        "operationId": "revokeApiKey",
+        "summary": "Revoke a PAT",
+        "description": "Deactivate an API key permanently. Requires an active Supabase session.",
+        "tags": ["API Keys"],
+        "security": [
+          { "SessionAuth": [] }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["key_id"],
+                "properties": {
+                  "key_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "ID of the key to revoke"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Key revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": { "const": true }
+                  },
+                  "required": ["ok"]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": {
+            "description": "Key not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerPAT": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "fjk_live_...",
+        "description": "Personal Access Token. Obtain via Settings > API Keys in the Fajrak app."
+      },
+      "SessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "sb-fajrak-auth-token",
+        "description": "Supabase session cookie (for api-keys endpoints only)"
+      }
+    },
+    "schemas": {
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "type": { "type": "string", "enum": ["income", "expense"] },
+          "amount": { "type": "number", "exclusiveMinimum": 0 },
+          "category": { "type": "string", "description": "Arabic category name" },
+          "description": { "type": ["string", "null"] },
+          "transaction_date": { "type": "string", "format": "date" },
+          "account_id": { "type": ["string", "null"], "format": "uuid" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateTransactionRequest": {
+        "type": "object",
+        "required": ["type", "amount", "category", "transaction_date"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["income", "expense"]
+          },
+          "amount": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Transaction amount (must be positive)"
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Must match a valid category for the transaction type",
+            "examples": ["مواصلات", "راتب"]
+          },
+          "description": {
+            "type": ["string", "null"],
+            "maxLength": 500,
+            "description": "Optional note (HTML stripped, max 500 chars)"
+          },
+          "transaction_date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "Date in YYYY-MM-DD format"
+          },
+          "account_id": {
+            "type": ["string", "null"],
+            "format": "uuid",
+            "description": "Target account (auto-assigned if omitted)"
+          }
+        }
+      },
+      "AccountBalance": {
+        "type": "object",
+        "properties": {
+          "account_name": { "type": "string" },
+          "current_balance": { "type": "number" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" },
+          "details": {
+            "type": "object",
+            "description": "Field-level validation errors (for 400 responses)"
+          }
+        }
+      }
+    },
+    "headers": {
+      "X-RateLimit-Limit": {
+        "schema": { "type": "integer" },
+        "description": "Max requests per window"
+      },
+      "X-RateLimit-Remaining": {
+        "schema": { "type": "integer" },
+        "description": "Remaining requests in current window"
+      },
+      "X-RateLimit-Reset": {
+        "schema": { "type": "integer" },
+        "description": "Window reset time (Unix seconds)"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing, invalid, or revoked API key",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Key lacks required scope",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Rate limit exceeded",
+        "headers": {
+          "Retry-After": {
+            "schema": { "type": "integer" },
+            "description": "Seconds until the rate limit resets"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    }
+  }
+}
