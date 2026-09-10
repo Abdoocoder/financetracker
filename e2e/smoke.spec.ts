@@ -19,18 +19,18 @@ test.describe('Landing Page Smoke Test', () => {
     const heroHeading = page.getByRole('heading', { name: 'وين راح الراتب؟' });
     await expect(heroHeading).toBeVisible();
 
-    // Check for the "تسجيل الدخول" (Login) button
-    const loginBtn = page.getByRole('link', { name: 'تسجيل الدخول' });
+    // Check for the "تسجيل الدخول" (Login) button in the navbar
+    const loginBtn = page.getByRole('link', { name: 'تسجيل الدخول' }).first();
     await expect(loginBtn).toBeVisible();
 
     // Check for "ابدأ مجاناً" (Start for free) CTA
-    const startBtn = page.getByRole('link', { name: 'ابدأ مجاناً ←' }).first();
+    const startBtn = page.getByRole('link', { name: 'ابدأ مجاناً' }).first();
     await expect(startBtn).toBeVisible();
   });
 
   test('should have a working link to the login page', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: 'تسجيل الدخول' }).click();
+    await page.getByRole('link', { name: 'تسجيل الدخول' }).first().click();
     
     // Should navigate to /login
     await expect(page).toHaveURL(/\/login/);
