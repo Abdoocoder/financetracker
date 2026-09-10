@@ -22,6 +22,7 @@ export const arChat = {
     chat_error_insecure: 'يتطلب Ollama خادمًا محليًا على http://localhost:11434 أو HTTPS. هذه الصفحة تُعرض عبر ',
     chat_error_ollama_cors: 'رفض Ollama الطلب. فعّل CORS على Ollama (OLLAMA_ORIGINS) للدردشة من الويب.',
     chat_error_unauthorized: 'رُفض مفتاحك بواسطة المزوّد.',
+    chat_error_gone: 'تمت إزالة هذا النموذج أو هذه الواجهة من قِبل المزوّد (HTTP 410). اختر نموذجًا أو مزوّدًا آخر.',
     chat_error_vault: 'تعذّر فتح الخزنة المحلية للمفاتيح. أعد إضافة مفتاحك في الإعدادات.',
     chat_context_label: 'سياق مالي',
     chat_context_included: 'الأرصدة وملخص هذا الشهر مرفقان بمحادثتك.',

@@ -192,6 +192,8 @@ export default function ChatAssistant() {
             if (abort.signal.aborted) return
             if (!res.ok) {
                 if (res.status === 401 || res.status === 403) throw new Error('unauthorized')
+                // Upstream model/endpoint retired (e.g. NVIDIA NIM returns 410 Gone).
+                if (res.status === 410) throw new Error('gone')
                 // Proxy 502 → upstream rejected the malformed body; show generic + CORS hint for ollama.
                 if (provider.kind === 'clientDirect') throw new Error('ollama-cors')
                 throw new Error('generic')
@@ -203,6 +205,7 @@ export default function ChatAssistant() {
             const code = err instanceof Error ? err.message : 'generic'
             if (code === 'no-key') setError(t('chat_error_no_key'))
             else if (code === 'unauthorized') setError(t('chat_error_unauthorized'))
+            else if (code === 'gone') setError(t('chat_error_gone'))
             else if (code === 'ollama-cors') setError(t('chat_error_ollama_cors'))
             else setError(t('chat_error_generic'))
             // Drop the empty assistant bubble on failure so the user can retry.

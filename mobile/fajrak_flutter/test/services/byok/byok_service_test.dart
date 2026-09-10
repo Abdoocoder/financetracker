@@ -295,6 +295,28 @@ void main() {
       );
     });
 
+    test('proxy 410 -> gone', () async {
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-ant-test');
+      final svc = service(
+        MockClient((req) async => http.Response('{}', 410)),
+        store: store,
+      );
+
+      await expectLater(
+        svc.chat(
+          providerId: 'anthropic',
+          keyId: 'rec-1',
+          systemPrompt: 's',
+          messages: providerChat,
+          model: 'claude-sonnet-4-6',
+          onDelta: (_) {},
+        ),
+        throwsA(isA<ByokChatException>()
+            .having((e) => e.code, 'code', 'gone')),
+      );
+    });
+
     test('proxy 500 -> generic', () async {
       final store = InMemorySecureStore();
       await ByokVault(store).saveProviderKey('rec-1', 'sk-ant-test');
