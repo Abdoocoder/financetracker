@@ -22,12 +22,14 @@
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--bg-card);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
 }
 
 .cardProblem {
