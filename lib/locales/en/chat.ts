@@ -22,6 +22,7 @@ export const enChat = {
     chat_error_insecure: 'Ollama requires a local server at http://localhost:11434 or HTTPS. This page is served over ',
     chat_error_ollama_cors: 'Ollama rejected the request. Enable CORS on Ollama (OLLAMA_ORIGINS) to chat from the web.',
     chat_error_unauthorized: 'Your key was rejected by the provider.',
+    chat_error_gone: 'This model or endpoint has been removed by the provider (HTTP 410). Choose another model or provider.',
     chat_error_vault: 'The local key vault could not be opened. Re-add your key in Settings.',
     chat_context_label: 'Financial context',
     chat_context_included: 'Balances and this month\'s summary are attached to your conversation.',

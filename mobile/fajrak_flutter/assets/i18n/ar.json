@@ -960,6 +960,7 @@
   "chat_error_insecure": "يتطلب Ollama خادمًا محليًا على http://localhost:11434 أو HTTPS. هذا التطبيق يُعرض عبر ",
   "chat_error_ollama_cors": "رفض Ollama الطلب. فعّل CORS على Ollama (OLLAMA_ORIGINS) للدردشة من الويب.",
   "chat_error_unauthorized": "رُفض مفتاحك بواسطة المزوّد.",
+  "chat_error_gone": "تمت إزالة هذا النموذج أو هذه الواجهة من قِبل المزوّد (HTTP 410). اختر نموذجًا أو مزوّدًا آخر.",
   "chat_error_vault": "تعذّر فتح الخزنة المحلية للمفاتيح. أعد إضافة مفتاحك في الإعدادات.",
   "chat_error_rate_limit": "لقد وصلت إلى الحد المجاني — انتظر دقيقة ثم حاول مجددًا.",
   "chat_error_timeout": "تعطل الاتصال — تحقق من شبكتك وحاول مجددًا.",

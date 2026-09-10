@@ -236,6 +236,7 @@ class _ChatScreenState extends State<ChatScreen> {
         'insecure' => 'chat_error_insecure',
         'ollama-cors' => 'chat_error_ollama_cors',
         'unauthorized' => 'chat_error_unauthorized',
+        'gone' => 'chat_error_gone',
         'vault' => 'chat_error_vault',
         'rate-limit' => 'chat_error_rate_limit',
         'timeout' => 'chat_error_timeout',

@@ -67,9 +67,10 @@ class ByokService {
   /// Stream a provider chat completion.
   ///
   /// Throws [ByokChatException] with a stable [ByokChatException.code]:
-  /// `no-key`, `unauthorized`, `rate-limit`, `ollama-cors`, `generic`,
-  /// `timeout`. A silence gap over [stallTimeout] surfaces as `timeout` unless
-  /// [isStopped] reports true (then it is swallowed silently, T5.3).
+  /// `no-key`, `unauthorized`, `gone`, `rate-limit`, `ollama-cors`,
+  /// `generic`, `timeout`. A silence gap over [stallTimeout] surfaces as
+  /// `timeout` unless [isStopped] reports true (then it is swallowed silently,
+  /// T5.3).
   Future<void> chat({
     required String providerId,
     String? keyId,
@@ -271,6 +272,7 @@ class ByokService {
   String? _mapProxyStatus(int status) {
     if (status == 200) return null;
     if (status == 401 || status == 403) return 'unauthorized';
+    if (status == 410) return 'gone';
     if (status == 429) return 'rate-limit';
     return 'generic';
   }
