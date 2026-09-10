@@ -1,0 +1,73 @@
+/* ===================================================
+   LANDING PAGE SHARED STYLES
+   =================================================== */
+
+/* --- Glass Card --- */
+.glassCard {
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* --- Section Container --- */
+.sectionContainer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* --- Tag/Badge (section label) --- */
+.sectionTag {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 100px;
+  background: var(--accent-blue-dim);
+  border: 1px solid var(--accent-blue-border);
+  color: var(--accent-blue-light);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
+  margin-bottom: 20px;
+}
+
+/* --- Section Header --- */
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.sectionTitle {
+  font-size: 32px;
+  font-weight: var(--fw-black);
+  color: var(--text-primary);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: var(--fs-lg);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 12px 0 0 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .sectionContainer {
+    padding: 0 16px;
+  }
+
+  .sectionTitle {
+    font-size: 26px;
+  }
+
+  .sectionSubtitle {
+    font-size: var(--fs-md);
+  }
+}

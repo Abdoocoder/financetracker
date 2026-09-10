@@ -1,0 +1,146 @@
+.pricing {
+  padding: 80px 24px;
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.planCard {
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.planCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.planFeatured {
+  border-color: rgba(59, 126, 246, 0.3);
+  box-shadow: 0 0 40px rgba(59, 126, 246, 0.08);
+}
+
+.planBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 100px;
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue-light);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+
+.planName {
+  font-size: var(--fs-xl);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.planPrice {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin: 0 0 4px 0;
+}
+
+.planPriceSub {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  margin: 0 0 24px 0;
+}
+
+.planFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.planFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+  line-height: var(--lh-normal);
+}
+
+.planFeatureCheck {
+  color: var(--accent-green);
+  font-size: 14px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.planCta {
+  display: block;
+  text-align: center;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.planCtaPrimary {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.planCtaPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-blue-shadow);
+}
+
+.planCtaSecondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.planCtaSecondary:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .pricing {
+    padding: 60px 16px;
+  }
+
+  .pricingGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .planCard {
+    padding: 24px;
+  }
+
+  .planPrice {
+    font-size: 28px;
+  }
+}

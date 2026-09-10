@@ -1,0 +1,98 @@
+.problem {
+  padding: 80px 24px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.problemSide,
+.solutionSide {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.cardProblem {
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.cardSolution {
+  border-color: rgba(16, 185, 129, 0.15);
+}
+
+.cardIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.iconProblem {
+  background: var(--accent-red-dim);
+  color: var(--accent-red);
+}
+
+.iconSolution {
+  background: var(--accent-green-dim);
+  color: var(--accent-green);
+}
+
+.cardTitle {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+}
+
+.cardDesc {
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 0;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--accent-green);
+  padding: 8px 0;
+}
+
+@media (max-width: 768px) {
+  .problem {
+    padding: 60px 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .arrow {
+    transform: rotate(90deg);
+  }
+}
