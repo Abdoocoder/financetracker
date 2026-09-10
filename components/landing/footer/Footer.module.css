@@ -39,12 +39,11 @@
   font-size: var(--fs-md);
   font-weight: 700;
   text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
 
-.ctaPrimary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--accent-blue-shadow);
+.ctaPrimary:active {
+  transform: scale(0.97);
 }
 
 .ctaSecondary {
@@ -56,12 +55,23 @@
   font-size: var(--fs-md);
   font-weight: 600;
   text-decoration: none;
-  transition: border-color 0.2s, color 0.2s;
+  transition: transform 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out);
 }
 
-.ctaSecondary:hover {
-  border-color: var(--border-hover);
-  color: var(--text-primary);
+.ctaSecondary:active {
+  transform: scale(0.97);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ctaPrimary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--accent-blue-shadow);
+  }
+
+  .ctaSecondary:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+  }
 }
 
 .footerBottom {
@@ -104,11 +114,13 @@
   font-size: var(--fs-sm);
   color: var(--text-muted);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 160ms var(--ease-out);
 }
 
-.footerLink:hover {
-  color: var(--text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .footerLink:hover {
+    color: var(--text-primary);
+  }
 }
 
 .footerCopy {

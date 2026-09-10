@@ -44,11 +44,13 @@
   position: relative;
   z-index: 1;
   border: 2px solid;
-  transition: transform 0.2s;
+  transition: transform 160ms var(--ease-out);
 }
 
-.step:hover .stepNum {
-  transform: scale(1.1);
+@media (hover: hover) and (pointer: fine) {
+  .step:hover .stepNum {
+    transform: scale(1.1);
+  }
 }
 
 .stepNumActive {
