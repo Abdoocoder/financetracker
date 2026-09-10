@@ -143,4 +143,13 @@ curl -X POST http://localhost:3000/api/webhook/transaction \
 
 ---
 
+## 📎 مرجع آلي (Machine-Readable References)
+
+| الملف | الوصف | الرابط |
+|:------|:------|:-------|
+| OpenAPI 3.1 | مواصفة كاملة للـ API (Swagger/Postman compatible) | [openapi.json](https://fajrak.com/openapi.json) |
+| MCP Metadata | اكتشاف أدوات MCP للعملاء المدعومة | [/.well-known/mcp.json](https://fajrak.com/.well-known/mcp.json) |
+
+---
+
 **ملاحظة:** هذا التوثيق أولي وسيتم تحديثه مع إطلاق الإصدار v4.0. القسم الخاص بـ LLM Ecosystem (PAT / MCP / BYOK) يعكس التنفيذ الحالي في `app/api/` — ويبقى مرجع الحقيقة للمفاهيم المفصّلة في `docs/projects/llm-ecosystem_prd.md`.
