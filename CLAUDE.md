@@ -20,7 +20,9 @@ app/
 components/
   ui/             # shadcn components
   dashboard/      # StatsCards, BudgetChart, DebtProgress, InvestmentTracker
+  investments/    # WealthSimulator
   layout/         # Sidebar, Header
+  settings/       # api-keys-section, byok-keys-section, sections, section-common
 lib/
   supabase/       # client.ts, server.ts, middleware.ts
   *.ts            # utilities, hooks, i18n, firebase, currencies
