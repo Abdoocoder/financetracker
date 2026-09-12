@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 var mockFrom = jest.fn()
-var mockGetUser = jest.fn()
+var mockGetUser = jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
 jest.mock('@/lib/supabase/admin', () => ({
   createAdminClient: jest.fn(() => ({
@@ -21,9 +21,13 @@ jest.mock('@/lib/rate-limit', () => ({
 
 import { POST } from '@/app/api/push-test/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
+
+process.env.CRON_SECRET = 'test-cron-secret'
 
 function makePostRequest(body?: any, auth?: string, userId?: string) {
-  const headers: HeadersInit = { authorization: auth || 'Bearer token' }
+  const headers: HeadersInit = {}
+  if (auth) Object.assign(headers, { authorization: auth })
   const bodyInit = body ? JSON.stringify(body) : undefined
   return new NextRequest('http://localhost/api/push-test', {
     method: 'POST',
@@ -33,8 +37,8 @@ function makePostRequest(body?: any, auth?: string, userId?: string) {
 }
 
 function setupMock({
-  userId: explicitUserId,
-} = {}) {
+  explicitUserId,
+}: { explicitUserId?: string } = {}) {
   mockFrom.mockClear()
   ;(sendPushToUser as jest.Mock).mockClear()
 

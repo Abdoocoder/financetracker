@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 var mockFrom = jest.fn()
-var mockGetUser = jest.fn()
+var mockGetUser = jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
 jest.mock('@/lib/supabase/admin', () => ({
   createAdminClient: jest.fn(() => ({
@@ -18,25 +18,29 @@ jest.mock('@/lib/rate-limit', () => ({
 import { POST, DELETE } from '@/app/api/push-subscribe/route'
 import { NextRequest } from 'next/server'
 
-function makePostRequest(body: any, auth: string = 'Bearer token') {
+function makePostRequest(body: any, auth?: string) {
+  const headers: Record<string, string> = {}
+  if (auth) headers.authorization = auth
   return new NextRequest('http://localhost/api/push-subscribe', {
     method: 'POST',
-    headers: { authorization: auth },
+    headers,
     body: JSON.stringify(body),
   })
 }
 
-function makeDeleteRequest(body: any, auth: string = 'Bearer token') {
+function makeDeleteRequest(body: any, auth?: string) {
+  const headers: Record<string, string> = {}
+  if (auth) headers.authorization = auth
   return new NextRequest('http://localhost/api/push-subscribe', {
     method: 'DELETE',
-    headers: { authorization: auth },
+    headers,
     body: JSON.stringify(body),
   })
 }
 
 function setupMock({
-  profiles = [],
-  users = [],
+  profiles = [] as any[],
+  users = [] as any[],
 } = {}) {
   mockFrom.mockClear()
 
@@ -71,14 +75,15 @@ describe('POST /api/push-subscribe', () => {
   })
 
   it('returns 401 with invalid token', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null }, error: null })
     const req = makePostRequest({}, 'Bearer invalid')
     const res = await POST(req)
     expect(res.status).toBe(401)
   })
 
   it('stores FCM subscription when type=fcm', async () => {
-    setupMock({ profiles: [{ id: 'u1', full_name: 'أحمد علي' }], users: [{ id: 'u1' }] })
-    const req = makePostRequest({ fcmToken: 'token123', type: 'fcm' })
+    setupMock({ profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[], users: [{ id: 'u1' }] as any[] })
+    const req = makePostRequest({ fcmToken: 'token123', type: 'fcm' }, 'Bearer valid-user-token')
     const res = await POST(req)
     const json = await res.json()
     expect(json.ok).toBe(true)
@@ -86,11 +91,11 @@ describe('POST /api/push-subscribe', () => {
   })
 
   it('stores web push subscription', async () => {
-    setupMock({ profiles: [{ id: 'u1', full_name: 'أحمد علي' }], users: [{ id: 'u1' }] })
+    setupMock({ profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[], users: [{ id: 'u1' }] as any[] })
     const req = makePostRequest({
       endpoint: 'https://example.com/push',
       keys: { p256dh: 'dhkey', auth: 'authkey' },
-    })
+    }, 'Bearer valid-user-token')
     const res = await POST(req)
     const json = await res.json()
     expect(json.ok).toBe(true)
@@ -98,7 +103,7 @@ describe('POST /api/push-subscribe', () => {
   })
 
   it('returns 400 when missing endpoint/keys', async () => {
-    const req = makePostRequest({ endpoint: '', keys: {} })
+    const req = makePostRequest({ endpoint: '', keys: {} }, 'Bearer valid-user-token')
     const res = await POST(req)
     expect(res.status).toBe(400)
   })
@@ -112,8 +117,8 @@ describe('DELETE /api/push-subscribe', () => {
   })
 
   it('deletes subscription successfully', async () => {
-    setupMock({ profiles: [{ id: 'u1', full_name: 'أحمد علي' }], users: [{ id: 'u1' }] })
-    const req = makeDeleteRequest({ endpoint: 'test-endpoint' })
+    setupMock({ profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[], users: [{ id: 'u1' }] as any[] })
+    const req = makeDeleteRequest({ endpoint: 'test-endpoint' }, 'Bearer valid-user-token')
     const res = await DELETE(req)
     const json = await res.json()
     expect(json.ok).toBe(true)

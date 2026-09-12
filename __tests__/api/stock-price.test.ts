@@ -14,9 +14,16 @@ jest.mock('@/lib/supabase/admin', () => ({
       }),
     },
   })),
-})
+}))
+
+const mockFetch = jest.fn()
+global.fetch = mockFetch
 
 describe('GET /api/stock-price', () => {
+  beforeEach(() => {
+    mockFetch.mockReset()
+  })
+
   // Mock fetch implementations
   const cryptoPrice = { json: async () => ({ bitcoin: { usd: 45000 } }) }
   const twelvedataPrice = { json: async () => ({ price: '150.25' }) }
@@ -45,9 +52,7 @@ describe('GET /api/stock-price', () => {
   })
 
   it('returns crypto price from CoinGecko', async () => {
-    ;(global.fetch = jest.fn().mockImplementationOnce(() =>
-      Promise.resolve({ json: async () => ({ bitcoin: { usd: 45000 } }) })
-    ))
+    mockFetch.mockResolvedValueOnce({ json: async () => ({ bitcoin: { usd: 45000 } }) })
 
     const req = new NextRequest('http://localhost/api/stock-price?symbol=BTC', {
       headers: { authorization: 'Bearer token' }
@@ -60,10 +65,8 @@ describe('GET /api/stock-price', () => {
   })
 
   it('stock price falls back to TwelveData', async () => {
-    ;(global.fetch = jest.fn()
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({}) })) // crypto null
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({ price: '150.25' }) })) // twelvedata
-    )
+    mockFetch
+      .mockResolvedValueOnce({ json: async () => ({ price: '150.25' }) }) // twelvedata
 
     const req = new NextRequest('http://localhost/api/stock-price?symbol=AAPL', {
       headers: { authorization: 'Bearer token' }
@@ -75,13 +78,9 @@ describe('GET /api/stock-price', () => {
   })
 
   it('yahoo fallback when crypto and twelvedata fail', async () => {
-    ;(global.fetch = jest.fn()
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({}) })) // crypto null
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({}) })) // twelvedata null
-      .mockImplementationOnce(() =>
-        Promise.resolve({ json: async () => ({ chart: { result: [{ meta: { regularMarketPrice: 2800 } }] } } }))
-      ) // yahoo
-    )
+    mockFetch
+      .mockResolvedValueOnce({ json: async () => ({}) }) // twelvedata null
+      .mockResolvedValueOnce({ json: async () => ({ chart: { result: [{ meta: { regularMarketPrice: 2800 } }] } }) }) // yahoo
 
     const req = new NextRequest('http://localhost/api/stock-price?symbol=GOOG', {
       headers: { authorization: 'Bearer token' }
@@ -93,11 +92,9 @@ describe('GET /api/stock-price', () => {
   })
 
   it('returns 500 when all providers fail', async () => {
-    ;(global.fetch = jest.fn()
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({}) })) // crypto
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({}) })) // twelvedata
-      .mockImplementationOnce(() => Promise.resolve({ json: async () => ({}) })) // yahoo
-    )
+    mockFetch
+      .mockResolvedValueOnce({ json: async () => ({}) }) // twelvedata
+      .mockResolvedValueOnce({ json: async () => ({}) }) // yahoo
 
     const req = new NextRequest('http://localhost/api/stock-price?symbol=UNKNOWN', {
       headers: { authorization: 'Bearer token' }
