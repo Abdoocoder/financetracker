@@ -20,17 +20,34 @@ jest.mock('@/lib/cron-auth', () => ({
 
 import { GET } from '@/app/api/evening-reminder/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
 function makeGetRequest(url = 'http://localhost/api/evening-reminder') {
   return new NextRequest(url)
 }
 
+function chain(data: any = { data: [], error: null, count: 0 }) {
+  const obj: any = {
+    then: (resolve: any) => Promise.resolve(data).then(resolve),
+    catch: (reject: any) => Promise.resolve(data).catch(reject),
+    finally: (fn: any) => Promise.resolve(data).finally(fn),
+  }
+  const methods = [
+    'select', 'insert', 'update', 'delete', 'upsert',
+    'eq', 'neq', 'gt', 'gte', 'lt', 'lte',
+    'order', 'limit', 'single', 'maybeSingle',
+    'is', 'in', 'match', 'textSearch', 'head',
+  ]
+  methods.forEach(m => { obj[m] = () => chain(data) })
+  return obj
+}
+
 function setupMock({
-  profiles = [],
-  transactions = [],
-  debts = [],
-  investments = [],
-  goals = [],
+  profiles = [] as any[],
+  transactions = [] as any[],
+  debts = [] as any[],
+  investments = [] as any[],
+  goals = [] as any[],
   alertsCount = 0,
 } = {}) {
   mockFrom.mockClear()
@@ -51,22 +68,6 @@ function setupMock({
     }
     return chain()
   })
-}
-
-function chain(data: any = { data: [], error: null }) {
-  const obj: any = {
-    then: (resolve: any) => Promise.resolve(data).then(resolve),
-    catch: (reject: any) => Promise.resolve(data).catch(reject),
-    finally: (fn: any) => Promise.resolve(data).finally(fn),
-  }
-  const methods = [
-    'select', 'insert', 'update', 'delete', 'upsert',
-    'eq', 'neq', 'gt', 'gte', 'lt', 'lte',
-    'order', 'limit', 'single', 'maybeSingle',
-    'is', 'in', 'match', 'textSearch', 'head',
-  ]
-  methods.forEach(m => { obj[m] = () => chain(data) })
-  return obj
 }
 
 describe('GET /api/evening-reminder', () => {
@@ -91,7 +92,7 @@ describe('GET /api/evening-reminder', () => {
       profiles: [
         { id: 'u1', full_name: 'أحمد علي' },
         { id: 'u2', full_name: 'محمد خالد' },
-      ],
+      ] as any[],
     })
     const res = await GET(makeGetRequest())
     const json = await res.json()
@@ -102,8 +103,8 @@ describe('GET /api/evening-reminder', () => {
 
   it('sends reminders with correct messages for users with 0 transactions', async () => {
     setupMock({
-      profiles: [{ id: 'u1', full_name: 'أحمد علي' }],
-      transactions: [],
+      profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[],
+      transactions: [] as any[],
     })
     const res = await GET(makeGetRequest())
     const json = await res.json()

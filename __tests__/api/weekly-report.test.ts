@@ -20,16 +20,17 @@ jest.mock('@/lib/cron-auth', () => ({
 
 import { GET } from '@/app/api/weekly-report/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
 function makeGetRequest(url = 'http://localhost/api/weekly-report') {
   return new NextRequest(url)
 }
 
 function setupMock({
-  profiles = [],
-  thisWeekExpenses = [],
-  lastWeekExpenses = [],
-  categories = [],
+  profiles = [] as any[],
+  thisWeekExpenses = [] as any[],
+  lastWeekExpenses = [] as any[],
+  categories = [] as any[],
 } = {}) {
   mockFrom.mockClear()
   ;(sendPushToUser as jest.Mock).mockClear()
@@ -80,10 +81,10 @@ describe('GET /api/weekly-report', () => {
     const weekAgo = '2026-09-03'
     const twoWeeksAgo = '2026-08-27'
     setupMock({
-      profiles: [{ id: 'u1', full_name: 'أحمد علي', monthly_income: 1000 }],
-      thisWeekExpenses: [{ amount: 100 }, { amount: 200 }],
-      lastWeekExpenses: [{ amount: 150 }, { amount: 250 }],
-      categories: [],
+      profiles: [{ id: 'u1', full_name: 'أحمد علي', monthly_income: 1000 }] as any[],
+      thisWeekExpenses: [{ amount: 100 }, { amount: 200 }] as any[],
+      lastWeekExpenses: [{ amount: 150 }, { amount: 250 }] as any[],
+      categories: [] as any[],
     })
     const res = await GET(makeGetRequest())
     const json = await res.json()

@@ -55,8 +55,8 @@ describe('verifyCronAuth', () => {
     try {
       verifyCronAuth(req)
       expect(true).toBe(false) // should not reach here
-    } catch (e) {
-      expect(e.message).toContain('CRON_SECRET is not set')
+    } catch (e: unknown) {
+      expect((e as Error).message).toContain('CRON_SECRET is not set')
     } finally {
       if (orig !== undefined) process.env.CRON_SECRET = orig
     }

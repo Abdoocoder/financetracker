@@ -20,14 +20,15 @@ jest.mock('@/lib/cron-auth', () => ({
 
 import { GET } from '@/app/api/zakat-reminder/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
 function makeGetRequest(url = 'http://localhost/api/zakat-reminder') {
   return new NextRequest(url)
 }
 
 function setupMock({
-  profiles = [],
-  investments = [],
+  profiles = [] as any[],
+  investments = [] as any[],
 } = {}) {
   mockFrom.mockClear()
   ;(sendPushToUser as jest.Mock).mockClear()
@@ -79,7 +80,7 @@ describe('GET /api/zakat-reminder', () => {
     const daysLeft = Math.ceil((haulDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000))
 
     setupMock({
-      profiles: [{ id: 'u1', full_name: 'أحمد علي' }],
+      profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[],
       investments: [
         {
           id: 'inv1',
@@ -89,7 +90,7 @@ describe('GET /api/zakat-reminder', () => {
           current_price: 50,
           created_at: createdAt.toISOString(),
         },
-      ],
+      ] as any[],
     })
 
     // Mock the daysLeft check - we need daysLeft to be 30, 7, or 0

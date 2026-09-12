@@ -25,6 +25,7 @@ jest.mock('@/lib/cron-auth', () => ({
 
 import { POST } from '@/app/api/push-send/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
 function makePostRequest(body: any, cronAuth = true) {
   const headers: HeadersInit = {
