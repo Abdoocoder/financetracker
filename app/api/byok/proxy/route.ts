@@ -34,7 +34,7 @@ import { unwrapProviderKey, zeroBytes, isKekConfigured } from '@/lib/byok/envelo
 
 // Per-request info logs (key-free body stats + key-destroy confirmation) are
 // useful during development/troubleshooting but noisy in production. Gate them
-// behind BYOK_PROXY_DEBUG=1. Error logs always emit (misconfig/RLS/upstream).
+// behind BYOK_PROXY_DEBUG=true. Error logs always emit (misconfig/RLS/upstream).
 const BYOK_PROXY_DEBUG = process.env.BYOK_PROXY_DEBUG === 'true'
 
 // Streaming LLM responses can run long. Extend the function max duration and

@@ -480,6 +480,9 @@ CRON_SECRET=
 # External APIs
 TWELVE_DATA_API_KEY=
 
+# BYOK LLM Proxy (optional verbose logging)
+BYOK_PROXY_DEBUG=
+
 # Sentry
 SENTRY_AUTH_TOKEN=
 NEXT_PUBLIC_SENTRY_DSN=
