@@ -4,7 +4,7 @@
 Fajrak is a Flutter finance tracker with 22 screens, sharing Supabase backend and Firebase with a Next.js web app for real-time sync. Core logic uses Supabase RPCs for accurate calculations across platforms.
 
 - **State Management**: Provider with `AppState` class for theme, language, and unread alerts (`lib/app_state.dart`)
-- **Navigation**: Named routes in `main.dart` + IndexedStack in `MainScreen` for bottom tabs
+- **Navigation**: Named routes in `main.dart` (now also imports chat screen for BYOK AI feature) + IndexedStack in `MainScreen` for bottom tabs
 - **Data Flow**: Services (`lib/services/`) call Supabase directly; screens consume via Provider or direct calls
 - **Localization**: `easy_localization` with JSON files (`assets/i18n/ar.json`, `assets/i18n/en.json`); use `.tr()` for keys like `'nav_dashboard'.tr()`
 
