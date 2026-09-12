@@ -131,7 +131,7 @@ make doctor
 | Routes | `app/**/page.tsx` |
 | API routes | `app/api/**/route.ts` |
 | Hooks (data) | `hooks/` |
-| UI components | `components/ui/`, `components/dashboard/`, `components/layout/` |
+- **UI components** | `components/ui/`, `components/dashboard/`, `components/investments/`, `components/layout/`, `components/settings/`
 | Types | `types/` |
 | i18n | `lib/i18n.tsx`, `lib/i18n-server.ts` |
 | Currency | `lib/currencies.ts`, `lib/currency.ts`, `lib/detectCurrency.ts` |

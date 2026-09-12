@@ -14,6 +14,9 @@ financeapp/
 │   │   └── alerts/page.tsx
 │   ├── api/
 │   │   ├── alerts/route.ts
+│   │   ├── byok/
+│   │   │   └── proxy/
+│   │   │       └── route.ts
 │   │   └── cron/route.ts
 │   ├── layout.tsx
 │   └── page.tsx (landing)
@@ -25,9 +28,16 @@ financeapp/
 │   │   ├── DebtProgress.tsx
 │   │   ├── InvestmentTracker.tsx
 │   │   └── AlertBanner.tsx
-│   └── layout/
-│       ├── Sidebar.tsx
-│       └── Header.tsx
+│   ├── investments/
+│   │   └── wealth-simulator.tsx
+│   ├── layout/
+│   │   ├── Sidebar.tsx
+│   │   └── Header.tsx
+│   └── settings/
+│       ├── section-common.tsx
+│       ├── sections.tsx
+│       ├── api-keys-section.tsx
+│       └── byok-keys-section.tsx
 ├── lib/
 │   ├── supabase/
 │   │   ├── client.ts
