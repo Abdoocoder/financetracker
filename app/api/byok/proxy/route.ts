@@ -32,6 +32,11 @@ import {
 } from '@/lib/byok/types'
 import { unwrapProviderKey, zeroBytes, isKekConfigured } from '@/lib/byok/envelope'
 
+// Per-request info logs (key-free body stats + key-destroy confirmation) are
+// useful during development/troubleshooting but noisy in production. Gate them
+// behind BYOK_PROXY_DEBUG=1. Error logs always emit (misconfig/RLS/upstream).
+const BYOK_PROXY_DEBUG = process.env.BYOK_PROXY_DEBUG === 'true'
+
 // Streaming LLM responses can run long. Extend the function max duration and
 // force dynamic so we never cache the proxied body.
 export const dynamic = 'force-dynamic'
@@ -156,11 +161,13 @@ export async function POST(request: NextRequest) {
     else if (provider.auth.kind === 'x-goog-api-key') headers.set('x-goog-api-key', key)
 
     // Key-free structured log: body size + sha-256 hash, NEVER the key/headers.
-    const bodyHash = createHash('sha256').update(keyBuf).digest('hex')
-    console.log('[byok/proxy] forwarding', JSON.stringify({
-      userId: user.id, providerId: provider.id, stream: !!reqBody.stream,
-      bodyBytes: keyBuf.length, bodySha256: bodyHash, ms: Date.now() - started,
-    }))
+    if (BYOK_PROXY_DEBUG) {
+      const bodyHash = createHash('sha256').update(keyBuf).digest('hex')
+      console.log('[byok/proxy] forwarding', JSON.stringify({
+        userId: user.id, providerId: provider.id, stream: !!reqBody.stream,
+        bodyBytes: keyBuf.length, bodySha256: bodyHash, ms: Date.now() - started,
+      }))
+    }
 
     // ---- 6. Forward verbatim ----------------------------------------------
     const upstream = await fetch(provider.baseUrl, {
@@ -234,6 +241,8 @@ export async function POST(request: NextRequest) {
     zeroBytes(Buffer.from(reqBody.body, 'base64'))
     // `key` is a JS string (immutable) — we can't zero it, but it is not
     // retained, cached, or persisted anywhere. Log is key-free.
-    console.log('[byok/proxy] key destroyed', JSON.stringify({ userId: user.id, ms: Date.now() - started }))
+    if (BYOK_PROXY_DEBUG) {
+      console.log('[byok/proxy] key destroyed', JSON.stringify({ userId: user.id, ms: Date.now() - started }))
+    }
   }
 }
