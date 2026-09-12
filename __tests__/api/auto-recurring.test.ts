@@ -20,33 +20,18 @@ jest.mock('@/lib/cron-auth', () => ({
 }))
 
 jest.mock('@/lib/timezone', () => ({
-  getLocalNow: jest.fn(),
+  getLocalNow: () => mockGetLocalNow() ?? new Date('2026-09-10T06:00:00Z'),
 }))
 
 import { GET } from '@/app/api/auto-recurring/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
 function makeGetRequest(url = 'http://localhost/api/auto-recurring') {
   return new NextRequest(url)
 }
 
-function setupMock({
-  profiles = [],
-  transactions = [],
-  savingsGoals = [],
-} = {}) {
-  mockFrom.mockClear()
-  ;(sendPushToUser as jest.Mock).mockClear()
-  mockGetLocalNow.mockClear()
-
-  mockFrom.mockImplementation((table: string) => {
-    if (table === 'profiles') return chain({ data: profiles, error: null })
-    if (table === 'transactions') return chain({ data: transactions, error: null })
-    if (table === 'savings_goals') return chain({ data: savingsGoals, error: null })
-    return chain()
-  })
-}
-
+// Chain proxy that supports fluent query building and resolves to `data` when awaited
 function chain(data: any = { data: [], error: null }) {
   const obj: any = {
     then: (resolve: any) => Promise.resolve(data).then(resolve),
@@ -61,6 +46,23 @@ function chain(data: any = { data: [], error: null }) {
   ]
   methods.forEach(m => { obj[m] = () => chain(data) })
   return obj
+}
+
+function setupMock({
+  profiles = [] as any[],
+  transactions = [] as any[],
+  savingsGoals = [] as any[],
+} = {}) {
+  mockFrom.mockClear()
+  ;(sendPushToUser as jest.Mock).mockClear()
+  mockGetLocalNow.mockClear()
+
+  mockFrom.mockImplementation((table: string) => {
+    if (table === 'profiles') return chain({ data: profiles, error: null })
+    if (table === 'transactions') return chain({ data: transactions, error: null })
+    if (table === 'savings_goals') return chain({ data: savingsGoals, error: null })
+    return chain()
+  })
 }
 
 describe('GET /api/auto-recurring', () => {
@@ -81,18 +83,19 @@ describe('GET /api/auto-recurring', () => {
     const res = await GET(makeGetRequest())
     const json = await res.json()
     expect(json.ok).toBe(true)
-    expect(json.sent).toBe(0)
+    expect(json.auto).toBe(0)
+    expect(json.reminders).toBe(0)
   })
 
   it('processes recurring transactions for users', async () => {
     setupMock({
-      profiles: [{ id: 'u1', full_name: 'أحمد علي' }],
-      transactions: [],
-      savingsGoals: [],
+      profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[],
+      transactions: [] as any[],
+      savingsGoals: [] as any[],
     })
     const res = await GET(makeGetRequest())
     const json = await res.json()
     expect(json.ok).toBe(true)
-    expect(json.sent).toBeGreaterThanOrEqual(0)
+    expect(json.auto).toBeGreaterThanOrEqual(0)
   })
 })

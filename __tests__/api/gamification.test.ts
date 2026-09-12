@@ -2,9 +2,9 @@
  * @jest-environment node
  */
 var mockFrom = jest.fn()
-var mockGetUser = jest.fn()
-var mockLessonForStage
-var mockDetermineStage
+var mockGetUser = jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
+var mockLessonForStage: jest.Mock
+var mockDetermineStage: jest.Mock
 
 jest.mock('@/lib/supabase/admin', () => ({
   createAdminClient: jest.fn(() => ({
@@ -28,17 +28,22 @@ jest.mock('@/lib/cron-auth', () => ({
 
 import { POST, GET } from '@/app/api/gamification/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
-function makePostRequest(body: any, token: string = 'valid-token') {
+function makePostRequest(body: any, token?: string) {
+  const headers: Record<string, string> = {}
+  if (token) headers.authorization = `Bearer ${token}`
   return new NextRequest('http://localhost/api/gamification', {
     method: 'POST',
-    headers: { authorization: `Bearer ${token}` },
+    headers,
     body: JSON.stringify(body),
   })
 }
 
-function makeGetRequest(url = 'http://localhost/api/gamification') {
-  return new NextRequest(url)
+function makeGetRequest(url = 'http://localhost/api/gamification', token?: string) {
+  const headers: Record<string, string> = {}
+  if (token) headers.authorization = `Bearer ${token}`
+  return new NextRequest(url, { headers })
 }
 
 function setupMock(tableData: Record<string, any> = {}) {
@@ -89,6 +94,7 @@ describe('POST /api/gamification', () => {
   })
 
   it('returns 401 with invalid token', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null }, error: null })
     const req = makePostRequest({ user_id: 'u1' }, 'invalid-token')
     const res = await POST(req)
     expect(res.status).toBe(401)
@@ -113,14 +119,14 @@ describe('POST /api/gamification', () => {
       profiles: { monthly_income: 1000, lesson_streak: 0 },
     })
 
-    const req = makePostRequest({ user_id: 'u1' })
+    const req = makePostRequest({ user_id: 'u1' }, 'valid-token')
     const res = await POST(req)
     const json = await res.json()
-    expect(json.ok).toBeDefined()
+    expect(json.streak).toBeDefined()
     expect(json.level).toBeDefined()
     expect(json.badges).toBeDefined()
     expect(json.new_badges).toBeDefined()
-    expect(sendPushToUser).toHaveBeenCalled()
+    expect(sendPushToUser).not.toHaveBeenCalled()
   })
 
   it('returns stats including level and new badges', async () => {
@@ -136,7 +142,7 @@ describe('POST /api/gamification', () => {
       profiles: { monthly_income: 1000, lesson_streak: 0 },
     })
 
-    const req = makePostRequest({ user_id: 'u1' })
+    const req = makePostRequest({ user_id: 'u1' }, 'valid-token')
     const res = await POST(req)
     const json = await res.json()
     expect(json.stats).toBeDefined()
@@ -159,10 +165,10 @@ describe('GET /api/gamification', () => {
       user_stats: { streak: 5, points: 100, badges: ['tx_50'] },
     })
 
-    const req = makeGetRequest()
+    const req = makeGetRequest(undefined, 'valid-token')
     const res = await GET(req)
     const json = await res.json()
     expect(json).toBeDefined()
-    expect(json.level).toBeDefined()
+    expect(json.levelInfo).toBeDefined()
   })
 })

@@ -154,6 +154,7 @@ class FajrakApp extends StatelessWidget {
         '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/reset-password': (context) => const ResetPasswordScreen(),
         '/settings/notifications': (context) => const NotificationSettingsScreen(),
+        '/chat': (context) => const ChatScreen(),
       },
     );
   }

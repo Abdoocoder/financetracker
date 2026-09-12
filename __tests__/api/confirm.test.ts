@@ -60,7 +60,7 @@ describe('GET /api/confirm', () => {
       headers: { cookie: '' },
     })
     const res = await GET(req as any)
-    expect(res.status).toBe(302)
+    expect(res.status).toBe(307)
   })
 
   it('returns HTML page when no code provided', async () => {

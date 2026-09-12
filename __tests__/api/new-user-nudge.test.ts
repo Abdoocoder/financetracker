@@ -20,23 +20,10 @@ jest.mock('@/lib/cron-auth', () => ({
 
 import { GET } from '@/app/api/new-user-nudge/route'
 import { NextRequest } from 'next/server'
+import { sendPushToUser } from '@/lib/push-send'
 
 function makeGetRequest(url = 'http://localhost/api/new-user-nudge') {
   return new NextRequest(url)
-}
-
-function setupMock({
-  transactions = [],
-  alertsCount = 0,
-} = {}) {
-  mockFrom.mockClear()
-  ;(sendPushToUser as jest.Mock).mockClear()
-
-  mockFrom.mockImplementation((table: string) => {
-    if (table === 'profiles') return chain({ data: [], error: null })
-    if (table === 'transactions') return chain({ data: transactions, error: null })
-    return chain()
-  })
 }
 
 function chain(data: any = { data: [], error: null }) {
@@ -53,6 +40,20 @@ function chain(data: any = { data: [], error: null }) {
   ]
   methods.forEach(m => { obj[m] = () => chain(data) })
   return obj
+}
+
+function setupMock({
+  transactions = [] as any[],
+  alertsCount = 0,
+} = {}) {
+  mockFrom.mockClear()
+  ;(sendPushToUser as jest.Mock).mockClear()
+
+  mockFrom.mockImplementation((table: string) => {
+    if (table === 'profiles') return chain({ data: [], error: null })
+    if (table === 'transactions') return chain({ data: transactions, error: null })
+    return chain()
+  })
 }
 
 describe('GET /api/new-user-nudge', () => {
@@ -79,7 +80,7 @@ describe('GET /api/new-user-nudge', () => {
       transactions: [
         { user_id: 'u1', type: 'expense', transaction_date: yesterday },
         { user_id: 'u2', type: 'expense', transaction_date: yesterday },
-      ],
+      ] as any[],
     })
     const res = await GET(makeGetRequest())
     const json = await res.json()
