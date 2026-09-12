@@ -17,6 +17,7 @@ import 'screens/auth/register_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
+import 'screens/chat/chat_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/settings/notification_settings_screen.dart';
 import 'services/notification_service.dart';
