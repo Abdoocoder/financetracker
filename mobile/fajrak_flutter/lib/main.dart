@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,7 +33,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  // Edge-to-edge is the automatic default since Flutter 3.27 on
+  // Android SDK 35+; native enableEdgeToEdge() in MainActivity.kt
+  // handles the window insets configuration.
 
   // Global Error Handling — set up before anything async
   FlutterError.onError = (details) {
