@@ -1,7 +1,7 @@
 /**
  * API Key management for external integrations.
  *
- * Keys follow the format: fjk_live_<48-hex-chars>
+ * Keys follow the format: fjk_live_<96-hex-chars>
  * Stored as SHA-256 hashes — the full key is shown only once at creation.
  *
  * SERVER-ONLY — import only from API route handlers.
