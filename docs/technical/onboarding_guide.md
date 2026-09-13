@@ -10,14 +10,14 @@
 - **Web** — Next.js 16 (App Router) + React 19 + TypeScript (strict)
 - **Mobile** — Flutter (`mobile/fajrak_flutter/`), name *Fajrak*
 
-Current version: `3.39.1+50` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency **KWD** (per-user overridable via `profiles`).
+Current version: `3.40.0+51` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency **KWD** (per-user overridable via `profiles`).
 
 ## 2. High-level architecture
 
 ```
                  ┌───────────────────────────────────────────────┐
                  │                    Supabase                    │
-                 │   PostgreSQL (19 tables, RLS enforced)         │
+                 │   PostgreSQL (28 tables, RLS enforced)         │
                  │   Auth (Supabase Auth)                         │
                  │   Realtime (alerts count etc.)                 │
                  └───────────────┬───────────────────────────────┘
@@ -41,6 +41,8 @@ Current version: `3.39.1+50` (see `mobile/fajrak_flutter/pubspec.yaml`). Default
 - **Soft delete** — `deleted_at` columns + sync RPCs.
 - **Multi-currency** — 45+ currencies (`lib/currencies.ts`, `currency.ts`, `detectCurrency.ts`).
 - **3-tier notifications** — Web Push (Firebase), in-app alerts, Vercel cron jobs.
+- **Auth for non-session clients** — external agents/MCP/webhooks authenticate with per-user PATs (`fjk_live_…`, see `docs/technical/api_integration_guide.md`), cron jobs with a shared `CRON_SECRET`; the BYOK proxy accepts either the web session cookie or a Supabase JWT (`Authorization: Bearer …`).
+- **BYOK (Bring-Your-Own-Key)** — user's LLM keys live only on their device; per request the key is wrapped as an AD-4 envelope (`payload` = AES-GCM with an ephemeral key, `env` = that ephemeral key RSA-OAEP-wrapped to the server's public key) and only the server's RSA private key can unwrap it. Providers are SSRF-allowlisted in `lib/byok/providers.ts`; the thin proxy (`app/api/byok/proxy/route.ts`) never parses the body (base64 passthrough) and rate-limits per user (30/min) via `bump_proxy_usage()`. Mobile mirrors this in `services/byok/` (flutter_secure_storage vault + `buildEnvelope`).
 
 ## 3. Key entry points
 
@@ -91,11 +93,11 @@ lib/supabase/
 
 ## 8. Database map
 
-19 tables (verified against `create table` occurrences in migrations). Migrations live in `supabase/migrations/` — **10 top-level files (`042`–`051`)** plus a `legacy/` folder holding the older `001`–`041` set (**42 files**). Migrations are **sequentially numbered — add a new one, never edit existing**.
+19+ tables (verified against migrations). Migrations live in `supabase/migrations/` — **10 top-level files** (`042`, `043`, plus eight dated `2026-09xx` hardening migrations) plus a `legacy/` folder holding the older `001`–`041` set (**42 files**). Migrations are **sequentially numbered — add a new one, never edit existing**. Newer migrations use dated `YYYYMMDDHHMMSS_name.sql` names rather than the old `NNN_name.sql` scheme.
 
 ## 9. Testing
 
-- **Jest 30 / jsdom** — 37 suites / 443 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing. Coverage ≈31.9% statements.
+- **Jest / jsdom** — 56 suites / 524 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing. Coverage ≈45% statements / 32% branches.
 - **Playwright** — `e2e/` (smoke + auth-flow + `transaction-management` all passing). Authenticated specs need a test account via `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in `.env.local`; `globalSetup` builds `e2e/.auth/user.json` automatically.
 - **Flutter** — `make doctor` (analyze + test, zero issues required).
 - Shared Supabase mock: `chainProxy` pattern in `__tests__/hooks/`.
@@ -133,7 +135,8 @@ make doctor
 | Hooks (data) | `hooks/` |
 - **UI components** | `components/ui/`, `components/dashboard/`, `components/investments/`, `components/layout/`, `components/settings/`
 | Types | `types/` |
-| i18n | `lib/i18n.tsx`, `lib/i18n-server.ts` |
+| i18n | `lib/i18n.tsx`, `lib/i18n-server.ts`, translations in `lib/locales/{ar,en}/` (per-domain files merged in `index.ts`) |
+| Auth (PATs / cron / BYOK) | `lib/api-keys.ts`, `lib/cron-auth.ts`, `lib/byok/` (envelope.ts **server-only**, providers.ts SSRF allowlist, types.ts wire contract) |
 | Currency | `lib/currencies.ts`, `lib/currency.ts`, `lib/detectCurrency.ts` |
 | Supabase clients | `lib/supabase/` |
 | Migrations | `supabase/migrations/` |

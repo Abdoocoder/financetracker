@@ -607,7 +607,7 @@ E2E_TEST_PASSWORD=your-password
 
 ## 📝 Changelog
 
-### v3.39.2 — 2026-09-08 *(BYOK UX Polish)*
+### v3.40.0 — 2026-09-08 *(BYOK UX Polish)*
 
 | Change | Description |
 |:-------|:------------|
