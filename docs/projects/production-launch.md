@@ -33,26 +33,19 @@
 
 ## 📋 Phase 1 — Platform Configuration (Week 1)
 
-### 1.1 iOS Project Setup
+### 1.1 iOS Project Setup — *Deferred (build on Mac when needed)*
 ```bash
-cd /home/ubuntu/financetracker/mobile/fajrak_flutter
+# On Mac when iOS is on roadmap:
+cd mobile/fajrak_flutter
 flutter create --platforms=ios .
-# Verify: ios/Runner/Info.plist exists
-```
-
-**Required Info.plist additions:**
-```xml
-<key>NSAllowsLocalNetworking</key>
-<true/>
-<key>NSAppTransportSecurity</key>
-<dict>
-  <key>NSAllowsArbitraryLoads</key>
-  <true/>
-</dict>
+# Edit ios/Runner/Info.plist to add:
+# <key>NSAllowsLocalNetworking</key><true/>
+# <key>NSAppTransportSecurity</key><dict><key>NSAllowsArbitraryLoads</key><true/></dict>
+# <key>NSLocalNetworkUsageDescription</key><string>Fajrak needs local network access to connect to Ollama for on-device AI chat.</string>
 ```
 
 **Bundle ID:** `com.fajrak.app`
-**Team ID:** (add your Apple Developer Team ID)
+**Team ID:** (add Apple Developer Team ID when building)
 **Provisioning:** Automatic or manual
 
 ### 1.2 Android Verification
