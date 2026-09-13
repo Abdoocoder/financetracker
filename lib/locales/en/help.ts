@@ -189,6 +189,7 @@ export const enHelp = {
                 { q: 'What assets does the app support?', a: 'Supports US stocks (like SPUS, VOO) and cryptocurrencies (BTC, ETH, and 15+ coins) with live prices.' },
                 { q: 'How does the app calculate profit and loss?', a: 'It calculates the difference between the purchase price you entered and the current live price. The result shows in dollars and percentage.' },
                 { q: 'What is the purchase date and how does it relate to Zakat?', a: 'The asset purchase date is used to calculate the haul (354 lunar days) in the Zakat page. Enter it when editing an investment to get accurate alerts about when Zakat is due.' },
+                { q: 'What is the Wealth Simulator?', a: 'A projection tool that shows how your money could grow: set a monthly amount, a time horizon, and an expected annual return, and it computes your future balance with yearly milestones plus how much is invested versus profit — ideal for long-term planning like retirement or building wealth.' },
             ],
         },
         {
@@ -222,19 +223,13 @@ export const enHelp = {
             ],
         },
         {
-            section: '📄 PDF Reports',
+            section: '🤖 AI Assistant',
             items: [
-                { q: 'How do I export a PDF report?', a: 'Go to the "PDF Reports" page, select the time period and accounts to include, then tap "Export PDF". A print-ready file will download.' },
-                { q: 'What does the report include?', a: 'A summary of transactions, budget, goals, debts, and investment data for the selected period — everything in one organized file.' },
-            ],
-        },
-        {
-            section: '🔗 API Keys',
-            items: [
-                { q: 'What are API Keys?', a: 'API Keys let you connect Fajrak to AI assistants like ChatGPT, Claude, or custom apps. You create a key in Settings, then use it to send natural language commands (like "Add lunch expense 5 KWD") that Fajrak converts into transactions automatically.' },
-                { q: 'How do I create an API Key?', a: 'Go to Settings → API Keys, type a descriptive name for your key (e.g., "My ChatGPT"), and click Create. The full key is shown only once — copy it immediately and store it securely.' },
-                { q: 'What can I do with API Keys?', a: 'There are three capabilities: Create Transactions (send natural language to log expenses/income), Read Transactions (query your transaction history), and Read Balances (check account balances). You can mix and match these per key.' },
-                { q: 'Is the Conversational Ledger safe?', a: 'Yes. Every request requires your API key and is rate-limited. Only you can see your own data (enforced by database security). All API activity is logged in an audit trail so you can review what was accessed and when.' },
+                { q: 'What is the AI Assistant?', a: 'A private chat (in the sidebar) where you can ask questions about your finances in natural language and get instant answers — all powered by your own AI provider keys (BYOK).' },
+                { q: 'How do I set it up?', a: 'Go to Settings → AI Provider Keys (BYOK), add a key for a cloud provider like OpenAI (ChatGPT), Anthropic (Claude), Google Gemini, OpenRouter, or NVIDIA NIM, then open the AI Assistant page and start chatting.' },
+                { q: 'Do I need an API key?', a: 'Only if you use a cloud provider. If you run Ollama locally on your own computer, no key is needed — Fajrak connects to it directly at http://localhost:11434.' },
+                { q: 'Is my key safe? Does Fajrak see it?', a: 'Yes. Keys are encrypted and stored only in your browser (IndexedDB) — they never leave your device and are never stored on Fajrak servers. A server proxy is only used per-request to bypass CORS.' },
+                { q: 'Does the AI see all my data?', a: 'No. Only your current balances and this month\'s income/expense summary are attached to the conversation as context, so answers match your real numbers. Nothing is stored or used for training.' },
             ],
         },
         {
@@ -250,7 +245,8 @@ export const enHelp = {
                 { q: 'What are API Keys?', a: 'API Keys let you connect Fajrak to AI assistants like ChatGPT, Claude, or custom apps. You create a key in Settings, then use it to send natural language commands (like "Add lunch expense 5 KWD") that Fajrak converts into transactions automatically.' },
                 { q: 'How do I create an API Key?', a: 'Go to Settings → API Keys, type a descriptive name for your key (e.g., "My ChatGPT"), and click Create. The full key is shown only once — copy it immediately and store it securely.' },
                 { q: 'What can I do with API Keys?', a: 'There are three capabilities: Create Transactions (send natural language to log expenses/income), Read Transactions (query your transaction history), and Read Balances (check account balances). You can mix and match these per key.' },
-                { q: 'Is the Conversational Ledger safe?', a: 'Yes. Every request requires your API key and is rate-limited. Only you can see your own data (enforced by database security). All API activity is logged in an audit trail so you can review what was accessed and when.' },
+                { q: 'Can I connect other AI assistants and apps?', a: 'Yes. Fajrak exposes an OpenAPI spec at https://fajrak.com/openapi.json and a Model Context Protocol (MCP) server, so assistants like Claude, ChatGPT, Codex, and automation tools can read balances, read transactions, and create transactions on your account. Create a key in Settings → API Keys to connect.' },
+                { q: 'Is it safe?', a: 'Yes. API keys are stored hashed and only a short preview is shown back to you. Each key is rate-limited and scoped to specific capabilities, and every request is recorded in an audit trail so you can review what was accessed and when.' },
             ],
         },
         {
