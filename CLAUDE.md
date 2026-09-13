@@ -76,7 +76,7 @@ make build-apk   # release APK
 
 - **RLS** on every table — لا تعطّل أبداً. Server-only work uses `lib/supabase/admin.ts` (service-role) sparingly.
 - **Cron endpoints** (`app/api/cron-*`) authenticate via `Authorization: Bearer <CRON_SECRET>` compared with `timingSafeEqual` (`lib/cron-auth.ts`).
-- **External agents / MCP / webhook** use per-user PATs `fjk_live_…` (`/api/api-keys/*`): SHA-256 partial-hash storage, scopes `create_transaction|read_transactions|read_balances`, max **5 active**, rate-limit 10/min per key, audited in `api_audit_log`. See `docs/technical/api_integration_guide.md`.
+- **External agents / MCP / webhook** use per-user PATs `fjk_live_…` (`/api/api-keys/*`): SHA-256 hash storage (only the 12-char prefix is stored/shown), scopes `create_transaction|read_transactions|read_balances`, max **5 active**, rate-limit 10/min per key, audited in `api_audit_log`. See `docs/technical/api_integration_guide.md`.
 - **BYOK proxy** (`app/api/byok/proxy`): thin pass-through only — accepts web session cookie **or** `Authorization: Bearer <supabase JWT>`; providers SSRF-allowlisted in `lib/byok/providers.ts` (never dials arbitrary URLs); body passed as base64, never parsed; per-user rate limit 30/min via `bump_proxy_usage()`.
 - **BYOK envelope** (`lib/byok/envelope.ts` is **server-only** — throws on `typeof window !== 'undefined'`): client sends `payload` = AES-GCM(provider_key, ephemeral key) + `env` = RSA-OAEP(ephemeral key, server public key) + `keyId`; server unwraps with RSA private key (env `BYOK_PRIVATE_KEY`, selected by `BYOK_KEK_ID`), decrypts, zeroes key bytes in `finally`. Never log key material or `payload`.
 
