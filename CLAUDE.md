@@ -201,3 +201,29 @@ Key routing rules:
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
 - Author a backlog-ready spec/issue → invoke /spec
+
+## Verified Facts — Live Audit (Sep 2026)
+
+Fresh facts from a live Supabase/GitHub audit performed Sep 2026. Trust these over assumptions below.
+
+### Live DB drift (live DB ≠ migrations)
+The live schema has prod additions made via the Supabase SQL editor that are **NOT in `supabase/migrations/`** (repo schema lags production — risk for `supabase db reset`):
+- `profiles` extra cols: `opening_balance`, `salary_day` (check 1–28), `asset_real_estate`, `asset_vehicles`, `asset_jewelry`, `asset_other`, `assets_updated_at`, `phone`, `job_title`, `birth_date`, `avatar_url`, `onboarding_done`, `lang` (check ar/en, default 'ar'), `lesson_streak`, `last_lesson_date`, `monthly_income`, `timezone` (default Asia/Amman), `plan` (check free/pro), `currency` (default **JOD**).
+- Prod tables with no migration file: `user_stats`, `testimonials`, `saving_challenges`, `health_score_history`.
+- Default currency on live profiles is **JOD, not KWD** (KWD below is stale). Always read `profiles.currency` per user.
+- Live scale: 49 profiles, 1,025 transactions, 51 debts, 9,663 alerts, 21,483 notification_history rows. Postgres 17.6.1.084, region ap-northeast-1.
+
+### Security audit (advisor output, Sep 2026)
+- 6 WARN: `authenticated` role can execute the **owner-guarded** SECURITY DEFINER RPCs — intentional per migration `20260907083248_verify_owner_in_user_rpcs.sql` (functions verify `auth.uid() = owner` internally). `delete_user_account`, `get_account_balances`, `get_financial_dashboard`, etc. Do NOT remove the owner guards.
+- Leaked-password protection is **disabled** on the auth config.
+- No performance advisories flagged.
+
+### Verified health (ran this session)
+- lint ✓ · typecheck ✓ · `next build` 54/54 ✓ · Jest 524 tests / 56 suites (stmts 45.68%) ✓ · Playwright 7 e2e ✓ · Flutter `make doctor` ✓.
+- `npm audit`: 8 moderate @opentelemetry/* transitive advisories (GHSA-8988-4f7v-96qf). Next.js 16.3.5 upgrade available (on 16.3.4).
+- Jest exits via `--forceExit` (worker force-exit after run) — acceptable.
+- Web dev server verified live at fajrak.com + local :3000; Flutter app runs on Chrome.
+
+### Git / identity
+- Solo dev: `Abdoocoder` (Abdallah Abu Saghierh, Amman/JO). Commits occasionally authored as `abdooraf3@gmail.com` (still never use that as the support email).
+- Remote: `https://github.com/Abdoocoder/financetracker.git`. Convention: conventional commits (`feat:` `fix:` `docs:` `chore:` `refactor:` `test:` `style:`), `feat/*` branches, tags up to `v2.1.0-android`.
