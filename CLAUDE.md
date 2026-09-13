@@ -16,7 +16,7 @@
 app/
   (auth)/         # login, register
   (dashboard)/    # dashboard, transactions, debts, investments, alerts, budgets, goals
-  api/            # API routes (alerts, cron, push)
+  api/            # API routes (alerts, cron, push, webhook, byok/proxy, api-keys, mcp)
 components/
   ui/             # shadcn components
   dashboard/      # StatsCards, BudgetChart, DebtProgress, InvestmentTracker
@@ -25,10 +25,12 @@ components/
   settings/       # api-keys-section, byok-keys-section, sections, section-common
 lib/
   supabase/       # client.ts, server.ts, middleware.ts
+  byok/           # BYOK: envelope.ts (server-only), providers.ts (SSRF allowlist), types.ts, client.ts
+  locales/        # translations: lib/locales/{ar,en}/<domain>.ts merged in index.ts; i18n key prefixes below
   *.ts            # utilities, hooks, i18n, firebase, currencies
 types/            # shared TypeScript types
 supabase/
-  migrations/     # SQL migrations (numbered)
+  migrations/     # SQL migrations (numbered: legacy/ has 001–041, top-level has 042/043 + dated 2026-09xx)
 mobile/fajrak_flutter/
   lib/
     screens/      # accounts, dashboard, transactions, debts, investments, goals, budgets, alerts, settings, help
@@ -68,6 +70,15 @@ make build-apk   # release APK
 
 - **Support email**: `support@fajrak.com` — لا تستخدم `abdooraf3@gmail.com` أبداً
 - **Current version**: `3.40.0+51` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+  - `pubspec.yaml` `X.Y.Z+N` === `package.json` `X.Y.Z` — حافظ على التطابق
+
+## Security & Auth
+
+- **RLS** on every table — لا تعطّل أبداً. Server-only work uses `lib/supabase/admin.ts` (service-role) sparingly.
+- **Cron endpoints** (`app/api/cron-*`) authenticate via `Authorization: Bearer <CRON_SECRET>` compared with `timingSafeEqual` (`lib/cron-auth.ts`).
+- **External agents / MCP / webhook** use per-user PATs `fjk_live_…` (`/api/api-keys/*`): SHA-256 partial-hash storage, scopes `create_transaction|read_transactions|read_balances`, max **5 active**, rate-limit 10/min per key, audited in `api_audit_log`. See `docs/technical/api_integration_guide.md`.
+- **BYOK proxy** (`app/api/byok/proxy`): thin pass-through only — accepts web session cookie **or** `Authorization: Bearer <supabase JWT>`; providers SSRF-allowlisted in `lib/byok/providers.ts` (never dials arbitrary URLs); body passed as base64, never parsed; per-user rate limit 30/min via `bump_proxy_usage()`.
+- **BYOK envelope** (`lib/byok/envelope.ts` is **server-only** — throws on `typeof window !== 'undefined'`): client sends `payload` = AES-GCM(provider_key, ephemeral key) + `env` = RSA-OAEP(ephemeral key, server public key) + `keyId`; server unwraps with RSA private key (env `BYOK_PRIVATE_KEY`, selected by `BYOK_KEK_ID`), decrypts, zeroes key bytes in `finally`. Never log key material or `payload`.
 
 ## Version Update Checklist
 
@@ -119,8 +130,8 @@ help_faq_<section>_title/q1/a1  # صفحة المساعدة
   - **Smart Focus**: Always set `autoFocus` on the primary input of any new form.
 - **State Management**: TanStack Query v5 (Web), Flutter Provider + Supabase (Mobile)
 - **Styling**: Tailwind CSS
-- **i18n**: custom i18n (`lib/i18n.tsx`) — Arabic/English support, easy_localization (Flutter)
-- **Database migrations**: `supabase/migrations/` — numbered sequentially
+- **i18n**: custom i18n (`lib/i18n.tsx`) — Arabic/English support, easy_localization (Flutter). Translations live in `lib/locales/{ar,en}/` as per-domain files (e.g. `alerts.ts`, `transactions.ts`) merged in `index.ts`; `lib/locales/{ar,en}.ts` are re-export shims. Add/update the per-domain file, never the shim.
+- **Database migrations**: `supabase/migrations/` — legacy/ holds 001–041; top-level has 042/043 and newer dated `202609HSMMSS_name.sql`. Add a new migration, never edit existing.
 
 ## Rules
 

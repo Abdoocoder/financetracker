@@ -37,6 +37,12 @@ class NotificationService {
   );
 
   static Future<void> initialize() async {
+    // Web push is handled by the Next.js PWA. Initializing
+    // flutter_local_notifications here registers its own service worker
+    // (skipWaiting + clients.claim) over Flutter's, which drops the debug
+    // connection at startup. So on web we skip local-notifications entirely.
+    if (kIsWeb) return;
+
     final messaging = FirebaseMessaging.instance;
 
     // طلب أذونات الإشعارات
@@ -95,6 +101,9 @@ class NotificationService {
   }
 
   static Future<void> showNotification(RemoteMessage message) async {
+    // On web the FCM service worker / Next.js PWA handles notifications.
+    if (kIsWeb) return;
+
     final notification = message.notification;
     if (notification == null) return;
 
