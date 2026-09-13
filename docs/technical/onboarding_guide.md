@@ -10,7 +10,7 @@
 - **Web** — Next.js 16 (App Router) + React 19 + TypeScript (strict)
 - **Mobile** — Flutter (`mobile/fajrak_flutter/`), name *Fajrak*
 
-Current version: `3.40.0+51` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency **KWD** (per-user overridable via `profiles`).
+Current version: `3.40.0+51` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §13 drift notes; earlier docs referencing KWD are stale.
 
 ## 2. High-level architecture
 
@@ -145,3 +145,13 @@ make doctor
 | Styling tokens | CSS vars `--text-*`, `--bg-*`, `--border`, `--accent-*`, `--shadow-card` |
 
 > `docs/technical/structure.md` is **stale** — it still references `middleware.ts`, `lib/utils.ts`, and `001_initial.sql`, all of which were superseded (auth gate is now `proxy.ts`). Prefer this guide and `CLAUDE.md` over it.
+
+## 13. Live-audit drift notes (Sep 2026)
+
+From a live Supabase/GitHub MCP audit performed Sep 2026. **Repo schema lags production** — the live DB has prod-only objects added via the SQL editor that are not in `supabase/migrations/`:
+
+- `profiles` extra cols on live: `opening_balance`, `salary_day` (check 1–28), `asset_real_estate`, `asset_vehicles`, `asset_jewelry`, `asset_other`, `assets_updated_at`, `phone`, `job_title`, `birth_date`, `avatar_url`, `onboarding_done`, `lang` (check ar/en, default 'ar'), `lesson_streak`, `last_lesson_date`, `monthly_income`, `timezone` (default Asia/Amman), `plan` (check free/pro), `currency` (default **JOD**).
+- Prod tables with **no migration file**: `user_stats`, `testimonials`, `saving_challenges`, `health_score_history`.
+- Watch out when running `supabase db reset` — the reset branch will be missing all of the above.
+
+Security posture (advisor: 6 WARN, **intentional**): `authenticated` can execute the owner-guarded SECURITY DEFINER RPCs (`delete_user_account`, `get_account_balances`, `get_financial_dashboard`, …); the guard is `auth.uid() = owner` inside the function (migration `20260907083248_verify_owner_in_user_rpcs.sql`) — do not remove it. Leaked-password protection is currently disabled on the auth config. No performance advisories.
