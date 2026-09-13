@@ -212,6 +212,7 @@ curl "https://fajrak.com/api/webhook/transaction?action=balances" \
 - Default: **10 requests per minute** per API key
 - Rate limit headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`
 - Max **5 active keys** per user
+- ⚠️ The limiter (`lib/rate-limit.ts`) is **in-memory (single-instance)**. On multi-region Vercel deployments each instance tracks its own window, so the 10/min guarantee is per-region instance, not global across all edges.
 
 ## Security
 
