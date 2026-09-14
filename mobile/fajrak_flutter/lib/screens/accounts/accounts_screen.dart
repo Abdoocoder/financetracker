@@ -4,6 +4,7 @@ import '../../utils/app_colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/accounts_service.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 
 const _accountTypes = [
   {'type': 'bank',        'icon': '🏦', 'labelKey': 'acc_type_bank',   'color': AppColors.primary},
@@ -100,16 +101,18 @@ class _AccountsScreenState extends State<AccountsScreen> {
                   ..._accounts.map((acc) => _AccountCard(
                     acc: acc, currency: _currency,
                     onEdit: () => _showAccountDialog(account: acc),
-                    onDelete: acc['is_default'] == true ? null : () async {
-                      final ok = await showDialog<bool>(context: context, builder: (_) => AlertDialog(
-                        title: Text('accounts_archive_title'.tr(), style: const TextStyle()),
-                        content: Text('accounts_archive_confirm'.tr(), style: const TextStyle()),
-                        actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('accounts_archive_cancel'.tr(), style: const TextStyle())),
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('accounts_archive'.tr(), style: const TextStyle(color: Colors.red))),
-                        ],
-                      ));
-                      if (ok == true) { await AccountsService.archiveAccount(acc['id'] as String); _load(); }
+                    onDelete: acc['is_default'] == true ? null : () {
+                      ConfirmDialog.show(
+                        context: context,
+                        title: 'accounts_archive_title'.tr(),
+                        message: 'accounts_archive_confirm'.tr(),
+                        confirmLabel: 'accounts_archive'.tr(),
+                        cancelLabel: 'accounts_archive_cancel'.tr(),
+                        onConfirm: () async {
+                          await AccountsService.archiveAccount(acc['id'] as String);
+                          _load();
+                        },
+                      );
                     },
                   )),
                 ],

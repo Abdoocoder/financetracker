@@ -3,6 +3,7 @@ import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/currency_service.dart';
+import '../../widgets/common/confirm_dialog.dart';
 import 'investment_transaction_history.dart';
 import 'add_investment_dialog.dart';
 
@@ -144,56 +145,22 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
     final realizedPnl = proceeds - costBasis;
     final isGain = realizedPnl >= 0;
 
-    final confirmed = await showDialog<bool>(
+    final message = '${'inv_sell_avg_buy'.tr()}: \$${avgBuyPrice.toStringAsFixed(2)}\n'
+        '${'inv_price'.tr()}: \$${price.toStringAsFixed(2)}\n'
+        '${'inv_sell_proceeds'.tr()}: \$${proceeds.toStringAsFixed(2)}\n'
+        '-----\n'
+        '${isGain ? 'inv_sell_realized_gain'.tr() : 'inv_sell_realized_loss'.tr()}: '
+        '${isGain ? '+' : ''}\$${realizedPnl.toStringAsFixed(2)}';
+
+    ConfirmDialog.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(ctx).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('inv_sell_confirm_btn'.tr(),
-            style: TextStyle(fontWeight: FontWeight.w900,
-                color: Theme.of(ctx).colorScheme.onSurface)),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          _summaryRow(ctx, 'inv_sell_avg_buy'.tr(),
-              '\$${avgBuyPrice.toStringAsFixed(2)}',
-              Theme.of(ctx).colorScheme.onSurfaceVariant),
-          const SizedBox(height: 8),
-          _summaryRow(ctx, 'inv_price'.tr(),
-              '\$${price.toStringAsFixed(2)}',
-              Theme.of(ctx).colorScheme.onSurfaceVariant),
-          const SizedBox(height: 8),
-          _summaryRow(ctx, 'inv_sell_proceeds'.tr(),
-              '\$${proceeds.toStringAsFixed(2)}',
-              Theme.of(ctx).colorScheme.onSurface),
-          const Divider(height: 20),
-          _summaryRow(
-            ctx,
-            isGain ? 'inv_sell_realized_gain'.tr() : 'inv_sell_realized_loss'.tr(),
-            '${isGain ? '+' : ''}\$${realizedPnl.toStringAsFixed(2)}',
-            isGain ? AppColors.success : AppColors.error,
-          ),
-        ]),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text('inv_cancel'.tr(), style: const TextStyle()),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-            child: Text('inv_sell_confirm_btn'.tr(),
-                style: const TextStyle(fontWeight: FontWeight.w900)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    setState(() => _savingSell = true);
-    final user = Supabase.instance.client.auth.currentUser!;
+      title: 'inv_sell_confirm_btn'.tr(),
+      message: message,
+      confirmLabel: 'inv_sell_confirm_btn'.tr(),
+      cancelLabel: 'inv_cancel'.tr(),
+      onConfirm: () async {
+        setState(() => _savingSell = true);
+        final user = Supabase.instance.client.auth.currentUser!;
 
     try {
       final today = DateTime.now().toIso8601String().split('T')[0];
@@ -256,15 +223,8 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
     } catch (e) {
       if (mounted) setState(() => _savingSell = false);
     }
-  }
-
-  Widget _summaryRow(BuildContext ctx, String label, String value, Color valueColor) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: TextStyle(fontSize: 13,
-          color: Theme.of(ctx).colorScheme.onSurfaceVariant)),
-      Text(value, style: TextStyle(fontSize: 13,
-          fontWeight: FontWeight.w900, color: valueColor)),
-    ]);
+      },
+    );
   }
 
   TextField _miniField(
