@@ -79,6 +79,7 @@ make build-apk   # release APK
 - **External agents / MCP / webhook** use per-user PATs `fjk_live_…` (`/api/api-keys/*`): SHA-256 hash storage (only the 12-char prefix is stored/shown), scopes `create_transaction|read_transactions|read_balances`, max **5 active**, rate-limit 10/min per key, audited in `api_audit_log`. See `docs/technical/api_integration_guide.md`.
 - **BYOK proxy** (`app/api/byok/proxy`): thin pass-through only — accepts web session cookie **or** `Authorization: Bearer <supabase JWT>`; providers SSRF-allowlisted in `lib/byok/providers.ts` (never dials arbitrary URLs); body passed as base64, never parsed; per-user rate limit 30/min via `bump_proxy_usage()`.
 - **BYOK envelope** (`lib/byok/envelope.ts` is **server-only** — throws on `typeof window !== 'undefined'`): client sends `payload` = AES-GCM(provider_key, ephemeral key) + `env` = RSA-OAEP(ephemeral key, server public key) + `keyId`; server unwraps with RSA private key (env `BYOK_PRIVATE_KEY`, selected by `BYOK_KEK_ID`), decrypts, zeroes key bytes in `finally`. Never log key material or `payload`.
+- **CSP hardening**: webpages enforce a Content-Security-Policy served via a nonce proxy (`proxy.ts`) — Supabase REST/realtime, Firebase FCM googleapis, and `va.vercel-scripts.com` allowed under `connect-src`; Sentry Session Replay blob worker allowed under `worker-src`/`child-src`. `/monitoring` (Sentry tunnel) and service workers are excluded from the matcher. Web API auth also uses `timingSafeEqual` via `lib/cron-auth.ts` (`verifyCronAuth`).
 
 ## Version Update Checklist
 
@@ -94,7 +95,7 @@ make build-apk   # release APK
 | `app/download/page.tsx` | رقم الإصدار في الـ badge + رابط الـ APK + نص الزر |
 | `CLAUDE.md` | تحديث سطر **Current version** أعلاه |
 
-- **Default currency**: KWD — يتغير حسب إعدادات المستخدم في جدول `profiles`
+- **Default currency**: JOD — يتغير حسب إعدادات المستخدم في جدول `profiles`
 
 ## CSS Variables (Web)
 
