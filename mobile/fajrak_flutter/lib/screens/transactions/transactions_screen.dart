@@ -22,6 +22,7 @@ import '../../widgets/transactions/month_year_picker_dialog.dart';
 import '../../widgets/transactions/transaction_filters.dart';
 import '../../widgets/transactions/transaction_summary.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 import '../../widgets/transactions/transaction_list_item.dart';
 import 'recurring_screen.dart';
 
@@ -349,18 +350,26 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Future<void> _delete(String id) async {
-    if (_saving) return;
-    _saving = true;
-    setState(() {});
-    try {
-      await Supabase.instance.client.from('transactions').delete().eq('id', id);
-      if (mounted) {
-        setState(() => _transactions.removeWhere((t) => t['id'] == id));
-        context.read<AppState>().notifyTransactionChanged();
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
+    ConfirmDialog.show(
+      context: context,
+      title: 'trans_delete_title'.tr(),
+      message: 'trans_delete_msg'.tr(),
+      confirmLabel: 'delete'.tr(),
+      onConfirm: () async {
+        if (_saving) return;
+        _saving = true;
+        setState(() {});
+        try {
+          await Supabase.instance.client.from('transactions').delete().eq('id', id);
+          if (mounted) {
+            setState(() => _transactions.removeWhere((t) => t['id'] == id));
+            context.read<AppState>().notifyTransactionChanged();
+          }
+        } finally {
+          if (mounted) setState(() => _saving = false);
+        }
+      },
+    );
   }
 
   void _showAddDialog({Map<String, dynamic>? existing}) {

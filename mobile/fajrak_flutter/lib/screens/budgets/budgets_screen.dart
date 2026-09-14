@@ -13,6 +13,7 @@ import '../../widgets/budgets/budget_list_item.dart';
 import '../../widgets/budgets/add_budget_dialog.dart';
 import '../../widgets/budgets/category_spending_item.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 
 class BudgetsScreen extends StatefulWidget {
   const BudgetsScreen({super.key});
@@ -131,8 +132,16 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
   }
 
   Future<void> _deleteBudget(String id) async {
-    await Supabase.instance.client.from('budgets').delete().eq('id', id);
-    await _load();
+    ConfirmDialog.show(
+      context: context,
+      title: 'budget_delete_title'.tr(),
+      message: 'budget_delete_msg'.tr(),
+      confirmLabel: 'delete'.tr(),
+      onConfirm: () async {
+        await Supabase.instance.client.from('budgets').delete().eq('id', id);
+        await _load();
+      },
+    );
   }
 
   Future<void> _apply502030() async {
@@ -341,20 +350,15 @@ class _BudgetsScreenState extends State<BudgetsScreen> {
                           currency: _currency,
                           colorScheme: colorScheme,
                           onApply: () async {
-                            final confirm = await showDialog<bool>(
+                            ConfirmDialog.show(
                                 context: context,
-                                builder: (_) => AlertDialog(
-                                      backgroundColor: colorScheme.surface,
-                                      title: Text('dash_rule_confirm_title'.tr(),
-                                          style: TextStyle(color: colorScheme.onSurface)),
-                                      content: Text('dash_rule_confirm_body'.tr(),
-                                          style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                                      actions: [
-                                        TextButton(onPressed: () => Navigator.pop(context, false), child: Text('cancel'.tr(), style: const TextStyle())),
-                                        TextButton(onPressed: () => Navigator.pop(context, true), child: Text('تطبيق', style: TextStyle(color: colorScheme.primary))),
-                                      ],
-                                    ));
-                            if (confirm == true) await _apply502030();
+                                title: 'dash_rule_confirm_title'.tr(),
+                                message: 'dash_rule_confirm_body'.tr(),
+                                confirmLabel: 'apply'.tr(),
+                                danger: false,
+                                onConfirm: () async {
+                                  await _apply502030();
+                                });
                           },
                         ),
                         const SizedBox(height: 16),
