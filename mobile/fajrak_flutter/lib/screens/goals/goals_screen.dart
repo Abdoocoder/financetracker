@@ -10,6 +10,7 @@ import '../../widgets/goals/overall_progress_card.dart';
 import '../../widgets/goals/add_goal_dialog.dart';
 import '../../widgets/goals/add_amount_dialog.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 
 class GoalsScreen extends StatefulWidget {
   const GoalsScreen({super.key});
@@ -101,37 +102,23 @@ class _GoalsScreenState extends State<GoalsScreen> {
   }
 
   Future<void> _deleteGoal(String id) async {
-    final colorScheme = Theme.of(context).colorScheme;
-    final confirm = await showDialog<bool>(
+    ConfirmDialog.show(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: colorScheme.surface,
-        title: Text('goals_delete_title'.tr(),
-            style: TextStyle(color: colorScheme.onSurface)),
-        content: Text('confirm_delete'.tr(),
-            style: TextStyle(color: colorScheme.onSurfaceVariant)),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle())),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text('delete'.tr(),
-                  style: TextStyle(color: Theme.of(context).colorScheme.error))),
-        ],
-      ),
+      title: 'goals_delete_title'.tr(),
+      message: 'confirm_delete'.tr(),
+      confirmLabel: 'delete'.tr(),
+      onConfirm: () async {
+        if (_saving) return;
+        _saving = true;
+        setState(() {});
+        try {
+          await Supabase.instance.client.from('savings_goals').delete().eq('id', id);
+          await _load();
+        } finally {
+          if (mounted) setState(() => _saving = false);
+        }
+      },
     );
-    if (confirm == true) {
-      if (_saving) return;
-      _saving = true;
-      setState(() {});
-      try {
-        await Supabase.instance.client.from('savings_goals').delete().eq('id', id);
-        await _load();
-      } finally {
-        if (mounted) setState(() => _saving = false);
-      }
-    }
   }
 
   @override

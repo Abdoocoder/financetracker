@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 
 class RecurringScreen extends StatefulWidget {
   const RecurringScreen({super.key});
@@ -61,21 +62,29 @@ class _RecurringScreenState extends State<RecurringScreen> {
   }
 
   Future<void> _delete(String id) async {
-    if (_saving) return;
-    _saving = true;
-    setState(() {});
-    try {
-      await Supabase.instance.client
-          .from('recurring_transactions').delete().eq('id', id);
-      if (mounted) {
-        setState(() => _list.removeWhere((r) => r['id'] == id));
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('toast_deleted'.tr(), style: const TextStyle())),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
+    ConfirmDialog.show(
+      context: context,
+      title: 'recurring_delete_title'.tr(),
+      message: 'confirm_delete'.tr(),
+      confirmLabel: 'delete'.tr(),
+      onConfirm: () async {
+        if (_saving) return;
+        _saving = true;
+        setState(() {});
+        try {
+          await Supabase.instance.client
+              .from('recurring_transactions').delete().eq('id', id);
+          if (mounted) {
+            setState(() => _list.removeWhere((r) => r['id'] == id));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('toast_deleted'.tr(), style: const TextStyle())),
+            );
+          }
+        } finally {
+          if (mounted) setState(() => _saving = false);
+        }
+      },
+    );
   }
 
   void _showForm({Map<String, dynamic>? existing}) {

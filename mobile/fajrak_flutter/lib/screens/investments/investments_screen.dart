@@ -13,6 +13,7 @@ import '../../widgets/investments/investment_cash_card.dart';
 import '../../services/investments_service.dart';
 import '../../services/currency_service.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 
 class InvestmentsScreen extends StatefulWidget {
   const InvestmentsScreen({super.key});
@@ -165,45 +166,22 @@ class _InvestmentsScreenState extends State<InvestmentsScreen> {
   }
 
   Future<void> _deleteInvestment(String id) async {
-    final confirm = await showDialog<bool>(
+    ConfirmDialog.show(
         context: context,
-        builder: (_) {
-          final theme = Theme.of(context);
-          final colorScheme = theme.colorScheme;
-          return AlertDialog(
-            backgroundColor: colorScheme.surface,
-            title: Text('inv_delete_title'.tr(),
-                style: TextStyle(
-                    color: colorScheme.onSurface)),
-            content: Text('confirm_delete'.tr(),
-                style: TextStyle(
-                    color: colorScheme.onSurfaceVariant)),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: Text('cancel'.tr(),
-                      style: TextStyle(
-                          color: colorScheme.onSurfaceVariant))),
-              TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text('delete'.tr(),
-                      style: TextStyle(
-                          color: colorScheme.error))),
-            ],
-          );
+        title: 'inv_delete_title'.tr(),
+        message: 'confirm_delete'.tr(),
+        confirmLabel: 'delete'.tr(),
+        onConfirm: () async {
+          if (_saving) return;
+          _saving = true;
+          setState(() {});
+          try {
+            await Supabase.instance.client.from('investments').delete().eq('id', id);
+            await _load();
+          } finally {
+            if (mounted) setState(() => _saving = false);
+          }
         });
-
-    if (confirm == true) {
-      if (_saving) return;
-      _saving = true;
-      setState(() {});
-      try {
-        await Supabase.instance.client.from('investments').delete().eq('id', id);
-        await _load();
-      } finally {
-        if (mounted) setState(() => _saving = false);
-      }
-    }
   }
 
   void _showAddDialog() {
