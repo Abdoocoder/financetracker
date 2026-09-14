@@ -33,7 +33,7 @@ class ChatFinancialData {
     this.totalBalance = 0,
     this.income = 0,
     this.expenses = 0,
-    this.currency = 'KWD',
+    this.currency = 'JOD',
   });
 }
 
@@ -78,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
   double _totalBalance = 0;
   double _income = 0;
   double _expenses = 0;
-  String _currency = 'KWD';
+  String _currency = 'JOD';
 
   @override
   void initState() {
@@ -125,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<ChatFinancialData?> _defaultContextLoader() async {
     double total = 0;
-    String currency = 'KWD';
+    String currency = 'JOD';
     try {
       final profile = await _db
           .from('profiles')
@@ -182,7 +182,7 @@ class _ChatScreenState extends State<ChatScreen> {
           _totalBalance = contextData.totalBalance;
           _income = contextData.income;
           _expenses = contextData.expenses;
-          _currency = contextData.currency.isEmpty ? 'KWD' : contextData.currency;
+          _currency = contextData.currency.isEmpty ? 'JOD' : contextData.currency;
         }
       });
       _syncKeySelection();
