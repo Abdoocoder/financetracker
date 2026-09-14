@@ -248,8 +248,21 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
         onUpgrade: (m, from, to) async {
-          // Add schema upgrades here as new migrations are needed.
-          // Example: if (from < 2) await m.addColumn(transactionsTable, transactionsTable.newColumn);
+          // Schema began at v1 (single init commit). Every future schema
+          // change MUST bump [schemaVersion] AND add its migration here,
+          // otherwise released installs silently keep a stale schema.
+          //
+          //   if (from < 2) {
+          //     await m.addColumn(transactionsTable, transactionsTable.newColumn);
+          //   }
+          //
+          // If a version was bumped but no migration was written, fail loudly
+          // instead of opening over a torn schema.
+          if (to > from) {
+            throw StateError(
+                'Missing Drift migration for schema v$from → v$to. '
+                'Add it in AppDatabase.migration.onUpgrade before releasing.');
+          }
         },
         beforeOpen: (details) async {
           // Enable foreign keys.
