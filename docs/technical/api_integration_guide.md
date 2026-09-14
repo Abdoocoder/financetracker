@@ -4,7 +4,7 @@ Connect AI assistants (ChatGPT, Claude, Zapier, custom bots) to Fajrak for conve
 
 ## Overview
 
-Fajrak exposes a webhook API that allows external AI assistants to **create** financial transactions and **read** transaction/balance data on behalf of the user. The AI translates natural language into structured JSON and POSTs/GETs the webhook.
+Fajrak exposes two API transports that allow external AI assistants to **create** financial transactions and **read** transaction/balance data on behalf of the user: The AI translates natural language into structured JSON and POSTs/GETs the webhook.
 
 ```
 User: "سجل 15 دينار بنزين في محطة الوقود"
@@ -287,6 +287,42 @@ curl "https://fajrak.com/api/webhook/transaction?action=balances" \
    }
    ```
 4. Set the Authentication to **API Key** → Header → `Authorization` → Bearer → your `fjk_live_...` key
+
+## Alternative: MCP Server (Model Context Protocol)
+
+For LLMs that support MCP function-calling (Claude, Cursor, etc.), Fajrak exposes an MCP server over Streamable HTTP — no webhook wiring required.
+
+**Endpoint:** `POST https://fajrak.com/api/mcp`
+
+**Auth:** Same `Authorization: Bearer fjk_live_…` header. No other configuration needed.
+
+**Available tools:**
+
+| Tool | Scope Required | Description |
+|------|---------------|-------------|
+| `get_balances` | `read_balances` | Returns all account names and current balances |
+| `get_cashflow_summary` | `read_transactions` | Monthly income vs. expenses summary |
+| `create_transaction` | `create_transaction` | Record a new income or expense |
+
+**Example — list tools:**
+```bash
+curl -X POST https://fajrak.com/api/mcp \
+  -H "Authorization: Bearer fjk_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
+```
+
+**Example — get balances:**
+```bash
+curl -X POST https://fajrak.com/api/mcp \
+  -H "Authorization: Bearer fjk_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"get_balances"},"id":2}'
+```
+
+**Transport choice:**
+- Use the **webhook** (`/api/webhook/transaction`) for simple HTTP integrations, Zapier, n8n, or custom bots.
+- Use the **MCP server** (`/api/mcp`) when the LLM supports MCP natively — it handles tool discovery and structured calling automatically.
 
 ## Troubleshooting
 

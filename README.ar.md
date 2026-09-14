@@ -514,8 +514,11 @@ Text('nav_dashboard'.tr())
 |:-------|:--------|
 | **Row Level Security** | جميع جداول Supabase — المستخدم يرى بياناته فقط |
 | **Auth Middleware** | `proxy.ts` يحمي جميع مسارات `/dashboard/*` |
-| **CRON Secret** | API endpoints تتحقق من ترويسة `Authorization` |
+| **CRON Secret** | API endpoints تتحقق من ترويسة `Authorization` عبر `timingSafeEqual` |
 | **Firebase Admin** | SDK على الخادم فقط للإشعارات الآمنة |
+| **Personal Access Tokens** | مفاتيح `fjk_live_…` مشفرة SHA-256 مع scopes لكل أداة، حد 5 مفاتيح نشطة، 10 طلبات/دقيقة، مسجلة في `api_audit_log` |
+| **BYOK Proxy** | تشفير AES-GCM + RSA-OAEP Stateless؛ المفاتيح لا تترك المتصفح — البروكسي يفك التشفير مؤقتاً ويرسل لل הציבורי المسموح فقط |
+| **خادم MCP** | نقطة Model Context Protocol عبر Streamable HTTP؛ مصادقة PAT، محدود بـ `read_balances`، `read_transactions`، `create_transaction` |
 | **متغيرات البيئة** | جميع الأسرار في `.env.local`، غير مُودَعة في Git |
 | **لا مفاتيح مُضمَّنة** | جميع بيانات الاعتماد مُزالة من الكود المصدري |
 
