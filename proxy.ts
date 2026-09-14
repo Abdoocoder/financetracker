@@ -15,10 +15,17 @@ const PROTECTED_PATHS = [
 
 function buildCspHeader(nonce: string): string {
   const isDev = process.env.NODE_ENV === 'development'
+  // In development, Next.js/Turbopack injects styles as inline <style> tags.
+  // When nonce is present in style-src, 'unsafe-inline' is ignored per CSP spec.
+  // So we allow 'unsafe-inline' for styles in dev without nonce, or use nonce only for scripts.
+  const styleSrc = isDev
+    ? "style-src 'self' 'unsafe-inline'"  // Dev: allow inline styles (Turbopack injects them)
+    : `style-src 'self' 'nonce-${nonce}'` // Prod: strict nonce-only for styles
+  
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''}`,
-    `style-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
+    styleSrc,
     "img-src 'self' blob: data: https:",
     "font-src 'self'",
     "worker-src 'self' blob:",
