@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:fajrak/services/llm_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// In-memory [SecureStore] so the device keystore isn't needed in tests.
 class InMemorySecureStore implements SecureStore {
@@ -25,6 +27,19 @@ class InMemorySecureStore implements SecureStore {
 }
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
+    // Stub Supabase so ErrorHandler's fire-and-forget analytics log stays
+    // inert in tests (no real network, no uninitialized client).
+    await Supabase.initialize(
+      url: 'https://test.supabase.co',
+      publishableKey: 'anon-key',
+      httpClient: MockClient((req) async => http.Response('{}', 404)),
+      authOptions: const FlutterAuthClientOptions(persistSession: false),
+    );
+  });
+
   group('LlmService.queryFinancialInsight (Ollama OpenAI-compatible)', () {
     test('posts a financial system prompt and returns choices[0].message.content',
         () async {
@@ -110,32 +125,38 @@ void main() {
       expect(authHeader, isNull);
     });
 
-    test('returns null on a non-200 response', () async {
+    test('throws LlmServiceException on a non-200 response', () async {
       final client = MockClient((request) async => http.Response('boom', 500));
       final service = LlmService(
         httpClient: client,
         secureStore: InMemorySecureStore(),
       );
-      final result = await service.queryFinancialInsight(
-        providerBaseUrl: 'http://localhost:11434/v1',
-        model: 'm',
-        prompt: 'p',
+      await expectLater(
+        service.queryFinancialInsight(
+          providerBaseUrl: 'http://localhost:11434/v1',
+          model: 'm',
+          prompt: 'p',
+        ),
+        throwsA(isA<LlmServiceException>()
+            .having((e) => e.code, 'code', 'http-500')),
       );
-      expect(result, isNull);
     });
 
-    test('returns null when the response has no choices', () async {
+    test('throws LlmServiceException when the response has no choices', () async {
       final client = MockClient((request) async => http.Response('{"choices":[]}', 200));
       final service = LlmService(
         httpClient: client,
         secureStore: InMemorySecureStore(),
       );
-      final result = await service.queryFinancialInsight(
-        providerBaseUrl: 'http://localhost:11434/v1',
-        model: 'm',
-        prompt: 'p',
+      await expectLater(
+        service.queryFinancialInsight(
+          providerBaseUrl: 'http://localhost:11434/v1',
+          model: 'm',
+          prompt: 'p',
+        ),
+        throwsA(isA<LlmServiceException>()
+            .having((e) => e.code, 'code', 'empty-response')),
       );
-      expect(result, isNull);
     });
   });
 

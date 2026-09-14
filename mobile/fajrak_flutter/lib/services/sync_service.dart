@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../database/app_database.dart';
+import '../utils/error_handler.dart';
 import 'repositories/transaction_repository.dart';
 
 enum SyncDirection { pull, push }
@@ -117,9 +118,14 @@ class SyncService {
       _status = SyncStatus.idle;
 
       return SyncResult(pulled: totalPulled, conflicts: totalConflicts);
-    } catch (e) {
+    } catch (e, st) {
       _status = SyncStatus.error;
       _lastError = e.toString();
+      ErrorHandler.handle(
+        e,
+        st: st,
+        developerMessage: 'SyncService: pullWithPagination failed',
+      );
       return SyncResult(error: e.toString());
     }
   }
@@ -479,37 +485,63 @@ class SyncService {
     _lastError = null;
 
     int totalPushed = 0;
+    int permanentFailures = 0;
 
     try {
       final pending = await txRepo.getOrderedOperations();
 
       for (int i = 0; i < pending.length; i++) {
         final item = pending[i];
+        // تخطي المهام التي استنفدت محاولاتها مع إبقائها في السجل لأغراض التشخيص
+        if (item.attemptCount >= 4) {
+          _status = SyncStatus.error;
+          _lastError = item.lastError ?? 'Unknown sync error';
+          onProgress?.call(i + 1, pending.length);
+          continue;
+        }
         await txRepo.markProcessing(item.id);
 
         try {
           await _pushOperation(item);
           await txRepo.markCompleted(item.id);
           totalPushed++;
-        } catch (e) {
+        } catch (e, st) {
+          ErrorHandler.handle(
+            e,
+            st: st,
+            developerMessage:
+                'SyncService: push op ${item.operationType} ${item.entityType}/${item.entityId} failed on attempt ${item.attemptCount + 1}',
+          );
+          _lastError = e.toString();
           await txRepo.markFailed(item.id, e.toString(), item.attemptCount);
-          
+
           final backoff = txRepo.getBackoffDuration(item.attemptCount);
           await Future.delayed(backoff);
-          
+
+          // المحاولة الرابعة فشلت أيضاً → مهمة فاشلة نهائياً دون حذف سجلها
           if (item.attemptCount >= 3) {
-            await txRepo.markCompleted(item.id);
+            permanentFailures++;
           }
         }
 
         onProgress?.call(i + 1, pending.length);
       }
 
+      if (permanentFailures > 0 || _lastError != null) {
+        _status = SyncStatus.error;
+        return SyncResult(pushed: totalPushed, error: _lastError);
+      }
+
       _status = SyncStatus.idle;
       return SyncResult(pushed: totalPushed);
-    } catch (e) {
+    } catch (e, st) {
       _status = SyncStatus.error;
       _lastError = e.toString();
+      ErrorHandler.handle(
+        e,
+        st: st,
+        developerMessage: 'SyncService: pushPendingChanges failed',
+      );
       return SyncResult(error: e.toString());
     }
   }

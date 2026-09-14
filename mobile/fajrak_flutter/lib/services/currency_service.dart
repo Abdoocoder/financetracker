@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
+import '../utils/error_handler.dart';
+
 class CurrencyService {
   static const String _baseUrl = 'https://open.er-api.com/v6/latest';
 
@@ -71,9 +73,20 @@ class CurrencyService {
           return (rates[target] as num?)?.toDouble();
         }
       }
+      // تسجيل الفشل بدلاً من إخفائه بصمت؛ عقد الاستدعاء (يرجع null) يبقى كما هو.
+      ErrorHandler.handle(
+        CurrencyServiceException(
+          'http-${response.statusCode}',
+          'failed to fetch $base rates (status ${response.statusCode})',
+        ),
+        developerMessage: 'CurrencyService: fetchExchangeRate $base→$target failed',
+      );
       return null;
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('Error fetching exchange rate: $e');
+      ErrorHandler.handle(e,
+          st: st,
+          developerMessage: 'CurrencyService: fetchExchangeRate $base→$target threw');
       return null;
     }
   }
@@ -83,4 +96,15 @@ class CurrencyService {
     final decimals = getDecimals(currency);
     return '${amount.toStringAsFixed(decimals)} $currency';
   }
+}
+
+/// خطأ جلب أسعار صرف — جاهز للهجرة القادمة نحو الترميز (يُسجَّل حالياً ويُعاد null).
+class CurrencyServiceException implements Exception {
+  CurrencyServiceException(this.code, this.message);
+
+  final String code;
+  final String message;
+
+  @override
+  String toString() => 'CurrencyServiceException($code): $message';
 }
