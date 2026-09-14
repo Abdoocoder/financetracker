@@ -97,17 +97,17 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!currentUser) return
     async function loadNetWorth() {
-      const [txRes, goalsRes, invRes, debtsRes] = await Promise.all([
+      const [txRes, goalsRes, invRes, debtsRes, profileRes] = await Promise.all([
         supabase.from('transactions').select('type, amount').eq('user_id', currentUser!.id),
         supabase.from('savings_goals').select('current_amount').eq('user_id', currentUser!.id),
         supabase.from('investments').select('shares, current_price').eq('user_id', currentUser!.id),
         supabase.from('debts').select('remaining_amount').eq('user_id', currentUser!.id).eq('is_paid', false),
+        supabase.from('profiles').select('opening_balance').eq('id', currentUser!.id).single(),
       ])
       const txs = txRes.data ?? []
       const income = txs.filter(t => t.type === 'income').reduce((a, t) => a + Number(t.amount), 0)
       const expenses = txs.filter(t => t.type === 'expense').reduce((a, t) => a + Number(t.amount), 0)
-      const { data: profileData } = await supabase.from('profiles').select('opening_balance').eq('id', currentUser!.id).single()
-      const cashBalance = Number(profileData?.opening_balance ?? 0) + income - expenses
+      const cashBalance = Number(profileRes.data?.opening_balance ?? 0) + income - expenses
       const savings = (goalsRes.data ?? []).reduce((a, g) => a + Number(g.current_amount), 0)
       const investments = (invRes.data ?? []).reduce((a, i) => a + Number(i.shares) * Number(i.current_price), 0)
       const totalDebt = (debtsRes.data ?? []).reduce((a, d) => a + Number(d.remaining_amount), 0)
