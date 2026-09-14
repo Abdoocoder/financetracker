@@ -806,6 +806,8 @@
   "debts_tab_receivable": "Owed to Me",
   "debts_receive_btn": "Mark as Received",
   "debts_received_msg": "Payment received! 🎉",
+  "debts_received_cat": "Debt Received",
+  "debts_received_desc": "Debt Received: {name}",
   "debt_name_required": "Please enter the debt name",
   "debt_amount_required": "Please enter the original amount",
   "debt_amount_positive": "Amount must be greater than zero",
