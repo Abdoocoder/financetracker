@@ -111,7 +111,7 @@ class AccountsTable extends Table {
   TextColumn get name => text()();
   TextColumn get type => text()(); // 'cash' | 'bank' | 'savings' | 'credit_card'
   RealColumn get openingBalance => real().withDefault(const Constant(0))();
-  TextColumn get currency => text().withDefault(const Constant('KWD'))();
+  TextColumn get currency => text().withDefault(const Constant('JOD'))();
   TextColumn get color =>
       text().withDefault(const Constant('#3B7EF6'))();
   TextColumn get icon => text().withDefault(const Constant('🏦'))();
@@ -164,7 +164,7 @@ class RecurringTransactionsTable extends Table {
   TextColumn get type => text()(); // 'income' | 'expense'
   TextColumn get frequency => text()(); // 'daily' | 'weekly' | 'monthly' | 'yearly'
   DateTimeColumn get nextDate => dateTime()();
-  TextColumn get currency => text().withDefault(const Constant('KWD'))();
+  TextColumn get currency => text().withDefault(const Constant('JOD'))();
   TextColumn get notes => text().nullable()();
   BoolColumn get isActive =>
       boolean().withDefault(const Constant(true))();
