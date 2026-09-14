@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { rateLimit } from '@/lib/rate-limit'
+import { verifyCronAuth } from '@/lib/cron-auth'
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
@@ -17,8 +18,15 @@ export async function POST(request: NextRequest) {
   let userId: string
 
   // قبول CRON_SECRET + user_id في الـ body (للاختبار من الـ terminal)
-  const cronSecret = process.env.CRON_SECRET
-  if (cronSecret && token === cronSecret) {
+  // timingSafeEqual بدون الكشف عن المفتاح — ولو CRON_SECRET غير مضبوط نرجع لـ token auth
+  let isCron = false
+  try {
+    isCron = verifyCronAuth(request)
+  } catch {
+    isCron = false
+  }
+
+  if (isCron) {
     const body = await request.json().catch(() => ({}))
     if (!body.user_id) return NextResponse.json({ error: 'user_id required' }, { status: 400 })
     userId = body.user_id
