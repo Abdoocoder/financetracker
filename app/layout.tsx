@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { I18nProvider } from '@/lib/i18n'
 import { UserProvider } from '@/lib/user-context'
 import { getServerTranslation, getServerLang } from '@/lib/i18n-server'
+import { headers } from 'next/headers'
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -37,11 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getServerLang()
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   
   return (
     <html lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{
+        <script nonce={nonce} dangerouslySetInnerHTML={{
           __html: `(function(){
           var saved = localStorage.getItem('theme');
           var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -60,7 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         })()` }} />
       </head>
       <body suppressHydrationWarning className={`${cairo.variable} font-cairo antialiased`}>
-        <script dangerouslySetInnerHTML={{
+        <script nonce={nonce} dangerouslySetInnerHTML={{
           __html: `
           if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
