@@ -161,7 +161,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
               child: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : Text('add'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)))),
         ]),
         if (_selectedCurrency != widget.currency) 
-          Padding(padding: const EdgeInsets.only(top: 4), child: Text('Rate: ${_exchangeRate.toStringAsFixed(4)} | ≈ ${(double.tryParse(_amountController.text) ?? 0 * _exchangeRate).toStringAsFixed(2)} ${widget.currency}', style: TextStyle(fontSize: 10, color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.6), fontWeight: FontWeight.bold))),
+          Padding(padding: const EdgeInsets.only(top: 4), child: Text('Rate: ${_exchangeRate.toStringAsFixed(4)} | ≈ ${((double.tryParse(_amountController.text) ?? 0) * _exchangeRate).toStringAsFixed(2)} ${widget.currency}', style: TextStyle(fontSize: 10, color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.6), fontWeight: FontWeight.bold))),
       ]),
     );
   }
