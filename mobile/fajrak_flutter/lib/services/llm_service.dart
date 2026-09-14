@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../utils/error_handler.dart';
+
 /// عميل BYOK المحلي (Flutter) — اتّصال مباشر بـ Ollama على الجهاز دون وكيل.
 ///
 /// وفق AD-3 (Zero-Server Storage): مفتاح المزوّد يُخزَّن على الجهاز فقط عبر
@@ -75,11 +77,23 @@ class LlmService {
     final response = await send(uri, headers, body);
     if (response.statusCode != 200) {
       debugPrint('LlmService error ${response.statusCode}: ${response.body}');
-      return null;
+      final ex = LlmServiceException(
+        'http-${response.statusCode}',
+        'Ollama replied ${response.statusCode}: ${response.body}',
+      );
+      ErrorHandler.handle(ex,
+          developerMessage: 'LlmService: queryFinancialInsight HTTP ${response.statusCode}');
+      throw ex;
     }
     final data = json.decode(response.body) as Map<String, dynamic>;
     final choices = data['choices'] as List<dynamic>? ?? const [];
-    if (choices.isEmpty) return null;
+    if (choices.isEmpty) {
+      final ex =
+          LlmServiceException('empty-response', 'Ollama returned no choices');
+      ErrorHandler.handle(ex,
+          developerMessage: 'LlmService: queryFinancialInsight empty response');
+      throw ex;
+    }
     final message = (choices.first as Map<String, dynamic>)['message'] as Map<String, dynamic>?;
     return message?['content'] as String?;
   }
@@ -88,6 +102,18 @@ class LlmService {
   @visibleForTesting
   Future<http.Response> send(Uri uri, Map<String, String> headers, String body) =>
       _http.post(uri, headers: headers, body: body);
+}
+
+/// خطأ غير متوقّع من مزوّد Ollama المحلي (استجابة HTTP فاشلة أو استجابة بلا اختيارات).
+/// محلي في هذا الملف لمنع الاستيراد الدائري مع byok_service.
+class LlmServiceException implements Exception {
+  LlmServiceException(this.code, this.message);
+
+  final String code;
+  final String message;
+
+  @override
+  String toString() => 'LlmServiceException($code): $message';
 }
 
 /// واجهة تخزين آمن ملخّصة بحيث يمكن استبدالها في الاختبارات.

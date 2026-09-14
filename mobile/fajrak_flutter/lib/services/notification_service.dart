@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import '../main.dart';
+import '../utils/error_handler.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
@@ -175,9 +176,10 @@ class NotificationService {
       final token = newToken ?? await FirebaseMessaging.instance.getToken();
 
       if (token == null) {
-        if (kDebugMode) {
-          debugPrint('[NotificationService] saveToken: FCM token is null');
-        }
+        ErrorHandler.handle(
+          Exception('FCM token is null'),
+          developerMessage: '[NotificationService] saveToken: FCM token is null',
+        );
         return;
       }
 
@@ -186,19 +188,19 @@ class NotificationService {
             '[NotificationService] Saving FCM token: ${token.substring(0, 20)}...');
       }
 
-      final error = await Supabase.instance.client
-          .from('push_subscriptions')
-          .upsert({
-            'user_id': user.id,
-            'endpoint': 'fcm:$token',
-            'p256dh': 'fcm',
-            'auth': 'fcm',
-          }, onConflict: 'user_id,endpoint')
-          .then((_) => null)
-          .catchError((e) => e);
-
-      if (error != null && kDebugMode) {
-        debugPrint('[NotificationService] Supabase upsert error: $error');
+      try {
+        await Supabase.instance.client
+            .from('push_subscriptions')
+            .upsert({
+              'user_id': user.id,
+              'endpoint': 'fcm:$token',
+              'p256dh': 'fcm',
+              'auth': 'fcm',
+            }, onConflict: 'user_id,endpoint');
+      } catch (e, st) {
+        ErrorHandler.handle(e,
+            st: st,
+            developerMessage: '[NotificationService] Supabase upsert error: $e');
       }
     } catch (e) {
       if (kDebugMode) debugPrint('[NotificationService] saveToken error: $e');
