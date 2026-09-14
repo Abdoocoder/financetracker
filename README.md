@@ -103,9 +103,10 @@ on this journey.
 ### 🤖 AI Assistant Integration
 Connect AI assistants (ChatGPT, Claude, custom bots) for conversational finance tracking:
 - **Conversational Ledger Webhook**: Create transactions and read balances via natural language
-- **Secure API Key Management**: Scoped API keys with read/write permissions
-- **Audit Logging**: All API operations logged for security
-- **Rate Limiting**: Protects against abuse with configurable limits
+- **MCP Server**: [Model Context Protocol](https://modelcontextprotocol.io/) server over Streamable HTTP — exposes `get_balances`, `get_cashflow_summary`, and `create_transaction` tools for direct LLM function-calling
+- **Secure API Key Management**: Scoped API keys (`fjk_live_…`) with per-tool permissions; max 5 active keys
+- **Audit Logging**: All API and MCP operations logged to `api_audit_log`
+- **Rate Limiting**: Per-key rate limits (10 req/min for PATs, 30 req/min for BYOK proxy)
 
 ### 🏠 Dashboard
 
@@ -326,8 +327,12 @@ Learning, and Wealth.
 | `budgets` | Monthly category limits |
 | `alerts` | Smart notification records |
 | `savings_goals` | Financial targets |
+| `user_api_keys` | PAT storage (SHA-256 hash, scopes) |
+| `api_audit_log` | Per-key request audit trail |
 | `testimonials` | User reviews (public read) |
 | `push_subscriptions` | FCM + Web Push tokens |
+| `notification_history` | Deduplicated push delivery log |
+| `user_stats` | Gamification state (XP, level, streak) |
 | `health_score_history` | Daily score snapshots |
 
 ---
@@ -414,8 +419,11 @@ Text('nav_dashboard'.tr())
 |:--------|:--------------|
 | **Row Level Security** | All Supabase tables — users see only their own data |
 | **Auth Middleware** | `proxy.ts` protects all `/dashboard/*` routes |
-| **CRON Secret** | API endpoints validate `Authorization` header |
+| **CRON Secret** | API endpoints validate `Authorization` header via `timingSafeEqual` |
 | **Firebase Admin** | Server-only SDK for secure push notifications |
+| **Personal Access Tokens** | SHA-256-hashed `fjk_live_…` keys with per-tool scopes, max 5 active, 10 req/min, audited in `api_audit_log` |
+| **BYOK Proxy** | Stateless AES-GCM + RSA-OAEP envelope encryption; keys never leave the browser — proxy decrypts ephemerally and forwards to provider SSRF-allowlist only |
+| **MCP Server** | Model Context Protocol endpoint over Streamable HTTP; PAT-authenticated, scoped to `read_balances`, `read_transactions`, `create_transaction` |
 | **Environment Variables** | All secrets in `.env.local`, never committed |
 | **No Hardcoded Keys** | All credentials removed from source code |
 | **Error Monitoring** | Sentry for real-time error tracking |
@@ -601,7 +609,7 @@ E2E_TEST_PASSWORD=your-password
 ### 📋 In Progress
 
 - [ ] Subscription System (Paddle/Stripe)
-- [ ] AI Financial Advisor (in-app curated — BYOK core shipped as v3.39.0; remaining: guided advisor UX & mobile)
+- [ ] AI Financial Advisor (in-app curated — BYOK vault shipped v3.39.0; re-enter key + vault-aware filtering shipped v3.40.0; remaining: guided advisor UX & mobile)
 
 ---
 
