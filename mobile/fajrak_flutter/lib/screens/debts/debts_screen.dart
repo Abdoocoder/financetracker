@@ -11,6 +11,7 @@ import '../../widgets/debts/paid_debt_item.dart';
 import '../../widgets/debts/debt_list_item.dart';
 import '../../widgets/debts/add_debt_dialog.dart';
 import '../../widgets/common/skeleton_loader.dart';
+import '../../widgets/common/confirm_dialog.dart';
 
 List<Color> _buildPriorityColors(ColorScheme cs) => [
   cs.error,
@@ -133,80 +134,61 @@ class _DebtsScreenState extends State<DebtsScreen> {
   }
 
   Future<void> _deleteDebt(String id) async {
-    final cs = Theme.of(context).colorScheme;
-    final confirm = await showDialog<bool>(
+    ConfirmDialog.show(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('debts_delete_title'.tr(), style: const TextStyle()),
-        content: Text('confirm_delete'.tr(), style: const TextStyle()),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle())),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text('delete'.tr(), style: TextStyle(color: cs.error))),
-        ],
-      ),
+      title: 'debts_delete_title'.tr(),
+      message: 'confirm_delete'.tr(),
+      confirmLabel: 'delete'.tr(),
+      onConfirm: () async {
+        if (_saving) return;
+        _saving = true;
+        setState(() {});
+        try {
+          await Supabase.instance.client.from('debts').delete().eq('id', id);
+          await _load();
+        } finally {
+          if (mounted) setState(() => _saving = false);
+        }
+      },
     );
-    if (confirm == true) {
-      if (_saving) return;
-      _saving = true;
-      setState(() {});
-      try {
-        await Supabase.instance.client.from('debts').delete().eq('id', id);
-        await _load();
-      } finally {
-        if (mounted) setState(() => _saving = false);
-      }
-    }
   }
 
   Future<void> _receiveDebt(Map<String, dynamic> debt) async {
-    final cs = Theme.of(context).colorScheme;
-    final confirm = await showDialog<bool>(
+    ConfirmDialog.show(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text('debts_receive_btn'.tr(), style: const TextStyle()),
-        content: Text(
-            '${'debts_tab_receivable'.tr()}: ${debt['name']}\n${(debt['remaining_amount'] as num).toStringAsFixed(0)} $_currency',
-            style: const TextStyle()),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text('cancel'.tr(), style: const TextStyle())),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text('debts_receive_btn'.tr(),
-                  style: TextStyle(color: cs.primary))),
-        ],
-      ),
+      title: 'debts_receive_btn'.tr(),
+      message:
+          '${'debts_tab_receivable'.tr()}: ${debt['name']}\n${(debt['remaining_amount'] as num).toStringAsFixed(0)} $_currency',
+      confirmLabel: 'debts_receive_btn'.tr(),
+      danger: false,
+      onConfirm: () async {
+        if (_saving) return;
+        _saving = true;
+        setState(() {});
+        try {
+          final user = Supabase.instance.client.auth.currentUser;
+          if (user == null) return;
+          await Supabase.instance.client
+              .from('debts')
+              .update({'is_paid': true})
+              .eq('id', debt['id']);
+          await Supabase.instance.client.from('transactions').insert({
+            'user_id': user.id,
+            'type': 'income',
+            'amount': debt['remaining_amount'],
+            'category': 'debts_received_cat'.tr(),
+            'description': 'debts_received_desc'.tr(namedArgs: {'name': debt['name']}),
+            'transaction_date': DateTime.now().toIso8601String().split('T')[0],
+          });
+          if (mounted) {
+            _showCelebration(debt['name']);
+            await _load();
+          }
+        } finally {
+          if (mounted) setState(() => _saving = false);
+        }
+      },
     );
-    if (confirm != true) return;
-    if (_saving) return;
-
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
-
-    _saving = true;
-    setState(() {});
-    try {
-      await Supabase.instance.client.from('debts').update({'is_paid': true}).eq('id', debt['id']);
-      await Supabase.instance.client.from('transactions').insert({
-        'user_id': user.id,
-        'type': 'income',
-        'amount': debt['remaining_amount'],
-        'category': 'دين مستلم',
-        'description': 'استلام دين: ${debt['name']}',
-        'transaction_date': DateTime.now().toIso8601String().split('T')[0],
-      });
-      if (mounted) {
-        _showCelebration(debt['name']);
-        await _load();
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
   }
 
   void _showAddDialog({Map<String, dynamic>? existing, List<String>? labels}) {

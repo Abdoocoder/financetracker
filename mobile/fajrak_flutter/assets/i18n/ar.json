@@ -806,6 +806,8 @@
   "debts_tab_receivable": "ديون لي",
   "debts_receive_btn": "استلمت الدين",
   "debts_received_msg": "تم استلام دينك! 🎉",
+  "debts_received_cat": "دين مستلم",
+  "debts_received_desc": "استلام دين: {name}",
   "debt_name_required": "الرجاء إدخال اسم الدين",
   "debt_amount_required": "الرجاء إدخال المبلغ الأصلي",
   "debt_amount_positive": "المبلغ يجب أن يكون أكبر من صفر",
