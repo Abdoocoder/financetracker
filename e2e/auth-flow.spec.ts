@@ -25,14 +25,14 @@ test.describe('Authentication Flow', () => {
   test('should allow switching between Login and Register', async ({ page }) => {
     await page.goto('/login');
     
-    // Click on "سجل مجانا" (Register Free) link
-    await page.getByRole('link', { name: 'سجل مجانا' }).click();
+    // Click on "سجل مجاناً" (Register Free) link - matches auth_register_link translation
+    await page.getByRole('link', { name: 'سجل مجاناً' }).click();
     
     await expect(page).toHaveURL(/\/register/);
     await expect(page.getByRole('heading', { name: 'ابدأ رحلتك المالية' })).toBeVisible();
     
-    // Switch back to login
-    await page.getByText('سجل الدخول').click();
+    // Switch back to login - matches auth_login_link translation
+    await page.getByRole('link', { name: 'سجل الدخول' }).click();
     await expect(page).toHaveURL(/\/login/);
   });
 });
