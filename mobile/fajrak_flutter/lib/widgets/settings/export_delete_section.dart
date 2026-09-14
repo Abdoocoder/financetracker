@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -57,6 +59,18 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
       final type = tx['type'] == 'income' ? 'csv_income'.tr() : 'csv_expense'.tr();
       buffer.writeln(
           '${tx['transaction_date']},$type,${tx['amount']},${tx['category'] ?? ''},${tx['description'] ?? ''}');
+    }
+
+    if (kIsWeb) {
+      await Clipboard.setData(
+        ClipboardData(text: '\uFEFF${buffer.toString()}'),
+      );
+      if (mounted) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('CSV copied to clipboard — paste into a .csv file')));
+      }
+      return;
     }
 
     final directory = await getTemporaryDirectory();

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -255,15 +256,25 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         ].join(','));
       }
 
-      final dir = await getTemporaryDirectory();
-      final ts = DateTime.now().millisecondsSinceEpoch;
-      final file = File('${dir.path}/fajrak_transactions_$ts.csv');
-      await file.writeAsString('\u{feff}${buffer.toString()}', encoding: utf8);
+      if (kIsWeb) {
+        final csvText = '\u{feff}${buffer.toString()}';
+        await Clipboard.setData(ClipboardData(text: csvText));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('CSV copied to clipboard — paste into a .csv file')),
+          );
+        }
+      } else {
+        final dir = await getTemporaryDirectory();
+        final ts = DateTime.now().millisecondsSinceEpoch;
+        final file = File('${dir.path}/fajrak_transactions_$ts.csv');
+        await file.writeAsString('\u{feff}${buffer.toString()}', encoding: utf8);
 
-      await SharePlus.instance.share(ShareParams(
-        files: [XFile(file.path, mimeType: 'text/csv')],
-        subject: 'trans_title'.tr(),
-      ));
+        await SharePlus.instance.share(ShareParams(
+          files: [XFile(file.path, mimeType: 'text/csv')],
+          subject: 'trans_title'.tr(),
+        ));
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
