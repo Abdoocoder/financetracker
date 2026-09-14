@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import 'package:flutter/services.dart';
@@ -440,6 +441,18 @@ class _LearnScreenState extends State<LearnScreen> {
       if (byteData == null) throw Exception('Failed to encode image');
 
       final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+      if (kIsWeb) {
+        await Clipboard.setData(
+          ClipboardData(text: 'fajrak.com — ${_lesson['title'] ?? 'Today lesson'}'),
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lesson link copied to clipboard')),
+          );
+        }
+        return;
+      }
 
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/fajrak-lesson.png');
