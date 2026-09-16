@@ -14,9 +14,14 @@
 
 ```
 app/
-  (auth)/         # login, register
+  (auth)/         # login, register, forgot-password, reset-password, onboarding
   (dashboard)/    # dashboard, transactions, debts, investments, alerts, budgets, goals
   api/            # API routes (alerts, cron, push, webhook, byok/proxy, api-keys, mcp)
+  robots.ts       # disallows /api/, /dashboard/, /onboarding, /forgot-password, /reset-password
+  sitemap.ts      # 6 public pages
+# SEO page-split pattern: 'use client' pages that need metadata are split into
+#   page.tsx        → thin server wrapper: generateMetadata() + render <XClient />
+#   x-client.tsx    → the original client component body (named export) — never edit page.tsx for UI
 components/
   ui/             # shadcn components
   dashboard/      # StatsCards, BudgetChart, DebtProgress, InvestmentTracker
