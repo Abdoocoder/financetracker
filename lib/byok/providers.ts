@@ -32,6 +32,8 @@ export interface ByokProvider {
   /** Fixed upstream URL — the only host the proxy may dial for this id. */
   baseUrl: string
   defaultModel: string
+  /** Available models for this provider (shown in UI model selector). */
+  availableModels?: string[]
   auth: ProviderAuth
   /** Extra headers to always add (e.g. anthropic-version). Overridden by the request if present. */
   defaultHeaders?: Record<string, string>
@@ -51,6 +53,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     kind: 'proxy',
     baseUrl: 'https://api.openai.com/v1/chat/completions',
     defaultModel: 'gpt-5.4-mini',
+    availableModels: ['gpt-5.4-mini', 'gpt-5.4', 'gpt-4.1', 'gpt-4.1-mini', 'o1-preview', 'o1-mini'],
     auth: { kind: 'bearer' },
     authHeaderName: 'authorization',
   },
@@ -60,6 +63,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     kind: 'proxy',
     baseUrl: 'https://api.anthropic.com/v1/messages',
     defaultModel: 'claude-sonnet-4-6',
+    availableModels: ['claude-sonnet-4-6', 'claude-opus-4', 'claude-3.5-sonnet'],
     auth: { kind: 'x-api-key' },
     authHeaderName: 'x-api-key',
     defaultHeaders: { 'anthropic-version': '2023-06-01' },
@@ -69,7 +73,15 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     name: 'NVIDIA NIM',
     kind: 'proxy',
     baseUrl: 'https://integrate.api.nvidia.com/v1/chat/completions',
-    defaultModel: 'meta/llama-3.1-70b-instruct',
+    defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b',
+    availableModels: [
+      'nvidia/nemotron-3-ultra-550b-a55b',
+      'nvidia/nemotron-3-super-120b-a12b',
+      'meta/llama-3.1-70b-instruct',
+      'meta/llama-3.1-405b-instruct',
+      'mistralai/mistral-nemotron',
+      'google/gemma-2-27b-it',
+    ],
     auth: { kind: 'bearer' },
     authHeaderName: 'authorization',
   },
@@ -79,6 +91,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     kind: 'proxy',
     baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
     defaultModel: 'auto',
+    availableModels: ['auto', 'openai/gpt-5.4-mini', 'anthropic/claude-sonnet-4-6', 'meta/llama-3.1-405b-instruct'],
     auth: { kind: 'bearer' },
     authHeaderName: 'authorization',
   },
@@ -89,6 +102,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     baseUrl:
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent',
     defaultModel: 'gemini-2.5-pro',
+    availableModels: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-1.5-pro'],
     auth: { kind: 'x-goog-api-key' },
     authHeaderName: 'x-goog-api-key',
   },
@@ -98,6 +112,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     kind: 'clientDirect',
     baseUrl: 'http://localhost:11434/v1',
     defaultModel: 'llama3.1',
+    availableModels: ['llama3.1', 'llama3.2', 'mistral', 'qwen2.5', 'phi3.5'],
     auth: { kind: 'none' },
     authHeaderName: '',
   },

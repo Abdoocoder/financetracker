@@ -58,7 +58,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   late final ByokService _service = widget.service ?? ByokService();
 
-  final TextEditingController _modelController = TextEditingController();
   final TextEditingController _inputController = TextEditingController();
   final FocusNode _inputFocus = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -74,6 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _loadingKeys = true;
   bool _loadingContext = true;
   bool _atBottom = true;
+  String _selectedModel = '';
 
   double _totalBalance = 0;
   double _income = 0;
@@ -94,7 +94,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    _modelController.dispose();
     _inputController.dispose();
     _inputFocus.dispose();
     _scrollController.dispose();
@@ -267,9 +266,7 @@ class _ChatScreenState extends State<ChatScreen> {
         keyId: _needsKey ? _keyId : null,
         systemPrompt: _buildSystemPrompt(),
         messages: List.of(_messages),
-        model: _modelController.text.trim().isEmpty
-            ? null
-            : _modelController.text.trim(),
+        model: _selectedModel.isEmpty ? null : _selectedModel,
         onDelta: (delta) {
           if (!mounted) return;
           setState(() => _assistantPartial += delta);
@@ -315,15 +312,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _onProviderChanged(String? id) {
     if (id == null || id == _providerId) return;
+    final provider = getProvider(id);
     setState(() {
       _providerId = id;
       _keyId = null;
-      _modelController.clear();
+      _selectedModel = provider?.defaultModel ?? '';
     });
   }
 
   void _resetModel() {
-    setState(() => _modelController.clear());
+    final provider = getProvider(_providerId);
+    setState(() => _selectedModel = provider?.defaultModel ?? '');
   }
 
   // ---------------------------------------------------------------------------
@@ -380,6 +379,9 @@ class _ChatScreenState extends State<ChatScreen> {
     final showKeyRow =
         _needsKey && !_hasKeysForProvider && !_loadingKeys;
 
+    final provider = getProvider(_providerId);
+    final models = provider?.availableModels ?? [];
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Column(
@@ -416,15 +418,17 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          TextField(
-            controller: _modelController,
+          InputDecorator(
             decoration: InputDecoration(
               labelText: 'chat_model'.tr(),
-              hintText: 'chat_auto_model'.tr(),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              suffixIcon: _modelController.text.isEmpty
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 4,
+              ),
+              suffixIcon: _selectedModel.isEmpty
                   ? null
                   : IconButton(
                       icon: const Icon(Icons.restart_alt),
@@ -432,7 +436,24 @@ class _ChatScreenState extends State<ChatScreen> {
                       onPressed: _resetModel,
                     ),
             ),
-            onChanged: (_) => setState(() {}),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                isExpanded: true,
+                isDense: true,
+                value: _selectedModel.isEmpty ? null : _selectedModel,
+                hint: Text('chat_auto_model'.tr()),
+                items: [
+                  for (final m in models)
+                    DropdownMenuItem<String>(
+                      value: m,
+                      child: Text(m, overflow: TextOverflow.ellipsis),
+                    ),
+                ],
+                onChanged: (v) {
+                  if (v != null) setState(() => _selectedModel = v);
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           if (_needsKey && showKeyRow) ...[
