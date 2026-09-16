@@ -85,7 +85,7 @@ Body schema:
 | Category | Translation |
 |----------|------------|
 | `راتب` | Salary |
-| `عملحر` | Freelance |
+| `عمل حر` | Freelance |
 | `استثمار` | Investment |
 | `مكافأة` | Bonus |
 | `أخرى` | Other |

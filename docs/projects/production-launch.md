@@ -7,7 +7,7 @@
 | Metric | Value |
 |--------|-------|
 | **App Name** | Fajrak (فجرك) |
-| **Version** | 3.40.0+51 |
+| **Version** | 3.40.0+52 |
 | **Stack** | Next.js 16 / React 19 / TS (Web) • Flutter 3.x (Mobile) • Supabase (DB/Auth/Realtime) • Firebase (FCM) • Vercel (Hosting) |
 | **Repo** | `Abdoocoder/financetracker` (GitHub) |
 | **Package Name** | `com.fajrak.app` (Android) / `com.fajrak.app` (iOS) |
@@ -19,7 +19,7 @@
 
 | Area | Status | Evidence |
 |------|--------|----------|
-| **Web Tests** | ✅ 524/524 passing | `npm test` |
+| **Web Tests** | ✅ 531/531 passing | `npm test` |
 | **Flutter Tests** | ✅ 135/135 passing | `flutter test` |
 | **TypeScript** | ✅ Clean | `npm run typecheck` |
 | **ESLint** | ✅ Clean | `npm run lint` |

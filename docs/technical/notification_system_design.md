@@ -47,7 +47,7 @@
 
 export enum NotificationType {
   BUDGET = 'budget',           // تجاوز الميزانية
-  DEBT = 'debt',               // ديون ومosporمولات
+  DEBT = 'debt',               // ديون ومسؤوليات
   GOAL = 'goal',               // أهداف ادخار
   TRANSACTION = 'transaction', // معاملات
   REMINDER = 'reminder',       // تذكيرات
@@ -952,7 +952,7 @@ export class NotificationServiceV2 {
       return { success: false, reason: 'rate_limited' };
     }
     
-    // 3. التحقق منquiet hours
+    // 3. التحقق من quiet hours
     if (await this.isInQuietHours(notification.userId)) {
       // جدولة للإرسال لاحقاً
       await this.scheduleNotification(notification);
@@ -965,7 +965,7 @@ export class NotificationServiceV2 {
     
     // 5. الإرسال
     const results = await Promise.allSettled([
-      // FCM (للتerminated/background)
+      // FCM (للـ terminated/background)
       this.sendFCM(notification.userId, fcmPayload),
       // Local (للـ foreground)
       this.showLocal(notification, localPayload)
