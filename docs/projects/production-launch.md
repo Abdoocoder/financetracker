@@ -25,7 +25,7 @@
 | **ESLint** | ✅ Clean | `npm run lint` |
 | **Flutter Analyze** | ✅ Clean | `flutter analyze` |
 | **Web Build** | ✅ Successful | `npm run build` |
-| **Feature A (BYOK Proxy)** | ✅ Complete + tested | `/api/byok/proxy`, 7 providers |
+| **Feature A (BYOK Proxy)** | ✅ Complete + tested | `/api/byok/proxy`, 6 providers |
 | **Feature B (MCP Server)** | ✅ Complete + tested | `/api/mcp`, 3 tools, PAT auth |
 | **Shared Config** | ✅ `SUPPORTED_PROVIDERS` synced | Web + Flutter |
 
