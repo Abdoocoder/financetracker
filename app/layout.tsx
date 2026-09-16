@@ -17,9 +17,21 @@ const cairo = Cairo({
 })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getServerTranslation()
-  
+  const { t, lang } = await getServerTranslation()
+  const title = t('meta_title')
+  const description = t('meta_desc')
+  const appName = t('app_name')
+  const primaryLocale = lang === 'en' ? 'en_US' : 'ar_JO'
+  const alternateLocale = lang === 'en' ? ['ar_JO'] : ['en_US']
+  const ogImage = {
+    url: '/feature-graphic.png',
+    width: 1024,
+    height: 500,
+    alt: appName,
+  }
+
   return {
+    metadataBase: new URL('https://fajrak.com'),
     manifest: '/manifest.json',
     appleWebApp: {
       capable: true,
@@ -30,8 +42,30 @@ export async function generateMetadata(): Promise<Metadata> {
       'mobile-web-app-capable': 'yes',
       'theme-color': '#070B14',
     },
-    title: t('meta_title'),
-    description: t('meta_desc'),
+    title: {
+      template: `%s | ${appName}`,
+      default: title,
+    },
+    description,
+    alternates: {
+      canonical: '/',
+    },
+    openGraph: {
+      type: 'website',
+      url: 'https://fajrak.com',
+      locale: primaryLocale,
+      alternateLocale,
+      siteName: appName,
+      title,
+      description,
+      images: [ogImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/feature-graphic.png'],
+    },
     icons: { icon: '/icon-512.png' },
   }
 }
@@ -39,10 +73,24 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getServerLang()
   const nonce = (await headers()).get('x-nonce') ?? undefined
+  const { t } = await getServerTranslation()
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: t('app_name'),
+    alternateName: ['فجرك', 'Fajrak Financial'],
+    url: 'https://fajrak.com',
+    logo: 'https://fajrak.com/icon-512.png',
+    email: 'support@fajrak.com',
+    description: t('meta_desc'),
+  }
   
   return (
     <html lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <head>
+        <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema),
+        }} />
         <script nonce={nonce} dangerouslySetInnerHTML={{
           __html: `(function(){
           var saved = localStorage.getItem('theme');
