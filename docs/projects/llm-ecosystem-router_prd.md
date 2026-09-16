@@ -175,6 +175,22 @@ class RouterEngine {
       this.privacyAllows(p, task.privacyLevel)
     )
 
+    // Handle empty candidate set — fallback to cheapest available provider
+    if (candidates.length === 0) {
+      const fallback = this.registry.find(p => p.kind === 'local') 
+        ?? this.registry['ollama']
+        ?? Object.values(this.registry)[0]
+      return {
+        providerId: fallback.id,
+        model: fallback.defaultModel,
+        reason: 'No capable provider matched task constraints; fell back to default',
+        fallbackChain: [],
+        estimatedCostUsd: this.estimateCost(fallback, task),
+        estimatedLatencyMs: fallback.routingProfile?.latencyP50Ms ?? 5000,
+        routingStrategy: this.userPrefs.strategy
+      }
+    }
+
     // 2. Score by strategy
     const scored = candidates.map(p => ({
       provider: p,
@@ -222,17 +238,29 @@ CREATE TABLE byok_usage_log (
 
 CREATE INDEX idx_byok_usage_user_date ON byok_usage_log(user_id, created_at DESC);
 CREATE INDEX idx_byok_usage_provider ON byok_usage_log(provider_id);
+
+-- RLS: users only see their own usage
+ALTER TABLE byok_usage_log ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own usage logs"
+  ON byok_usage_log FOR SELECT
+  USING (user_id = auth.uid());
+CREATE POLICY "Users can insert own usage logs"
+  ON byok_usage_log FOR INSERT
+  WITH CHECK (user_id = auth.uid());
+-- No UPDATE/DELETE policies — append-only audit log
+
+GRANT SELECT, INSERT ON byok_usage_log TO authenticated;
 ```
 
-**Cost Estimation (per 1k tokens, USD):**
+**Cost Estimation (per 1M tokens, USD):**
 
-| Provider/Model | Input | Output |
+|| Provider/Model | Input | Output ||
 |----------------|-------|--------|
 | NVIDIA Nemotron Ultra | $0.00 (free tier) | $0.00 |
 | NVIDIA Nemotron Super | $0.00 | $0.00 |
-| OpenAI GPT-5.4-mini | $0.15 | $0.60 |
-| Anthropic Sonnet 4 | $3.00 | $15.00 |
-| Gemini 2.5 Pro | $1.25 | $5.00 |
+| OpenAI GPT-5.4-mini | $150 | $600 |
+| Anthropic Sonnet 4 | $3,000 | $15,000 |
+| Gemini 2.5 Pro | $1,250 | $5,000 |
 | OpenRouter (auto) | variable | variable |
 | Ollama (local) | $0.00 | $0.00 |
 
@@ -446,8 +474,9 @@ interface ABTestConfig {
   keyId?: string                // for proxy providers
 }
 
-// Response: SSE stream (unchanged) + routing metadata in headers
-// x-routing-decision: {"providerId":"nvidia-nim","model":"nemotron-3-ultra","reason":"reasoning_heavy task, 1M context needed","fallbackChain":["openai","anthropic"],"estimatedCostUsd":0.00}
+// Response: SSE stream (unchanged) + routing metadata in response body (not headers)
+// Since routing is client-side, the decision is returned in the first SSE event:
+// data: {"type":"routing","decision":{"providerId":"nvidia-nim","model":"nemotron-3-ultra","reason":"reasoning_heavy task, 1M context needed","fallbackChain":["openai","anthropic"],"estimatedCostUsd":0.00}}
 ```
 
 #### `GET /api/byok/routing/stats`
@@ -503,11 +532,11 @@ BYOK_ROUTER_ENABLED=true
 BYOK_DEFAULT_STRATEGY=auto
 BYOK_COST_TRACKING_ENABLED=true
 
-# Provider Cost Overrides (optional, USD per 1k tokens)
+# Provider Cost Overrides (optional, USD per 1M tokens)
 BYOK_COST_NVIDIA_NEMOTRON_ULTRA_INPUT=0
 BYOK_COST_NVIDIA_NEMOTRON_ULTRA_OUTPUT=0
-BYOK_COST_OPENAI_GPT54_MINI_INPUT=0.15
-BYOK_COST_OPENAI_GPT54_MINI_OUTPUT=0.60
+BYOK_COST_OPENAI_GPT54_MINI_INPUT=150
+BYOK_COST_OPENAI_GPT54_MINI_OUTPUT=600
 # ... etc
 
 # Evaluation
@@ -533,7 +562,7 @@ EVAL_BASELINE_PATH=eval/results/baseline.json
 ### 8.3 Rate Limiting
 - Per-user: 30/min (existing `bump_proxy_usage`)
 - Per-provider: Respect upstream limits (NVIDIA free tier generous)
-- Cost-based: Hard stop at user's monthly budget
+- Cost-based: **Advisory budget alerts** at 80%/100% — client checks before routing; proxy cannot enforce (body not parsed). See §7.1.
 
 ---
 
