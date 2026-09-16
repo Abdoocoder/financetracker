@@ -8,6 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
+    // Optimize CSS loading to reduce unused preload warnings
+    optimizeCss: true,
   },
   serverExternalPackages: ['firebase-admin'],
   turbopack: { root: __dirname },
@@ -57,10 +59,8 @@ export default withSentryConfig(nextConfig, {
   widenClientFileUpload: true,
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  tunnelRoute: "/monitoring",
+  // Disabled due to project ID mismatch causing 403 errors.
+  // tunnelRoute: "/monitoring",
 
   webpack: {
     // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
