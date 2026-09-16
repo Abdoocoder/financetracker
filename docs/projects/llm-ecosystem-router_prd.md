@@ -87,7 +87,7 @@ interface ByokProvider {
 interface ProviderRoutingProfile {
   tier: 'premium' | 'balanced' | 'budget' | 'local'
   strengths: TaskType[]           // e.g., ['reasoning', 'arabic', 'coding']
-  costPer1kTokens: { input: number; output: number }  // USD estimates
+  costPer1MTokens: { input: number; output: number }  // USD per 1M tokens (real list prices)
   latencyP50Ms: number
   contextWindow: number
   supportsStreaming: boolean
@@ -95,7 +95,7 @@ interface ProviderRoutingProfile {
 }
 ```
 
-**Current Registry (7 providers):**
+**Current Registry (6 providers):**
 
 | Provider | Tier | Default Model | Available Models | Strengths |
 |----------|------|---------------|------------------|-----------|
@@ -167,28 +167,28 @@ class RouterEngine {
   ) {}
 
   route(task: ClassifiedTask): RoutingDecision {
-    // 1. Filter by capability
-    const candidates = this.registry.filter(p => 
+    // 1. Filter by capability (streaming requires a strict match)
+    let candidates = this.registry.filter(p =>
       p.supportsStreaming === task.requiresStreaming &&
       p.supportsTools === task.requiresTools &&
       p.contextWindow >= task.estimatedTokens.input + task.estimatedTokens.output &&
       this.privacyAllows(p, task.privacyLevel)
     )
 
-    // Handle empty candidate set — fallback to cheapest available provider
+    // 1b. Empty-candidate fallback (ADR-ROUTER-005): never crash on no-match.
+    //     Relax requiresStreaming → false, then privacy-only, then default-tier.
     if (candidates.length === 0) {
-      const fallback = this.registry.find(p => p.kind === 'local') 
-        ?? this.registry['ollama']
-        ?? Object.values(this.registry)[0]
-      return {
-        providerId: fallback.id,
-        model: fallback.defaultModel,
-        reason: 'No capable provider matched task constraints; fell back to default',
-        fallbackChain: [],
-        estimatedCostUsd: this.estimateCost(fallback, task),
-        estimatedLatencyMs: fallback.routingProfile?.latencyP50Ms ?? 5000,
-        routingStrategy: this.userPrefs.strategy
-      }
+      candidates = this.registry.filter(p =>
+        p.supportsTools === task.requiresTools &&
+        p.contextWindow >= task.estimatedTokens.input + task.estimatedTokens.output &&
+        this.privacyAllows(p, task.privacyLevel)
+      )
+    }
+    if (candidates.length === 0) {
+      candidates = this.registry.filter(p => this.privacyAllows(p, task.privacyLevel))
+    }
+    if (candidates.length === 0) {
+      candidates = [this.defaultTierProvider]   // seeded registry always has one
     }
 
     // 2. Score by strategy
@@ -197,7 +197,7 @@ class RouterEngine {
       score: this.calculateScore(p, task)
     })).sort((a, b) => b.score - a.score)
 
-    // 3. Apply user prefs (manual override, budget caps)
+    // 3. Apply user prefs (manual override, budget caps) — scored[0] always defined
     const final = this.applyPreferences(scored[0], task)
 
     // 4. Build fallback chain (next 2 best)
@@ -239,30 +239,33 @@ CREATE TABLE byok_usage_log (
 CREATE INDEX idx_byok_usage_user_date ON byok_usage_log(user_id, created_at DESC);
 CREATE INDEX idx_byok_usage_provider ON byok_usage_log(provider_id);
 
--- RLS: users only see their own usage
+-- ADR-ROUTER-004: RLS is mandatory (mirror proxy_usage pattern, legacy/040)
 ALTER TABLE byok_usage_log ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can view own usage logs"
-  ON byok_usage_log FOR SELECT
-  USING (user_id = auth.uid());
-CREATE POLICY "Users can insert own usage logs"
-  ON byok_usage_log FOR INSERT
-  WITH CHECK (user_id = auth.uid());
--- No UPDATE/DELETE policies — append-only audit log
+
+CREATE POLICY "byok_usage_log_select_own" ON byok_usage_log
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "byok_usage_log_insert_own" ON byok_usage_log
+  FOR INSERT TO authenticated WITH CHECK (user_id = auth.uid());
 
 GRANT SELECT, INSERT ON byok_usage_log TO authenticated;
 ```
 
-**Cost Estimation (per 1M tokens, USD):**
+**Cost Estimation (USD per 1M tokens — real list prices):**
 
-|| Provider/Model | Input | Output ||
+| Provider/Model | Input | Output |
 |----------------|-------|--------|
 | NVIDIA Nemotron Ultra | $0.00 (free tier) | $0.00 |
 | NVIDIA Nemotron Super | $0.00 | $0.00 |
-| OpenAI GPT-5.4-mini | $150 | $600 |
-| Anthropic Sonnet 4 | $3,000 | $15,000 |
-| Gemini 2.5 Pro | $1,250 | $5,000 |
+| OpenAI GPT-5.4-mini | $0.15 | $0.60 |
+| Anthropic Sonnet 4 | $3.00 | $15.00 |
+| Gemini 2.5 Pro | $1.25 | $5.00 |
 | OpenRouter (auto) | variable | variable |
 | Ollama (local) | $0.00 | $0.00 |
+
+> **Unit note (ADR-ROUTER-001):** these are provider **per-1M** list prices, not per-1k.
+> `estimatedCostUsd = (tokens / 1_000_000) × costPer1MTokens`. The Phase-2 field is
+> named `costPer1MTokens` to match reality and is locked by a golden unit test (see §9);
+> rendering these as per-1k would inflate estimates ~1000× and corrupt `cost_optimize`.
 
 ---
 
@@ -474,9 +477,12 @@ interface ABTestConfig {
   keyId?: string                // for proxy providers
 }
 
-// Response: SSE stream (unchanged) + routing metadata in response body (not headers)
-// Since routing is client-side, the decision is returned in the first SSE event:
-// data: {"type":"routing","decision":{"providerId":"nvidia-nim","model":"nemotron-3-ultra","reason":"reasoning_heavy task, 1M context needed","fallbackChain":["openai","anthropic"],"estimatedCostUsd":0.00}}
+// Response: SSE stream (unchanged). ADR-ROUTER-002 — the proxy never parses
+// bodies, so it CANNOT emit server-side routing metadata. The client router
+// returns the decision to the UI directly. For server-side audit the client
+// MAY echo the finalized decision as a REQUEST header (informational only;
+// the proxy does not assert or trust it):
+// x-routing-decision: {"providerId":"nvidia-nim","model":"nemotron-3-ultra","reason":"reasoning_heavy task, 1M context needed","fallbackChain":["openai","anthropic"],"estimatedCostUsd":0.00}
 ```
 
 #### `GET /api/byok/routing/stats`
@@ -520,6 +526,8 @@ CREATE TABLE byok_ab_assignment (
   assigned_at TIMESTAMPTZ DEFAULT NOW(),
   PRIMARY KEY (user_id, experiment_id)
 );
+-- ADR-ROUTER-004: ENABLE ROW LEVEL SECURITY + owner-row policies + grants,
+-- exactly mirroring byok_usage_log / proxy_usage (legacy/040).
 ```
 
 ---
@@ -532,11 +540,11 @@ BYOK_ROUTER_ENABLED=true
 BYOK_DEFAULT_STRATEGY=auto
 BYOK_COST_TRACKING_ENABLED=true
 
-# Provider Cost Overrides (optional, USD per 1M tokens)
+# Provider Cost Overrides (optional, USD per 1M tokens — see ADR-ROUTER-001)
 BYOK_COST_NVIDIA_NEMOTRON_ULTRA_INPUT=0
 BYOK_COST_NVIDIA_NEMOTRON_ULTRA_OUTPUT=0
-BYOK_COST_OPENAI_GPT54_MINI_INPUT=150
-BYOK_COST_OPENAI_GPT54_MINI_OUTPUT=600
+BYOK_COST_OPENAI_GPT54_MINI_INPUT=0.15
+BYOK_COST_OPENAI_GPT54_MINI_OUTPUT=0.60
 # ... etc
 
 # Evaluation
@@ -562,7 +570,11 @@ EVAL_BASELINE_PATH=eval/results/baseline.json
 ### 8.3 Rate Limiting
 - Per-user: 30/min (existing `bump_proxy_usage`)
 - Per-provider: Respect upstream limits (NVIDIA free tier generous)
-- Cost-based: **Advisory budget alerts** at 80%/100% — client checks before routing; proxy cannot enforce (body not parsed). See §7.1.
+- Cost-based: **Advisory monthly budget** (ADR-ROUTER-003) — the thin proxy
+  cannot enforce a hard stop (it never parses bodies; usage is client-reported
+  and spoofable). Enforce on the client: warn at 80% utilization, soft-block when
+  the user's monthly budget is exceeded (user may override manually). Never market
+  this as a server-enforced cap.
 
 ---
 
@@ -570,7 +582,7 @@ EVAL_BASELINE_PATH=eval/results/baseline.json
 
 | Layer | Coverage | Tools |
 |-------|----------|-------|
-| **Unit** | Task classifier, router scoring, cost estimation | Jest (web), flutter_test (mobile) |
+| **Unit** | Task classifier, router scoring, cost estimation (golden: Sonnet 4 = $3.00/$15.00 per **1M**; GPT-5.4-mini = $0.15/$0.60 per **1M**), empty-candidate fallback (streaming/tools/privacy no-match → next relaxed tier → default-tier, never crashes) | Jest (web), flutter_test (mobile) |
 | **Integration** | Router → Proxy → Provider (mocked) | Playwright (web), integration_test (mobile) |
 | **E2E** | Full chat flow with routing indicator | Playwright |
 | **Benchmark** | Weekly multi-provider evaluation | DeepSeek Harness |
@@ -651,6 +663,28 @@ supabase/migrations/
 - [ ] **Engineering Lead** — Architecture, performance budget
 - [ ] **DevOps** — CI pipeline, DeepSeek Harness integration
 - [ ] **UX** — Routing indicator, preferences screen
+
+---
+
+## 14. Review Decision & ADR Notes (2026-09-16)
+
+**Mode:** HOLD SCOPE · **Approach:** C (Router + usage log + eval harness in CI; A/B testing, provider-health auto-exclusion, and tuning UI deferred to later phases).
+**Verdict:** DONE_WITH_CONCERNS — 5 blocking concerns, all applied below. Full review: `memory/2026-09-16-llm-ecosystem-router-ceo-review.md`.
+
+### ADR-ROUTER-001 — Cost units are per 1M tokens (§3.1, §3.4, §7.3)
+Provider list prices are billed per **1M** tokens, not per 1k. Field renamed `costPer1kTokens` → `costPer1MTokens` (safe: not yet in shipped code). Golden unit test locks Sonnet 4 = $3.00/$15.00 per 1M, GPT-5.4-mini = $0.15/$0.60 per 1M, so `cost_optimize` scoring can never silently inflate ~1000×.
+
+### ADR-ROUTER-002 — No routing metadata in the API response (§7.1)
+The thin proxy never parses bodies, so it cannot emit server-side routing metadata. The client router returns the decision to the UI; the client MAY echo `x-routing-decision` as a **request** header for audit only (informational, never asserted or trusted server-side).
+
+### ADR-ROUTER-003 — Budget is advisory, not a server-enforced hard stop (§8.3)
+The proxy cannot count tokens, and usage is client-reported/spoofable. Enforcement moves to the client: 80% alert + soft-block with manual override. Marketing must not claim an enforced monthly cap.
+
+### ADR-ROUTER-004 — `byok_usage_log` and `byok_ab_assignment` are RLS-protected (§3.4, §7.2)
+`ENABLE ROW LEVEL SECURITY` + owner-row SELECT/INSERT policies + `GRANT ... TO authenticated`, mirroring the `proxy_usage` pattern (legacy/040). No RLS-less cost/experiment tables may ship — RLS is mandatory on every table.
+
+### ADR-ROUTER-005 — Empty-candidate fallback in `route()` (§3.3)
+If capability filtering eliminates all candidates (streaming/tools/privacy no-match), relax `requiresStreaming` → false, then privacy-only, then default-tier provider. `scored[0]` is always defined; unit test covers the no-match path.
 
 ---
 
