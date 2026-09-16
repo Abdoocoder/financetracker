@@ -280,13 +280,18 @@ export default function ChatAssistant() {
                     )}
 
                     <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>{t('chat_model')}</label>
-                    <input
+                    <select
                         aria-label={t('chat_model')}
                         value={model}
                         onChange={e => setModel(e.target.value)}
-                        placeholder={provider?.id === 'openrouter' ? t('chat_auto_model') : provider?.defaultModel}
                         style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: 10, padding: '6px 10px', fontSize: 14, width: 220 }}
-                    />
+                    >
+                        {provider?.availableModels?.map(m => (
+                            <option key={m} value={m}>{m}</option>
+                        )) || (
+                            <option value={provider?.defaultModel ?? ''}>{provider?.defaultModel ?? t('chat_auto_model')}</option>
+                        )}
+                    </select>
                 </div>
                 {(vaultUnavailable && needsKey) && (
                     <div style={{ fontSize: 12, color: 'var(--accent-red-light)' }}>{t('chat_error_vault')}</div>
