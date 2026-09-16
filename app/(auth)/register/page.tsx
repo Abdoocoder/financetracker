@@ -1,128 +1,16 @@
-'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
-import { useI18n } from '@/lib/i18n'
+import type { Metadata } from 'next'
+import { getServerTranslation } from '@/lib/i18n-server'
+import { RegisterClient } from './register-client'
 
-const MIN_LENGTH = 8
-
-function checkPassword(pw: string) {
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslation()
   return {
-    upper:  /[A-Z]/.test(pw),
-    lower:  /[a-z]/.test(pw),
-    number: /[0-9]/.test(pw),
-    symbol: /[^A-Za-z0-9]/.test(pw),
-    length: pw.length,
+    title: t('auth_register_title'),
+    description: t('auth_register_subtitle'),
+    alternates: { canonical: '/register' },
   }
 }
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const { t } = useI18n()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  const checks = checkPassword(password)
-  const allMet = checks.upper && checks.lower && checks.number && checks.symbol && checks.length >= MIN_LENGTH
-
-  async function handleRegister(e: React.FormEvent) {
-    e.preventDefault()
-    if (loading) return
-    setLoading(true)
-    setError('')
-    const supabase = createClient()
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
-    })
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    } else {
-      router.push('/onboarding')
-      router.refresh()
-    }
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: 'var(--bg-primary)' }}>
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl gradient-blue flex items-center justify-center text-white font-bold text-xl mx-auto mb-4">
-            {t('app_name')[0]}
-          </div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{t('auth_register_title')}</h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>{t('auth_register_subtitle')}</p>
-        </div>
-
-        <form onSubmit={handleRegister} className="p-8 rounded-2xl border space-y-5"
-          style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
-          {error && (
-            <div className="p-3 rounded-lg text-sm text-center"
-              style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--accent-red)', border: '1px solid rgba(239,68,68,0.2)' }}>
-              {error}
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('auth_email')}</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required autoFocus
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-              placeholder="you@example.com" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>{t('auth_password')}</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-              style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
-              placeholder={t('auth_pass_placeholder')} />
-
-            {password.length > 0 && (
-              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5">
-                <Req met={checks.upper}  label={t('auth_pass_req_upper')} />
-                <Req met={checks.lower}  label={t('auth_pass_req_lower')} />
-                <Req met={checks.number} label={t('auth_pass_req_number')} />
-                <Req met={checks.symbol} label={t('auth_pass_req_symbol')} />
-                <div className="col-span-2">
-                  <Req
-                    met={checks.length >= MIN_LENGTH}
-                    label={`${t('auth_pass_req_length')}: ${checks.length}/${MIN_LENGTH}`}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          <button type="submit" disabled={loading || !allMet}
-            className="w-full py-3.5 rounded-xl gradient-blue text-white font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
-            {loading ? t('auth_btn_creating') : t('auth_btn_register')}
-          </button>
-          <p className="text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {t('auth_have_account')}{' '}
-            <Link href="/login" style={{ color: 'var(--accent-blue)' }} className="hover:underline font-medium">
-              {t('auth_login_link')}
-            </Link>
-          </p>
-        </form>
-      </div>
-    </div>
-  )
-}
-
-function Req({ met, label }: { met: boolean; label: string }) {
-  return (
-    <div className="flex items-center gap-1.5 text-xs">
-      <span style={{ color: met ? 'var(--accent-green-light)' : 'var(--text-muted)', transition: 'color 0.2s' }}>
-        {met ? '✓' : '✗'}
-      </span>
-      <span style={{ color: met ? 'var(--accent-green-light)' : 'var(--text-muted)', transition: 'color 0.2s' }}>
-        {label}
-      </span>
-    </div>
-  )
+  return <RegisterClient />
 }

@@ -220,11 +220,49 @@ The live schema has prod additions made via the Supabase SQL editor that are **N
 - No performance advisories flagged.
 
 ### Verified health (ran this session)
-- lint ✓ · typecheck ✓ · `next build` 54/54 ✓ · Jest 524 tests / 56 suites (stmts 45.68%) ✓ · Playwright 7 e2e ✓ · Flutter `make doctor` ✓.
+- lint ✓ · typecheck ✓ · `next build` 54/54 ✓ · Jest 531 tests / 59 suites (stmts 45.82%) ✓ · Playwright 6 pass + 1 flaky (auth-flow nav race) ✓ · Flutter `make doctor` ✓.
 - `npm audit`: 8 moderate @opentelemetry/* transitive advisories (GHSA-8988-4f7v-96qf). Next.js 16.3.5 upgrade available (on 16.3.4).
 - Jest exits via `--forceExit` (worker force-exit after run) — acceptable.
 - Web dev server verified live at fajrak.com + local :3000; Flutter app runs on Chrome.
+- **Supabase performance advisories** (6 WARN): RLS initplan — `user_stats`, `testimonials` (3), `saving_challenges`, `health_score_history` policies use `auth.uid()` per-row; wrap with `(select auth.uid())` for performance. 21 unused indexes on `debt_payments`, `investment_transactions`, `saving_challenges`, `testimonials`, `transactions`, `debts`, `user_byok_keys`, `budget_alert_log`, `user_api_keys`, `investments`, `budgets`, `proxy_usage`, `api_audit_log`, `chats`, `messages`.
 
 ### Git / identity
 - Solo dev: `Abdoocoder` (Abdallah Abu Saghierh, Amman/JO). Commits occasionally authored as `abdooraf3@gmail.com` (still never use that as the support email).
 - Remote: `https://github.com/Abdoocoder/financetracker.git`. Convention: conventional commits (`feat:` `fix:` `docs:` `chore:` `refactor:` `test:` `style:`), `feat/*` branches, tags up to `v2.1.0-android`.
+
+## CI/CD Pipeline
+
+- **GitHub Actions** (`lint-test-build.yml`): runs on push to `main` and PRs
+  - Steps: `npm ci` → `npm run lint` → `npm run typecheck` → `npm run test`
+  - Node 22, ubuntu-latest
+- **Supabase validation** (`supabase-validate.yml`): DRY-RUN migration lint on isolated local stack (never touches live DB)
+- **Smart notifications** (`smart-notifications.yml`): separate workflow
+- **Deploy**: Vercel auto-deploys from `main`; Flutter builds via `make build-apk`
+
+## Git Conventions
+
+- **Commits**: Conventional commits — `feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`, `style:`, `ci:`
+- **Branches**: `feat/*` pattern (e.g., `feat/flutter-byok-chat`, `feat/v3.36.0-security-hardening`)
+- **Tags**: Semantic versioning (e.g., `v1.0.0`, `v2.1.0-android`)
+- **PR workflow**: Merge commits to `main`
+
+## Testing Architecture
+
+- **Jest** (`jest.config.js`): 59 suites, 531 tests; coverage via `--forceExit` (acceptable — worker force-exit after run)
+- **Playwright** (`playwright.config.ts`): Chromium only; global auth setup via `e2e/setup/global-setup.ts`
+  - `baseURL: localhost:3000`; retries: 2 on CI, 1 locally; workers: 1 on CI, 2 locally
+  - Dev server: `npx next dev --webpack` (avoids Linux inotify limit)
+  - Trace on first retry; HTML reporter
+- **Coverage gaps**: All `app/(dashboard)/` pages at 0%; hooks `useDashboardData.ts` and `useDashboardLayout.ts` at 0%
+
+## Environment Variables
+
+Full `.env.example` with 20+ vars across 7 groups:
+- **Supabase**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- **E2E**: `E2E_TEST_EMAIL`, `E2E_TEST_PASSWORD` (dedicated test account — never use a real user)
+- **Firebase** (client + admin): `NEXT_PUBLIC_FIREBASE_*`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`
+- **Push/VAPID**: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_EMAIL`
+- **Market data**: `TWELVE_DATA_KEY`, `NEXT_PUBLIC_EXCHANGE_RATE_KEY`
+- **BYOK**: `BYOK_PRIVATE_KEY` (server-only pkcs8 PEM), `NEXT_PUBLIC_BYOK_PUBLIC_KEY` (safe for browser), `NEXT_PUBLIC_BYOK_KEK_ID`
+- **Cron**: `CRON_SECRET` (used with `timingSafeEqual` in `lib/cron-auth.ts`)
+- **Sentry**: `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
