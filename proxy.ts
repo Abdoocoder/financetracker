@@ -17,10 +17,9 @@ function buildCspHeader(nonce: string): string {
   const isDev = process.env.NODE_ENV === 'development'
   // In development, Next.js/Turbopack injects styles as inline <style> tags.
   // When nonce is present in style-src, 'unsafe-inline' is ignored per CSP spec.
-  // So we allow 'unsafe-inline' for styles in dev without nonce, or use nonce only for scripts.
-  const styleSrc = isDev
-    ? "style-src 'self' 'unsafe-inline'"  // Dev: allow inline styles (Turbopack injects them)
-    : `style-src 'self' 'nonce-${nonce}'` // Prod: strict nonce-only for styles
+  // So we allow 'unsafe-inline' for styles (dev and prod), reserving nonce for scripts only.
+  // Sentry Replay masks the DOM by mutating inline styles — nonce-only style-src breaks it.
+  const styleSrc = "style-src 'self' 'unsafe-inline'"
   
   return [
     "default-src 'self'",
