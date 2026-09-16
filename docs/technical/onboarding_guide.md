@@ -10,7 +10,7 @@
 - **Web** — Next.js 16 (App Router) + React 19 + TypeScript (strict)
 - **Mobile** — Flutter (`mobile/fajrak_flutter/`), name *Fajrak*
 
-Current version: `3.40.0+51` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §13 drift notes; earlier docs referencing KWD are stale.
+Current version: `3.40.0+52` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §13 drift notes; earlier docs referencing KWD are stale.
 
 ## 2. High-level architecture
 
@@ -93,11 +93,11 @@ lib/supabase/
 
 ## 8. Database map
 
-19+ tables (verified against migrations). Migrations live in `supabase/migrations/` — **10 top-level files** (`042`, `043`, plus eight dated `2026-09xx` hardening migrations) plus a `legacy/` folder holding the older `001`–`041` set (**42 files**). Migrations are **sequentially numbered — add a new one, never edit existing**. Newer migrations use dated `YYYYMMDDHHMMSS_name.sql` names rather than the old `NNN_name.sql` scheme.
+19+ tables (verified against migrations). Migrations live in `supabase/migrations/` — **11 top-level files** (`042`, `043`, plus nine dated `2026-09xx` hardening migrations) plus a `legacy/` folder holding the older `001`–`041` set (**42 files**). Migrations are **sequentially numbered — add a new one, never edit existing**. Newer migrations use dated `YYYYMMDDHHMMSS_name.sql` names rather than the old `NNN_name.sql` scheme.
 
 ## 9. Testing
 
-- **Jest / jsdom** — 56 suites / 524 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing. Coverage ≈45% statements / 32% branches.
+- **Jest / jsdom** — 58 suites / 531 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing. Coverage ≈48% statements / 31% branches.
 - **Playwright** — `e2e/` (smoke + auth-flow + `transaction-management` all passing). Authenticated specs need a test account via `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in `.env.local`; `globalSetup` builds `e2e/.auth/user.json` automatically.
 - **Flutter** — `make doctor` (analyze + test, zero issues required).
 - Shared Supabase mock: `chainProxy` pattern in `__tests__/hooks/`.
@@ -144,7 +144,7 @@ make doctor
 | Mobile | `mobile/fajrak_flutter/lib/{screens,widgets,services}` |
 | Styling tokens | CSS vars `--text-*`, `--bg-*`, `--border`, `--accent-*`, `--shadow-card` |
 
-> `docs/technical/structure.md` is **stale** — it still references `middleware.ts`, `lib/utils.ts`, and `001_initial.sql`, all of which were superseded (auth gate is now `proxy.ts`). Prefer this guide and `CLAUDE.md` over it.
+> The old layout doc `docs/technical/structure.md` was **removed** — it referenced `middleware.ts`, `lib/utils.ts`, and `001_initial.sql`, all of which were superseded (auth gate is now `proxy.ts`). Prefer this guide and `CLAUDE.md`.
 
 ## 13. Live-audit drift notes (Sep 2026)
 

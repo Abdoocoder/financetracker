@@ -3,7 +3,7 @@
   "name": "fajrak",
   "version": "1.0.0",
   "description": "Fajrak Finance MCP Server — AI-powered personal finance tracking with account balances, cash flow summaries, and transaction creation.",
-  "repository": "https://github.com/anthropics/fajrak",
+  "repository": "https://github.com/Abdoocoder/financetracker",
   "endpoint": "https://fajrak.com/api/mcp",
   "transport": {
     "type": "streamable-http",
