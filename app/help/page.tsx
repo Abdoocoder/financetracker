@@ -1,17 +1,17 @@
 import type { Metadata } from 'next'
 import { getServerTranslation } from '@/lib/i18n-server'
 import { buildPageMetadata } from '@/lib/seo'
-import { LoginClient } from './login-client'
+import { HelpClient } from './help-client'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerTranslation()
   return buildPageMetadata({
-    title: t('auth_login_title'),
-    description: t('auth_login_subtitle'),
-    path: '/login',
+    title: t('help_title'),
+    description: t('help_subtitle'),
+    path: '/help',
   })
 }
 
-export default function LoginPage() {
-  return <LoginClient />
+export default function HelpPage() {
+  return <HelpClient />
 }
