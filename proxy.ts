@@ -29,7 +29,7 @@ function buildCspHeader(nonce: string): string {
     "font-src 'self'",
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com`,
+    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io`,
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
