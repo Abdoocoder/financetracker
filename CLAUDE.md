@@ -40,9 +40,16 @@ mobile/fajrak_flutter/
   lib/
     screens/      # accounts, dashboard, transactions, debts, investments, goals, budgets, alerts, settings, help
     widgets/      # reusable widgets per feature (dashboard, transactions, investments, goals, budgets, debts, common)
-    services/     # AccountsService, InvestmentsService, CurrencyService, etc.
+    services/     # AccountsService, InvestmentsService, CurrencyService, etc. (+ byok/, repositories/)
   assets/i18n/    # ar.json, en.json
+  AGENTS.md       # mobile-specific agent instructions (architecture, patterns, conventions)
   Makefile        # make doctor (analyze + test), make build-apk, make clean
+# NEW (codebase-onboarding, Sep 2026) — additional top-level areas not listed above:
+hooks/            # useAccounts, useDashboardData, useDashboardLayout, useFinancialSummary, useTransactions
+docs/             # technical/ (api_integration_guide, onboarding_guide, notification_system_design, loading_states_ux_guidelines), projects/, superpowers/
+__tests__/        # Jest unit tests: {api,hooks,lib,types}/ + helpers/supabase-mock.ts (chainProxy pattern)
+e2e/              # Playwright: setup/global-setup.ts builds e2e/.auth/user.json; specs below
+e2e/  spec files  # smoke.spec.ts, auth-flow.spec.ts, transaction-management.spec.ts
 ```
 
 ## Commands
@@ -258,6 +265,7 @@ The live schema has prod additions made via the Supabase SQL editor that are **N
   - `baseURL: localhost:3000`; retries: 2 on CI, 1 locally; workers: 1 on CI, 2 locally
   - Dev server: `npx next dev --webpack` (avoids Linux inotify limit)
   - Trace on first retry; HTML reporter
+  - Specs: `e2e/{smoke,auth-flow,transaction-management}.spec.ts`; auth specs use the shared storageState built at `e2e/.auth/user.json`
 - **Coverage gaps**: All `app/(dashboard)/` pages at 0%; hooks `useDashboardData.ts` and `useDashboardLayout.ts` at 0%
 
 ## Environment Variables
