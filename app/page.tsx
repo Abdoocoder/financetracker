@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import LandingPageClient from '@/components/landing/LandingPageClient'
+import JsonLd from '@/components/seo/JsonLd'
 
 export default async function LandingPage() {
   const supabase = await createClient()
@@ -9,5 +10,10 @@ export default async function LandingPage() {
     .eq('is_visible', true)
     .order('created_at')
 
-  return <LandingPageClient testimonialsList={testimonials || []} />
+  return (
+    <>
+      <JsonLd />
+      <LandingPageClient testimonialsList={testimonials || []} />
+    </>
+  )
 }

@@ -73,24 +73,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = await getServerLang()
   const nonce = (await headers()).get('x-nonce') ?? undefined
-  const { t } = await getServerTranslation()
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: t('app_name'),
-    alternateName: ['فجرك', 'Fajrak Financial'],
-    url: 'https://fajrak.com',
-    logo: 'https://fajrak.com/icon-512.png',
-    email: 'support@fajrak.com',
-    description: t('meta_desc'),
-  }
-  
   return (
     <html lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <head>
-        <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{
-          __html: JSON.stringify(schema),
-        }} />
         <script nonce={nonce} dangerouslySetInnerHTML={{
           __html: `(function(){
           var saved = localStorage.getItem('theme');
