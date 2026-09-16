@@ -225,8 +225,8 @@ The live schema has prod additions made via the Supabase SQL editor that are **N
 - No performance advisories flagged.
 
 ### Verified health (ran this session)
-- lint ✓ · typecheck ✓ · `next build` 54/54 ✓ · Jest 531 tests / 59 suites (stmts 45.82%) ✓ · Playwright 6 pass + 1 flaky (auth-flow nav race) ✓ · Flutter `make doctor` ✓.
-- `npm audit`: 8 moderate @opentelemetry/* transitive advisories (GHSA-8988-4f7v-96qf). Next.js 16.3.5 upgrade available (on 16.3.4).
+- lint ✓ · typecheck ✓ · `next build` 54/54 ✓ · Jest 531 tests / 58 suites (stmts 48.04% / br 31.46% / fn 31.54%, 156 files) ✓ · Playwright 6 pass + 1 flaky (auth-flow nav race) ✓ · Flutter `make doctor` ✓.
+- `npm audit`: 8 moderate @opentelemetry/* transitive advisories (GHSA-8988-4f7v-96qf). Next.js 16.3.5 (installed; also React 19.2.8, TS 5.9.3, `@supabase/ssr` 0.5.2, `@tanstack/react-query` 5.101.4).
 - Jest exits via `--forceExit` (worker force-exit after run) — acceptable.
 - Web dev server verified live at fajrak.com + local :3000; Flutter app runs on Chrome.
 - **Supabase performance advisories** (6 WARN): RLS initplan — `user_stats`, `testimonials` (3), `saving_challenges`, `health_score_history` policies use `auth.uid()` per-row; wrap with `(select auth.uid())` for performance. 21 unused indexes on `debt_payments`, `investment_transactions`, `saving_challenges`, `testimonials`, `transactions`, `debts`, `user_byok_keys`, `budget_alert_log`, `user_api_keys`, `investments`, `budgets`, `proxy_usage`, `api_audit_log`, `chats`, `messages`.
@@ -253,7 +253,7 @@ The live schema has prod additions made via the Supabase SQL editor that are **N
 
 ## Testing Architecture
 
-- **Jest** (`jest.config.js`): 59 suites, 531 tests; coverage via `--forceExit` (acceptable — worker force-exit after run)
+- **Jest** (`jest.config.js`): 58 suites, 531 tests; coverage via `--forceExit` (acceptable — worker force-exit after run)
 - **Playwright** (`playwright.config.ts`): Chromium only; global auth setup via `e2e/setup/global-setup.ts`
   - `baseURL: localhost:3000`; retries: 2 on CI, 1 locally; workers: 1 on CI, 2 locally
   - Dev server: `npx next dev --webpack` (avoids Linux inotify limit)
