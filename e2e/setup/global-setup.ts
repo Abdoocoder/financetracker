@@ -1,6 +1,7 @@
 import { chromium, type FullConfig } from '@playwright/test';
 import path from 'node:path';
 import { config as loadEnv } from 'dotenv';
+import { assertAuthenticatedSession } from './session';
 
 // This file lives at <repoRoot>/e2e/setup/global-setup.ts, so the project root
 // is two levels up. Resolving off __dirname (instead of process.cwd()) is
@@ -58,17 +59,28 @@ export default async function globalSetup(config: FullConfig) {
 
     // Wait for auth to complete and cookies/localStorage to be written.
     // Login redirects to /dashboard (or /onboarding for a fresh account).
-    await page
-      .waitForURL(
+    try {
+      await page.waitForURL(
         (url) => ['/dashboard', '/onboarding'].some((p) => url.pathname.startsWith(p)),
         { timeout: 15000 }
-      )
-      .catch(() => {
-        // Don't fail if redirect target differs slightly — cookies may still be set.
-      });
+      );
+    } catch {
+      // Don't hard-fail setup on a slow/exotic redirect — the session may
+      // still be set. assertAuthenticatedSession below decides, loudly.
+      console.warn(
+        '[global-setup] Did not reach /dashboard or /onboarding after login; ' +
+        'asserting the session will catch a missing auth token.'
+      );
+    }
 
     // Give the client a moment to hydrate the persisted session.
     await page.waitForTimeout(1000);
+
+    // Fail loudly instead of persisting an empty session. Regression (Sep
+    // 2026): the old code swallowed the nav failure and saved '{"cookies":[]}',
+    // so authenticated specs silently started logged-out.
+    const state = await page.context().storageState();
+    assertAuthenticatedSession(state, `${baseURL}/login`);
 
     await page.context().storageState({ path: AUTH_FILE });
     console.log(`[global-setup] Saved authenticated session to ${AUTH_FILE}`);
