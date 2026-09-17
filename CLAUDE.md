@@ -92,6 +92,7 @@ make build-apk   # release APK
 - **BYOK proxy** (`app/api/byok/proxy`): thin pass-through only — accepts web session cookie **or** `Authorization: Bearer <supabase JWT>`; providers SSRF-allowlisted in `lib/byok/providers.ts` (never dials arbitrary URLs); body passed as base64, never parsed; per-user rate limit 30/min via `bump_proxy_usage()`.
 - **BYOK envelope** (`lib/byok/envelope.ts` is **server-only** — throws on `typeof window !== 'undefined'`): client sends `payload` = AES-GCM(provider_key, ephemeral key) + `env` = RSA-OAEP(ephemeral key, server public key) + `keyId`; server unwraps with RSA private key (env `BYOK_PRIVATE_KEY`, selected by `BYOK_KEK_ID`), decrypts, zeroes key bytes in `finally`. Never log key material or `payload`.
 - **CSP hardening**: webpages enforce a Content-Security-Policy served via a nonce proxy (`proxy.ts`) — Supabase REST/realtime, Firebase FCM googleapis, and `va.vercel-scripts.com` allowed under `connect-src`; Sentry Session Replay blob worker allowed under `worker-src`/`child-src`. `/monitoring` (Sentry tunnel) and service workers are excluded from the matcher. Web API auth also uses `timingSafeEqual` via `lib/cron-auth.ts` (`verifyCronAuth`).
+- **upgrade-insecure-requests**: `buildCspHeader()` in `proxy.ts` adds this directive **only in production** (`NODE_ENV=production`). Omitted in development to prevent SPA router navigations (e.g., `router.push('/dashboard')` after login) from being rewritten to `https://localhost:3000/...` and failing with `ERR_SSL_PROTOCOL_ERROR`. Regression test in `__tests__/proxy-csp.test.ts`.
 
 ## Version Update Checklist
 
@@ -260,13 +261,16 @@ The live schema has prod additions made via the Supabase SQL editor that are **N
 
 ## Testing Architecture
 
-- **Jest** (`jest.config.js`): 58 suites, 531 tests; coverage via `--forceExit` (acceptable — worker force-exit after run)
+- **Jest** (`jest.config.js`): 58 suites, 540 tests; coverage via `--forceExit` (acceptable — worker force-exit after run)
 - **Playwright** (`playwright.config.ts`): Chromium only; global auth setup via `e2e/setup/global-setup.ts`
   - `baseURL: localhost:3000`; retries: 2 on CI, 1 locally; workers: 1 on CI, 2 locally
   - Dev server: `npx next dev --webpack` (avoids Linux inotify limit)
   - Trace on first retry; HTML reporter
   - Specs: `e2e/{smoke,auth-flow,transaction-management}.spec.ts`; auth specs use the shared storageState built at `e2e/.auth/user.json`
+  - **Fail-loud session validation**: `assertAuthenticatedSession()` in `e2e/setup/session.ts` prevents empty session persistence (Sep 2026 fix)
 - **Coverage gaps**: All `app/(dashboard)/` pages at 0%; hooks `useDashboardData.ts` and `useDashboardLayout.ts` at 0%
+- **Local Playwright Types**: `e2e/playwright-types.ts` defines `StorageState`, `StorageStateCookie`, `StorageStateOrigin` (not exported by `@playwright/test` v1.62.1)
+- **NODE_ENV mocking**: Use `Object.defineProperty(process.env, 'NODE_ENV', { value: '...', writable: true, configurable: true })` for tests (`__tests__/proxy-csp.test.ts`)
 
 ## Environment Variables
 
