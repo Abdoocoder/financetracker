@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #070B14; font-family: 'Cairo', ui-sans-serif, system-ui, sans-serif; }
+      #root { width: 100%; height: 100%; position: relative; }
+      .clip { position: absolute; opacity: 0; }
+      .scene { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+      /* Typography */
+      .arabic-title { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 72px; line-height: 1.2; color: #F0F4FF; letter-spacing: -0.02em; }
+      .arabic-subtitle { font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 28px; color: #8B9CC8; letter-spacing: 0.02em; }
+      .english-title { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 56px; line-height: 1.2; color: #F0F4FF; letter-spacing: -0.02em; }
+      .stat-label { font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 20px; color: #8B9CC8; direction: rtl; }
+      .stat-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 48px; color: #F0F4FF; letter-spacing: -0.02em; }
+      .stat-value.accent-blue { color: #6BA3FF; }
+      .stat-value.accent-green { color: #34D399; }
+      .stat-value.accent-red { color: #F87171; }
+      .stat-value.accent-purple { color: #A78BFA; }
+      .badge-text { font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 16px; color: #6BA3FF; direction: rtl; }
+      .tagline-ar { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 28px; color: #F0F4FF; line-height: 1.4; text-align: center; direction: rtl; }
+      .tagline-en { font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 20px; color: #8B9CC8; text-align: center; margin-top: 12px; }
+      .url-text { font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 18px; color: #6BA3FF; text-align: center; margin-top: 20px; }
+
+      /* Card styles */
+      .glass-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; backdrop-filter: blur(20px); box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04); padding: 32px; }
+      .glass-card-elevated { background: rgba(22, 32, 50, 0.9); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 28px; backdrop-filter: blur(24px); box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06); padding: 40px; }
+      .blue-glow { box-shadow: 0 0 40px rgba(59, 126, 246, 0.25), 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04); }
+      .green-glow { box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04); }
+
+      /* Roadmap stages */
+      .roadmap-track { display: flex; gap: 24px; align-items: flex-end; padding: 0 40px; direction: ltr; }
+      .roadmap-stage { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; opacity: 0.3; transform: scale(0.95); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+      .roadmap-stage.active { opacity: 1; transform: scale(1.05); }
+      .roadmap-stage.active .stage-circle { background: #10B981; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); }
+      .roadmap-stage.active .stage-label { color: #F0F4FF; font-weight: 700; }
+      .stage-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(17, 24, 39, 0.85); border: 2px solid rgba(255, 255, 255, 0.07); display: flex; align-items: center; justify-content: center; font-size: 28px; font-family: 'Cairo', sans-serif; font-weight: 700; color: #F0F4FF; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+      .stage-label { font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 18px; color: #8B9CC8; text-align: center; max-width: 140px; direction: rtl; transition: all 0.3s ease; }
+      .stage-desc { font-family: 'Cairo', sans-serif; font-weight: 400; font-size: 13px; color: #4A5568; text-align: center; max-width: 140px; line-height: 1.4; direction: rtl; }
+
+      /* Health Score */
+      .health-score { width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(#34D399 0deg, #34D399 var(--progress, 0deg), rgba(255,255,255,0.07) var(--progress, 0deg)); display: flex; align-items: center; justify-content: center; position: relative; }
+      .health-score::before { content: ''; position: absolute; inset: 16px; border-radius: 50%; background: #070B14; }
+      .health-score-inner { position: relative; z-index: 1; text-align: center; }
+      .health-number { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 56px; color: #34D399; line-height: 1; }
+      .health-label { font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 16px; color: #8B9CC8; margin-top: 4px; }
+
+      /* Mobile frame */
+      .mobile-frame { width: 380px; height: 780px; background: #0D1221; border-radius: 40px; border: 8px solid #111827; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04); position: relative; overflow: hidden; }
+      .mobile-screen { width: 100%; height: 100%; padding: 24px; display: flex; flex-direction: column; gap: 16px; direction: rtl; }
+      .mobile-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+      .mobile-title { font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 20px; color: #F0F4FF; }
+      .mobile-input-group { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+      .mobile-input { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 16px 20px; font-family: 'Cairo', sans-serif; font-size: 16px; color: #F0F4FF; outline: none; }
+      .mobile-select { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 16px 20px; font-family: 'Cairo', sans-serif; font-size: 16px; color: #F0F4FF; outline: none; }
+      .mobile-btn { background: linear-gradient(135deg, #3B7EF6, #10B981); border: none; border-radius: 16px; padding: 18px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 18px; color: white; cursor: pointer; }
+      .mobile-dashboard { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+      .mobile-card { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+      .mobile-card-label { font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 14px; color: #8B9CC8; }
+      .mobile-card-value { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 22px; color: #F0F4FF; }
+      .mobile-card-value.positive { color: #34D399; }
+      .mobile-card-value.negative { color: #F87171; }
+
+      /* Hero buttons */
+      .hero-cta-primary { background: linear-gradient(135deg, #3B7EF6, #10B981); border: none; border-radius: 16px; padding: 18px 40px; font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 18px; color: white; }
+      .hero-cta-secondary { background: transparent; border: 2px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 18px 40px; font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 18px; color: #F0F4FF; }
+      .hero-tag { background: rgba(17, 24, 39, 0.85); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 100px; padding: 8px 20px; font-family: 'Cairo', sans-serif; font-weight: 500; font-size: 14px; color: #8B9CC8; display: inline-flex; align-items: center; gap: 8px; direction: rtl; }
+      .hero-tag-icon { color: #34D399; font-size: 12px; }
+
+      /* Dashboard grid */
+      .dashboard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; max-width: 1400px; width: 100%; direction: ltr; }
+
+      /* Arabic pattern background */
+      .arabesque-bg { position: absolute; inset: 0; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L100 50L50 100L0 50Z' fill='none' stroke='%233B7EF6' stroke-width='0.5'/%3E%3C/svg%3E"); }
+
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="18"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Background pattern -->
+      <div id="bg-pattern" class="arabesque-bg clip" data-start="0" data-duration="18" data-track-index="0"></div>
+
+      <!-- ==================== SCENE 1: HOOK (0-2s) ==================== -->
+      <div id="scene-hook" class="scene clip" data-start="0" data-duration="2" data-track-index="1">
+        <div id="hook-arabic" class="arabic-title clip" data-start="0" data-duration="2" data-track-index="1" style="white-space: nowrap;"></div>
+        <div id="hook-english" class="english-title clip" data-start="0.5" data-duration="1.5" data-track-index="1" style="white-space: nowrap; margin-top: 24px; opacity: 0;"></div>
+      </div>
+
+      <!-- ==================== SCENE 2: REVEAL (2-5s) ==================== -->
+      <div id="scene-reveal" class="scene clip" data-start="2" data-duration="3" data-track-index="2">
+        <div class="glass-card-elevated" style="max-width: 900px; text-align: center; position: relative;">
+          <div class="arabesque-bg" style="position: absolute; inset: -40px; opacity: 0.03;"></div>
+          <div style="position: relative; z-index: 1;">
+            <div id="reveal-badge" class="badge-text clip" data-start="2" data-duration="3" data-track-index="2">🇯🇴🇸🇦🇦🇪 First fully Arabic financial tool</div>
+            <div id="reveal-logo" class="arabic-title clip" data-start="2.2" data-duration="2.8" data-track-index="2" style="margin-top: 16px;">فجرك</div>
+            <div id="reveal-logo-en" class="english-title clip" data-start="2.3" data-duration="2.7" data-track-index="2" style="margin-top: 8px; font-size: 48px;">Fajrak</div>
+            <div id="reveal-subtitle" class="arabic-subtitle clip" data-start="2.5" data-duration="2.5" data-track-index="2" style="margin-top: 12px;">Smart Finance</div>
+            <div style="display: flex; gap: 16px; justify-content: center; margin-top: 32px; flex-wrap: wrap;">
+              <button id="reveal-cta1" class="hero-cta-primary clip" data-start="2.7" data-duration="2.3" data-track-index="2">ابدأ مجاناً →</button>
+              <button id="reveal-cta2" class="hero-cta-secondary clip" data-start="2.8" data-duration="2.2" data-track-index="2">كيف يعمل ↓</button>
+            </div>
+            <div style="display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap;">
+              <span id="reveal-tag1" class="hero-tag clip" data-start="3.0" data-duration="2.0" data-track-index="2"><span class="hero-tag-icon">✓</span> مجاني للأبد</span>
+              <span id="reveal-tag2" class="hero-tag clip" data-start="3.1" data-duration="1.9" data-track-index="2"><span class="hero-tag-icon">✓</span> بدون بطاقة ائتمان</span>
+              <span id="reveal-tag3" class="hero-tag clip" data-start="3.2" data-duration="1.8" data-track-index="2"><span class="hero-tag-icon">✓</span> استثمار حلال</span>
+            </div>
+            <a href="/download" id="reveal-download" class="hero-tag clip" data-start="3.4" data-duration="1.6" data-track-index="2" style="text-decoration: none; background: linear-gradient(135deg, #3B7EF6, #10B981); border-color: transparent;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              📱 Download Android App — Now Available ✨
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 3: DASHBOARD (5-9s) ==================== -->
+      <div id="scene-dashboard" class="scene clip" data-start="5" data-duration="4" data-track-index="3">
+        <div class="dashboard-grid" style="align-items: start;">
+          <div id="dash-networth" class="glass-card clip blue-glow" data-start="5" data-duration="4" data-track-index="3" style="grid-column: span 1;">
+            <div class="stat-label">القيمة الصافية</div>
+            <div id="dash-networth-value" class="stat-value accent-blue clip" data-start="5.2" data-duration="3.8" data-track-index="3">$0</div>
+            <div class="stat-label" style="margin-top: 8px; font-size: 14px;">Net Worth</div>
+          </div>
+          <div id="dash-income" class="glass-card clip" data-start="5.3" data-duration="3.7" data-track-index="3">
+            <div class="stat-label">الدخل الشهري</div>
+            <div id="dash-income-value" class="stat-value accent-green clip" data-start="5.5" data-duration="3.5" data-track-index="3">$0</div>
+            <div class="stat-label" style="margin-top: 8px; font-size: 14px;">Monthly Income</div>
+          </div>
+          <div id="dash-expenses" class="glass-card clip" data-start="5.6" data-duration="3.4" data-track-index="3">
+            <div class="stat-label">المصروفات</div>
+            <div id="dash-expenses-value" class="stat-value accent-red clip" data-start="5.8" data-duration="3.2" data-track-index="3">$0</div>
+            <div class="stat-label" style="margin-top: 8px; font-size: 14px;">Expenses</div>
+          </div>
+          <div id="dash-savings" class="glass-card clip" data-start="5.9" data-duration="3.1" data-track-index="3">
+            <div class="stat-label">معدل الادخار</div>
+            <div id="dash-savings-value" class="stat-value accent-purple clip" data-start="6.1" data-duration="2.9" data-track-index="3">0%</div>
+            <div class="stat-label" style="margin-top: 8px; font-size: 14px;">Savings Rate</div>
+          </div>
+        </div>
+        <div id="dash-caption" class="arabic-subtitle clip" data-start="6.5" data-duration="2.5" data-track-index="3" style="margin-top: 40px; text-align: center;">One dashboard. All your money.</div>
+      </div>
+
+      <!-- ==================== SCENE 4: ROADMAP + HEALTH SCORE (9-14s) ==================== -->
+      <div id="scene-roadmap" class="scene clip" data-start="9" data-duration="5" data-track-index="4">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 40px; width: 100%; padding: 0 60px;">
+          <div class="arabic-subtitle" style="text-align: center;">Wealth Roadmap</div>
+          <div class="roadmap-track" id="roadmap-track">
+            <div id="stage-1" class="roadmap-stage clip" data-start="9" data-duration="5" data-track-index="4">
+              <div class="stage-circle">1</div>
+              <div class="stage-label">الوعي المالي</div>
+              <div class="stage-desc">أين يذهب كل دينار</div>
+            </div>
+            <div id="stage-2" class="roadmap-stage clip" data-start="9.2" data-duration="4.8" data-track-index="4">
+              <div class="stage-circle">2</div>
+              <div class="stage-label">حرية من الديون</div>
+              <div class="stage-desc">خطة سداد واضحة</div>
+            </div>
+            <div id="stage-3" class="roadmap-stage clip" data-start="9.4" data-duration="4.6" data-track-index="4">
+              <div class="stage-circle">3</div>
+              <div class="stage-label">شبكة أمان</div>
+              <div class="stage-desc">3 أشهر ادخار</div>
+            </div>
+            <div id="stage-4" class="roadmap-stage clip" data-start="9.6" data-duration="4.4" data-track-index="4">
+              <div class="stage-circle">4</div>
+              <div class="stage-label">استثمر و انمُ</div>
+              <div class="stage-desc">خيارات حلال</div>
+            </div>
+            <div id="stage-5" class="roadmap-stage clip" data-start="9.8" data-duration="4.2" data-track-index="4">
+              <div class="stage-circle">5</div>
+              <div class="stage-label">الحرية المالية</div>
+              <div class="stage-desc">تعطي بلا حاجة</div>
+            </div>
+          </div>
+          <!-- Health Score -->
+          <div id="health-score" class="health-score clip" data-start="11" data-duration="3" data-track-index="4" style="--progress: 0deg;">
+            <div class="health-score-inner">
+              <div id="health-number" class="health-number">0</div>
+              <div class="health-label">Financial Health Score</div>
+            </div>
+          </div>
+          <div id="roadmap-caption" class="arabic-subtitle clip" data-start="12" data-duration="2" data-track-index="4" style="text-align: center;">Know your stage. Get a plan.</div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 5: MOBILE SYNC (14-16.5s) ==================== -->
+      <div id="scene-mobile" class="scene clip" data-start="14" data-duration="2.5" data-track-index="5">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 32px;">
+          <div class="arabic-subtitle" style="text-align: center;">Web + Mobile. Same data. Synced.</div>
+          <div id="mobile-frame" class="mobile-frame clip" data-start="14" data-duration="2.5" data-track-index="5">
+            <div class="mobile-screen">
+              <div class="mobile-header">
+                <div class="mobile-title">إضافة مصروف</div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; color: #8B9CC8;">✕</div>
+              </div>
+              <div class="mobile-input-group" id="mobile-form">
+                <input type="text" id="mobile-amount" class="mobile-input" placeholder="المبلغ" value="" readonly>
+                <select id="mobile-category" class="mobile-select" disabled>
+                  <option value="">اختر الفئة</option>
+                  <option value="مواصلات" selected>🚌 مواصلات</option>
+                  <option value="طعام">🍽️ طعام</option>
+                  <option value="فواتير">📄 فواتير</option>
+                </select>
+                <button id="mobile-save" class="mobile-btn" disabled>حفظ</button>
+              </div>
+              <div class="mobile-dashboard" id="mobile-dash" style="opacity: 0;">
+                <div class="mobile-card">
+                  <span class="mobile-card-label">القيمة الصافية</span>
+                  <span id="mobile-networth" class="mobile-card-value positive">$0</span>
+                </div>
+                <div class="mobile-card">
+                  <span class="mobile-card-label">الدخل الشهري</span>
+                  <span id="mobile-income" class="mobile-card-value positive">$0</span>
+                </div>
+                <div class="mobile-card">
+                  <span class="mobile-card-label">المصروفات</span>
+                  <span id="mobile-expenses" class="mobile-card-value negative">$0</span>
+                </div>
+                <div class="mobile-card">
+                  <span class="mobile-card-label">الادخار</span>
+                  <span id="mobile-savings" class="mobile-card-value positive">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENE 6: OUTRO (16.5-18s) ==================== -->
+      <div id="scene-outro" class="scene clip" data-start="16.5" data-duration="1.5" data-track-index="6">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px;">
+          <div id="outro-logo-ar" class="arabic-title clip" data-start="16.5" data-duration="1.5" data-track-index="6" style="font-size: 80px;">فجرك</div>
+          <div id="outro-logo-en" class="english-title clip" data-start="16.6" data-duration="1.4" data-track-index="6" style="font-size: 56px;">Fajrak</div>
+          <div id="outro-tagline-ar" class="tagline-ar clip" data-start="16.8" data-duration="1.2" data-track-index="6">كلنا نحلم بالثراء، هنا تبدأ الرحلة</div>
+          <div id="outro-tagline-en" class="tagline-en clip" data-start="16.9" data-duration="1.1" data-track-index="6">We all dream of wealth — here the journey begins</div>
+          <div id="outro-url" class="url-text clip" data-start="17.1" data-duration="0.9" data-track-index="6">fajrak.com/download</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="music" data-start="0" data-duration="18" data-track-index="10" data-volume="1" src="assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.mp3"></audio>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+
+      const mainTl = window.__timelines["main"];
+
+      // ==================== SCENE 1: HOOK (0-2s) ====================
+      const hookArabicText = "أين ذهب الراتب؟";
+      const hookEnglishText = "Where did the salary go?";
+      const hookArabicEl = document.getElementById("hook-arabic");
+      const hookEnglishEl = document.getElementById("hook-english");
+
+      // GSAP-based typewriter using timeline
+      function createTypewriterTimeline(element, text, startTime, charDuration = 0.09) {
+        const chars = text.split('');
+        const tl = gsap.timeline();
+        chars.forEach((char, i) => {
+          tl.to({}, {
+            duration: charDuration,
+            onStart: () => {
+              element.textContent += char;
+            }
+          }, startTime + i * charDuration);
+        });
+        return tl;
+      }
+
+      // Arabic types out 0-1.2s
+      mainTl.add(createTypewriterTimeline(hookArabicEl, hookArabicText, 0, 0.09), 0);
+      // English fades in and types 0.5-1.8s
+      mainTl.set(hookEnglishEl, { opacity: 1 }, 0.5);
+      mainTl.add(createTypewriterTimeline(hookEnglishEl, hookEnglishText, 0.5, 0.06), 0.5);
+
+      // ==================== SCENE 2: REVEAL (2-5s) ====================
+      const revealElements = [
+        { id: "reveal-badge", delay: 0 },
+        { id: "reveal-logo", delay: 0.2 },
+        { id: "reveal-logo-en", delay: 0.3 },
+        { id: "reveal-subtitle", delay: 0.5 },
+        { id: "reveal-cta1", delay: 0.7 },
+        { id: "reveal-cta2", delay: 0.8 },
+        { id: "reveal-tag1", delay: 1.0 },
+        { id: "reveal-tag2", delay: 1.1 },
+        { id: "reveal-tag3", delay: 1.2 },
+        { id: "reveal-download", delay: 1.4 },
+      ];
+
+      revealElements.forEach(({ id, delay }) => {
+        const el = document.getElementById(id);
+        if (el) {
+          mainTl.fromTo(el,
+            { opacity: 0, y: 30, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "cubic-bezier(0.23, 1, 0.32, 1)" },
+            2 + delay
+          );
+        }
+      });
+
+      // ==================== SCENE 3: DASHBOARD (5-9s) ====================
+      // Count-up using GSAP
+      function gsapCountUp(element, target, suffix = "", startTime, duration = 1.0) {
+        const obj = { value: 0 };
+        mainTl.to(obj, {
+          value: target,
+          duration: duration,
+          ease: "power3.out",
+          onUpdate: () => {
+            element.textContent = Math.floor(obj.value).toLocaleString() + suffix;
+          },
+          onComplete: () => {
+            element.textContent = target.toLocaleString() + suffix;
+          }
+        }, startTime);
+      }
+
+      gsapCountUp(document.getElementById("dash-networth-value"), 12450, "", 5.2, 1.0);
+      gsapCountUp(document.getElementById("dash-income-value"), 3200, "", 5.5, 0.8);
+      gsapCountUp(document.getElementById("dash-expenses-value"), 1800, "", 5.8, 0.8);
+      gsapCountUp(document.getElementById("dash-savings-value"), 44, "%", 6.1, 0.8);
+
+      // ==================== SCENE 4: ROADMAP (9-14s) ====================
+      const stages = [
+        document.getElementById("stage-1"),
+        document.getElementById("stage-2"),
+        document.getElementById("stage-3"),
+        document.getElementById("stage-4"),
+        document.getElementById("stage-5"),
+      ];
+
+      stages.forEach((stage, i) => {
+        const delay = i * 0.2;
+        mainTl.add(() => {
+          stage.classList.add("active");
+          // Pulse animation on stage 2 (index 1) - Debt Freedom
+          if (i === 1) {
+            const circle = stage.querySelector(".stage-circle");
+            gsap.to(circle, {
+              scale: 1.15,
+              boxShadow: "0 0 50px rgba(16, 185, 129, 0.8)",
+              duration: 0.8,
+              yoyo: true,
+              repeat: 3,
+              ease: "sine.inOut"
+            });
+          }
+        }, 9 + delay);
+      });
+
+      // Health Score (11-14s) - GSAP animated conic gradient
+      const healthScoreEl = document.getElementById("health-score");
+      const healthNumberEl = document.getElementById("health-number");
+      const healthObj = { value: 0, progress: 0 };
+      mainTl.to(healthObj, {
+        value: 78,
+        progress: 78 / 100 * 360,
+        duration: 1.5,
+        ease: "power3.out",
+        onUpdate: () => {
+          healthNumberEl.textContent = Math.floor(healthObj.value);
+          healthScoreEl.style.setProperty('--progress', healthObj.progress + 'deg');
+        },
+        onComplete: () => {
+          healthNumberEl.textContent = 78;
+          healthScoreEl.style.setProperty('--progress', (78 / 100 * 360) + 'deg');
+        }
+      }, 11);
+
+      // ==================== SCENE 5: MOBILE (14-16.5s) ====================
+      const mobileAmount = document.getElementById("mobile-amount");
+      const mobileCategory = document.getElementById("mobile-category");
+      const mobileSave = document.getElementById("mobile-save");
+      const mobileForm = document.getElementById("mobile-form");
+      const mobileDash = document.getElementById("mobile-dash");
+      const mobileNetworth = document.getElementById("mobile-networth");
+      const mobileIncome = document.getElementById("mobile-income");
+      const mobileExpenses = document.getElementById("mobile-expenses");
+      const mobileSavings = document.getElementById("mobile-savings");
+
+      // Mobile amount typing - GSAP
+      const amountText = "150";
+      const amountObj = { value: 0 };
+      mainTl.to(amountObj, {
+        value: 150,
+        duration: 0.5,
+        ease: "none",
+        onUpdate: () => {
+          mobileAmount.value = Math.floor(amountObj.value).toString();
+        },
+        onComplete: () => {
+          mobileAmount.value = "150";
+        }
+      }, 14);
+
+      // Save button click
+      mainTl.add(() => {
+        mobileSave.disabled = false;
+        gsap.to(mobileSave, { scale: 0.95, duration: 0.1, yoyo: true, repeat: 1 });
+      }, 14.6);
+
+      // Transition to dashboard
+      mainTl.to(mobileForm, { opacity: 0, y: -20, duration: 0.4, ease: "cubic-bezier(0.23, 1, 0.32, 1)" }, 14.9);
+      mainTl.to(mobileDash, { opacity: 1, y: 0, duration: 0.6, ease: "cubic-bezier(0.23, 1, 0.32, 1)" }, 15.2);
+
+      // Mobile dashboard count-ups
+      gsapCountUp(mobileNetworth, 12450, "", 15.4, 0.5);
+      gsapCountUp(mobileIncome, 3200, "", 15.5, 0.4);
+      gsapCountUp(mobileExpenses, 1800, "", 15.6, 0.4);
+      gsapCountUp(mobileSavings, 44, "%", 15.7, 0.4);
+
+      // ==================== SCENE 6: OUTRO (16.5-18s) ====================
+      const outroElements = [
+        { id: "outro-logo-ar", delay: 0 },
+        { id: "outro-logo-en", delay: 0.1 },
+        { id: "outro-tagline-ar", delay: 0.3 },
+        { id: "outro-tagline-en", delay: 0.4 },
+        { id: "outro-url", delay: 0.6 },
+      ];
+      outroElements.forEach(({ id, delay }) => {
+        const el = document.getElementById(id);
+        if (el) {
+          mainTl.fromTo(el,
+            { opacity: 0, y: 20, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "cubic-bezier(0.23, 1, 0.32, 1)" },
+            16.5 + delay
+          );
+        }
+      });
+
+      // Music fade out on last 1.5s (volume from 1 to 0)
+      mainTl.to("#music", { volume: 0, duration: 1.5, ease: "power2.out" }, 16.5);
+
+      // Seek to start
+      mainTl.seek(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+Built فجرK (Fajrak) — the first fully Arabic finance tracker that actually answers "where did my salary go?" 🌅
+
+Web (Next.js 16) + Mobile (Flutter) sharing Supabase backend. Dark luxury design, Cairo Arabic font, 5-stage Wealth Roadmap, Financial Health Score, halal investing, regional currencies.
+
+fajrak.com/download
