@@ -4,8 +4,16 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+// Validate DSN before initializing to prevent 403 errors from invalid/mismatched DSN
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+const isValidDsn = Boolean(dsn && dsn.startsWith('https://') && dsn.includes('@') && dsn.includes('.ingest.'));
+
+if (!isValidDsn) {
+  console.warn('[Sentry] Invalid or missing NEXT_PUBLIC_SENTRY_DSN — Sentry disabled. Configure in .env.local');
+}
+
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  dsn: isValidDsn ? dsn : undefined,
   tracesSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
   replaysSessionSampleRate: 0.05,
@@ -15,7 +23,7 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
-  enabled: process.env.NODE_ENV === 'production',
+  enabled: isValidDsn && process.env.NODE_ENV === 'production',
   beforeSend(event) {
     // Filter out the noisy unhandled promise rejections caused by Sentry's own
     // wrapping of navigator.serviceWorker.register failing on strict browsers

@@ -8,8 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'recharts'],
-    // Optimize CSS loading to reduce unused preload warnings
-    optimizeCss: true,
+    // Optimize CSS loading - disabled due to preload warnings for unused chunks
+    // optimizeCss: true,
   },
   serverExternalPackages: ['firebase-admin'],
   turbopack: { root: __dirname },
@@ -45,9 +45,11 @@ export default withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
-  org: "abdoocoder-m2",
-
-  project: "javascript-nextjs",
+  // IMPORTANT: These must match your actual Sentry project!
+  // Check https://sentry.io/settings/<org>/projects/<project>/
+  // The DSN in .env.local must match this org/project combination
+  org: process.env.SENTRY_ORG || "abdoocoder-m2",
+  project: process.env.SENTRY_PROJECT || "javascript-nextjs",
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
@@ -59,8 +61,8 @@ export default withSentryConfig(nextConfig, {
   widenClientFileUpload: true,
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // Disabled due to project ID mismatch causing 403 errors.
-  // tunnelRoute: "/monitoring",
+  // Requires matching project ID in DSN - disabled if mismatch causes 403.
+  tunnelRoute: process.env.SENTRY_TUNNEL_ROUTE || "/monitoring",
 
   webpack: {
     // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
