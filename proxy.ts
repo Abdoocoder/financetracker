@@ -13,15 +13,15 @@ const PROTECTED_PATHS = [
   '/settings',
 ]
 
-function buildCspHeader(nonce: string): string {
+export function buildCspHeader(nonce: string): string {
   const isDev = process.env.NODE_ENV === 'development'
   // In development, Next.js/Turbopack injects styles as inline <style> tags.
   // When nonce is present in style-src, 'unsafe-inline' is ignored per CSP spec.
   // So we allow 'unsafe-inline' for styles (dev and prod), reserving nonce for scripts only.
   // Sentry Replay masks the DOM by mutating inline styles — nonce-only style-src breaks it.
   const styleSrc = "style-src 'self' 'unsafe-inline'"
-  
-  return [
+
+  const directives = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''}`,
     styleSrc,
@@ -33,8 +33,16 @@ function buildCspHeader(nonce: string): string {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "upgrade-insecure-requests",
-  ].join('; ')
+  ]
+  if (!isDev) {
+    // Production is served over https, so clients may upgrade any stray
+    // http: subresource loads. Skipped in development because the local dev
+    // server is plain HTTP: the directive makes browsers rewrite SPA router
+    // navigations (e.g. router.push('/dashboard') after login) to https and
+    // abort them with ERR_SSL_PROTOCOL_ERROR (flaky e2e).
+    directives.push("upgrade-insecure-requests")
+  }
+  return directives.join('; ')
 }
 
 export async function proxy(request: NextRequest) {
