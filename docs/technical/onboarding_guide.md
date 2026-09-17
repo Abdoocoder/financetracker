@@ -146,7 +146,32 @@ make doctor
 
 > The old layout doc `docs/technical/structure.md` was **removed** — it referenced `middleware.ts`, `lib/utils.ts`, and `001_initial.sql`, all of which were superseded (auth gate is now `proxy.ts`). Prefer this guide and `CLAUDE.md`.
 
-## 13. Live-audit drift notes (Sep 2026)
+## 13. Testing & E2E (Sep 2026)
+
+### Unit Tests (Jest)
+- 58 suites / 540 tests across `api/`, `hooks/`, `lib/`, `integration/`, `types/`
+- Run: `npm run test` (or `npm run test:coverage`)
+- Shared Supabase mock uses `chainProxy` pattern (`__tests__/hooks/`)
+- Coverage: ~48% statements, ~31% branches (dashboard pages/hooks at 0%)
+
+### E2E Tests (Playwright)
+- 3 spec files: `smoke`, `auth-flow`, `transaction-management`
+- Run: `npm run test:e2e` (requires dev server on port 3000)
+- **Global setup** (`e2e/setup/global-setup.ts`): logs in with `E2E_TEST_EMAIL`/`E2E_TEST_PASSWORD` from `.env.local`, persists `e2e/.auth/user.json`
+- **Fail-loud session validation**: `assertAuthenticatedSession()` in `e2e/setup/session.ts` prevents empty session persistence (regression fix Sep 2026)
+- **Known flaky**: `auth-flow.spec.ts` — nav race between Login/Register pages
+
+### Local Playwright Types
+- `e2e/playwright-types.ts` — local `StorageState`, `StorageStateCookie`, `StorageStateOrigin` definitions
+- Required because `@playwright/test` v1.62.1 doesn't export `StorageState`
+- Used by: `__tests__/e2e/session.test.ts`, `e2e/setup/session.ts`
+
+### CSP & `upgrade-insecure-requests`
+- `buildCspHeader()` in `proxy.ts` conditionally adds `upgrade-insecure-requests` **only in production** (NODE_ENV=production)
+- Development (http://localhost:3000) omits it to prevent SPA router navigations from being rewritten to https → `ERR_SSL_PROTOCOL_ERROR`
+- Regression test: `__tests__/proxy-csp.test.ts` mocks NODE_ENV via `Object.defineProperty`
+
+## 14. Live-audit drift notes (Sep 2026)
 
 From a live Supabase/GitHub MCP audit performed Sep 2026. **Repo schema lags production** — the live DB has prod-only objects added via the SQL editor that are not in `supabase/migrations/`:
 
