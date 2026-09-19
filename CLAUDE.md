@@ -47,7 +47,7 @@ mobile/fajrak_flutter/
 # NEW (codebase-onboarding, Sep 2026) — additional top-level areas not listed above:
 hooks/            # useAccounts, useDashboardData, useDashboardLayout, useFinancialSummary, useTransactions
 docs/             # technical/ (api_integration_guide, onboarding_guide, notification_system_design, loading_states_ux_guidelines), projects/, superpowers/
-__tests__/        # Jest unit tests: {api,hooks,lib,types}/ + helpers/supabase-mock.ts (chainProxy pattern)
+__tests__/  # Jest unit tests: {api,e2e,helpers,hooks,integration,lib,types}/ + helpers/supabase-mock.ts (chainProxy pattern); root proxy-csp.test.ts (CSP regression)
 e2e/              # Playwright: setup/global-setup.ts builds e2e/.auth/user.json; specs below
 e2e/  spec files  # smoke.spec.ts, auth-flow.spec.ts, transaction-management.spec.ts
 ```
