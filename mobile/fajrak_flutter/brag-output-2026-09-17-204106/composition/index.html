@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Fajrak Brag Video</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/ScrollTrigger.min.js"></script>
+  <style>
+    @font-face {
+      font-family: 'Cairo';
+      src: url('assets/fonts/Cairo-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Cairo';
+      src: url('assets/fonts/Cairo-Bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg: #0A1628;
+      --bg-deep: #050D17;
+      --gold: #D4A843;
+      --gold-dim: #B8923A;
+      --white: #FFFFFF;
+      --white-dim: rgba(255,255,255,0.87);
+      --emerald: #10B981;
+      --amber: #F59E0B;
+      --glass-bg: rgba(255,255,255,0.06);
+      --glass-border: rgba(255,255,255,0.12);
+      --glass-blur: blur(20px);
+      --card-radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Cairo', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 30%, rgba(212,168,67,0.08) 0%, transparent 60%), var(--bg-deep);
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    /* Glassmorphism card utility */
+    .glass-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--card-radius);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    /* Hook Scene */
+    .hook-scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .logo-arabic {
+      font-size: 140px;
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: 0 0 60px rgba(212,168,67,0.4), 0 4px 24px rgba(0,0,0,0.5);
+      letter-spacing: -2px;
+      transform-origin: center center;
+    }
+
+    .logo-glass-card {
+      width: 480px;
+      height: 200px;
+      opacity: 0;
+      transform: scale(0.8) translateY(40px);
+    }
+
+    .logo-english {
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--white-dim);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0;
+    }
+
+    /* Reveal Scene - 4 cards */
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      width: 100%;
+      max-width: 1600px;
+      padding: 0 80px;
+      align-items: start;
+    }
+
+    .reveal-card {
+      aspect-ratio: 16/10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 24px;
+      opacity: 0;
+      transform: translateY(60px) scale(0.9);
+    }
+
+    .reveal-card-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .reveal-card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .reveal-card-label {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--white-dim);
+      text-align: center;
+      max-width: 280px;
+      line-height: 1.4;
+    }
+
+    .card-1 .reveal-card-icon { background: linear-gradient(135deg, var(--gold), var(--gold-dim)); }
+    .card-2 .reveal-card-icon { background: linear-gradient(135deg, var(--emerald), #059669); }
+    .card-3 .reveal-card-icon { background: linear-gradient(135deg, var(--amber), #D97706); }
+    .card-4 .reveal-card-icon { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+
+    /* Beat 1: Shared Brain - Split Screen */
+    .beat1-scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      width: 100%;
+      padding: 0 60px;
+    }
+
+    .beat1-headline {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+      line-height: 1.2;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .beat1-headline .gold { color: var(--gold); }
+
+    .split-screen {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      max-width: 1400px;
+      opacity: 0;
+      transform: scale(0.92);
+    }
+
+    .device-frame {
+      flex: 1;
+      aspect-ratio: 9/16;
+      background: #1a1a2e;
+      border-radius: 32px;
+      border: 8px solid #1a1a2e;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .device-frame::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      z-index: 10;
+    }
+
+    .device-frame.phone { border-width: 12px 8px 12px 8px; border-radius: 40px; }
+    .device-frame.desktop { border-width: 8px; border-radius: 16px; aspect-ratio: 16/9; }
+
+    .device-screen {
+      position: absolute;
+      inset: 8px;
+      border-radius: inherit;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone .device-screen { inset: 12px; }
+
+    .device-header {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+    }
+
+    .device-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .device-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(212,168,67,0.15);
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid rgba(212,168,67,0.3);
+    }
+
+    .sync-animation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      pointer-events: none;
+    }
+
+    .sync-arrow {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: var(--bg);
+      animation: spin 1s linear infinite;
+      opacity: 0;
+    }
+
+    .sync-pulse {
+      position: absolute;
+      inset: -20px;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      opacity: 0;
+      animation: pulse-ring 1.5s ease-out infinite;
+    }
+
+    .sync-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gold);
+      white-space: nowrap;
+      opacity: 0;
+    }
+
+    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+    @keyframes pulse-ring { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.6; } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+
+    .beat1-tagline {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--white-dim);
+      text-align: center;
+      max-width: 800px;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .beat1-tagline .gold { color: var(--gold); font-weight: 700; }
+
+    /* Beat 2: Islamic Finance */
+    .beat2-scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 100%;
+      padding: 0 60px;
+    }
+
+    .beat2-headline {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+      line-height: 1.2;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .beat2-headline .gold { color: var(--gold); }
+
+    .beat2-cards {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 1400px;
+      opacity: 0;
+    }
+
+    .beat2-card {
+      flex: 1;
+      aspect-ratio: 4/5;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      transform: translateY(40px) scale(0.92);
+    }
+
+    .beat2-card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+
+    .zakat-card .beat2-card-icon { background: linear-gradient(135deg, var(--emerald), #059669); }
+    .fire-card .beat2-card-icon { background: linear-gradient(135deg, var(--amber), #D97706); }
+    .learn-card .beat2-card-icon { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+
+    .beat2-card-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+    }
+
+    .beat2-card-metric {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .beat2-card-label {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--white-dim);
+      text-align: center;
+      max-width: 240px;
+      line-height: 1.5;
+    }
+
+    .confetti-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 16px;
+      border-radius: 2px;
+      opacity: 0;
+      transform: translate(-50%, -50%) rotate(var(--rot)) scale(0);
+    }
+
+    /* Beat 3: Smart Notifications */
+    .beat3-scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 100%;
+      padding: 0 60px;
+    }
+
+    .beat3-headline {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--white);
+      text-align: center;
+      line-height: 1.2;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .beat3-headline .gold { color: var(--gold); }
+
+    .notifications-demo {
+      display: flex;
+      gap: 24px;
+      width: 100%;
+      max-width: 1400px;
+      opacity: 0;
+    }
+
+    .lock-screen {
+      flex: 1;
+      aspect-ratio: 9/16;
+      background: linear-gradient(180deg, #0A1628 0%, #000 100%);
+      border-radius: 32px;
+      border: 8px solid #1a1a2e;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      position: relative;
+    }
+
+    .lock-screen::before {
+      content: '';
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 5px;
+      background: #333;
+      border-radius: 3px;
+    }
+
+    .lock-notification {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 16px 20px;
+      backdrop-filter: blur(20px);
+    }
+
+    .lock-notif-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .lock-notif-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--amber), #D97706);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .lock-notif-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .lock-notif-body {
+      font-size: 14px;
+      color: var(--white-dim);
+      line-height: 1.5;
+    }
+
+    .lock-notif-amount {
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .lock-notif-amount.hidden {
+      color: transparent;
+      background: repeating-linear-gradient(90deg, #333, #333 4px, #444 4px, #444 8px);
+      -webkit-background-clip: text;
+      background-clip: text;
+      border-radius: 4px;
+    }
+
+    .settings-panel {
+      flex: 1;
+      aspect-ratio: 9/16;
+      background: var(--bg);
+      border-radius: 24px;
+      border: 1px solid var(--glass-border);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .settings-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .channel-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .channel-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .channel-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .channel-desc {
+      font-size: 12px;
+      color: var(--white-dim);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 56px;
+      height: 32px;
+      background: #333;
+      border-radius: 16px;
+      border: 1px solid #444;
+      cursor: pointer;
+    }
+
+    .toggle-switch.active {
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      border-color: var(--emerald);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(24px);
+    }
+
+    .beat3-tagline {
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--white-dim);
+      text-align: center;
+      max-width: 800px;
+      line-height: 1.4;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .beat3-tagline .gold { color: var(--gold); font-weight: 700; }
+
+    /* Outro Scene */
+    .outro-scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .outro-icon {
+      width: 180px;
+      height: 180px;
+      border-radius: 40px;
+      opacity: 0;
+      transform: scale(0.6) translateY(40px);
+    }
+
+    .outro-title-arabic {
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(212,168,67,0.3);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .outro-title-english {
+      font-size: 22px;
+      font-weight: 400;
+      color: var(--white-dim);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .outro-tagline {
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--white);
+      text-align: center;
+      line-height: 1.3;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .outro-tagline .gold { color: var(--gold); }
+
+    .outro-badges {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .badge {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white-dim);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      padding: 8px 20px;
+    }
+
+    .badge.gold {
+      color: var(--gold);
+      border-color: rgba(212,168,67,0.4);
+      background: rgba(212,168,67,0.1);
+    }
+
+    .outro-cta {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--gold);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* Audio-reactive subtle glow */
+    .audio-glow {
+      position: absolute;
+      inset: -40px;
+      border-radius: inherit;
+      background: radial-gradient(ellipse at center, rgba(212,168,67,0) 0%, rgba(212,168,67,0) 70%);
+      pointer-events: none;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body dir="rtl">
+  <div data-hf-id="hf-kfcf" id="root" data-composition-id="fajrak-brag" data-start="0" data-width="1920" data-height="1080" data-duration="20">
+    <!-- Audio: Music Bed -->
+    <audio data-hf-id="hf-p3p8" id="bg-music" data-start="0" data-duration="20" data-track-index="10" data-volume="0.35" src="assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.mp3"></audio>
+
+    <!-- SFX -->
+    <audio data-hf-id="hf-uc9x" id="sfx-whoosh" data-start="0" data-duration="1" data-track-index="11" data-volume="0.7" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+    <audio data-hf-id="hf-5ng8" id="sfx-drop1" data-start="2.1" data-duration="1" data-track-index="12" data-volume="0.55" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio data-hf-id="hf-b8xs" id="sfx-drop2" data-start="2.7" data-duration="1" data-track-index="13" data-volume="0.55" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio data-hf-id="hf-909z" id="sfx-drop3" data-start="3.3" data-duration="1" data-track-index="14" data-volume="0.55" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio data-hf-id="hf-i4af" id="sfx-drop4" data-start="3.9" data-duration="1" data-track-index="15" data-volume="0.55" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio data-hf-id="hf-zak8" id="sfx-sync" data-start="5.8" data-duration="1" data-track-index="16" data-volume="0.7" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+    <audio data-hf-id="hf-lfr9" id="sfx-confetti" data-start="9.8" data-duration="1" data-track-index="17" data-volume="0.65" src="assets/sfx/impact/impactGlass_light_001.ogg"></audio>
+    <audio data-hf-id="hf-41ng" id="sfx-notif" data-start="13.8" data-duration="1" data-track-index="18" data-volume="0.6" src="assets/sfx/interface/click_001.ogg"></audio>
+    <audio data-hf-id="hf-bz1r" id="sfx-outro" data-start="17.5" data-duration="2" data-track-index="19" data-volume="0.75" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+
+    <!-- Scene 1: Hook (0-2s) -->
+    <section data-hf-id="hf-7ta8" id="scene-hook" class="clip hook-scene" data-start="0" data-duration="2">
+      <div data-hf-id="hf-qp7n" class="logo-arabic" id="hook-arabic">فجرك</div>
+      <div data-hf-id="hf-8tcu" class="glass-card logo-glass-card" id="hook-glass"></div>
+      <div data-hf-id="hf-p4cb" class="logo-english" id="hook-english">FAJRAK</div>
+      <div data-hf-id="hf-vuiv" class="audio-glow" id="hook-glow"></div>
+    </section>
+
+    <!-- Scene 2: Reveal (2-5s) -->
+    <section data-hf-id="hf-31fd" id="scene-reveal" class="clip" data-start="2" data-duration="3">
+      <div data-hf-id="hf-etgi" class="reveal-grid" id="reveal-grid">
+        <div data-hf-id="hf-t5fs" class="glass-card reveal-card card-1" id="reveal-1">
+          <div data-hf-id="hf-d2b7" class="reveal-card-icon">📊</div>
+          <div data-hf-id="hf-7gfr" class="reveal-card-title">Health Score</div>
+          <div data-hf-id="hf-6k3e" class="reveal-card-label">Real-time financial health</div>
+        </div>
+        <div data-hf-id="hf-uodc" class="glass-card reveal-card card-2" id="reveal-2">
+          <div data-hf-id="hf-xf0z" class="reveal-card-icon">🗑️</div>
+          <div data-hf-id="hf-1j3j" class="reveal-card-title">Swipe to Delete</div>
+          <div data-hf-id="hf-y54l" class="reveal-card-label">Native gestures, instant</div>
+        </div>
+        <div data-hf-id="hf-2gec" class="glass-card reveal-card card-3" id="reveal-3">
+          <div data-hf-id="hf-y0v9" class="reveal-card-icon">🕌</div>
+          <div data-hf-id="hf-2scq" class="reveal-card-title">Zakat Calculator</div>
+          <div data-hf-id="hf-uj5n" class="reveal-card-label">Auto-filled from accounts</div>
+        </div>
+        <div data-hf-id="hf-8wzw" class="glass-card reveal-card card-4" id="reveal-4">
+          <div data-hf-id="hf-iix6" class="reveal-card-icon">🔥</div>
+          <div data-hf-id="hf-4bw1" class="reveal-card-title">FIRE Calculator</div>
+          <div data-hf-id="hf-dgvd" class="reveal-card-label">Lean / Full / Fat modes</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: Beat 1 - Shared Brain (5-9s) -->
+    <section data-hf-id="hf-5r3f" id="scene-beat1" class="clip beat1-scene" data-start="5" data-duration="4">
+      <h2 data-hf-id="hf-dck5" class="beat1-headline" id="beat1-headline">
+        One brain.<br data-hf-id="hf-x5px">
+        <span data-hf-id="hf-kjjs" class="gold">Two screens.</span><br data-hf-id="hf-rsrt">
+        Zero lag.
+      </h2>
+      <div data-hf-id="hf-gg9y" class="split-screen" id="split-screen">
+        <div data-hf-id="hf-uih8" class="device-frame phone" id="phone-frame">
+          <div data-hf-id="hf-knsr" class="device-screen">
+            <div data-hf-id="hf-vc60" class="device-header">
+              <span data-hf-id="hf-7ynn" class="device-title">Fajrak Mobile</span>
+              <span data-hf-id="hf-wnwb" class="device-badge">LIVE</span>
+            </div>
+            <div data-hf-id="hf-isk6" class="sync-animation" id="phone-sync">
+              <div data-hf-id="hf-ogjq" class="sync-arrow">↗</div>
+              <div data-hf-id="hf-q83l" class="sync-pulse"></div>
+              <span data-hf-id="hf-rplk" class="sync-label" id="phone-sync-label">Synced</span>
+            </div>
+          </div>
+        </div>
+        <div data-hf-id="hf-ysgg" class="device-frame desktop" id="desktop-frame">
+          <div data-hf-id="hf-jdbv" class="device-screen">
+            <div data-hf-id="hf-aqi8" class="device-header">
+              <span data-hf-id="hf-lr45" class="device-title">Fajrak Web</span>
+              <span data-hf-id="hf-2b3v" class="device-badge">LIVE</span>
+            </div>
+            <div data-hf-id="hf-bjim" class="sync-animation" id="desktop-sync">
+              <div data-hf-id="hf-khhg" class="sync-arrow">↙</div>
+              <div data-hf-id="hf-3zit" class="sync-pulse"></div>
+              <span data-hf-id="hf-ypro" class="sync-label" id="desktop-sync-label">Synced</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p data-hf-id="hf-kikp" class="beat1-tagline" id="beat1-tagline">
+        Shared Supabase backend. Real-time sync.<br data-hf-id="hf-szow">
+        <span data-hf-id="hf-ewwr" class="gold">Add on phone → instant on web.</span>
+      </p>
+    </section>
+
+    <!-- Scene 4: Beat 2 - Islamic Finance (9-13s) -->
+    <section data-hf-id="hf-c6mr" id="scene-beat2" class="clip beat2-scene" data-start="9" data-duration="4">
+      <h2 data-hf-id="hf-p3jn" class="beat2-headline" id="beat2-headline">
+        Islamic finance.<br data-hf-id="hf-sldv">
+        <span data-hf-id="hf-7ril" class="gold">Native code.</span>
+      </h2>
+      <div data-hf-id="hf-3t3i" class="beat2-cards" id="beat2-cards">
+        <div data-hf-id="hf-qeeu" class="glass-card beat2-card zakat-card" id="zakat-card">
+          <div data-hf-id="hf-dy6g" class="beat2-card-icon">🕌</div>
+          <div data-hf-id="hf-67uf" class="beat2-card-title">Zakat</div>
+          <div data-hf-id="hf-rlw6" class="beat2-card-metric" id="hawl-counter">342</div>
+          <div data-hf-id="hf-hkq5" class="beat2-card-label">Days until Hawl • Nisab auto-fetched</div>
+          <div data-hf-id="hf-s2mu" class="confetti-container" id="zakat-confetti"></div>
+        </div>
+        <div data-hf-id="hf-ffl0" class="glass-card beat2-card fire-card" id="fire-card">
+          <div data-hf-id="hf-ekwz" class="beat2-card-icon">🔥</div>
+          <div data-hf-id="hf-0ytg" class="beat2-card-title">FIRE</div>
+          <div data-hf-id="hf-79qq" class="beat2-card-metric" id="fire-percent">67%</div>
+          <div data-hf-id="hf-j5fw" class="beat2-card-label">Lean • Full • Fat sliders</div>
+          <div data-hf-id="hf-0qut" class="confetti-container" id="fire-confetti"></div>
+        </div>
+        <div data-hf-id="hf-luom" class="glass-card beat2-card learn-card" id="learn-card">
+          <div data-hf-id="hf-ymtm" class="beat2-card-icon">📚</div>
+          <div data-hf-id="hf-vkw5" class="beat2-card-title">Lessons</div>
+          <div data-hf-id="hf-2yd0" class="beat2-card-metric" id="streak-counter">47</div>
+          <div data-hf-id="hf-a4i8" class="beat2-card-label">Daily streak • 20+ badges</div>
+          <div data-hf-id="hf-x5jb" class="confetti-container" id="learn-confetti"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Beat 3 - Smart Notifications (13-17s) -->
+    <section data-hf-id="hf-oa8o" id="scene-beat3" class="clip beat3-scene" data-start="13" data-duration="4">
+      <h2 data-hf-id="hf-3z09" class="beat3-headline" id="beat3-headline">
+        Smart alerts.<br data-hf-id="hf-qluq">
+        <span data-hf-id="hf-54u6" class="gold">Your privacy.</span><br data-hf-id="hf-q7jp">
+        Your rules.
+      </h2>
+      <div data-hf-id="hf-4992" class="notifications-demo" id="notifications-demo">
+        <div data-hf-id="hf-inoa" class="lock-screen" id="lock-screen">
+          <div data-hf-id="hf-3k0x" class="lock-notification" id="lock-notif">
+            <div data-hf-id="hf-358y" class="lock-notif-header">
+              <div data-hf-id="hf-pn47" class="lock-notif-icon">💰</div>
+              <span data-hf-id="hf-evan" class="lock-notif-title">Budget Alert</span>
+            </div>
+            <div data-hf-id="hf-1p1n" class="lock-notif-body">
+              Dining category at <span data-hf-id="hf-ed8q" class="lock-notif-amount" id="lock-amount">87%</span> of limit
+            </div>
+          </div>
+        </div>
+        <div data-hf-id="hf-a3te" class="settings-panel" id="settings-panel">
+          <div data-hf-id="hf-d65f" class="settings-title">Notification Channels</div>
+          <div data-hf-id="hf-4i65" class="channel-toggle" id="ch-budget">
+            <div data-hf-id="hf-mroe" class="channel-info">
+              <span data-hf-id="hf-k0fa" class="channel-name">Budget Alerts</span>
+              <span data-hf-id="hf-z08f" class="channel-desc">Category limits, overspend warnings</span>
+            </div>
+            <div data-hf-id="hf-q88n" class="toggle-switch active" id="toggle-budget"></div>
+          </div>
+          <div data-hf-id="hf-7gtp" class="channel-toggle" id="ch-debt">
+            <div data-hf-id="hf-qgsi" class="channel-info">
+              <span data-hf-id="hf-851o" class="channel-name">Debt Reminders</span>
+              <span data-hf-id="hf-p2l3" class="channel-desc">Installment due, payoff celebrations</span>
+            </div>
+            <div data-hf-id="hf-jfn7" class="toggle-switch active" id="toggle-debt"></div>
+          </div>
+          <div data-hf-id="hf-gm9v" class="channel-toggle" id="ch-goal">
+            <div data-hf-id="hf-qv3j" class="channel-info">
+              <span data-hf-id="hf-m5wo" class="channel-name">Goal Milestones</span>
+              <span data-hf-id="hf-joax" class="channel-desc">Progress updates, completion confetti</span>
+            </div>
+            <div data-hf-id="hf-dd3h" class="toggle-switch active" id="toggle-goal"></div>
+          </div>
+          <div data-hf-id="hf-26kr" class="channel-toggle" id="ch-zakat">
+            <div data-hf-id="hf-r9ek" class="channel-info">
+              <span data-hf-id="hf-ezsz" class="channel-name">Zakat Hawl</span>
+              <span data-hf-id="hf-x35d" class="channel-desc">30/7/0 day reminders, Nisab changes</span>
+            </div>
+            <div data-hf-id="hf-48yp" class="toggle-switch active" id="toggle-zakat"></div>
+          </div>
+        </div>
+      </div>
+      <p data-hf-id="hf-uv8u" class="beat3-tagline" id="beat3-tagline">
+        Per-channel toggles. Hide amounts on lock screen.<br data-hf-id="hf-regs">
+        <span data-hf-id="hf-2q2i" class="gold">Morning 6AM • Evening 6PM • Weekly Friday</span>
+      </p>
+    </section>
+
+    <!-- Scene 6: Outro (17-20s) -->
+    <section data-hf-id="hf-ap95" id="scene-outro" class="clip outro-scene" data-start="17" data-duration="3">
+      <img data-hf-id="hf-helc" class="outro-icon" id="outro-icon" src="assets/app_icon.png" alt="Fajrak">
+      <div data-hf-id="hf-xdbk" class="outro-title-arabic" id="outro-arabic">فجرك</div>
+      <div data-hf-id="hf-n3do" class="outro-title-english" id="outro-english">FAJRAK</div>
+      <p data-hf-id="hf-g9is" class="outro-tagline" id="outro-tagline">
+        Your dawn. Your wealth.<br data-hf-id="hf-r05r">
+        <span data-hf-id="hf-1prr" class="gold">فجرَك. ثروتك.</span>
+      </p>
+      <div data-hf-id="hf-f3qa" class="outro-badges" id="outro-badges">
+        <span data-hf-id="hf-p9gn" class="badge">22 Screens</span>
+        <span data-hf-id="hf-u53z" class="badge gold">100% Parity</span>
+        <span data-hf-id="hf-cam0" class="badge">On Google Play</span>
+      </div>
+      <p data-hf-id="hf-k620" class="outro-cta" id="outro-cta">fajrak.com/download</p>
+      <div data-hf-id="hf-hoz7" class="audio-glow" id="outro-glow"></div>
+    </section>
+  </div>
+
+  <script>
+    // Wait for fonts to load before building timeline
+    document.fonts.ready.then(() => {
+      const tl = gsap.timeline({ paused: true });
+
+      // ==========================================
+      // SCENE 1: HOOK (0-2s)
+      // ==========================================
+      // Arabic logo - gradient sweep entrance
+      tl.fromTo("#hook-arabic",
+        { scale: 0.3, opacity: 0, filter: "blur(20px)" },
+        { scale: 1, opacity: 1, filter: "blur(0px)", duration: 1.0, ease: "power3.out" },
+        0.1
+      );
+
+      // Glass card rises behind logo
+      tl.fromTo("#hook-glass",
+        { scale: 0.6, y: 60, opacity: 0, borderRadius: "40px" },
+        { scale: 1, y: 0, opacity: 1, borderRadius: "20px", duration: 1.2, ease: "back.out(1.4)" },
+        0.3
+      );
+
+      // English label fades in
+      tl.fromTo("#hook-english",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        1.2
+      );
+
+      // Audio-reactive glow on glass card (subtle)
+      tl.to("#hook-glow",
+        { opacity: 0.15, duration: 0.5 },
+        0.5
+      );
+
+      // ==========================================
+      // SCENE 2: REVEAL (2-5s) - 4 cards waterfall entry
+      // ==========================================
+      const revealCards = ["#reveal-1", "#reveal-2", "#reveal-3", "#reveal-4"];
+      revealCards.forEach((sel, i) => {
+        const delay = i * 0.15; // stagger ~0.15s (fast cascade)
+        tl.fromTo(sel,
+          { y: 60, scale: 0.9, opacity: 0 },
+          { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" },
+          2.0 + delay
+        );
+      });
+
+      // ==========================================
+      // SCENE 3: BEAT 1 - SHARED BRAIN (5-9s)
+      // ==========================================
+      // Headline
+      tl.fromTo("#beat1-headline",
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+        5.0
+      );
+
+      // Split screen devices
+      tl.fromTo("#split-screen",
+        { scale: 0.92, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.8, ease: "power3.out" },
+        5.4
+      );
+
+      // Sync animation - arrow spins, pulse rings
+      tl.fromTo("#phone-sync .sync-arrow",
+        { xPercent: -50, yPercent: -50, scale: 0, opacity: 0 },
+        { xPercent: -50, yPercent: -50, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" },
+        5.8
+      );
+      tl.fromTo("#desktop-sync .sync-arrow",
+        { xPercent: -50, yPercent: -50, scale: 0, opacity: 0 },
+        { xPercent: -50, yPercent: -50, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(2)" },
+        5.9
+      );
+      tl.to("#phone-sync .sync-pulse, #desktop-sync .sync-pulse",
+        { opacity: 0.6, duration: 0.3 },
+        6.0
+      );
+      tl.to("#phone-sync-label, #desktop-sync-label",
+        { opacity: 1, duration: 0.4, ease: "power2.out" },
+        6.2
+      );
+
+      // Tagline
+      tl.fromTo("#beat1-tagline",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        6.8
+      );
+
+      // ==========================================
+      // SCENE 4: BEAT 2 - ISLAMIC FINANCE (9-13s)
+      // ==========================================
+      tl.fromTo("#beat2-headline",
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+        9.0
+      );
+
+      // Three cards enter
+      const beat2Cards = ["#zakat-card", "#fire-card", "#learn-card"];
+      beat2Cards.forEach((sel, i) => {
+        tl.fromTo(sel,
+          { y: 40, scale: 0.92, opacity: 0 },
+          { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.4)" },
+          9.4 + i * 0.12
+        );
+      });
+
+      // Hawl counter count-up
+      tl.to("#hawl-counter",
+        {
+          innerText: 342,
+          duration: 1.2,
+          ease: "power2.out",
+          snap: { innerText: 1 },
+          onUpdate: function() {
+            this.targets()[0].innerText = Math.round(this.targets()[0].innerText);
+          }
+        },
+        9.8
+      );
+
+      // FIRE percentage count-up
+      tl.to("#fire-percent",
+        {
+          innerText: 67,
+          duration: 1.0,
+          ease: "power2.out",
+          snap: { innerText: 1 },
+          onUpdate: function() {
+            this.targets()[0].innerText = Math.round(this.targets()[0].innerText) + "%";
+          }
+        },
+        10.0
+      );
+
+      // Streak counter count-up
+      tl.to("#streak-counter",
+        {
+          innerText: 47,
+          duration: 1.0,
+          ease: "power2.out",
+          snap: { innerText: 1 },
+          onUpdate: function() {
+            this.targets()[0].innerText = Math.round(this.targets()[0].innerText);
+          }
+        },
+        10.2
+      );
+
+      // Confetti bursts on each card (staggered)
+      const confettiContainers = ["#zakat-confetti", "#fire-confetti", "#learn-confetti"];
+      confettiContainers.forEach((sel, i) => {
+        tl.call(() => createConfetti(sel), null, 10.5 + i * 0.3);
+      });
+
+      // ==========================================
+      // SCENE 5: BEAT 3 - SMART NOTIFICATIONS (13-17s)
+      // ==========================================
+      tl.fromTo("#beat3-headline",
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+        13.0
+      );
+
+      tl.fromTo("#notifications-demo",
+        { opacity: 0, scale: 0.95 },
+        { opacity: 1, scale: 1, duration: 0.8, ease: "power3.out" },
+        13.4
+      );
+
+      // Lock screen notification amount - toggle hidden effect
+      tl.to("#lock-amount",
+        { className: "+=hidden", duration: 0.3 },
+        13.8
+      );
+
+      // Channel toggles cascade in
+      const toggles = ["#ch-budget", "#ch-debt", "#ch-goal", "#ch-zakat"];
+      toggles.forEach((sel, i) => {
+        tl.fromTo(sel,
+          { x: -30, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" },
+          14.2 + i * 0.1
+        );
+      });
+
+      // Tagline
+      tl.fromTo("#beat3-tagline",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        15.2
+      );
+
+      // ==========================================
+      // SCENE 6: OUTRO (17-20s)
+      // ==========================================
+      tl.fromTo("#outro-icon",
+        { scale: 0.6, y: 40, opacity: 0, filter: "blur(10px)" },
+        { scale: 1, y: 0, opacity: 1, filter: "blur(0px)", duration: 0.9, ease: "back.out(1.6)" },
+        17.0
+      );
+
+      tl.fromTo("#outro-arabic",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+        17.4
+      );
+
+      tl.fromTo("#outro-english",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
+        17.7
+      );
+
+      tl.fromTo("#outro-tagline",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" },
+        18.0
+      );
+
+      tl.fromTo("#outro-badges",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out", stagger: 0.1 },
+        18.3
+      );
+
+      tl.fromTo("#outro-cta",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" },
+        18.6
+      );
+
+      // Final glow on icon
+      tl.to("#outro-glow",
+        { opacity: 0.2, duration: 0.5 },
+        17.2
+      );
+
+      // Register timeline
+      window.__timelines["fajrak-brag"] = tl;
+    });
+
+    // Confetti generator (deterministic, seek-safe)
+    function createConfetti(containerSel) {
+      const container = document.querySelector(containerSel);
+      if (!container) return;
+
+      const colors = [
+        '#D4A843', '#10B981', '#F59E0B', '#8B5CF6',
+        '#EC4899', '#06B6D4', '#FFFFFF'
+      ];
+
+      // Clear existing
+      container.innerHTML = '';
+
+      // Create 25 pieces per burst
+      for (let i = 0; i < 25; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        const color = colors[i % colors.length];
+        const startX = 50 + (Math.sin(i * 0.5) * 30); // deterministic spread
+        const startY = 50 + (Math.cos(i * 0.5) * 20);
+        const rot = (i * 137.5) % 360; // golden angle for distribution
+        const delay = (i * 0.02); // stagger
+
+        piece.style.cssText = `
+          --rot: ${rot}deg;
+          left: ${startX}%;
+          top: ${startY}%;
+          background: ${color};
+          animation: confetti-fall 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${delay}s forwards;
+        `;
+        container.appendChild(piece);
+      }
+    }
+
+    // Add confetti keyframes dynamically
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes confetti-fall {
+        0% { opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot)) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, 150vh) rotate(calc(var(--rot) + 720deg)) scale(0.3); }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
