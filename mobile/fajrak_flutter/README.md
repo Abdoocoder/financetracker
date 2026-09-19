@@ -91,7 +91,8 @@ fajrak_flutter/
 │   │   │   └── dashboard_screen.dart   ← لوحة التحكم الرئيسية
 │   │   │
 │   │   ├── transactions/
-│   │   │   └── transactions_screen.dart
+│   │   │   ├── transactions_screen.dart
+│   │   │   └── recurring_screen.dart    ← المعاملات المتكررة
 │   │   │
 │   │   ├── debts/
 │   │   │   └── debts_screen.dart
@@ -129,10 +130,24 @@ fajrak_flutter/
 │   │   ├── more/
 │   │   │   └── more_screen.dart        ← شاشة المزيد
 │   │   │
+│   │   ├── chat/
+│   │   │   └── chat_screen.dart        ← مساعد الدردشة BYOK (ميزة أ)
+│   │   │
 │   │   ├── splash_screen.dart          ← شاشة البداية
 │   │   └── main_screen.dart            ← هيكل التنقل الرئيسي
 │   │
 │   ├── services/
+│   │   ├── notification_service.dart   ← Firebase FCM + محلي
+│   │   ├── currency_service.dart       ← تحويل العملات
+│   │   ├── analytics_service.dart      ← تتبع الأحداث
+│   │   ├── investments_service.dart    ← بيانات الاستثمارات
+│   │   ├── byok/                       ← ميزة أ: BYOK (Bring Your Own Key)
+│   │   │   ├── byok_service.dart       ← خدمة الدردشة (Proxy + ClientDirect)
+│   │   │   ├── chat.dart               ← بناء جسم الطلب + استخراج دلتا + SSE
+│   │   │   ├── envelope.dart           ← غلاف التشفير (RSA-OAEP + AES-GCM)
+│   │   │   ├── providers.dart          ← سجل المزوّدين (OpenAI، Anthropic، إلخ)
+│   │   │   └── vault.dart              ← خزنة مفاتيح الجهاز (flutter_secure_storage)
+│   │   │
 │   │   ├── notification_service.dart   ← Firebase FCM + محلي
 │   │   ├── currency_service.dart       ← تحويل العملات
 │   │   ├── analytics_service.dart      ← تتبع الأحداث
@@ -188,6 +203,8 @@ fajrak_flutter/
 | 18 | **Zakat Calculator** | حاسبة الزكاة        | ملء تلقائي، عداد الحول، تاريخ             |
 | 19 | **More**             | المزيد              | قائمة تنقل إضافية                         |
 | 20 | **Main**             | الهيكل الرئيسي      | Bottom navigation bar (4 تبويبات)         |
+| 21 | **Chat**             | مساعد الدردشة BYOK   | ميزة أ، مفاتيح BYOK، تيار SSE، سياق مالي  |
+| 22 | **Recurring**        | المعاملات المتكررة   | CRUD، تكرار، تذكيرات، Skeleton Loader     |
 
 ---
 
@@ -211,6 +228,8 @@ fajrak_flutter/
 | `shared_preferences`          |  ^2.5.5   | التخزين المحلي                                |
 | `url_launcher`                |  ^6.3.2   | روابط خارجية                                  |
 | `http`                        |  ^1.6.0   | طلبات HTTP                                    |
+| `flutter_secure_storage`      | ^11.2.0   | تخزين مفاتيح BYOK (Keychain / Android Keystore) |
+| `webcrypto`                   |  ^0.6.1   | تشفير RSA-OAEP + AES-GCM لميزة BYOK           |
 
 ### اللغة والإطار
 
