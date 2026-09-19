@@ -1,0 +1,20 @@
+Fajrak Flutter — Your Dawn. Your Wealth. 🌅
+
+A native Android finance tracker built with Flutter, Arabic-first, with Islamic finance features built in. Shares a Supabase + Firebase brain with its Next.js web twin for real-time sync.
+
+✨ 22 screens · 100% feature parity · On Google Play
+
+Features:
+📊 Health Score dashboard with live sparklines
+🗑️ Swipe-to-delete transactions
+🕌 Zakat Calculator — auto-filled, Hawl countdown
+🔥 FIRE Calculator — Lean/Full/Fat modes
+📚 Daily Islamic lessons + streak tracking
+🏆 20+ achievements, 6 levels
+🔔 Smart notifications with per-channel toggles & privacy controls
+
+Built with: Flutter 3.x, Dart 3.x, Supabase, Firebase FCM, Cairo font (Arabic + Latin), Glassmorphism Material 3
+
+Download: fajrak.com/download
+
+#Fajrak #Flutter #FinanceTracker #ArabicFirst #IslamicFinance #OpenSource #GooglePlay
