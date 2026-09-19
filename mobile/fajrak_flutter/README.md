@@ -195,22 +195,22 @@ fajrak_flutter/
 
 ### الاعتمادات الأساسية
 
-| الحزمة                        | الإصدار | الغرض                                         |
-|:------------------------------|:-------:|:----------------------------------------------|
-| `supabase_flutter`            |  2.3.4  | قاعدة البيانات + Auth + Real-time             |
-| `firebase_core`               |  4.5.0  | تهيئة Firebase                                |
-| `firebase_messaging`          | 16.1.2  | Cloud Messaging (FCM)                         |
-| `flutter_local_notifications` | 21.0.0  | إشعارات Foreground                            |
-| `fl_chart`                    |  1.1.0  | رسوم بيانية (خطية، دائرية، شريطية، Sparkline) |
-| `easy_localization`           |  3.0.3  | التوطين AR/EN                                 |
-| `provider`                    |  6.1.1  | إدارة الحالة                                  |
-| `shimmer`                     |  3.0.0  | تأثيرات التحميل                               |
-| `cached_network_image`        |  3.3.1  | تخزين مؤقت للصور                              |
-| `flutter_dotenv`              |  6.0.0  | متغيرات البيئة                                |
-| `intl`                        | 0.20.2  | تنسيق التواريخ والعملات                       |
-| `shared_preferences`          |  2.2.2  | التخزين المحلي                                |
-| `url_launcher`                |  6.2.4  | روابط خارجية                                  |
-| `http`                        |  1.2.1  | طلبات HTTP                                    |
+| الحزمة                        | الإصدار   | الغرض                                         |
+|:------------------------------|:---------:|:----------------------------------------------|
+| `supabase_flutter`            |  ^2.17.2  | قاعدة البيانات + Auth + Real-time             |
+| `firebase_core`               |  ^4.15.0  | تهيئة Firebase                                |
+| `firebase_messaging`          |  ^16.7.0  | Cloud Messaging (FCM)                         |
+| `flutter_local_notifications` | ^22.3.1   | إشعارات Foreground                            |
+| `fl_chart`                    |  ^1.2.0   | رسوم بيانية (خطية، دائرية، شريطية، Sparkline) |
+| `easy_localization`           |  ^3.0.8   | التوطين AR/EN                                 |
+| `provider`                    |  ^6.1.5+1 | إدارة الحالة                                  |
+| `shimmer`                     |  ^4.0.0   | تأثيرات التحميل                               |
+| `cached_network_image`        |  ^3.3.1   | تخزين مؤقت للصور                              |
+| `flutter_dotenv`              |  ^6.0.1   | متغيرات البيئة                                |
+| `intl`                        |  ^0.20.3  | تنسيق التواريخ والعملات                       |
+| `shared_preferences`          |  ^2.5.5   | التخزين المحلي                                |
+| `url_launcher`                |  ^6.3.2   | روابط خارجية                                  |
+| `http`                        |  ^1.6.0   | طلبات HTTP                                    |
 
 ### اللغة والإطار
 
