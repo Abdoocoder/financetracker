@@ -154,37 +154,40 @@ class _RecurringScreenState extends State<RecurringScreen> {
                             right: BorderSide(color: color, width: 3),
                           ),
                         ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          leading: CircleAvatar(
-                            backgroundColor: color.withValues(alpha: 0.12),
-                            child: Icon(isIncome ? Icons.trending_up : Icons.trending_down, color: color, size: 20),
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            leading: CircleAvatar(
+                              backgroundColor: color.withValues(alpha: 0.12),
+                              child: Icon(isIncome ? Icons.trending_up : Icons.trending_down, color: color, size: 20),
+                            ),
+                            title: Text(rec['name'] ?? '', style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 14)),
+                            subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('${rec['category']} · $freqLabel', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
+                              Text('${'recurring_next'.tr()}: ${rec['next_date'] ?? ''}', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10)),
+                            ]),
+                            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Text(
+                                '${(rec['amount'] as num? ?? 0).toStringAsFixed(0)} ${rec['currency'] ?? _currency}',
+                                style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14),
+                              ),
+                              const SizedBox(width: 6),
+                              PopupMenuButton<String>(
+                                color: cs.surface,
+                                onSelected: (action) {
+                                  if (action == 'toggle') _toggleActive(rec);
+                                  if (action == 'edit') _showForm(existing: rec);
+                                  if (action == 'delete') _delete(rec['id'] as String);
+                                },
+                                itemBuilder: (_) => [
+                                  PopupMenuItem(value: 'toggle', child: Text(isActive ? 'recurring_pause'.tr() : 'recurring_resume'.tr(), style: const TextStyle())),
+                                  PopupMenuItem(value: 'edit', child: Text('btn_edit'.tr(), style: const TextStyle())),
+                                  PopupMenuItem(value: 'delete', child: Text('btn_delete'.tr(), style: TextStyle(color: cs.error))),
+                                ],
+                              ),
+                            ]),
                           ),
-                          title: Text(rec['name'] ?? '', style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 14)),
-                          subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('${rec['category']} · $freqLabel', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 11)),
-                            Text('${'recurring_next'.tr()}: ${rec['next_date'] ?? ''}', style: TextStyle(color: cs.onSurfaceVariant, fontSize: 10)),
-                          ]),
-                          trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                            Text(
-                              '${(rec['amount'] as num? ?? 0).toStringAsFixed(0)} ${rec['currency'] ?? _currency}',
-                              style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 14),
-                            ),
-                            const SizedBox(width: 6),
-                            PopupMenuButton<String>(
-                              color: cs.surface,
-                              onSelected: (action) {
-                                if (action == 'toggle') _toggleActive(rec);
-                                if (action == 'edit') _showForm(existing: rec);
-                                if (action == 'delete') _delete(rec['id'] as String);
-                              },
-                              itemBuilder: (_) => [
-                                PopupMenuItem(value: 'toggle', child: Text(isActive ? 'recurring_pause'.tr() : 'recurring_resume'.tr(), style: const TextStyle())),
-                                PopupMenuItem(value: 'edit', child: Text('btn_edit'.tr(), style: const TextStyle())),
-                                PopupMenuItem(value: 'delete', child: Text('btn_delete'.tr(), style: TextStyle(color: cs.error))),
-                              ],
-                            ),
-                          ]),
                         ),
                       ),
                     );
