@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, height=1080">
+  <title>Fajrak Brag Video</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/TextPlugin.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #070B14;
+      --bg-secondary: #0D1221;
+      --bg-card: #111827;
+      --bg-elevated: #162032;
+      --bg-glass: rgba(17, 24, 39, 0.85);
+      --border: rgba(255, 255, 255, 0.07);
+      --border-light: rgba(255, 255, 255, 0.12);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --text-primary: #F0F4FF;
+      --text-secondary: #8B9CC8;
+      --text-muted: #4A5568;
+      --accent-blue: #3B7EF6;
+      --accent-blue-light: #6BA3FF;
+      --accent-blue-glow: rgba(59, 126, 246, 0.25);
+      --accent-blue-dim: rgba(59, 126, 246, 0.12);
+      --accent-blue-border: rgba(59, 126, 246, 0.2);
+      --accent-green: #10B981;
+      --accent-green-light: #34D399;
+      --accent-red: #EF4444;
+      --accent-amber: #F59E0B;
+      --accent-amber-light: #FCD34D;
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 20px;
+      --r-xl: 28px;
+      --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-primary);
+      background-image:
+        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(59, 126, 246, 0.06) 0%, transparent 60%);
+      color: var(--text-primary);
+      font-family: 'Cairo', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .clip {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .clip > *:first-child {
+      z-index: 1;
+    }
+    .clip > *:not(:first-child) {
+      z-index: 20;
+    }
+    .clip.flex-col { flex-direction: column; }
+    .clip.flex-start { align-items: flex-start; }
+    .clip.flex-end { align-items: flex-end; }
+
+    /* Scene 1: Hook */
+    .scene1-bg { position: absolute; inset: 0; background: var(--bg-primary); }
+    .hero-text-container { text-align: center; direction: rtl; }
+    .hero-title {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1.3;
+      color: var(--text-primary);
+      margin: 0;
+      white-space: pre-wrap;
+    }
+    .hero-title .highlight { color: var(--accent-blue-light); }
+    .balance-card {
+      margin-top: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 32px 48px;
+      box-shadow: var(--shadow-card);
+      text-align: center;
+      direction: ltr;
+    }
+    .balance-label {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .balance-value {
+      font-size: 64px;
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-green-light);
+      text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+    .balance-currency {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-left: 8px;
+    }
+
+    /* Scene 2: Journey Roadmap */
+    .scene2-bg { position: absolute; inset: 0; background: var(--bg-primary); }
+    .journey-track {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 0 40px;
+      direction: rtl;
+    }
+    .journey-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      transform: translateY(20px) scale(0.97);
+    }
+    .journey-step.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-blue-dim);
+      border: 2px solid var(--accent-blue-border, rgba(59,126,246,0.2));
+      color: var(--accent-blue-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .step-num.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: white;
+      box-shadow: 0 0 20px var(--accent-blue-glow);
+    }
+    .step-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--r-md);
+      background: var(--accent-blue-dim);
+      border: 1px solid rgba(59,126,246,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .step-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 160px;
+      line-height: 1.5;
+    }
+
+    /* Scene 3: QuickAdd Flow */
+    .scene3-bg { position: absolute; inset: 0; background: var(--bg-primary); }
+    .dashboard-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .dash-header {
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .dash-title { font-size: 22px; font-weight: 700; }
+    .fab {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-blue) 0%, #6366F1 100%);
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-blue-glow);
+      transition: transform 0.15s;
+    }
+    .fab:active { transform: scale(0.92); }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 24px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: var(--shadow-elevated);
+      transform: scale(0.93);
+      transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center; direction: rtl; }
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 16px;
+      direction: rtl;
+    }
+    .chip {
+      padding: 10px 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip.selected {
+      background: var(--accent-blue-dim);
+      border-color: var(--accent-blue-border);
+      color: var(--accent-blue-light);
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .key {
+      aspect-ratio: 1;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .key:active { transform: scale(0.92); background: var(--bg-elevated); }
+    .key.zero { grid-column: span 2; }
+    .key.action { background: var(--accent-blue); border-color: var(--accent-blue); color: white; }
+    .display-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      font-size: 28px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      direction: ltr;
+    }
+    .currency-badge {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-left: 12px;
+    }
+    .save-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%);
+      border: none;
+      border-radius: var(--r-md);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 24px 32px;
+      opacity: 0;
+    }
+    .stat-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-icon { font-size: 24px; margin-bottom: 8px; }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .stat-value.green { color: var(--accent-green-light); }
+    .stat-value.red { color: var(--accent-red-light); }
+    .stat-value.blue { color: var(--accent-blue-light); }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .stat-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Scene 4: Zakat Auto-fill */
+    .scene4-bg { position: absolute; inset: 0; background: var(--bg-primary); }
+    .zakat-container {
+      width: 100%;
+      max-width: 600px;
+      padding: 32px;
+      direction: rtl;
+    }
+    .zakat-title {
+      font-size: 28px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .zakat-badge {
+      display: inline-block;
+      background: var(--accent-amber-dim);
+      color: var(--accent-amber-light);
+      border: 1px solid rgba(245,158,11,0.2);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      animation: pulseSlow 2.5s ease-in-out infinite;
+    }
+    @keyframes pulseSlow { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .zakat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      margin-bottom: 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+    }
+    .zakat-row.visible { opacity: 1; transform: translateY(0); }
+    .zakat-row.highlight { box-shadow: 0 0 20px var(--accent-amber-glow); border-color: var(--accent-amber-border, rgba(245,158,11,0.2)); }
+    .row-label { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .row-value {
+      font-size: 18px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-amber-light);
+      direction: ltr;
+    }
+    .row-value.green { color: var(--accent-green-light); }
+    .zakat-final {
+      margin-top: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(217,119,6,0.1) 100%);
+      border: 1px solid var(--accent-amber-border);
+      border-radius: var(--r-lg);
+      text-align: center;
+    }
+    .final-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+    .final-value { font-size: 32px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--accent-amber-light); }
+    .pay-btn {
+      margin-top: 16px;
+      padding: 14px 40px;
+      background: linear-gradient(135deg, var(--accent-amber) 0%, #D97706 100%);
+      border: none;
+      border-radius: var(--r-md);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 4px 20px var(--accent-amber-glow);
+      animation: glowPulse 2s ease-in-out infinite;
+    }
+    @keyframes glowPulse { 0%,100% { box-shadow: 0 0 8px currentColor; } 50% { box-shadow: 0 0 20px currentColor, 0 0 40px currentColor; } }
+
+    /* Scene 5: Outro */
+    .scene5-bg { position: absolute; inset: 0; background: var(--bg-primary); }
+    .logo-container { text-align: center; }
+    .logo-arabic {
+      font-size: 96px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    .logo-english {
+      font-size: 36px;
+      font-weight: 600;
+      color: var(--accent-blue-light);
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .tagline {
+      font-size: 22px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .url-line {
+      font-size: 16px;
+      color: var(--text-secondary);
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div data-hf-id="hf-cn0c" id="root" data-composition-id="fajrak-brag" data-width="1920" data-height="1080" data-duration="18" data-fps="30">
+    <!-- Audio: Music bed (track 10) -->
+    <audio data-hf-id="hf-4i7n" id="bg-music" data-start="0" data-duration="18" data-track-index="10" data-volume="0.18" src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"></audio>
+
+    <!-- SFX (tracks 11+) - will be added by Hyperframes after visual implementation -->
+    <!-- Placeholder SFX elements - actual files chosen at composition time -->
+    <audio data-hf-id="hf-qgue" id="sfx-keyboard" data-start="0" data-duration="0.25" data-track-index="11" data-volume="0.7" src="assets/sfx/keyboard/keypress-001.wav"></audio>
+    <audio data-hf-id="hf-v631" id="sfx-card-place" data-start="0" data-duration="0.69" data-track-index="12" data-volume="0.7" src="assets/sfx/casino/card-place-1.ogg"></audio>
+    <audio data-hf-id="hf-o3j4" id="sfx-click" data-start="0" data-duration="0.10" data-track-index="13" data-volume="0.7" src="assets/sfx/interface/click_001.ogg"></audio>
+    <audio data-hf-id="hf-4k6e" id="sfx-select" data-start="0" data-duration="0.05" data-track-index="14" data-volume="0.7" src="assets/sfx/interface/select_008.ogg"></audio>
+    <audio data-hf-id="hf-4z5v" id="sfx-save" data-start="0" data-duration="0.19" data-track-index="15" data-volume="0.7" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+    <audio data-hf-id="hf-ykul" id="sfx-drop" data-start="0" data-duration="0.11" data-track-index="16" data-volume="0.6" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio data-hf-id="hf-gwig" id="sfx-bell" data-start="0" data-duration="1.48" data-track-index="17" data-volume="0.85" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+
+    <!-- Scene 1: Hook (0-2.5s) -->
+    <section data-hf-id="hf-0lkb" id="scene-hook" class="clip" data-start="0" data-duration="2.5">
+      <div data-hf-id="hf-dtef" class="scene1-bg"></div>
+      <div data-hf-id="hf-9qz2" class="hero-text-container">
+        <h1 data-hf-id="hf-glfo" class="hero-title" id="hero-title"></h1>
+        <div data-hf-id="hf-p7b2" class="balance-card" id="balance-card">
+          <div data-hf-id="hf-2dpr" class="balance-label" id="balance-label">Net Worth</div>
+          <div data-hf-id="hf-32fi" class="balance-value" id="balance-value">0</div>
+          <span data-hf-id="hf-84iv" class="balance-currency" id="balance-currency">KWD</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 2: Journey Roadmap (2.5-6.5s) -->
+    <section data-hf-id="hf-lmvo" id="scene-journey" class="clip" data-start="2.5" data-duration="4">
+      <div data-hf-id="hf-ew12" class="scene2-bg"></div>
+      <div data-hf-id="hf-1sze" class="journey-track" id="journey-track">
+        <div data-hf-id="hf-u02u" class="journey-step" data-step="1">
+          <div data-hf-id="hf-fffj" class="step-num" id="step-num-1">1</div>
+          <div data-hf-id="hf-rj7i" class="step-icon">✏️</div>
+          <h3 data-hf-id="hf-5fwx" class="step-title" id="step-title-1">Awareness</h3>
+          <p data-hf-id="hf-slxf" class="step-desc" id="step-desc-1">Know where every dinar goes. Build the habit of tracking.</p>
+        </div>
+        <div data-hf-id="hf-q1yt" class="journey-step" data-step="2">
+          <div data-hf-id="hf-mxg7" class="step-num" id="step-num-2">2</div>
+          <div data-hf-id="hf-cqkm" class="step-icon">🔍</div>
+          <h3 data-hf-id="hf-qsug" class="step-title" id="step-title-2">Debt Freedom</h3>
+          <p data-hf-id="hf-zf71" class="step-desc" id="step-desc-2">Clear your debts with a structured payment plan.</p>
+        </div>
+        <div data-hf-id="hf-pab0" class="journey-step" data-step="3">
+          <div data-hf-id="hf-q3on" class="step-num" id="step-num-3">3</div>
+          <div data-hf-id="hf-to3t" class="step-icon">🎯</div>
+          <h3 data-hf-id="hf-n7f3" class="step-title" id="step-title-3">Safety Net</h3>
+          <p data-hf-id="hf-qkte" class="step-desc" id="step-desc-3">Build 3 months of emergency savings.</p>
+        </div>
+        <div data-hf-id="hf-crsj" class="journey-step" data-step="4">
+          <div data-hf-id="hf-751z" class="step-num" id="step-num-4">4</div>
+          <div data-hf-id="hf-0z9b" class="step-icon">📊</div>
+          <h3 data-hf-id="hf-d2p9" class="step-title" id="step-title-4">Invest &amp; Grow</h3>
+          <p data-hf-id="hf-1lr3" class="step-desc" id="step-desc-4">Start investing with halal options and grow your wealth.</p>
+        </div>
+        <div data-hf-id="hf-8toi" class="journey-step" data-step="5">
+          <div data-hf-id="hf-p8lb" class="step-num" id="step-num-5">5</div>
+          <div data-hf-id="hf-i0l9" class="step-icon">🚀</div>
+          <h3 data-hf-id="hf-s9v5" class="step-title" id="step-title-5">Financial Freedom</h3>
+          <p data-hf-id="hf-jvvq" class="step-desc" id="step-desc-5">Give freely, live fully, and never worry about money again.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: QuickAdd Flow (6.5-11.5s) -->
+    <section data-hf-id="hf-ww8p" id="scene-quickadd" class="clip" data-start="6.5" data-duration="5">
+      <div data-hf-id="hf-v6th" class="scene3-bg"></div>
+      <div data-hf-id="hf-zd4g" class="dashboard-frame">
+        <header data-hf-id="hf-isf2" class="dash-header">
+          <h1 data-hf-id="hf-tfq2" class="dash-title">فجرك</h1>
+          <button data-hf-id="hf-18v0" class="fab" id="fab" aria-label="Add transaction">+</button>
+        </header>
+        <div data-hf-id="hf-ejhe" style="flex:1; position:relative;">
+          <!-- Modal -->
+          <div data-hf-id="hf-mtzm" class="modal-overlay" id="modal-overlay">
+            <div data-hf-id="hf-1bwg" class="modal" id="modal">
+              <h2 data-hf-id="hf-tsa2" class="modal-title" id="modal-title">إضافة معاملة</h2>
+              <div data-hf-id="hf-krmi" class="category-chips" id="category-chips">
+                <span data-hf-id="hf-jyu8" class="chip" data-cat="expense">مصاريف</span>
+                <span data-hf-id="hf-1rn4" class="chip" data-cat="transport">نقل</span>
+                <span data-hf-id="hf-bri9" class="chip" data-cat="food">طعام</span>
+                <span data-hf-id="hf-5md0" class="chip" data-cat="health">صحة</span>
+                <span data-hf-id="hf-f5pd" class="chip" data-cat="education">تعليم</span>
+                <span data-hf-id="hf-is20" class="chip" data-cat="entertainment">ترفيه</span>
+                <span data-hf-id="hf-f8bi" class="chip" data-cat="other">أخرى</span>
+              </div>
+              <div data-hf-id="hf-do5p" class="display-row">
+                <span data-hf-id="hf-f89d" id="keypad-display">٠</span>
+                <span data-hf-id="hf-3xxr" class="currency-badge">JOD</span>
+              </div>
+              <div data-hf-id="hf-6oo2" class="keypad" id="keypad">
+                <button data-hf-id="hf-gxin" class="key" data-key="1">1</button>
+                <button data-hf-id="hf-yhif" class="key" data-key="2">2</button>
+                <button data-hf-id="hf-aiyf" class="key" data-key="3">3</button>
+                <button data-hf-id="hf-ip47" class="key" data-key="4">4</button>
+                <button data-hf-id="hf-0snj" class="key" data-key="5">5</button>
+                <button data-hf-id="hf-8ao7" class="key" data-key="6">6</button>
+                <button data-hf-id="hf-bgwn" class="key" data-key="7">7</button>
+                <button data-hf-id="hf-si9z" class="key" data-key="8">8</button>
+                <button data-hf-id="hf-n63j" class="key" data-key="9">9</button>
+                <button data-hf-id="hf-ub4t" class="key key-action" data-key="backspace">⌫</button>
+                <button data-hf-id="hf-7rjr" class="key key-zero" data-key="0">0</button>
+                <button data-hf-id="hf-pp4u" class="key key-action" data-key="save">حفظ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Stats Grid -->
+        <div data-hf-id="hf-2rve" class="stats-grid" id="stats-grid">
+          <div data-hf-id="hf-inpa" class="stat-box">
+            <div data-hf-id="hf-21bf" class="stat-icon">↑</div>
+            <div data-hf-id="hf-tgcy" class="stat-value green" id="stat-income">+0</div>
+            <div data-hf-id="hf-nz3w" class="stat-label">Income</div>
+          </div>
+          <div data-hf-id="hf-f2oy" class="stat-box">
+            <div data-hf-id="hf-18pd" class="stat-icon">↓</div>
+            <div data-hf-id="hf-nw69" class="stat-value red" id="stat-expenses">0</div>
+            <div data-hf-id="hf-8ehm" class="stat-label">Expenses</div>
+          </div>
+          <div data-hf-id="hf-fgzz" class="stat-box">
+            <div data-hf-id="hf-73em" class="stat-icon">🏦</div>
+            <div data-hf-id="hf-8fzv" class="stat-value blue" id="stat-net">+0</div>
+            <div data-hf-id="hf-ixuy" class="stat-label">Net</div>
+            <div data-hf-id="hf-464d" class="stat-sub" id="stat-sub">Month: +0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 4: Zakat Auto-fill (11.5-15s) -->
+    <section data-hf-id="hf-g809" id="scene-zakat" class="clip" data-start="11.5" data-duration="3.5">
+      <div data-hf-id="hf-auv0" class="scene4-bg"></div>
+      <div data-hf-id="hf-fflb" class="zakat-container">
+        <h1 data-hf-id="hf-2rpj" class="zakat-title">Zakat Calculator</h1>
+        <div data-hf-id="hf-xdt4" class="zakat-badge" id="zakat-badge">Auto-fill from your data</div>
+        <div data-hf-id="hf-397s" class="zakat-row" id="zakat-row-1">
+          <span data-hf-id="hf-iw2b" class="row-label">Cash (Savings Goals)</span>
+          <span data-hf-id="hf-05bq" class="row-value" id="zakat-cash">٠</span>
+        </div>
+        <div data-hf-id="hf-bx3n" class="zakat-row" id="zakat-row-2">
+          <span data-hf-id="hf-579k" class="row-label">Liabilities (Debts)</span>
+          <span data-hf-id="hf-dj2c" class="row-value" id="zakat-liabilities">٠</span>
+        </div>
+        <div data-hf-id="hf-7yzm" class="zakat-row" id="zakat-row-3">
+          <span data-hf-id="hf-56fj" class="row-label">Investments (Portfolio)</span>
+          <span data-hf-id="hf-p9rl" class="row-value" id="zakat-investments">٠</span>
+        </div>
+        <div data-hf-id="hf-p79x" class="zakat-row" id="zakat-row-4">
+          <span data-hf-id="hf-jqwg" class="row-label">Gold &amp; Silver (Live)</span>
+          <span data-hf-id="hf-y3rl" class="row-value" id="zakat-metals">٠</span>
+        </div>
+        <div data-hf-id="hf-ofm4" class="zakat-row" id="zakat-row-5">
+          <span data-hf-id="hf-3b14" class="row-label">Nisab Threshold</span>
+          <span data-hf-id="hf-mmlz" class="row-value green" id="zakat-nisab">٠</span>
+        </div>
+        <div data-hf-id="hf-x3hz" class="zakat-row" id="zakat-row-6">
+          <span data-hf-id="hf-1aov" class="row-label">Haul Countdown</span>
+          <span data-hf-id="hf-tewy" class="row-value" id="zakat-haul">Color-coded per investment</span>
+        </div>
+        <div data-hf-id="hf-hnvi" class="zakat-final">
+          <div data-hf-id="hf-3qr6" class="final-label">Zakat Due</div>
+          <div data-hf-id="hf-y9et" class="final-value" id="zakat-final-value">٠ JOD</div>
+          <button data-hf-id="hf-e6bm" class="pay-btn" id="pay-btn">Record Payment</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Outro (15-18s) -->
+    <section data-hf-id="hf-iskd" id="scene-outro" class="clip" data-start="15" data-duration="3">
+      <div data-hf-id="hf-014z" class="scene5-bg"></div>
+      <div data-hf-id="hf-18pb" class="logo-container">
+        <h1 data-hf-id="hf-4qz9" class="logo-arabic" id="logo-arabic">فجرك</h1>
+        <h2 data-hf-id="hf-nuto" class="logo-english" id="logo-english">Fajrak</h2>
+        <p data-hf-id="hf-7fm6" class="tagline" id="tagline">Your dawn toward financial freedom</p>
+        <p data-hf-id="hf-6kx0" class="url-line" id="url-line">fajrak.com · Free forever · No credit card</p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // GSAP Timeline
+    const tl = gsap.timeline({ paused: true });
+    const compositionId = "fajrak-brag";
+
+    // ===== Scene 1: Hook (0-2.5s) =====
+    // Hero title types out (0.0 - 2.0s)
+    tl.to("#hero-title", {
+      duration: 2.0,
+      text: {
+        value: "كل شهر نفس السؤال...\nأين ذهب الراتب؟",
+        delimiter: ""
+      },
+      ease: "none"
+    }, 0.0);
+
+    // Balance card appears (2.0s)
+    tl.from("#balance-card", {
+      y: 20,
+      opacity: 0,
+      scale: 0.97,
+      duration: 0.4,
+      ease: "power3.out"
+    }, 2.0);
+
+    // Balance value counts up (2.1 - 3.0s)
+    tl.to("#balance-value", {
+      duration: 0.9,
+      text: {
+        value: "12,450",
+        delimiter: ""
+      },
+      ease: "power2.out"
+    }, 2.1);
+
+    // ===== Scene 2: Journey Roadmap (2.5-6.5s) =====
+    const steps = [
+      { num: 1, title: "Awareness", desc: "Know where every dinar goes. Build the habit of tracking.", icon: "✏️" },
+      { num: 2, title: "Debt Freedom", desc: "Clear your debts with a structured payment plan.", icon: "🔍" },
+      { num: 3, title: "Safety Net", desc: "Build 3 months of emergency savings.", icon: "🎯" },
+      { num: 4, title: "Invest & Grow", desc: "Start investing with halal options and grow your wealth.", icon: "📊" },
+      { num: 5, title: "Financial Freedom", desc: "Give freely, live fully, and never worry about money again.", icon: "🚀" }
+    ];
+
+    // Beat grid timing: 5 steps on consecutive beats starting ~3.2s (tempo ~112 BPM = 0.536s/beat)
+    const beatInterval = 60 / 112; // ~0.536s
+    const firstBeat = 3.2;
+
+    steps.forEach((step, i) => {
+      const stepTime = firstBeat + i * beatInterval;
+      const stepEl = `#journey-track [data-step="${step.num}"]`;
+      const numEl = `#step-num-${step.num}`;
+      const titleEl = `#step-title-${step.num}`;
+      const descEl = `#step-desc-${step.num}`;
+
+      // Step container animates in
+      tl.from(stepEl, {
+        y: 20,
+        scale: 0.97,
+        opacity: 0,
+        duration: 0.4,
+        ease: "power3.out"
+      }, stepTime);
+
+      // Number circle activates
+      tl.to(numEl, {
+        backgroundColor: "var(--accent-blue)",
+        borderColor: "var(--accent-blue)",
+        color: "white",
+        boxShadow: "0 0 20px var(--accent-blue-glow)",
+        duration: 0.2,
+        ease: "power2.out"
+      }, stepTime + 0.15);
+
+      // SFX cue: card-place on each step (handled via audio-coupled idea in plan)
+    });
+
+    // Step 5 gets bell hit at ~5.8s (near strong cue ~5.8s)
+    tl.to("#step-num-5", {
+      scale: 1.1,
+      duration: 0.15,
+      yoyo: true,
+      repeat: 1,
+      ease: "power2.out"
+    }, 5.8);
+
+    // ===== Scene 3: QuickAdd Flow (6.5-11.5s) =====
+    // FAB pulse/attract attention
+    tl.from("#fab", {
+      scale: 0,
+      rotation: -180,
+      duration: 0.3,
+      ease: "back.out(1.7)"
+    }, 6.5);
+
+    // FAB tap - modal opens (6.85s)
+    tl.to("#fab", {
+      scale: 0.92,
+      duration: 0.08,
+      yoyo: true,
+      repeat: 1,
+      ease: "power2.inOut"
+    }, 6.85);
+
+    tl.to("#modal-overlay", {
+      opacity: 1,
+      pointerEvents: "auto",
+      duration: 0.2,
+      ease: "power2.out",
+      onStart: () => document.getElementById("modal-overlay").classList.add("open")
+    }, 6.85);
+
+    // Category chips appear staggered (6.95s)
+    const chips = document.querySelectorAll("#category-chips .chip");
+    chips.forEach((chip, i) => {
+      tl.from(chip, {
+        y: 12,
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.25,
+        ease: "back.out(1.5)"
+      }, 6.95 + i * 0.06);
+    });
+
+    // "طعام" chip selected (7.4s)
+    const foodChip = document.querySelector('#category-chips .chip[data-cat="food"]');
+    tl.to(foodChip, {
+      backgroundColor: "var(--accent-blue-dim)",
+      borderColor: "var(--accent-blue-border)",
+      color: "var(--accent-blue-light)",
+      duration: 0.2,
+      ease: "power2.out"
+    }, 7.4);
+
+    // Keypad typing "15" (7.5 - 7.9s)
+    const display = document.getElementById("keypad-display");
+    tl.to(display, {
+      duration: 0.2,
+      text: { value: "1", delimiter: "" },
+      ease: "none"
+    }, 7.5);
+    tl.to(display, {
+      duration: 0.2,
+      text: { value: "15", delimiter: "" },
+      ease: "none"
+    }, 7.7);
+
+    // Save button press (8.0s)
+    tl.to("#modal .save-btn", {
+      scale: 0.96,
+      duration: 0.08,
+      yoyo: true,
+      repeat: 1,
+      ease: "power2.inOut"
+    }, 8.0);
+
+    // Modal dismisses (8.1s)
+    tl.to("#modal-overlay", {
+      opacity: 0,
+      pointerEvents: "none",
+      duration: 0.25,
+      ease: "power2.in",
+      onComplete: () => document.getElementById("modal-overlay").classList.remove("open")
+    }, 8.1);
+
+    // Stats grid appears (8.3s)
+    tl.fromTo("#stats-grid", {
+      opacity: 0,
+      y: 20
+    }, {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      ease: "power3.out"
+    }, 8.3);
+
+    // Stat values count up (8.4s)
+    tl.to("#stat-income", {
+      duration: 0.6,
+      text: { value: "+8,200", delimiter: "" },
+      ease: "power2.out"
+    }, 8.4);
+    tl.to("#stat-expenses", {
+      duration: 0.6,
+      text: { value: "2,100", delimiter: "" },
+      ease: "power2.out"
+    }, 8.45);
+    tl.to("#stat-net", {
+      duration: 0.6,
+      text: { value: "+6,100", delimiter: "" },
+      ease: "power2.out"
+    }, 8.5);
+    tl.to("#stat-sub", {
+      duration: 0.3,
+      text: { value: "Month: +8,200", delimiter: "" },
+      ease: "none"
+    }, 8.7);
+
+    // ===== Scene 4: Zakat Auto-fill (11.5-15s) =====
+    // Badge pulse already via CSS
+
+    const zakatRows = [
+      { id: "zakat-row-1", valueEl: "zakat-cash", value: "12,450", label: "Cash" },
+      { id: "zakat-row-2", valueEl: "zakat-liabilities", value: "3,200", label: "Liabilities" },
+      { id: "zakat-row-3", valueEl: "zakat-investments", value: "8,750", label: "Investments" },
+      { id: "zakat-row-4", valueEl: "zakat-metals", value: "2,100", label: "Metals" },
+      { id: "zakat-row-5", valueEl: "zakat-nisab", value: "4,320", label: "Nisab", green: true },
+      { id: "zakat-row-6", valueEl: "zakat-haul", value: "Color-coded per investment", label: "Haul" }
+    ];
+
+    // Rows appear sequentially every ~0.25s starting at 11.6s (beat grid from ~9.5s in plan, but scene starts at 11.5)
+    zakatRows.forEach((row, i) => {
+      const rowTime = 11.6 + i * 0.25;
+      tl.to(`#${row.id}`, {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: "power3.out",
+        onStart: () => document.getElementById(row.id).classList.add("visible")
+      }, rowTime);
+
+      // Count up values (except last row)
+      if (row.valueEl !== "zakat-haul") {
+        const isGreen = row.green;
+        tl.to(`#${row.valueEl}`, {
+          duration: 0.5,
+          text: { value: row.value, delimiter: "" },
+          ease: "power2.out"
+        }, rowTime + 0.15);
+      }
+    });
+
+    // Final value appears (13.2s)
+    tl.from(".zakat-final", {
+      y: 20,
+      opacity: 0,
+      duration: 0.4,
+      ease: "power3.out"
+    }, 13.2);
+
+    tl.to("#zakat-final-value", {
+      duration: 0.6,
+      text: { value: "312.500 JOD", delimiter: "" },
+      ease: "power2.out"
+    }, 13.4);
+
+    // ===== Scene 5: Outro (15-18s) =====
+    // Logo slams in (15.0s) - beat-locked to strong cue ~14.1s + 0.15s tolerance = ~14.25, but scene starts at 15
+    tl.from("#logo-arabic", {
+      scale: 0.8,
+      opacity: 0,
+      duration: 0.5,
+      ease: "back.out(1.5)"
+    }, 15.0);
+
+    tl.to("#logo-english", {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      ease: "power3.out"
+    }, 15.2);
+
+    tl.to("#tagline", {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      ease: "power3.out"
+    }, 15.4);
+
+    tl.to("#url-line", {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      ease: "power3.out"
+    }, 15.6);
+
+    // Bell ring at logo slam (15.0s)
+    // SFX handled via audio-coupled idea
+
+    // Hold final frame until 18s
+    tl.to({}, { duration: 1.0 }, 16.5);
+
+    // Register timeline
+    window.__timelines = window.__timelines || {};
+    window.__timelines[compositionId] = tl;
+  </script>
+</body>
+</html>
