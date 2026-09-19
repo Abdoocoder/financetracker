@@ -69,19 +69,22 @@ class _PreferencesSectionState extends State<PreferencesSection> {
         const Divider(height: 32),
 
         // --- Notifications ---
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          leading: Icon(Icons.notifications_active_outlined, color: colorScheme.primary),
-          title: Text(
-            'settings_notifications'.tr(),
-            style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
+        Material(
+          type: MaterialType.transparency,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(Icons.notifications_active_outlined, color: colorScheme.primary),
+            title: Text(
+              'settings_notifications'.tr(),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
             ),
+            trailing: Icon(Icons.arrow_forward_ios, size: 14, color: colorScheme.onSurfaceVariant),
+            onTap: () => Navigator.pushNamed(context, '/settings/notifications'),
           ),
-          trailing: Icon(Icons.arrow_forward_ios, size: 14, color: colorScheme.onSurfaceVariant),
-          onTap: () => Navigator.pushNamed(context, '/settings/notifications'),
         ),
       ],
     ),
