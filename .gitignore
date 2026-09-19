@@ -33,6 +33,7 @@ next-env.d.ts
 public/*.apk
 *.apk
 *.aab
+*.hprof
 
 # Logs
 logs
