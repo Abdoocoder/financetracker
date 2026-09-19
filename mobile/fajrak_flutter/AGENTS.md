@@ -36,5 +36,33 @@ Fajrak is a Flutter finance tracker with 22 screens, sharing Supabase backend an
 - **Firebase**: Messaging for notifications; Analytics via `AnalyticsService`
 - **External APIs**: Currency rates via `CurrencyService` (Yahoo Finance + FreeGoldAPI)
 - **Platform-Specific**: Android keystore in `android/app/`; web config in `web/`
-- **Cross-Platform Sync**: Shared user data; mobile triggers web updates via Supabase real-time</content>
-<parameter name="filePath">C:\Users\user\Projects\financetracker\mobile\fajrak_flutter\AGENTS.md
+- **Cross-Platform Sync**: Shared user data; mobile triggers web updates via Supabase real-time
+
+## Onboarding 2026-09 (New Agent Notes)
+### Testing Conventions
+- `flutter test` runs 13 files under `test/`; plain `group()`/`test()` from `flutter_test`, no mocking framework (inline constants/maps; helpers declared inside `group()`)
+- English descriptions for services/i18n tests; Arabic for repository tests (e.g., `'10 تحديثات على نفس المعاملة ينتج payload مدمج'`)
+- Raw timeouts accepted in service tests (no `fake_async`); `TestWidgetsFlutterBinding.ensureInitialized()` + `setUp` with `late Map<String, dynamic>` in i18n test
+- `test/i18n_keys_test.dart`: const `I18n` class asserts `ar.json`/`en.json` parse, identical key sets, non-empty strings, exact BYOK wording; `byokChatKeys` (28) + `byokSettingsKeys` (4) + `more_ai_chat`
+- `test/` mirrors `lib/`; model/repository tests run without live Supabase/Firebase
+
+### Error Handling
+- `ErrorHandler.handle(e, context)` in `lib/utils/error_handler.dart`: logs via `dev.log(name: 'ErrorHandler')`, sends `AnalyticsService.logError`, shows SnackBar (`Icons.wifi_off`/`Icons.error_outline`) only when `context?.mounted`
+- `_isNetworkError`: matches `SocketException` or `'socketexception' | 'failed host lookup' | 'no address associated' | 'authretryablefetchexception' | 'network is unreachable' | 'connection refused'` (case-insensitive) → `'error_no_internet'.tr()` else `'error_generic'.tr()`
+
+### Git / Naming Conventions
+- Commit prefixes observed (`git log --oneline -20`): `fix:`, `fix(build):`, `chore:`, `chore(deps):`, `docs:`, `docs(router):`, `feat:`, `feat(byok):`, `merge:` — follow per-scope style
+- Feature subfolders under `lib/screens/` and `lib/widgets/`; classes `XxxScreen`/`XxxService`/`XxxRepository`
+- Arabic comments in code; English for technical terms and guide feedback; app UI strings localized via `.tr()`
+
+### Sync & BYOK Details
+- Sync merge in `SyncService`: `remoteVersion = (data['local_version'] as int?) ?? 1`; `localVersion = local?.localVersion ?? 0`; op `'delete'` → local delete; local null → insert with `syncStatus: 'synced'` + `localVersion: remoteVersion`; `remoteVersion > localVersion` → drift update; else `MergeResult.conflict`
+- `_applyDelete` handles only 4 entity types (`transactions`, `debts`, `savings_goals`, `budgets`) though `SyncQueue.entityType` comment lists 6 (incl. `'recurring'`)
+- `pushPendingChanges`: per-item failure → `ErrorHandler.handle` + backoff (`getBackoffDuration`); `attemptCount >= 3` → permanent failure; `fullSync` = `pullWithPagination` → `pushPendingChanges` → `SyncResult`
+- `TransactionRepository` queues: `enqueueCreate` cancels pending `'delete'` for same `entityId` (and vice versa), `entityType: 'transaction'`
+- BYOK (`LlmService.clientDirect` only): vault keys in secure storage prefixes `byok_key_` / `llm_key_`, device-only via `flutter_secure_storage` + `webcrypto`; `kTemperature = 0.2`; default Ollama base URL `http://10.0.2.2:11434/v1` on Android emulator else `http://localhost:11434/v1`
+- BYOK proxy envelope `(env, payload, keyId)`: payload = `base64(IV(12) || AES-256-GCM ciphertext)`; env = `base64(RSA-OAEP-SHA256(ephemeral AES key))`; POST `{providerId, keyId, env, payload, body, stream}` to `{proxyBaseUrl}/api/byok/proxy` with session JWT
+- `NotificationService` (3 Android channels: `budget_alerts` high, `debt_reminders` max, `saving_goals` default) early-returns on `kIsWeb`
+- `PdfReportService.shareMonthlyReport(ReportData)`: palette `_green 0xFF10B981`, `_red 0xFFEF4444`, `_blue 0xFF3B7EF6`, `_bg 0xFFF8FAFC`, `_text 0xFF0F172A`, `_muted 0xFF64748B`, `_border 0xFFE2E8F0`
+- Account colors sent as `'#${_color.toARGB32().toRadixString(16).substring(2).toUpperCase()}'`
+- `MainScreen` IndexedStack: 5 tabs (0=More, 1=Accounts, 2=Debts, 3=Transactions, 4=Dashboard default) + deep-link `{'tab': int}`
