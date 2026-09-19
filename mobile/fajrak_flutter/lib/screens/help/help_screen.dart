@@ -337,20 +337,23 @@ class _FAQItemState extends State<_FAQItem> {
       ),
       child: Column(
         children: [
-            ListTile(
-            onTap: () => setState(() => _open = !_open),
-            title: Text(widget.q,
-                style: TextStyle(
-                    color: _open ? cs.onSurface : cs.onSurfaceVariant,
-                    fontWeight: _open ? FontWeight.w900 : FontWeight.w700,
-                    fontSize: 13)),
-            trailing: AnimatedRotation(
-              duration: const Duration(milliseconds: 200),
-              turns: _open ? 0.5 : 0,
-              child: Icon(Icons.keyboard_arrow_down,
-                  color: cs.onSurfaceVariant),
+            Material(
+              type: MaterialType.transparency,
+              child: ListTile(
+                onTap: () => setState(() => _open = !_open),
+                title: Text(widget.q,
+                    style: TextStyle(
+                        color: _open ? cs.onSurface : cs.onSurfaceVariant,
+                        fontWeight: _open ? FontWeight.w900 : FontWeight.w700,
+                        fontSize: 13)),
+                trailing: AnimatedRotation(
+                  duration: const Duration(milliseconds: 200),
+                  turns: _open ? 0.5 : 0,
+                  child: Icon(Icons.keyboard_arrow_down,
+                      color: cs.onSurfaceVariant),
+                ),
+              ),
             ),
-          ),
           if (_open)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
