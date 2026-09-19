@@ -113,9 +113,11 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
           ),
           // List
           Expanded(
-            child: ListView(
-              controller: scrollController,
-              children: [
+            child: Material(
+              type: MaterialType.transparency,
+              child: ListView(
+                controller: scrollController,
+                children: [
                 for (final groupKey in ['arabic', 'islamic', 'global'])
                   if ((groups[groupKey] ?? []).isNotEmpty) ...[
                     // Group header
@@ -153,6 +155,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
               ],
             ),
           ),
+          ), // close Material
         ]),
       ),
     );
