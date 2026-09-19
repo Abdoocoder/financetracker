@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080" />
+  <title>Fajrak Brag Video</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #070B14;
+      --text-primary: #F0F4FF;
+      --text-secondary: #8B9CC8;
+      --text-muted: #6B7A9A;
+      --accent-blue: #3B7EF6;
+      --accent-blue-light: #6BA3FF;
+      --accent-green: #10B981;
+      --accent-green-light: #34D399;
+      --accent-amber: #F59E0B;
+      --accent-amber-light: #FCD34D;
+      --accent-green-dim: rgba(16, 185, 129, 0.1);
+      --accent-green-border: rgba(16, 185, 129, 0.2);
+      --accent-blue-dim: rgba(59, 126, 246, 0.12);
+      --accent-blue-border: rgba(59, 126, 246, 0.2);
+      --border: rgba(255, 255, 255, 0.07);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --font-family: 'Cairo', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      overflow: hidden;
+    }
+
+    #root {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Scene 1: Arabic Hook */
+    #scene1-hook {
+      flex-direction: column;
+    }
+
+    .arabic-hook {
+      font-size: 64px;
+      font-weight: 900;
+      color: var(--text-primary);
+      text-align: center;
+      direction: rtl;
+      letter-spacing: -0.02em;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    /* Scene 2: Reveal */
+    #scene2-reveal {
+      flex-direction: column;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue-light) 50%, var(--accent-green-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      transform: translateY(20px) scale(0.97);
+    }
+
+    .hero-subtitle {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      max-width: 800px;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    /* Scene 3: Hero Balance Card (Phone Frame) */
+    #scene3-dashboard {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .phone-frame {
+      width: 380px;
+      height: 780px;
+      border-radius: 40px;
+      background: #000;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 0 4px rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      position: relative;
+      transform: scale(0.9) translateY(30px);
+      opacity: 0;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 28px;
+      background: var(--bg-primary);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      height: 24px;
+      border-radius: 12px;
+      background: #000;
+      z-index: 10;
+    }
+
+    .hero-card {
+      padding: 24px 20px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .stat-value.green { color: var(--accent-green-light); }
+    .stat-value.blue { color: var(--accent-blue-light); }
+    .stat-value.amber { color: var(--accent-amber-light); }
+
+    .stat-sub {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .mini-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      height: 80px;
+      margin-top: 8px;
+      padding: 0 4px;
+    }
+
+    .chart-bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+
+    .chart-bar.blue { background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-blue-light) 100%); }
+    .chart-bar.green { background: linear-gradient(180deg, var(--accent-green) 0%, var(--accent-green-light) 100%); }
+    .chart-bar.amber { background: linear-gradient(180deg, var(--accent-amber) 0%, var(--accent-amber-light) 100%); }
+
+    /* Scene 4: Debt Card */
+    #scene4-debt {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .debt-card {
+      width: 420px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      transform: scale(0.92) translateY(20px);
+      opacity: 0;
+    }
+
+    .debt-card.expanded {
+      height: auto;
+    }
+
+    .debt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .debt-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .debt-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--accent-green-dim);
+      border: 1px solid var(--accent-green-border);
+      border-radius: 100px;
+      color: var(--accent-green-light);
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .debt-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+
+    .debt-item:last-child {
+      border-bottom: none;
+    }
+
+    .debt-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .debt-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .debt-amount {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .debt-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      transform: scale(0);
+      opacity: 0;
+    }
+
+    .auto-deduction {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: var(--accent-green-dim);
+      border: 1px solid var(--accent-green-border);
+      border-radius: 12px;
+      margin-top: 16px;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .auto-deduction svg {
+      color: var(--accent-green-light);
+      flex-shrink: 0;
+    }
+
+    .auto-deduction-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-green-light);
+    }
+
+    /* Scene 5: Wealth Roadmap */
+    #scene5-roadmap {
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .roadmap-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    .roadmap-track {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      padding: 0 20px;
+    }
+
+    .roadmap-card {
+      flex: 1;
+      max-width: 280px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      transform: translateY(40px) scale(0.95);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .roadmap-card.unlocked {
+      border-color: var(--accent-blue-border);
+      box-shadow: 0 8px 32px rgba(59, 126, 246, 0.15);
+    }
+
+    .roadmap-card.freedom {
+      border-color: var(--accent-amber-border);
+      box-shadow: 0 8px 32px rgba(245, 158, 11, 0.2);
+    }
+
+    .roadmap-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    .roadmap-card.unlocked .roadmap-icon {
+      opacity: 1;
+    }
+
+    .roadmap-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .roadmap-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .freedom-quote {
+      font-size: 16px;
+      font-style: italic;
+      color: var(--accent-amber-light);
+      text-align: center;
+      max-width: 700px;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    /* Scene 6: Cultural Trio */
+    #scene6-trio {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .trio-container {
+      display: flex;
+      gap: 16px;
+      perspective: 1000px;
+    }
+
+    .feature-card {
+      width: 300px;
+      height: 380px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform: rotateY(90deg);
+      opacity: 0;
+      transform-origin: center;
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .feature-detail {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .feature-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--accent-green-dim);
+      border: 1px solid var(--accent-green-border);
+      border-radius: 100px;
+      color: var(--accent-green-light);
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    .halal-badge {
+      background: var(--accent-amber-dim);
+      border-color: rgba(245, 158, 11, 0.2);
+      color: var(--accent-amber-light);
+    }
+
+    /* Scene 7: Outro */
+    #scene7-outro {
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      text-align: center;
+    }
+
+    .outro-tagline {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 900px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-blue-light) 50%, var(--accent-green-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    .dawn-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 50%, var(--accent-amber) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 40px rgba(59, 126, 246, 0.4), 0 0 80px rgba(245, 158, 11, 0.2);
+    }
+
+    .dawn-logo::before {
+      content: 'ف';
+      font-size: 40px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .logo-arabic {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--text-primary);
+      direction: rtl;
+    }
+
+    .logo-english {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .outro-footer {
+      font-size: 14px;
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    /* Audio-reactive subtle glow */
+    @keyframes audioBreathe {
+      0%, 100% { opacity: 0.95; filter: brightness(1); }
+      50% { opacity: 1; filter: brightness(1.05); }
+    }
+
+    .audio-reactive {
+      animation: audioBreathe 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div
+    id="root"
+    data-composition-id="fajrak-brag"
+    data-width="1920"
+    data-height="1080"
+    data-duration="20"
+    data-fps="60"
+    data-layout-allow-overlap
+  >
+    <!-- Scene 1: Arabic Hook (0-3s) -->
+    <section id="scene1-hook" class="clip" data-start="0" data-duration="3" data-track-index="1">
+      <div class="arabic-hook" id="arabic-text">أين راتبك؟</div>
+    </section>
+
+    <!-- Scene 2: Reveal (3-5.5s) -->
+    <section id="scene2-reveal" class="clip" data-start="3" data-duration="2.5" data-track-index="2">
+      <h1 class="hero-title" id="hero-title">Where did the salary go?</h1>
+      <p class="hero-subtitle" id="hero-subtitle">Fajrak has the answer — by numbers, not guessing 🌅</p>
+    </section>
+
+    <!-- Scene 3: Hero Balance Card (5.5-9.5s) -->
+    <section id="scene3-dashboard" class="clip" data-start="5.5" data-duration="4" data-track-index="3">
+      <div class="phone-frame" id="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="hero-card">
+            <div class="stat-row">
+              <span class="stat-label">Net Worth</span>
+              <span class="stat-value green" id="net-worth">0</span>
+            </div>
+            <div class="stat-sub" id="net-worth-sub">KWD</div>
+            <div class="stat-row">
+              <span class="stat-label">Monthly Income</span>
+              <span class="stat-value blue" id="monthly-income">0</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">Savings Rate</span>
+              <span class="stat-value amber" id="savings-rate">0</span>
+            </div>
+            <div class="stat-sub">of income saved</div>
+            <div class="mini-chart" id="mini-chart">
+              <div class="chart-bar blue" style="height: 35%"></div>
+              <div class="chart-bar green" style="height: 55%"></div>
+              <div class="chart-bar blue" style="height: 42%"></div>
+              <div class="chart-bar green" style="height: 68%"></div>
+              <div class="chart-bar amber" style="height: 30%"></div>
+              <div class="chart-bar blue" style="height: 75%"></div>
+              <div class="chart-bar green" style="height: 50%"></div>
+              <div class="chart-bar blue" style="height: 85%"></div>
+              <div class="chart-bar green" style="height: 60%"></div>
+              <div class="chart-bar amber" style="height: 45%"></div>
+              <div class="chart-bar blue" style="height: 70%"></div>
+              <div class="chart-bar green" style="height: 90%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 4: Debt Card (9.5-13s) -->
+    <section id="scene4-debt" class="clip" data-start="9.5" data-duration="3.5" data-track-index="4">
+      <div class="debt-card" id="debt-card">
+        <div class="debt-header">
+          <span class="debt-title">Debt Payments</span>
+          <div class="debt-badge" id="debt-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            Auto-deduction active
+          </div>
+        </div>
+        <div class="debt-item" id="debt-1">
+          <div class="debt-info">
+            <span class="debt-name">Car Loan</span>
+            <span class="debt-amount">1,200 KWD/month</span>
+          </div>
+          <div class="debt-check" id="check-1">✓</div>
+        </div>
+        <div class="debt-item" id="debt-2">
+          <div class="debt-info">
+            <span class="debt-name">Personal Loan</span>
+            <span class="debt-amount">800 KWD/month</span>
+          </div>
+          <div class="debt-check" id="check-2">✓</div>
+        </div>
+        <div class="debt-item" id="debt-3">
+          <div class="debt-info">
+            <span class="debt-name">Friend's Debt</span>
+            <span class="debt-amount">300 KWD/month</span>
+          </div>
+          <div class="debt-check" id="check-3">✓</div>
+        </div>
+        <div class="auto-deduction" id="auto-deduction">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span class="auto-deduction-text">Auto-deduction active ✓</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Wealth Roadmap (13-16.3s) -->
+    <section id="scene5-roadmap" class="clip" data-start="13" data-duration="3.3" data-track-index="5" data-layout-ignore>
+      <h2 class="roadmap-title" id="roadmap-title">Wealth Roadmap</h2>
+      <div class="roadmap-track">
+        <div class="roadmap-card" id="card-1" data-layout-allow-overlap>
+          <div class="roadmap-icon">🌅</div>
+          <div class="roadmap-name">Awareness</div>
+          <div class="roadmap-desc">Know where every dinar goes</div>
+        </div>
+        <div class="roadmap-card" id="card-2" data-layout-allow-overlap>
+          <div class="roadmap-icon">💳</div>
+          <div class="roadmap-name">Debt Freedom</div>
+          <div class="roadmap-desc">Clear debts with a plan</div>
+        </div>
+        <div class="roadmap-card" id="card-3" data-layout-allow-overlap>
+          <div class="roadmap-icon">🛡️</div>
+          <div class="roadmap-name">Safety Net</div>
+          <div class="roadmap-desc">3 months emergency fund</div>
+        </div>
+        <div class="roadmap-card" id="card-4" data-layout-allow-overlap>
+          <div class="roadmap-icon">📈</div>
+          <div class="roadmap-name">Invest & Grow</div>
+          <div class="roadmap-desc">Halal options, compound growth</div>
+        </div>
+        <div class="roadmap-card freedom" id="card-5" data-layout-allow-overlap>
+          <div class="roadmap-icon">👑</div>
+          <div class="roadmap-name">Financial Freedom</div>
+          <div class="roadmap-desc">Give freely, live fully</div>
+        </div>
+      </div>
+      <p class="freedom-quote" id="freedom-quote">"The upper hand is better than the lower hand"</p>
+    </section>
+
+    <!-- Scene 6: Cultural Trio (16.5-19s) -->
+    <section id="scene6-trio" class="clip" data-start="16.5" data-duration="2.5" data-track-index="6" data-layout-ignore>
+      <div class="trio-container">
+        <div class="feature-card" id="card-zakat" data-layout-allow-overlap>
+          <div class="feature-icon">🌙</div>
+          <h3 class="feature-title">Zakat Calculator</h3>
+          <p class="feature-detail">Auto-filled from your real data with correct nisab thresholds</p>
+          <div class="feature-badge">Auto-calculated ✓</div>
+        </div>
+        <div class="feature-card" id="card-fire" data-layout-allow-overlap>
+          <div class="feature-icon">🔥</div>
+          <h3 class="feature-title">FIRE Calculator</h3>
+          <p class="feature-detail">Lean FIRE in <strong>7.2 years</strong> — Full FIRE in 12.4</p>
+          <div class="feature-badge">Your timeline</div>
+        </div>
+        <div class="feature-card" id="card-halal" data-layout-allow-overlap>
+          <div class="feature-icon">🕌</div>
+          <h3 class="feature-title">Halal Investing</h3>
+          <p class="feature-detail">Shariah-compliant stocks & crypto screening built-in</p>
+          <div class="feature-badge halal-badge">Halal Certified ✓</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 7: Outro (19.2-20.5s) -->
+    <section id="scene7-outro" class="clip" data-start="19.2" data-duration="1.3" data-track-index="7" data-layout-ignore>
+      <p class="outro-tagline" id="outro-tagline">Your finances deserve better than Excel 💡</p>
+      <div class="logo-container" id="logo-container">
+        <div class="dawn-logo" id="dawn-logo"></div>
+        <div class="logo-text">
+          <span class="logo-arabic" id="logo-arabic">فجرِك</span>
+          <span class="logo-english" id="logo-english">Fajrak</span>
+        </div>
+      </div>
+      <p class="outro-footer" id="outro-footer">Start free • No card • Built for the Arab world</p>
+    </section>
+
+    <!-- Audio -->
+    <audio id="bg-music" data-start="3" data-duration="17" data-track-index="10" data-volume="0.125" src="assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.mp3"></audio>
+    <audio id="sfx-keytick" data-start="0" data-duration="0.1" data-track-index="11" data-volume="0.4" src="assets/sfx/keypress-001.wav"></audio>
+    <audio id="sfx-counter" data-start="5.5" data-duration="0.1" data-track-index="12" data-volume="0.25" src="assets/sfx/interface/click_001.ogg"></audio>
+    <audio id="sfx-chart-pop" data-start="6.5" data-duration="0.1" data-track-index="13" data-volume="0.2" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-tap" data-start="9.5" data-duration="0.02" data-track-index="14" data-volume="0.5" src="assets/sfx/interface/click_002.ogg"></audio>
+    <audio id="sfx-expand" data-start="9.7" data-duration="0.1" data-track-index="15" data-volume="0.3" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-check1" data-start="10.1" data-duration="0.06" data-track-index="16" data-volume="0.4" src="assets/sfx/interface/select_008.ogg"></audio>
+    <audio id="sfx-check2" data-start="10.3" data-duration="0.06" data-track-index="17" data-volume="0.4" src="assets/sfx/interface/select_008.ogg"></audio>
+    <audio id="sfx-check3" data-start="10.5" data-duration="0.06" data-track-index="18" data-volume="0.4" src="assets/sfx/interface/select_008.ogg"></audio>
+    <audio id="sfx-unlock1" data-start="13.1" data-duration="0.1" data-track-index="19" data-volume="0.35" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-unlock2" data-start="13.65" data-duration="0.1" data-track-index="20" data-volume="0.35" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-unlock3" data-start="14.2" data-duration="0.1" data-track-index="21" data-volume="0.35" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-unlock4" data-start="14.75" data-duration="0.1" data-track-index="22" data-volume="0.35" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-unlock5" data-start="15.3" data-duration="0.1" data-track-index="23" data-volume="0.35" src="assets/sfx/interface/switch_001.ogg"></audio>
+    <audio id="sfx-flip1" data-start="16.5" data-duration="0.1" data-track-index="24" data-volume="0.35" src="assets/sfx/casino/card-slide-1.ogg"></audio>
+    <audio id="sfx-flip2" data-start="17.3" data-duration="0.1" data-track-index="25" data-volume="0.35" src="assets/sfx/casino/card-slide-1.ogg"></audio>
+    <audio id="sfx-flip3" data-start="18.1" data-duration="0.1" data-track-index="26" data-volume="0.35" src="assets/sfx/casino/card-slide-1.ogg"></audio>
+    <audio id="sfx-bong" data-start="19.2" data-duration="0.1" data-track-index="27" data-volume="0.5" src="assets/sfx/interface/bong_001.ogg"></audio>
+  </div>
+
+  <script>
+    // ============================================
+    // FAJRAK BRAG VIDEO - GSAP TIMELINE
+    // ============================================
+    
+    const tl = gsap.timeline({ paused: true });
+    
+    // Register Cairo font loading
+    document.fonts.ready.then(() => {
+      // Font ready, timeline can be built
+      buildTimeline();
+    });
+    
+    function buildTimeline() {
+      // ============================================
+      // SCENE 1: Arabic Hook (0-3s)
+      // Types out "أين راتبك؟" character by character
+      // ============================================
+      const arabicText = "أين راتبك؟";
+      const arabicEl = document.getElementById("arabic-text");
+      
+      // Create individual character spans for typing effect
+      arabicEl.innerHTML = "";
+      arabicText.split("").forEach((char, i) => {
+        const span = document.createElement("span");
+        span.textContent = char;
+        span.style.display = "inline-block";
+        span.style.opacity = 0;
+        span.style.transform = "translateY(12px) scale(0.9)";
+        span.style.transition = "none";
+        span.dataset.index = i;
+        arabicEl.appendChild(span);
+      });
+      
+      const chars = arabicEl.querySelectorAll("span");
+      const charDuration = 2.0 / chars.length; // ~0.22s per char over 2.2s
+      
+      chars.forEach((char, i) => {
+        const startTime = i * charDuration;
+        tl.to(char, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.15,
+          ease: "back.out(1.5)"
+        }, startTime);
+        
+        // Keytick SFX per character (handled via audio elements)
+      });
+      
+      // Hold final frame
+      // ============================================
+      // SCENE 2: Reveal (3-5.5s)
+      // Hard cut - gradient title resolves, subtitle fades in
+      // Music bed fades in
+      // ============================================
+      tl.to("#hero-title", {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: "power3.out"
+      }, 3.0);
+      
+      tl.to("#hero-subtitle", {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 3.4);
+      
+      // Music fade in (handled by audio element data-start=3)
+      
+      // ============================================
+      // SCENE 3: Hero Balance Card (5.5-9.5s)
+      // Phone frame scales in, counters count up, bars stagger
+      // ============================================
+      tl.to("#phone-frame", {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.7,
+        ease: "power3.out"
+      }, 5.5);
+      
+      // Net worth counter: 12,450 KWD (counts up 1.2s)
+      tl.to("#net-worth", {
+        innerText: 12450,
+        duration: 1.2,
+        ease: "power2.out",
+        snap: { innerText: 1 },
+        onUpdate: function() {
+          this.targets()[0].innerText = Math.round(this.targets()[0].innerText).toLocaleString('ar-EG');
+        }
+      }, 5.8);
+      
+      // Monthly income: 8,200 (counts up 0.8s)
+      tl.to("#monthly-income", {
+        innerText: 8200,
+        duration: 0.8,
+        ease: "power2.out",
+        snap: { innerText: 1 },
+        onUpdate: function() {
+          this.targets()[0].innerText = Math.round(this.targets()[0].innerText).toLocaleString('ar-EG');
+        }
+      }, 6.6);
+      
+      // Savings rate: 28% (counts up 0.6s)
+      tl.to("#savings-rate", {
+        innerText: 28,
+        duration: 0.6,
+        ease: "power2.out",
+        snap: { innerText: 1 },
+        onUpdate: function() {
+          this.targets()[0].innerText = Math.round(this.targets()[0].innerText) + "%";
+        }
+      }, 7.2);
+      
+      // Mini chart bars stagger in
+      const bars = document.querySelectorAll("#mini-chart .chart-bar");
+      bars.forEach((bar, i) => {
+        const targetHeight = bar.style.height;
+        bar.style.height = "0%";
+        tl.to(bar, {
+          height: targetHeight,
+          duration: 0.4,
+          ease: "power3.out"
+        }, 7.6 + i * 0.08);
+      });
+      
+      // ============================================
+      // SCENE 4: Debt Card (9.5-13s)
+      // Tap -> expand -> checkmarks cascade -> auto-deduction
+      // ============================================
+      tl.to("#debt-card", {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 9.5);
+      
+      // Tap ripple effect on badge area (simulated by badge appearing)
+      tl.to("#debt-badge", {
+        opacity: 1,
+        y: 0,
+        duration: 0.3,
+        ease: "back.out(1.7)"
+      }, 9.8);
+      
+      // Expand: debt items cascade in
+      const debtItems = ["#debt-1", "#debt-2", "#debt-3"];
+      debtItems.forEach((selector, i) => {
+        tl.to(selector, {
+          opacity: 1,
+          x: 0,
+          duration: 0.4,
+          ease: "power3.out"
+        }, 10.0 + i * 0.15);
+        
+        // Checkmark appears after item
+        const checkSelector = selector.replace("debt", "check");
+        tl.to(checkSelector, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.3,
+          ease: "back.out(2)"
+        }, 10.1 + i * 0.15);
+      });
+      
+      // Auto-deduction line
+      tl.to("#auto-deduction", {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        ease: "power3.out"
+      }, 10.9);
+      
+      // ============================================
+      // SCENE 5: Wealth Roadmap (13-16.5s)
+      // 5 cards unlock sequentially on beat grid (~0.55s apart)
+      // ============================================
+      tl.to("#roadmap-title", {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 13.0);
+      
+      const roadmapCards = ["#card-1", "#card-2", "#card-3", "#card-4", "#card-5"];
+      roadmapCards.forEach((selector, i) => {
+        const unlockTime = 13.1 + i * 0.55; // ~0.55s = every 2nd beat at 110 BPM
+        tl.to(selector, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          ease: "power3.out",
+          onStart: () => {
+            document.querySelector(selector).classList.add("unlocked");
+          }
+        }, unlockTime);
+      });
+      
+      // Freedom quote
+      tl.to("#freedom-quote", {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        ease: "power3.out"
+      }, 15.5);
+      
+      // ============================================
+      // SCENE 6: Cultural Trio (16.5-19s)
+      // 3 cards flip in sequentially
+      // ============================================
+      const trioCards = ["#card-zakat", "#card-fire", "#card-halal"];
+      trioCards.forEach((selector, i) => {
+        const startTime = 16.5 + i * 0.8;
+        tl.to(selector, {
+          opacity: 1,
+          rotationY: 0,
+          duration: 0.7,
+          ease: "power3.out",
+          transformOrigin: "center center"
+        }, startTime);
+        
+        // Badge pops in after card
+        const badge = document.querySelector(selector + " .feature-badge");
+        if (badge) {
+          tl.to(badge, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.3,
+            ease: "back.out(1.7)"
+          }, startTime + 0.5);
+        }
+      });
+      
+      // ============================================
+      // SCENE 7: Outro (19.2-20.5s)
+      // Phone pulls back, gradient tagline, logo, footer
+      // Music fades out
+      // ============================================
+      tl.to("#outro-tagline", {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power3.out"
+      }, 19.2);
+      
+      tl.to("#logo-container", {
+        opacity: 1,
+        scale: 1,
+        duration: 0.5,
+        ease: "back.out(1.5)"
+      }, 19.5);
+      
+      // Dawn logo subtle pulse
+      tl.to("#dawn-logo", {
+        scale: 1.05,
+        duration: 0.8,
+        ease: "sine.inOut",
+        repeat: 1,
+        yoyo: true
+      }, 19.6);
+      
+      tl.to("#outro-footer", {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        ease: "power3.out"
+      }, 19.6);
+      
+      // Music fade out handled by audio element
+      
+      // Register timeline
+      window.__timelines["fajrak-brag"] = tl;
+    }
+  </script>
+</body>
+</html>
