@@ -192,7 +192,15 @@ void main() {
     final service = _FakeByokService();
     await _pumpApp(tester, _screen(service));
 
-    await tester.tap(find.byType(DropdownButton<String>));
+    // Tap the provider dropdown by finding the InputDecorator with label "Provider"
+    // then tapping the DropdownButton inside it
+    final providerDropdown = find.descendant(
+      of: find.byWidgetPredicate((w) =>
+          w is InputDecorator &&
+          w.decoration.labelText == 'Provider'),
+      matching: find.byType(DropdownButton<String>),
+    );
+    await tester.tap(providerDropdown);
     await tester.pumpAndSettle();
     await tester.tap(find.text('OpenAI').last);
     await tester.pumpAndSettle();
