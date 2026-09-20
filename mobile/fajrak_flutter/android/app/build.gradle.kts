@@ -57,7 +57,7 @@ android {
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
-            isShrinkResources = true
+            // isShrinkResources is deprecated in AGP 9.0+; resource shrinking is enabled by default when minify is enabled
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // Disable lint for release to avoid Metaspace OOM
             lintOptions {
