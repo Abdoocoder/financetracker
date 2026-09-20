@@ -24,4 +24,4 @@
 }
 
 # Optimize resource shrinking - allow R8 to remove unused resources
-# (isShrinkResources = true in build.gradle.kts handles this)
+# (enabled by default in AGP 9.0+ when isMinifyEnabled = true)
