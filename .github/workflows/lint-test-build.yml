@@ -28,3 +28,6 @@ jobs:
 
       - name: Test
         run: npm run test
+
+      - name: BYOK Provider Sync Check
+        run: npx tsx scripts/sync-byok-providers.ts
