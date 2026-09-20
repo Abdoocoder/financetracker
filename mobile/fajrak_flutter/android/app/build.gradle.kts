@@ -58,6 +58,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // Disable lint for release to avoid Metaspace OOM
             lintOptions {
                 isCheckReleaseBuilds = false
