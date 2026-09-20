@@ -56,12 +56,27 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            // Disable lint for release to avoid Metaspace OOM
+            lintOptions {
+                isCheckReleaseBuilds = false
+                isAbortOnError = false
+            }
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+// Workaround for app_links + Gradle 8.14+ issue
+// https://github.com/flutter/flutter/issues/149791
+// https://github.com/app-links/app-links-flutter/issues/123
+// Only target the app_links module's parseReleaseLocalResources task
+tasks.matching { it.name.startsWith(":app_links:parseReleaseLocalResources") }.configureEach {
+    doNotTrackState("Workaround for app_links librarySymbolsFile issue")
 }
 
 tasks.withType<JavaCompile>().configureEach {
