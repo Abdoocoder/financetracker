@@ -10,7 +10,7 @@
 - **Web** — Next.js 16 (App Router) + React 19 + TypeScript (strict)
 - **Mobile** — Flutter (`mobile/fajrak_flutter/`), name *Fajrak*
 
-Current version: `3.40.0+52` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §13 drift notes; earlier docs referencing KWD are stale.
+Current version: `3.41.0+53` (see `mobile/fajrak_flutter/pubspec.yaml`). Web and mobile versions may drift between releases (web is currently v3.40.0). Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §14 drift notes; earlier docs referencing KWD are stale.
 
 ## 2. High-level architecture
 
@@ -180,3 +180,27 @@ From a live Supabase/GitHub MCP audit performed Sep 2026. **Repo schema lags pro
 - Watch out when running `supabase db reset` — the reset branch will be missing all of the above.
 
 Security posture (advisor: 6 WARN, **intentional**): `authenticated` can execute the owner-guarded SECURITY DEFINER RPCs (`delete_user_account`, `get_account_balances`, `get_financial_dashboard`, …); the guard is `auth.uid() = owner` inside the function (migration `20260907083248_verify_owner_in_user_rpcs.sql`) — do not remove it. Leaked-password protection is currently disabled on the auth config. No performance advisories.
+
+## 15. Net worth — 5 duplicate implementations
+
+Net worth is **not** centralized. The same LTV math (cash + investments + debts + assets) is computed in **5 places** — keep them in sync or display diverges:
+
+1. SQL RPC `get_financial_dashboard` — **authoritative** (migration `20260907083248_verify_owner_in_user_rpcs.sql` lines 67–82).
+2. `hooks/useDashboardData.ts` (`.computeNetWorth` at line ~102).
+3. `components/ui/financial-health-combined.tsx` (`.calculateNetWorth` at lines ~142–148).
+4. `mobile/fajrak_flutter/lib/screens/dashboard/dashboard_screen.dart` (line ~182).
+5. `app/api/gamification/route.ts` (lines ~138–142).
+
+If the formula changes, update all 5 — the RPC is the source of truth the web clients feed off.
+
+## 16. Monitoring & push notifications
+
+- **Sentry** (web): enabled via `withSentryConfig` in `sentry.client.config.ts` + `sentry.server.config.ts`; Session Replay worker allowed in the CSP. Source maps/wallaby: `SENTRY_AUTH_TOKEN`.
+- **Firebase (web + mobile)**: client config (`NEXT_PUBLIC_FIREBASE_*`) + admin (`FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) for push; Web Push via `NEXT_PUBLIC_VAPID_*` / `VAPID_*` keys. See `docs/technical/notification_system_design.md`.
+- **Smart notifications cron**: GitHub Actions `smart-notifications.yml` POSTs daily (07:00 UTC) to `https://fajrak.com/api/smart-notifications` with `secrets.CRON_SECRET` — expects HTTP 200.
+
+## 17. CI/CD
+
+- `lint-test-build.yml` — push to `main` / PRs: `npm ci` → `npm run lint` → `npm run typecheck` → `npm run test` (Node 22, ubuntu-latest).
+- `supabase-validate.yml` — **DRY-RUN** migration lint on an isolated local stack; never touches the live DB.
+- Deploy — Vercel auto-deploys from `main`; Flutter release APK via `make build-apk`.
