@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "analyzing-projects": {
+      "source": "cloudai-x/opencode-workflow",
+      "sourceType": "github",
+      "skillPath": "skills/analyzing-projects/SKILL.md",
+      "computedHash": "c0618ff8f4a5aafda8a0d06e6ac7836dcfc408bde39f8488ec0794dbc18f1dbb"
+    },
     "dart-add-unit-test": {
       "source": "flutter/agent-plugins",
       "sourceType": "github",

@@ -19,9 +19,10 @@ const customJestConfig = {
         '<rootDir>/node_modules/',
         '<rootDir>/.next/',
         '<rootDir>/mobile/',
-        '<rootDir>/__tests__/helpers/',
-        '<rootDir>/e2e/',
-    ],
+'<rootDir>/__tests__/helpers/',
+    '<rootDir>/e2e/',
+    '<rootDir>/headroom/',
+  ],
     collectCoverageFrom: [
         'app/**/*.{js,ts,tsx}',
         'lib/**/*.{js,ts,tsx}',
