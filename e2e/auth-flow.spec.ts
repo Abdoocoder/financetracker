@@ -28,11 +28,17 @@ test.describe('Authentication Flow', () => {
     // Click on "سجل مجاناً" (Register Free) link - matches auth_register_link translation
     await page.getByRole('link', { name: 'سجل مجاناً' }).click();
     
+    // Wait for navigation to complete
     await expect(page).toHaveURL(/\/register/);
     await expect(page.getByRole('heading', { name: 'ابدأ رحلتك المالية' })).toBeVisible();
     
+    // Wait for page to be fully loaded before clicking the link
+    await page.waitForLoadState('networkidle');
+    
     // Switch back to login - matches auth_login_link translation
     await page.getByRole('link', { name: 'سجل الدخول' }).click();
+    
+    // Wait for navigation to complete
     await expect(page).toHaveURL(/\/login/);
   });
 });
