@@ -1,0 +1,15 @@
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/main.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/app_state.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/utils/app_colors.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/sync_service.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/byok_service.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/vault.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/providers.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/envelope.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/chat.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/repositories/transaction_repository.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_colors.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_theme.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_typography.dart
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/AGENTS.md
+/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/README.md

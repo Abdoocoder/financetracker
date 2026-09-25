@@ -1,0 +1,1037 @@
+{
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/outdated.json": {
+    "mtime": 1779052422.6147919,
+    "ast_hash": "3f68f42dba70001756f0bc36ffe4a488",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/assets/i18n/ar.json": {
+    "mtime": 1789401889.4982443,
+    "ast_hash": "ba868855320368cacb6cfdae0e838046",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/assets/i18n/en.json": {
+    "mtime": 1789401889.4982443,
+    "ast_hash": "daf7ab7c94cef58073bb2db3434877c8",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/i18n_keys_test.dart": {
+    "mtime": 1788837034.6295857,
+    "ast_hash": "f3567d70dbe30e8bd3742ed6600e413b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/utils/finance_utils_test.dart": {
+    "mtime": 1779052422.6153874,
+    "ast_hash": "4635915517ce0fd11c0362eabe0c0c03",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/sync_service_test.dart": {
+    "mtime": 1779052422.6153874,
+    "ast_hash": "ede328d3aacbee4cc32f8e4f475b3667",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/currency_service_test.dart": {
+    "mtime": 1779052422.615291,
+    "ast_hash": "d7a230ab9662394151dbd8bd93365723",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/llm_service_test.dart": {
+    "mtime": 1789417926.1425,
+    "ast_hash": "571d18f42970c1e3edf93168a69bab4b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/byok/chat_test.dart": {
+    "mtime": 1788812379.9111102,
+    "ast_hash": "aab4603da6adf8b2b35937e3d0b7f6b9",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/byok/providers_test.dart": {
+    "mtime": 1788811731.568379,
+    "ast_hash": "e84638f4b1d7c3e5a4bd13b5cbbac6e6",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/byok/byok_service_test.dart": {
+    "mtime": 1789401889.5012443,
+    "ast_hash": "fa20f9fa49050fba52f10142c53ddf43",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/byok/vault_test.dart": {
+    "mtime": 1788812482.7269647,
+    "ast_hash": "c0e7f56cb5f55a9d189cf1f51c5207fb",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/byok/envelope_test.dart": {
+    "mtime": 1788814515.08091,
+    "ast_hash": "358b521feab2b24c7cc580f28ddec17e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/services/byok/fixtures/browser_envelope.json": {
+    "mtime": 1788812724.1502452,
+    "ast_hash": "7b514e7af981f3e018461a9c78f48953",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/screens/chat/chat_screen_test.dart": {
+    "mtime": 1789842258.7801175,
+    "ast_hash": "a14e6e796de82bfa5022463e7d30605c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/widgets/settings/byok_keys_section_test.dart": {
+    "mtime": 1788881413.5672445,
+    "ast_hash": "ca7308512e13e9c7fbb6e469cf40775d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/test/repositories/transaction_repository_test.dart": {
+    "mtime": 1779052422.615291,
+    "ast_hash": "de614b235a0e516a4822196d24e2c139",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/settings.gradle.kts": {
+    "mtime": 1790288156.3617876,
+    "ast_hash": "d5440fb4f8e0788b06ba2300e8b48894",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/gradlew": {
+    "mtime": 1787262913.8699553,
+    "ast_hash": "7f1cd7eb3f75a1dc85cd37753972a6e2",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/build.gradle.kts": {
+    "mtime": 1779052422.6036944,
+    "ast_hash": "f4d43b8e2684e536120bd7644053ec31",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/build.gradle.kts": {
+    "mtime": 1790287262.8294706,
+    "ast_hash": "0562aa151da7f4e585066e5e6d020b1a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java": {
+    "mtime": 1789405054.7545543,
+    "ast_hash": "2e1abe77b167ca68e9e5f53ec9e7ba1e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/kotlin/com/fajrak/app/MainActivity.kt": {
+    "mtime": 1779052422.6035745,
+    "ast_hash": "582fdf47174ef02ce1c52be5bfd118cf",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/web/manifest.json": {
+    "mtime": 1779052422.6156056,
+    "ast_hash": "b27888b1c6398984eec9ac24ebdf614a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/web/firebase-messaging-sw.js": {
+    "mtime": 1779052422.6153874,
+    "ast_hash": "36e8360974a63b29d0c6bb0724ddf2e7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.music-cues.json": {
+    "mtime": 1789667115.2277815,
+    "ast_hash": "b6e8dc10d524d0c187120c4d4defccb3",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.waveform-cache/v2_assets_sfx_impact_impactSoft_medium_001.ogg_5506-1789667552069.json": {
+    "mtime": 1789670090.908854,
+    "ast_hash": "fc57e59d72de90283bb10467a0ef2081",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.waveform-cache/v2_assets_sfx_interface_click_001.ogg_4876-1789667133654.json": {
+    "mtime": 1789670090.9528308,
+    "ast_hash": "7e3f6bca2ebc4a6c7bcac24f8aeeaf50",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.waveform-cache/v2_assets_sfx_interface_drop_001.ogg_5859-1789667133653.json": {
+    "mtime": 1789670090.8996904,
+    "ast_hash": "5e567b123728f44fb0234014a17764e4",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.waveform-cache/v2_assets_music_happy-beats-business-moves-vol-10-by-ende-dot-app.mp3_1441152-1789667100875.json": {
+    "mtime": 1789670074.3915412,
+    "ast_hash": "d2d694eb6f23fa3475fa62a22f26dbc7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.waveform-cache/v2_assets_sfx_impact_impactGlass_light_001.ogg_6544-1789667552069.json": {
+    "mtime": 1789670090.9153194,
+    "ast_hash": "baf5376e80bcd983f1ab4ea6dbde1944",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.waveform-cache/v2_assets_sfx_impact_impactBell_heavy_000.ogg_13915-1789667148838.json": {
+    "mtime": 1789670090.9052708,
+    "ast_hash": "9736e644ed3299461a8e08b6af511f7a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/runner/my_application.cc": {
+    "mtime": 1790266197.5127575,
+    "ast_hash": "f744762797251b9c97407f64b759d56d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/runner/main.cc": {
+    "mtime": 1790266197.5127575,
+    "ast_hash": "0643b8609698e96b3abd63c210361a87",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/runner/my_application.h": {
+    "mtime": 1790266197.5127575,
+    "ast_hash": "326a85d68857137fdfe8698a0c071baf",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/flutter/generated_plugin_registrant.h": {
+    "mtime": 1790266197.5125024,
+    "ast_hash": "d295462c9da9f7fef22dc86c34492318",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/flutter/generated_plugin_registrant.cc": {
+    "mtime": 1790266197.5125024,
+    "ast_hash": "fa79ec30c0a8246e490cc7a0fe36e498",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/main.dart": {
+    "mtime": 1789401889.4982443,
+    "ast_hash": "ef407bd76c1ef57098eaf18006e90552",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/app_state.dart": {
+    "mtime": 1779052422.607336,
+    "ast_hash": "851ad575fd3c60a1187b26279c6f5774",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/utils/detect_currency.dart": {
+    "mtime": 1779052422.6109293,
+    "ast_hash": "9a7519c105e2f1397e8880e684e09448",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/utils/app_colors.dart": {
+    "mtime": 1787260206.6744606,
+    "ast_hash": "013852dcba3d4a5f7ca99c5c79b5b7bb",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/utils/finance_utils.dart": {
+    "mtime": 1779052422.6109293,
+    "ast_hash": "35f2bde6f564727afa7b180a45cfe453",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/utils/date_formatter.dart": {
+    "mtime": 1787260206.6745298,
+    "ast_hash": "7c3f1d1285584c26923473f6c92193a7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/utils/error_handler.dart": {
+    "mtime": 1787260206.674604,
+    "ast_hash": "dc07bf97c32ba942e606ce71bb6cbb40",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/notification_service.dart": {
+    "mtime": 1789417410.9604776,
+    "ast_hash": "a7295ec4c752b13479a25f8cd6e11039",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/accounts_service.dart": {
+    "mtime": 1779052422.6104217,
+    "ast_hash": "e96d1ebb49f90e09bc3f61980ae796ed",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/currency_service.dart": {
+    "mtime": 1789417542.2109547,
+    "ast_hash": "f66da30036241300963a5dab405c8883",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/pdf_report_service.dart": {
+    "mtime": 1779052422.6105094,
+    "ast_hash": "47cae40553f9f6176023cdbb3ea55195",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/llm_service.dart": {
+    "mtime": 1789417379.73684,
+    "ast_hash": "6f2c686e18e305d92ca27274fde2cee7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/investments_service.dart": {
+    "mtime": 1779052422.6105094,
+    "ast_hash": "90640c412b78372356914f44071b169a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/sync_service.dart": {
+    "mtime": 1789417335.7403505,
+    "ast_hash": "ec5572a8d54ccf061cff8727e5f9b51c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/finance_service.dart": {
+    "mtime": 1779052422.6105094,
+    "ast_hash": "7f3d933c92fa3ce4728e8167b2e1c741",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/analytics_service.dart": {
+    "mtime": 1779052422.6105094,
+    "ast_hash": "f1bf25b64247d04bfde0b9ab9410d382",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/byok_service.dart": {
+    "mtime": 1789401889.5002444,
+    "ast_hash": "e34f731542c5a193c32c958c88693294",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/vault.dart": {
+    "mtime": 1788812569.325,
+    "ast_hash": "9c5f1827c5ca1c2249e5b136828ccf9a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/providers.dart": {
+    "mtime": 1789577973.9892828,
+    "ast_hash": "4b586ddd5f760b11eb61cccfe36d5b75",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/envelope.dart": {
+    "mtime": 1788815134.6040852,
+    "ast_hash": "2c2378471dbb1c72d4d1a1b56d615333",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/byok/chat.dart": {
+    "mtime": 1788812410.830887,
+    "ast_hash": "e4d0ca28b65e15958d9a5086d30ea698",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/services/repositories/transaction_repository.dart": {
+    "mtime": 1779052422.6105094,
+    "ast_hash": "02bda42c1812e7dc3a0350f128c2f23a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/database/app_database.dart": {
+    "mtime": 1789401889.4982443,
+    "ast_hash": "5c63581c926dd0949cfa59d761e8b88e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/database/connection/unsupported.dart": {
+    "mtime": 1779052422.6079934,
+    "ast_hash": "5822c4155cd0e2ff0976d8822e5145ac",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/database/connection/web.dart": {
+    "mtime": 1779052422.6079934,
+    "ast_hash": "79029b447275c01e3e267fefb0314ea1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/database/connection/native.dart": {
+    "mtime": 1779052422.6079366,
+    "ast_hash": "33ca621e57dc4f759ab5079d72dd196e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/main_screen.dart": {
+    "mtime": 1779052422.6087527,
+    "ast_hash": "a06fa8c0065d4c002ceceac79b819509",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/splash_screen.dart": {
+    "mtime": 1787260206.6739893,
+    "ast_hash": "ea3a7fbcb80783a45ae46c290049640f",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/chat/chat_screen.dart": {
+    "mtime": 1789577973.9892828,
+    "ast_hash": "7e7fd8018926988c748647cc01ad6897",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/more/zakat_calculator_screen.dart": {
+    "mtime": 1787260206.6736207,
+    "ast_hash": "1540cb74578452d1d613fa239f824611",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/more/more_screen.dart": {
+    "mtime": 1788842587.752264,
+    "ast_hash": "d5338dbaa3cff76f87f00a68f02dd387",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/more/fire_calculator_screen.dart": {
+    "mtime": 1787260206.6733274,
+    "ast_hash": "0d65e5683edb2ede87ae3b571b45a145",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/learn/learn_screen.dart": {
+    "mtime": 1789401889.4992445,
+    "ast_hash": "24492bcf8a8d2e57a877899f3f9a8165",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/help/help_screen.dart": {
+    "mtime": 1790327376.408514,
+    "ast_hash": "20d5219e3ed4461e809b39dc28d203f7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/goals/goals_screen.dart": {
+    "mtime": 1789401889.4992445,
+    "ast_hash": "8aa0158baf87e2de34308fed1197243b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/debts/debts_screen.dart": {
+    "mtime": 1789401889.4992445,
+    "ast_hash": "e0491835d068242170cfd6c744f49f4c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/achievements/achievements_screen.dart": {
+    "mtime": 1787260206.6712625,
+    "ast_hash": "03f32972c1ebd25eb3019c58f000bfed",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/transactions/transactions_screen.dart": {
+    "mtime": 1789401889.4992445,
+    "ast_hash": "a7872c6402c869a07785ca93f12168aa",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/transactions/recurring_screen.dart": {
+    "mtime": 1790327369.643591,
+    "ast_hash": "e451f7a6212a1b46f772aa3570dac7c1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/settings/notification_settings_screen.dart": {
+    "mtime": 1787260206.6737561,
+    "ast_hash": "88cbbaa4e084d9be566de8c71b996aa1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/settings/settings_screen.dart": {
+    "mtime": 1788881413.5657628,
+    "ast_hash": "de1e75d74af627be51973c91170f7de6",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/dashboard/dashboard_screen.dart": {
+    "mtime": 1787260206.6723747,
+    "ast_hash": "caad6a6cd4d9e9d0186b7f41a16440e0",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/alerts/alerts_screen.dart": {
+    "mtime": 1787260206.6714072,
+    "ast_hash": "280942558da69033daaeb5a6e3ca8122",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/budgets/budgets_screen.dart": {
+    "mtime": 1789401889.4982443,
+    "ast_hash": "ed6cd8f7910ba7ee6e8a93c3123e7e4c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/investments/investments_screen.dart": {
+    "mtime": 1789401889.4992445,
+    "ast_hash": "2fcbf4248e1b366bb9da63a1aa5031a0",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/auth/register_screen.dart": {
+    "mtime": 1787260206.671871,
+    "ast_hash": "f52c80439469f94276d6a3ed9cfbd4dd",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/auth/onboarding_screen.dart": {
+    "mtime": 1787260206.6717496,
+    "ast_hash": "9bd8fdd9b13d515bd16f9bdb1bfa75aa",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/auth/login_screen.dart": {
+    "mtime": 1787260206.6716251,
+    "ast_hash": "85522bb4360f3ad64e3c5257e89b58e1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/screens/accounts/accounts_screen.dart": {
+    "mtime": 1789401889.4982443,
+    "ast_hash": "623c23fa0b3cecc533cef7fd710f03bd",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/more/more_menu_item.dart": {
+    "mtime": 1787260206.6801963,
+    "ast_hash": "6542c81d28d9a0df19fb0f390a9cbfba",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/main_screen/main_bottom_nav_bar.dart": {
+    "mtime": 1779052422.6138902,
+    "ast_hash": "1840b4e3abaacefd71c7f7bc6f18019f",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/main_screen/nav_item_widget.dart": {
+    "mtime": 1787260206.6801,
+    "ast_hash": "5b12e98ddfac07ea7a9d9a26f97bb8df",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/common/skeleton_loader.dart": {
+    "mtime": 1779052422.6122472,
+    "ast_hash": "eecad3813da24911f5420a0ae9195bca",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/common/currency_picker_sheet.dart": {
+    "mtime": 1789850617.1398242,
+    "ast_hash": "6454fe2ccf248d67c88b109b99f71d96",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/common/confirm_dialog.dart": {
+    "mtime": 1787260206.676207,
+    "ast_hash": "cece0dfa101e130b0440371a199effb2",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/common/calculator_disclaimer.dart": {
+    "mtime": 1787260206.6761029,
+    "ast_hash": "ec24bd8945aaa616d9d597bb2d2227a4",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/common/glass_panel.dart": {
+    "mtime": 1779052422.6122472,
+    "ast_hash": "7189b84b48e44c3db81def2d9f812244",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/common/auth_error_banner.dart": {
+    "mtime": 1787260206.6760275,
+    "ast_hash": "d0a3ff132958438922fe58b5d188b2ea",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/learn/financial_roadmap.dart": {
+    "mtime": 1787260206.6800199,
+    "ast_hash": "60d4763626fcce8b9b0ef83b54bd2b96",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/goals/goal_summary_cards.dart": {
+    "mtime": 1787260206.6790206,
+    "ast_hash": "6289e3c7e45128b40ab2a49a4665293a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/goals/goal_list_item.dart": {
+    "mtime": 1787260206.6789227,
+    "ast_hash": "a108630aa73f8ebe44a55f2a6334c220",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/goals/overall_progress_card.dart": {
+    "mtime": 1787260206.6791072,
+    "ast_hash": "4aeded3ea45ebf2373adaba87f7d6314",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/goals/add_goal_dialog.dart": {
+    "mtime": 1787260206.6788065,
+    "ast_hash": "86d6a58ec15c1310d20c65fc93320c6a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/goals/add_amount_dialog.dart": {
+    "mtime": 1787260206.678678,
+    "ast_hash": "1cabe74620e04debc948f496b6bffeb2",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/debts/debt_summary_section.dart": {
+    "mtime": 1787260206.678487,
+    "ast_hash": "ac40bdd1b70417f3da7ef26240bdf387",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/debts/debt_list_item.dart": {
+    "mtime": 1787260206.6783845,
+    "ast_hash": "59c7329f1aacba4791efba08e363c711",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/debts/add_debt_dialog.dart": {
+    "mtime": 1787260206.6780856,
+    "ast_hash": "4930d8907dd9164fb71595a191b65192",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/debts/debt_celebration_dialog.dart": {
+    "mtime": 1787260206.6782067,
+    "ast_hash": "e7851b1cf693c687622edab9da5bc9ad",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/debts/paid_debt_item.dart": {
+    "mtime": 1787260206.678574,
+    "ast_hash": "ad16e032177a7881ed468e61cc19f228",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/achievements/badge_grid.dart": {
+    "mtime": 1787260206.674713,
+    "ast_hash": "5fb27f460ff6a3bc73343c4438c9d980",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/achievements/level_card.dart": {
+    "mtime": 1787260206.6747966,
+    "ast_hash": "b09f8f7c84503a8292a7b140e82f6e97",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/transactions/transaction_list_item.dart": {
+    "mtime": 1787260206.6814423,
+    "ast_hash": "be8968f5ee2734f39f1bbef679cac14e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/transactions/month_year_picker_dialog.dart": {
+    "mtime": 1787260206.6812391,
+    "ast_hash": "e6ef88b2c3f014aa1597cacf9db0919d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/transactions/transaction_filters.dart": {
+    "mtime": 1787260206.6813498,
+    "ast_hash": "1226e5d47dcd2d9c76963e4a53221ebe",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/transactions/transaction_summary.dart": {
+    "mtime": 1787260206.6815443,
+    "ast_hash": "a9097839408d83d8941400d8f887c2cf",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/transactions/add_transaction_dialog.dart": {
+    "mtime": 1787260206.6811285,
+    "ast_hash": "8497716c2934b844b6575cf592f2662f",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/settings_accordion.dart": {
+    "mtime": 1788881413.5657628,
+    "ast_hash": "ec16ec3f9412593663aaec0cadbbc26b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/byok_keys_section.dart": {
+    "mtime": 1788881413.5657628,
+    "ast_hash": "b33e65f18074c028927787e7fdfd5b56",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/api_keys_section.dart": {
+    "mtime": 1788722460.3264346,
+    "ast_hash": "1087854f31a943ad47861499afd39b6f",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/preferences_section.dart": {
+    "mtime": 1789850462.1995904,
+    "ast_hash": "7b1b51e76e7eb4547a21dc7d92987e08",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/testimonial_card.dart": {
+    "mtime": 1787260206.6809173,
+    "ast_hash": "383e13059c6d5d770aeddf726e8b3839",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/export_delete_section.dart": {
+    "mtime": 1789401889.5002444,
+    "ast_hash": "ce3f52f175a85a8b92dd08c18553eb8e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/assets_form.dart": {
+    "mtime": 1787260206.6802938,
+    "ast_hash": "16d09121524ec2a4d034e9b3ce3d6c39",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/settings/profile_form.dart": {
+    "mtime": 1787260206.6806848,
+    "ast_hash": "2a314521ceae64f95fdb468a866694c7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/recent_transactions_list.dart": {
+    "mtime": 1787260206.677782,
+    "ast_hash": "1672abe76ce4064c31590dd42c94b274",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/gamification_card.dart": {
+    "mtime": 1787260206.677422,
+    "ast_hash": "18b532301a4ce4744f2d926f5ec656c2",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/dashboard_quick_add.dart": {
+    "mtime": 1789401889.5002444,
+    "ast_hash": "50772262110c4ac5091422a927ce083c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/challenges_card.dart": {
+    "mtime": 1787260206.676606,
+    "ast_hash": "00fd1c2950c5b5502883210b2a89a9cb",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/dashboard_stage_card.dart": {
+    "mtime": 1787260206.677265,
+    "ast_hash": "d5d1d349c19e2c577d7149e1407ccf2d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/charts_card.dart": {
+    "mtime": 1787260206.6767223,
+    "ast_hash": "b2fd0f7a647bac4433d89e9ac3b5330f",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/dashboard_health_score.dart": {
+    "mtime": 1787260206.6770477,
+    "ast_hash": "e6cfc2372052a263c8aacd4a1f8b6ce3",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/month_summary_card.dart": {
+    "mtime": 1787260206.6775062,
+    "ast_hash": "efdb22feafe129c7b88fecac0480b196",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/dashboard_header.dart": {
+    "mtime": 1787260206.6769474,
+    "ast_hash": "84ead8d1fac917f1f27f868b7bceb477",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/quick_links_card.dart": {
+    "mtime": 1787260206.6776912,
+    "ast_hash": "cb659aa66036d9ecc0541fb883a1836e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/badges_grid.dart": {
+    "mtime": 1787260206.6763966,
+    "ast_hash": "46e7b80384b366a670564e05e8d1d387",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/wealth_simulator_card.dart": {
+    "mtime": 1787260206.6778848,
+    "ast_hash": "eec1f09bcbd7e6673d248023aa239670",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/budget_progress_card.dart": {
+    "mtime": 1787260206.67649,
+    "ast_hash": "137b118ef0314ff6714843c49a03d985",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/dashboard_customizer_sheet.dart": {
+    "mtime": 1787260206.6768422,
+    "ast_hash": "7cc1b4a3965b0b65606f518163c86d63",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/net_worth_card.dart": {
+    "mtime": 1787260206.6775966,
+    "ast_hash": "fa5f8435438e3bce1100f5bf7c508c3d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/dashboard/dashboard_stats.dart": {
+    "mtime": 1787260206.6773381,
+    "ast_hash": "57bdef723e6935bade94e51db9aab996",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/alerts/alert_actions.dart": {
+    "mtime": 1787260206.6749847,
+    "ast_hash": "c6773157deb62c6563f24da2c944491d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/alerts/alert_filter_tabs.dart": {
+    "mtime": 1787260206.6750772,
+    "ast_hash": "49db46e7e7c88dbd5c59c0371013c290",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/alerts/alert_header.dart": {
+    "mtime": 1787260206.675173,
+    "ast_hash": "db53ab10a39beca4c583209791058a08",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/alerts/alert_list_item.dart": {
+    "mtime": 1787260206.675269,
+    "ast_hash": "718aec22fff8d2cd2ad5f64718b21d78",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/alerts/ai_generator_card.dart": {
+    "mtime": 1787260206.674893,
+    "ast_hash": "ff4f408b22822e0af876b8efb29336a9",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/budget_summary_card.dart": {
+    "mtime": 1787260206.6756637,
+    "ast_hash": "15200a67f9de93a3f7ba7343c0513b2a",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/category_spending_item.dart": {
+    "mtime": 1787260206.675753,
+    "ast_hash": "db9f7c182dc549e3de93d5e5d1dee280",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/financial_advisor_card.dart": {
+    "mtime": 1787260206.6758454,
+    "ast_hash": "67e8325e32ad19428d1c2afd0fc29d10",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/budget_rule_card.dart": {
+    "mtime": 1787260206.6755798,
+    "ast_hash": "a046a9ac40f9b9d7c472b5df8bb2707c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/budget_list_item.dart": {
+    "mtime": 1787260206.675483,
+    "ast_hash": "a2535a8326cafc1585765a16f0ad3dfc",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/month_selector.dart": {
+    "mtime": 1787260206.6759362,
+    "ast_hash": "3f2ec365d5d69a5c741de7608cd139da",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/budgets/add_budget_dialog.dart": {
+    "mtime": 1787260206.67537,
+    "ast_hash": "01ea3a449dcdaed496158cf0f7fb71f0",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/investment_list_item.dart": {
+    "mtime": 1789401889.5002444,
+    "ast_hash": "337b0759419bb7a0e38348c76b888afa",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/portfolio_summary_card.dart": {
+    "mtime": 1787260206.6798234,
+    "ast_hash": "e7e0f60e278a3ba883ad9a6ed5e3f8db",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/investment_cash_card.dart": {
+    "mtime": 1787260206.6793313,
+    "ast_hash": "39e33253aba9b2ac1feab0502872fefb",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/portfolio_chart_card.dart": {
+    "mtime": 1787260206.6797278,
+    "ast_hash": "aa6ec2a9fef5102b19fce62527139644",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/add_investment_dialog.dart": {
+    "mtime": 1787260206.6792212,
+    "ast_hash": "266550bfdd167c8e35534f17f2084bf4",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/investment_transaction_history.dart": {
+    "mtime": 1787260206.6796231,
+    "ast_hash": "c3041ad04218cc25d7d6356cbbc59ba4",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/widgets/investments/wealth_simulator_card.dart": {
+    "mtime": 1787260206.6799302,
+    "ast_hash": "17cb57bf4a391bbd182eaff0c8b068c1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_colors.dart": {
+    "mtime": 1787260206.6705496,
+    "ast_hash": "6b2b5aca33b21d6e9bf06d77d10784fb",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_radius.dart": {
+    "mtime": 1787260206.6706097,
+    "ast_hash": "17751fc1cb2e569f6b56853ac7955965",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_spacing.dart": {
+    "mtime": 1787260206.6706657,
+    "ast_hash": "cc6b2a4e93bb38d8805da462f1824080",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_theme.dart": {
+    "mtime": 1787260206.6707463,
+    "ast_hash": "8732522266c4f1ac3a18c746bf040b76",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/core/theme/app_typography.dart": {
+    "mtime": 1787260206.6708102,
+    "ast_hash": "b004e9588cbcf929ed7c09aa00528cb7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/models/notification_settings.dart": {
+    "mtime": 1779052422.6079934,
+    "ast_hash": "9a65abc62d69c4ebd21dd5eb40f8c928",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/lib/providers/dashboard_layout_provider.dart": {
+    "mtime": 1779052422.6079934,
+    "ast_hash": "0977b51e9ad11b7835351139eeb4663b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/pubspec.yaml": {
+    "mtime": 1790266197.5127575,
+    "ast_hash": "28e7cac9a91fa3300367415b07271785",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/outdated_full.txt": {
+    "mtime": 1779052422.6147919,
+    "ast_hash": "97a8ceb08e258a149fdaf21f9abeefac",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/AGENTS.md": {
+    "mtime": 1789849530.143617,
+    "ast_hash": "7af96e606cdd02057dfdefd2b553d6f0",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/analysis_options.yaml": {
+    "mtime": 1788453118.7716272,
+    "ast_hash": "33d8d2f7b7af52c5eaf407230a2a91d6",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/deps.txt": {
+    "mtime": 1779052422.607336,
+    "ast_hash": "3ed8e3c96bdea57811b6c03a3ebd37a2",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/devtools_options.yaml": {
+    "mtime": 1789410787.145877,
+    "ast_hash": "1f3e9f93db0210485be5adc08d158837",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/README.md": {
+    "mtime": 1789851292.4781256,
+    "ast_hash": "5d26f42462cbefc803dd26a84897b5f7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/gradlew_output.txt": {
+    "mtime": 1779052422.6052942,
+    "ast_hash": "d336dc386be56818cb82d7a66bc8bd06",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/web/index.html": {
+    "mtime": 1779052422.6156056,
+    "ast_hash": "c62bad336627c49a0906f675209c056d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/brag-plan.md": {
+    "mtime": 1789666945.5648515,
+    "ast_hash": "8eb02ac36f81309c082f0eba43d28a98",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/share-copy.txt": {
+    "mtime": 1789667678.824424,
+    "ast_hash": "aaf94171619b8788d98c931580c84831",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition-brief.md": {
+    "mtime": 1789667093.2040503,
+    "ast_hash": "83343062add2b93b9569ad6af9e3740f",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/index.html": {
+    "mtime": 1789670073.7734528,
+    "ast_hash": "afb10c8938b52605860b1516582ffc7c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/sfx/sfx-analysis.md": {
+    "mtime": 1789667148.8417184,
+    "ast_hash": "88e3c6bef52303cf563aa803f0ed9687",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.music-cues.md": {
+    "mtime": 1789667115.2287636,
+    "ast_hash": "fcaa7a27e01711a205fe04596802c908",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/CMakeLists.txt": {
+    "mtime": 1790266197.511422,
+    "ast_hash": "cbd0d263a5a1ddc5fe267310d745a37b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/runner/CMakeLists.txt": {
+    "mtime": 1790266197.5125024,
+    "ast_hash": "6d75431dc21756981b53a7494c836311",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/linux/flutter/CMakeLists.txt": {
+    "mtime": 1790266197.511422,
+    "ast_hash": "46690fb8ffaf7d227d8bc4713f31140d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/assets/images/app_icon_light.jpg": {
+    "mtime": 1779052422.607336,
+    "ast_hash": "86a008802c60cd775f35f939a2a08bef",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/assets/images/app_icon.png": {
+    "mtime": 1779052422.607336,
+    "ast_hash": "9672c4e2ddfebb164493bde869cfe1b1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/res/mipmap-mdpi/ic_launcher.png": {
+    "mtime": 1779052422.6036944,
+    "ast_hash": "1bb5309d18fecd004d07eec42d8e087e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/res/mipmap-hdpi/ic_launcher.png": {
+    "mtime": 1779052422.6036944,
+    "ast_hash": "9f40911acdc1afe5820c13a9cc260dc8",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png": {
+    "mtime": 1779052422.6036944,
+    "ast_hash": "e1b822752e8876a1a056c5e672381ce8",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png": {
+    "mtime": 1779052422.6036944,
+    "ast_hash": "53aa44d12841859235758570efa3d9a3",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png": {
+    "mtime": 1779052422.6036944,
+    "ast_hash": "18cb442c1111793537ac1e3b5cd85dfb",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/web/icons/Icon-192.png": {
+    "mtime": 1779052422.6155193,
+    "ast_hash": "703c77eda9cb75b045ee0dc5b62e01e5",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/web/icons/Icon-512.png": {
+    "mtime": 1779052422.6156056,
+    "ast_hash": "9672c4e2ddfebb164493bde869cfe1b1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/brag.jpg": {
+    "mtime": 1789667648.0579958,
+    "ast_hash": "2547b3577450b2d95ad43783a7286aa6",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.thumbnails/v4_v3_ce65edf7adaf4ba5_12bd3d24bfdff56b_jpeg_preview_index.html_1920x1080_240x135_1789670073773_3.50__scene-reveal_0.jpg": {
+    "mtime": 1789670077.2154162,
+    "ast_hash": "24badbf5aaf2f46b06e90a0e6a267d5e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.thumbnails/v4_v3_ce65edf7adaf4ba5_12bd3d24bfdff56b_jpeg_preview_index.html_1920x1080_240x135_1789670073773_7.00__scene-beat1_0.jpg": {
+    "mtime": 1789670078.1314065,
+    "ast_hash": "19ff8f7a6993666e9730b1785009239b",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.thumbnails/v4_v3_ce65edf7adaf4ba5_12bd3d24bfdff56b_jpeg_preview_index.html_1920x1080_240x135_1789670073773_1.00__scene-hook_0.jpg": {
+    "mtime": 1789670076.7794209,
+    "ast_hash": "64b3aa4e6717289acaf951bb6fed1538",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.thumbnails/v4_v3_ce65edf7adaf4ba5_12bd3d24bfdff56b_jpeg_preview_index.html_1920x1080_240x135_1789670073773_3.00.jpg": {
+    "mtime": 1789670077.6644115,
+    "ast_hash": "24badbf5aaf2f46b06e90a0e6a267d5e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.thumbnails/v4_v3_ce65edf7adaf4ba5_12bd3d24bfdff56b_jpeg_preview_index.html_1920x1080_240x135_1789670073773_11.00__scene-beat2_0.jpg": {
+    "mtime": 1789670078.5854018,
+    "ast_hash": "b47a86a766d36b5ccde7b1f3b3894f58",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/.thumbnails/v4_v3_ce65edf7adaf4ba5_12bd3d24bfdff56b_jpeg_preview_index.html_1920x1080_240x135_1789670073773_15.00__scene-beat3_0.jpg": {
+    "mtime": 1789670079.0463967,
+    "ast_hash": "e0fdca3e9a930cbe655432f014776c41",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/app_icon.png": {
+    "mtime": 1789667200.6393137,
+    "ast_hash": "9672c4e2ddfebb164493bde869cfe1b1",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/renders/9396bd2c-4afb-4118-acc4-2387fafaad21.mp4": {
+    "mtime": 1789669763.1758318,
+    "ast_hash": "226c8ff9ac18970f6891bcb3459ffd2e",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/brag.mp4": {
+    "mtime": 1789667657.87864,
+    "ast_hash": "01da67181f41657fdb0e7383e70e14b7",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/sfx/interface/drop_001.ogg": {
+    "mtime": 1789667133.652557,
+    "ast_hash": "fdb7c6bd1abf0e06c75f5ef3ee29d5a2",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/sfx/interface/click_001.ogg": {
+    "mtime": 1789667133.6537776,
+    "ast_hash": "594234cc27bcfb903fdafc49cb728bc9",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/sfx/impact/impactSoft_medium_001.ogg": {
+    "mtime": 1789667552.0687697,
+    "ast_hash": "daf869c83db8d9799689a01836439d2c",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/sfx/impact/impactGlass_light_001.ogg": {
+    "mtime": 1789667552.0689523,
+    "ast_hash": "a2a4923a52fe7539f1ad6117233fed58",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/sfx/impact/impactBell_heavy_000.ogg": {
+    "mtime": 1789667148.8383715,
+    "ast_hash": "59698e3609b413aedcd7d96c27badd4d",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/assets/music/happy-beats-business-moves-vol-10-by-ende-dot-app.mp3": {
+    "mtime": 1789667100.8749566,
+    "ast_hash": "97c0f8cb988e32177efdb69886d31d61",
+    "semantic_hash": ""
+  },
+  "/home/abdullah/Projects/financetracker/mobile/fajrak_flutter/brag-output-2026-09-17-204106/composition/renders/composition_2026-09-17_20-53-37.mp4": {
+    "mtime": 1789667632.6249137,
+    "ast_hash": "c9dbefaa78974519cc01bbcbbd83eb48",
+    "semantic_hash": ""
+  }
+}

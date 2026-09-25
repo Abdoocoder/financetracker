@@ -1,0 +1,59 @@
+{
+  "documentation_concepts": {
+    "AGENTS.md": {
+      "Architecture Overview": {
+        "supabase_backend": "lib/services/sync_service.dart -> package:supabase_flutter/supabase_flutter.dart",
+        "firebase_messaging": "lib/services/notification_service.dart -> package:firebase_messaging/firebase_messaging.dart",
+        "drift_sqlcipher": "lib/database/app_database.dart -> package:drift/drift.dart + sqlcipher_flutter_libs",
+        "provider_state": "lib/app_state.dart + lib/providers/dashboard_layout_provider.dart",
+        "rpc_calculations": "lib/services/sync_service.dart uses get_changed_records, get_deleted_records RPCs"
+      },
+      "Key Patterns": {
+        "feature_structure": "lib/screens/, lib/widgets/, lib/services/ by domain",
+        "service_layer": "Static methods in services (AccountsService.fetchAccounts())",
+        "ui_components": "Custom widgets in lib/widgets/ reused across screens",
+        "error_handling": "lib/utils/error_handler.dart -> global in main.dart",
+        "notifications": "lib/services/notification_service.dart (3 Android channels)",
+        "theming": "lib/core/theme/app_theme.dart (Material 3, Cairo font)",
+        "localization": "assets/i18n/ar.json, en.json + easy_localization"
+      },
+      "Sync & BYOK Details": {
+        "sync_merge_logic": "remoteVersion = data[local_version] ?? 1; localVersion = local?.localVersion ?? 0",
+        "sync_entities": "transactions, debts, savings_goals, budgets (4 types in _applyDelete)",
+        "queue_collapse": "enqueueCreate cancels pending delete; enqueueDelete cancels pending create",
+        "byok_vault": "flutter_secure_storage + webcrypto, keys prefixed byok_key_ / llm_key_",
+        "byok_envelope": "RSA-OAEP-SHA256(ephemeral AES) + AES-256-GCM(payload)",
+        "byok_paths": "Proxy (Anthropic/OpenAI) vs ClientDirect (Ollama localhost)",
+        "byok_proxy": "POST {providerId, keyId, env, payload, body, stream} to /api/byok/proxy + JWT"
+      },
+      "Testing Conventions": {
+        "structure": "test/ mirrors lib/, *_test.dart suffix",
+        "framework": "flutter_test only, no mocking framework",
+        "descriptions": "English for services/i18n, Arabic for repository tests",
+        "i18n_validation": "test/i18n_keys_test.dart enforces identical key sets, non-empty strings, BYOK wording"
+      }
+    },
+    "README.md": {
+      "Screens": "22 screens listed (auth, dashboard, transactions, debts, budgets, goals, investments, chat, learn, help, more, settings)",
+      "Tech Stack": "Flutter, Supabase, Firebase, Drift/SQLCipher, Provider, easy_localization, fl_chart, pdf, fl_chart",
+      "Shared Backend": "Next.js web app shares Supabase + Firebase",
+      "Feature Parity": "100% with web app",
+      "Changelog": "Shows BYOK evolution v3.37+ (AI assistant), v3.39+ (financial MCP server)"
+    }
+  },
+  "code_to_doc_links": {
+    "SyncService": "AGENTS.md: Sync & BYOK Details -> merge logic, entities, queue collapse",
+    "TransactionRepository": "AGENTS.md: Sync & BYOK Details -> enqueueCreate/Update/Delete, backoff",
+    "ByokService": "AGENTS.md: Sync & BYOK Details -> proxy path, clientDirect path, envelope, vault",
+    "ByokVault": "AGENTS.md: Sync & BYOK Details -> flutter_secure_storage, key prefixes",
+    "Envelope": "AGENTS.md: Sync & BYOK Details -> RSA-OAEP + AES-GCM construction",
+    "AppTheme": "AGENTS.md: Key Patterns -> Material 3, Cairo font, light/dark/system",
+    "AppColors": "AGENTS.md: Key Patterns -> primary=Islamic Blue, semantic colors",
+    "AppTypography": "AGENTS.md: Key Patterns -> Apple HIG 11-level scale + Stripe currency styles",
+    "AppState": "AGENTS.md: Architecture Overview -> Provider for theme, locale, unread alerts",
+    "ErrorHandler": "AGENTS.md: Error Handling -> global catch, network vs generic, SnackBar",
+    "NotificationService": "AGENTS.md: Key Patterns -> 3 Android channels (budget_alerts high, debt_reminders max, saving_goals default)",
+    "CurrencyService": "AGENTS.md: Integration Points -> Yahoo Finance + FreeGoldAPI",
+    "main.dart": "AGENTS.md: Developer Workflows -> Firebase/Supabase init, routes, AppState, NotificationService"
+  }
+}
