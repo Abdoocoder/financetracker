@@ -145,7 +145,6 @@ class _RecurringScreenState extends State<RecurringScreen> {
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
-                          color: cs.surface,
                           borderRadius: BorderRadius.circular(14),
                           border: Border(
                             top: BorderSide(color: cs.outlineVariant),
@@ -155,7 +154,8 @@ class _RecurringScreenState extends State<RecurringScreen> {
                           ),
                         ),
                         child: Material(
-                          type: MaterialType.transparency,
+                          type: MaterialType.card,
+                          color: cs.surface,
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                             leading: CircleAvatar(
