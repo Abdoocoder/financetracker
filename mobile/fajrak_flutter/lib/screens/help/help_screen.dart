@@ -326,9 +326,6 @@ class _FAQItemState extends State<_FAQItem> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: _open
-            ? cs.surface
-            : cs.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: _open
@@ -338,7 +335,8 @@ class _FAQItemState extends State<_FAQItem> {
       child: Column(
         children: [
             Material(
-              type: MaterialType.transparency,
+              type: MaterialType.card,
+              color: _open ? cs.surface : cs.surface.withValues(alpha: 0.5),
               child: ListTile(
                 onTap: () => setState(() => _open = !_open),
                 title: Text(widget.q,
