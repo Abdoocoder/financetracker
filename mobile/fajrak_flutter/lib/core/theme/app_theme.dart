@@ -65,7 +65,7 @@ abstract final class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         iconTheme: IconThemeData(color: onSurface, size: 24),
-        titleTextStyle: AppTypography.title3.copyWith(color: onSurface),
+        titleTextStyle: AppTypography.heading.copyWith(color: onSurface),
         surfaceTintColor: Colors.transparent,
       ),
 
@@ -108,9 +108,9 @@ abstract final class AppTheme {
           borderRadius: AppRadius.borderMd,
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
-        labelStyle: AppTypography.callout.copyWith(color: onSurfaceVariant),
-        hintStyle: AppTypography.callout.copyWith(color: onSurfaceVariant.withValues(alpha: 0.6)),
-        errorStyle: AppTypography.caption1.copyWith(color: AppColors.error),
+        labelStyle: AppTypography.body.copyWith(color: onSurfaceVariant),
+        hintStyle: AppTypography.body.copyWith(color: onSurfaceVariant.withValues(alpha: 0.6)),
+        errorStyle: AppTypography.caption.copyWith(color: AppColors.error),
       ),
 
       // ── ElevatedButton ─────────────────────────────────────
@@ -122,7 +122,7 @@ abstract final class AppTheme {
           shadowColor: Colors.transparent,
           minimumSize: const Size(double.infinity, AppSpacing.inputHeight),
           shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
-          textStyle: AppTypography.headline,
+          textStyle: AppTypography.bodySemiBold,
         ),
       ),
 
@@ -133,7 +133,7 @@ abstract final class AppTheme {
           minimumSize: const Size(double.infinity, AppSpacing.inputHeight),
           side: BorderSide(color: outlineVariant),
           shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
-          textStyle: AppTypography.headline,
+          textStyle: AppTypography.bodySemiBold,
         ),
       ),
 
@@ -141,7 +141,7 @@ abstract final class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: primary,
-          textStyle: AppTypography.callout.copyWith(fontWeight: FontWeight.w600),
+          textStyle: AppTypography.captionSemiBold,
           minimumSize: const Size(44, 44),
         ),
       ),
@@ -163,8 +163,8 @@ abstract final class AppTheme {
         unselectedItemColor: onSurfaceVariant,
         elevation: 0,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: AppTypography.caption1.copyWith(fontWeight: FontWeight.w600),
-        unselectedLabelStyle: AppTypography.caption1,
+        selectedLabelStyle: AppTypography.captionSemiBold,
+        unselectedLabelStyle: AppTypography.caption,
       ),
 
       // ── NavigationBar (M3) ─────────────────────────────────
@@ -180,7 +180,7 @@ abstract final class AppTheme {
           size: 24,
         )),
         labelTextStyle: WidgetStateProperty.resolveWith((states) =>
-          AppTypography.caption1.copyWith(
+          AppTypography.caption.copyWith(
             fontWeight: states.contains(WidgetState.selected) ? FontWeight.w600 : FontWeight.w400,
             color: states.contains(WidgetState.selected) ? primary : onSurfaceVariant,
           ),
@@ -192,7 +192,7 @@ abstract final class AppTheme {
         backgroundColor: surface,
         selectedColor: primary.withValues(alpha: 0.15),
         disabledColor: outlineVariant.withValues(alpha: 0.5),
-        labelStyle: AppTypography.caption1.copyWith(fontWeight: FontWeight.w500),
+        labelStyle: AppTypography.captionSemiBold,
         side: BorderSide(color: outlineVariant),
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderPill),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
@@ -201,7 +201,7 @@ abstract final class AppTheme {
       // ── ListTile ───────────────────────────────────────────
       listTileTheme: ListTileThemeData(
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        titleTextStyle: AppTypography.callout.copyWith(color: onSurface, fontWeight: FontWeight.w500),
+        titleTextStyle: AppTypography.body.copyWith(color: onSurface, fontWeight: FontWeight.w500),
         subtitleTextStyle: AppTypography.footnote.copyWith(color: onSurfaceVariant),
         iconColor: onSurfaceVariant,
         minLeadingWidth: 24,
@@ -253,7 +253,7 @@ abstract final class AppTheme {
         backgroundColor: surface,
         elevation: 0,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderXl),
-        titleTextStyle: AppTypography.title3.copyWith(color: onSurface),
+        titleTextStyle: AppTypography.heading.copyWith(color: onSurface),
         contentTextStyle: AppTypography.body.copyWith(color: onSurfaceVariant),
       ),
 
@@ -263,7 +263,7 @@ abstract final class AppTheme {
           color: isDark ? AppColors.card1 : AppColors.textPrimaryLight,
           borderRadius: AppRadius.borderSm,
         ),
-        textStyle: AppTypography.caption1.copyWith(color: Colors.white),
+        textStyle: AppTypography.caption.copyWith(color: Colors.white),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       ),
 
