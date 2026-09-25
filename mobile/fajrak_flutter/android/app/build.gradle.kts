@@ -1,4 +1,6 @@
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
@@ -29,8 +31,10 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 
     defaultConfig {
@@ -60,9 +64,9 @@ android {
             // isShrinkResources is deprecated in AGP 9.0+; resource shrinking is enabled by default when minify is enabled
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             // Disable lint for release to avoid Metaspace OOM
-            lintOptions {
-                isCheckReleaseBuilds = false
-                isAbortOnError = false
+            lint {
+                checkReleaseBuilds = false
+                abortOnError = false
             }
         }
     }
