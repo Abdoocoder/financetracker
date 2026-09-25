@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import '../../core/theme/app_typography.dart';
 import '../../services/currency_service.dart';
 
 /// يفتح BottomSheet لاختيار العملة مع بحث وتجميع.
@@ -94,7 +95,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                   style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
                     hintText: 'ابحث عن عملة...',
-                    hintStyle: TextStyle(color: cs.onSurfaceVariant, fontSize: 14),
+                    hintStyle: AppTypography.caption.copyWith(color: cs.onSurfaceVariant),
                     prefixIcon: Icon(Icons.search, color: cs.onSurfaceVariant, size: 20),
                     filled: true,
                     fillColor: cs.surfaceContainerHighest,
@@ -125,9 +126,8 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                       child: Text(
                         groupLabels[groupKey]!,
-                        style: TextStyle(
+                        style: AppTypography.caption.copyWith(
                           color: cs.onSurfaceVariant,
-                          fontSize: 11,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.5,
                         ),
