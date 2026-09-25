@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import '../../core/theme/app_typography.dart';
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
@@ -101,10 +102,7 @@ class ConfirmDialog extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-            ),
+            style: AppTypography.heading.copyWith(fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 12),
           Text(
@@ -134,7 +132,7 @@ class ConfirmDialog extends StatelessWidget {
                   ),
                   child: Text(
                     confirmLabel ?? (danger ? 'delete'.tr() : 'confirm'.tr()),
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                    style: AppTypography.bodySemiBold.copyWith(fontWeight: FontWeight.w900),
                   ),
                 ),
               ),
@@ -149,10 +147,9 @@ class ConfirmDialog extends StatelessWidget {
                   ),
                   child: Text(
                     cancelLabel ?? 'cancel'.tr(),
-                    style: TextStyle(
+                    style: AppTypography.bodySemiBold.copyWith(
                       color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w700,
-                      fontSize: 16,
                     ),
                   ),
                 ),
