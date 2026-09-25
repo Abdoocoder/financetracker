@@ -1,11 +1,12 @@
 import { act, renderHook } from '@testing-library/react';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
+import type { CardId } from '@/hooks/useDashboardLayout';
 
 const STORAGE_KEY = 'dashboard_layout_v1';
 
 const REQUIRED_CARD = 'quick_add';
 
-const DEFAULT_VISIBLE = [
+const DEFAULT_VISIBLE: CardId[] = [
   'month_summary',
   'hero_balance',
   'monthly_stats',
@@ -17,7 +18,7 @@ const DEFAULT_VISIBLE = [
   'net_worth',
 ];
 
-const DEFAULT_HIDDEN = ['health', 'achievements', 'charts', 'simulator', 'challenges'];
+const DEFAULT_HIDDEN: CardId[] = ['health', 'achievements', 'charts', 'simulator', 'challenges'];
 
 const readStored = (): Record<string, boolean> | null => {
   const raw = localStorage.getItem(STORAGE_KEY);
