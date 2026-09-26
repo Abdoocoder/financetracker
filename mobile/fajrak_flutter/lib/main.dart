@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import 'app_state.dart';
+import 'providers/dashboard_layout_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
@@ -117,8 +118,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AppState(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(create: (_) => DashboardLayoutProvider()),
+      ],
       child: Consumer<AppState>(
         builder: (context, appState, child) {
           return MaterialApp(
