@@ -1,0 +1,139 @@
+{
+  "dashboard": {
+    "uid": "fajrak-byok-proxy",
+    "title": "Fajrak BYOK Proxy",
+    "tags": ["fajrak", "byok", "proxy", "feature-a"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+        "title": "BYOK Proxy Request Rate (req/s)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(byok_proxy_requests_total[1m])",
+            "legendFormat": "{{provider_id}} - {{status}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "color": { "mode": "palette-classic" }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+        "title": "BYOK Proxy Latency (p50, p95, p99)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(byok_proxy_latency_ms_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(byok_proxy_latency_ms_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(byok_proxy_latency_ms_bucket[5m]))",
+            "legendFormat": "p99",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "color": { "mode": "thresholds", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 500 }, { "color": "red", "value": 2000 }] } }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+        "title": "BYOK Proxy Error Rate by Provider",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(byok_proxy_errors_total[1m])",
+            "legendFormat": "{{provider_id}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "reqps" }
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+        "title": "BYOK Proxy Rate Limit Hits (429)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(byok_proxy_rate_limit_hits_total[1m])",
+            "legendFormat": "{{provider_id}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "reqps" }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+        "title": "Active SSE Streams",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "byok_proxy_sse_streams_active",
+            "legendFormat": "Active Streams",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "short" }
+        }
+      },
+      {
+        "id": 6,
+        "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+        "title": "BYOK Proxy Requests by Provider (Stacked)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum by (provider_id) (rate(byok_proxy_requests_total[5m]))",
+            "legendFormat": "{{provider_id}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": { "stacking": { "mode": "normal" } }
+          }
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: Crypto Unwrap Failures Spike",
+    "severity": "critical",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "crypto_unwrap_failures_total",
+      "condition": "rate > 0.5 req/s over 5m",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/crypto-unwrap-failures.md"
+    },
+    "dedup_key": "fajrak-crypto-unwrap-failures"
+  },
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: Envelope Errors Spike",
+    "severity": "warning",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "crypto_envelope_errors_total",
+      "condition": "rate > 0.1 req/s over 5m",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/crypto-envelope-errors.md"
+    },
+    "dedup_key": "fajrak-crypto-envelope-errors"
+  },
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: Proxy Rate Limit Near Capacity",
+    "severity": "warning",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "rate_limit_proxy_usage",
+      "condition": "any user > 25 req/min (83% of 30/min limit)",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/proxy-rate-limit-capacity.md"
+    },
+    "dedup_key": "fajrak-proxy-rate-limit-capacity"
+  },
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: PAT Rate Limit Near Capacity",
+    "severity": "warning",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "rate_limit_pat_usage",
+      "condition": "any key > 8 req/min (80% of 10/min limit)",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/pat-rate-limit-capacity.md"
+    },
+    "dedup_key": "fajrak-pat-rate-limit-capacity"
+  }
+]
