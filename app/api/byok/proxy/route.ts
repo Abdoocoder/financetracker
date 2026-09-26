@@ -30,7 +30,7 @@ import {
   type ByokProxyRequest,
   type ByokProxyError,
 } from '@/lib/byok/types'
-import { unwrapProviderKey, zeroBytes, isKekConfigured } from '@/lib/byok/envelope'
+import { unwrapProviderKeyWithRotation, zeroBytes, isKekConfigured } from '@/lib/byok/envelope'
 
 // Per-request info logs (key-free body stats + key-destroy confirmation) are
 // useful during development/troubleshooting but noisy in production. Gate them
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
   const keyBuf = Buffer.from(reqBody.body, 'base64')
   let key: string
   try {
-    key = await unwrapProviderKey(reqBody.keyId, reqBody.env, reqBody.payload)
+    key = await unwrapProviderKeyWithRotation(reqBody.keyId, reqBody.env, reqBody.payload)
   } catch (err) {
     return json({ error: `Failed to unwrap key: ${(err as Error).message}` }, 400)
   }

@@ -23,6 +23,19 @@ jest.mock('@/lib/api-keys', () => ({
   writeAuditLog: jest.fn().mockResolvedValue(undefined),
 }))
 
+jest.mock('@/lib/unified-tools', () => ({
+  getAccountBalances: jest.fn(),
+  getCashflowSummary: jest.fn(),
+  createTransaction: jest.fn(),
+  validateCategory: jest.fn(),
+  getValidCategories: jest.fn(),
+  checkAndReserveIdempotencyKey: jest.fn(),
+  completeIdempotencyKey: jest.fn(),
+  getTransactionById: jest.fn(),
+  sanitizeDescription: jest.fn((d) => d?.replace(/<[^>]*>/g, '').replace(/[<>\"'&]/g, '').trim().slice(0, 500) ?? null),
+  writeAuditLog: jest.fn().mockResolvedValue(undefined),
+}))
+
 jest.mock('@/lib/rate-limit', () => ({
   rateLimit: jest.fn(),
 }))
@@ -50,7 +63,8 @@ jest.mock('@modelcontextprotocol/server', () => ({
 
 import { GET, POST, OPTIONS, DELETE } from '@/app/api/mcp/route'
 import { NextRequest } from 'next/server'
-import { verifyApiKey, writeAuditLog } from '@/lib/api-keys'
+import { verifyApiKey } from '@/lib/api-keys'
+import * as unifiedTools from '@/lib/unified-tools'
 import { rateLimit } from '@/lib/rate-limit'
 
 const VALID_KEY = 'fjk_live_' + 'a'.repeat(96)
@@ -131,7 +145,31 @@ function invokeTool(name: string, args: any, authInfo?: any) {
 beforeEach(() => {
   ;(verifyApiKey as jest.Mock).mockReset().mockResolvedValue(mockKeyData)
   ;(rateLimit as jest.Mock).mockReset().mockReturnValue(rateLimitOk())
-  ;(writeAuditLog as jest.Mock).mockReset().mockResolvedValue(undefined)
+  ;(unifiedTools.writeAuditLog as jest.Mock).mockReset().mockResolvedValue(undefined)
+  ;(unifiedTools.getAccountBalances as jest.Mock).mockReset().mockResolvedValue([])
+  ;(unifiedTools.getCashflowSummary as jest.Mock).mockReset().mockResolvedValue({
+    ok: true,
+    period: { from: null, to: null },
+    income: 0,
+    expense: 0,
+    net: 0,
+    transaction_count: 0,
+  })
+  ;(unifiedTools.createTransaction as jest.Mock).mockReset().mockResolvedValue({
+    id: 'tx-new-1',
+    type: 'expense',
+    amount: 50,
+    category: 'طعام وشراب',
+    transaction_date: '2026-01-01',
+    created_at: new Date().toISOString(),
+  })
+  ;(unifiedTools.validateCategory as jest.Mock).mockReset().mockReturnValue(true)
+  ;(unifiedTools.getValidCategories as jest.Mock).mockReset().mockReturnValue(['طعام وشراب', 'مواصلات'])
+  ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockReset().mockResolvedValue({ status: 'available' })
+  ;(unifiedTools.completeIdempotencyKey as jest.Mock).mockReset().mockResolvedValue(undefined)
+  ;(unifiedTools.getTransactionById as jest.Mock).mockReset().mockResolvedValue(null)
+  ;(unifiedTools.sanitizeDescription as jest.Mock).mockReset().mockImplementation((d) => d?.replace(/<[^>]*>/g, '').replace(/[<>\"'&]/g, '').trim().slice(0, 500) ?? null)
+  ;(unifiedTools.writeAuditLog as jest.Mock).mockReset().mockResolvedValue(undefined)
   mockFrom.mockReset()
   mockFrom.mockReturnValue(chain())
   mockRpc.mockReset()
@@ -305,14 +343,14 @@ describe('scope gating in tool callbacks', () => {
     await expect(invokeTool('get_balances', {}, { ...readOnlyAuth })).rejects.toThrow(
       'read_balances'
     )
-    expect(mockRpc).not.toHaveBeenCalled()
+    expect(unifiedTools.getAccountBalances).not.toHaveBeenCalled()
   })
 
   it('get_balances calls get_account_balances RPC and writes audit with full scope', async () => {
-    mockRpc.mockResolvedValue({ data: [{ id: 'acct-1', balance: 100 }], error: null })
+    ;(unifiedTools.getAccountBalances as jest.Mock).mockResolvedValue([{ id: 'acct-1', balance: 100 }])
     const result = await invokeTool('get_balances', {}, { ...fullAuth })
-    expect(mockRpc).toHaveBeenCalledWith('get_account_balances', { p_user_id: 'user-1' })
-    expect(writeAuditLog).toHaveBeenCalledWith(
+    expect(unifiedTools.getAccountBalances).toHaveBeenCalledWith('user-1')
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'read_balances', userId: 'user-1', apiKeyId: 'key-id-1' })
     )
     expect(result.structuredContent.ok).toBe(true)
@@ -325,11 +363,14 @@ describe('scope gating in tool callbacks', () => {
   })
 
   it('get_cashflow_summary aggregates income and expense from transactions', async () => {
-    mockFrom.mockReturnValue(chain({ data: [
-      { type: 'income', amount: 1000 },
-      { type: 'expense', amount: 300 },
-      { type: 'expense', amount: 200 },
-    ], error: null }))
+    ;(unifiedTools.getCashflowSummary as jest.Mock).mockResolvedValue({
+      ok: true,
+      period: { from: '2026-01-01', to: '2026-01-31' },
+      income: 1000,
+      expense: 500,
+      net: 500,
+      transaction_count: 3,
+    })
     const result = await invokeTool('get_cashflow_summary', { from: '2026-01-01', to: '2026-01-31' }, { ...fullAuth })
     expect(result.structuredContent).toMatchObject({
       ok: true,
@@ -338,7 +379,7 @@ describe('scope gating in tool callbacks', () => {
       net: 500,
       transaction_count: 3,
     })
-    expect(writeAuditLog).toHaveBeenCalledWith(
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'read_transactions', userId: 'user-1' })
     )
   })
@@ -350,62 +391,64 @@ describe('scope gating in tool callbacks', () => {
   })
 
   it('create_transaction rejects invalid categories', async () => {
-    mockFrom.mockReturnValue(chain())
+    ;(unifiedTools.validateCategory as jest.Mock).mockReturnValue(false)
     const result = await invokeTool(
       'create_transaction',
       { type: 'expense', amount: 50, category: 'not-a-real-category', transaction_date: '2026-01-01' },
       { ...fullAuth }
     )
     expect(result.isError).toBe(true)
-    expect(mockFrom).not.toHaveBeenCalled()
+    expect(unifiedTools.createTransaction).not.toHaveBeenCalled()
   })
 
   it('create_transaction rejects income category on expense', async () => {
-    mockFrom.mockReturnValue(chain())
+    ;(unifiedTools.validateCategory as jest.Mock).mockReturnValue(false)
     const result = await invokeTool(
       'create_transaction',
       { type: 'expense', amount: 50, category: 'راتب', transaction_date: '2026-01-01' },
       { ...fullAuth }
     )
     expect(result.isError).toBe(true)
-    expect(mockFrom).not.toHaveBeenCalled()
+    expect(unifiedTools.createTransaction).not.toHaveBeenCalled()
   })
 
   it('create_transaction rejects expense category on income', async () => {
-    mockFrom.mockReturnValue(chain())
+    ;(unifiedTools.validateCategory as jest.Mock).mockReturnValue(false)
     const result = await invokeTool(
       'create_transaction',
       { type: 'income', amount: 50, category: 'مواصلات', transaction_date: '2026-01-01' },
       { ...fullAuth }
     )
     expect(result.isError).toBe(true)
-    expect(mockFrom).not.toHaveBeenCalled()
+    expect(unifiedTools.createTransaction).not.toHaveBeenCalled()
   })
 
   it('create_transaction inserts sanitized transaction and writes audit', async () => {
-    let inserted: any = null
-    mockFrom.mockReturnValue({
-      insert: (row: any) => {
-        inserted = row
-        return { select: () => chain({ data: [row], error: null }) }
-      },
-    } as any)
-
+    ;(unifiedTools.createTransaction as jest.Mock).mockResolvedValue({
+      id: 'tx-audit',
+      type: 'expense',
+      amount: 50,
+      category: 'طعام وشراب',
+      transaction_date: '2026-01-01',
+      created_at: new Date().toISOString(),
+    })
     const result = await invokeTool(
       'create_transaction',
       { type: 'expense', amount: 50, category: 'طعام وشراب', description: '<b>lunch</b>', transaction_date: '2026-01-01' },
       { ...fullAuth }
     )
-    expect(inserted).toMatchObject({
-      user_id: 'user-1',
-      type: 'expense',
-      amount: 50,
-      category: 'طعام وشراب',
-      description: 'lunch',
-      transaction_date: '2026-01-01',
-    })
+    expect(unifiedTools.createTransaction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        user_id: 'user-1',
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        description: 'lunch',
+        transaction_date: '2026-01-01',
+      })
+    )
     expect(result.structuredContent.ok).toBe(true)
-    expect(writeAuditLog).toHaveBeenCalledWith(
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'create_transaction', userId: 'user-1', apiKeyId: 'key-id-1' })
     )
   })
@@ -414,5 +457,201 @@ describe('scope gating in tool callbacks', () => {
     expect(OPTIONS).toBe(POST)
     expect(DELETE).toBe(POST)
     expect(GET).toBe(POST)
+  })
+})
+
+describe('idempotency key handling in create_transaction', () => {
+  const fullAuth = {
+    clientId: 'user-1',
+    scopes: ['create_transaction', 'read_transactions', 'read_balances'],
+    extra: { keyId: 'key-id-1', rateLimitPerMin: 10 },
+  }
+
+  const idempotencyKey = 'idem-test-key-12345'
+
+  beforeEach(() => {
+    ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockReset()
+    ;(unifiedTools.completeIdempotencyKey as jest.Mock).mockReset()
+    ;(unifiedTools.getTransactionById as jest.Mock).mockReset()
+    ;(unifiedTools.createTransaction as jest.Mock).mockReset()
+    ;(unifiedTools.writeAuditLog as jest.Mock).mockReset().mockResolvedValue(undefined)
+  })
+
+  it('proceeds with transaction creation when idempotency key is new (available)', async () => {
+    ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockResolvedValueOnce({ status: 'available' })
+    ;(unifiedTools.completeIdempotencyKey as jest.Mock).mockResolvedValueOnce(undefined)
+    ;(unifiedTools.createTransaction as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-new-1',
+      type: 'expense',
+      amount: 50,
+      category: 'طعام وشراب',
+      transaction_date: '2026-01-01',
+      created_at: new Date().toISOString(),
+    })
+
+    const result = await invokeTool(
+      'create_transaction',
+      {
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        transaction_date: '2026-01-01',
+        idempotency_key: idempotencyKey,
+      },
+      { ...fullAuth }
+    )
+
+    expect(result.structuredContent.ok).toBe(true)
+    expect(result.structuredContent.idempotent_replay).toBeUndefined()
+    expect(unifiedTools.checkAndReserveIdempotencyKey).toHaveBeenCalledWith('user-1', expect.any(String))
+    expect(unifiedTools.completeIdempotencyKey).toHaveBeenCalledWith('user-1', expect.any(String), 'tx-new-1')
+  })
+
+  it('returns existing transaction when idempotency key is duplicate', async () => {
+    ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockResolvedValueOnce({
+      status: 'duplicate',
+      transaction_id: 'tx-existing-1',
+    })
+    ;(unifiedTools.getTransactionById as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-existing-1',
+      type: 'expense',
+      amount: 50,
+      category: 'طعام وشراب',
+      transaction_date: '2026-01-01',
+      created_at: '2026-01-01T12:00:00Z',
+    })
+
+    const result = await invokeTool(
+      'create_transaction',
+      {
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        transaction_date: '2026-01-01',
+        idempotency_key: idempotencyKey,
+      },
+      { ...fullAuth }
+    )
+
+    expect(result.structuredContent.ok).toBe(true)
+    expect(result.structuredContent.idempotent_replay).toBe(true)
+    expect(result.structuredContent.transaction.id).toBe('tx-existing-1')
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'create_transaction_idempotent_replay' })
+    )
+    // Should NOT call completeIdempotencyKey or createTransaction
+    expect(unifiedTools.completeIdempotencyKey).not.toHaveBeenCalled()
+    expect(unifiedTools.createTransaction).not.toHaveBeenCalled()
+  })
+
+  it('returns error when idempotency key is still processing', async () => {
+    ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockResolvedValueOnce({ status: 'processing' })
+
+    const result = await invokeTool(
+      'create_transaction',
+      {
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        transaction_date: '2026-01-01',
+        idempotency_key: idempotencyKey,
+      },
+      { ...fullAuth }
+    )
+
+    expect(result.isError).toBe(true)
+    expect(JSON.parse(result.content[0].text).error).toContain('still being processed')
+    expect(unifiedTools.createTransaction).not.toHaveBeenCalled()
+  })
+
+  it('works without idempotency_key (backwards compatible)', async () => {
+    ;(unifiedTools.createTransaction as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-no-idem',
+      type: 'expense',
+      amount: 50,
+      category: 'طعام وشراب',
+      transaction_date: '2026-01-01',
+      created_at: new Date().toISOString(),
+    })
+
+    const result = await invokeTool(
+      'create_transaction',
+      {
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        transaction_date: '2026-01-01',
+      },
+      { ...fullAuth }
+    )
+
+    expect(result.structuredContent.ok).toBe(true)
+    expect(result.structuredContent.idempotent_replay).toBeUndefined()
+    // Should NOT call checkAndReserveIdempotencyKey
+    expect(unifiedTools.checkAndReserveIdempotencyKey).not.toHaveBeenCalled()
+  })
+
+  it('logs audit with idempotency_key_hash when provided', async () => {
+    ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockResolvedValueOnce({ status: 'available' })
+    ;(unifiedTools.completeIdempotencyKey as jest.Mock).mockResolvedValueOnce(undefined)
+    ;(unifiedTools.createTransaction as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-audit',
+      type: 'expense',
+      amount: 50,
+      category: 'طعام وشراب',
+      transaction_date: '2026-01-01',
+      created_at: new Date().toISOString(),
+    })
+
+    await invokeTool(
+      'create_transaction',
+      {
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        transaction_date: '2026-01-01',
+        idempotency_key: idempotencyKey,
+      },
+      { ...fullAuth }
+    )
+
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'create_transaction',
+        userId: 'user-1',
+        apiKeyId: 'key-id-1',
+        payload: expect.objectContaining({
+          idempotency_key_hash: expect.any(String),
+        }),
+      })
+    )
+  })
+
+  it('does not fail request if complete_idempotency_key fails', async () => {
+    ;(unifiedTools.checkAndReserveIdempotencyKey as jest.Mock).mockResolvedValueOnce({ status: 'available' })
+    ;(unifiedTools.completeIdempotencyKey as jest.Mock).mockRejectedValueOnce(new Error('complete failed'))
+    ;(unifiedTools.createTransaction as jest.Mock).mockResolvedValueOnce({
+      id: 'tx-complete-fail',
+      type: 'expense',
+      amount: 50,
+      category: 'طعام وشراب',
+      transaction_date: '2026-01-01',
+      created_at: new Date().toISOString(),
+    })
+
+    const result = await invokeTool(
+      'create_transaction',
+      {
+        type: 'expense',
+        amount: 50,
+        category: 'طعام وشراب',
+        transaction_date: '2026-01-01',
+        idempotency_key: idempotencyKey,
+      },
+      { ...fullAuth }
+    )
+
+    expect(result.structuredContent.ok).toBe(true)
+    expect(result.structuredContent.transaction.id).toBe('tx-complete-fail')
   })
 })
