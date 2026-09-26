@@ -117,9 +117,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppState>(
-      builder: (context, appState, child) {
-        return MaterialApp(
+    return ChangeNotifierProvider(
+      create: (_) => AppState(),
+      child: Consumer<AppState>(
+        builder: (context, appState, child) {
+          return MaterialApp(
           title: 'Fajrak',
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
@@ -167,6 +169,7 @@ class _MyAppState extends State<MyApp> {
           },
         );
       },
+    ),
     );
   }
 }
