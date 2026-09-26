@@ -24,6 +24,10 @@ const customJestConfig = {
         '<rootDir>/__tests__/helpers/',
         '<rootDir>/e2e/',
     ],
+    modulePathIgnorePatterns: [
+        '<rootDir>/brag-output/',
+        '<rootDir>/brag-output-2026-09-17-134500/',
+    ],
     collectCoverageFrom: [
         'app/**/*.{js,ts,tsx}',
         'lib/**/*.{js,ts,tsx}',
