@@ -1,0 +1,139 @@
+{
+  "dashboard": {
+    "uid": "fajrak-mcp-server",
+    "title": "Fajrak MCP Server",
+    "tags": ["fajrak", "mcp", "server", "feature-b"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+        "title": "MCP Tool Call Rate (req/s)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(mcp_tool_calls_total[1m])",
+            "legendFormat": "{{tool_name}} - {{status}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "color": { "mode": "palette-classic" }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+        "title": "MCP Tool Latency (p50, p95, p99)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(mcp_tool_latency_ms_bucket[5m]))",
+            "legendFormat": "p50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(mcp_tool_latency_ms_bucket[5m]))",
+            "legendFormat": "p95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(mcp_tool_latency_ms_bucket[5m]))",
+            "legendFormat": "p99",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "color": { "mode": "thresholds", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 300 }, { "color": "red", "value": 1000 }] } }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+        "title": "MCP Tool Errors by Tool",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(mcp_tool_errors_total[1m])",
+            "legendFormat": "{{tool_name}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "reqps" }
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+        "title": "MCP Scope Violations (403)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(mcp_scope_violations_total[1m])",
+            "legendFormat": "{{tool_name}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "reqps" }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+        "title": "MCP PAT Auth Failures (401)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(mcp_pat_auth_failures_total[1m])",
+            "legendFormat": "Auth Failures",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "reqps" }
+        }
+      },
+      {
+        "id": 6,
+        "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+        "title": "MCP Tool Calls by Tool (Stacked)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum by (tool_name) (rate(mcp_tool_calls_total[5m]))",
+            "legendFormat": "{{tool_name}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": { "stacking": { "mode": "normal" } }
+          }
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}

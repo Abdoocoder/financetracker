@@ -1,0 +1,54 @@
+[
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: MCP Tool High Error Rate",
+    "severity": "critical",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "mcp_tool_errors_total",
+      "condition": "rate > 0.1 req/s over 5m",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/mcp-tool-high-errors.md"
+    },
+    "dedup_key": "fajrak-mcp-tool-high-errors"
+  },
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: MCP Tool High Latency (p99 > 3s)",
+    "severity": "warning",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "mcp_tool_latency_ms",
+      "condition": "histogram_quantile(0.99, rate(...[5m])) > 3000ms",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/mcp-tool-high-latency.md"
+    },
+    "dedup_key": "fajrak-mcp-tool-high-latency"
+  },
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: MCP Scope Violations Spike (403)",
+    "severity": "warning",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "mcp_scope_violations_total",
+      "condition": "rate > 1 req/s over 5m",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/mcp-scope-violations.md"
+    },
+    "dedup_key": "fajrak-mcp-scope-violations"
+  },
+  {
+    "service_key": "PAGERDUTY_INTEGRATION_KEY",
+    "event_type": "trigger",
+    "description": "Fajrak: MCP PAT Auth Failures Spike (401)",
+    "severity": "critical",
+    "source": "fajrak-observability",
+    "details": {
+      "metric": "mcp_pat_auth_failures_total",
+      "condition": "rate > 0.5 req/s over 5m",
+      "runbook_url": "https://github.com/Abdoocoder/financetracker/blob/main/observability/runbooks/mcp-pat-auth-failures.md"
+    },
+    "dedup_key": "fajrak-mcp-pat-auth-failures"
+  }
+]
