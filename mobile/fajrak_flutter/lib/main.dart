@@ -1,162 +1,167 @@
-import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'utils/error_handler.dart';
-import 'package:provider/provider.dart';
+
 import 'app_state.dart';
-import 'providers/dashboard_layout_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/register_screen.dart';
 import 'screens/auth/onboarding_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/reset_password_screen.dart';
-import 'screens/chat/chat_screen.dart';
 import 'screens/main_screen.dart';
+import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/accounts/accounts_screen.dart';
+import 'screens/debts/debts_screen.dart';
+import 'screens/transactions/transactions_screen.dart';
+import 'screens/transactions/recurring_screen.dart';
+import 'screens/budgets/budgets_screen.dart';
+import 'screens/goals/goals_screen.dart';
+import 'screens/investments/investments_screen.dart';
+import 'screens/alerts/alerts_screen.dart';
+import 'screens/chat/chat_screen.dart';
+import 'screens/more/more_screen.dart';
+import 'screens/more/fire_calculator_screen.dart';
+import 'screens/more/zakat_calculator_screen.dart';
+import 'screens/settings/settings_screen.dart';
 import 'screens/settings/notification_settings_screen.dart';
+import 'screens/help/help_screen.dart';
+import 'screens/learn/learn_screen.dart';
+import 'utils/error_handler.dart';
 import 'services/notification_service.dart';
-import 'database/app_database.dart';
-import 'core/theme/app_theme.dart';
+import 'services/sync_service.dart';
 
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  // NotificationService handles the local display logic if needed
-  await NotificationService.showNotification(message);
-}
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Edge-to-edge is the automatic default since Flutter 3.27 on
-  // Android SDK 35+; native enableEdgeToEdge() in MainActivity.kt
-  // handles the window insets configuration.
+  // Initialize Easy Localization
+  await EasyLocalization.ensureInitialized();
 
-  // Global Error Handling — set up before anything async
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    ErrorHandler.handle(details.exception, developerMessage: 'FlutterError: ${details.library}');
-  };
-  PlatformDispatcher.instance.onError = (error, stack) {
-    ErrorHandler.handle(error, developerMessage: 'PlatformError');
-    return true;
-  };
-
-  // Load .env + EasyLocalization + intl Arabic locale in parallel
-  await Future.wait([
-    dotenv.load(fileName: '.env').catchError((_) {}),
-    EasyLocalization.ensureInitialized(),
-    initializeDateFormatting('ar', null),
-  ]);
-
-  // Firebase + Supabase in parallel — they are independent of each other.
-  // Both need dotenv (loaded above), but not each other.
-  final firebaseFuture = kIsWeb
-      ? Firebase.initializeApp(
-          options: FirebaseOptions(
-            apiKey: dotenv.env['FLUTTER_FIREBASE_API_KEY'] ?? '',
-            appId: dotenv.env['FLUTTER_FIREBASE_APP_ID'] ?? '',
-            messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
-            projectId: dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1',
-            authDomain: '${dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1'}.firebaseapp.com',
-            storageBucket: '${dotenv.env['FLUTTER_FIREBASE_PROJECT_ID'] ?? 'fajrak-f7df1'}.appspot.com',
-          ),
-        )
-      : Firebase.initializeApp();
-
-  await Future.wait([
-    firebaseFuture,
-    Supabase.initialize(
-      url: dotenv.env['SUPABASE_URL'] ?? '',
-      publishableKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
-    ),
-  ]);
-
-  if (!kIsWeb) {
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  // Initialize Firebase
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: const String.fromEnvironment('FIREBASE_API_KEY'),
+        authDomain: const String.fromEnvironment('FIREBASE_AUTH_DOMAIN'),
+        projectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
+        storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
+        messagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+        appId: const String.fromEnvironment('FIREBASE_APP_ID'),
+        measurementId: const String.fromEnvironment('FIREBASE_MEASUREMENT_ID'),
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
   }
 
-  // Initialize local encrypted database.
-  // Key: user's auth session token (or anonymous key before login).
-  // The DB is re-opened with the correct key after the user signs in
-  // (handled in AuthService / SplashScreen).
-  if (!kIsWeb) {
-    final initialKey = Supabase.instance.client.auth.currentSession?.accessToken
-        ?? dotenv.env['SUPABASE_ANON_KEY']
-        ?? 'fajrak_default_key';
-    await AppDatabase.initialize(encryptionKey: initialKey);
-  }
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: const String.fromEnvironment('SUPABASE_URL'),
+    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+  );
 
-  final appState = AppState();
+  // Initialize notification service
+  await NotificationService.initialize();
 
-  FirebaseMessaging.onMessage.listen((_) => appState.loadUnreadAlerts());
-  FirebaseMessaging.onMessageOpenedApp.listen((msg) {
-    NotificationService.handleMessage(msg);
-    appState.loadUnreadAlerts();
-  });
-  FirebaseMessaging.instance.getInitialMessage().then((msg) {
-    if (msg != null) {
-      NotificationService.handleMessage(msg);
-      appState.loadUnreadAlerts();
-    }
-  });
+  // Initialize sync service
+  await SyncService.initialize();
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('ar'), Locale('en')],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/i18n',
-      fallbackLocale: const Locale('ar'),
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: appState),
-          ChangeNotifierProvider(create: (_) => DashboardLayoutProvider()),
-        ],
-        child: const FajrakApp(),
-      ),
+      fallbackLocale: const Locale('en'),
+      child: const MyApp(),
     ),
   );
-
-  // Initialize notifications AFTER runApp — keeps startup fast.
-  // Fire-and-forget: no await, doesn't block the first frame.
-  NotificationService.initialize();
 }
 
-class FajrakApp extends StatelessWidget {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-  const FajrakApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  static final ThemeData _lightTheme = AppTheme.light;
-  static final ThemeData _darkTheme  = AppTheme.dark;
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _setupErrorHandling();
+    _setupFirebaseMessaging();
+  }
+
+  void _setupErrorHandling() {
+    ErrorHandler.setup();
+  }
+
+  void _setupFirebaseMessaging() {
+    // Handle background messages
+    FirebaseMessaging.onBackgroundMessage(NotificationService.onBackgroundMessage);
+
+    // Handle foreground messages
+    FirebaseMessaging.onMessage.listen(NotificationService.onForegroundMessage);
+
+    // Handle notification taps when app is in background
+    FirebaseMessaging.onMessageOpenedApp.listen(NotificationService.onMessageOpenedApp);
+
+    // Handle notification tap when app is terminated
+    FirebaseMessaging.instance.getInitialMessage().then(NotificationService.onMessageOpenedApp);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final appState = context.watch<AppState>();
-    return MaterialApp(
-      title: 'فجرك',
-      navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
-      theme: _lightTheme,
-      darkTheme: _darkTheme,
-      themeMode: appState.themeMode,
-      locale: context.locale, // Use context.locale from EasyLocalization
-      supportedLocales: context.supportedLocales,
-      localizationsDelegates: context.localizationDelegates,
-      initialRoute: '/splash',
-      routes: {
-        '/splash': (context) => const SplashScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/onboarding': (context) => const OnboardingScreen(),
-        '/main': (context) => const MainScreen(),
-        '/forgot-password': (context) => const ForgotPasswordScreen(),
-        '/reset-password': (context) => const ResetPasswordScreen(),
-        '/settings/notifications': (context) => const NotificationSettingsScreen(),
-        '/chat': (context) => const ChatScreen(),
+    return Consumer<AppState>(
+      builder: (context, appState, child) {
+        return MaterialApp(
+          title: 'Fajrak',
+          debugShowCheckedModeBanner: false,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          theme: appState.themeData,
+          darkTheme: appState.darkThemeData,
+          themeMode: appState.themeMode,
+          initialRoute: '/splash',
+          routes: {
+            '/splash': (context) => const SplashScreen(),
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
+            '/onboarding': (context) => const OnboardingScreen(),
+            '/forgot-password': (context) => const ForgotPasswordScreen(),
+            '/reset-password': (context) => const ResetPasswordScreen(),
+            '/main': (context) => const MainScreen(),
+            '/dashboard': (context) => const DashboardScreen(),
+            '/accounts': (context) => const AccountsScreen(),
+            '/debts': (context) => const DebtsScreen(),
+            '/transactions': (context) => const TransactionsScreen(),
+            '/recurring': (context) => const RecurringScreen(),
+            '/budgets': (context) => const BudgetsScreen(),
+            '/goals': (context) => const GoalsScreen(),
+            '/investments': (context) => const InvestmentsScreen(),
+            '/alerts': (context) => const AlertsScreen(),
+            '/chat': (context) => const ChatScreen(),
+            '/more': (context) => const MoreScreen(),
+            '/fire-calculator': (context) => const FireCalculatorScreen(),
+            '/zakat-calculator': (context) => const ZakatCalculatorScreen(),
+            '/settings': (context) => const SettingsScreen(),
+            '/notification-settings': (context) => const NotificationSettingsScreen(),
+            '/help': (context) => const HelpScreen(),
+            '/learn': (context) => const LearnScreen(),
+          },
+          onGenerateRoute: (settings) {
+            if (settings.name == '/deep-link') {
+              final args = settings.arguments as Map<String, dynamic>?;
+              return MaterialPageRoute(
+                builder: (context) => MainScreen(initialTab: args?['tab'] ?? 4),
+              );
+            }
+            return null;
+          },
+        );
       },
     );
   }

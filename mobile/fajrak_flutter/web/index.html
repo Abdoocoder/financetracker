@@ -1,37 +1,42 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 
 <head>
-  <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="فجرك - تطبيق إدارة مالية ذكي">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="فجرك">
+  <meta name="description" content="Fajrak - Smart Finance Tracker">
+  <meta name="theme-color" content="#10B981">
+  <title>Fajrak</title>
+  <link rel="icon" type="image/png" href="icons/Icon-192.png">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
-  <title>فجرك - Finance Tracker</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#3B7EF6">
-  <!-- Cairo font: full weight range prevents Flutter Web from falling back to Noto for Arabic -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    // Environment variables for web build
+    // These are replaced at build time by flutter build web --dart-define
+    // For local development, you can override these in browser console or use a .env file
+    window.ENV = {
+      SUPABASE_URL: '{{SUPABASE_URL}}',
+      SUPABASE_ANON_KEY: '{{SUPABASE_ANON_KEY}}',
+      FIREBASE_API_KEY: '{{FIREBASE_API_KEY}}',
+      FIREBASE_AUTH_DOMAIN: '{{FIREBASE_AUTH_DOMAIN}}',
+      FIREBASE_PROJECT_ID: '{{FIREBASE_PROJECT_ID}}',
+      FIREBASE_STORAGE_BUCKET: '{{FIREBASE_STORAGE_BUCKET}}',
+      FIREBASE_MESSAGING_SENDER_ID: '{{FIREBASE_MESSAGING_SENDER_ID}}',
+      FIREBASE_APP_ID: '{{FIREBASE_APP_ID}}',
+      FIREBASE_MEASUREMENT_ID: '{{FIREBASE_MEASUREMENT_ID}}',
+    };
+    
+    // Development mode detection
+    window.IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    // For local development, you can set these in browser console:
+    // window.ENV.SUPABASE_URL = 'https://your-project.supabase.co';
+    // window.ENV.SUPABASE_ANON_KEY = 'your-anon-key';
+  </script>
 </head>
 
 <body>
-  <script>
-    // Register Firebase Messaging service worker explicitly
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('firebase-messaging-sw.js')
-        .catch(function(err) {
-          console.warn('Firebase SW registration failed:', err);
-        });
-    }
-  </script>
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="main.dart.js" type="application/javascript"></script>
 </body>
 
 </html>
