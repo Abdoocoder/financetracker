@@ -5,7 +5,7 @@
 
 المُعِد: عبد الله أبو صغيرة
 التاريخ: سبتمبر 2026
-الحالة: **Engineering Final Draft — v3.3** (بعد مراجعة CEO + Eng Review + ECC Security Audit + gstack Unified Decision Log)
+الحالة: **Released — v3.42.0** (LLM Ecosystem Complete: BYOK + MCP + Observability)
 
 ---
 
