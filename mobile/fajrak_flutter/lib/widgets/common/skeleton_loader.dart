@@ -80,8 +80,8 @@ class PageSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,20 +90,20 @@ class PageSkeleton extends StatelessWidget {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   SkeletonLoader(width: 120, height: 24),
                   SizedBox(height: 8),
                   SkeletonLoader(width: 80, height: 16),
                 ],
               ),
-              const SkeletonLoader(width: 48, height: 48, borderRadius: 12),
+              SkeletonLoader(width: 48, height: 48, borderRadius: 12),
             ],
           ),
-          const SizedBox(height: 24),
-          const SkeletonLoader(width: double.infinity, height: 160, borderRadius: 24),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
+          SkeletonLoader(width: double.infinity, height: 160, borderRadius: 24),
+          SizedBox(height: 24),
           Row(
-            children: const [
+            children: [
               Expanded(child: SkeletonLoader(width: double.infinity, height: 80, borderRadius: 16)),
               SizedBox(width: 12),
               Expanded(child: SkeletonLoader(width: double.infinity, height: 80, borderRadius: 16)),
@@ -111,10 +111,10 @@ class PageSkeleton extends StatelessWidget {
               Expanded(child: SkeletonLoader(width: double.infinity, height: 80, borderRadius: 16)),
             ],
           ),
-          const SizedBox(height: 24),
-          const SkeletonLoader(width: 150, height: 20),
-          const SizedBox(height: 16),
-          const ListSkeleton(count: 3),
+          SizedBox(height: 24),
+          SkeletonLoader(width: 150, height: 20),
+          SizedBox(height: 16),
+          ListSkeleton(count: 3),
         ],
       ),
     );

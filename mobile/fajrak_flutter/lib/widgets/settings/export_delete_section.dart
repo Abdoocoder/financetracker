@@ -67,7 +67,7 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
       );
       if (mounted) {
         setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('CSV copied to clipboard — paste into a .csv file')));
       }
       return;
@@ -78,13 +78,15 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
         '${directory.path}/fajrak_export_${DateTime.now().millisecondsSinceEpoch}.csv');
     await file.writeAsString('\uFEFF${buffer.toString()}');
 
-    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], subject: 'settings_export_msg'.tr()));
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      subject: 'settings_export_msg'.tr());
     if (mounted) setState(() => _loading = false);
   }
 
   void _shareApp() {
     final text = 'settings_share_msg'.tr();
-    SharePlus.instance.share(ShareParams(text: text));
+    Share.share(text);
   }
 
   Future<void> _deleteAccount() async {

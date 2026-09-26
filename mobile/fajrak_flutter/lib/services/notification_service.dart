@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -5,9 +7,36 @@ import 'package:flutter/foundation.dart';
 import '../main.dart';
 import '../utils/error_handler.dart';
 
+// Top-level background handler for Firebase Messaging
+// Must be a top-level function (not a static method) to work on Android
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage? message) async {
+  // Background messages are handled by the system tray on Android
+  // We just need to ensure the notification is shown
+  if (kIsWeb) return;
+  
+  final notification = message?.notification;
+  if (notification == null) return;
+
+  // For background messages, we don't have access to the full FlutterLocalNotifications
+  // The system will handle showing the notification via the FCM service
+  // This handler just ensures the message is received
+  debugPrint('[NotificationService] Background message received: ${notification.title}');
+}
+
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+
+  // Static getters for Firebase Messaging handlers
+  static BackgroundMessageHandler get onBackgroundMessage =>
+      _firebaseMessagingBackgroundHandler;
+
+  static void Function(RemoteMessage) get onForegroundMessage =>
+      (message) => showNotification(message);
+
+  static FutureOr<void> Function(RemoteMessage?) get onMessageOpenedApp =>
+      (message) => handleMessage(message);
 
   // 1. القنوات المتعددة (Notification Channels)
   static const AndroidNotificationChannel _budgetChannel =
@@ -64,7 +93,7 @@ class NotificationService {
         InitializationSettings(android: androidInit, iOS: iosInit);
 
     await _localNotifications.initialize(
-      settings: initSettings,
+      initSettings,
       onDidReceiveNotificationResponse: (details) {
         if (details.payload != null) {
           final message = RemoteMessage(data: {'url': details.payload!});
@@ -128,10 +157,10 @@ class NotificationService {
     }
 
     await _localNotifications.show(
-      id: notification.hashCode,
-      title: notification.title,
-      body: notification.body,
-      notificationDetails: NotificationDetails(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
         android: AndroidNotificationDetails(
           selectedChannel.id,
           selectedChannel.name,
@@ -146,11 +175,12 @@ class NotificationService {
     );
   }
 
-  static void handleMessage(RemoteMessage message) {
+  static void handleMessage(RemoteMessage? message) {
+    if (message == null) return;
     final url = message.data['url'] as String?;
     if (url == null) return;
 
-    final nav = FajrakApp.navigatorKey.currentState;
+    final nav = navigatorKey.currentState;
     if (nav == null) return;
 
     int tab = 4; // default: Dashboard

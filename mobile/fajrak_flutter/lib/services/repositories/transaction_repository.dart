@@ -170,8 +170,8 @@ class TransactionRepository {
   }
 
   Duration getBackoffDuration(int attemptCount) {
-    final baseDelay = Duration(seconds: 1);
-    final maxDelay = Duration(minutes: 5);
+    const baseDelay = Duration(seconds: 1);
+    const maxDelay = Duration(minutes: 5);
     final delay = baseDelay * (1 << attemptCount.clamp(0, 5));
     return delay > maxDelay ? maxDelay : delay;
   }

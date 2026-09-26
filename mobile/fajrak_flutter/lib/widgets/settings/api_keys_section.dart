@@ -227,7 +227,7 @@ class _ApiKeysSectionState extends State<ApiKeysSection> {
                 children: [
                   Text(
                     'settings_api_keys_created'.tr(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       color: AppColors.success,

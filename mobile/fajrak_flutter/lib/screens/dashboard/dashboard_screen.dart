@@ -397,7 +397,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   child: _loading
-                      ? Row(key: const ValueKey('stats-skel'), children: const [
+                      ? const Row(key: ValueKey('stats-skel'), children: [
                           Expanded(child: CardSkeleton(height: 70)),
                           SizedBox(width: 8),
                           Expanded(child: CardSkeleton(height: 70)),

@@ -3,13 +3,12 @@
 // This proxies requests from localhost:33963 to Supabase to avoid CORS issues
 
 import 'dart:io';
-import 'dart:convert';
 
 void main(List<String> args) async {
   // Configuration
-  final supabaseUrl = 'https://ujwcvtpwsaidljecqbaa.supabase.co';
-  final proxyPort = 33964; // Proxy runs on this port
-  final flutterPort = 33963; // Flutter web runs on this port
+  const supabaseUrl = 'https://ujwcvtpwsaidljecqbaa.supabase.co';
+  const proxyPort = 33964; // Proxy runs on this port
+  const flutterPort = 33963; // Flutter web runs on this port
 
   print('🚀 Starting Fajrak Development Proxy');
   print('   Supabase URL: $supabaseUrl');

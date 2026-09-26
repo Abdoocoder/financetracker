@@ -83,7 +83,7 @@ void main() {
     test('less than page size indicates last page', () {
       const recordsOnPage = 500;
       const pageSize = 1000;
-      final isLastPage = recordsOnPage < pageSize;
+      const isLastPage = recordsOnPage < pageSize;
 
       expect(isLastPage, isTrue);
     });
@@ -91,8 +91,8 @@ void main() {
 
   group('SyncService - Merge Logic', () {
     test('local record not exist - should insert new record', () {
-      final localRecord = null;
-      final shouldInsert = localRecord == null;
+      const localRecord = null;
+      const shouldInsert = localRecord == null;
 
       expect(shouldInsert, isTrue);
     });
@@ -163,7 +163,7 @@ void main() {
       const attemptCount = 3;
       const maxRetries = 3;
 
-      final shouldDrop = attemptCount >= maxRetries;
+      const shouldDrop = attemptCount >= maxRetries;
       expect(shouldDrop, isTrue);
     });
   });

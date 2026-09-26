@@ -423,7 +423,7 @@ class _DebtListItemState extends State<DebtListItem> {
                       border: Border.all(
                           color: AppColors.success.withValues(alpha: 0.2))),
                   child: Text('debts_add_payment_btn'.tr(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: AppColors.successLight,
                           fontSize: 12,
                           fontWeight: FontWeight.w700))),

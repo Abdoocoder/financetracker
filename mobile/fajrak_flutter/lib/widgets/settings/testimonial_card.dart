@@ -149,7 +149,7 @@ class _TestimonialCardState extends State<TestimonialCard> {
           iconColor: colorScheme.onSurfaceVariant,
           collapsedIconColor: colorScheme.onSurfaceVariant,
           title: Row(children: [
-            Icon(Icons.star, size: 18, color: Colors.amber),
+            const Icon(Icons.star, size: 18, color: Colors.amber),
             const SizedBox(width: 14),
             Expanded(
               child: Text(

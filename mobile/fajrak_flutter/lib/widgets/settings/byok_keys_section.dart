@@ -423,7 +423,7 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
               ),
               child: Text(
                 'settings_byok_keys_vault_unavailable'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.error,
                   fontSize: 12,
                   height: 1.6,

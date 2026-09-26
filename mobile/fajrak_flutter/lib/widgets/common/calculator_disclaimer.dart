@@ -61,7 +61,7 @@ class _CalculatorDisclaimerState extends State<CalculatorDisclaimer> {
                   isAr
                       ? 'النتائج تقديرية للتوعية المالية فقط وليست نصيحة مالية أو قانونية أو شرعية. استشر متخصصاً قبل اتخاذ أي قرار.'
                       : 'Results are estimates for financial awareness only — not financial, legal, or religious advice. Consult a professional before any decision.',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppColors.warningDark,
                     height: 1.5,

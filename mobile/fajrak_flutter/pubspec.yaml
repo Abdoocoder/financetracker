@@ -59,11 +59,38 @@ dependencies:
   encrypt: ^5.0.1
   pointycastle: ^3.7.3
 
+  # Local Database (Drift/SQLCipher)
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.20
+  sqlcipher_flutter_libs: ^0.5.5
+
+  # Environment Variables
+  flutter_dotenv: ^5.1.0
+
+  # Web Crypto
+  webcrypto: ^0.5.0
+
+  # Local Notifications
+  flutter_local_notifications: ^17.2.2
+
+  # UUID
+  uuid: ^4.3.3
+
+  # Shared Preferences
+  shared_preferences: ^2.2.2
+
+  # App Badge Control
+  flutter_app_badge_control: ^0.0.2
+
+  # Path
+  path: ^1.9.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
   build_runner: ^2.4.7
+  drift_dev: ^2.18.0
 
 flutter:
   uses-material-design: true
@@ -79,7 +106,3 @@ flutter:
         - asset: assets/fonts/Cairo-Regular.ttf
         - asset: assets/fonts/Cairo-Bold.ttf
           weight: 700
-        - asset: assets/fonts/Cairo-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/Cairo-Medium.ttf
-          weight: 500

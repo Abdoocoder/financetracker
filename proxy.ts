@@ -21,6 +21,9 @@ export function buildCspHeader(nonce: string): string {
   // Sentry Replay masks the DOM by mutating inline styles — nonce-only style-src breaks it.
   const styleSrc = "style-src 'self' 'unsafe-inline'"
 
+  // Allow localhost:11434 for Ollama direct connections in development
+  const ollamaConnectSrc = isDev ? ' http://localhost:11434' : ''
+
   const directives = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ''}`,
@@ -29,7 +32,7 @@ export function buildCspHeader(nonce: string): string {
     "font-src 'self'",
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io`,
+    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io${ollamaConnectSrc}`,
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
