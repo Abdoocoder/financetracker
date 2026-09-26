@@ -615,6 +615,20 @@ E2E_TEST_PASSWORD=your-password
 
 ## 📝 Changelog
 
+### v3.42.0 — 2026-09-26 *(LLM Ecosystem Complete: BYOK + MCP + Observability)*
+
+| Change | Description |
+|:-------|:------------|
+| 🔑 **BYOK Chat Assistant (Feature A)** | Full chat with 3 providers (Ollama clientDirect, OpenRouter + NVIDIA NIM via proxy), SSE streaming, key rotation UI, vault-aware filtering |
+| 🤖 **Financial MCP Server (Feature B)** | Streamable HTTP with `get_balances`, `get_cashflow_summary`, `create_transaction`; PAT auth reuse; scope enforcement (dual gate); idempotency keys |
+| 🔐 **Key Rotation (AD-11)** | `keyId` on envelopes, re-wrap script, UI in Settings, monitoring on unwrap failures |
+| 🛡️ **Moderation Layer (AD-12)** | Pre-output guardrails (riba, hallucination, prompt injection, boundary) + Post-output DOMPurify sanitization |
+| 🔄 **Idempotency (AD-14)** | `idempotency_key` required on `create_transaction` — prevents double-charge on retries |
+| 🔧 **Unified Tool Layer (AD-13)** | Shared RPCs (`get_account_balances`, `get_cashflow_summary`, `create_transaction`) used by both BYOK Chat and MCP Server — eliminates 4 net worth duplicates |
+| 📊 **Observability (AD-15)** | OpenTelemetry metrics for Proxy/MCP/Crypto/Rate-limits; 3 Grafana dashboards; 12 PagerDuty alerts with runbooks |
+| 📱 **Flutter BYOK Parity** | Chat screen, BYOK keys section, Network Security Config (LAN CIDR), clientDirect Ollama |
+| 🧪 **E2E Testing** | BYOK chat flow, MCP auth→tool→audit, key rotation; 561 web tests + 135 Flutter tests |
+
 ### v3.40.0 — 2026-09-08 *(BYOK UX Polish)*
 
 | Change | Description |

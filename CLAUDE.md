@@ -81,7 +81,7 @@ make build-apk   # release APK
 ## App Info
 
 - **Support email**: `support@fajrak.com` — لا تستخدم `abdooraf3@gmail.com` أبداً
-- **Current version**: `3.40.0+52` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
+- **Current version**: `3.42.0+54` — الموقع: `mobile/fajrak_flutter/pubspec.yaml`
   - `pubspec.yaml` `X.Y.Z+N` === `package.json` `X.Y.Z` — حافظ على التطابق
 
 ## Security & Auth
