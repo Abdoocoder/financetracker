@@ -7,10 +7,21 @@ import {
   type McpRequestContext,
   type ServerContext,
 } from '@modelcontextprotocol/server'
-import { verifyApiKey, writeAuditLog } from '@/lib/api-keys'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { verifyApiKey } from '@/lib/api-keys'
 import { rateLimit } from '@/lib/rate-limit'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/types'
+import {
+  getAccountBalances,
+  getCashflowSummary,
+  createTransaction,
+  validateCategory,
+  getValidCategories,
+  checkAndReserveIdempotencyKey,
+  completeIdempotencyKey,
+  getTransactionById,
+  sanitizeDescription,
+  writeAuditLog,
+} from '@/lib/unified-tools'
 
 /**
  * Fajrak MCP Server (Feature B)
@@ -52,19 +63,12 @@ const createTransactionSchema = z.object({
   description: z.string().max(MAX_DESCRIPTION_LENGTH).optional().nullable(),
   transaction_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
   account_id: z.string().uuid().optional().nullable(),
+  idempotency_key: z.string().min(1).max(128).optional(),
 })
 
 // ══════════════════════════════════════════════════════════
-// Helpers
+// Helpers (use unified-tools for shared functions)
 // ══════════════════════════════════════════════════════════
-function sanitizeDescription(desc: string | null | undefined): string | null {
-  if (!desc) return null
-  return desc
-    .replace(/<[^>]*>/g, '')
-    .replace(/[<>"'&]/g, '')
-    .trim()
-    .slice(0, MAX_DESCRIPTION_LENGTH)
-}
 
 /** Extract caller identity + metadata from the AuthInfo threaded into tool contexts. */
 function callerFrom(ctx: ServerContext, fallbackAuth?: AuthInfo): {
@@ -175,18 +179,8 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
     },
     async (_args, ctx) => {
       const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'read_balances')
-      const supabase = createAdminClient()
-      const { data, error } = await supabase.rpc('get_account_balances', {
-        p_user_id: userId,
-      })
-      if (error) {
-        return {
-          content: [{ type: 'text', text: 'Failed to fetch balances' }],
-          isError: true,
-        }
-      }
-      audit(keyId, userId, 'read_balances', { count: Array.isArray(data) ? data.length : 0 })
-      const accounts = data ?? []
+      const accounts = await getAccountBalances(userId)
+      audit(keyId, userId, 'read_balances', { count: accounts.length })
       return {
         content: [{ type: 'text', text: JSON.stringify({ ok: true, accounts }) }],
         structuredContent: { ok: true, accounts },
@@ -205,41 +199,11 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
     },
     async (args, ctx) => {
       const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'read_transactions')
-      const supabase = createAdminClient()
-
-      let query = supabase
-        .from('transactions')
-        .select('type, amount')
-        .eq('user_id', userId)
-        .is('deleted_at', null)
-
-      if (args.from) query = query.gte('transaction_date', args.from)
-      if (args.to) query = query.lte('transaction_date', args.to)
-
-      const { data, error } = await query
-      if (error) {
-        return { content: [{ type: 'text', text: 'Failed to fetch cash flow' }], isError: true }
-      }
-
-      const txs = data ?? []
-      let income = 0
-      let expense = 0
-      for (const tx of txs) {
-        if (tx.type === 'income') income += tx.amount
-        else if (tx.type === 'expense') expense += tx.amount
-      }
-      const summary = {
-        ok: true,
-        period: { from: args.from ?? null, to: args.to ?? null },
-        income,
-        expense,
-        net: income - expense,
-        transaction_count: txs.length,
-      }
+      const summary = await getCashflowSummary(userId, args.from, args.to)
       audit(keyId, userId, 'read_transactions', {
         from: args.from ?? null,
         to: args.to ?? null,
-        transaction_count: txs.length,
+        transaction_count: summary.transaction_count,
       })
       return {
         content: [{ type: 'text', text: JSON.stringify(summary) }],
@@ -254,26 +218,57 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
     {
       title: 'Create Transaction',
       description:
-        "Create a new income or expense transaction for the authenticated user. Requires the 'create_transaction' scope.",
+        "Create a new income or expense transaction for the authenticated user. Requires the 'create_transaction' scope. Accepts optional 'idempotency_key' to prevent duplicate transactions on retries.",
       inputSchema: createTransactionSchema,
     },
     async (args, ctx) => {
       const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'create_transaction')
 
-      // Match the category against the set that belongs to the transaction type
-      // (an income category on an expense, or vice versa, is invalid — the union
-      // check alone would let 'راتب' pass on an expense).
-      const validForType =
-        args.type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
-      if (!(validForType as readonly string[]).includes(args.category)) {
+      // Handle idempotency key if provided
+      let idempotencyKeyHash: string | null = null
+      if (args.idempotency_key) {
+        const { createHash } = await import('crypto')
+        idempotencyKeyHash = createHash('sha256').update(args.idempotency_key).digest('hex')
+
+        const idemResult = await checkAndReserveIdempotencyKey(userId, idempotencyKeyHash)
+
+        if (idemResult.status === 'duplicate') {
+          // Return existing transaction
+          const existingTxId = idemResult.transaction_id!
+          const existingTx = await getTransactionById(userId, existingTxId)
+
+          if (!existingTx) {
+            return { content: [{ type: 'text', text: 'Original transaction not found' }], isError: true }
+          }
+
+          audit(keyId, userId, 'create_transaction_idempotent_replay', {
+            transaction_id: existingTxId,
+            idempotency_key_hash: idempotencyKeyHash,
+          })
+
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ ok: true, transaction: existingTx, idempotent_replay: true }) }],
+            structuredContent: { ok: true, transaction: existingTx, idempotent_replay: true },
+          }
+        } else if (idemResult.status === 'processing') {
+          return {
+            content: [{ type: 'text', text: JSON.stringify({ error: 'Transaction with this idempotency key is still being processed' }) }],
+            isError: true,
+          }
+        }
+        // status === 'available' - proceed to create
+      }
+
+      // Validate category
+      if (!validateCategory(args.type, args.category)) {
         return {
           content: [
             {
               type: 'text',
               text: JSON.stringify({
                 error: 'Invalid category',
-                valid_expense: [...EXPENSE_CATEGORIES],
-                valid_income: [...INCOME_CATEGORIES],
+                valid_expense: getValidCategories('expense'),
+                valid_income: getValidCategories('income'),
               }),
             },
           ],
@@ -281,23 +276,25 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
         }
       }
 
-      const supabase = createAdminClient()
-      const { data: tx, error } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: userId,
-          type: args.type,
-          amount: args.amount,
-          category: args.category,
-          description: sanitizeDescription(args.description),
-          transaction_date: args.transaction_date,
-          account_id: args.account_id ?? null,
-        })
-        .select('id, type, amount, category, transaction_date, created_at')
-        .single()
+      // Create the transaction
+      const tx = await createTransaction({
+        user_id: userId,
+        type: args.type,
+        amount: args.amount,
+        category: args.category,
+        description: sanitizeDescription(args.description),
+        transaction_date: args.transaction_date,
+        account_id: args.account_id ?? null,
+      })
 
-      if (error) {
-        return { content: [{ type: 'text', text: 'Failed to create transaction' }], isError: true }
+      // Complete idempotency key if provided
+      if (idempotencyKeyHash) {
+        try {
+          await completeIdempotencyKey(userId, idempotencyKeyHash, tx.id)
+        } catch (completeError) {
+          console.error('[mcp] complete_idempotency_key error:', completeError)
+          // Don't fail the request - transaction was created successfully
+        }
       }
 
       audit(keyId, userId, 'create_transaction', {
@@ -305,7 +302,9 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
         type: tx.type,
         amount: tx.amount,
         category: tx.category,
+        idempotency_key_hash: idempotencyKeyHash,
       })
+
       return {
         content: [{ type: 'text', text: JSON.stringify({ ok: true, transaction: tx }) }],
         structuredContent: { ok: true, transaction: tx },
