@@ -1,10 +1,10 @@
 name: fajrak
-description: فجرك - تطبيق إدارة مالية ذكي
-publish_to: 'fajrak.com'
-version: 3.42.0+54
+description: Smart Finance Tracker - Flutter Mobile App
+publish_to: 'none'
+version: 1.0.0+1
 
 environment:
-  sdk: '>=3.11.0 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -12,78 +12,74 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # State Management
+  provider: ^6.1.1
+
   # Supabase
-  supabase_flutter: ^2.17.2
+  supabase_flutter: ^2.3.4
 
-  # Firebase - إصدارات متوافقة مع بعض
-  firebase_core: ^4.15.0
-  firebase_messaging: ^16.7.0
-  flutter_local_notifications: ^22.3.1
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  firebase_analytics: ^10.7.4
 
-  # UI
-  fl_chart: ^1.2.0
-  shimmer: ^4.0.0
+  # Localization
+  easy_localization: ^3.0.3
 
-  # Utils
+  # Secure Storage
+  flutter_secure_storage: ^9.0.0
+
+  # HTTP & Networking
+  http: ^1.2.0
+  dio: ^5.4.0
+
+  # Utilities - intl version must match flutter_localizations (0.20.3)
   intl: ^0.20.3
-  shared_preferences: ^2.5.5
-  url_launcher: ^6.3.2
-  package_info_plus: ^10.2.1
-  share_plus: ^13.3.0
-  path_provider: ^2.1.6
-  easy_localization: ^3.0.8
-  provider: ^6.1.5+1
-  http: ^1.6.0
-  flutter_dotenv: ^6.0.1
-  flutter_app_badge_control: ^0.0.2
-  pdf: ^3.13.1
-  printing: ^5.15.1
-  uuid: ^4.6.0
+  url_launcher: ^6.2.2
+  share_plus: ^7.2.1
+  path_provider: ^2.1.1
+  device_info_plus: ^9.1.1
+  package_info_plus: ^4.2.0
+  connectivity_plus: ^5.0.2
+  permission_handler: ^11.0.1
 
-  # Offline-first local database
-  drift: ^2.35.0
-  sqlcipher_flutter_libs: ^0.7.0+eol  # SQLCipher encryption — mobile/desktop only
-  path: ^1.9.1
+  # UI Components
+  fl_chart: ^0.66.0
+  syncfusion_flutter_charts: ^34.2.9
+  flutter_staggered_grid_view: ^0.7.0
+  shimmer: ^3.0.0
+  cached_network_image: ^3.3.0
+  flutter_svg: ^2.0.9
 
-  # BYOK — device-only provider keys (Keychain / Android Keystore) — Feature A
-  flutter_secure_storage: ^11.2.0
-  webcrypto: ^0.6.1
+  # PDF Generation
+  pdf: ^3.10.7
+  printing: ^5.11.1
+
+  # Cryptography
+  encrypt: ^5.0.1
+  pointycastle: ^3.7.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
-  flutter_launcher_icons: ^0.14.4
-  drift_dev: ^2.35.0
-  build_runner: ^2.16.1
-
-flutter_launcher_icons:
-  android: "ic_launcher"
-  image_path: "assets/images/app_icon.png"
-  min_sdk_android: 21
-dependency_overrides:
-  vector_math: ^2.3.0
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.7
 
 flutter:
   uses-material-design: true
+
   assets:
-    - .env
-    - assets/images/
     - assets/i18n/
+    - assets/fonts/
+    - assets/images/
+
   fonts:
-    - family: IBMPlexSansArabic
-      fonts:
-        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
-          weight: 600
-        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
-          weight: 700
     - family: Cairo
       fonts:
         - asset: assets/fonts/Cairo-Regular.ttf
-          weight: 400
         - asset: assets/fonts/Cairo-Bold.ttf
           weight: 700
+        - asset: assets/fonts/Cairo-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Cairo-Medium.ttf
+          weight: 500

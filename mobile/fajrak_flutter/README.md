@@ -1,949 +1,210 @@
-<div align="center">
+# Fajrak Flutter - Smart Finance Tracker
 
-<img
-  src="../../public/icon-512.png"
-  alt="Fajrak Logo"
-  width="110"
-  height="110"
-  style="border-radius: 22px;"
-/>
+A Flutter finance tracking app with Supabase backend and Firebase integration.
 
-# Fajrak Flutter
+## 🚀 Quick Start
 
-**تطبيق أندرويد أصلي — Native Android App**
+### Prerequisites
+- Flutter SDK 3.22+
+- Dart SDK 3.4+
+- Android Studio / Xcode (for mobile)
+- Chrome (for web)
 
-*22 شاشة · 100% Feature Parity · Arabic-First*
-
----
-
-[![APK](https://img.shields.io/badge/📦_APK-54.5_MB-38ef7d?style=for-the-badge)](https://fajrak.com/download)
-[![Google Play](https://img.shields.io/badge/🎯_Google_Play-Closed_Testing-4285F4?style=for-the-badge)](https://fajrak.com/download)
-[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
-[![Supabase](https://img.shields.io/badge/Supabase-Shared_Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
-
-</div>
-
----
-
-## Table of Contents
-
-- [نظرة عامة](#-نظرة-عامة)
-- [هيكل المشروع](#-هيكل-المشروع)
-- [الشاشات](#-الشاشات)
-- [التقنيات](#️-التقنيات)
-- [المتطلبات](#-المتطلبات)
-- [الإعداد والتشغيل](#️-الإعداد-والتشغيل)
-- [البيئة المشتركة مع الويب](#-البيئة-المشتركة-مع-الويب)
-- [نظام الإشعارات](#-نظام-الإشعارات)
-- [الترجمة والتوطين](#-الترجمة-والتوطين)
-- [النشر](#-النشر)
-- [سجل التغييرات](#-سجل-التغييرات)
-
----
-
-## ✨ نظرة عامة
-
-تطبيق أندرويد أصلي مبني بـ **Flutter** لمنصة **Fajrak** لإدارة المالية.
-يشارك نفس قاعدة بيانات Supabase وFirebase مع تطبيق الويب Next.js، مما يضمن
-**تزامناً فورياً** بين المنصتين.
-
-> 🎉 **متوفر على متجر Play** — بنيت حزمة `.aab` ورُفعت للاختبار بنجاح!
-
-**مميزات التطبيق:**
-- تطابق 100% مع ميزات تطبيق الويب
-- **منطق مالي مركزي (Supabase RPC)**: حسابات دقيقة وموحدة مع الويب
-- **نظام أسعار مزدوج (Dual-API)**: أسعار حية وموثوقة للأسهم والمعادن
-- تصميم عربي أصيل مع دعم RTL الكامل
-- إشعارات Firebase FCM عالية الأولوية
-- Foreground notifications + Deep Linking
-- دعم اللغتين: العربية (الافتراضية) والإنجليزية
-- رسوم بيانية تفاعلية (fl_chart)
-- إيماءات نشطة (سحب للتحديث، سحب للحذف)
-
----
-
-## 📁 هيكل المشروع
-
-```
-fajrak_flutter/
-├── lib/
-│   ├── main.dart                       ← نقطة الدخول + إعداد Theme + استيراد شاشة الدردشة (ميزة BYOK)
-│   ├── app_state.dart                  ← إدارة حالة التطبيق
-│   │
-│   ├── models/                         ← نماذج البيانات (Dart classes)
-│   │   ├── transaction.dart
-│   │   ├── debt.dart
-│   │   ├── investment.dart
-│   │   ├── budget.dart
-│   │   ├── savings_goal.dart
-│   │   └── alert.dart
-│   │
-│   ├── screens/                        ← 22 شاشة كاملة
-│   │   ├── auth/
-│   │   │   ├── login_screen.dart       ← تسجيل الدخول
-│   │   │   ├── register_screen.dart    ← إنشاء حساب
-│   │   │   ├── onboarding_screen.dart  ← إعداد أولي (4 خطوات)
-│   │   │   ├── forgot_password_screen.dart
-│   │   │   └── reset_password_screen.dart
-│   │   │
-│   │   ├── dashboard/
-│   │   │   └── dashboard_screen.dart   ← لوحة التحكم الرئيسية
-│   │   │
-│   │   ├── transactions/
-│   │   │   ├── transactions_screen.dart
-│   │   │   └── recurring_screen.dart    ← المعاملات المتكررة
-│   │   │
-│   │   ├── debts/
-│   │   │   └── debts_screen.dart
-│   │   │
-│   │   ├── investments/
-│   │   │   └── investments_screen.dart
-│   │   │
-│   │   ├── goals/
-│   │   │   └── goals_screen.dart
-│   │   │
-│   │   ├── budgets/
-│   │   │   └── budgets_screen.dart
-│   │   │
-│   │   ├── alerts/
-│   │   │   └── alerts_screen.dart
-│   │   │
-│   │   ├── settings/
-│   │   │   └── settings_screen.dart
-│   │   │
-│   │   ├── learn/
-│   │   │   └── learn_screen.dart       ← الدروس الإسلامية
-│   │   │
-│   │   ├── help/
-│   │   │   └── help_screen.dart
-│   │   │
-│   │   ├── achievements/
-│   │   │   └── achievements_screen.dart ← الشارات والمستويات
-│   │   │
-│   │   ├── fire/
-│   │   │   └── fire_calculator_screen.dart ← حاسبة FIRE
-│   │   │
-│   │   ├── zakat/
-│   │   │   └── zakat_calculator_screen.dart ← حاسبة الزكاة
-│   │   │
-│   │   ├── more/
-│   │   │   └── more_screen.dart        ← شاشة المزيد
-│   │   │
-│   │   ├── chat/
-│   │   │   └── chat_screen.dart        ← مساعد الدردشة BYOK (ميزة أ)
-│   │   │
-│   │   ├── splash_screen.dart          ← شاشة البداية
-│   │   └── main_screen.dart            ← هيكل التنقل الرئيسي
-│   │
-│   ├── services/
-│   │   ├── notification_service.dart   ← Firebase FCM + محلي
-│   │   ├── currency_service.dart       ← تحويل العملات
-│   │   ├── analytics_service.dart      ← تتبع الأحداث
-│   │   ├── investments_service.dart    ← بيانات الاستثمارات
-│   │   ├── byok/                       ← ميزة أ: BYOK (Bring Your Own Key)
-│   │   │   ├── byok_service.dart       ← خدمة الدردشة (Proxy + ClientDirect)
-│   │   │   ├── chat.dart               ← بناء جسم الطلب + استخراج دلتا + SSE
-│   │   │   ├── envelope.dart           ← غلاف التشفير (RSA-OAEP + AES-GCM)
-│   │   │   ├── providers.dart          ← سجل المزوّدين (OpenAI، Anthropic، إلخ)
-│   │   │   └── vault.dart              ← خزنة مفاتيح الجهاز (flutter_secure_storage)
-│   │   │
-│   │   ├── notification_service.dart   ← Firebase FCM + محلي
-│   │   ├── currency_service.dart       ← تحويل العملات
-│   │   ├── analytics_service.dart      ← تتبع الأحداث
-│   │   └── investments_service.dart    ← بيانات الاستثمارات
-│   │
-│   ├── widgets/                        ← مكونات قابلة لإعادة الاستخدام
-│   │   ├── more_menu_item.dart
-│   │   └── ...
-│   │
-│   └── utils/                          ← أدوات مساعدة
-│
-├── assets/
-│   ├── images/
-│   │   └── app_icon.png               ← شعار التطبيق
-│   ├── fonts/
-│   │   ├── Cairo-Regular.ttf
-│   │   └── Cairo-Bold.ttf
-│   └── i18n/
-│       ├── en.json                    ← ترجمة إنجليزية
-│       └── ar.json                    ← ترجمة عربية
-│
-├── android/
-│   └── app/
-│       └── google-services.json       ← (غير مُودَع — من Firebase Console)
-│
-├── pubspec.yaml                       ← تعريف الاعتمادات
-└── .env                               ← متغيرات البيئة (غير مُودَعة)
-```
-
----
-
-## 📱 الشاشات
-
-| #  | الشاشة               | الوصف               | الميزات الرئيسية                          |
-|:--:|:---------------------|:--------------------|:------------------------------------------|
-| 1  | **Splash**           | شاشة البداية        | تحميل شعار + فحص جلسة                     |
-| 2  | **Login**            | تسجيل الدخول        | البريد + كلمة المرور، التوجيه             |
-| 3  | **Register**         | إنشاء حساب          | تحقق، إنشاء Profile                       |
-| 4  | **Onboarding**       | إعداد أولي          | 4 خطوات تفاعلية (PageView)                |
-| 5  | **ForgotPassword**   | استعادة كلمة المرور | إرسال بريد إلكتروني                       |
-| 6  | **Dashboard**        | لوحة التحكم         | Health Score، المعاملات الأخيرة، المخططات |
-| 7  | **Transactions**     | المعاملات           | CRUD، بحث، فلترة، CSV، سحب للحذف          |
-| 8  | **Debts**            | الديون              | تقدم، أقساط، Confetti عند السداد          |
-| 9  | **Budgets**          | الميزانية           | حدود الفئات، التقدم الفوري                |
-| 10 | **Goals**            | أهداف الادخار       | تتبع التقدم، Emoji picker                 |
-| 11 | **Investments**      | الاستثمارات         | أسعار حية، P&L، الحلال، الحول             |
-| 12 | **Alerts**           | التنبيهات           | مركز الإشعارات، تصنيف بالنوع              |
-| 13 | **Settings**         | الإعدادات           | الملف الشخصي، العملة، اللغة، الثيم        |
-| 14 | **Learn**            | الدروس              | محتوى إسلامي يومي، تتبع الاستمرارية       |
-| 15 | **Help**             | المساعدة            | FAQ، معلومات التواصل                      |
-| 16 | **Achievements**     | الإنجازات           | 20+ شارة، 6 مستويات                       |
-| 17 | **FIRE Calculator**  | حاسبة FIRE          | Lean/Full/Fat، متزلجات تفاعلية            |
-| 18 | **Zakat Calculator** | حاسبة الزكاة        | ملء تلقائي، عداد الحول، تاريخ             |
-| 19 | **More**             | المزيد              | قائمة تنقل إضافية                         |
-| 20 | **Main**             | الهيكل الرئيسي      | Bottom navigation bar (4 تبويبات)         |
-| 21 | **Chat**             | مساعد الدردشة BYOK   | ميزة أ، مفاتيح BYOK، تيار SSE، سياق مالي  |
-| 22 | **Recurring**        | المعاملات المتكررة   | CRUD، تكرار، تذكيرات، Skeleton Loader     |
-
----
-
-## 🛠️ التقنيات
-
-### الاعتمادات الأساسية
-
-| الحزمة                        | الإصدار   | الغرض                                         |
-|:------------------------------|:---------:|:----------------------------------------------|
-| `supabase_flutter`            |  ^2.17.2  | قاعدة البيانات + Auth + Real-time             |
-| `firebase_core`               |  ^4.15.0  | تهيئة Firebase                                |
-| `firebase_messaging`          |  ^16.7.0  | Cloud Messaging (FCM)                         |
-| `flutter_local_notifications` | ^22.3.1   | إشعارات Foreground                            |
-| `fl_chart`                    |  ^1.2.0   | رسوم بيانية (خطية، دائرية، شريطية، Sparkline) |
-| `easy_localization`           |  ^3.0.8   | التوطين AR/EN                                 |
-| `provider`                    |  ^6.1.5+1 | إدارة الحالة                                  |
-| `shimmer`                     |  ^4.0.0   | تأثيرات التحميل                               |
-| `cached_network_image`        |  ^3.3.1   | تخزين مؤقت للصور                              |
-| `flutter_dotenv`              |  ^6.0.1   | متغيرات البيئة                                |
-| `intl`                        |  ^0.20.3  | تنسيق التواريخ والعملات                       |
-| `shared_preferences`          |  ^2.5.5   | التخزين المحلي                                |
-| `url_launcher`                |  ^6.3.2   | روابط خارجية                                  |
-| `http`                        |  ^1.6.0   | طلبات HTTP                                    |
-| `flutter_secure_storage`      | ^11.2.0   | تخزين مفاتيح BYOK (Keychain / Android Keystore) |
-| `webcrypto`                   |  ^0.6.1   | تشفير RSA-OAEP + AES-GCM لميزة BYOK           |
-
-### اللغة والإطار
-
-|                  |                        |
-|:-----------------|:-----------------------|
-| **اللغة**        | Dart 3.x               |
-| **الإطار**       | Flutter 3.x            |
-| **إدارة الحالة** | Provider 6             |
-| **التنقل**       | Navigator 2.0          |
-| **الخط**         | Cairo (Arabic + Latin) |
-
----
-
-## 📋 المتطلبات
-
-| المتطلب          |            الإصدار             |
-|:-----------------|:------------------------------:|
-| Flutter SDK      |        `>=3.0.0 <4.0.0`        |
-| Dart SDK         |           `>=3.0.0`            |
-| Android SDK      |     API 21+ (Android 5.0+)     |
-| Android Studio   | أو VS Code + Flutter extension |
-| Firebase Project |         مرتبط بالمشروع         |
-
----
-
-## ⚙️ الإعداد والتشغيل
-
-### 1. تثبيت الاعتمادات
-
+### Setup
 ```bash
-flutter pub get
+cd mobile/fajrak_flutter
+make setup
 ```
 
-### 2. إضافة أصول خط Cairo
+This will:
+1. Install Flutter dependencies
+2. Create `.env` from `.env.example` (edit with your credentials)
 
-حمّل خط Cairo من [Google Fonts](https://fonts.google.com/specimen/Cairo) وضع
-الملفات في:
+### Required Environment Variables
 
-```
-assets/fonts/Cairo-Regular.ttf
-assets/fonts/Cairo-Bold.ttf
-assets/fonts/Cairo-SemiBold.ttf
-assets/fonts/Cairo-Bold.ttf
-```
-
-### 3. إعداد Firebase
-
-من [Firebase Console](https://console.firebase.google.com):
-1. اختر مشروعك
-2. اذهب إلى **Project Settings → Your Apps**
-3. حمّل `google-services.json`
-4. ضعه في: `android/app/google-services.json`
-
-> ⚠️ هذا الملف مُدرج في `.gitignore` ولن يُرفع على GitHub
-
-### 4. متغيرات البيئة
-
-```bash
-cp .env.example .env
-```
-
+Edit `.env` with your credentials:
 ```env
-SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_ANON_KEY=eyJ...
-FLUTTER_FIREBASE_API_KEY=AIza...
-TWELVE_DATA_KEY=xxxx
+# Supabase (get from Supabase Dashboard > Settings > API)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+
+# Firebase (get from Firebase Console > Project Settings)
+FIREBASE_API_KEY=your-api-key
+FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+FIREBASE_PROJECT_ID=your-project
+FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=123456789
+FIREBASE_APP_ID=1:123456789:web:abcdef123456
+FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
-### 5. تشغيل التطبيق
+## 🌐 Web Development & CORS Issue
 
+### The Problem
+When running `flutter run -d chrome`, the app runs on `http://localhost:33963` and makes requests to Supabase. Supabase blocks these requests due to CORS policy because `localhost:33963` is not in the allowed origins.
+
+### Solution 1: Add to Supabase Dashboard (Recommended)
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard/project/ujwcvtpwsaidljecqbaa/auth/url-configuration)
+2. Add to **Additional Redirect URLs**:
+   ```
+   http://localhost:33963/**
+   http://127.0.0.1:33963/**
+   ```
+3. Save changes
+
+### Solution 2: Use Development Proxy (Alternative)
 ```bash
-# التشغيل على جهاز/محاكي
-flutter run
+make run-web-proxy
+```
 
-# التشغيل مع تحديد الجهاز
+This starts a local proxy on port 33964 that forwards requests to Supabase with proper CORS headers.
+
+## 🏃 Running the App
+
+### Mobile
+```bash
+# Run on connected device/emulator
+make run
+
+# Or specific device
 flutter run -d <device_id>
-
-# عرض الأجهزة المتاحة
-flutter devices
 ```
 
-### 🌐 تشغيل Flutter Web (مهم: إصلاح CORS)
-
-عند تشغيل `flutter run -d chrome`، يبدي الخادم على منفذ عشوائي (مثلاً `36727`). **Supabase Auth يحظر الطلبات من منافذ غير مصرح بها.**
-
-**الخطأ المتوقع:**
-```
-Access to fetch at 'https://ujwcvtpwsaidljecqbaa.supabase.co/auth/v1/token' 
-from origin 'http://localhost:36727' has been blocked by CORS policy
-```
-
-**إصلاح (اختر واحداً):**
-
-**خيار أ — إضافة المنفذ في Supabase Dashboard (موصى به):**
-1. افتح: https://supabase.com/dashboard/project/ujwcvtpwsaidljecqbaa
-2. اذهب إلى **Authentication → URL Configuration**
-3. في **Additional Redirect URLs** أضف:
-   ```
-   http://localhost:36727
-   http://127.0.0.1:36727
-   ```
-4. اضغط **Save**
-
-**خيار ب — تشغيل على منفذ 3000 (مصرح به مسبقاً):**
+### Web
 ```bash
-flutter run -d chrome --web-port=3000
+# Basic web run (requires Supabase CORS fix)
+make run-web
+
+# With CORS proxy (workaround)
+make run-web-proxy
 ```
-ثم افتح `http://localhost:3000` — إعداد `site_url` في `supabase/config.toml` هو `http://127.0.0.1:3000` بالفعل.
 
-> ⚠️ خطأ `504 Gateway Timeout` في الكونسول هو **نتيجة جانبية** لفشل CORS — الطلب الفعلي لا يصل للخادم.
-
----
-
-### 6. بناء APK للإصدار
-
+### Web with Custom Environment
 ```bash
-# APK للتوزيع المباشر
-flutter build apk --release
-
-# AAB لـ Google Play
-flutter build appbundle --release
+flutter run -d chrome \
+  --web-port=33963 \
+  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your-anon-key
 ```
 
-| الملف | المسار                                             |
-|:------|:---------------------------------------------------|
-| APK   | `build/app/outputs/flutter-apk/app-release.apk`    |
-| AAB   | `build/app/outputs/bundle/release/app-release.aab` |
+## 📦 Building
 
----
-
-## 🔗 البيئة المشتركة مع الويب
-
-التطبيق يشارك نفس البنية التحتية مع تطبيق الويب Next.js:
-
-| المورد                           | الحالة  |
-|:---------------------------------|:-------:|
-| قاعدة بيانات Supabase PostgreSQL | ✅ مشترك |
-| المصادقة Supabase Auth           | ✅ مشترك |
-| Firebase Project + FCM           | ✅ مشترك |
-| تسجيل الدخول بنفس الحساب         | ✅ مدعوم |
-| مزامنة فورية عبر المنصتين        | ✅ فوري  |
-
-**أي بيانات تُضاف على الويب تظهر فوراً على الهاتف والعكس.**
-
----
-
-## 🔔 نظام الإشعارات
-
-### Firebase Cloud Messaging (FCM)
-
-```dart
-// تهيئة في notification_service.dart
-FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  // عرض إشعار Foreground
-});
-
-FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-  // Deep Linking عند الضغط
-});
+### Web (Production)
+```bash
+make build-web
+# Output: build/web/
 ```
 
-**أنواع الإشعارات:**
+### Android
+```bash
+# APK for direct install
+make build-apk
+# Output: build/app/outputs/flutter-apk/app-release.apk
 
-| النوع             | الوصف                                                |
-|:------------------|:-----------------------------------------------------|
-| تذكير صباحي       | إشعار يومي الساعة 6:00 ص                             |
-| تذكير مسائي       | تذكير عند الحاجة 6:00 م                              |
-| تقرير أسبوعي      | ملخص الجمعة                                          |
-| تذكير الزكاة      | قبل 30، 7، 0 يوم من الحول                            |
-| تنبيهات ذكية      | تحذيرات وتحفيز سياقي                                 |
-| **تحكم دقيق**     | إمكانية تفعيل/إيقاف فئات الإشعارات من الإعدادات      |
-| **إخفاء الحساس**  | خيار لإخفاء المبالغ المالية من إشعار شاشة القفل      |
-| **قنوات أندرويد** | دعم فني للقنوات (Budget, Debt, Goal) مع تخصص الأصوات |
-
-### Local Notifications
-
-للإشعارات في وضع Foreground (التطبيق مفتوح):
-
-```dart
-FlutterLocalNotificationsPlugin().show(
-  id, title, body,
-  NotificationDetails(android: AndroidNotificationDetails(
-    channelId, channelName,
-    importance: Importance.high,
-    priority: Priority.high,
-  )),
-);
+# App Bundle for Play Store
+make build-bundle
+# Output: build/app/outputs/bundle/release/app-release.aab
 ```
 
----
-
-## 🌍 الترجمة والتوطين
-
-يستخدم التطبيق `easy_localization` مع ملفات JSON:
-
-### ملفات الترجمة
-
-| الملف                 |   اللغة    | الاتجاه |
-|:----------------------|:----------:|:-------:|
-| `assets/i18n/ar.json` |  العربية   |   RTL   |
-| `assets/i18n/en.json` | الإنجليزية |   LTR   |
-
-### الاستخدام
-
-```dart
-// في أي widget
-import 'package:easy_localization/easy_localization.dart';
-
-Text('nav_dashboard'.tr())
-Text('greeting'.tr(args: ['اسم المستخدم']))
+### iOS
+```bash
+flutter build ios --release
+# Then archive in Xcode
 ```
 
-### إضافة ترجمة جديدة
-
-```json
-// ar.json
-{
-  "your_key": "النص بالعربية"
-}
-
-// en.json
-{
-  "your_key": "Your text in English"
-}
-```
-
-### المفاتيح الشائعة
-
-| المفتاح            |   العربية    |    الإنجليزية    |
-|:-------------------|:------------:|:----------------:|
-| `app_name`         |     فجرك     |      Fajrak      |
-| `nav_dashboard`    | لوحة التحكم  |    Dashboard     |
-| `nav_transactions` |  المعاملات   |   Transactions   |
-| `nav_debts`        |    الديون    |      Debts       |
-| `nav_investments`  | الاستثمارات  |   Investments    |
-| `nav_settings`     |  الإعدادات   |     Settings     |
-| `fire_title`       |  حاسبة FIRE  | FIRE Calculator  |
-| `zakat_title`      | حاسبة الزكاة | Zakat Calculator |
-
----
-
-## 🚀 النشر
-
-### Google Play Store
+## 🧪 Testing
 
 ```bash
-# 1. بناء AAB
-flutter build appbundle --release
+# Run all tests
+make test
 
-# 2. التحقق من الحزمة
-flutter build appbundle --release --analyze-size
-
-# 3. الرفع
-# Google Play Console → Production → Closed Testing
+# With coverage report
+make test-coverage
+# View: coverage/html/index.html
 ```
 
-**متطلبات المتجر المكتملة:**
-- [x] شعار التطبيق (512×512)
-- [x] Feature Graphic (1024×500)
-- [x] Screenshots (هاتف + تابلت)
-- [x] وصف التطبيق (عربي + إنجليزي)
-- [x] سياسة الخصوصية
-- [x] Content Rating
-- [x] Target API Level 34+
-
-### التوزيع المباشر (APK)
+## 🔧 Development Commands
 
 ```bash
-flutter build apk --release --split-per-abi
+# Update dependencies
+make deps
+
+# Static analysis
+make analyze
+
+# Clean build artifacts
+make clean
 ```
 
-الملف النهائي: `build/app/outputs/flutter-apk/app-release.apk` (~54.5 MB)
-
----
-
-## 📊 Feature Parity — 100%
-
-| الميزة                | الويب | الهاتف |
-|:----------------------|:-----:|:------:|
-| لوحة التحكم الكاملة   |   ✅   |   ✅    |
-| المعاملات + CSV + بحث |   ✅   |   ✅    |
-| الديون + Confetti     |   ✅   |   ✅    |
-| الميزانية + 50/30/20  |   ✅   |   ✅    |
-| أهداف الادخار         |   ✅   |   ✅    |
-| التنبيهات الذكية      |   ✅   |   ✅    |
-| حاسبة FIRE            |   ✅   |   ✅    |
-| حاسبة الزكاة + حول    |   ✅   |   ✅    |
-| تاريخ الصحة المالية   |   ✅   |   ✅    |
-| تقارير PDF            |   ✅   |   —    |
-| Gamification + شارات  |   ✅   |   ✅    |
-| الدروس الإسلامية      |   ✅   |   ✅    |
-| إشعارات FCM           |   ✅   |   ✅    |
-| دعم AR/EN + RTL       |   ✅   |   ✅    |
-| متعدد العملات         |   ✅   |   ✅    |
-| Onboarding (4 خطوات)  |   ✅   |   ✅    |
-
----
-
-## 📝 سجل التغييرات
-
-### v3.40.0 — 2026-09-08 *(تحسين تجربة BYOK)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔑 **إعادة إدخال مفتاح BYOK** | إضافة زر "إعادة إدخال المفتاح" لكل صف في الإعدادات ← مفاتيح BYOK للمفاتيح غير المخزنة على هذا الجهاز (صفوف قديمة أو عبر أجهزة) — يربط المفتاح الخام بالصف الوصفي الموجود عبر خزنة IndexedDB المحلية دون إنشاء صفوف مكررة |
-| 💬 **تصفية مفاتيح الدردشة حسب الخزنة** | الدردشة الذكية تصفّي مفاتيح BYOK الآن حسب توفر الخزنة المحلية — تظهر فقط المفاتيح التي تملك نصاً مشفراً في هذا المتصفح؛ تعرض "مفاتيح موجودة لكن ليس على هذا الجهاز. أعد إدخالها في الإعدادات." عند وجود مفاتيح في قاعدة البيانات لكن لا شيء متاح محلياً |
-
-### v3.39.1 — 2026-09-08 *(إصلاح واجهة Flutter)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🎨 **إصلاح تموّج الأكورديون في الإعدادات (Flutter)** | إصلاح تحذير ListTile الملفوف في DecoratedBox في أكورديون الإعدادات بنقل لون السطح إلى Material الأصلي — تموّج اللمس على أقسام الإعدادات (التفضيلات، مفاتيح BYOK، الأصول، الملف الشخصي، التصدير/الحذف، مفاتيح API) يعمل الآن بشكل صحيح |
-
-### v3.39.0 — 2026-09-04 *(نظام الذكاء الاصطناعي: BYOK + خادم MCP المالي)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔑 **مساعد الدردشة BYOK (الميزة أ)** | دردشة بمفتاحك الخاص (ByoK) — يبقى مفتاح المزوّد على جهاز المستخدم، ويُشفر كل طلب (غلاف RSA-OAEP + AES-GCM) ويُفك في الذاكرة فقط بالخادم (`/api/byok/proxy`)، ويُتلف المفتاح بعد كل استدعاء |
-| 🔐 **وكيل تمرير رفيع** | عبر مزوّدين في قائمة معتمدة، دون مصادقة من العميل، حد أسبق ذرّي لكل مستخدم (30/دقيقة)، سجل بلا مفاتيح (حجم + sha-256 فقط) |
-| 🤖 **خادم MCP المالي (الميزة ب)** | خادم Model Context Protocol عبر Streamable HTTP بأدوات `get_balances`، `get_cashflow_summary`، `create_transaction` |
-| 🎫 **مصادقة PAT عبر MCP** | يستخدم نظام PAT الحالي `fjk_live_...` — مجزأ SHA-256، scopes مسطحة، حد أسبق لكل مفتاح، تسجيل `api_audit_log` لكل استدعاء |
-| 📚 **توثيق API** | `API_DOCS.md` يوثّق الآن نظام PAT الكامل و REST webhook و `/api/mcp` و `/api/byok/proxy` مع أمثلة curl |
-
-### v3.38.0 — 2026-09-03 *(إصلاحات التبعيات وجودة الكود)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔒 **إصلاح التبعيات** | سدّ 48+ ثغرة تبعية عبر npm overrides (`uuid`، `googleapis-common`) |
-| ⚡ **ترحيل TanStack Query** | ترحيل `useAccounts` من الحالة اليدوية إلى TanStack Query للاتساق |
-| 🛡️ **حماية استيراد Admin** | حماية استيراد `lib/supabase/admin.ts` على جانب العميل |
-| 🧹 **توحيد المنطقة الزمنية** | إنشاء `lib/timezone.ts` مع دالة `getLocalNow()` مشتركة UTC+3 |
-| 🐛 **تسريب عمال Jest** | إصلاح تسريب المؤقتات في `lib/rate-limit.ts` بـ `stopCleanupTimer()` + `afterAll` |
-| 🔧 **استقرار E2E** | إضافة نقطة فحص صحة (`/api/health`) وخيارات إعادة محاولة Playwright |
-
-### v3.37.0 — 2026-08-26 *(تكامل المساعد الذكي وتعزيزات الأمان)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🤖 **تكامل المساعد الذكي** | إضافة ويب هوك الدفتر الحواري لإنشاء المعاملات وقرء الرصيد عبر اللغة الطبيعية |
-| 🔑 **إدارة مفاتيح API آمنة** | تنفيذ نظام مفاتيح API scoped مع صلاحيات create_transaction، read_transactions، وread_balances |
-| 📝 **حماية عرض مفتاح API** | الآن يتم اختصار بادئات مفاتيح API للأمان (يظهر أول 12 حرف + ... إذا كان أطول من 20 حرف) |
-| ⚡ **تحسين autoFocus** | تم إضافة autoFocus إلى حقل إدخال مفتاح API لتحسين تجربة المستخدم |
-| 🔐 **الهجرة 039** | تمت إضافة جداول user_api_keys وapi_audit_log مع سياسات RLS |
-| 🧪 **اختبارات شاملة** | تمت إضافة 111 اختبار جديد تغطي مسارات API، ومعالجات الويب هوك، ووظائف المكتبة |
-
-### v3.36.0 — 2026-08-20 *(استخراج السمة وتحسينات الأمان)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 📱 **استخراج سمة Flutter** | `_buildTheme()` السطرية نُقلت إلى `core/theme/app_theme.dart` للاستخدام المشترك. |
-| 📱 **تنسيق التواريخ العربية** | `initializeDateFormatting('ar')` تستدعى عند البداية لعرض أسماء الأيام والأشهر بالعربية. |
-| 📱 **حماية قاعدة البيانات على الويب** | `AppDatabase.initialize()` تتخطى على منصة الوib لتجنب استدعاء SQLite غير المدعومة. |
-
-### v3.35.4 — 2026-05-03 *(إصلاح قفل المصادقة)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔒 **Supabase Client Singleton** | `createClient()` تُعيد نسخة واحدة مشتركة لمنع تنافس `GoTrueClient` على Navigator Lock. |
-| 🔒 **إصلاح قفل سياق المصادقة** | حذف `getUser()` الزائد في `UserProvider` والاعتماد على `INITIAL_SESSION` فقط. |
-
-### v3.35.3 — 2026-05-03 *(إصلاحات المزامنة والتجربة)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🐛 **إصلاح الرصيد = 0** | الـ Dashboard يعرض صافي الشهر بدلاً من +0 عند عدم ربط المعاملات بالحسابات. |
-| 🐛 **إصلاح خطأ RPC** | Migration 038 يضمن وجود أعمدة `deleted_at` قبل استخدامها في `get_account_balances`. |
-| 🔔 **إصلاح بانر الإشعارات** | لا يظهر مجدداً بعد الضغط على "لاحقاً". |
-| 📱 **تحسين Flutter Dashboard** | فشل `fetchMonthlyFinancialSummary` لم يعد يُسقط الشاشة كاملاً. |
-| ✏️ **تعديل المعاملات التلقائية** | أيقونة تعديل ظاهرة + `InkWell` + قوائم فئات موحدة تحفظ الفئات الخاصة عند التعديل. |
-
-### v3.35.2 — 2026-05-03 *(إصلاح شاشة البداية)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🐛 **إصلاح i18n الـ Splash** | إضافة import ناقص لـ`easy_localization` في `splash_screen.dart` كان يُسبب خطأ `tr()` غير معرَّف. |
-
-### v3.35.1 — 2026-04-30 *(تكافؤ منطق الديون وإصلاحات)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔄 **تكافؤ الويب والموبايل** | نموذج الديون في الويب يطابق Flutter: `auto_deduct` مخفي لديون "لي"؛ `paid_from_account` يبدأ بـ`true` للديون الجديدة المُقرَضة. |
-| 📝 **تلميح الديون القديمة** | وصف واضح عند إلغاء تحديد `paid_from_account`: "لن يُخصم — مناسب للديون القديمة". |
-| 🔧 **إصلاح FCM على الويب** | منع خطأ 401 من Firebase على Flutter web. |
-| 💥 **إصلاح تعطل الـ Splash** | إصلاح عطل `dependOnInheritedWidgetOfExactType` في `initState`. |
-| ⚡ **إصلاح كرون الديون** | أقساط ديون "لي" تُسجَّل الآن كـ`income` بشكل صحيح. |
-
-### v3.35.0 — 2026-04-30 *(مصدر الدين الذكي)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 💡 **مصدر الدين الذكي** | عند إضافة دين جديد، يُسأل المستخدم عمّا إذا كان المبلغ قد دُفع أو استُلم من حسابه الحالي — في حال الإيجاب، تُنشأ معاملة مقابلة تلقائياً (مصروف لـ"دين لي"، دخل لـ"دين علي"). الديون القديمة لا تُؤثر على الرصيد. |
-
-### v3.34.0 — 2026-04-28 *(إصلاح مزامنة الراتب)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🐛 **إصلاح مزامنة الراتب** | عند تعديل الراتب من الإعدادات، يُحدَّث الآن مبلغ معاملة الراتب للشهر الحالي تلقائياً — يحل مشكلة ظهور الدخل القديم في الشاشة الرئيسية بعد التسجيل. |
-| 📱 **Flutter Parity** | تطبيق إصلاح المزامنة في Flutter (`profile_form.dart`) — يدعم كلاً من `'راتب'` و`'Salary'`، حساب صحيح لحدود الشهر، وإنشاء معاملة جديدة إذا لم تكن موجودة. |
-
-### v3.33.0 — 2026-04-26 *(إعادة تصميم لوحة التحكم)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🎨 **إعادة تصميم لوحة التحكم** | إعادة بناء مكونات `Cards` و`HeroBalanceCard` و`NetWorthCard` بنظام CSS modular — هيكل أنظف وأسهل صيانةً. |
-| 🏠 **إعادة تصميم الصفحة الرئيسية** | إعادة بناء كاملة لـ `LandingPageClient` بتخطيط جديد وهيكل CSS منفصل. |
-| 📄 **صفحات جديدة** | إضافة صفحتَي الديون والاستثمارات في لوحة التحكم مع routing أولي. |
-| 🔐 **Supabase Middleware** | إضافة middleware لإدارة جلسات المستخدمين في المسارات المحمية. |
-| 📱 **موبايل: عنصر الاستثمار** | تحسين `investment_list_item` بتخطيط محسّن وعرض بيانات أوضح. |
-| 🔧 **إعادة هيكلة Proxy** | تحديث تنفيذ الـ proxy لأمان أنواع أفضل. |
-
-### v3.32.14 — 2026-04-23 *(تحديث الحزم)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 📦 **تحديث الحزم** | 10 حزم محدّثة: `build_runner` 2.14.0، `flutter_dotenv` 6.0.1، `package_info_plus` 10.1.0، `share_plus` 13.1.0. ترقية Flutter إلى 3.41.7. |
-
-### v3.32.13 — 2026-04-19 *(تجربة المستخدم ومعالجة الأخطاء)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔔 **رسائل خطأ ودّية** | رسائل المصادقة أصبحت مفهومة للمستخدم — لا raw exceptions. |
-| 🎨 **لافتة الخطأ** | `AuthErrorBanner` widget جديد بتصميم Material 3 في Login و Register. |
-| 🖼️ **شعار المشاركة** | قسم المشاركة في الإعدادات يعرض شعار التطبيق الفعلي بدلاً من أيقونة عامة. |
-| 🔗 **رابط المشاركة** | تحديث الرابط إلى `https://fajrak.com/download`. |
-| 📦 **تحديث الحزم** | `supabase_flutter` → 2.12.4، `dart_jsonwebtoken` → 3.4.1. |
-
-### v3.32.12 — 2026-04-19 *(شارات المزامنة)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 📶 **شارات المزامنة** | `TransactionListItem` يعرض أيقونات حالة المزامنة (🟠 معلق، 🔴 فشل) لكل معاملة. |
-| 🔄 **سحب للمزامنة** | pull-to-refresh يُشغّل `SyncService.fullSync()` بدلاً من إعادة التحميل من Supabase فقط. |
-| 🔢 **عداد المعلقة** | شريط التطبيق يعرض عدد العمليات المعلقة في شارة برتقالية مع زر مزامنة فوري. |
-
-### v3.32.11 — 2026-04-18 *(إصلاحات وإمكانية الوصول)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🐛 **إصلاح Rage Click** | زر "التالي" في الخطوة الأولى من Onboarding يُظهر الآن حالة تحميل ويُعطَّل أثناء حفظ البيانات. |
-| 🔒 **تحصين i18n-server** | معالجة أعطال Turbopack في `getServerLang` و`getServerTranslation`. |
-| ♿ **إصلاح ARIA** | تصحيح `aria-pressed="{expression}"` في صفحة الميزانيات. |
-| 🎨 **إزالة الأنماط المضمّنة** | تحويل `style={{}}` إلى Tailwind في `budgets/page.tsx` و`onboarding/page.tsx`. |
-
-### v3.32.10 — 2026-04-16 *(إصلاحات UI/UX في Flutter)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🎨 **ModalBottomSheet** | إصلاح الألوان الثابتة (`cardColor`, `AppColors.surface0`) → `colorScheme.surface` في شاشات الحسابات والاستثمارات. |
-| 📊 **إصلاح الرسوم البيانية** | إصلاح crash في رسوم لوحة التحكم — تصحيح مفتاح `'expense'` → `'expenses'`، إضافة حقل `percentage` لبيانات الفئات. |
-| ⚠️ **حالات الخطأ** | إضافة واجهة خطأ واضحة مع زر retry في `transactions_screen` عند فشل الاتصال. |
-| 💀 **Skeleton Loader** | استبدال containers التحميل اليدوية في `recurring_screen` بـ `ListSkeleton` (shimmer animation). |
-
-### v3.32.9 — 2026-04-16 *(إصلاح البناء وتحسين UX)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔧 **إصلاح بناء Android** | ترقية `compileSdk` إلى 36 و`sqlcipher_flutter_libs` إلى 0.7.0 و`package_info_plus` و`share_plus` — يحل خطأ `lStar` وتحذيرات SDK 36. |
-| 📱 **Edge-to-Edge** | تحديث `MainActivity.kt` لإزالة تحذيرات Play Console المتعلقة بـ `setStatusBarColor`/`setNavigationBarColor` المهملة. |
-| 🔐 **شروط كلمة المرور** | إضافة مؤشر تفاعلي لشروط كلمة المرور في شاشة التسجيل (حروف كبيرة، صغيرة، أرقام، رموز، عدد الأحرف) — متطابق مع تطبيق الويب. |
-
-### v3.32.8 — 2026-04-15 *(الأداء واتساق الواجهة)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🎨 **نظام AppColors** | 12 ثابت لوني جديد + استبدال 86 لوناً مشفّراً في جميع الملفات. |
-| ⚡ **أداء التخطيط** | استبدال `GridView + shrinkWrap` بـ `Wrap` في 3 widgets لإلغاء مرور التخطيط المزدوج. |
-| 🔁 **تحسين build()** | قوائم الـ FAQs والتحديات تُبنى مرة واحدة في `didChangeDependencies`. |
-
-### v3.32.7 — 2026-04-15 *(الأداء وتوافق Android 15)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| ⚡ **سرعة التشغيل** | تحميل متوازٍ للتهيئات؛ تأجيل الإشعارات بعد `runApp()` لتسريع ظهور الشاشة الأولى. |
-| 🗂️ **تحميل كسول** | الشاشة الرئيسية تبني التبويبات عند أول زيارة فقط بدلاً من تحميل الكل دفعةً واحدة. |
-| 🖼️ **عزل الرسم** | `RepaintBoundary` على الرسوم البيانية لمنع إعادة الرسم غير الضرورية. |
-| 🤖 **Android 15** | `enableEdgeToEdge()` + إزالة الـ APIs المهجورة (`setStatusBarColor` وغيرها) + إزالة استدعاء `SystemChrome` الزائد في `main.dart` (الوضع التلقائي منذ Flutter 3.27). |
-| 🎨 **ألوان موحّدة** | استبدال الألوان المشفّرة في 5 شاشات بـ `ColorScheme` لدعم الثيم الفاتح والداكن. |
-| 📦 **تقليل الحجم** | حذف `google_fonts` و `cached_network_image` من التبعيات. |
-
-### v3.32.6 — 2026-04-15 *(استقرار وتزامن عام)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔄 **مزامنة الإصدار** | تحديث أرقام الإصدارات والمعايير التوجيهية للبرمجة لتتوافق مع التحديثات الأمنية لمنصة الويب. |
-
-### v3.32.5 — 2026-04-14 *(الترجمة والتوطين)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🌐 **توطين 100%** | دمج الحسابات المتقدمة في نظام الترجمة `t()` الموحد. |
-| 🧹 **تنظيف البيانات** | حذف المفاتيح المكررة في ملفات الترجمة لتجنب أخطاء البناء. |
-
-### v3.32.4 — 2026-04-14 *(الأداء واختبارات الاستقرار)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🦴 **واجهات Skeleton موحدة** | تطبيق واجهات تحميل نبضية (Pulse Loading) لجميع بطاقات لوحة التحكم لضمان تجربة مستخدم سريعة وبدون قفزات في الواجهة (Layout Shifts). |
-| 🧪 **استقرار النظام** | التأكد من سلامة جميع العمليات الحسابية والمنطقية بعد مراجعة شاملة للـ RPCs واختبارات التكامل. |
-| 🛠️ **أتمتة التطوير** | إضافة دعم أداة **Task Master AI** لتسهيل تتبع وإتمام المهام البرمجية في بيئة الموبايل والويب. |
-| 🔧 **إصلاحات تقنية** | حل مشاكل تعارض الأنواع في ملفات الاختبار وتحديث التبعيات لضمان أداء مستقر. |
-
-### v3.32.3 — 2026-04-11 *(تخصيص لوحة التحكم)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| ⚙️ **Dashboard Customization** | bottom sheet لتبديل إظهار/إخفاء 14 بطاقة — `Provider` + `SharedPreferences` |
-| 🔒 **حماية البطاقات** | "إضافة سريعة" مطلوبة دائماً — منع إخفاء كل البطاقات |
-| 🌐 **i18n** | 20 مفتاح جديد (`dash_customize_*`, `dash_card_*`) بالعربية والإنجليزية |
-
-### v3.32.2 — 2026-04-11 *(إصلاح الترجمة وتحسين UX)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🎯 **Validation الأهداف** | رسائل خطأ محددة لكل حقل عند إضافة هدف — مبلغ سالب، يتجاوز الهدف، حقل فارغ |
-| ⚠️ **Disclaimer الحاسبات** | إخلاء مسؤولية قابل للإخفاء في FIRE والزكاة مع "لا تظهر مجدداً" |
-| 🗑️ **تنظيف الكود** | حذف ملفات Hive المتقادمة `.g.dart` (40 خطأ) |
-| 📝 **إضافة مفاتيح i18n** | 5 مفاتيح جديدة في `en.json`: validation + سؤال الديون التلقائية |
-
-### v3.32.1 — 2026-04-10 *(أمان وإصلاح الإشعارات)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🔒 **حماية API** | تأمين مسارات `stock-price` و`zakat/prices` و`gamification` بـ Bearer token |
-| 🔔 **إصلاح الإشعارات** | إصلاح توقف الإشعارات اليومية بسبب خطأ 307 Redirect |
-| 🔑 **تقوية CRON_SECRET** | استبدال الـ secret الضعيف بـ 64 حرف عشوائي |
-
-### v3.32.0 — 2026-04-09 *(الأحدث — استقرار وتحسينات)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🚀 **تحسين الاستقرار** | تحسين أداء التطبيق واستقراره العام استعداداً لإصدار المتجر |
-| ⚖️ **دقة الأرصدة** | تحسين منطق حساب الأرصدة المالية لضمان دقة أعلى عبر جميع الحسابات |
-| 🛡️ **حماية البيانات** | مراجعة شاملة لإدارة الذاكرة في شاشات المصادقة لمنع أي تسريبات محتملة |
-| ✨ **صقل الواجهة** | تحسينات طفيفة في واجهات المستخدم وإصلاح بعض التنبيهات البرمجية |
-
-### v3.31.0 — 2026-04-08 *(جودة واستقرار شامل)*
-
-| التغيير | الوصف |
-|:--------|:------|
-| 🛡️ **حماية الضغط المزدوج** | حماية شاملة لجميع أزرار الحفظ في التطبيق (9 شاشات/ديالوج) — لا إمكانية لتسجيل معاملة مكررة بالخطأ |
-| 🔧 **finally في كل عملية حفظ** | إضافة `finally` لإعادة تفعيل زر الحفظ تلقائياً في حالة حدوث خطأ — قبل ذلك كان يبقى معطلاً للأبد |
-| 🧹 **إصلاح تسريب الذاكرة** | إضافة `dispose()` لـ `TextEditingController` في شاشات تسجيل الدخول والتسجيل |
-| ⚖️ **تصحيح عرض الرصيد** | الشاشة الرئيسية تعرض الآن إجمالي رصيد الحسابات الحقيقي (من `get_account_balances`) بدلاً من صافي الشهر |
-| 🔔 **FCM على الويب** | تحويل خطأ FCM على localhost من خطأ مميت إلى تحذير غير مؤثر |
-
-### v3.30.2 — 2026-04-07
-
-| التغيير                | الوصف                                               |
-|:-----------------------|:----------------------------------------------------|
-| ⚙️ **محرك الحسابات**    | مركزة تقييم الصحة المالية في قاعدة البيانات بدلاً من التطبيق لضمان دقة وتطابق 100%. |
-| 🛡️ **تحديثات التبعية** | رفع رقم إصدار التطبيق (Version Code) إلى 21 استعداداً للإنتاج. |
-
-### v3.30.1 — 2026-04-06
-
-| التغيير                | الوصف                                               |
-|:-----------------------|:----------------------------------------------------|
-| 🐛 **إصلاح الإشعارات** | حل مشكلة عدم وصول الإشعارات عبر تصحيح تسجيل رمز FCM |
-| 🏗️ **استقرار البناء** | تحديث AGP إلى 8.9.1 للتوافق مع بيئة بناء Flutter    |
-| 🚀 **حزمة AAB**        | إصلاح مسار مخرجات التطبيق وبناء حزمة جاهزة للإصدار  |
-
-### v3.30.0 — 2026-04-05 *(نظام الإشعارات الذكي)*
-
-| التغيير             | الوصف                                                                                            |
-|:--------------------|:-------------------------------------------------------------------------------------------------|
-| 🔔 **إشعارات ذكية** | **منصة متكاملة**: دعم القنوات المتعددة (Notification Channels) والتحكم الدقيق في ظهور التنبيهات. |
-| 🛡️ **خصوصية**      | إضافة ميزة "إخفاء البيانات الحساسة" لإخفاء المبالغ المالية من واجهة شاشة القفل.                  |
-| ⚙️ **إعدادات**      | واجهة مستخدم جديدة للتحكم في تفضيلات الإشعارات لكل فئة (ميزانية، ديون، أهداف).                   |
-| 🚀 **تزامن الحول**  | تحسين دقة تنبيهات حول الزكاة وربطها بالمشغلات السحابية (Edge Functions).                         |
-
-### v3.29.0 — 2026-04-05
-
-| التغيير           | الوصف                                                                                                     |
-|:------------------|:----------------------------------------------------------------------------------------------------------|
-| 🔧 **إصلاح Lint** | حل جميع تحذيرات `use_build_context_synchronously` في `PreferencesSection` — استخدام آمن للـ async context |
-| 🎨 **صقل واجهة**  | استبدال أيقونة صندوق التوفير بأيقونة المحفظة في إعدادات الملف الشخصي                                      |
-
-### v3.28.0 — 2026-04-04
-
-| التغيير                 | الوصف                                           |
-|:------------------------|:------------------------------------------------|
-| 🧪 **تغطية الاختبارات** | الوصول لـ **80.26%** على الويب (+70% من 10.21%) |
-| ✅ **225 اختبار**        | إضافة اختبارات شاملة للـ hooks والمكونات        |
-
-### v3.27.0 — 2026-04-03
-
-| التغيير                | الوصف                                                                         |
-|:-----------------------|:------------------------------------------------------------------------------|
-| 🔔 **شارات الإشعارات** | إصلاح عداد التنبيهات غير المقروءة الدقيق والمزامن على أيقونة التطبيق الداخلي. |
-| 🌍 **إعدادات النظام**  | خيار "افتراضي النظام" للغة التطبيق والمظهر ليتبع التفضيلات العامة.            |
-
-### v3.26.0 — 2026-04-03
-
-| التغيير               | الوصف                                                                                                                                          |
-|:----------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
-| 📊 **ملخص الشهر**     | بطاقة `MonthSummaryCard` تظهر تلقائياً في الأيام 1-7 من الشهر الجديد بدخل وإنفاق وادخار الشهر السابق. تُحفظ حالة الإغلاق في SharedPreferences. |
-| ← **تنقل بين الشهور** | شريط `‹ مارس 2025 ›` في شاشة المعاملات يستبدل أيقونة التقويم — السهم الأيمن للشهر السابق، الأيسر للتالي (معطّل عند الشهر الحالي).              |
-| ⚡ **فصل الديون**      | `TransactionSummary` يعرض المصاريف الحقيقية بشارة زرقاء منفصلة لأقساط الديون.                                                                  |
-| 🕌 **امتثال إسلامي**  | استبدال `Icons.savings` (خنزير التوفير) بـ `Icons.account_balance_wallet` في 7 شاشات.                                                          |
-| 🔧 **إصلاحات**        | حذف import زائد لـ `intl`، إزالة تعريف مكرر لـ `_prevExpenses`، مفاتيح ترجمة `filter_date` و`cancel_filter`.                                   |
-
-### v3.25.0 — 2026-04-03
-
-| التغيير                 | الوصف                                                                                                                          |
-|:------------------------|:-------------------------------------------------------------------------------------------------------------------------------|
-| 🏗️ **Core Logic**      | **المنطق المركزي**: نقل كافة الحسابات الأساسية (صافي الثروة، الزكاة، الأرصدة) إلى Supabase RPC لضمان دقة رياضية 100% مع الويب. |
-| 💎 **Dual-API Prices**  | **الأسعار الحية**: تطبيق نظام جلب الأسعار المزدوج (Yahoo Finance + FreeGoldAPI) مع تحديث خلفي أوتوماتيكي.                      |
-| 🛡️ **Technical Audit** | مراجعة شاملة لجميع الخدمات المالية (FinanceService, AccountsService) لضمان الدقة واستهلاك الـ RPCs الجديدة.                    |
-
-### v3.24.0 — 2026-04-02
-
-| التغيير                 | الوصف                                                             |
-|:------------------------|:------------------------------------------------------------------|
-| 💎 **واجهة بريميوم**    | واجهة Glassmorphism جديدة للداشبورد تعتمد على `BackdropFilter`    |
-| 🧪 **تغطية الاختبارات** | إضافة اختبارات وحدة لخدمات العملات والحسابات (تغطية 100% للخدمات) |
-
-### v3.23.0 — 2 أبريل 2026
-
-| التغيير                       | الوصف                                                                |
-|:------------------------------|:---------------------------------------------------------------------|
-| 💎 **واجهة بريميوم**          | واجهة Glassmorphism جديدة للداشبورد تعتمد على `BackdropFilter`       |
-| 🧪 **تغطية الاختبارات**       | إضافة اختبارات وحدة لخدمات العملات والحسابات (تغطية 100% للخدمات)    |
-| 📐 **معمارية متعددة المنصات** | ويب + *native mobile* مع مزامنة فورية عبر `FinanceUtils` لضمان الدقة |
-| 🛡️ **إصلاحات تقنية**         | حل مشاكل التحميل وتنظيف الاختبارات القديمة (v3.23.0+15)              |
-
-### v3.22.0 — 2 أبريل 2026
-
-| التغيير                 | الوصف                                                                             |
-|:------------------------|:----------------------------------------------------------------------------------|
-| ⚡ **تحميل تدريجي**      | الداشبورد على مرحلتين: `_loadPhase1` للحسابات فوراً، `_loadPhase2` لباقي البيانات |
-| 🦴 **Skeleton Screens** | `_SkeletonBox` نابض بدل المؤشر الدوار — الرصيد يظهر فور اكتمال phase 1            |
-| ✨ **AnimatedSwitcher**  | انتقال سلس Skeleton → محتوى حقيقي لبطاقة الرصيد والإحصائيات                       |
-
-### v3.21.0 — 2 أبريل 2026
-
-| التغيير                    | الوصف                                                    |
-|:---------------------------|:---------------------------------------------------------|
-| 🏦 **نظام الحسابات**       | شاشة حسابات كاملة: بنك، نقدي، توفير، بطاقة ائتمان        |
-| 💰 **بطاقة إجمالي الرصيد** | الداشبورد يعرض الرصيد الفعلي مع تفاصيل كل حساب           |
-| 🔄 **تحويل بين الحسابات**  | نافذة تحويل مع اختيار المصدر والوجهة والمبلغ             |
-| 🧭 **تبويب الحسابات**      | استبدال تبويب الميزانية بتبويب الحسابات في الشريط السفلي |
-
-### الإصدار 9 (v3.16.1) — 31 مارس 2026
-
-| التغيير               | الوصف                                             |
-|:----------------------|:--------------------------------------------------|
-| 📊 **حاسبات المالية** | إضافة حاسبة (FIRE) لتتبع تقاعدك المبكر            |
-| 📖 **منصة التعلم**    | إطلاق منصة الدروس المالية اليومية التفاعلية       |
-| 💳 **ديون مستحقة**    | تطوير ميزة إدارة الديون لفصل الديون التي لك وعليك |
-
-### الإصدار 7 (v3.15.0) — 30 مارس 2026
-
-| التغيير              | الوصف                                        |
-|:---------------------|:---------------------------------------------|
-| 🔄 **إصلاحات تقنية** | حل مشكلة التحميل وتحسين استقرار التطبيق      |
-| 📊 **تصنيفات ذكية**  | فصل الدخل عن المصاريف وإضافة 7 تصنيفات جديدة |
-| 🌄 **هوية موحدة**    | توحيد رقم الإصدار مع متجر Play وتحديث الشعار |
-
-### الإصدار 5 (v1.0.2) — 28 مارس 2026
-
-| التغيير             | الوصف                                                 |
-|:--------------------|:------------------------------------------------------|
-| 🚀 **تحديث المتجر** | أول نسخة مستقرة تم رفعها للاختبار المغلق في جوجل بلاي |
-
-### الإصدار 3 (v1.0.1) — 28 مارس 2026
-
-| التغيير             | الوصف                                                  |
-|:--------------------|:-------------------------------------------------------|
-| 🔧 **إصلاحات عامة** | تحسينات في واجهة المستخدم ومعالجة بعض الأخطاء البرمجية |
-
-### الإصدار 2 (v1.0.0) — 23 مارس 2026
-
-| التغيير                 | الوصف                                              |
-|:------------------------|:---------------------------------------------------|
-| 🎉 **الإطلاق التجريبي** | النسخة الأولى من فجرك (Beta Launch)                |
-| 🖼️ **شعار Splash**     | استخدام الشعار الحقيقي مع `ClipRRect` و`BoxShadow` |
-| 🖼️ **شعار Login**      | استخدام الشعار الحقيقي مع تأثير `BoxShadow`        |
-| 📜 **إعادة هيكلة More** | تحويل الشاشة لـ `ListView` مباشر وأخف              |
-
-### v3.13.0 — 25 مارس 2026
-
-| التغيير             | الوصف                                               |
-|:--------------------|:----------------------------------------------------|
-| 🔥 **حاسبة FIRE**   | حاسبة متكاملة مع ملء تلقائي ومحاكاة الفائدة المركبة |
-| 🌙 **حاسبة الزكاة** | ملء تلقائي ومتابعة الحول لكل أصل                    |
-| 📈 **تاريخ الصحة**  | رسم Sparkline مصغر لعرض التقدم في آخر 30 يوماً      |
-
-### v3.12.0 — 24 مارس 2026
-
-| التغيير              | الوصف                                                     |
-|:---------------------|:----------------------------------------------------------|
-| 💎 **تحديث الواجهة** | إعادة تصميم شاملة: تدرجات لونية، خط Cairo عالي الدقة      |
-| 🛡️ **الأمان**       | إزالة جميع المفاتيح المُضمَّنة؛ الانتقال الكامل لـ `.env` |
-| 🎨 **الثيم**         | إصلاح مشكلة "الأبيض على الأبيض" في الوضع الفاتح           |
-
-### v3.10.0 — 23 مارس 2026
-
-| التغيير               | الوصف                         |
-|:----------------------|:------------------------------|
-| 🚀 **Google Play**    | رفع حزمة .aab للاختبار المغلق |
-| ⚙️ **إصلاحات Gradle** | تقليل استهلاك الذاكرة في Gradle (`-Xmx1536m` بدلاً من `-Xmx2G`) وتعطيل التوازي لتحسين استقرار البناء. |
-| 🌍 **الترجمة**        | تغطية 100% لجميع الشاشات      |
-
----
-
-<div align="center">
-
-## 🌅 Fajrak — فجرك
-
-**مبني بـ ❤️ من الأردن للعالم العربي**
-
-[![GitHub](https://img.shields.io/badge/GitHub-Abdoocoder-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Abdoocoder)
-[![Website](https://img.shields.io/badge/Website-fajrak.com-FF6B35?style=for-the-badge)](https://fajrak.com)
-[![Download](https://img.shields.io/badge/APK-Download-38ef7d?style=for-the-badge)](https://fajrak.com/download)
-
-**© 2026 Fajrak — كلنا نحلم بالثراء، هنا تبدأ الرحلة**
-
-</div>
+## 📁 Project Structure
+
+```
+lib/
+├── main.dart                 # App entry point
+├── app_state.dart            # Global state (theme, locale, alerts)
+├── core/                     # Core theme & styling
+├── database/                 # Database connections
+├── models/                   # Data models
+├── providers/                # State providers
+├── screens/                  # Feature screens (22 screens)
+│   ├── auth/                 # Login, register, onboarding
+│   ├── dashboard/            # Main dashboard
+│   ├── accounts/             # Account management
+│   ├── transactions/         # Transaction management
+│   ├── debts/                # Debt tracking
+│   ├── budgets/              # Budget management
+│   ├── goals/                # Savings goals
+│   ├── investments/          # Investment tracking
+│   ├── alerts/               # Smart alerts
+│   ├── chat/                 # BYOK AI chat
+│   ├── more/                 # Calculators, settings
+│   └── settings/             # App settings
+├── services/                 # Business logic & API calls
+│   ├── accounts_service.dart
+│   ├── currency_service.dart
+│   ├── notification_service.dart
+│   ├── sync_service.dart
+│   └── byok/                 # Bring Your Own Key AI
+├── utils/                    # Helpers & utilities
+└── widgets/                  # Reusable UI components
+```
+
+## 🔑 Key Features
+
+- **Multi-currency support** with real-time exchange rates
+- **Offline-first** with Supabase sync
+- **BYOK AI Chat** - Bring your own LLM key
+- **Smart notifications** with Firebase
+- **PDF reports** with charts
+- **Zakat & FIRE calculators**
+- **Arabic/English** localization with RTL support
+- **Material 3** theming with Cairo font
+
+## 🔐 Security
+
+- **Never commit** `.env`, `google-services.json`, or keystore files
+- API keys stored in `--dart-define` at build time
+- BYOK keys encrypted in secure storage (device only)
+- Supabase RLS policies enforce data isolation
+
+## 📱 Platform Support
+
+| Platform | Status |
+|----------|--------|
+| Android  | ✅     |
+| iOS      | ✅     |
+| Web      | ✅     |
+| Linux    | ✅     |
+| macOS    | ⚠️     |
+| Windows  | ⚠️     |
+
+## 🤝 Contributing
+
+1. Follow `flutter_lints` style guide
+2. Use conventional commits: `feat:`, `fix:`, `chore:`, `docs:`
+3. Add tests for new features
+4. Update localization files (`assets/i18n/ar.json`, `en.json`)
+
+## 📄 License
+
+Proprietary - All rights reserved.
