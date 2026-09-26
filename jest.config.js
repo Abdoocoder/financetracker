@@ -10,6 +10,8 @@ const customJestConfig = {
     testEnvironment: 'jest-environment-jsdom',
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/$1',
+        '^@/lib/byok/crypto-utils$': '<rootDir>/lib/byok/crypto-utils.ts',
+        '^@/lib/byok/(.*)\\.js$': '<rootDir>/lib/byok/$1.ts',
     },
     testMatch: [
         '**/__tests__/**/*.[jt]s?(x)',

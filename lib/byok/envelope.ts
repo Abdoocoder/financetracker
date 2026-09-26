@@ -21,6 +21,8 @@
  * SERVER-ONLY: imports Node's global Web Crypto. Do not import into client code.
  */
 
+import { base64ToBytes, copyToArrayBuffer, pemToArrayBuffer, zeroBytes } from './crypto-utils'
+
 const PRIVATE_KEY_PEM = process.env.BYOK_PRIVATE_KEY ?? ''
 const KEK_ID = process.env.BYOK_KEK_ID ?? ''
 
@@ -35,31 +37,6 @@ if (!KEK_ID) {
 }
 
 const decoder = new TextDecoder()
-
-/** base64 → a fresh Uint8Array backed by a plain ArrayBuffer (Web Crypto-safe). */
-function base64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
-  const bin = Buffer.from(b64, 'base64')
-  return copyToArrayBuffer(bin)
-}
-
-/** Copy bytes into a fresh Uint8Array over a plain ArrayBuffer (Web Crypto-safe). */
-function copyToArrayBuffer(src: Uint8Array): Uint8Array<ArrayBuffer> {
-  const out = new Uint8Array(src.byteLength)
-  out.set(src)
-  return out
-}
-
-/** Strip PEM armor → DER bytes (base64 body only). */
-function pemToArrayBuffer(pem: string): ArrayBuffer {
-  const b64 = pem
-    .replace(/-----BEGIN [^-]+-----/g, '')
-    .replace(/-----END [^-]+-----/g, '')
-    .replace(/\s+/g, '')
-  const bytes = Buffer.from(b64, 'base64')
-  const out = new Uint8Array(bytes.byteLength)
-  out.set(bytes)
-  return out.buffer as ArrayBuffer
-}
 
 /** Import the RSA private key once (PKCS#8, RSA-OAEP SHA-256). */
 let keyPromise: Promise<CryptoKey> | null = null
@@ -147,19 +124,13 @@ export async function unwrapProviderKey(
   return key
 }
 
-/** Zero a Uint8Array in place so the secret doesn't linger in memory. */
-export function zeroBytes(bytes: Uint8Array | ArrayBuffer): void {
-  try {
-    const view = bytes instanceof Uint8Array
-      ? bytes
-      : new Uint8Array(bytes as ArrayBuffer)
-    view.fill(0)
-  } catch {
-    /* best-effort — ignore */
-  }
-}
-
 /** Whether the RSA private key env is configured (short-circuit 500 early). */
 export function isKekConfigured(): boolean {
   return Boolean(PRIVATE_KEY_PEM && KEK_ID)
 }
+
+/** Re-export zeroBytes for testing and internal use. */
+export { zeroBytes } from './crypto-utils'
+
+/** Re-export key rotation functions for backward compatibility. */
+export { unwrapProviderKeyWithRotation, getCurrentKeyId, isValidKeyId } from '@/lib/byok/key-rotation'

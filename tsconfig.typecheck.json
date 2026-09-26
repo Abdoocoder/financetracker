@@ -10,7 +10,8 @@
     ".next",
     "coverage",
     "playwright-report",
-    "test-results"
+    "test-results",
+    "headroom"
   ]
 }
 
