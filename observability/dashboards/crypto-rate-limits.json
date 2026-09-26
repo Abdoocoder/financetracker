@@ -1,0 +1,126 @@
+{
+  "dashboard": {
+    "uid": "fajrak-crypto-rate-limits",
+    "title": "Fajrak Crypto & Rate Limits",
+    "tags": ["fajrak", "crypto", "rate-limits", "security"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+        "title": "Crypto Unwrap Failures",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(crypto_unwrap_failures_total[1m])",
+            "legendFormat": "{{provider_id}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "ops" }
+        }
+      },
+      {
+        "id": 2,
+        "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+        "title": "Key Rotation Events",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(crypto_key_rotation_events_total[1h])",
+            "legendFormat": "{{key_id}} - {{count}} keys rotated",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "events/h" }
+        }
+      },
+      {
+        "id": 3,
+        "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+        "title": "Envelope Encryption/Decryption Errors",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(crypto_envelope_errors_total[1m])",
+            "legendFormat": "Envelope Errors",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "ops" }
+        }
+      },
+      {
+        "id": 4,
+        "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+        "title": "Proxy Rate Limit Usage (per user, per min)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate_limit_proxy_usage",
+            "legendFormat": "{{user_id}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 20 }, { "color": "red", "value": 30 }] }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+        "title": "PAT Rate Limit Usage (per key, per min)",
+        "type": "timeseries",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate_limit_pat_usage",
+            "legendFormat": "{{key_id}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 7 }, { "color": "red", "value": 10 }] }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+        "title": "Top Users by Proxy Usage",
+        "type": "table",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "topk(10, rate_limit_proxy_usage)",
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "short" }
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}
