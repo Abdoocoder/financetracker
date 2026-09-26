@@ -311,6 +311,38 @@ flutter run -d <device_id>
 flutter devices
 ```
 
+### 🌐 تشغيل Flutter Web (مهم: إصلاح CORS)
+
+عند تشغيل `flutter run -d chrome`، يبدي الخادم على منفذ عشوائي (مثلاً `36727`). **Supabase Auth يحظر الطلبات من منافذ غير مصرح بها.**
+
+**الخطأ المتوقع:**
+```
+Access to fetch at 'https://ujwcvtpwsaidljecqbaa.supabase.co/auth/v1/token' 
+from origin 'http://localhost:36727' has been blocked by CORS policy
+```
+
+**إصلاح (اختر واحداً):**
+
+**خيار أ — إضافة المنفذ في Supabase Dashboard (موصى به):**
+1. افتح: https://supabase.com/dashboard/project/ujwcvtpwsaidljecqbaa
+2. اذهب إلى **Authentication → URL Configuration**
+3. في **Additional Redirect URLs** أضف:
+   ```
+   http://localhost:36727
+   http://127.0.0.1:36727
+   ```
+4. اضغط **Save**
+
+**خيار ب — تشغيل على منفذ 3000 (مصرح به مسبقاً):**
+```bash
+flutter run -d chrome --web-port=3000
+```
+ثم افتح `http://localhost:3000` — إعداد `site_url` في `supabase/config.toml` هو `http://127.0.0.1:3000` بالفعل.
+
+> ⚠️ خطأ `504 Gateway Timeout` في الكونسول هو **نتيجة جانبية** لفشل CORS — الطلب الفعلي لا يصل للخادم.
+
+---
+
 ### 6. بناء APK للإصدار
 
 ```bash

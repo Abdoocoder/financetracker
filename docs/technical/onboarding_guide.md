@@ -171,7 +171,42 @@ make doctor
 - Development (http://localhost:3000) omits it to prevent SPA router navigations from being rewritten to https → `ERR_SSL_PROTOCOL_ERROR`
 - Regression test: `__tests__/proxy-csp.test.ts` mocks NODE_ENV via `Object.defineProperty`
 
-## 14. Live-audit drift notes (Sep 2026)
+## 14. Common Development Issues
+
+### 14.1 Flutter Web CORS Error on Supabase Auth
+
+**Error:**
+```
+Access to fetch at 'https://ujwcvtpwsaidljecqbaa.supabase.co/auth/v1/token?grant_type=password' 
+from origin 'http://localhost:36727' has been blocked by CORS policy
+```
+
+**Cause:** The Flutter web dev server runs on a random port (e.g., `36727`), but the remote Supabase project's Auth configuration only allows specific origins.
+
+**Fix (choose one):**
+
+**Option A — Add to Supabase Dashboard (recommended):**
+1. Open: https://supabase.com/dashboard/project/ujwcvtpwsaidljecqbaa
+2. Go to **Authentication** → **URL Configuration**
+3. In **Additional Redirect URLs**, add:
+   ```
+   http://localhost:36727
+   http://127.0.0.1:36727
+   ```
+4. Click **Save**
+
+**Option B — Run on fixed port 3000 (already allowed):**
+```bash
+cd mobile/fajrak_flutter
+flutter run -d chrome --web-port=3000
+```
+Then open `http://localhost:3000` — the `site_url` in `supabase/config.toml` is already `http://127.0.0.1:3000`.
+
+> The 504 Gateway Timeout in the error is a side effect of the CORS preflight failing — the actual auth request never reaches the server.
+
+---
+
+## 15. Live-audit drift notes (Sep 2026)
 
 From a live Supabase/GitHub MCP audit performed Sep 2026. **Repo schema lags production** — the live DB has prod-only objects added via the SQL editor that are not in `supabase/migrations/`:
 
