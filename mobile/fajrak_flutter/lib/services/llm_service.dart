@@ -133,16 +133,16 @@ class SecureKeyStore implements SecureStore {
 
   @override
   Future<void> write({required String key, required String value}) async {
-    await _storage.write(key: key, value: value, aOptions: AndroidOptions());
+    await _storage.write(key: key, value: value, aOptions: const AndroidOptions());
   }
 
   @override
   Future<String?> read({required String key}) async {
-    return _storage.read(key: key, aOptions: AndroidOptions());
+    return _storage.read(key: key, aOptions: const AndroidOptions());
   }
 
   @override
   Future<void> delete({required String key}) async {
-    await _storage.delete(key: key, aOptions: AndroidOptions());
+    await _storage.delete(key: key, aOptions: const AndroidOptions());
   }
 }

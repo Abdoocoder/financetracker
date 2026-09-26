@@ -33,7 +33,7 @@ class TransactionListItem extends StatelessWidget {
           child: Icon(Icons.delete_outline, size: 14, color: Colors.red[400]),
         );
       case 'failed':
-        return Tooltip(
+        return const Tooltip(
           message: 'فشلت المزامنة',
           child: Icon(Icons.error_outline, size: 14, color: Colors.red),
         );

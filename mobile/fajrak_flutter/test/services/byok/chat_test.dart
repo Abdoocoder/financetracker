@@ -11,10 +11,10 @@ Map<String, dynamic> _decode(Object? body) =>
         : jsonDecode(body as String) as Map<String, dynamic>;
 
 void main() {
-  final system = 'You are a helpful assistant.';
+  const system = 'You are a helpful assistant.';
   final msgs = [
-    ChatMsg(role: 'user', content: 'Hello'),
-    ChatMsg(role: 'assistant', content: 'Hi there'),
+    const ChatMsg(role: 'user', content: 'Hello'),
+    const ChatMsg(role: 'assistant', content: 'Hi there'),
   ];
 
   group('buildChatBody', () {
@@ -99,7 +99,7 @@ void main() {
   group('readStream', () {
     final openaiFrame =
         'data: ${jsonEncode({'choices': [{'delta': {'content': 'tok'}}]})}\n\n';
-    final done = 'data: [DONE]\n\n';
+    const done = 'data: [DONE]\n\n';
 
     test('accumulates deltas across chunk-split boundaries', () async {
       final body = openaiFrame + done;
@@ -115,8 +115,8 @@ void main() {
 
     test('tolerates malformed frames and splits mid-frame', () async {
       // Two "tok" frames interleaved with a malformed frame, split mid-line.
-      final a = 'data: {"choices":[{"delta":{"content":"t';
-      final b = 'o"}}]}\n\njunk\n\ndata: [DONE]';
+      const a = 'data: {"choices":[{"delta":{"content":"t';
+      const b = 'o"}}]}\n\njunk\n\ndata: [DONE]';
       final streamed = http.StreamedResponse(
         Stream.fromIterable([
           utf8.encode(a),

@@ -180,8 +180,8 @@ void main() {
     });
 
     test('deltas split across network chunks are accumulated', () async {
-      final a = 'data: {"choices":[{"delta":{"content":"t';
-      final b = 'o"}}]}\n\ndata: [DONE]\n\n';
+      const a = 'data: {"choices":[{"delta":{"content":"t';
+      const b = 'o"}}]}\n\ndata: [DONE]\n\n';
       final store = InMemorySecureStore();
       await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
       final svc = service(

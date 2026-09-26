@@ -247,7 +247,7 @@ class PdfReportService {
           pw.Directionality(
             textDirection: pw.TextDirection.rtl,
             child: pw.Table(
-              border: pw.TableBorder(
+              border: const pw.TableBorder(
                 horizontalInside: pw.BorderSide(color: _border, width: 0.5),
                 bottom: pw.BorderSide(color: _border, width: 0.5),
               ),
@@ -296,7 +296,7 @@ class PdfReportService {
             pw.Directionality(
               textDirection: pw.TextDirection.rtl,
               child: pw.Table(
-                border: pw.TableBorder(
+                border: const pw.TableBorder(
                   horizontalInside: pw.BorderSide(color: _border, width: 0.5),
                 ),
                 columnWidths: {

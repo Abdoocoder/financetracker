@@ -43,7 +43,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final allCurrencies = CurrencyService.currencies;
+    const allCurrencies = CurrencyService.currencies;
 
     final filtered = _query.isEmpty
         ? allCurrencies

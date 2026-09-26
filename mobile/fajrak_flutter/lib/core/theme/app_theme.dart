@@ -100,13 +100,13 @@ abstract final class AppTheme {
           borderRadius: AppRadius.borderMd,
           borderSide: BorderSide(color: primary, width: 1.5),
         ),
-        errorBorder: OutlineInputBorder(
+        errorBorder: const OutlineInputBorder(
           borderRadius: AppRadius.borderMd,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: AppColors.error),
         ),
-        focusedErrorBorder: OutlineInputBorder(
+        focusedErrorBorder: const OutlineInputBorder(
           borderRadius: AppRadius.borderMd,
-          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+          borderSide: BorderSide(color: AppColors.error, width: 1.5),
         ),
         labelStyle: AppTypography.body.copyWith(color: onSurfaceVariant),
         hintStyle: AppTypography.body.copyWith(color: onSurfaceVariant.withValues(alpha: 0.6)),

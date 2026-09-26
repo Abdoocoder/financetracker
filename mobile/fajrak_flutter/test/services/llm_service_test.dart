@@ -36,7 +36,6 @@ void main() {
       url: 'https://test.supabase.co',
       publishableKey: 'anon-key',
       httpClient: MockClient((req) async => http.Response('{}', 404)),
-      authOptions: const FlutterAuthClientOptions(persistSession: false),
     );
   });
 

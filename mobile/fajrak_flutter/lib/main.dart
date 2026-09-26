@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 
 import 'app_state.dart';
 import 'screens/splash_screen.dart';
@@ -32,7 +33,6 @@ import 'screens/help/help_screen.dart';
 import 'screens/learn/learn_screen.dart';
 import 'utils/error_handler.dart';
 import 'services/notification_service.dart';
-import 'services/sync_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,14 +43,14 @@ Future<void> main() async {
   // Initialize Firebase
   if (kIsWeb) {
     await Firebase.initializeApp(
-      options: FirebaseOptions(
-        apiKey: const String.fromEnvironment('FIREBASE_API_KEY'),
-        authDomain: const String.fromEnvironment('FIREBASE_AUTH_DOMAIN'),
-        projectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
-        storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
-        messagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
-        appId: const String.fromEnvironment('FIREBASE_APP_ID'),
-        measurementId: const String.fromEnvironment('FIREBASE_MEASUREMENT_ID'),
+      options: const FirebaseOptions(
+        apiKey: String.fromEnvironment('FIREBASE_API_KEY'),
+        authDomain: String.fromEnvironment('FIREBASE_AUTH_DOMAIN'),
+        projectId: String.fromEnvironment('FIREBASE_PROJECT_ID'),
+        storageBucket: String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
+        messagingSenderId: String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+        appId: String.fromEnvironment('FIREBASE_APP_ID'),
+        measurementId: String.fromEnvironment('FIREBASE_MEASUREMENT_ID'),
       ),
     );
   } else {
@@ -60,14 +60,15 @@ Future<void> main() async {
   // Initialize Supabase
   await Supabase.initialize(
     url: const String.fromEnvironment('SUPABASE_URL'),
-    anonKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    publishableKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
   );
 
   // Initialize notification service
   await NotificationService.initialize();
 
-  // Initialize sync service
-  await SyncService.initialize();
+  // Initialize sync service (deferred until after authentication)
+  // SyncService.initialize() requires AppDatabase which needs encryption key from auth session
+  // It will be initialized in the auth state listener after user logs in
 
   runApp(
     EasyLocalization(
@@ -78,6 +79,8 @@ Future<void> main() async {
     ),
   );
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -119,6 +122,7 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           title: 'Fajrak',
           debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
@@ -145,7 +149,7 @@ class _MyAppState extends State<MyApp> {
             '/alerts': (context) => const AlertsScreen(),
             '/chat': (context) => const ChatScreen(),
             '/more': (context) => const MoreScreen(),
-            '/fire-calculator': (context) => const FireCalculatorScreen(),
+            '/fire-calculator': (context) => const FIRECalculatorScreen(),
             '/zakat-calculator': (context) => const ZakatCalculatorScreen(),
             '/settings': (context) => const SettingsScreen(),
             '/notification-settings': (context) => const NotificationSettingsScreen(),

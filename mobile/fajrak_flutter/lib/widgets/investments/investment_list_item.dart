@@ -399,7 +399,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
             child: Text('inv_tx_history'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           )),
@@ -418,7 +418,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
             child: Text('inv_record_buy'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           )),
@@ -439,7 +439,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8))),
             child: Text('inv_record_sell'.tr(),
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700)),
           ),
@@ -483,7 +483,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Colors.white))
                         : Text('inv_submit_btn'.tr(),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w900,
                                 fontSize: 12)),
                   )),
@@ -537,7 +537,7 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, color: Colors.white))
                         : Text('inv_sell_confirm_btn'.tr(),
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w900,
                                 fontSize: 12)),
                   )),
