@@ -10,7 +10,7 @@
 var mockGetUser = jest.fn()
 var mockRpc = jest.fn()
 var mockCreateClient = jest.fn()
-var mockUnwrapProviderKey = jest.fn()
+var mockUnwrapProviderKeyWithRotation = jest.fn()
 var mockIsKekConfigured = jest.fn()
 var mockZeroBytes = jest.fn()
 
@@ -19,7 +19,7 @@ jest.mock('@/lib/supabase/server', () => ({
 }))
 
 jest.mock('@/lib/byok/envelope', () => ({
-  unwrapProviderKey: (...args: any[]) => mockUnwrapProviderKey(...args),
+  unwrapProviderKeyWithRotation: (...args: any[]) => mockUnwrapProviderKeyWithRotation(...args),
   isKekConfigured: () => mockIsKekConfigured(),
   zeroBytes: (...args: any[]) => mockZeroBytes(...args),
 }))
@@ -32,7 +32,7 @@ beforeEach(() => {
   mockGetUser.mockReset()
   mockRpc.mockReset()
   mockCreateClient.mockReset()
-  mockUnwrapProviderKey.mockReset().mockResolvedValue('sk-test-key')
+  mockUnwrapProviderKeyWithRotation.mockReset().mockResolvedValue('sk-test-key')
   mockIsKekConfigured.mockReset().mockReturnValue(true)
   mockZeroBytes.mockReset()
   global.fetch = jest.fn()
@@ -65,7 +65,7 @@ function makeProxyRequest(body: unknown, authHeader?: string) {
   })
 }
 
-const BEARER = 'Bearer eyJhbGciOiJSUzI1NiJ9.valid.jwt'
+const BEARER = 'Bearer eyJhbG...alid.jwt'
 
 // ─── Auth: cookie session path ────────────────────────────────────────────────
 
@@ -104,7 +104,7 @@ describe('POST /api/byok/proxy — bearer JWT auth (Flutter, D1)', () => {
     )
     const res = await POST(makeProxyRequest({}, BEARER))
     expect(res.status).toBe(200)
-    expect(mockCreateClient).toHaveBeenCalledWith('eyJhbGciOiJSUzI1NiJ9.valid.jwt')
+    expect(mockCreateClient).toHaveBeenCalledWith('eyJhbG...alid.jwt')
   })
 
   it('returns 401 when the bearer JWT is invalid/rejected', async () => {
