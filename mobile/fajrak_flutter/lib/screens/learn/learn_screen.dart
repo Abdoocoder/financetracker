@@ -312,10 +312,10 @@ class _LearnScreenState extends State<LearnScreen> {
       const double H = 1350;
 
       final recorder = ui.PictureRecorder();
-      final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, W, H));
+      final canvas = Canvas(recorder, const Rect.fromLTWH(0, 0, W, H));
 
       // 1. Background
-      final Rect bgRect = Rect.fromLTWH(0, 0, W, H);
+      const Rect bgRect = Rect.fromLTWH(0, 0, W, H);
       final Paint bgPaint = Paint()
         ..shader = ui.Gradient.linear(
           const Offset(0, 0),
@@ -351,7 +351,7 @@ class _LearnScreenState extends State<LearnScreen> {
 
       canvas.save();
       canvas.clipRRect(RRect.fromRectAndRadius(
-          Rect.fromLTWH(logoX, logoY, logoSize, logoSize),
+          const Rect.fromLTWH(logoX, logoY, logoSize, logoSize),
           const Radius.circular(24)));
       canvas.drawImage(logo, const Offset(logoX, logoY), Paint());
       canvas.restore();
@@ -448,7 +448,7 @@ class _LearnScreenState extends State<LearnScreen> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lesson link copied to clipboard')),
+            const SnackBar(content: Text('Lesson link copied to clipboard')),
           );
         }
         return;
@@ -460,11 +460,9 @@ class _LearnScreenState extends State<LearnScreen> {
 
       if (!mounted) return;
       final isAr = context.locale.languageCode == 'ar';
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          text: isAr ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak",
-        ),
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: isAr ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak",
       );
     } catch (e, st) {
       if (mounted) {

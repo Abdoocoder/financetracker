@@ -6,6 +6,11 @@ import 'dart:developer' as dev;
 import 'dart:io';
 
 class ErrorHandler {
+  static void setup() {
+    // Initialization logic can be added here if needed
+    // Currently a no-op placeholder for future initialization
+  }
+
   static bool _isNetworkError(dynamic error) {
     final msg = error.toString().toLowerCase();
     return error is SocketException ||

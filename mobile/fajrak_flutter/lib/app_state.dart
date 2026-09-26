@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_app_badge_control/flutter_app_badge_control.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'core/theme/app_theme.dart';
 
 class AppState extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
@@ -12,6 +13,9 @@ class AppState extends ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
   int get transactionVersion => _transactionVersion;
+  
+  ThemeData get themeData => AppTheme.light;
+  ThemeData get darkThemeData => AppTheme.dark;
 
   void notifyTransactionChanged() {
     _transactionVersion++;

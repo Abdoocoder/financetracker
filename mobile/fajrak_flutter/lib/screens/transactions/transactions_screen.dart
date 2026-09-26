@@ -262,7 +262,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         await Clipboard.setData(ClipboardData(text: csvText));
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('CSV copied to clipboard — paste into a .csv file')),
+            const SnackBar(content: Text('CSV copied to clipboard — paste into a .csv file')),
           );
         }
       } else {
@@ -271,10 +271,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         final file = File('${dir.path}/fajrak_transactions_$ts.csv');
         await file.writeAsString('\u{feff}${buffer.toString()}', encoding: utf8);
 
-        await SharePlus.instance.share(ShareParams(
-          files: [XFile(file.path, mimeType: 'text/csv')],
+        await Share.shareXFiles(
+          [XFile(file.path, mimeType: 'text/csv')],
           subject: 'trans_title'.tr(),
-        ));
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -330,8 +330,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('حدث خطأ أثناء إنشاء التقرير',
-              style: const TextStyle()),
+          content: const Text('حدث خطأ أثناء إنشاء التقرير',
+              style: TextStyle()),
           backgroundColor: Theme.of(context).colorScheme.error,
         ));
       }

@@ -1,8 +1,6 @@
-// Unsupported platform database connection
-import 'package:supabase_flutter/supabase_flutter.dart';
+// Unsupported platform database connection (fallback)
+import 'package:drift/drift.dart';
 
-class UnsupportedDatabaseConnection {
-  static SupabaseClient get client {
-    throw UnsupportedError('Database not supported on this platform');
-  }
+QueryExecutor buildDatabaseConnection(String encryptionKey) {
+  throw UnsupportedError('Database not supported on this platform');
 }

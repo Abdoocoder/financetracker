@@ -1,40 +1,19 @@
-// Web-specific database connection using Supabase
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:html' as html;
-import 'dart:js_util' as js_util;
+// Web-specific database connection using Drift with IndexedDB
+// TODO: Migrate to package:drift/wasm.dart (requires sqlite3.wasm + worker setup)
+// See: https://drift.simonbinder.eu/web/#drift-wasm
+// ignore: deprecated_member_use
+import 'package:drift/drift.dart';
+// ignore: deprecated_member_use
+import 'package:drift/web.dart';
 
-class WebDatabaseConnection {
-  static SupabaseClient? _client;
-  
-  static SupabaseClient get client {
-    if (_client == null) {
-      // Read environment variables from window.ENV (set in index.html)
-      final env = js_util.getProperty(html.window, 'ENV');
-      
-      String? url;
-      String? anonKey;
-      
-      if (env != null) {
-        url = js_util.getProperty(env, 'SUPABASE_URL') as String?;
-        anonKey = js_util.getProperty(env, 'SUPABASE_ANON_KEY') as String?;
-      }
-      
-      // Fallback to dart-define values
-      url ??= const String.fromEnvironment('SUPABASE_URL');
-      anonKey ??= const String.fromEnvironment('SUPABASE_ANON_KEY');
-      
-      if (url == null || url.isEmpty || anonKey == null || anonKey.isEmpty) {
-        throw StateError('Supabase credentials not configured. '
-            'Set SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define or in web/index.html');
-      }
-      
-      _client = SupabaseClient(url, anonKey);
-    }
-    return _client!;
-  }
-  
-  // Allow re-initialization (useful for testing or config changes)
-  static void reset() {
-    _client = null;
-  }
+QueryExecutor buildDatabaseConnection(String encryptionKey) {
+  // On web, we use WebDatabase with IndexedDB storage
+  // The encryptionKey is ignored on web platform (no browser encryption support)
+  // ignore: experimental_member_use
+  final storage = DriftWebStorage.indexedDb('fajrak_offline_db');
+  return WebDatabase.withStorage(
+    storage,
+    logStatements: false,
+    readIntsAsBigInt: true,
+  );
 }

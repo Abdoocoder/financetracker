@@ -61,8 +61,8 @@ class _MonthSummaryCardState extends State<MonthSummaryCard> {
         ? (prevSaved / widget.prevIncome * 100).round()
         : 0;
 
-    final green = AppColors.success;
-    final red = AppColors.error;
+    const green = AppColors.success;
+    const red = AppColors.error;
     final accentColor = isPositive ? green : red;
 
     String fmt(double n) {

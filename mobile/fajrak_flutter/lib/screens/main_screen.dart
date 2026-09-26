@@ -10,14 +10,16 @@ import 'more/more_screen.dart';
 import '../widgets/main_screen/main_bottom_nav_bar.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({super.key, this.initialTab = 4});
+
+  final int initialTab;
 
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 4; // Default to Dashboard
+  late int _currentIndex;
 
   // Track which tabs have been visited — only build a screen on first visit.
   late final List<bool> _visited;
@@ -33,6 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialTab.clamp(0, _screens.length - 1);
     // Mark only the initial tab as visited.
     _visited = List.generate(_screens.length, (i) => i == _currentIndex);
     WidgetsBinding.instance.addPostFrameCallback((_) {

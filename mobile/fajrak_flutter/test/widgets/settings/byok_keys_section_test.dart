@@ -182,7 +182,6 @@ void main() {
       url: 'https://test.supabase.co',
       publishableKey: 'anon-key',
       httpClient: MockClient(_handler),
-      authOptions: const FlutterAuthClientOptions(persistSession: false),
     );
   });
 
