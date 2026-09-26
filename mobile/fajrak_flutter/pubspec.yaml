@@ -19,9 +19,9 @@ dependencies:
   supabase_flutter: ^2.3.4
 
   # Firebase
-  firebase_core: ^2.24.2
-  firebase_messaging: ^14.7.10
-  firebase_analytics: ^10.7.4
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
+  firebase_analytics: ^12.6.0
 
   # Localization
   easy_localization: ^3.0.3
