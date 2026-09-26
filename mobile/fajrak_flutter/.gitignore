@@ -54,3 +54,6 @@ key.properties
 .env
 .env.local
 .env.*.local
+
+# Local run scripts
+run_web.sh
