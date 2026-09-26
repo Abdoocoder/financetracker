@@ -4,7 +4,12 @@ Connect AI assistants (ChatGPT, Claude, Zapier, custom bots) to Fajrak for conve
 
 ## Overview
 
-Fajrak exposes two API transports that allow external AI assistants to **create** financial transactions and **read** transaction/balance data on behalf of the user: The AI translates natural language into structured JSON and POSTs/GETs the webhook.
+Fajrak exposes **two API transports** that allow external AI assistants to **create** financial transactions and **read** transaction/balance data on behalf of the user:
+
+1. **REST Webhook** (`/api/webhook/transaction`) — Simple HTTP integration
+2. **MCP Server** (`/api/mcp`) — Model Context Protocol over Streamable HTTP for native LLM function-calling
+
+The AI translates natural language into structured JSON and calls the appropriate endpoint.
 
 ```
 User: "سجل 15 دينار بنزين في محطة الوقود"
@@ -20,7 +25,7 @@ GET /api/webhook/transaction?action=transactions&from=2026-08-01 → Returns tra
 
 ## API Scopes
 
-Each API key is assigned one or more scopes at creation:
+Each API key (`fjk_live_...`) is assigned one or more scopes at creation:
 
 | Scope | HTTP Method | Description |
 |-------|------------|-------------|
@@ -28,11 +33,15 @@ Each API key is assigned one or more scopes at creation:
 | `read_transactions` | GET | Fetch transaction history with filters |
 | `read_balances` | GET | Fetch account balances via RPC |
 
-Keys created before Phase 2 have only `create_transaction`. To enable reads, revoke the old key and create a new one (which gets all three scopes by default).
+Keys created before v3.39 had only `create_transaction`. To enable reads, revoke the old key and create a new one (which gets all three scopes by default).
 
-## Setup
+---
 
-### 1. Generate an API Key
+## 1. REST Webhook API (`/api/webhook/transaction`)
+
+### Setup
+
+#### 1. Generate an API Key
 
 1. Open Fajrak → **Settings** → **🔑 API Keys**
 2. Enter a name (e.g., "ChatGPT", "My Bot")
@@ -41,7 +50,7 @@ Keys created before Phase 2 have only `create_transaction`. To enable reads, rev
 
 The key format is: `fjk_live_<96-hex-chars>`
 
-### 2. Configure Your AI Assistant
+#### 2. Configure Your AI Assistant
 
 Add the following to your AI's system prompt or tool definition:
 
@@ -51,7 +60,7 @@ recording a transaction, use the webhook to create it.
 
 Endpoint: POST https://fajrak.com/api/webhook/transaction
 Headers:
-  Authorization: Bearer fjk_live_YOUR_KEY_HERE
+  Authorization: Bearer fjk_li...HERE
   Content-Type: application/json
 
 Body schema:
@@ -68,6 +77,7 @@ Body schema:
 ### 3. Valid Categories
 
 **Expense categories:**
+
 | Category | Translation |
 |----------|------------|
 | `إيجار / قسط` | Rent / Installment |
@@ -82,6 +92,7 @@ Body schema:
 | `أخرى` | Other |
 
 **Income categories:**
+
 | Category | Translation |
 |----------|------------|
 | `راتب` | Salary |
@@ -90,13 +101,13 @@ Body schema:
 | `مكافأة` | Bonus |
 | `أخرى` | Other |
 
-## Example Requests
+### Example Requests
 
-### Record an expense
+#### Record an expense
 
 ```bash
 curl -X POST https://fajrak.com/api/webhook/transaction \
-  -H "Authorization: Bearer fjk_live_abc123..." \
+  -H "Authorization: Bearer fjk_li...3..." \
   -H "Content-Type: application/json" \
   -d '{
     "type": "expense",
@@ -123,11 +134,11 @@ curl -X POST https://fajrak.com/api/webhook/transaction \
 }
 ```
 
-### Record income
+#### Record income
 
 ```bash
 curl -X POST https://fajrak.com/api/webhook/transaction \
-  -H "Authorization: Bearer fjk_live_abc123..." \
+  -H "Authorization: Bearer fjk_li...3..." \
   -H "Content-Type: application/json" \
   -d '{
     "type": "income",
@@ -138,13 +149,15 @@ curl -X POST https://fajrak.com/api/webhook/transaction \
   }'
 ```
 
-## Read Operations (GET)
+---
 
-### Fetch recent transactions
+### Read Operations (GET)
+
+#### Fetch recent transactions
 
 ```bash
 curl "https://fajrak.com/api/webhook/transaction?action=transactions&limit=10" \
-  -H "Authorization: Bearer fjk_live_abc123..."
+  -H "Authorization: Bearer fjk_li...3..."
 ```
 
 **Query parameters:**
@@ -179,11 +192,11 @@ curl "https://fajrak.com/api/webhook/transaction?action=transactions&limit=10" \
 }
 ```
 
-### Fetch account balances
+#### Fetch account balances
 
 ```bash
 curl "https://fajrak.com/api/webhook/transaction?action=balances" \
-  -H "Authorization: Bearer fjk_live_abc123..."
+  -H "Authorization: Bearer fjk_li...3..."
 ```
 
 **Response (200):**
@@ -197,32 +210,154 @@ curl "https://fajrak.com/api/webhook/transaction?action=balances" \
 }
 ```
 
-## Error Responses
+---
+
+### Error Responses
 
 | Status | Meaning | How to Fix |
 |--------|---------|-----------|
-| `400` | Validation error | Check body fields or query params (see schema above) |
+| `400` | Validation error | Check body fields or query params |
 | `401` | Invalid/revoked key | Generate a new key in Settings |
-| `403` | Key lacks scope | Ensure key has the required scope (`create_transaction`, `read_transactions`, or `read_balances`) |
+| `403` | Key lacks scope | Ensure key has required scope |
 | `413` | Payload too large | Keep POST request body under 1KB |
 | `429` | Rate limited | Wait and retry (default: 10 req/min per key) |
 
-## Rate Limits
+### Rate Limits
 
 - Default: **10 requests per minute** per API key
-- Rate limit headers returned: `X-RateLimit-Limit`, `X-RateLimit-Remaining`
+- Rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`
 - Max **5 active keys** per user
-- ⚠️ The limiter (`lib/rate-limit.ts`) is **in-memory (single-instance)**. On multi-region Vercel deployments each instance tracks its own window, so the 10/min guarantee is per-region instance, not global across all edges.
+- ⚠️ In-memory limiter (single-instance). On multi-region Vercel, limit is per-region instance.
 
-## Security
+### Security
 
-- API keys are **hashed with SHA-256** — never stored in plaintext
-- Keys are shown **only once** at creation
-- Each key is independent from your login credentials
-- Revoke any key instantly from Settings → API Keys
-- All API calls are **audit logged** with IP and user agent
-- **Scoped access**: each key can be limited to specific operations (create, read transactions, read balances)
-- READ endpoints return only the authenticated user's own data
+- API keys **hashed with SHA-256** — never stored in plaintext
+- Keys shown **only once** at creation
+- Each key independent from login credentials
+- Revoke instantly from Settings → API Keys
+- All calls **audit logged** with IP and user agent
+- **Scoped access**: each key limited to specific operations
+- READ endpoints return only authenticated user's data
+
+---
+
+## 2. MCP Server (`/api/mcp`)
+
+For LLMs that support MCP function-calling (Claude Desktop, Cursor, etc.), Fajrak exposes an MCP server over **Streamable HTTP** — no webhook wiring required.
+
+### Endpoint
+
+```
+POST https://fajrak.com/api/mcp
+```
+
+**Auth:** Same `Authorization: Bearer fjk_live_...` header.
+
+### Available Tools
+
+| Tool | Scope Required | Description |
+|------|---------------|-------------|
+| `get_balances` | `read_balances` | Returns all account names and current balances |
+| `get_cashflow_summary` | `read_transactions` | Monthly income vs. expenses summary |
+| `create_transaction` | `create_transaction` | Record a new income or expense |
+
+### Example — List Tools
+
+```bash
+curl -X POST https://fajrak.com/api/mcp \
+  -H "Authorization: Bearer fjk_li...3..." \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
+```
+
+### Example — Get Balances
+
+```bash
+curl -X POST https://fajrak.com/api/mcp \
+  -H "Authorization: Bearer fjk_li...3..." \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"get_balances"},"id":2}'
+```
+
+### Example — Create Transaction with Idempotency
+
+```bash
+curl -X POST https://fajrak.com/api/mcp \
+  -H "Authorization: Bearer fjk_li...3..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0",
+    "method":"tools/call",
+    "params":{
+      "name":"create_transaction",
+      "arguments":{
+        "type":"expense",
+        "amount":15,
+        "category":"مواصلات",
+        "transaction_date":"2026-08-26",
+        "idempotency_key":"unique-key-123"
+      }
+    },
+    "id":3
+  }'
+```
+
+**Idempotency:** The `idempotency_key` (UUID) prevents double-charge on retries. Duplicate requests with the same key return the original transaction.
+
+### MCP Authentication & Scopes
+
+- **PAT reuse:** Uses existing `fjk_live_...` keys (SHA-256 hashed, flat scopes)
+- **Dual scope gate:** HTTP-level (403 before tool) + tool-callback (defense in depth)
+- **Per-key rate limit:** 10 req/min (configurable per key)
+- **Audit logging:** Every tool call logged to `api_audit_log`
+
+### Transport Choice
+
+| Use Case | Transport |
+|----------|-----------|
+| Simple HTTP, Zapier, n8n, custom bots | **Webhook** (`/api/webhook/transaction`) |
+| Native MCP support (Claude, Cursor, etc.) | **MCP Server** (`/api/mcp`) |
+
+---
+
+## 3. BYOK Chat Assistant (Feature A)
+
+Fajrak includes a built-in **BYOK (Bring Your Own Key) Chat Assistant** for in-app conversational finance.
+
+### Features
+
+- **3 Providers:** Ollama (local, clientDirect), OpenRouter, NVIDIA NIM (via proxy)
+- **SSE Streaming** — real-time token streaming
+- **Key Rotation UI** — Settings → BYOK Keys → Rotate Key
+- **Vault-aware filtering** — Only shows keys with ciphertext on this device
+- **Moderation Layer** — Pre-output guardrails + DOMPurify post-output sanitization
+
+### Supported Providers (v1)
+
+| Provider | Kind | Default Model |
+|----------|------|---------------|
+| Ollama | clientDirect | llama3.1 |
+| OpenRouter | proxy | auto |
+| NVIDIA NIM | proxy | nvidia/nemotron-3-ultra-550b-a55b |
+
+### Client Configuration
+
+Fetch runtime config:
+
+```bash
+curl https://fajrak.com/api/byok/config
+```
+
+**Response:**
+```json
+{
+  "providers": [...],
+  "keyId": "kek-1",
+  "publicKey": "-----BEGIN PUBLIC KEY-----..."
+}
+```
+
+---
 
 ## ChatGPT Custom GPT Setup
 
@@ -234,95 +369,34 @@ curl "https://fajrak.com/api/webhook/transaction?action=balances" \
    with the user before sending. Use the user's current date for
    transaction_date unless they specify otherwise.
    ```
-3. Add an Action (OpenAPI schema):
-   ```json
-   {
-     "openapi": "3.1.0",
-     "info": { "title": "Fajrak Finance", "version": "1.1" },
-     "paths": {
-       "/api/webhook/transaction": {
-         "post": {
-           "operationId": "createTransaction",
-           "description": "Create a financial transaction in Fajrak",
-           "parameters": [{
-             "name": "Authorization",
-             "in": "header",
-             "required": true,
-             "schema": { "type": "string" }
-           }],
-           "requestBody": {
-             "required": true,
-             "content": {
-               "application/json": {
-                 "schema": {
-                   "type": "object",
-                   "required": ["type", "amount", "category", "transaction_date"],
-                   "properties": {
-                     "type": { "type": "string", "enum": ["income", "expense"] },
-                     "amount": { "type": "number", "minimum": 0.01 },
-                     "category": { "type": "string" },
-                     "description": { "type": "string", "maxLength": 500 },
-                     "transaction_date": { "type": "string", "format": "date" }
-                   }
-                 }
-               }
-             }
-           }
-         },
-         "get": {
-           "operationId": "readTransactions",
-           "description": "Read transactions or account balances from Fajrak",
-           "parameters": [
-             { "name": "Authorization", "in": "header", "required": true, "schema": { "type": "string" } },
-             { "name": "action", "in": "query", "schema": { "type": "string", "enum": ["transactions", "balances"] } },
-             { "name": "limit", "in": "query", "schema": { "type": "integer", "maximum": 50 } },
-             { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["income", "expense"] } },
-             { "name": "category", "in": "query", "schema": { "type": "string" } },
-             { "name": "from", "in": "query", "schema": { "type": "string", "format": "date" } },
-             { "name": "to", "in": "query", "schema": { "type": "string", "format": "date" } }
-           ]
-         }
-       }
-     }
-   }
-   ```
-4. Set the Authentication to **API Key** → Header → `Authorization` → Bearer → your `fjk_live_...` key
+3. Add an Action (OpenAPI schema) — see [original guide](#chatgpt-custom-gpt-setup)
+4. Set Authentication: **API Key** → Header → `Authorization` → Bearer → your `fjk_live_...` key
 
-## Alternative: MCP Server (Model Context Protocol)
+---
 
-For LLMs that support MCP function-calling (Claude, Cursor, etc.), Fajrak exposes an MCP server over Streamable HTTP — no webhook wiring required.
+## Rate Limits Summary
 
-**Endpoint:** `POST https://fajrak.com/api/mcp`
+| Endpoint | Limit | Window |
+|----------|-------|--------|
+| Webhook API | 10 req/min | per key |
+| MCP Server | 10 req/min | per key (configurable) |
+| BYOK Proxy | 30 req/min | per user (atomic counter) |
 
-**Auth:** Same `Authorization: Bearer fjk_live_…` header. No other configuration needed.
+---
 
-**Available tools:**
+## Error Responses
 
-| Tool | Scope Required | Description |
-|------|---------------|-------------|
-| `get_balances` | `read_balances` | Returns all account names and current balances |
-| `get_cashflow_summary` | `read_transactions` | Monthly income vs. expenses summary |
-| `create_transaction` | `create_transaction` | Record a new income or expense |
+| Status | Meaning | How to Fix |
+|--------|---------|-----------|
+| `400` | Validation error | Check body fields or query params |
+| `401` | Invalid/revoked key | Generate a new key in Settings |
+| `403` | Key lacks scope | Ensure key has required scope |
+| `409` | Idempotency key processing | Wait and retry |
+| `410` | Model/endpoint gone | Choose another model |
+| `429` | Rate limited | Wait and retry |
+| `502` | Upstream error | Retry or contact support |
 
-**Example — list tools:**
-```bash
-curl -X POST https://fajrak.com/api/mcp \
-  -H "Authorization: Bearer fjk_live_abc123..." \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
-```
-
-**Example — get balances:**
-```bash
-curl -X POST https://fajrak.com/api/mcp \
-  -H "Authorization: Bearer fjk_live_abc123..." \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"get_balances"},"id":2}'
-```
-
-**Transport choice:**
-- Use the **webhook** (`/api/webhook/transaction`) for simple HTTP integrations, Zapier, n8n, or custom bots.
-- Use the **MCP server** (`/api/mcp`) when the LLM supports MCP natively — it handles tool discovery and structured calling automatically.
+---
 
 ## Troubleshooting
 
@@ -332,3 +406,12 @@ curl -X POST https://fajrak.com/api/mcp \
 | Category rejected | Use exact Arabic category names from the table above. |
 | Transaction not showing | Check the Fajrak app — triggers may have auto-assigned an account. |
 | Rate limited | Reduce request frequency (default: 10/min). |
+| Idempotency duplicate | Expected — returns existing transaction with `idempotent_replay: true` |
+
+---
+
+## Version
+
+Current API version: **v3.42.0** (September 2026)
+
+See [Changelog](https://github.com/Abdoocoder/financetracker/blob/main/README.md#-changelog) for full history.
