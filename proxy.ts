@@ -22,7 +22,10 @@ export function buildCspHeader(nonce: string): string {
   const styleSrc = "style-src 'self' 'unsafe-inline'"
 
   // Allow localhost:11434 for Ollama direct connections in development
+  // Allow local Supabase (127.0.0.1:54321) for E2E tests
+  const isE2E = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('127.0.0.1') === true
   const ollamaConnectSrc = isDev ? ' http://localhost:11434' : ''
+  const localSupabaseConnectSrc = (isDev || isE2E) ? ' http://127.0.0.1:54321 ws://127.0.0.1:54321' : ''
 
   const directives = [
     "default-src 'self'",
@@ -32,7 +35,7 @@ export function buildCspHeader(nonce: string): string {
     "font-src 'self'",
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io${ollamaConnectSrc}`,
+    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io${ollamaConnectSrc}${localSupabaseConnectSrc}`,
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",

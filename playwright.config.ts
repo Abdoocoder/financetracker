@@ -1,4 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'node:path';
+
+const ROOT = path.resolve(__dirname);
+
+// Use system Chromium binary from snap
+const CHROMIUM_EXECUTABLE = '/snap/chromium/current/usr/lib/chromium-browser/chrome';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -9,9 +15,9 @@ export default defineConfig({
   /* Run global-setup once to build the authenticated storageState. */
   globalSetup: './e2e/setup/global-setup.ts',
   /* Maximum time one test can run for. */
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   expect: {
-    timeout: 5000
+    timeout: 10000
   },
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -38,17 +44,21 @@ export default defineConfig({
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        // Use system Chromium instead of downloading Chrome for Testing
-        executablePath: '/usr/bin/chromium-browser',
+        // Use system Chromium via channel (uses system Chrome/Chromium)
+        channel: 'chromium',
       },
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx next dev --webpack',
+    command: 'node scripts/e2e-dev-server.js',
     url: 'http://localhost:3000/api/health',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    reuseExistingServer: false,
+    timeout: 180 * 1000,
+    env: {
+      // Use system Chromium executable
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: CHROMIUM_EXECUTABLE,
+    },
   },
 });

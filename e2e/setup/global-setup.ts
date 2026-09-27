@@ -8,22 +8,26 @@ import { assertAuthenticatedSession } from './session';
 // deterministic and independent of where Playwright was launched from.
 const ROOT = path.resolve(__dirname, '..', '..');
 
-// Playwright's globalSetup runs in plain Node and does NOT auto-load .env.local
-// (that's Next.js build-time behavior). Load it explicitly so E2E_TEST_* vars
-// are available. override:true lets real shell-exported vars take precedence.
-loadEnv({ path: path.join(ROOT, '.env.local'), override: true });
+// Playwright's globalSetup runs in plain Node and does NOT auto-load .env files
+// (that's Next.js build-time behavior). Load the E2E-specific env file explicitly
+// so E2E_TEST_* vars and local Supabase credentials are available.
+loadEnv({ path: path.join(ROOT, '.env.e2e'), override: true });
 
 // StorageState written here MUST match the relative `storageState` string used
 // in the specs ('e2e/.auth/user.json'), which Playwright resolves from the
 // config file's directory (the project root).
 const AUTH_FILE = path.join(ROOT, 'e2e', '.auth', 'user.json');
 
+// Use system Chromium binary from snap (via env var or direct path)
+const CHROMIUM_EXECUTABLE = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || 
+  '/snap/chromium/current/usr/lib/chromium-browser/chrome';
+
 /**
  * Global setup: log in once with the dedicated E2E test account and persist
  * the authenticated session (cookies + localStorage) to storageState so that
  * authenticated specs can reuse it via test.use({ storageState }).
  *
- * Requires E2E_TEST_EMAIL and E2E_TEST_PASSWORD env vars (see .env.example).
+ * Requires E2E_TEST_EMAIL and E2E_TEST_PASSWORD env vars (see .env.e2e).
  * Uses Supabase PKCE flow — tokens live in localStorage, captured by
  * page.context().storageState().
  */
@@ -42,8 +46,8 @@ export default async function globalSetup(config: FullConfig) {
   const { baseURL } = config.projects[0].use;
   if (!baseURL) throw new Error('[global-setup] baseURL is not configured');
 
-  // Use system Chromium instead of downloading Chrome for Testing
-  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium-browser' });
+  // Use system Chromium binary directly
+  const browser = await chromium.launch({ executablePath: CHROMIUM_EXECUTABLE });
   const page = await browser.newPage();
 
   // The login UI renders Arabic (default here). Serve it in 'ar' so the Arabic
@@ -53,7 +57,8 @@ export default async function globalSetup(config: FullConfig) {
   });
 
   try {
-    await page.goto(`${baseURL}/login`);
+    // Increase timeout for initial page load (Next.js compilation on first request)
+    await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.getByPlaceholder('you@example.com').fill(email);
     await page.getByPlaceholder('••••••••').fill(password);
     await page.getByRole('button', { name: 'تسجيل الدخول' }).click();
