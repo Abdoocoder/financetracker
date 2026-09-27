@@ -42,7 +42,8 @@ export default async function globalSetup(config: FullConfig) {
   const { baseURL } = config.projects[0].use;
   if (!baseURL) throw new Error('[global-setup] baseURL is not configured');
 
-  const browser = await chromium.launch();
+  // Use system Chromium instead of downloading Chrome for Testing
+  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium-browser' });
   const page = await browser.newPage();
 
   // The login UI renders Arabic (default here). Serve it in 'ar' so the Arabic
