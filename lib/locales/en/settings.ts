@@ -113,4 +113,6 @@ export const enSettings = {
     settings_byok_keys_reenter: 'Re-enter key',
     settings_byok_keys_reentered: 'Key re-entered on this device',
     settings_byok_keys_vault_unavailable: 'The local key vault could not be opened (private browsing / unsupported browser). Saving or testing keys is disabled.',
+    settings_byok_keys_show_key: 'Show key',
+    settings_byok_keys_hide_key: 'Hide key',
 } as const

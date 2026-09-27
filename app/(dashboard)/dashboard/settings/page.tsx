@@ -284,9 +284,9 @@ export default function SettingsPage() {
         <ApiKeysSection />
       </AccordionCard>
 
-      <AccordionCard icon="🤖" title={t('settings_byok_keys') || "AI Provider Keys (BYOK)"}>
+<AccordionCard icon="🤖" title={t('settings_byok_keys') || "AI Provider Keys (BYOK)"} defaultOpen={true}>
         <BYOKKeysSection />
-      </AccordionCard>
+</AccordionCard>
 
       <AccordionCard icon="📥" title={t('settings_data')}>
         <ExportSection exporting={loadingStates.export} userId={currentUser?.id ?? ''} />
