@@ -2,6 +2,8 @@
 
 A Flutter finance tracking app with Supabase backend and Firebase integration.
 
+**Version:** 3.42.0+54 (matches web v3.42.0)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -173,7 +175,9 @@ lib/
 
 - **Multi-currency support** with real-time exchange rates
 - **Offline-first** with Supabase sync
-- **BYOK AI Chat** - Bring your own LLM key
+- **BYOK AI Chat v3.42.0** — Bring your own LLM key with 3 providers (Ollama clientDirect, OpenRouter + NVIDIA NIM via proxy), SSE streaming, key rotation UI, vault-aware filtering
+- **ClientDirect Ollama** — Local LLM on `http://localhost:11434/v1` (Android emulator: `http://10.0.2.2:11434/v1`)
+- **Network Security Config** — LAN CIDR allowances for local Ollama (no blanket cleartext)
 - **Smart notifications** with Firebase
 - **PDF reports** with charts
 - **Zakat & FIRE calculators**
