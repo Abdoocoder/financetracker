@@ -1,7 +1,7 @@
 name: fajrak
 description: Smart Finance Tracker - Flutter Mobile App
 publish_to: 'none'
-version: 1.0.0+1
+version: 3.42.0+54
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

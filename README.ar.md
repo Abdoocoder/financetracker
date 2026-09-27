@@ -665,6 +665,20 @@ npm run test:coverage
 
 ## 📝 سجل التغييرات
 
+### v3.42.0 — 2026-09-26 *(بيئة LLM مكتملة: BYOK + MCP + المراقبة)*
+
+| التغيير | الوصف |
+|:--------|:------|
+| 🔑 **مساعد الدردشة BYOK (الميزة أ)** | دردشة كاملة مع 3 مزودين (Ollama clientDirect، OpenRouter + NVIDIA NIM عبر الوكيل)، تدفق SSE، واجهة تدوير المفاتيح، تصفية الخزنة |
+| 🤖 **خادم MCP المالي (الميزة ب)** | Streamable HTTP مع `get_balances`، `get_cashflow_summary`، `create_transaction`؛ مصادقة PAT المعاد استخدامها؛ فرض النطاق (بوابة مزدوجة)؛ مفاتيح التكرار |
+| 🔐 **تدوير المفاتيح (AD-11)** | `keyId` على الأغلفة، سكريبت إعادة التشفير، واجهة في الإعدادات، مراقبة أخطاء فك التشفير |
+| 🛡️ **طبقة الاعتدال (AD-12)** | حواجز ما قبل المخرجات (الربا، الهلوسة، حقن الأوامر، الحدود) + تنظيف DOMPurify ما بعد المخرجات |
+| 🔄 **التكرار (AD-14)** | `idempotency_key` مطلوب على `create_transaction` — يمنع التحميل المزدوج عند إعادة المحاولة |
+| 🔧 **طبقة أدوات موحدة (AD-13)** | RPCs مشتركة (`get_account_balances`، `get_cashflow_summary`، `create_transaction`) مستخدمة من BYOK Chat و MCP Server — تزيل 4 نسخ من net worth |
+| 📊 **المراقبة (AD-15)** | مقاييس OpenTelemetry للوكيل/MCP/التشفير/حدود المعدل؛ 3 لوحات Grafana؛ 12 تنبيه PagerDuty مع Runbooks |
+| 📱 **تكافؤ Flutter BYOK** | شاشة الدردشة، قسم مفاتيح BYOK، Network Security Config (CIDR LAN)، clientDirect Ollama |
+| 🧪 **اختبارات E2E** | تدفق دردشة BYOK، MCP auth→tool→audit، تدوير المفاتيح؛ 561 اختبار ويب + 135 اختبار Flutter |
+
 ### v3.40.0 — 2026-09-08 *(تحسين تجربة BYOK)*
 
 | التغيير | الوصف |

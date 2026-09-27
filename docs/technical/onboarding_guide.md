@@ -10,7 +10,7 @@
 - **Web** — Next.js 16 (App Router) + React 19 + TypeScript (strict)
 - **Mobile** — Flutter (`mobile/fajrak_flutter/`), name *Fajrak*
 
-Current version: `3.40.0+52` (see `mobile/fajrak_flutter/pubspec.yaml`). Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §13 drift notes; earlier docs referencing KWD are stale.
+Current version: `3.42.0` (web) / `3.42.0+54` (Flutter) — see `mobile/fajrak_flutter/pubspec.yaml`. Default currency on the **live** DB is **JOD** on `profiles.currency` (per-user overridable) — see §13 drift notes; earlier docs referencing KWD are stale.
 
 ## 2. High-level architecture
 
@@ -41,8 +41,8 @@ Current version: `3.40.0+52` (see `mobile/fajrak_flutter/pubspec.yaml`). Default
 - **Soft delete** — `deleted_at` columns + sync RPCs.
 - **Multi-currency** — 45+ currencies (`lib/currencies.ts`, `currency.ts`, `detectCurrency.ts`).
 - **3-tier notifications** — Web Push (Firebase), in-app alerts, Vercel cron jobs.
-- **Auth for non-session clients** — external agents/MCP/webhooks authenticate with per-user PATs (`fjk_live_…`, see `docs/technical/api_integration_guide.md`), cron jobs with a shared `CRON_SECRET`; the BYOK proxy accepts either the web session cookie or a Supabase JWT (`Authorization: Bearer …`).
-- **BYOK (Bring-Your-Own-Key)** — user's LLM keys live only on their device; per request the key is wrapped as an AD-4 envelope (`payload` = AES-GCM with an ephemeral key, `env` = that ephemeral key RSA-OAEP-wrapped to the server's public key) and only the server's RSA private key can unwrap it. Providers are SSRF-allowlisted in `lib/byok/providers.ts`; the thin proxy (`app/api/byok/proxy/route.ts`) never parses the body (base64 passthrough) and rate-limits per user (30/min) via `bump_proxy_usage()`. Mobile mirrors this in `services/byok/` (flutter_secure_storage vault + `buildEnvelope`).
+- **Auth for non-session clients** — external agents/MCP/webhooks authenticate with per-user PATs (`fjk_live_…`, see `docs/technical/api_integration_guide.md`), cron jobs with a shared `CRON_SECRET`; the BYOK proxy accepts either the web session cookie or a Supabase JWT (`Authorization: Bearer ***`)
+- **BYOK (Bring-Your-Own-Key) v3.42.0** — user's LLM keys live only on their device; per request the key is wrapped as an AD-4 envelope (`payload` = AES-GCM with an ephemeral key, `env` = that ephemeral key RSA-OAEP-wrapped to the server's public key) and only the server's RSA private key can unwrap it. **Key rotation (ADR-011)** via `keyId` on envelopes, re-wrap script, and UI in Settings. **Moderation layer (ADR-012)** with pre-output guardrails (riba, hallucination, prompt injection, boundary) + post-output DOMPurify sanitization. **Providers:** Ollama (clientDirect, local), OpenRouter + NVIDIA NIM (proxy). **ClientDirect Ollama** on `http://localhost:11434/v1` (Android emulator: `http://10.0.2.2:11434/v1`). Providers are SSRF-allowlisted in `lib/byok/providers.ts`; the thin proxy (`app/api/byok/proxy/route.ts`) never parses the body (base64 passthrough) and rate-limits per user (30/min) via `bump_proxy_usage()`. **Unified Tool Layer (ADR-013)** — Shared RPCs (`get_account_balances`, `get_cashflow_summary`, `create_transaction`) used by BYOK Chat, MCP Server, and Dashboard — eliminates duplication. Mobile mirrors BYOK in `services/byok/` (flutter_secure_storage vault + `buildEnvelope`). **Observability (ADR-015)** — OpenTelemetry metrics for Proxy/MCP/Crypto/Rate-limits; 3 Grafana dashboards; 12 PagerDuty alerts with runbooks.
 
 ## 3. Key entry points
 
