@@ -437,12 +437,12 @@ export function BYOKKeysSection() {
             />
             <button
               onClick={() => setShowKey(!showKey)}
+              aria-label={showKey ? t('settings_byok_keys_hide_key') : t('settings_byok_keys_show_key')}
               style={{
                 padding: "11px 14px", borderRadius: 12,
                 background: "var(--bg-secondary)", border: "1px solid var(--border)",
                 color: "var(--text-muted)", fontSize: 16, cursor: "pointer", fontFamily: "inherit",
               }}
-              aria-label={showKey ? "Hide key" : "Show key"}
             >
               {showKey ? "🙈" : "👁️"}
             </button>

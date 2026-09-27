@@ -113,4 +113,6 @@ export const arSettings = {
     settings_byok_keys_reenter: 'إعادة إدخال المفتاح',
     settings_byok_keys_reentered: 'أُعيد إدخال المفتاح على هذا الجهاز',
     settings_byok_keys_vault_unavailable: 'تعذّر فتح الخزنة المحلية للمفاتيح (تصفّح خاص / متصفح غير مدعوم). حفظ المفاتيح أو اختبارها معطّل.',
+    settings_byok_keys_show_key: 'عرض المفتاح',
+    settings_byok_keys_hide_key: 'إخفاء المفتاح',
 } as const

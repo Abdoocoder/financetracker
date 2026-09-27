@@ -196,6 +196,7 @@ export function ApiKeysSection() {
             </button>
             <button
               onClick={() => setNewKey(null)}
+              aria-label={t('close')}
               style={{
                 padding: "10px 16px", borderRadius: 10,
                 background: "var(--bg-secondary)", border: "1px solid var(--border)",
