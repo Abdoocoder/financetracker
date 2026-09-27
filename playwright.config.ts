@@ -3,9 +3,6 @@ import path from 'node:path';
 
 const ROOT = path.resolve(__dirname);
 
-// Use system Chromium binary from snap
-const CHROMIUM_EXECUTABLE = '/snap/chromium/current/usr/lib/chromium-browser/chrome';
-
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -54,11 +51,7 @@ export default defineConfig({
   webServer: {
     command: 'node scripts/e2e-dev-server.js',
     url: 'http://localhost:3000/api/health',
-    reuseExistingServer: false,
+    reuseExistingServer: true,
     timeout: 180 * 1000,
-    env: {
-      // Use system Chromium executable
-      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: CHROMIUM_EXECUTABLE,
-    },
   },
 });
