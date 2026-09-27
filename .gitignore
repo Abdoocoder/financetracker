@@ -70,3 +70,5 @@ e2e/.auth/
 
 mobile/fajrak_flutter/android/build/
 .gstack/
+.env.e2e
+.env.local.e2e-backup
