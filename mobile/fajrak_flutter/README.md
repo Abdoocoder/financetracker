@@ -2,7 +2,7 @@
 
 A Flutter finance tracking app with Supabase backend and Firebase integration.
 
-**Version:** 3.42.0+54 (matches web v3.42.0)
+**Version:** 3.42.2+56 (matches web v3.42.0)
 
 ## 🚀 Quick Start
 
@@ -108,6 +108,10 @@ make build-bundle
 # Output: build/app/outputs/bundle/release/app-release.aab
 ```
 
+> **⚠️ Important:** The `make build-apk` and `make build-bundle` commands now automatically embed Supabase/Firebase credentials from your `.env` file using `--dart-define`. This fixes authentication issues in production builds.
+> 
+> **Do NOT run** `flutter build appbundle --release` **directly** — it won't include credentials and will cause login failures.
+
 ### ⚠️ Android 13+ Advertising ID
 If targeting Android 13+ with Firebase Analytics, add to `android/app/src/main/AndroidManifest.xml`:
 ```xml
@@ -118,6 +122,10 @@ If targeting Android 13+ with Firebase Analytics, add to `android/app/src/main/A
 Current plugins (`firebase_analytics`, `firebase_core`, `flutter_app_badge_control`) use legacy KGP.
 Migrate to Built-in Kotlin before Flutter drops support:
 - [Migration Guide](https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers)
+
+### ⚠️ Android 15 Edge-to-Edge (API 35)
+App uses `enableEdgeToEdge()` in `MainActivity.kt` with transparent system bar colors in themes.
+This resolves Play Console warnings about deprecated `setStatusBarColor`/`setNavigationBarColor` APIs.
 
 ### iOS
 ```bash

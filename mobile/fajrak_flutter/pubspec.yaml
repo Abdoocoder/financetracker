@@ -1,7 +1,7 @@
 name: fajrak
 description: Smart Finance Tracker - Flutter Mobile App
 publish_to: 'none'
-version: 3.42.1+55
+version: 3.42.2+56
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -45,7 +45,7 @@ dependencies:
 
   # UI Components
   fl_chart: ^1.2.0
-  syncfusion_flutter_charts: ^34.2.9
+  syncfusion_flutter_charts: ^35.1.37
   flutter_staggered_grid_view: ^0.7.0
   shimmer: ^4.0.0
   cached_network_image: ^4.0.2
@@ -84,7 +84,6 @@ dependencies:
 
   # Path
   path: ^1.9.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -90,11 +90,29 @@ build-web:
 
 # Build release APK
 build-apk:
-	flutter build apk --release
+	flutter build apk --release \
+		--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
 
 # Build release App Bundle
 build-bundle:
-	flutter build appbundle --release
+	flutter build appbundle --release \
+		--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
+		--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
 
 # Run tests
 test:

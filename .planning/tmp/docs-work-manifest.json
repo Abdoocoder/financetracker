@@ -1,0 +1,95 @@
+{
+  "canonical_queue": [
+    {
+      "type": "readme",
+      "resolved_path": "README.md",
+      "mode": "supplement",
+      "preservation_mode": "supplement",
+      "wave": 1,
+      "status": "pending"
+    },
+    {
+      "type": "architecture",
+      "resolved_path": "docs/architecture/overview.md",
+      "mode": "create",
+      "preservation_mode": null,
+      "wave": 1,
+      "status": "completed"
+    },
+    {
+      "type": "configuration",
+      "resolved_path": "docs/configuration/overview.md",
+      "mode": "create",
+      "preservation_mode": null,
+      "wave": 1,
+      "status": "completed"
+    },
+    {
+      "type": "getting_started",
+      "resolved_path": "docs/guides/getting-started.md",
+      "mode": "create",
+      "preservation_mode": null,
+      "wave": 2,
+      "status": "pending"
+    },
+    {
+      "type": "development",
+      "resolved_path": "docs/guides/development.md",
+      "mode": "create",
+      "preservation_mode": null,
+      "wave": 2,
+      "status": "pending"
+    },
+    {
+      "type": "testing",
+      "resolved_path": "docs/testing/overview.md",
+      "mode": "create",
+      "preservation_mode": null,
+      "wave": 2,
+      "status": "pending"
+    },
+    {
+      "type": "deployment",
+      "resolved_path": "docs/deployment/overview.md",
+      "mode": "create",
+      "preservation_mode": null,
+      "wave": 2,
+      "status": "pending"
+    }
+  ],
+  "review_queue": [
+    {"path": "API_DOCS.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "ARCHITECTURE_AUDIT_VERIFIED.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "ARCHITECTURE_AUDIT.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "AUDIT_REPORT_AR.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "AUDIT_REPORT.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "BCP.ar.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "CLAUDE.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "COMPREHENSIVE_AUDIT_REPORT_AR.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "DEEP_PROJECT_ANALYSIS.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "DESIGN.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "FAJRAK_ACCOUNTING_ANALYSIS.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "FAJRAK_AUDIT_REPORT_AR.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "MONTHLY_REPORT_GUIDE.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "PRODUCT.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "README.ar.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "RISK_REGISTER.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "STORYBOARD.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "structure.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "VISION.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/flutter-byok-chat-ui-plan.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/projects/llm-ecosystem_prd.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/projects/llm-ecosystem-router_prd.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/projects/notification_system_implementation_plan.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/projects/production-launch.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/superpowers/plans/2026-09-07-push-prefilter.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/superpowers/plans/2026-09-10-openapi-and-mcp-metadata.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/technical/api_integration_guide.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/technical/chrome_devtools_live_metrics.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/technical/loading_states_ux_guidelines.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/technical/notification_system_design.md", "type": "hand-written", "status": "pending_review"},
+    {"path": "docs/technical/onboarding_guide.md", "type": "hand-written", "status": "pending_review"}
+  ],
+  "gap_queue": [],
+  "created_at": "2026-09-29T10:30:00.000Z"
+}

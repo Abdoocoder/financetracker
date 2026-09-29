@@ -1,13 +1,22 @@
-# Google Play Store Release Details - v3.42.0+54
+# Google Play Store Release Details - v3.42.2+56
 
 ## Release Name
-**Fajrak v3.42.0 — BYOK AI Assistant & Security Enhancements**
+**Fajrak v3.42.2 — Play Store Compliance & Auth Fixes**
 
 ---
 
 ## Release Notes - English (en-US)
 
-### 🤖 New: BYOK AI Finance Assistant
+### 🔐 Play Store Compliance Fixes
+- **AD_ID Permission**: Added `com.google.android.gms.permission.AD_ID` for Android 13+ Firebase Analytics compliance
+- **Edge-to-Edge (Android 15/API 35)**: Migrated from deprecated `setStatusBarColor`/`setNavigationBarColor` to modern `enableEdgeToEdge()` with transparent system bar themes
+- **Target SDK 35**: Updated for Android 15 edge-to-edge requirements
+
+### 🐛 Critical Bug Fixes
+- **Login Failure on Production Builds**: Fixed by embedding Supabase/Firebase credentials via `--dart-define` in Makefile build targets (`make build-bundle`, `make build-apk`)
+- **Credentials Missing**: Previous builds ran `flutter build appbundle --release` directly without `--dart-define`, causing authentication to fail
+
+### 🤖 BYOK AI Finance Assistant (from v3.42.0)
 Bring Your Own Key (BYOK) — Chat privately with your own LLM provider (Ollama, OpenAI, Anthropic, etc.) directly in the app. Your API keys never leave your device — encrypted with AES-256-GCM + RSA-OAEP before any proxy request.
 
 ### 🔐 Security Hardening
@@ -43,7 +52,16 @@ Bring Your Own Key (BYOK) — Chat privately with your own LLM provider (Ollama,
 
 ## Release Notes - Arabic (ar)
 
-### 🤖 جديد: مساعد الذكاء الاصطناعي BYOK
+### 🔐 إصلاحات امتثال متجر بلاي
+- **إذن AD_ID**: تمت إضافة `com.google.android.gms.permission.AD_ID` للامتثال لـ Firebase Analytics على Android 13+
+- **الحافة للحافة (Android 15/API 35)**: تمت الهجرة من `setStatusBarColor`/`setNavigationBarColor` المهجورة إلى `enableEdgeToEdge()` الحديث مع ثيمات شريط نظام شفافة
+- **Target SDK 35**: تم التحديث لمتطلبات Android 15 للحافة للحافة
+
+### 🐛 إصلاحات أخطاء حرجة
+- **فشل تسجيل الدخول في إصدارات الإنتاج**: تم الإصلاح عن طريق تضمين بيانات اعتماد Supabase/Firebase عبر `--dart-define` في أهداف بناء Makefile (`make build-bundle`، `make build-apk`)
+- **بيانات اعتماد مفقودة**: الإصدارات السابقة شغلت `flutter build appbundle --release` مباشرة بدون `--dart-define`، مما تسبب في فشل المصادقة
+
+### 🤖 مساعد الذكاء الاصطناعي BYOK (من v3.42.0)
 أحضر مفتاحك الخاص (BYOK) — تواصل بخصوصية مع مزود LLM خاص بك (Ollama، OpenAI، Anthropic، إلخ) مباشرة في التطبيق. مفاتيح API الخاصة بك لا تغادر جهازك أبداً — مشفرة بـ AES-256-GCM + RSA-OAEP قبل أي طلب وسيط.
 
 ### 🔐 تعزيزات الأمان
@@ -77,7 +95,7 @@ Bring Your Own Key (BYOK) — Chat privately with your own LLM provider (Ollama,
 
 ---
 
-## Version Code: 54
-## Version Name: 3.42.0
-## Target SDK: 34
+## Version Code: 56
+## Version Name: 3.42.2
+## Target SDK: 35
 ## Min SDK: 21
