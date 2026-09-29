@@ -1,5 +1,7 @@
 # AGENTS.md - Fajrak Flutter App
 
+**Version:** 3.42.2+56
+
 ## Architecture Overview
 Fajrak is a Flutter finance tracker with 22 screens, sharing Supabase backend and Firebase with a Next.js web app for real-time sync. Core logic uses Supabase RPCs for accurate calculations across platforms.
 
@@ -19,7 +21,10 @@ Fajrak is a Flutter finance tracker with 22 screens, sharing Supabase backend an
 ## Developer Workflows
 - **Setup**: `flutter pub get`; copy `.env.example` to `.env` with Supabase/Firebase keys; place `google-services.json` in `android/app/`
 - **Run**: `flutter run` (auto-detects device); `flutter run -d <id>` for specific; `flutter devices` to list
-- **Build**: `flutter build apk --release` for direct install; `flutter build appbundle --release` for Play Store
+- **Build**: Use Makefile targets (embed credentials from `.env`):
+  - `make build-apk` — APK for direct install
+  - `make build-bundle` — App Bundle for Play Store
+  - **Do NOT run** `flutter build appbundle --release` **directly** (missing credentials → login fails)
 - **Test**: `flutter test` in `test/` directory; services tested with mocks (e.g., `currency_service_test.dart`)
 - **Web Build**: `flutter build web` outputs to `build/web/`; served via Firebase Hosting (shared with Next.js)
 
