@@ -108,6 +108,17 @@ make build-bundle
 # Output: build/app/outputs/bundle/release/app-release.aab
 ```
 
+### ⚠️ Android 13+ Advertising ID
+If targeting Android 13+ with Firebase Analytics, add to `android/app/src/main/AndroidManifest.xml`:
+```xml
+<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+```
+
+### ⚠️ Kotlin Gradle Plugin Migration
+Current plugins (`firebase_analytics`, `firebase_core`, `flutter_app_badge_control`) use legacy KGP.
+Migrate to Built-in Kotlin before Flutter drops support:
+- [Migration Guide](https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers)
+
 ### iOS
 ```bash
 flutter build ios --release

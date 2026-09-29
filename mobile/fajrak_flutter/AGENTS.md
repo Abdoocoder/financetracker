@@ -36,6 +36,7 @@ Fajrak is a Flutter finance tracker with 22 screens, sharing Supabase backend an
 - **Firebase**: Messaging for notifications; Analytics via `AnalyticsService`
 - **External APIs**: Currency rates via `CurrencyService` (Yahoo Finance + FreeGoldAPI)
 - **Platform-Specific**: Android keystore in `android/app/`; web config in `web/`
+  - **Android 13+ AD_ID**: `<uses-permission android:name="com.google.android.gms.permission.AD_ID"/>` required for Firebase Analytics
 - **Cross-Platform Sync**: Shared user data; mobile triggers web updates via Supabase real-time
 
 ## Onboarding 2026-09 (New Agent Notes)
