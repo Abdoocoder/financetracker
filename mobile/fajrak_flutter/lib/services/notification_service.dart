@@ -93,13 +93,14 @@ class NotificationService {
         InitializationSettings(android: androidInit, iOS: iosInit);
 
     await _localNotifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (details) {
         if (details.payload != null) {
           final message = RemoteMessage(data: {'url': details.payload!});
           handleMessage(message);
         }
       },
+      onDidReceiveBackgroundNotificationResponse: null,
     );
 
     // تسجيل القنوات على أندرويد
@@ -157,10 +158,10 @@ class NotificationService {
     }
 
     await _localNotifications.show(
-      notification.hashCode,
-      notification.title,
-      notification.body,
-      NotificationDetails(
+      id: notification.hashCode,
+      title: notification.title,
+      body: notification.body,
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           selectedChannel.id,
           selectedChannel.name,

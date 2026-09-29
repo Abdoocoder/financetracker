@@ -4,12 +4,9 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlcipher_flutter_libs/sqlcipher_flutter_libs.dart';
 
 QueryExecutor buildDatabaseConnection(String encryptionKey) {
   return LazyDatabase(() async {
-    await applyWorkaroundToOpenSqlCipherOnOldAndroidVersions();
-
     final dir = await getApplicationDocumentsDirectory();
     final file = File(p.join(dir.path, 'fajrak_offline.db'));
 
