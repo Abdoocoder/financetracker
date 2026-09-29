@@ -57,3 +57,4 @@ key.properties
 
 # Local run scripts
 run_web.sh
+lib/firebase_options.dart
