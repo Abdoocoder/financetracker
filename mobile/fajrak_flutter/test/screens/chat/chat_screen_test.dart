@@ -101,10 +101,11 @@ Future<void> _pumpApp(WidgetTester tester, Widget child) async {
   await tester.pumpAndSettle();
 }
 
-ChatScreen _screen(_FakeByokService service) {
+ChatScreen _screen(_FakeByokService service,
+    {List<ChatKeyRow> keys = const <ChatKeyRow>[]}) {
   return ChatScreen(
     service: service,
-    keysLoader: () async => const <ChatKeyRow>[],
+    keysLoader: () async => keys,
     contextLoader: () async => const ChatFinancialData(),
   );
 }
@@ -210,6 +211,121 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Add BYOK keys'), findsOneWidget);
+    expect(_sendIcon(tester).onPressed, isNull);
+  });
+
+  testWidgets('proxy provider with a saved key auto-selects it and enables send',
+      (tester) async {
+    final service = _FakeByokService()..release = Completer<void>();
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-openai', providerId: 'openai', keyName: 'My OpenAI'),
+      ]),
+    );
+
+    final providerDropdown = find.descendant(
+      of: find.byWidgetPredicate((w) =>
+          w is InputDecorator &&
+          w.decoration.labelText == 'Provider'),
+      matching: find.byType(DropdownButton<String>),
+    );
+    await tester.tap(providerDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OpenAI').last);
+    await tester.pumpAndSettle();
+
+    // A key exists for this provider, so the "add a key" hint must not show.
+    expect(find.text('Add BYOK keys'), findsNothing);
+
+    // Regression: send used to stay disabled forever because _keyId was
+    // never auto-selected.
+    expect(_sendIcon(tester).onPressed, isNull);
+
+    await tester.enterText(find.byType(TextField).last, 'How is my balance?');
+    await tester.pump();
+    expect(_sendIcon(tester).onPressed, isNotNull);
+
+    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.pump();
+
+    expect(service.chatCalls, 1);
+    expect(service.capturedProviderId, 'openai');
+    expect(service.capturedKeyId, 'k-openai');
+
+    service.release!.complete();
+    await tester.pump();
+    expect(find.text('Sure!'), findsOneWidget);
+  });
+
+  testWidgets('switching provider reselects that provider key and disables send',
+      (tester) async {
+    final service = _FakeByokService();
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-openai', providerId: 'openai', keyName: 'My OpenAI'),
+        ChatKeyRow(id: 'k-gemini', providerId: 'gemini', keyName: 'My Gemini'),
+      ]),
+    );
+
+    Future<void> selectProvider(String label) async {
+      final providerDropdown = find.descendant(
+        of: find.byWidgetPredicate((w) =>
+            w is InputDecorator &&
+            w.decoration.labelText == 'Provider'),
+        matching: find.byType(DropdownButton<String>),
+      );
+      await tester.tap(providerDropdown);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label).last);
+      await tester.pumpAndSettle();
+    }
+
+    await selectProvider('OpenAI');
+    await tester.enterText(find.byType(TextField).last, 'Hi');
+    await tester.pump();
+    expect(_sendIcon(tester).onPressed, isNotNull);
+
+    // A different provider key must be picked, and the stale one cleared.
+    await selectProvider('Gemini');
+    expect(_sendIcon(tester).onPressed, isNotNull);
+
+    await tester.enterText(find.byType(TextField).last, 'Hi again');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.pump();
+
+    expect(service.capturedProviderId, 'gemini');
+    expect(service.capturedKeyId, 'k-gemini');
+  });
+
+  testWidgets('keys from another provider are never used as keyId',
+      (tester) async {
+    final service = _FakeByokService();
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-gemini', providerId: 'gemini', keyName: 'My Gemini'),
+      ]),
+    );
+
+    final providerDropdown = find.descendant(
+      of: find.byWidgetPredicate((w) =>
+          w is InputDecorator &&
+          w.decoration.labelText == 'Provider'),
+      matching: find.byType(DropdownButton<String>),
+    );
+    await tester.tap(providerDropdown);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OpenAI').last);
+    await tester.pumpAndSettle();
+
+    // OpenAI has no key of its own: must show the hint and stay disabled
+    // rather than borrowing the Gemini key.
+    expect(find.text('Add BYOK keys'), findsOneWidget);
+    await tester.enterText(find.byType(TextField).last, 'Hi');
+    await tester.pump();
     expect(_sendIcon(tester).onPressed, isNull);
   });
 
