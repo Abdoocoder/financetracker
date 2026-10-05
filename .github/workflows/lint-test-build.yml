@@ -67,6 +67,12 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
+      # Drift generates lib/database/app_database.g.dart, which is gitignored
+      # (.gitignore: mobile/**/*.g.dart). Without this the database layer and
+      # everything importing it fail to analyze on a clean checkout.
+      - name: Generate code (Drift)
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Analyze
         run: flutter analyze
 
