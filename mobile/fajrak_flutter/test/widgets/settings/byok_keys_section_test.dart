@@ -159,6 +159,24 @@ ByokKeysSection _section() => ByokKeysSection(
       service: _FakeByokService(),
     );
 
+/// Secure store that fails every write, reproducing the web case where
+/// WebCrypto is unavailable outside a secure context. Previously this surfaced
+/// only as "Something went wrong. Please try again."
+class _UnusableSecureStore implements SecureStore {
+  @override
+  Future<void> write({required String key, required String value}) async {
+    throw StateError(
+      'Operation failed: crypto.subtle is unavailable in this secure context',
+    );
+  }
+
+  @override
+  Future<String?> read({required String key}) async => null;
+
+  @override
+  Future<void> delete({required String key}) async {}
+}
+
 Future<void> _pumpApp(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(_app(child));
   for (var i = 0; i < 20; i++) {
@@ -203,5 +221,44 @@ void main() {
 
     expect(find.textContaining('OpenAI'), findsWidgets);
     expect(find.textContaining('Anthropic'), findsWidgets);
+  });
+
+  testWidgets(
+      'a failing vault surfaces the real cause instead of the generic error',
+      (tester) async {
+    await _pumpApp(
+      tester,
+      ByokKeysSection(
+        vault: ByokVault(_UnusableSecureStore()),
+        service: _FakeByokService(),
+      ),
+    );
+
+    // Pick the NVIDIA NIM provider.
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.text('NVIDIA NIM — nvidia/nemotron-3-ultra-550b-a55b'),
+    );
+    await tester.pumpAndSettle();
+
+    final fields = find.byType(TextField);
+    await tester.enterText(fields.at(0), 'NVIDIA key');
+    await tester.enterText(fields.at(1), 'nvapi-abcdef0123456789');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('+ Add Key'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    // The specific, actionable message is shown...
+    expect(
+      find.textContaining('Secure key storage is unavailable'),
+      findsOneWidget,
+    );
+    // ...the underlying cause is included as a detail line...
+    expect(find.textContaining('crypto.subtle'), findsOneWidget);
+    // ...and the useless generic message is gone.
+    expect(find.text('Something went wrong. Please try again.'), findsNothing);
   });
 }
