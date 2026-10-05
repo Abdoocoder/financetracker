@@ -201,10 +201,14 @@ class _ChatScreenState extends State<ChatScreen> {
     final providerKeys = _byokKeys
         .where((k) => k.providerId == _providerId)
         .toList();
-    if (_keyId != null && !providerKeys.any((k) => k.id == _keyId)) {
-      _keyId = providerKeys.isNotEmpty ? providerKeys.first.id : null;
-      if (mounted) setState(() {});
-    }
+    final stillValid =
+        _keyId != null && providerKeys.any((k) => k.id == _keyId);
+    final next = stillValid
+        ? _keyId
+        : (providerKeys.isNotEmpty ? providerKeys.first.id : null);
+    if (next == _keyId) return;
+    _keyId = next;
+    if (mounted) setState(() {});
   }
 
   // ---------------------------------------------------------------------------
@@ -318,6 +322,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _keyId = null;
       _selectedModel = provider?.defaultModel ?? '';
     });
+    _syncKeySelection();
   }
 
   void _resetModel() {
