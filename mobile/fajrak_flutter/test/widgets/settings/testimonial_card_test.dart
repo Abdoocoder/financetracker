@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Loads i18n JSON from disk once per `setUpAll` and returns it synchronously so
@@ -74,6 +75,11 @@ void main() {
     final ar = jsonDecode(await rootBundle.loadString('assets/i18n/ar.json'))
         as Map<String, dynamic>;
     _translations = {'en': en, 'ar': ar};
+
+    // Supabase.initialize persists session state via SharedPreferences; without
+    // a mock the platform channel is absent and setUpAll throws
+    // MissingPluginException (getAll). Same pattern as byok_keys_section_test.
+    SharedPreferences.setMockInitialValues({});
 
     await Supabase.initialize(
       url: 'https://test.supabase.co',
