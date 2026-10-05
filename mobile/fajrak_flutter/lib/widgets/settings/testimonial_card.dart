@@ -142,49 +142,53 @@ class _TestimonialCardState extends State<TestimonialCard> {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Theme(
-        data: theme.copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          iconColor: colorScheme.onSurfaceVariant,
-          collapsedIconColor: colorScheme.onSurfaceVariant,
-          title: Row(children: [
-            const Icon(Icons.star, size: 18, color: Colors.amber),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                'testimonial_share_title'.tr(),
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 13,
+      child: Material(
+        color: colorScheme.surface,
+        child: Theme(
+          data: theme.copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            iconColor: colorScheme.onSurfaceVariant,
+            collapsedIconColor: colorScheme.onSurfaceVariant,
+            title: Row(children: [
+              const Icon(Icons.star, size: 18, color: Colors.amber),
+              const SizedBox(height: 14),
+              Expanded(
+                child: Text(
+                  'testimonial_share_title'.tr(),
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                  ),
                 ),
               ),
-            ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              'testimonial_new'.tr(),
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'testimonial_new'.tr(),
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+            ]),
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                child: _submitted && !_existing
+                    ? _buildSuccess(isEn, colorScheme)
+                    : _buildForm(isEn, canSubmit, colorScheme),
+              ),
+            ],
           ),
-          ],
-          ),
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              child: _submitted && !_existing ? _buildSuccess(isEn, colorScheme) : _buildForm(isEn, canSubmit, colorScheme),
-            ),
-          ],
         ),
       ),
     );
