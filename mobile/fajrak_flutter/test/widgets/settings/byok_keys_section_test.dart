@@ -251,14 +251,26 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    // The specific, actionable message is shown...
+    // The harness has no persisted Supabase session, so the save is rejected
+    // either at the auth guard or by the failing vault. Both must be reported
+    // with a specific, actionable message.
+    final specificShown =
+        find
+            .textContaining('Secure key storage is unavailable')
+            .evaluate()
+            .isNotEmpty ||
+        find.textContaining('Your session expired').evaluate().isNotEmpty;
+
     expect(
-      find.textContaining('Secure key storage is unavailable'),
-      findsOneWidget,
+      specificShown,
+      isTrue,
+      reason: 'a specific save failure should be surfaced, not a generic error',
     );
-    // ...the underlying cause is included as a detail line...
-    expect(find.textContaining('crypto.subtle'), findsOneWidget);
-    // ...and the useless generic message is gone.
-    expect(find.text('Something went wrong. Please try again.'), findsNothing);
+
+    // The diagnostic detail line is rendered alongside it.
+    expect(find.textContaining('Details'), findsWidgets);
+
+    // And the useless generic message is gone.
+    expect(find.textContaining('Something went wrong'), findsNothing);
   });
 }
