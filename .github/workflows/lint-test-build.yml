@@ -6,18 +6,30 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+# Cancel superseded runs so rapid pushes don't queue redundant CI.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-typecheck-test:
+    name: web (lint, typecheck, test, build)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
-      - run: npm install
+      # `npm ci` only: it installs exactly the committed lockfile and fails if
+      # package.json and package-lock.json disagree. Running `npm install` first
+      # wasted ~30s and could rewrite the lockfile, defeating that guarantee.
       - run: npm ci
 
       - name: Lint
@@ -28,3 +40,37 @@ jobs:
 
       - name: Test
         run: npm run test
+
+      # Build was previously ungated, so a Next.js compile error only surfaced
+      # at deploy time. Safe without env vars: every route is dynamic (ƒ) except
+      # robots.txt and sitemap.xml, which use hardcoded URLs.
+      - name: Build
+        run: npm run build
+
+  mobile:
+    name: mobile (flutter analyze, test)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: mobile/fajrak_flutter
+    steps:
+      - uses: actions/checkout@v5
+
+      # Keep in sync with the local SDK (flutter --version).
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.6
+          channel: stable
+          cache: true
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      # Needs cmake/ninja/clang to build the webcrypto dependency; these are
+      # preinstalled on ubuntu-latest.
+      - name: Test
+        run: flutter test
