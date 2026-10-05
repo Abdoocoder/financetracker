@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fajrak/services/byok/byok_service.dart';
 import 'package:fajrak/services/byok/chat.dart';
+import 'package:fajrak/services/byok/key_save_error.dart';
 import 'package:fajrak/services/byok/providers.dart';
 import 'package:fajrak/utils/app_colors.dart';
 import 'package:fajrak/utils/error_handler.dart';
@@ -186,7 +187,12 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
     if (name.isEmpty || _newProvider.isEmpty || rawKey.isEmpty) return;
 
     final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      _showSaveError(
+        const ByokSaveException(ByokSaveFailure.auth, 'no_active_session'),
+      );
+      return;
+    }
 
     _saving = true;
     setState(() {});
@@ -232,13 +238,18 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
         });
         _showToast('settings_byok_keys_created', success: true);
       }
-    } catch (e) {
+    } catch (e, st) {
       if (mounted) {
+        // Classify first, then report. ErrorHandler is called WITHOUT a
+        // context so it only logs + reports to analytics — otherwise it would
+        // also raise its own generic SnackBar on top of our specific one.
+        final failure = classifyByokSaveError(e);
         ErrorHandler.handle(
-          e,
-          context: context,
+          failure,
+          st: st,
           developerMessage: 'ByokKeys Save',
         );
+        _showSaveError(failure);
       }
     } finally {
       _saving = false;
@@ -340,6 +351,40 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
         content: Text(key.tr()),
         backgroundColor: success ? AppColors.success : AppColors.error,
         behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  /// Shows an actionable save failure instead of the generic error, plus a
+  /// redacted diagnostic line so the exact cause is actionable.
+  void _showSaveError(ByokSaveException failure) {
+    if (!mounted) return;
+    final messageKey = switch (failure.kind) {
+      ByokSaveFailure.network => 'byok_keys_save_failed_network',
+      ByokSaveFailure.secureStore => 'byok_keys_save_failed_secure_store',
+      ByokSaveFailure.auth => 'byok_keys_save_failed_auth',
+      ByokSaveFailure.database => 'byok_keys_save_failed_database',
+      ByokSaveFailure.unknown => 'byok_keys_save_failed_unknown',
+    };
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(messageKey.tr(), style: const TextStyle()),
+            if (failure.detail.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                '${'byok_keys_error_detail'.tr()}: ${failure.detail}',
+                style: const TextStyle(fontSize: 11),
+              ),
+            ],
+          ],
+        ),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 6),
       ),
     );
   }
