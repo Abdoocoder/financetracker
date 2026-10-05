@@ -460,9 +460,11 @@ class _LearnScreenState extends State<LearnScreen> {
 
       if (!mounted) return;
       final isAr = context.locale.languageCode == 'ar';
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: isAr ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak",
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          text: isAr ? 'درس اليوم من فجرك' : "Today's lesson from Fajrak",
+        ),
       );
     } catch (e, st) {
       if (mounted) {

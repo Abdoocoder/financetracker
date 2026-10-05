@@ -78,15 +78,18 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
         '${directory.path}/fajrak_export_${DateTime.now().millisecondsSinceEpoch}.csv');
     await file.writeAsString('\uFEFF${buffer.toString()}');
 
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      subject: 'settings_export_msg'.tr());
+    await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'settings_export_msg'.tr(),
+        ),
+      );
     if (mounted) setState(() => _loading = false);
   }
 
-  void _shareApp() {
+  Future<void> _shareApp() async {
     final text = 'settings_share_msg'.tr();
-    Share.share(text);
+    await SharePlus.instance.share(ShareParams(text: text));
   }
 
   Future<void> _deleteAccount() async {
