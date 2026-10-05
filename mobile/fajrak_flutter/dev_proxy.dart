@@ -2,6 +2,9 @@
 // Run with: dart run dev_proxy.dart
 // This proxies requests from localhost:33963 to Supabase to avoid CORS issues
 
+// Standalone CLI dev tool: console output is the intended output channel.
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 void main(List<String> args) async {
