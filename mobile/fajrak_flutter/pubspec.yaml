@@ -71,7 +71,7 @@ dependencies:
   webcrypto: ^0.6.0
 
   # Local Notifications
-  flutter_local_notifications: ^22.3.1
+  flutter_local_notifications: ^23.0.0-dev.3
 
   # UUID
   uuid: ^4.3.3
