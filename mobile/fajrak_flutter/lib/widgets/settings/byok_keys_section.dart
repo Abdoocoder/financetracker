@@ -307,7 +307,6 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
         _showToast('settings_byok_keys_test_fail');
         ErrorHandler.handle(
           e,
-          context: context,
           developerMessage: 'ByokKeys Test',
         );
       }
@@ -334,7 +333,6 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
       if (mounted) {
         ErrorHandler.handle(
           e,
-          context: context,
           developerMessage: 'ByokKeys Remove',
         );
       }
