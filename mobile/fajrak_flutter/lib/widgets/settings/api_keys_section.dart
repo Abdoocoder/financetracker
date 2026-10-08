@@ -53,7 +53,7 @@ class _ApiKeysSectionState extends State<ApiKeysSection> {
       }
     } catch (e) {
       if (mounted) {
-        ErrorHandler.handle(e, context: context, developerMessage: 'API Keys Load');
+        ErrorHandler.handle(e, developerMessage: 'API Keys Load');
         setState(() => _loading = false);
       }
     }
@@ -109,7 +109,7 @@ class _ApiKeysSectionState extends State<ApiKeysSection> {
       }
     } catch (e) {
       if (mounted) {
-        ErrorHandler.handle(e, context: context, developerMessage: 'API Key Generate');
+        ErrorHandler.handle(e, developerMessage: 'API Key Generate');
       }
     } finally {
       _generating = false;
@@ -145,7 +145,7 @@ class _ApiKeysSectionState extends State<ApiKeysSection> {
       }
     } catch (e) {
       if (mounted) {
-        ErrorHandler.handle(e, context: context, developerMessage: 'API Key Revoke');
+        ErrorHandler.handle(e, developerMessage: 'API Key Revoke');
       }
     }
   }
