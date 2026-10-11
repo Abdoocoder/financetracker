@@ -198,75 +198,107 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
     final keyId = const Uuid().v4();
     var metadataSaved = false;
     try {
-      // 1. Encrypt into the local secure vault FIRST (AD-3: device-only).
-      await _vault.saveProviderKey(keyId, rawKey);
-
-      // 2. Persist metadata only to Supabase — never the key itself.
-      //
-      // The Dart PostgREST client returns the decoded rows on success and
-      // throws on failure. Unlike the JS client it never resolves to a
-      // `{ data, error }` pair, so the previous `res.error` check performed a
-      // dynamic getter lookup on a `List` and threw on EVERY successful
-      // insert — dropping the flow into the catch block even though the row
-      // had in fact been saved.
-      await Supabase.instance.client.from('user_byok_keys').insert({
-        'id': keyId,
-        'user_id': user.id,
-        'provider_id': _newProvider,
-        'key_name': name,
-        'key_prefix': getKeyPrefix(_newProvider, rawKey),
-        'is_active': true,
-      });
+      await _persistNewKey(
+        id: keyId,
+        userId: user.id,
+        providerId: _newProvider,
+        name: name,
+        rawKey: rawKey,
+      );
       metadataSaved = true;
-
       if (mounted) {
-        setState(() {
-          _keys.insert(
-            0,
-            _ByokKey(
-              id: keyId,
-              providerId: _newProvider,
-              keyName: name,
-              keyPrefix: getKeyPrefix(_newProvider, rawKey),
-              createdAt: DateTime.now().toUtc().toIso8601String(),
-              lastUsedAt: null,
-              isActive: true,
-              hasKey: true,
-            ),
-          );
-          _nameCtrl.clear();
-          _valueCtrl.clear();
-          _newProvider = '';
-          _showKey = false;
-        });
-        _showToast('settings_byok_keys_created', success: true);
+        _applyKeyAdded(
+          id: keyId,
+          providerId: _newProvider,
+          name: name,
+          rawKey: rawKey,
+        );
       }
     } catch (e, st) {
       // Roll back the orphaned ciphertext whenever the metadata row was not
       // persisted, so the secure vault and the table never diverge.
-      if (!metadataSaved) {
-        try {
-          await _vault.deleteProviderKey(keyId);
-        } catch (_) {
-          // Best-effort cleanup: never mask the original failure.
-        }
-      }
-      if (mounted) {
-        // Classify first, then report. ErrorHandler is called WITHOUT a
-        // context so it only logs + reports to analytics — otherwise it would
-        // also raise its own generic SnackBar on top of our specific one.
-        final failure = classifyByokSaveError(e);
-        ErrorHandler.handle(
-          failure,
-          st: st,
-          developerMessage: 'ByokKeys Save',
-        );
-        _showSaveError(failure);
-      }
+      if (!metadataSaved) await _rollbackVault(keyId);
+      if (mounted) _reportSaveFailure(e, st);
     } finally {
       _saving = false;
       if (mounted) setState(() {});
     }
+  }
+
+  /// Encrypts the raw key into the device vault FIRST (AD-3: device-only), then
+  /// persists metadata only to Supabase — never the key itself.
+  ///
+  /// The Dart PostgREST client resolves `insert()` to the decoded rows and
+  /// throws on failure. Unlike the JS client it never returns a
+  /// `{ data, error }` pair, so a `res.error` check would do a dynamic getter
+  /// lookup on a `List` and throw on EVERY successful insert.
+  Future<void> _persistNewKey({
+    required String id,
+    required String userId,
+    required String providerId,
+    required String name,
+    required String rawKey,
+  }) async {
+    await _vault.saveProviderKey(id, rawKey);
+    await Supabase.instance.client.from('user_byok_keys').insert({
+      'id': id,
+      'user_id': userId,
+      'provider_id': providerId,
+      'key_name': name,
+      'key_prefix': getKeyPrefix(providerId, rawKey),
+      'is_active': true,
+    });
+  }
+
+  /// Reflects a persisted key in the UI and resets the add-key form.
+  void _applyKeyAdded({
+    required String id,
+    required String providerId,
+    required String name,
+    required String rawKey,
+  }) {
+    setState(() {
+      _keys.insert(
+        0,
+        _ByokKey(
+          id: id,
+          providerId: providerId,
+          keyName: name,
+          keyPrefix: getKeyPrefix(providerId, rawKey),
+          createdAt: DateTime.now().toUtc().toIso8601String(),
+          lastUsedAt: null,
+          isActive: true,
+          hasKey: true,
+        ),
+      );
+      _nameCtrl.clear();
+      _valueCtrl.clear();
+      _newProvider = '';
+      _showKey = false;
+    });
+    _showToast('settings_byok_keys_created', success: true);
+  }
+
+  /// Best-effort removal of an orphaned vault entry; never masks the cause.
+  Future<void> _rollbackVault(String keyId) async {
+    try {
+      await _vault.deleteProviderKey(keyId);
+    } catch (_) {
+      // Never mask the original failure.
+    }
+  }
+
+  /// Classifies and reports a save failure. ErrorHandler is called WITHOUT a
+  /// context so it only logs + reports to analytics — otherwise it would raise
+  /// its own generic SnackBar on top of our specific one.
+  void _reportSaveFailure(Object error, StackTrace st) {
+    final failure = classifyByokSaveError(error);
+    ErrorHandler.handle(
+      failure,
+      st: st,
+      developerMessage: 'ByokKeys Save',
+    );
+    _showSaveError(failure);
   }
 
   Future<void> _handleTest(_ByokKey key) async {
