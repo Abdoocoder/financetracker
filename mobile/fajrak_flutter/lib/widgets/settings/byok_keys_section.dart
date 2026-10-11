@@ -139,7 +139,6 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
         // surface non-RLS errors.
         ErrorHandler.handle(
           e,
-          context: context,
           developerMessage: 'ByokKeys Load',
         );
       }
@@ -197,12 +196,20 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
     _saving = true;
     setState(() {});
     final keyId = const Uuid().v4();
+    var metadataSaved = false;
     try {
       // 1. Encrypt into the local secure vault FIRST (AD-3: device-only).
       await _vault.saveProviderKey(keyId, rawKey);
 
       // 2. Persist metadata only to Supabase — never the key itself.
-      final res = await Supabase.instance.client.from('user_byok_keys').insert({
+      //
+      // The Dart PostgREST client returns the decoded rows on success and
+      // throws on failure. Unlike the JS client it never resolves to a
+      // `{ data, error }` pair, so the previous `res.error` check performed a
+      // dynamic getter lookup on a `List` and threw on EVERY successful
+      // insert — dropping the flow into the catch block even though the row
+      // had in fact been saved.
+      await Supabase.instance.client.from('user_byok_keys').insert({
         'id': keyId,
         'user_id': user.id,
         'provider_id': _newProvider,
@@ -210,11 +217,7 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
         'key_prefix': getKeyPrefix(_newProvider, rawKey),
         'is_active': true,
       });
-      if (res.error != null) {
-        // Roll back the orphaned ciphertext.
-        await _vault.deleteProviderKey(keyId);
-        throw res.error!;
-      }
+      metadataSaved = true;
 
       if (mounted) {
         setState(() {
@@ -239,6 +242,15 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
         _showToast('settings_byok_keys_created', success: true);
       }
     } catch (e, st) {
+      // Roll back the orphaned ciphertext whenever the metadata row was not
+      // persisted, so the secure vault and the table never diverge.
+      if (!metadataSaved) {
+        try {
+          await _vault.deleteProviderKey(keyId);
+        } catch (_) {
+          // Best-effort cleanup: never mask the original failure.
+        }
+      }
       if (mounted) {
         // Classify first, then report. ErrorHandler is called WITHOUT a
         // context so it only logs + reports to analytics — otherwise it would
