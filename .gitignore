@@ -72,3 +72,8 @@ mobile/fajrak_flutter/android/build/
 .gstack/
 .env.e2e
 .env.local.e2e-backup
+
+# Backups must never be committed
+*.dump
+fajrak_backups/
+INCIDENT.md
