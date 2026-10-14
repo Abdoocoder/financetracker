@@ -71,3 +71,30 @@ jobs:
           name: supabase-backup-${{ github.run_number }}
           path: full_backup.dump
           retention-days: 30
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+          aws --version
+
+      - name: Upload to Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)
+          R2_KEY="fajrak_backup_${TIMESTAMP}.dump"
+          echo "Uploading full_backup.dump to R2 as ${R2_KEY}"
+          aws s3 cp full_backup.dump \
+            "s3://${R2_BUCKET}/${R2_KEY}" \
+            --endpoint-url "${R2_ENDPOINT}"
+          echo "Upload complete."
+          echo "=== Verify upload ==="
+          aws s3 ls "s3://${R2_BUCKET}/${R2_KEY}" \
+            --endpoint-url "${R2_ENDPOINT}" \
+            --human-readable
