@@ -26,26 +26,34 @@ jobs:
             | sudo tee /etc/apt/sources.list.d/pgdg.list
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
-          pg_dump --version
+          echo "=== installed postgresql binaries ==="
+          ls -la /usr/lib/postgresql/ 2>&1 || true
+          echo "=== pg_dump 17 binary ==="
+          ls -la /usr/lib/postgresql/17/bin/pg_dump 2>&1 || true
+          echo "=== pg_dump 17 version ==="
+          /usr/lib/postgresql/17/bin/pg_dump --version 2>&1 || true
+          echo "=== default pg_dump on PATH ==="
+          which pg_dump
+          /usr/lib/postgresql/17/bin/pg_dump --version 2>&1 || true; echo "---"; pg_dump --version 2>&1 || true
 
       - name: Create backups
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
           set -euo pipefail
-          pg_dump "$SUPABASE_DB_URL" \
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
             --schema-only --no-owner --no-privileges \
             --schema=public --schema=auth --schema=storage \
             -f schema.sql
-          pg_dump "$SUPABASE_DB_URL" \
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
             --data-only --no-owner --no-privileges \
             --schema=public --inserts \
             -f data_public.sql
-          pg_dump "$SUPABASE_DB_URL" \
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
             --data-only --no-owner --no-privileges \
             --schema=auth --inserts \
             -f data_auth.sql
-          pg_dump "$SUPABASE_DB_URL" \
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
             --format=custom --no-owner --no-privileges \
             -f full_backup.dump
           ls -lh *.sql *.dump
