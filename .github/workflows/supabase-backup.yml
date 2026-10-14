@@ -1,0 +1,59 @@
+name: 'Supabase Daily Backup'
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # daily 02:00 UTC = 05:00 Amman
+  workflow_dispatch:       # allow manual runs
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install postgresql-client-17 (matches server major version)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+          pg_dump --version
+
+      - name: Create backups
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          pg_dump "$SUPABASE_DB_URL" \
+            --schema-only --no-owner --no-privileges \
+            --schema=public --schema=auth --schema=storage \
+            -f schema.sql
+          pg_dump "$SUPABASE_DB_URL" \
+            --data-only --no-owner --no-privileges \
+            --schema=public --inserts \
+            -f data_public.sql
+          pg_dump "$SUPABASE_DB_URL" \
+            --data-only --no-owner --no-privileges \
+            --schema=auth --inserts \
+            -f data_auth.sql
+          pg_dump "$SUPABASE_DB_URL" \
+            --format=custom --no-owner --no-privileges \
+            -f full_backup.dump
+          ls -lh *.sql *.dump
+
+      - name: Verify sizes (fail if any file is empty)
+        run: |
+          for f in schema.sql data_public.sql data_auth.sql full_backup.dump; do
+            test -s "$f" || { echo "MISSING: $f"; exit 1; }
+          done
+          echo "All backup files present and non-empty."
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-backup-${{ github.run_number }}
+          path: full_backup.dump
+          retention-days: 30
