@@ -42,6 +42,7 @@ class I18n {
     'chat_financial_context',
     'chat_error_rate_limit',
     'chat_error_timeout',
+    'chat_error_config_missing',
   ];
 
   static const List<String> byokSettingsKeys = [
@@ -115,6 +116,13 @@ void main() {
       expect(en['chat_error_timeout'], contains('check your network'));
       expect((ar['chat_error_rate_limit']! as String).trim(), isNotEmpty);
       expect((ar['chat_error_timeout']! as String).trim(), isNotEmpty);
+    });
+
+    test('chat_error_config_missing matches the BYOK config contract', () {
+      expect(en['chat_error_config_missing'],
+          'Service configuration missing — please contact support');
+      expect(ar['chat_error_config_missing'],
+          'إعداد الخدمة غير مكتمل — يرجى التواصل مع الدعم');
     });
 
     test('chat_error_insecure is adapted for mobile (app, not page)', () {

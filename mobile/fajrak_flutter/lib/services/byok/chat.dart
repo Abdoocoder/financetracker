@@ -12,7 +12,15 @@ import 'package:http/http.dart' as http;
 
 const kTemperature = 0.2;
 
-const _stallTimeout = Duration(seconds: 20);
+/// Idle (silence) timeout for a streaming response before it is treated as
+/// stalled. NVIDIA NIM serves very large models (Nemotron 3 Ultra 550B) whose
+/// time-to-first-token can exceed 20s, so it gets a longer idle allowance.
+const kDefaultStallTimeout = Duration(seconds: 20);
+const kNimStallTimeout = Duration(seconds: 90);
+
+/// Provider-aware default idle timeout for [readStream].
+Duration stallTimeoutFor(String providerId) =>
+    providerId == 'nvidia-nim' ? kNimStallTimeout : kDefaultStallTimeout;
 
 class ChatMsg {
   final String role;
@@ -117,20 +125,21 @@ String extractDelta(String providerId, Map<String, dynamic> parsed) {
 
 /// Consume an SSE response body, calling [onDelta] for each text fragment.
 ///
-/// **Silent-stall protection (S1, not in web):** any gap >20s between stream
-/// events throws a [TimeoutException]. Pass a [stop] flag so a timeout that
-/// races a user Stop is swallowed.
+/// **Silent-stall protection (S1, not in web):** any gap longer than
+/// [stallTimeout] — which defaults to [stallTimeoutFor] the provider — between
+/// stream events throws a [TimeoutException]. Pass a [stop] flag so a timeout
+/// that races a user Stop is swallowed.
 Future<void> readStream(
   http.StreamedResponse res,
   String providerId,
   void Function(String) onDelta, {
   bool Function()? isStopped,
-  Duration stallTimeout = _stallTimeout,
+  Duration? stallTimeout,
 }) async {
   if (res.statusCode != 200) {
     throw http.ClientException('HTTP ${res.statusCode}');
   }
-  final body = res.stream.timeout(stallTimeout);
+  final body = res.stream.timeout(stallTimeout ?? stallTimeoutFor(providerId));
   var buffer = '';
   try {
     await for (final chunk in body) {

@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/accounts_service.dart';
 import '../../services/byok/byok_service.dart';
 import '../../services/byok/chat.dart';
+import '../../services/byok/envelope.dart';
 import '../../services/byok/providers.dart';
 import '../../services/currency_service.dart';
 import '../../services/finance_service.dart';
@@ -278,6 +279,9 @@ class _ChatScreenState extends State<ChatScreen> {
         },
         isStopped: () => _stopRequested,
       );
+    } on ByokConfigException {
+      if (!mounted) return;
+      setState(() => _errorKey = 'chat_error_config_missing');
     } on ByokChatException catch (e) {
       if (!mounted) return;
       setState(() => _errorKey = _codeToErrorKey(e.code));
