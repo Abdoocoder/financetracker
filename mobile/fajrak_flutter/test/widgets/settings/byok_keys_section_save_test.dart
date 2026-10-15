@@ -60,7 +60,7 @@ class _FakeByokService extends ByokService {
     void Function(String)? onDelta,
     bool Function()? isStopped,
     bool stream = true,
-    Duration stallTimeout = const Duration(seconds: 20),
+    Duration? stallTimeout,
   }) async {}
 }
 
