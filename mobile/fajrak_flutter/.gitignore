@@ -60,3 +60,9 @@ run_web.sh
 lib/firebase_options.dart
 # Widget Preview related
 .widget_preview/
+
+# Local env files — never commit
+.env
+.env.*
+!.env.example
+.env.nextjs-backup
