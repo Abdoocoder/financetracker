@@ -206,19 +206,19 @@ void main() {
     test('throws StateError when keyId is absent and BYOK_KEK_ID is unset', () {
       expectLater(
         buildEnvelope('sk-x', publicKeyPem: fixtureBPublicPem),
-        throwsStateError,
+        throwsA(isA<ByokConfigException>()),
       );
     });
 
     test('throws StateError when publicKeyPem is absent and BYOK_PUBLIC_KEY is unset', () {
       expectLater(
         buildEnvelope('sk-x', keyId: 'test-kek-v1'),
-        throwsStateError,
+        throwsA(isA<ByokConfigException>()),
       );
     });
 
     test('throws StateError when both are absent', () {
-      expectLater(buildEnvelope('sk-x'), throwsStateError);
+      expectLater(buildEnvelope('sk-x'), throwsA(isA<ByokConfigException>()));
     });
   });
 }

@@ -339,6 +339,33 @@ void main() {
       );
     });
 
+    test('proxy 500 diagnostics redact secrets without throwing', () async {
+      // Regression: _logProxyFailure -> _redactSecrets must not throw (an
+      // invalid inline `(?i)` RegExp previously surfaced as FormatException
+      // instead of ByokChatException).
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-ant-test');
+      final svc = service(
+        MockClient((req) async => http.Response(
+              '{"error":"boom","authorization":"Bearer sk-leak-123456"}',
+              500,
+            )),
+        store: store,
+      );
+
+      await expectLater(
+        svc.chat(
+          providerId: 'anthropic',
+          keyId: 'rec-1',
+          systemPrompt: 's',
+          messages: providerChat,
+          model: 'claude-sonnet-4-6',
+          onDelta: (_) {},
+        ),
+        throwsA(isA<ByokChatException>()),
+      );
+    });
+
     test('silent stall without stop -> timeout', () async {
       final store = InMemorySecureStore();
       await ByokVault(store).saveProviderKey('rec-1', 'sk-ant-test');
