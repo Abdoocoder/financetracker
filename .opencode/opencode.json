@@ -8,15 +8,6 @@
           "dart",
           "mcp-server"
         ]
-      },
-      "git": {
-        "type": "local",
-        "command": [
-          "/home/ubuntu/.local/bin/uvx",
-          "mcp-server-git",
-          "--repository",
-          "/home/ubuntu/financetracker"
-        ]
       }
     }
   }
