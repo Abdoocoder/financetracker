@@ -2,17 +2,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
+import '../../utils/exceptions.dart';
 import '../../utils/detect_currency.dart';
 import '../../services/analytics_service.dart';
 import '../../services/currency_service.dart';
 import '../../widgets/common/currency_picker_sheet.dart';
-
-class SessionRequiredException implements Exception {
-  final String message;
-  SessionRequiredException(this.message);
-  @override
-  String toString() => 'SessionRequiredException: $message';
-}
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -49,18 +43,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<void> _save() async {
     setState(() => _loading = true);
+
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ErrorHandler.handle(
+        const SessionRequiredException('No active session in onboarding'),
+        context: context,
+        developerMessage: 'Onboarding: no active session',
+        userMessage: 'error_session_required'.tr(),
+      );
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (mounted) Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        ErrorHandler.handle(
-          SessionRequiredException('No active session'),
-          context: context,
-          developerMessage: 'Onboarding: no active session',
-          userMessage: 'error_session_required'.tr(),
-        );
-        if (mounted) Navigator.pushReplacementNamed(context, '/login');
-        return;
-      }
       final income = double.tryParse(_incomeController.text) ?? 0;
 
       await Supabase.instance.client.from('profiles').upsert({
@@ -89,8 +88,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       });
 
       if (mounted) Navigator.pushReplacementNamed(context, '/main');
-    } catch (e) {
-      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Onboarding Save');
+    } catch (e, st) {
+      debugPrint('[Onboarding._save] FAILED: $e\n$st');
+      if (mounted) {
+        ErrorHandler.handle(
+          e,
+          st: st,
+          context: context,
+          developerMessage: 'Onboarding Save',
+        );
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

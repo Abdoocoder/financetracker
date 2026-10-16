@@ -514,6 +514,8 @@
   "auth_error_password_too_short": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
   "auth_error_invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
   "auth_error_email_not_confirmed": "يرجى تأكيد بريدك الإلكتروني أولاً",
+  "auth_error_email_taken": "هذا البريد الإلكتروني مسجّل مسبقاً. جرّب تسجيل الدخول.",
+  "auth_error_generic": "تعذّر إنشاء الحساب. يرجى المحاولة لاحقاً.",
   "auth_error_too_many_requests": "محاولات كثيرة جداً، يرجى الانتظار قليلاً ثم المحاولة مجدداً",
   "error_session_required": "جلسة غير صالحة. يرجى تسجيل الدخول مرة أخرى.",
   "onboarding_start": "ابدأ رحلتك 🚀",

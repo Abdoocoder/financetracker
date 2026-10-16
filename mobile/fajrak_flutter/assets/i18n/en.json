@@ -511,6 +511,8 @@
   "auth_error_password_too_short": "Password must be at least 6 characters",
   "auth_error_invalid_credentials": "Incorrect email or password",
   "auth_error_email_not_confirmed": "Please confirm your email address first",
+  "auth_error_email_taken": "This email is already registered. Try signing in.",
+  "auth_error_generic": "Could not create account. Please try again later.",
   "auth_error_too_many_requests": "Too many attempts, please wait a moment and try again",
   "error_session_required": "Invalid session. Please log in again.",
   "onboarding_start": "Start Your Journey 🚀",
