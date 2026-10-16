@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
 import '../../services/analytics_service.dart';
 
+import '../../services/byok/byok_service.dart';
 import '../../widgets/achievements/level_card.dart';
 import '../../widgets/achievements/badge_grid.dart';
 
@@ -49,33 +53,75 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   }
 
   Future<void> _load() async {
-    final user = Supabase.instance.client.auth.currentUser;
+    final auth = Supabase.instance.client.auth;
+    final user = auth.currentUser;
     if (user == null) {
       if (mounted) setState(() => _loading = false);
       return;
     }
 
-    try {
-      try {
-        await Supabase.instance.client.functions.invoke(
-          'gamification',
-          body: {'user_id': user.id},
-        );
-      } catch (_) {}
+    int points = 0;
+    List<String> badges = [];
+    int level = 1;
+    String levelTitle = 'مبتدئ';
+    int nextLevel = 50;
 
+    try {
+      // 1) Try the real gamification API (POST triggers a recompute).
+      final base = ByokService.defaultProxyBaseUrl()
+          .replaceAll(RegExp(r'/+$'), '');
+      final token = auth.currentSession?.accessToken;
+      final resp = await http
+          .post(
+            Uri.parse('$base/api/gamification'),
+            headers: {
+              'Content-Type': 'application/json',
+              if (token != null) 'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode({'user_id': user.id}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      if (resp.statusCode == 200) {
+        final json = jsonDecode(resp.body) as Map<String, dynamic>;
+        points = (json['points'] as num?)?.toInt() ?? 0;
+        badges = (json['badges'] as List?)?.cast<String>() ?? [];
+        final lvl = json['level'] as Map<String, dynamic>?;
+        if (lvl != null) {
+          level = (lvl['level'] as num?)?.toInt() ?? 1;
+          levelTitle = (lvl['title_ar'] ?? lvl['title_en'] ?? 'مبتدئ') as String;
+          nextLevel = (lvl['next'] as num?)?.toInt() ?? 50;
+        }
+        if (mounted) {
+          setState(() {
+            _points = points;
+            _badges = badges;
+            _level = level;
+            _levelTitle = levelTitle;
+            _nextLevel = nextLevel;
+            _loading = false;
+          });
+        }
+        return;
+      }
+      // else: fall through to the user_stats fallback below.
+    } catch (_) {
+      // Network/parse failure — fall through to fallback.
+    }
+
+    // 2) Fallback: read user_stats directly + compute level locally.
+    try {
       final stats = await Supabase.instance.client
           .from('user_stats')
-          .select('points, badges')
+          .select('total_points, badges')
           .eq('id', user.id)
           .maybeSingle();
 
       if (stats != null && mounted) {
-        final points = (stats['points'] as num?)?.toInt() ?? 0;
-        final badges = (stats['badges'] as List?)?.cast<String>() ?? [];
+        points = (stats['total_points'] as num?)?.toInt() ?? 0;
+        badges = (stats['badges'] as List?)?.cast<String>() ?? [];
 
-        String levelTitle = 'مبتدئ';
-        int level = 1;
-        int nextLevel = 50;
+        // Keep the existing local level ladder (50/150/350/700/1200).
         if (points >= 1200) {
           level = 6;
           levelTitle = 'حر مالياً';
@@ -107,7 +153,11 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         });
       }
     } catch (e) {
-      if (mounted) ErrorHandler.handle(e, context: context, developerMessage: 'Achievements Load');
+      if (mounted) {
+        ErrorHandler.handle(e,
+            context: context,
+            developerMessage: 'Achievements Load');
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
