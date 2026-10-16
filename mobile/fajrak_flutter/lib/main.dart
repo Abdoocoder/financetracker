@@ -65,8 +65,14 @@ Future<void> main() async {
     publishableKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
   );
 
-  // Initialize notification service
-  await NotificationService.initialize();
+  // Initialize notification service — wrapped in a timeout so a hang
+  // can never freeze the splash.
+  await NotificationService.initialize()
+      .timeout(const Duration(seconds: 5), onTimeout: () {
+        if (kDebugMode) {
+          debugPrint('[main] NotificationService.initialize() timed out');
+        }
+      });
 
   // Initialize sync service (deferred until after authentication)
   // SyncService.initialize() requires AppDatabase which needs encryption key from auth session
