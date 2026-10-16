@@ -1,6 +1,6 @@
 # AGENTS.md - Fajrak Flutter App
 
-**Version:** 3.42.2+56
+**Version:** 3.43.1+60
 
 ## Architecture Overview
 Fajrak is a Flutter finance tracker with 22 screens, sharing Supabase backend and Firebase with a Next.js web app for real-time sync. Core logic uses Supabase RPCs for accurate calculations across platforms.
