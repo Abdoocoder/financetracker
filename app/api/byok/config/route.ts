@@ -7,18 +7,17 @@
  */
 
 import { NextResponse } from 'next/server'
-import { SUPPORTED_PROVIDERS, getProvider } from '@/lib/byok/providers'
+import { SUPPORTED_PROVIDERS } from '@/lib/byok/providers'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse> {
-  // Filter to v1 scope: Ollama (clientDirect) + OpenRouter + NVIDIA NIM (proxy)
-  // Per PRD D3: 3 providers only for v1
-  const V1_PROVIDER_IDS = ['ollama', 'openrouter', 'nvidia-nim'] as const
-
-  const providers = V1_PROVIDER_IDS
-    .map((id) => getProvider(id))
-    .filter((p): p is typeof SUPPORTED_PROVIDERS[string] => p !== undefined)
+  // Advertise every provider in SUPPORTED_PROVIDERS. The proxy already
+  // accepts all of them via getProvider(); this endpoint previously
+  // filtered to a v1 subset (Ollama/OpenRouter/NVIDIA NIM), which hid
+  // OpenAI/Anthropic/Gemini from the web UI while the mobile app showed
+  // them from a hardcoded list.
+  const providers = Object.values(SUPPORTED_PROVIDERS)
 
   const publicKeyPem = process.env.NEXT_PUBLIC_BYOK_PUBLIC_KEY ?? ''
   const kekId = process.env.NEXT_PUBLIC_BYOK_KEK_ID ?? ''
