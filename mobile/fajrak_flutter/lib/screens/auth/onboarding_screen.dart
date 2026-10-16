@@ -7,6 +7,13 @@ import '../../services/analytics_service.dart';
 import '../../services/currency_service.dart';
 import '../../widgets/common/currency_picker_sheet.dart';
 
+class SessionRequiredException implements Exception {
+  final String message;
+  SessionRequiredException(this.message);
+  @override
+  String toString() => 'SessionRequiredException: $message';
+}
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -43,7 +50,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _save() async {
     setState(() => _loading = true);
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        ErrorHandler.handle(
+          SessionRequiredException('No active session'),
+          context: context,
+          developerMessage: 'Onboarding: no active session',
+          userMessage: 'error_session_required'.tr(),
+        );
+        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        return;
+      }
       final income = double.tryParse(_incomeController.text) ?? 0;
 
       await Supabase.instance.client.from('profiles').upsert({

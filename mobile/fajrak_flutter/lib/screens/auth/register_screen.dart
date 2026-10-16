@@ -5,6 +5,13 @@ import '../../widgets/common/auth_error_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+class SessionRequiredException implements Exception {
+  final String message;
+  SessionRequiredException(this.message);
+  @override
+  String toString() => 'SessionRequiredException: $message';
+}
+
 const int _kMinLength = 8;
 
 class _PasswordChecks {
@@ -85,7 +92,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
         data: {'full_name': _nameController.text.trim()},
       );
       if (res.user != null && mounted) {
-        Navigator.pushReplacementNamed(context, '/onboarding');
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user != null) {
+          Navigator.pushReplacementNamed(context, '/onboarding');
+        } else {
+          ErrorHandler.handle(
+            SessionRequiredException('No active session after signUp'),
+            context: context,
+            developerMessage: 'Register: no session after signUp',
+            userMessage: 'auth_error_email_not_confirmed'.tr(),
+          );
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      } else if (mounted) {
+        ErrorHandler.handle(
+          SessionRequiredException('signUp returned no user'),
+          context: context,
+          developerMessage: 'Register: signUp returned no user',
+          userMessage: 'auth_error_email_not_confirmed'.tr(),
+        );
       }
     } catch (e) {
       if (mounted) {

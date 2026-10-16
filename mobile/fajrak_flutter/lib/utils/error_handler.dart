@@ -24,7 +24,12 @@ class ErrorHandler {
 
   /// Standardized error handling method.
   /// Shows a Snackbar and logs the error to analytics.
-  static void handle(dynamic error, {StackTrace? st, BuildContext? context, String? developerMessage}) {
+  /// If [userMessage] is provided it overrides the default generic/network text.
+  static void handle(dynamic error,
+      {StackTrace? st,
+      BuildContext? context,
+      String? developerMessage,
+      String? userMessage}) {
     final String errorMessage = error.toString();
     dev.log('Error: $errorMessage', name: 'ErrorHandler', error: error, stackTrace: st);
 
@@ -45,7 +50,8 @@ class ErrorHandler {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  isNetwork ? 'error_no_internet'.tr() : 'error_generic'.tr(),
+                  userMessage ??
+                      (isNetwork ? 'error_no_internet'.tr() : 'error_generic'.tr()),
                   style: const TextStyle(),
                 ),
               ),
