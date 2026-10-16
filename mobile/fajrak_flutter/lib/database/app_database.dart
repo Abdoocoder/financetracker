@@ -235,6 +235,11 @@ class AppDatabase extends _$AppDatabase {
     return _instance!;
   }
 
+  /// Returns the singleton, or null if [initialize] has not been
+  /// called yet. Callers should prefer this over [instance] when
+  /// the DB is optional (e.g. offline sync queue indicators).
+  static AppDatabase? get maybeInstance => _instance;
+
   /// Closes the database and clears the singleton (useful in tests / logout).
   static Future<void> disposeInstance() async {
     await _instance?.close();

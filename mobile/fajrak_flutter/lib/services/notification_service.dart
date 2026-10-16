@@ -27,6 +27,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage? message) async {
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+  static String? _cachedFcmToken;
 
   // Static getters for Firebase Messaging handlers
   static BackgroundMessageHandler get onBackgroundMessage =>
@@ -126,9 +127,20 @@ class NotificationService {
       showNotification(message);
     });
 
-    messaging.onTokenRefresh.listen((token) async {
+    messaging.onRegistered.listen((token) async {
+      _cachedFcmToken = token;
       await saveToken(newToken: token);
     });
+
+    // Fire-and-forget: do NOT await register() — it can hang forever
+    // on Android when notification permission is not yet granted.
+    unawaited(
+      messaging.register().catchError((Object e) {
+        if (kDebugMode) {
+          debugPrint('[NotificationService] register() failed: $e');
+        }
+      }),
+    );
   }
 
   static Future<void> showNotification(RemoteMessage message) async {
@@ -204,13 +216,9 @@ class NotificationService {
         return;
       }
 
-      final token = newToken ?? await FirebaseMessaging.instance.getToken();
+      final token = newToken ?? _cachedFcmToken;
 
       if (token == null) {
-        ErrorHandler.handle(
-          Exception('FCM token is null'),
-          developerMessage: '[NotificationService] saveToken: FCM token is null',
-        );
         return;
       }
 
