@@ -1,4 +1,22 @@
-# Google Play Store Release Details - v3.42.2+56
+# Google Play Store Release Details - v3.43.1+60
+
+## Release Name
+**Fajrak v3.43.1 — Production Hotfix**
+
+## Fajrak v3.43.1 — Production Hotfix (Oct 16, 2026)
+
+### 🚨 Critical Fixes
+- **Splash screen hang (FCM)**: `NotificationService.initialize()` no longer hangs on Android when Firebase Messaging registration fails due to missing notification permission. Added a 5-second timeout as defense-in-depth.
+- **Transactions screen crash**: `AppDatabase.instance` was called before `AppDatabase.initialize()`, causing an assertion failure on Android. Added `AppDatabase.maybeInstance` nullable accessor — sync queue is gracefully skipped when the offline-first DB isn't initialized.
+
+### ✨ Also included (from 3.43.0)
+- AchievementsScreen wired to `/api/gamification` API (with `user_stats` fallback)
+- BYOK `/api/byok/config` now advertises all 6 providers (was 3: openai, anthropic, gemini added)
+- 4 missing DB RPCs restored: `get_changed_records`, `get_deleted_records`, `calculate_health_score`, `get_health_score`
+- `get_financial_dashboard` now returns real `health_score` from `get_health_score` RPC (was hardcoded `0`)
+- Store listing rewritten
+
+---
 
 ## Release Name
 **Fajrak v3.42.2 — Play Store Compliance & Auth Fixes**
@@ -95,7 +113,7 @@ Bring Your Own Key (BYOK) — Chat privately with your own LLM provider (Ollama,
 
 ---
 
-## Version Code: 56
-## Version Name: 3.42.2
+## Version Code: 60
+## Version Name: 3.43.1
 ## Target SDK: 35
 ## Min SDK: 21
