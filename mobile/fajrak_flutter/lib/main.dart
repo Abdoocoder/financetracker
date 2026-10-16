@@ -17,6 +17,7 @@ import 'screens/auth/reset_password_screen.dart';
 import 'screens/main_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
 import 'screens/accounts/accounts_screen.dart';
+import 'screens/achievements/achievements_screen.dart';
 import 'screens/debts/debts_screen.dart';
 import 'screens/transactions/transactions_screen.dart';
 import 'screens/transactions/recurring_screen.dart';
@@ -161,6 +162,7 @@ class _MyAppState extends State<MyApp> {
             '/notification-settings': (context) => const NotificationSettingsScreen(),
             '/help': (context) => const HelpScreen(),
             '/learn': (context) => const LearnScreen(),
+            '/achievements': (context) => const AchievementsScreen(),
           },
           onGenerateRoute: (settings) {
             if (settings.name == '/deep-link') {
