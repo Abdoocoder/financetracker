@@ -1,46 +1,117 @@
 === وصف التطبيق للمتجر (عربي) ===
 
-الاسم: FinanceTracker
-العنوان (30 حرف): FinanceTracker - ادارة مالية
-الوصف القصير (80 حرف): تتبع مصاريفك وديونك واستثماراتك بذكاء في مكان واحد
+الاسم: فجرك
+العنوان (30 حرف): فجرك - مدربك المالي الذكي
+الوصف القصير (80 حرف): ميزانية، زكاة، ديون، استثمار حلال، ومساعد AI خاص بك
 
 الوصف الكامل:
-💰 FinanceTracker منصة ادارة مالية شخصية ذكية
 
-هل تريد السيطرة على امولك؟ FinanceTracker يساعدك على تتبع كل ريال بشكل منظم.
+☀️ فجرك — مدربك المالي الإسلامي الذكي
 
-المميزات:
-• لوحة تحكم شاملة مع رسوم بيانية
-• تتبع المعاملات اليومية مع Quick Add
-• ميزانية شهرية مع تحذيرات التجاوز
-• ادارة الديون مع خصم تلقائي للاقساط
-• تتبع الاستثمارات باسعار حية (اسهم + عملات رقمية)
-• تنبيهات ذكية بالذكاء الاصطناعي
-• دعم عربي/انجليزي مع RTL كامل
+ابدأ يومك بسيطرة كاملة على أموالك. فجرك ليس مجرد تطبيق ميزانية — إنه مدرّب مالي شخصي يفهم القيم الإسلامية ويحترم خصوصيتك.
+
+🤖 مساعد ذكي خاص (BYOK)
+• اسأل عن أموالك بالعربية الطبيعية
+• استخدم مفتاحك الخاص من NVIDIA أو OpenAI أو Anthropic أو Gemini أو OpenRouter
+• مفاتيحك مشفّرة على جهازك فقط (AES-256-GCM + RSA-OAEP) ولا تصل لخوادمنا
+• خصوصية كاملة — لا نحتفظ بمحادثاتك
+
+🕌 أدوات إسلامية فريدة
+• حاسبة زكاة شاملة (ذهب، فضة، نقد، استثمارات، ديون)
+• تتبع حول الزكاة تلقائياً (354 يوماً)
+• سجل زكاة سنوي مع تذكيرات
+• تتبع الاستثمار الحلال (is_halal)
+
+🎯 تخطيط الاستقلال المالي (FIRE)
+• احسب رقم FIRE الشخصي
+• اعرف متى تستطيع التقاعد المالي
+• محاكاة بأهداف ادخارك الفعلية
+
+📊 إدارة مالية شاملة
+• لوحة تحكم مع رسوم بيانية
+• تتبع المعاملات مع Quick Add
+• ميزانية شهرية بقاعدة 50/30/20
+• إدارة الديون مع خصم تلقائي للأقساط
+• أهداف الادخار مع التقدم
+• أرصدة حسابات متعددة
+• دعم عملات متعددة
+
+🏆 تعلّم واكسب
+• دروس مالية يومية حسب مرحلتك
+• سلاسل تعلم (streaks)
+• شارات وإنجازات (18 شارة)
+• مستويات من مبتدئ إلى حر مالياً
+
+📱 مميزات إضافية
+• دعم عربي/إنجليزي مع RTL كامل
 • وضع داكن وفاتح
+• تصدير CSV وتقارير PDF شهرية
+• تنبيهات ذكية للفواتير والديون
+
+🔒 خصوصية أولاً
+• لا نشارك بياناتك مع أي معلن
+• تخزين محلي آمن على جهازك
+• لا تتبع إعلاني
 
 الفئة: Finance
 التصنيف العمري: للجميع
-الموقع: https://financetracker-brown.vercel.app
+الموقع: https://fajrak.com
+
 
 === English Store Listing ===
 
-Title (30 chars): FinanceTracker - Smart Finance
-Short Description: Track expenses, debts and investments intelligently in one place
+Title (30 chars): Fajrak — Smart Finance Coach
+Short Description: Budget, zakat, debts, halal investing, and your own private AI
 
 Full Description:
-Take control of your money with FinanceTracker.
 
-Features:
-• Comprehensive dashboard with charts
-• Daily transaction tracking with Quick Add
-• Monthly budget with overspending alerts
-• Debt management with automatic deductions
-• Investment portfolio with live prices (stocks + crypto)
-• AI-powered smart alerts
+☀️ Fajrak — Your Islamic Finance Coach
+
+Start your day in full control of your money. Fajrak is not just a budgeting app — it's a personal finance coach that respects Islamic values and your privacy.
+
+🤖 Private AI Assistant (BYOK)
+• Ask about your finances in natural language
+• Use your own API key from NVIDIA, OpenAI, Anthropic, Gemini, or OpenRouter
+• Keys encrypted on your device only (AES-256-GCM + RSA-OAEP) — never sent to our servers
+• Complete privacy — we don't store your conversations
+
+🕌 Unique Islamic Tools
+• Comprehensive zakat calculator (gold, silver, cash, investments, debts)
+• Automatic zakat hawl tracking (354 days)
+• Yearly zakat history with reminders
+• Halal investment flagging
+
+🎯 FIRE Planning
+• Calculate your personal FIRE number
+• See when you can reach financial independence
+• Simulate with your actual savings goals
+
+📊 Complete Financial Management
+• Dashboard with charts
+• Transaction tracking with Quick Add
+• Monthly budgets with the 50/30/20 rule
+• Debt management with auto-deduction
+• Savings goals with progress
+• Multi-account balances
+• Multi-currency support
+
+🏆 Learn & Earn
+• Daily financial lessons by life stage
+• Learning streaks
+• 18 achievement badges
+• Levels from Beginner to Financially Free
+
+📱 More Features
 • Full Arabic/English support with RTL
 • Dark and light mode
+• CSV export and monthly PDF reports
+• Smart alerts for bills and debts
+
+🔒 Privacy First
+• We never share your data with advertisers
+• Secure local storage on your device
+• No ad tracking
 
 Category: Finance
 Content Rating: Everyone
-Website: https://financetracker-brown.vercel.app
+Website: https://fajrak.com
