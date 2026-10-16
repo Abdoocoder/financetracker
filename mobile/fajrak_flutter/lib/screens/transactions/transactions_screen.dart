@@ -71,7 +71,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     // Offline queue tracking is native-only: AppDatabase is not initialized
     // on web (offline-first disabled; Supabase is used directly).
     if (kIsWeb) return;
-    final db = AppDatabase.instance;
+    final db = AppDatabase.maybeInstance;
+    if (db == null) return;   // DB not initialized — skip sync indicator
     _syncSubscription = (db.select(db.transactionsTable)
           ..where((t) => t.syncStatus.isNotValue('synced')))
         .watch()
