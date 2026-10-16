@@ -7,17 +7,17 @@ import { NextRequest } from 'next/server'
 const VALID_KEY = 'fjk_live_' + 'a'.repeat(96)
 
 describe('GET /api/byok/config', () => {
-  it('returns provider list with v1 scope (ollama, openrouter, nvidia-nim)', async () => {
+  it('returns all supported providers (openai, anthropic, nvidia-nim, openrouter, gemini, ollama)', async () => {
     const res = await GET()
     expect(res.status).toBe(200)
     const body = await res.json()
 
     expect(body.providers).toBeDefined()
     expect(Array.isArray(body.providers)).toBe(true)
-    expect(body.providers.length).toBe(3)
+    expect(body.providers.length).toBe(6)
 
     const ids = body.providers.map((p: any) => p.id).sort()
-    expect(ids).toEqual(['nvidia-nim', 'ollama', 'openrouter'])
+    expect(ids).toEqual(['anthropic', 'gemini', 'nvidia-nim', 'ollama', 'openai', 'openrouter'])
   })
 
   it('includes keyId and publicKey in response', async () => {
