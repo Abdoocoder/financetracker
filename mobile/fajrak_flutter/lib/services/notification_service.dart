@@ -131,7 +131,16 @@ class NotificationService {
       _cachedFcmToken = token;
       await saveToken(newToken: token);
     });
-    await messaging.register();
+
+    // Fire-and-forget: do NOT await register() — it can hang forever
+    // on Android when notification permission is not yet granted.
+    unawaited(
+      messaging.register().catchError((Object e) {
+        if (kDebugMode) {
+          debugPrint('[NotificationService] register() failed: $e');
+        }
+      }),
+    );
   }
 
   static Future<void> showNotification(RemoteMessage message) async {
