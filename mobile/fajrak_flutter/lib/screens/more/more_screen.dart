@@ -9,6 +9,7 @@ import '../goals/goals_screen.dart';
 import '../investments/investments_screen.dart';
 import '../learn/learn_screen.dart';
 import '../alerts/alerts_screen.dart';
+import '../achievements/achievements_screen.dart';
 import '../settings/settings_screen.dart';
 import '../help/help_screen.dart';
 import '../chat/chat_screen.dart';
@@ -95,6 +96,12 @@ class _MoreScreenState extends State<MoreScreen> {
               icon: Icons.menu_book_outlined,
               title: 'nav_learn'.tr(),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LearnScreen())),
+              colorScheme: colorScheme),
+          MoreMenuItem(
+              icon: Icons.emoji_events_outlined,
+              title: 'nav_achievements'.tr(),
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AchievementsScreen())),
               colorScheme: colorScheme),
           MoreMenuItem(
               icon: Icons.assistant_outlined,

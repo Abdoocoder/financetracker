@@ -64,11 +64,31 @@ class ListSkeleton extends StatelessWidget {
   final int count;
   const ListSkeleton({super.key, this.count = 5});
 
+  /// Row height used by CardSkeleton(height: 80) plus its 12px bottom
+  /// margin. Kept here so the layout math stays in one place.
+  static const double _rowExtent = 92;
+
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // If height is unbounded (e.g. inside a scroll view), honour
+        // the caller's requested count as-is.
+        if (!constraints.hasBoundedHeight) {
+          return _buildColumn(count);
+        }
+        // Otherwise, cap the number of rows to what actually fits.
+        final fits = (constraints.maxHeight / _rowExtent).floor();
+        return _buildColumn(fits < count ? fits : count);
+      },
+    );
+  }
+
+  Widget _buildColumn(int rows) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: List.generate(
-        count,
+        rows,
         (index) => const CardSkeleton(height: 80),
       ),
     );
