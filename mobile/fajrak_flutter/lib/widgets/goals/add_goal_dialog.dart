@@ -82,9 +82,10 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
       _showValidationError(validationError);
       return;
     }
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
     _saving = true;
     setState(() {});
-    final user = Supabase.instance.client.auth.currentUser!;
     HapticFeedback.mediumImpact();
     final target = double.parse(_targetCtrl.text.replaceAll(',', '.'));
     final current = double.tryParse(_currentCtrl.text.replaceAll(',', '.')) ?? 0;

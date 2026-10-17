@@ -193,8 +193,9 @@ class _InvestmentCashCardState extends State<InvestmentCashCard> {
       return;
     }
 
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
     setModalState(() => _transferring = true);
-    final user = Supabase.instance.client.auth.currentUser!;
 
     try {
       final convertedAmount = _needsConversion && _exchangeRate != null

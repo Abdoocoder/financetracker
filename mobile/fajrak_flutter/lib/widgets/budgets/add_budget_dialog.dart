@@ -50,9 +50,10 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
   Future<void> _save() async {
     if (_saving) return;
     if (_limitCtrl.text.isEmpty) return;
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
     _saving = true;
     setState(() {});
-    final user = Supabase.instance.client.auth.currentUser!;
     HapticFeedback.mediumImpact();
     
     final limit = double.tryParse(_limitCtrl.text) ?? 0;

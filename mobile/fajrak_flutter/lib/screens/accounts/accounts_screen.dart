@@ -175,7 +175,7 @@ class _AccountCard extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(acc['name'] as String? ?? '', style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 14)),
+            Flexible(child: Text(acc['name'] as String? ?? '', overflow: TextOverflow.ellipsis, style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800, fontSize: 14))),
             if (acc['is_default'] == true) ...[
               const SizedBox(width: 6),
               Container(

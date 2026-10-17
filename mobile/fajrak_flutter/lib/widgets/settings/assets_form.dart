@@ -60,7 +60,8 @@ class _AssetsFormState extends State<AssetsForm> {
     _savingAssets = true;
     setState(() {});
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
       await Supabase.instance.client.from('profiles').upsert({
         'id': user.id,
         'asset_real_estate': double.tryParse(_realEstateCtrl.text) ?? 0,

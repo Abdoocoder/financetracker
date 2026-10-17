@@ -83,8 +83,10 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
     final commission = double.tryParse(_buyCommCtrl.text) ?? 0.0;
     if (shares == null || shares <= 0 || price == null || price <= 0) return;
 
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+
     setState(() => _savingBuy = true);
-    final user = Supabase.instance.client.auth.currentUser!;
 
     try {
       await Supabase.instance.client.from('investment_transactions').insert({
@@ -159,8 +161,9 @@ class _InvestmentListItemState extends State<InvestmentListItem> {
       confirmLabel: 'inv_sell_confirm_btn'.tr(),
       cancelLabel: 'inv_cancel'.tr(),
       onConfirm: () async {
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user == null) return;
         setState(() => _savingSell = true);
-        final user = Supabase.instance.client.auth.currentUser!;
 
     try {
       final today = DateTime.now().toIso8601String().split('T')[0];
