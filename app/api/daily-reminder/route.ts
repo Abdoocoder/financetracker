@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
-import { getLocalNow } from '@/lib/timezone'
+import { getLocalNow, getZonedHourFromLocalNow, isLocalMorningHour } from '@/lib/timezone'
 
 // ⚠️  هذا المسار موجود للاختبار اليدوي فقط.
 // المنطق الفعلي ينفّذه المنظّم الرئيسي /api/smart-notifications عند hour === 6.
@@ -20,13 +20,15 @@ async function sendDailyReminders() {
 
   const { data: profiles } = await supabase
     .from('profiles')
-    .select('id, full_name, monthly_income')
+    .select('id, full_name, monthly_income, timezone')
     .gt('monthly_income', 0)
 
   if (!profiles?.length) return 0
 
   let sent = 0
   for (const profile of profiles) {
+    const hour = getZonedHourFromLocalNow(localNow, (profile as any).timezone)
+    if (!isLocalMorningHour(hour)) continue
     const uid = profile.id
     const name = profile.full_name?.split(' ')[0] ?? 'أخي'
     const income = profile.monthly_income ?? 0

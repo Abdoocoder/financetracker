@@ -28,6 +28,8 @@ jest.mock('@/lib/cron-auth', () => ({
 
 jest.mock('@/lib/timezone', () => ({
   getLocalNow: () => mockGetLocalNow() ?? new Date('2026-09-10T06:00:00Z'),
+  getZonedHourFromLocalNow: jest.requireActual('@/lib/timezone').getZonedHourFromLocalNow,
+  isLocalMorningHour: jest.requireActual('@/lib/timezone').isLocalMorningHour,
 }))
 
 jest.mock('@/lib/daily-lessons', () => ({
@@ -174,5 +176,46 @@ describe('GET /api/smart-notifications', () => {
     const json = await res.json()
     expect(json.ok).toBe(true)
     expect(Array.isArray(json.tasks)).toBe(true)
+  })
+
+  it('sends the morning greeting only inside the user local morning window', async () => {
+    mockGetLocalNow.mockImplementation(() => new Date('2026-09-10T06:00:00Z'))
+    mockDetermineStage?.mockReturnValueOnce('beginner')
+
+    setupMock({
+      profiles: [
+        { id: 'u1', full_name: 'أحمد علي', timezone: 'Asia/Amman' },
+      ] as any[],
+    })
+
+    await GET(makeGetRequest())
+    expect(sendPushToUser).toHaveBeenCalledWith(
+      'u1',
+      expect.stringContaining('صباح الخير'),
+      expect.any(String),
+      '/dashboard?quick=1',
+      'morning'
+    )
+  })
+
+  it('skips the morning greeting outside the user local morning window', async () => {
+    // 06:00 server-local (UTC+3) → instant 03:00Z → 12:00 in Asia/Tokyo → not morning
+    mockGetLocalNow.mockImplementation(() => new Date('2026-09-10T06:00:00Z'))
+    mockDetermineStage?.mockReturnValueOnce('beginner')
+
+    setupMock({
+      profiles: [
+        { id: 'u1', full_name: 'أحمد علي', timezone: 'Asia/Tokyo' },
+      ] as any[],
+    })
+
+    await GET(makeGetRequest())
+    expect(sendPushToUser).not.toHaveBeenCalledWith(
+      'u1',
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      'morning'
+    )
   })
 })

@@ -9,6 +9,7 @@ import { SUPPORTED_PROVIDERS, type ByokProvider } from '@/lib/byok/providers'
 import { byokChat } from '@/lib/byok/client'
 import { getProviderKey, hasProviderKey, isVaultUnavailable } from '@/lib/byok/vault'
 import { buildChatBody, readStream, type ChatMsg } from '@/lib/byok/chat'
+import { buildChatFormatRules } from '@/lib/byok/system-prompt'
 import { formatAmount } from '@/lib/currency'
 
 interface ByokKeyRow {
@@ -126,7 +127,9 @@ export default function ChatAssistant() {
                     : '')
             )
         }
-        return parts.join('\n')
+        const base = parts.join('\n')
+        const rules = buildChatFormatRules({ plainText: true, currency: 'JOD' })
+        return `${base}\n\n${rules}`
     }, [t, balancesLoading, totalBalance, monthly, currency])
 
     const send = useCallback(async () => {

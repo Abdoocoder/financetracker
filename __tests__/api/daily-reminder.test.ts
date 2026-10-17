@@ -19,12 +19,15 @@ jest.mock('@/lib/cron-auth', () => ({
 }))
 
 jest.mock('@/lib/timezone', () => ({
-  getLocalNow: jest.fn().mockReturnValue(new Date('2026-09-10T06:00:00Z')),
+  getLocalNow: jest.fn(() => new Date('2026-09-10T06:00:00Z')),
+  getZonedHourFromLocalNow: jest.requireActual('@/lib/timezone').getZonedHourFromLocalNow,
+  isLocalMorningHour: jest.requireActual('@/lib/timezone').isLocalMorningHour,
 }))
 
 import { GET } from '@/app/api/daily-reminder/route'
 import { NextRequest } from 'next/server'
 import { sendPushToUser } from '@/lib/push-send'
+import { getLocalNow } from '@/lib/timezone'
 
 function makeGetRequest(url = 'http://localhost/api/daily-reminder') {
   return new NextRequest(url)
@@ -91,6 +94,10 @@ function setupMock({
 }
 
 describe('GET /api/daily-reminder', () => {
+  beforeEach(() => {
+    ;(getLocalNow as jest.Mock).mockReturnValue(new Date('2026-09-10T06:00:00Z'))
+  })
+
   it('returns 401 when cron auth fails', async () => {
     const { verifyCronAuth } = require('@/lib/cron-auth')
     verifyCronAuth.mockReturnValueOnce(false)
@@ -138,6 +145,54 @@ describe('GET /api/daily-reminder', () => {
       'u1',
       expect.stringContaining('أحسنت'),
       expect.stringContaining('المتاح اليوم'),
+      '/dashboard?quick=1',
+      'daily-reminder'
+    )
+  })
+
+  it('does NOT send the morning greeting at 3:20 AM in the user timezone', async () => {
+    ;(getLocalNow as jest.Mock).mockReturnValue(new Date('2026-09-10T03:20:00Z'))
+    setupMock({
+      profiles: [
+        { id: 'u1', full_name: 'أحمد علي', monthly_income: 1000, timezone: 'Asia/Amman' },
+      ] as any[],
+      transactions: [],
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.ok).toBe(true)
+    expect(json.sent).toBe(0)
+    expect(sendPushToUser).not.toHaveBeenCalled()
+  })
+
+  it('does NOT send the morning greeting at 3:20 AM when no timezone is stored', async () => {
+    ;(getLocalNow as jest.Mock).mockReturnValue(new Date('2026-09-10T03:20:00Z'))
+    setupMock({
+      profiles: [{ id: 'u1', full_name: 'أحمد علي', monthly_income: 1000 }] as any[],
+      transactions: [],
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.sent).toBe(0)
+    expect(sendPushToUser).not.toHaveBeenCalled()
+  })
+
+  it('sends the greeting when it is morning in the user timezone, even if the server hour is not', async () => {
+    // 01:00 server-local (UTC+3) → instant 22:00Z previous day → 07:00 in Asia/Tokyo
+    ;(getLocalNow as jest.Mock).mockReturnValue(new Date('2026-09-10T01:00:00Z'))
+    setupMock({
+      profiles: [
+        { id: 'u1', full_name: 'أحمد علي', monthly_income: 1000, timezone: 'Asia/Tokyo' },
+      ] as any[],
+      transactions: [],
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.sent).toBe(1)
+    expect(sendPushToUser).toHaveBeenCalledWith(
+      'u1',
+      expect.stringContaining('صباح الخير'),
+      expect.any(String),
       '/dashboard?quick=1',
       'daily-reminder'
     )

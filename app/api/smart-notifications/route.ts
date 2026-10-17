@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { getLessonForStage, determineStage } from '@/lib/daily-lessons'
 import { verifyCronAuth } from '@/lib/cron-auth'
-import { getLocalNow } from '@/lib/timezone'
+import { getLocalNow, getZonedHourFromLocalNow, isLocalMorningHour } from '@/lib/timezone'
 
 // ── helpers ──────────────────────────────────────────
 function getLocalHour() {
@@ -32,11 +32,13 @@ async function dailyMorningReminder() {
   const daysLeft = new Date(year, month, 0).getDate() - day + 1
 
   const { data: profiles } = await supabase
-    .from('profiles').select('id, full_name, monthly_income, lang')
+    .from('profiles').select('id, full_name, monthly_income, lang, timezone')
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 
   await Promise.allSettled(profiles.map(async (p) => {
+    const hour = getZonedHourFromLocalNow(now, (p as any).timezone)
+    if (!isLocalMorningHour(hour)) return
     const name = p.full_name?.split(' ')[0] ?? 'أخي'
     const income = p.monthly_income ?? 0
     const userLang: 'ar' | 'en' = p.lang === 'en' ? 'en' : 'ar'
@@ -214,7 +216,7 @@ async function wealthGuidanceAlert() {
 
   const supabase = createAdminClient()
   const { data: profiles } = await supabase
-    .from('profiles').select('id, full_name, monthly_income, lang')
+    .from('profiles').select('id, full_name, monthly_income, lang, timezone')
     .gt('monthly_income', 0)
   if (!profiles?.length) return
 

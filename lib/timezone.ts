@@ -15,3 +15,44 @@ export function getTimezoneOffsetMs(): number {
 export function getLocalNow(): Date {
   return new Date(Date.now() + getTimezoneOffsetMs())
 }
+
+export function getZonedHour(instant: Date | null | undefined, timeZone?: string | null): number {
+  if (!instant) return 3
+  const tz = timeZone || undefined
+
+  try {
+    // Use Intl when possible
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      hour12: false,
+      hour: '2-digit',
+      timeZoneName: undefined,
+    })
+    const parts = formatter.formatToParts(instant)
+    const hourPart = parts.find((p) => p.type === 'hour')
+    if (hourPart && hourPart.value) {
+      const h = Number.parseInt(hourPart.value, 10)
+      if (!Number.isNaN(h)) return h % 24
+    }
+  } catch (e) {
+    // fall through to offset-based
+  }
+
+  if (!tz) return (instant.getUTCHours() + 3) % 24 // default to UTC+3
+  return 3 // unknown timezone - fallback
+}
+
+export function getZonedHourFromLocalNow(
+  localNow: Date | null | undefined,
+  timeZone?: string | null
+): number {
+  if (!localNow) return 6
+  // re-project server-local (instant + offset) to the user's timezone
+  const serverOffset = getTimezoneOffsetMs()
+  const instant = new Date(localNow.getTime() - serverOffset)
+  return getZonedHour(instant, timeZone)
+}
+
+export function isLocalMorningHour(hour: number): boolean {
+  return hour >= 5 && hour < 11
+}
