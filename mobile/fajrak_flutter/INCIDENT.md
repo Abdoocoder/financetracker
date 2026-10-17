@@ -74,3 +74,7 @@
 - **Rotate the Supabase anon key** (still recommended post-incident — the key is embedded in clients).
 - **Consider upgrading off the Free tier** to enable PITR and higher platform resilience.
 - **Keep the daily R2 backup pipeline monitored** (alert on consecutive failed runs).
+
+## Security Hardening Backlog
+
+- Linter report reviewed; anon EXECUTE privileges revoked on internal RPCs via migration `20261018000000_linter_security_hardening.sql`.
