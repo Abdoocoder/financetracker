@@ -76,7 +76,6 @@ mobile/fajrak_flutter/android/build/
 # Backups must never be committed
 *.dump
 fajrak_backups/
-INCIDENT.md
 
 # Local secure configs (Google OAuth credentials, client secrets)
 secure_configs/

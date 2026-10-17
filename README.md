@@ -1,5 +1,7 @@
 # FinanceTracker (Fajrak)
 
+**Version:** 3.44.0+63
+
 A comprehensive personal finance tracking application with:
 - **Next.js 16+ App Router** frontend (TypeScript, React 19, Tailwind CSS)
 - **Supabase** backend (PostgreSQL 17, Auth, Realtime, Edge Functions)
@@ -63,3 +65,10 @@ A comprehensive personal finance tracking application with:
 - **Observability**: Sentry, OpenTelemetry, Grafana
 - **AI**: BYOK pattern for LLM integration, MCP server
 - **Push**: Firebase FCM (mobile), Web Push VAPID (browser)
+
+## Recent Updates (v3.44.0)
+- **AI Assistant**: proper Markdown rendering + Arabic prompt tuning + JOD 3-decimal formatting
+- **Alerts**: timezone-aware morning greeting (05:00–10:59 local) + zero-budget trigger guard
+- **Security**: 11 `currentUser!` null-safety fixes (mobile)
+- **Android**: Firebase FID registration manifest flag added
+- **Dependency**: migrated `flutter_markdown` → `flutter_markdown_plus ^1.0.12`

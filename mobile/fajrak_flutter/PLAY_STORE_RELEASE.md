@@ -1,3 +1,23 @@
+# Google Play Store Release Details - v3.44.0+63
+
+**Fajrak v3.44.0 — Feature & Stability Release**
+
+## Version Code: 63
+## Version Name: 3.44.0
+
+### 🐛 Fixed
+- AI Assistant: proper Arabic formatting (no raw Markdown), JOD 3-decimal display, no English filler words
+- Alerts: no more "Good morning" at 3 AM; per-user timezone gating (05:00–10:59 local)
+- Budget alerts: no false "exceeded" alerts when monthly_limit = 0 (DB trigger guard applied)
+- Accounts screen: RenderFlex overflow fixed for long account names
+- Session safety: 11 `currentUser!` force-unwraps replaced with null-safe early returns
+- Firebase: installation_id manifest flag added (FCM registration now works)
+
+### 🧪 Quality
+- 592 Web tests + 177 Flutter tests passing
+
+---
+
 # Google Play Store Release Details - v3.43.1+60
 
 ## Release Name

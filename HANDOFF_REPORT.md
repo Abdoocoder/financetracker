@@ -10,18 +10,18 @@
 
 - Repo is a dual-client personal-finance product: **Next.js 16 web app** + **Flutter mobile app**, both on one **Supabase** (PostgreSQL 17, Auth, RLS, RPCs, Realtime, Edge Functions) backend, deployed via Vercel/Firebase Hosting and Google Play.
 - Target market: Arabic-speaking users, primarily **Kuwait & the Gulf**; product identity is "**Fajrak** — Islamic finance coach" (zakat, halal investing, FIRE), while repo/tooling is named "FinanceTracker" — an unresolved identity mismatch.
-- **CRITICAL open incident** (`mobile/fajrak_flutter/INCIDENT.md`): production Supabase DB (`ujwcvtpwsaidljecqbaa`, Tokyo, Free plan) unreachable since ≥2026-10-11, **zero backups**, ~0.2% request success, unknown external client hammering `/rest/v1/testimonials`; anon key rotation pending.
+- Production incident: RESOLVED — see `mobile/fajrak_flutter/INCIDENT.md` (post-mortem). Outage ran ≥2026-10-11 → 2026-10-17; daily backups + zero-budget trigger guard now in place.
 - **Database drift is the #1 technical risk**: live prod has columns/tables not in migrations (`user_stats`, `testimonials`, `saving_challenges`, `health_score_history`, 25+ extra `profiles` columns) — `supabase db reset` would destroy prod reality.
 - Schema defines **29 tables; all 29 have `ENABLE ROW LEVEL SECURITY`** in migrations — but live-prod RLS state for the 4 unmigrated tables is UNKNOWN (policies exist, table DDL does not).
-- `currentUser!` force-unwrap: **11 occurrences in 10 files** under `mobile/fajrak_flutter/lib/` (file:line list in §5) — null-bust crash risk if auth state races.
-- Tests (declared, not re-run): **561 Jest** (AUDIT_REPORT) vs **524/56 suites** (DEEP_PROJECT_ANALYSIS) — docs themselves drift; **135 Flutter**, **7 Playwright**; coverage **44.85% stmts**, dashboard pages **0%** vs 80% target.
+- `currentUser!` force-unwrap: **FIXED in v3.44.0** — all 11 occurrences in 10 files under `mobile/fajrak_flutter/lib/` replaced with null-safe early returns (historical list retained in §4).
+- Tests (declared, not re-run): **592 Jest** (66 suites) and **177 Flutter**; **7 Playwright**; coverage **44.85% stmts**, dashboard pages **0%** vs 80% target (older docs cite 561/524 Jest — see §5).
 - Financial calculations are **duplicated 5–7× per metric** across web/mobile/SQL (per ARCHITECTURE_AUDIT_VERIFIED) with some hardcoded health-score thresholds (partially addressed by migration `20261017000000`).
 - Dependency issues (declared versions only): 8 moderate `@opentelemetry` vulns (documented), accidental runtime deps `install`/`npx` in `package.json`, Flutter `flutter_local_notifications: ^23.0.0-dev.3` (dev prerelease) and `sqlcipher_flutter_libs: ^0.7.0+eol` in a shipping app.
-- Release drift: web **3.42.0** vs mobile pubspec **3.43.3+62** vs AGENTS/README/Play docs **3.43.1+60** vs structure.md **3.40.0+51** — five sources of version truth, none authoritative.
+- Release: mobile **3.44.0+63** shipped to Google Play (Submission ID 44, status "In review"); web `package.json` remains **3.42.0**. Historical version drift across five sources is documented in §9.
 - Security posture: RLS-first design is sound; open items are **leaked-password protection disabled**, pending anon-key rotation, no feature flags, and BYOK "keys never leave device" store copy vs the envelope actually POSTed to the proxy (wording needs legal review).
 - Process reality: **single-developer SPOF**, no revenue/subscriptions, ~58 migration files (legacy 001–041 + 12 dated + 042–048 with numbering gaps 020/044–046), and multiple overlapping audit documents with conflicting numbers.
-- Toolchain is documented green: lint, typecheck, Jest, Playwright, `next build`, `flutter analyze`, 135 Flutter tests all pass per audits (not re-verified in this recon).
-- Biggest structural gaps for a new architect: DB-not-managed-by-migrations, duplicated calculation logic, version/identity drift, and the active production outage — everything else is polish.
+- Toolchain is documented green: lint, typecheck, Jest (592), Playwright, `next build`, `flutter analyze`, 177 Flutter tests all pass per audits (not re-verified in this recon).
+- Biggest structural gaps for a new architect: DB-not-managed-by-migrations, duplicated calculation logic, and version/identity drift. (The production outage is **resolved** — see `mobile/fajrak_flutter/INCIDENT.md`.)
 
 ---
 
@@ -71,10 +71,10 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 - Security-hardening migrations present: `advisor_function_lockdown`, `revoke_public_from_secdef_functions`, `verify_owner_in_user_rpcs`, `022_security_hardening`, `024_production_hardening`.
 - `supabase/config.toml` has `[auth] enabled = true`; **leaked-password protection is not enabled** (flagged as recommendation in AUDIT_REPORT.md:179).
 
-## 4. Codebase Structure & Force-Unwrap Hotspots
+## 4. Codebase Structure & Force-Unwrap Hotspots (RESOLVED in v3.44.0)
 
 - Structure map: see §2 "Code shape" plus `hooks/`, `types/index.ts` (single source of truth), `e2e/`, `__tests__/`, `observability/`, `docs/`, `mobile/`.
-- **`currentUser!` in `mobile/fajrak_flutter/lib/` — 11 occurrences, 10 files (file:line):**
+- **`currentUser!` in `mobile/fajrak_flutter/lib/` — RESOLVED in v3.44.0** (was 11 occurrences in 10 files; all replaced with null-safe early returns). Historical file:line list retained for reference:
 
 | # | File:line |
 |---|---|
@@ -90,17 +90,18 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 | 10 | `lib/widgets/debts/debt_list_item.dart:71` |
 | 11 | `lib/widgets/goals/add_goal_dialog.dart:87` |
 
-- Risk: any auth-state race (sign-out mid-session, session refresh failure — note the incident's auth retry errors) throws a null-check crash in add/edit/delete dialogs and list items. Recommend `?.` + early-return or a `requireAuth()` helper.
+- Status: **fixed in v3.44.0** — auth-state races (sign-out mid-session, session refresh failure) no longer throw a null-check crash; the add/edit/delete dialogs and list items now use null-safe early returns. (Legacy recommendation was `?.` + early-return or a `requireAuth()` helper.)
 
 ## 5. Tests & Coverage (declared only — suites NOT run)
 
 | Source | Web (Jest) | Flutter | Playwright | Coverage |
 |---|---|---|---|---|
-| `AUDIT_REPORT.md` | **561** | **135** | **7 specs** | — |
+| **Current (v3.44.0)** | **592 / 66 suites** | **177** | 7 specs | 44.85% stmts (last measured) |
+| `AUDIT_REPORT.md` (historical) | **561** | **135** | **7 specs** | — |
 | `DEEP_PROJECT_ANALYSIS.md` | **524 / 56 suites** | — | 7/7 (~46.5s) | **44.85% stmts** / 30.78% branch / 30.7% funcs / 48.07% lines |
 | On disk (files counted) | 62 test files | 20 test files | 7 specs | — |
 
-- **Docs disagree (561 vs 524)** — both claim green; treat as "524–561 passing, exact count needs one CI run".
+- **Current counts (v3.44.0): 592 web tests across 66 suites, 177 Flutter tests.** Older audits cite 561 / 524 / 135 — treat those as historical.
 - `mobile/AGENTS.md` says "`flutter test` runs 13 files" but **20 test files exist** → stale doc.
 - CLAUDE.md target is **80%+ coverage**; actual 44.85%; **dashboard pages 0%** (AUDIT_REPORT flags as Medium risk needing E2E).
 - Known test-infra quirk: Jest uses `forceExit` due to a documented worker leak (low risk, accepted).
@@ -114,10 +115,11 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 - **Smells:** runtime deps `install ^0.13.0` and `npx ^10.2.2` (accidental npm installs), `jsdom ^30.1.1` listed under dependencies (should be dev).
 - OTel version soup: `0.222.0`-series exporters/sdk-node alongside `2.11.0` resources/sdk-metrics — mixed major lines.
 
-**Mobile (`pubspec.yaml`, v3.43.3+62) key declared versions:**
-`supabase_flutter ^2.3.4`, `provider ^6.1.1`, `firebase_core ^5.0.0`, `firebase_messaging ^17.0.0`, `drift ^2.18.0`, `fl_chart ^1.2.0`, `syncfusion_flutter_charts ^35.1.37`, `pdf ^3.10.7`, `flutter_secure_storage ^11.2.0`, `easy_localization ^3.0.3`.
+**Mobile (`pubspec.yaml`, v3.44.0+63) key declared versions:**
+`supabase_flutter ^2.3.4`, `provider ^6.1.1`, `firebase_core ^5.0.0`, `firebase_messaging ^17.0.0`, `drift ^2.18.0`, `fl_chart ^1.2.0`, `syncfusion_flutter_charts ^35.1.37`, `pdf ^3.10.7`, `flutter_secure_storage ^11.2.0`, `easy_localization ^3.0.3`, `flutter_markdown_plus ^1.0.12`.
 - **Concerning pins:** `flutter_local_notifications: ^23.0.0-dev.3` (**dev prerelease in production**), `sqlcipher_flutter_libs: ^0.7.0+eol` (**EOL-suffixed build**), `webcrypto ^0.6.0` (unmaintained), `flutter_app_badge_control ^0.0.2`.
 - README flags **legacy KGP plugins** (`firebase_analytics`, `firebase_core`, `flutter_app_badge_control`) needing migration to built-in Kotlin before Flutter drops support.
+- **Resolved dependency debt (v3.44.0):** the deprecated `flutter_markdown` package was replaced by **`flutter_markdown_plus ^1.0.12`** (used by the AI chat assistant for proper Markdown rendering).
 
 ## 7. Feature Set vs Store Listing (`store-listing.txt`)
 
@@ -135,12 +137,12 @@ Store listing (ar + en) claims, mapped to implementation:
 | "Keys never sent to our servers" | ⚠️ architecture POSTs an **RSA-OAEP envelope + payload** to `{proxy}/api/byok/proxy` — technically wrapped, but verify store-copy wording |
 | "No ad tracking" / AD_ID permission | ⚠️ AD_ID permission added for Firebase Analytics compliance (Play requirement) — reconcile messaging |
 
-- Store identity: ar name "فجرك — مدربك المالي الذكي", en "Fajrak — Smart Finance Coach", category Finance, rating Everyone, site fajrak.com. Last documented release: **v3.43.1 (Oct 16, 2026)** "Production Hotfix" (FCM splash hang + transactions crash), version code 60, target SDK 35, min SDK 21.
+- Store identity: ar name "فجرك — مدربك المالي الذكي", en "Fajrak — Smart Finance Coach", category Finance, rating Everyone, site fajrak.com. Last documented release: **v3.44.0** (Oct 17, 2026) "Feature & Stability Release", version code 63 (Submission ID 44, status "In review"). Previous: v3.43.1 (Oct 16, 2026) "Production Hotfix" (FCM splash hang + transactions crash), version code 60, target SDK 35, min SDK 21.
 
 ## 8. Known Risks (documented — max 15 bullets)
 
-1. 🔴 **Production DB outage** — unreachable since ≥2026-10-11, 0.2% success, external hammering of `/rest/v1/testimonials` (INCIDENT.md).
-2. 🔴 **Zero backups** of the production Supabase Free-plan project — any loss is permanent.
+1. ✅ **Production DB outage — RESOLVED** (2026-10-17); post-mortem in `mobile/fajrak_flutter/INCIDENT.md`.
+2. ✅ **Backups — RESOLVED:** daily GitHub Actions → Cloudflare R2 (`fajrak-backups`) pipeline is live; 4 dumps retained (2026-10-14 → 2026-10-17).
 3. 🔴 **DB drift**: live schema ≠ migrations; `supabase db reset`/fresh migrate would destroy prod reality.
 4. 🔴 **Financial logic duplication** — 5–7 implementations of the same metric across web/mobile/SQL (ARCHITECTURE_AUDIT_VERIFIED).
 5. 🟠 Hardcoded health-score thresholds / hardcoded `0` health score bug (partially fixed by `20261016114425` + `20261017000000` migrations).
@@ -151,25 +153,27 @@ Store listing (ar + en) claims, mapped to implementation:
 10. 🟠 Anon key rotation still pending (post-incident) — key is embedded in clients.
 11. 🟡 Identity/currency inconsistencies: FinanceTracker vs Fajrak; **KWD (CLAUDE.md) vs JOD (prod default)** vs "Kuwait/Gulf" (PRODUCT.md).
 12. 🟡 Version drift across 5 documents (see §9).
-13. 🟡 11 `currentUser!` force-unwraps (see §4).
+13. 🟡 **Makefile fragility:** `mobile/fajrak_flutter/Makefile` extracts Firebase keys from `.env` via **unanchored** `grep`, matching `FLUTTER_FIREBASE_*` by substring. Anchoring the grep (`^FIREBASE_*`) would silently break web builds.
 14. 🟡 Single-developer SPOF; no bus-factor docs beyond this handoff; no revenue to fund help.
 15. 🟡 Play `dev`/`eol`-suffixed Flutter plugins in production (see §6).
 
 ## 9. Release & Version Drift
 
+**Current release:** mobile **3.44.0+63** — shipped to Google Play (Submission ID 44, status "In review", Oct 17 2026 22:29).
+
 | Source | Declared version |
 |---|---|
-| `package.json` (web) | **3.42.0** |
-| `mobile/fajrak_flutter/pubspec.yaml` | **3.43.3+62** |
-| `mobile/AGENTS.md` | 3.43.1+60 |
-| `mobile/README.md` | 3.43.1+60 |
-| `mobile/PLAY_STORE_RELEASE.md` | 3.43.1+60 (version code 60, target SDK 35, min SDK 21) |
+| `mobile/fajrak_flutter/pubspec.yaml` | **3.44.0+63** |
+| `mobile/README.md` | **3.44.0+63** |
+| `mobile/PLAY_STORE_RELEASE.md` | **3.44.0+63** (version code 63) |
+| `package.json` (web) | 3.42.0 *(web app not re-released)* |
+| `mobile/AGENTS.md` | 3.43.1+60 (stale) |
 | `structure.md` | 3.40.0+51 (stale) |
 
-- No single source of truth for release version; Play submission (3.43.1) is **behind** pubspec (3.43.3+62) — either 3.43.3 is unreleased or docs lag.
-- Release notes show a hotfix cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash).
+- Mobile version sources are now aligned at **3.44.0+63**; web `package.json` still declares **3.42.0** (web/mobile ship independently from the same repo).
+- Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → **3.44.0** (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety).
 - Build-process fragility: running `flutter build appbundle --release` directly (bypassing Makefile) silently ships a build with **no credentials → login fails** (documented past incident).
-- Web/mobile ship independently from the same repo; no changelog file at root observed (per this recon).
+- No changelog file at root; release history lives in `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md`.
 
 ## 10. Agent & Development Conventions (CLAUDE.md, ≤10 bullets)
 
@@ -188,7 +192,7 @@ Store listing (ar + en) claims, mapped to implementation:
 
 - **MISSING: `CONTEXT.md`** and **MISSING: `RESEARCH.md`** — explicitly noted as absent in `mobile/fajrak_flutter/UI-SPEC.md` ("No CONTEXT.md exists — No locked decisions to respect").
 - Migration numbering gaps: **020, 044, 045, 046** absent; legacy has duplicate numbers (two `003_*`, two `029_*`).
-- Doc-vs-disk drift: test counts (561 vs 524), Flutter test files (AGENTS says 13, disk has 20), versions (5 sources), structure.md pinned at 3.40.0.
+- Doc-vs-disk drift (remaining): `mobile/AGENTS.md` still pinned at **3.43.1+60** and says "13 test files" (disk has 20); `structure.md` pinned at **3.40.0+51**. Test counts are reconciled to **592 web / 177 Flutter**.
 - Overlapping/conflicting audit corpus: `AUDIT_REPORT.md`, `ARCHITECTURE_AUDIT.md`, `ARCHITECTURE_AUDIT_VERIFIED.md`, `DEEP_PROJECT_ANALYSIS.md`, `AUDIT_REPORT_AR.md`, `COMPREHENSIVE_AUDIT_REPORT_AR.md`, `FAJRAK_AUDIT_REPORT_AR.md`, `FAJRAK_ACCOUNTING_ANALYSIS.md` — several AR variants skimmed at header/key-section level only in this recon; no precedence order declared among them.
 - `20260913135653_add_prod_only_schema.sql` exists precisely because prod DDL was never migrated — signals that migrations are not the system of record.
 - No root CHANGELOG/VERSION file found in this recon (release history lives in `PLAY_STORE_RELEASE.md` only, mobile-side).
@@ -199,11 +203,11 @@ Store listing (ar + en) claims, mapped to implementation:
 
 ## 12. Questions for the Owner
 
-1. **Production DB**: what is the recovery plan for `ujwcvtpwsaidljecqbaa` (PITR/PgBackrest on paid tier, export, or restore-from-client-cache)? Who owns the outage with Supabase?
-2. **Backups**: may we enable daily backups + upgrade off the Free plan immediately, regardless of other decisions?
+1. **Production DB** (RESOLVED 2026-10-17): the outage is over — recovery plan / post-mortem in `mobile/fajrak_flutter/INCIDENT.md`. Remaining: any formal Supabase-side ownership follow-up.
+2. **Backups** (RESOLVED): daily GitHub Actions → Cloudflare R2 pipeline is live (4 dumps retained). Still open: decide whether to upgrade off the Free plan for PITR.
 3. **Schema truth**: do you want the live DB formally reconciled into migrations (baseline dump → squashed migration), so `db:push` becomes safe?
 4. **Anon key rotation**: post-incident, can we rotate the Supabase anon key and ship updated clients — and who is the unknown tester hitting `/rest/v1/testimonials`?
-5. **Version truth**: which version is actually live — web 3.42.0, Play 3.43.1+60, or pubspec 3.43.3+62? Where should the single version source live?
+5. **Version truth** (answered): mobile is **3.44.0+63** on Google Play (Submission ID 44); web `package.json` remains **3.42.0**. Decide whether the web app should track the same version.
 6. **Identity**: ship as "Fajrak" everywhere (store, repo, domain) or keep "FinanceTracker"? Any Play-console renaming constraints?
 7. **Default currency**: KWD, JOD, or per-profile detection? Which is authoritative for new signups?
 8. **Money**: is monetization (subscription/IAP) planned — it determines whether to prioritize paywall/auth work, feature flags, and higher test bars?
