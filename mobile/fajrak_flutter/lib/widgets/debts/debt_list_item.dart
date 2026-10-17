@@ -67,8 +67,14 @@ class _DebtListItemState extends State<DebtListItem> {
     _payingSaving = true; // تعيين فوري قبل أي await
     setState(() {});
     
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      _payingSaving = false;
+      setState(() {});
+      return;
+    }
+    
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
       final amountInBaseCurrency = _paymentCurrency == widget.currency ? amount : (amount * _paymentExchangeRate);
 
       final currentRemaining = (widget.debt['remaining_amount'] as num).toDouble();

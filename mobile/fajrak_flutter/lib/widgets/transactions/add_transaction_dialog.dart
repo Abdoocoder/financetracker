@@ -112,9 +112,10 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   Future<void> _save() async {
     if (_saving) return;
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
     _saving = true;
     setState(() {});
-    final user = Supabase.instance.client.auth.currentUser!;
     final origAmount = double.tryParse(_amountController.text) ?? 0;
     final rate = double.tryParse(_exchangeRateController.text) ?? 1.0;
     final baseAmount = _selectedCurrency == widget.baseCurrency ? origAmount : (origAmount * rate);

@@ -65,7 +65,8 @@ class _ProfileFormState extends State<ProfileForm> {
     _savingProfile = true;
     setState(() {});
     try {
-      final user = Supabase.instance.client.auth.currentUser!;
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
       final newIncome = double.tryParse(_incomeCtrl.text) ?? 0;
 
       await Supabase.instance.client.from('profiles').upsert({

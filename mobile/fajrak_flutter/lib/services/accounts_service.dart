@@ -4,22 +4,26 @@ import 'package:uuid/uuid.dart';
 class AccountsService {
   static SupabaseClient get _db => Supabase.instance.client;
 
-  static String get _uid => _db.auth.currentUser!.id;
+  static String? get _uid {
+    final user = _db.auth.currentUser;
+    return user?.id;
+  }
 
   /// جلب الحسابات مع حساب الرصيد باستخدام RPC المركزية
   static Future<List<Map<String, dynamic>>> fetchAccounts() async {
-    final userId = _uid;
+    final uid = _uid;
+    if (uid == null) return [];
     // جلب بيانات الحسابات الأساسية
     final accounts = await _db
         .from('accounts')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', uid)
         .eq('is_archived', false)
         .order('is_default', ascending: false)
         .order('created_at');
 
     // جلب الأرصدة المحسوبة من القاعدة مباشرة (Best Practice)
-    final List<dynamic> balancesData = await _db.rpc('get_account_balances', params: {'p_user_id': userId});
+    final List<dynamic> balancesData = await _db.rpc('get_account_balances', params: {'p_user_id': uid});
     
     final Map<String, double> balanceMap = {
       for (var b in balancesData) b['account_id'] as String: (b['current_balance'] as num).toDouble()
@@ -43,8 +47,10 @@ class AccountsService {
     required String icon,
     bool isDefault = false,
   }) async {
+    final uid = _uid;
+    if (uid == null) return;
     await _db.from('accounts').insert({
-      'user_id': _uid,
+      'user_id': uid,
       'name': name,
       'type': type,
       'opening_balance': openingBalance,
@@ -70,9 +76,11 @@ class AccountsService {
     required String date,
     String? note,
   }) async {
+    final uid = _uid;
+    if (uid == null) return;
     final pairId = const Uuid().v4();
     await _db.from('transactions').insert({
-      'user_id': _uid,
+      'user_id': uid,
       'type': 'transfer',
       'amount': amount,
       'category': 'تحويل',

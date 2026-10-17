@@ -7,10 +7,12 @@ import '../../services/byok/byok_service.dart';
 import '../../services/byok/chat.dart';
 import '../../services/byok/envelope.dart';
 import '../../services/byok/providers.dart';
+import '../../services/byok/prompt_rules.dart';
 import '../../services/currency_service.dart';
 import '../../services/finance_service.dart';
 import '../../screens/settings/settings_screen.dart';
 import '../../utils/error_handler.dart';
+import 'message_bubble.dart';
 
 class ChatKeyRow {
   final String id;
@@ -230,9 +232,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final base = 'chat_financial_context'.tr();
     if (_loadingContext) return base;
     String fmt(double v) => CurrencyService.formatAmount(v, _currency);
-    return '$base\n\n'
+    final context = '$base\n\n'
         'Current total balance: ${fmt(_totalBalance)}. '
         'This month: income ${fmt(_income)}, expenses ${fmt(_expenses)}.';
+    return '$context\n\n${ChatPromptRules.buildChatFormatRules(plainText: false)}';
   }
 
   String _codeToErrorKey(String code) => switch (code) {
@@ -506,7 +509,7 @@ class _ChatScreenState extends State<ChatScreen> {
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
       children: [
-        _MessageBubble(
+        MessageBubble(
           isUser: false,
           content: 'chat_greeting'.tr(),
           theme: theme,
@@ -547,7 +550,7 @@ class _ChatScreenState extends State<ChatScreen> {
       padding: const EdgeInsets.all(16),
       children: [
         if (_sending)
-          _MessageBubble(
+          MessageBubble(
             isUser: false,
             content: _assistantPartial.isEmpty
                 ? null
@@ -556,7 +559,7 @@ class _ChatScreenState extends State<ChatScreen> {
             theme: theme,
           ),
         for (final m in _messages.reversed)
-          _MessageBubble(
+          MessageBubble(
             isUser: m.role == 'user',
             content: m.content,
             theme: theme,
@@ -659,66 +662,3 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class _MessageBubble extends StatelessWidget {
-  final bool isUser;
-  final String? content;
-  final bool thinking;
-  final ThemeData theme;
-
-  const _MessageBubble({
-    required this.isUser,
-    required this.content,
-    required this.theme,
-    this.thinking = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = theme.colorScheme;
-    final bubbleColor =
-        isUser ? colorScheme.primary : colorScheme.secondaryContainer;
-    final textColor = isUser ? colorScheme.onPrimary : colorScheme.onSurface;
-
-    return Align(
-      alignment: isUser
-          ? AlignmentDirectional.centerEnd
-          : AlignmentDirectional.centerStart,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * 0.78,
-        ),
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: bubbleColor,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isUser ? 16 : 4),
-            bottomRight: Radius.circular(isUser ? 4 : 16),
-          ),
-        ),
-        child: thinking
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'chat_thinking'.tr(),
-                    style: TextStyle(color: textColor, fontStyle: FontStyle.italic),
-                  ),
-                ],
-              )
-            : Text(
-                content ?? '',
-                style: TextStyle(color: textColor),
-              ),
-      ),
-    );
-  }
-}
