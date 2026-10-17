@@ -76,10 +76,10 @@ npm run dev              # Start Next.js dev server (port 3000)
 
 # Mobile (separate build system — no npm script)
 cd mobile/fajrak_flutter && make run   # or: flutter run
-cd mobile/fajrak_flutter && make test  # Flutter tests
+cd mobile/fajrak_flutter && make test  # Flutter tests (177 tests)
 
 # Testing
-npm test                 # Run Jest tests (62 test files in __tests__/)
+npm test                 # Run Jest tests (592 tests / 66 suites in __tests__/)
 npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
 npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
 
@@ -189,7 +189,10 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
    CREATE TABLE migration (`user_stats`, `testimonials`, `saving_challenges`,
    `health_score_history`, 25+ extra `profiles` columns). Never run `supabase db reset`
    against prod, and diff schema against prod before trusting migration output.
-   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11+, anon key rotation pending).
+   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key rotation still recommended).
+9. **Do NOT anchor the `grep` calls in `mobile/fajrak_flutter/Makefile`.** `.env` stores
+   Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
+   Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
 
 ### Naming Conventions
 - Components: PascalCase (`HeroBalanceCard.tsx`)

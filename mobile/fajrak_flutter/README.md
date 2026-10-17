@@ -2,7 +2,7 @@
 
 A Flutter finance tracking app with Supabase backend and Firebase integration.
 
-**Version:** 3.43.1+60
+**Version:** 3.44.0+63
 
 ## 🚀 Quick Start
 
@@ -202,6 +202,13 @@ lib/
 - **Zakat & FIRE calculators**
 - **Arabic/English** localization with RTL support
 - **Material 3** theming with Cairo font
+
+## 🆕 Recent Updates (v3.44.0)
+- **AI Assistant**: proper Markdown rendering (migrated to `flutter_markdown_plus`), Arabic prompt tuning, JOD 3-decimal formatting
+- **Alerts**: timezone-aware morning greeting (05:00–10:59 local) + zero-budget trigger guard
+- **Security**: 11 `currentUser!` force-unwraps replaced with null-safe early returns
+- **Android**: Firebase FID registration manifest flag added (`firebase_messaging_installation_id_enabled`)
+- **Dependency**: migrated `flutter_markdown` → `flutter_markdown_plus ^1.0.12`
 
 ## 🔐 Security
 
