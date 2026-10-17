@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendPushToUser } from '@/lib/push-send'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { verifyCronAuth } from '@/lib/cron-auth'
+import { groupAlertsByCompatibility } from '@/lib/insight-alerts'
 
 function pushAlert(
   list: Record<string, unknown>[],
@@ -127,9 +128,16 @@ async function generateAlerts(userId?: string) {
       byUser.get(uid)!.push(a)
     }
     for (const [uid, list] of byUser) {
-      const title = list.length === 1 ? String(list[0].title) : `🔔 ${list.length} تنبيهات جديدة`
-      const message = list.length === 1 ? String(list[0].message).slice(0, 100) : list.map(a => String(a.title)).join(' • ').slice(0, 100)
-      await sendPushToUser(uid, title, message, '/dashboard/alerts', 'finance-daily')
+      const groups = groupAlertsByCompatibility(list)
+      for (const group of groups) {
+        if (group.length === 0) continue
+        const title = group.length === 1 ? String(group[0].title) : `🔔 ${group.length} تنبيهات جديدة`
+        const message = group
+          .map((a) => String(a.title))
+          .join(' • ')
+          .slice(0, 100)
+        await sendPushToUser(uid, title, message, '/dashboard/alerts', 'finance-daily')
+      }
     }
   }
   return toInsert.length

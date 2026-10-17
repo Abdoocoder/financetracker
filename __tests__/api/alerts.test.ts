@@ -328,3 +328,42 @@ describe('generateAlerts — motivation fallback', () => {
     expect(sendPushToUser).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('generateAlerts — conflicting income metrics', () => {
+  it('never bundles "% of income" with "multiple of income" in the same push', async () => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    setupMock({
+      transactions: [
+        { type: 'income',  amount: 1000, transaction_date: `${year}-${month}-01` },
+        { type: 'expense', amount: 950,  transaction_date: `${year}-${month}-02` },
+      ],
+      debts: [
+        {
+          name: 'دين كبير',
+          remaining_amount: 7000,
+          original_amount: 8000,
+          monthly_payment: 200,
+        },
+      ],
+      alertsCount: 0,
+    })
+    await GET(makeGetRequest())
+    const calls = (sendPushToUser as jest.Mock).mock.calls
+    expect(calls.length).toBeGreaterThan(0)
+
+    // No single push may contain both "% of income" headline and "multiple of income" headline
+    for (const call of calls) {
+      const text = `${call[1] ?? ''} ${call[2] ?? ''}`
+      const hasRatio = /\d+\s*%/.test(text)
+      const hasMultiple = /\d+\s*أضعاف/.test(text)
+      expect(hasRatio && hasMultiple).toBe(false)
+    }
+
+    // Both alerts must still be delivered
+    const all = calls.map((c) => `${c[1] ?? ''} ${c[2] ?? ''}`).join(' | ')
+    expect(all).toContain('90%')
+    expect(all).toContain('أضعاف')
+  })
+})

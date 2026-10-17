@@ -42,12 +42,13 @@ const chain = (data: any = { data: [], error: null }) => {
 describe('GET /api/budget-alerts', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    budgetLimit = 100
     const { verifyCronAuth } = require('@/lib/cron-auth')
     verifyCronAuth.mockReturnValue(true) // Reset to true by default
     
     mockFrom.mockImplementation((table: string) => {
       if (table === 'budgets') {
-        return chain({ data: [{ id: 'b1', user_id: 'u1', category: 'Food', monthly_limit: 100 }], error: null });
+        return chain({ data: [{ id: 'b1', user_id: 'u1', category: 'Food', monthly_limit: budgetLimit }], error: null });
       }
       if (table === 'transactions') {
         return chain({ data: [{ amount: spentAmount }], error: null });
@@ -57,6 +58,7 @@ describe('GET /api/budget-alerts', () => {
   })
 
   var spentAmount = 0
+  var budgetLimit = 100
 
   it('returns 401 if cron auth fails', async () => {
     const { verifyCronAuth } = require('@/lib/cron-auth')
@@ -104,5 +106,18 @@ describe('GET /api/budget-alerts', () => {
       undefined,
       expect.stringContaining('budget_80_b1')
     )
+  })
+
+  it('does NOT alert when monthly_limit is zero (zero-budget guard)', async () => {
+    budgetLimit = 0
+    spentAmount = 500 // any spend at all would previously trip "limit exceeded"
+
+    const req = new NextRequest('http://localhost/api/budget-alerts')
+    const res = await GET(req)
+    const json = await res.json()
+
+    expect(json.ok).toBe(true)
+    expect(json.alerted).toBe(0)
+    expect(sendPushToUser).not.toHaveBeenCalled()
   })
 })

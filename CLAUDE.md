@@ -44,7 +44,7 @@ A comprehensive personal finance tracking application with:
   /locales              # i18n — ALL user-facing text in en/ar subdirectories
   /errors               # Typed error rescue map
 /supabase               # Supabase config and migrations
-  /migrations           # Database migrations (40+)
+  /migrations           # Database migrations (58 files: legacy 001-041 + 16 dated/numbered)
     /legacy             # Baseline migrations (001_initial.sql through 041_chats.sql)
   /functions            # Edge Functions (push-notification in Deno)
 /e2e                    # Playwright E2E tests (Page Object Model)
@@ -66,19 +66,26 @@ A comprehensive personal finance tracking application with:
 - **Push**: Firebase FCM (mobile), Web Push VAPID (browser)
 
 ## Key Commands
+> Verified against `package.json` on 2026-10-17. Only these scripts exist — do not
+> invent npm scripts (an earlier version of this file listed `dev:mobile`, `db:push`,
+> `db:reset`, which were never defined).
+
 ```bash
 # Development
 npm run dev              # Start Next.js dev server (port 3000)
-npm run dev:mobile       # Start Flutter mobile app
+
+# Mobile (separate build system — no npm script)
+cd mobile/fajrak_flutter && make run   # or: flutter run
+cd mobile/fajrak_flutter && make test  # Flutter tests
 
 # Testing
-npm test                 # Run Jest tests
-npm run test:e2e         # Run Playwright tests
-npm run test:coverage    # Coverage report (target 80%+)
+npm test                 # Run Jest tests (62 test files in __tests__/)
+npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
+npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
 
-# Database
-npm run db:push          # Push migrations to Supabase
-npm run db:reset         # Reset local database
+# Database (Supabase CLI directly — not wrapped in npm scripts)
+npx supabase db push     # Apply migrations
+npx supabase db reset    # ⚠️ DANGEROUS: live prod has unmigrated tables (see DRIFT note below)
 
 # Linting/Typechecking
 npm run lint             # ESLint (eslint.config.mjs)
@@ -86,7 +93,10 @@ npm run typecheck        # TypeScript strict check (tsconfig.typecheck.json)
 
 # Build
 npm run build            # Production build
-npm run doctor           # Full health check (lint + typecheck + test + build)
+npm run doctor           # Full health check (audit + lint + typecheck + test:coverage + build)
+
+# Health check
+curl localhost:3000/api/health   # → {"ok":true}
 ```
 
 ## Environment Variables
@@ -175,6 +185,11 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
 5. Admin client only for system operations — Crons, webhooks, migrations
 6. Test multi-currency flows — Exchange rates, original_amount/original_currency fields
 7. Respect quiet hours — Check `notification_preferences` before sending pushes
+8. **Migrations are NOT the source of truth** — live prod has tables/columns with no
+   CREATE TABLE migration (`user_stats`, `testimonials`, `saving_challenges`,
+   `health_score_history`, 25+ extra `profiles` columns). Never run `supabase db reset`
+   against prod, and diff schema against prod before trusting migration output.
+   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11+, anon key rotation pending).
 
 ### Naming Conventions
 - Components: PascalCase (`HeroBalanceCard.tsx`)
