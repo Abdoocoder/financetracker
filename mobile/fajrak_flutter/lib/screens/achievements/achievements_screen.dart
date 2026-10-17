@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../utils/error_handler.dart';
+import '../../utils/level_ladder.dart';
 import '../../services/analytics_service.dart';
 
 import '../../services/byok/byok_service.dart';
@@ -121,28 +122,12 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
         points = (stats['total_points'] as num?)?.toInt() ?? 0;
         badges = (stats['badges'] as List?)?.cast<String>() ?? [];
 
-        // Keep the existing local level ladder (50/150/350/700/1200).
-        if (points >= 1200) {
-          level = 6;
-          levelTitle = 'حر مالياً';
-          nextLevel = 9999;
-        } else if (points >= 700) {
-          level = 5;
-          levelTitle = 'ثري مبتدئ';
-          nextLevel = 1200;
-        } else if (points >= 350) {
-          level = 4;
-          levelTitle = 'مستثمر';
-          nextLevel = 700;
-        } else if (points >= 150) {
-          level = 3;
-          levelTitle = 'مدخر';
-          nextLevel = 350;
-        } else if (points >= 50) {
-          level = 2;
-          levelTitle = 'متتبع';
-          nextLevel = 150;
-        }
+        // Shared ladder (level_ladder.dart) — the same source the Dashboard
+        // gamification card uses, so both screens always agree.
+        final info = levelForPoints(points);
+        level = info.level;
+        levelTitle = info.title;
+        nextLevel = info.nextPoints;
 
         setState(() {
           _points = points;

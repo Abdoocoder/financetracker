@@ -43,6 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _totalAccountsBalance = 0;
   List<Map<String, dynamic>> _accounts = [];
   int _healthScore = 0;
+  int _totalPoints = 0;
   String _currency = 'JOD';
   String _name = '';
   List<Map<String, dynamic>> _recentTx = [];
@@ -104,9 +105,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         /* 4 */ Supabase.instance.client.from('investments').select('shares, current_price').eq('user_id', user.id),
         /* 5 */ Supabase.instance.client.from('savings_goals').select('current_amount, target_amount').eq('user_id', user.id),
         /* 6 */ Supabase.instance.client.from('transactions').select('type, amount, category, transaction_date').eq('user_id', user.id).gte('transaction_date', sixMonthsAgo).order('transaction_date', ascending: true),
+        /* 7 */ Supabase.instance.client.from('user_stats').select('total_points, level').eq('id', user.id).maybeSingle(),
         // prev month totals for MonthSummaryCard (only fetched in first 7 days)
         if (now.day <= 7)
-          /* 7 */ Supabase.instance.client.from('transactions').select('type, amount')
+          /* 8 */ Supabase.instance.client.from('transactions').select('type, amount')
               .eq('user_id', user.id).gte('transaction_date', prevMonthStart).lt('transaction_date', prevMonthEnd),
       ]);
 
@@ -116,6 +118,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final debts = results[3] as List;
       final goals = results[5] as List;
       final chartsList = results[6] as List;
+      // Gamification card input: user_stats.total_points (level_title has no
+      // column — the title comes from the shared level_ladder, exactly like
+      // Achievements, so both screens always show the same value).
+      final stats = results[7] as Map<String, dynamic>?;
+      final totalPoints = (stats?['total_points'] as num?)?.toInt() ?? 0;
 
       // ── Build 6-month aggregated data from already-fetched chartsList ──
       final monthMap = <String, Map<String, double>>{};
@@ -208,7 +215,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // ── prev month summary ──
       double prevIncome = 0, prevExpenses = 0;
       if (now.day <= 7 && results.length > 7) {
-        final prevTxs = results[7] as List;
+        final prevTxs = results[8] as List;
         for (final tx in prevTxs) {
           if (tx['type'] == 'income') {
             prevIncome += (tx['amount'] as num).toDouble();
@@ -227,6 +234,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _monthlyDebtCommitments = monthlyDebtCommitments;
           _recentTx = recent.cast<Map<String, dynamic>>();
           _healthScore = score.clamp(0, 100);
+          _totalPoints = totalPoints;
           _stage = stage;
           _totalDebt = totalDebt;
           _totalReceivable = totalReceivable;
@@ -452,7 +460,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
                 if (layout.isVisible(DashCardId.gamification)) ...[
                   const SizedBox(height: 16),
-                  GamificationCard(score: _healthScore),
+                  GamificationCard(points: _totalPoints),
                 ],
                 if (layout.isVisible(DashCardId.simulator)) ...[
                   const SizedBox(height: 16),
