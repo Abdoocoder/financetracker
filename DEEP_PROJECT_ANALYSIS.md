@@ -1,6 +1,12 @@
+> ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
+> This file describes the project as of the version or date it names and is kept
+> for reference only. Current state lives in
+> [`HANDOFF_REPORT.md`](HANDOFF_REPORT.md) and
+> [`CHANGELOG.md`](CHANGELOG.md).
+
 # FinanceTracker (Fajrak) — Deep Project Analysis
 
-Generated from the repo's own docs — `CLAUDE.md`, `structure.md`, `VISION.md`, `PRODUCT.md`, `DESIGN.md`, `API_DOCS.md`, `AUDIT_REPORT_AR.md`, `store-listing.txt` — plus live toolchain verification of the repo at HEAD `fcea7f69` (v3.40.0).
+Generated from the repo's own docs — `CLAUDE.md`, `structure.md`, `VISION.md`, `PRODUCT.md`, `DESIGN.md`, `API_DOCS.md`, `docs/archive/AUDIT_REPORT_AR.md`, `store-listing.txt` — plus live toolchain verification of the repo at HEAD `fcea7f69` (v3.40.0).
 
 ---
 
@@ -12,7 +18,7 @@ FinanceTracker, internally branded **Fajrak (فجرك = "Your Dawn")**, is an Ar
 
 **The two biggest non-code findings:**
 1. **Identity mismatch** — the design spec (`DESIGN.md`) and product docs call the app "Fajrak" and frame it as a **Flutter mobile app**, while the store listing ships as **"FinanceTracker"** and the repo is overwhelmingly a web product. This is a naming/branding fork that should be resolved explicitly.
-2. **A known accounting bug** (`AUDIT_REPORT_AR.md` §6.1, §12.2): the web net-worth calc historically excluded account balances and savings-goal values. It is flagged as unfixed in the audit; the fix target is dashboard `page.tsx`.
+2. **A known accounting bug** (`docs/archive/AUDIT_REPORT_AR.md` §6.1, §12.2): the web net-worth calc historically excluded account balances and savings-goal values. It is flagged as unfixed in the audit; the fix target is dashboard `page.tsx`.
 
 ---
 
@@ -50,7 +56,7 @@ Key endpoints: `/api/health-score-snapshot` (per-user health score computed from
 
 ---
 
-## 4. Financial Logic Model (`AUDIT_REPORT_AR.md`)
+## 4. Financial Logic Model (`docs/archive/AUDIT_REPORT_AR.md`)
 
 ### 4.1 Core equations (canonical)
 ```
@@ -95,7 +101,7 @@ health_score         = composite(savings_rate, debt_ratio, emergency, investment
 |-----|------|---------|
 | `structure.md` | Simplified layout: `(auth)` + `(dashboard)`, components dir, `migrations/001_initial.sql` | **Stale** — repo has ~40 App Router routes, `components/ui` + `components/dashboard` + `components/layout`, ~24 API routes, middleware, migrations 039+. |
 | `DESIGN.md` / product docs | App is **Flutter** "Fajrak" | Repo is ~95% Next.js web; Flutter is a small mobile twin. |
-| `VISION.md` / `PRODUCT.md` / `CLAUDE.md` | Name **Fajrak / فجرك**; default currency **KWD** (CLAUDE.md) | Store listing = **FinanceTracker**; `AUDIT_REPORT_AR.md` examples use **JOD**; PRODUCT.md says Kuwait/Gulf. Currency default needs a single source of truth. |
+| `VISION.md` / `PRODUCT.md` / `CLAUDE.md` | Name **Fajrak / فجرك**; default currency **KWD** (CLAUDE.md) | Store listing = **FinanceTracker**; `docs/archive/AUDIT_REPORT_AR.md` examples use **JOD**; PRODUCT.md says Kuwait/Gulf. Currency default needs a single source of truth. |
 | `CLAUDE.md` | v3.40.0+51; support `support@fajrak.com` | Matches `pubspec.yaml`; correct. |
 
 **Consistency recommendation:** pick one canonical product name (recommend **Fajrak/فجرك** per VISION + DESIGN + mobile identity, with "FinanceTracker" as the store-facing brand, documented explicitly), unify default-currency (KWD) across docs and examples, and refresh `structure.md`.
@@ -121,7 +127,7 @@ health_score         = composite(savings_rate, debt_ratio, emergency, investment
 ## 8. Recommendations (priority order)
 
 1. **Resolve product identity** — pick canonical name/brand (Fajrak vs FinanceTracker), unify in docs + store listing + DESIGN.md framing.
-2. **Audit the net-worth equation live** — the `AUDIT_REPORT_AR.md` §6.1 bug target is web dashboard `page.tsx`; verify it now includes accounts + savings goals after the repo's subsequent changes.
+2. **Audit the net-worth equation live** — the `docs/archive/AUDIT_REPORT_AR.md` §6.1 bug target is web dashboard `page.tsx`; verify it now includes accounts + savings goals after the repo's subsequent changes.
 3. **Refresh `structure.md`** to match the real ~40-route App Router layout.
 4. **Single source of truth for default currency** (KWD) across CLAUDE.md, audit examples, and util.
 5. **Declare stale data policy** — investment prices + FX refresh cadence (job/cron + last-updated stamp per asset), per audit §6.3.

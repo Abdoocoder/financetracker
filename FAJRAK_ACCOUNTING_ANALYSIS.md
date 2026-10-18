@@ -1,3 +1,9 @@
+> ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
+> This file describes the project as of the version or date it names and is kept
+> for reference only. Current state lives in
+> [`HANDOFF_REPORT.md`](HANDOFF_REPORT.md) and
+> [`CHANGELOG.md`](CHANGELOG.md).
+
 # وثيقة تحليل منطق الحساب في تطبيق FAJRAK المالي
 
 **إصدار:** 1.0  
@@ -652,7 +658,7 @@ describe('Net Worth Consistency', () => {
 | supabase/migrations/002_multi_currency.sql | دعم العملات |
 | supabase/migrations/019_accounts.sql | نظام الحسابات |
 | mobile/fajrak_flutter/lib/utils/finance_utils.dart | utility functions |
-| AUDIT_REPORT_AR.md | تقرير المراجعة السابق |
+| docs/archive/AUDIT_REPORT_AR.md | تقرير المراجعة السابق |
 
 ### 9.2 المراجع
 

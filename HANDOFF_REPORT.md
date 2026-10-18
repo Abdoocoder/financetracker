@@ -1,5 +1,8 @@
 # HANDOFF REPORT — FinanceTracker (Fajrak)
 
+**Last updated:** 2026-10-18 · **Current release:** 3.44.0+63 · **Single source of truth for project state**
+Archived audits live in docs/archive/; open change history lives in CHANGELOG.md.
+
 **Prepared for:** external software architect
 **Date:** 2026-10-17
 **Method:** read-only repository reconnaissance (no source files modified, no package managers or test suites run, `node_modules/` etc. not read)
@@ -193,7 +196,7 @@ Store listing (ar + en) claims, mapped to implementation:
 - **MISSING: `CONTEXT.md`** and **MISSING: `RESEARCH.md`** — explicitly noted as absent in `mobile/fajrak_flutter/UI-SPEC.md` ("No CONTEXT.md exists — No locked decisions to respect").
 - Migration numbering gaps: **020, 044, 045, 046** absent; legacy has duplicate numbers (two `003_*`, two `029_*`).
 - Doc-vs-disk drift (remaining): `mobile/AGENTS.md` still pinned at **3.43.1+60** and says "13 test files" (disk has 20); `structure.md` pinned at **3.40.0+51**. Test counts are reconciled to **592 web / 177 Flutter**.
-- Overlapping/conflicting audit corpus: `AUDIT_REPORT.md`, `ARCHITECTURE_AUDIT.md`, `ARCHITECTURE_AUDIT_VERIFIED.md`, `DEEP_PROJECT_ANALYSIS.md`, `AUDIT_REPORT_AR.md`, `COMPREHENSIVE_AUDIT_REPORT_AR.md`, `FAJRAK_AUDIT_REPORT_AR.md`, `FAJRAK_ACCOUNTING_ANALYSIS.md` — several AR variants skimmed at header/key-section level only in this recon; no precedence order declared among them.
+- Overlapping/conflicting audit corpus: `AUDIT_REPORT.md`, `docs/archive/ARCHITECTURE_AUDIT.md`, `docs/archive/ARCHITECTURE_AUDIT_VERIFIED.md`, `DEEP_PROJECT_ANALYSIS.md`, `docs/archive/AUDIT_REPORT_AR.md`, `docs/archive/COMPREHENSIVE_AUDIT_REPORT_AR.md`, `docs/archive/FAJRAK_AUDIT_REPORT_AR.md`, `FAJRAK_ACCOUNTING_ANALYSIS.md` — several AR variants skimmed at header/key-section level only in this recon; no precedence order declared among them.
 - `20260913135653_add_prod_only_schema.sql` exists precisely because prod DDL was never migrated — signals that migrations are not the system of record.
 - No root CHANGELOG/VERSION file found in this recon (release history lives in `PLAY_STORE_RELEASE.md` only, mobile-side).
 - BYOK store copy vs proxy envelope (see §7) — unreviewed compliance wording gap.

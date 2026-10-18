@@ -1,3 +1,5 @@
+Last synced: 2026-10-18 · source: app/api/*/route.ts
+
 # توثيق واجهة برمجة التطبيقات (API Documentation) — مشروع فجرك
 
 هذا المستند يقدم تفاصيل حول نقاط الاتصال (Endpoints) المتاحة في مشروع فجرك، مع التركيز على المهام المؤتمتة (Cron Jobs) وتحليل البيانات.
@@ -117,6 +119,55 @@
 | `/api/webhook/transaction` | قراءة/إنشاء المعاملات عبر PAT (REST) |
 | `/api/mcp` | خادم MCP المالي (Streamable HTTP) |
 | `/api/byok/proxy` | وكيل LLM BYOK الرفيع (Feature A) |
+
+---
+
+## 🔑 مصفوفة المصادقة لكل نقطة اتصال (Endpoint auth matrix)
+
+Last synced: 2026-10-18 · source: `app/api/*/route.ts`. Auth derived from each route file (`verifyCronAuth`, `supabase.auth.getUser`, `verifyApiKey`); no parameters were invented.
+
+| المسار (Path) | الطريقة (Method) | المصادقة (Auth) |
+|:--------------|:-----------------|:-----------------|
+| `/api/alerts` | GET | cron (`CRON_SECRET`) |
+| `/api/alerts` | POST | authenticated (Bearer session token) |
+| `/api/api-keys/create` | POST | authenticated (Bearer session token) |
+| `/api/api-keys/revoke` | POST | authenticated (Bearer session token) |
+| `/api/auth/callback` | GET | public (OAuth callback redirect handler) |
+| `/api/auto-debt` | GET | cron (`CRON_SECRET`) |
+| `/api/auto-debt` | POST | authenticated (Bearer session token) |
+| `/api/auto-recurring` | GET | cron (`CRON_SECRET`) |
+| `/api/auto-salary` | GET | cron (`CRON_SECRET`) |
+| `/api/auto-salary` | POST | authenticated (Bearer session token) |
+| `/api/budget-alerts` | GET | cron (`CRON_SECRET`) |
+| `/api/budget-alerts` | POST | cron (`CRON_SECRET`) |
+| `/api/byok/config` | GET | public (runtime BYOK config + RSA public key) |
+| `/api/byok/proxy` | POST | authenticated (Bearer session token) |
+| `/api/confirm` | GET | public (email/sensitive-operation confirmation link) |
+| `/api/daily-reminder` | GET | cron (`CRON_SECRET`) |
+| `/api/evening-reminder` | GET | cron (`CRON_SECRET`) |
+| `/api/exchange-rate` | GET | authenticated (Bearer token; 401 without it) |
+| `/api/gamification` | GET, POST | authenticated (Bearer token) |
+| `/api/health` | GET | public (returns `{"ok":true}`) |
+| `/api/health-score-snapshot` | GET | cron (`CRON_SECRET`) |
+| `/api/mcp` | GET, POST, DELETE | PAT (`fjk_live_...` via `verifyApiKey`) |
+| `/api/new-user-nudge` | GET | cron (`CRON_SECRET`) |
+| `/api/push-send` | POST | cron (`CRON_SECRET`) |
+| `/api/push-subscribe` | POST, DELETE | authenticated (Bearer session token) |
+| `/api/push-test` | POST | cron (`CRON_SECRET`) or authenticated session token |
+| `/api/smart-notifications` | GET | cron (`CRON_SECRET`) |
+| `/api/stock-price` | GET | authenticated (Bearer token) |
+| `/api/streak-alert` | GET | cron (`CRON_SECRET`) |
+| `/api/testimonials` | POST | authenticated (Bearer session token) |
+| `/api/testimonials` | GET | public (own testimonial via token, otherwise visible-only fields) |
+| `/api/webhook/transaction` | GET, POST | PAT (`fjk_live_...` via `verifyApiKey`) |
+| `/api/weekly-report` | GET | cron (`CRON_SECRET`) |
+| `/api/zakat/prices` | GET | authenticated (Bearer token) |
+| `/api/zakat-reminder` | GET | cron (`CRON_SECRET`) |
+
+**ملاحظات:**
+
+- كل نقطة اتصال مذكورة في هذا المستند موجودة أيضاً في الشيفرة; لم يُعلَّم أي بند `⚠️ REMOVED`.
+- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat/prices`, `/api/testimonials`.
 
 ---
 

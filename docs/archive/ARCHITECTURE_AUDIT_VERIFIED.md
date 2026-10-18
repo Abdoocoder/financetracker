@@ -1,3 +1,9 @@
+> ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
+> This file describes the project as of the version or date it names and is kept
+> for reference only. Current state lives in
+> [`HANDOFF_REPORT.md`](../../HANDOFF_REPORT.md) and
+> [`CHANGELOG.md`](../../CHANGELOG.md).
+
 # Verified Calculation Inventory — Fajrak Financial Journey 2.0
 **Date:** 2026-09-19  
 **Phase:** Pre-Phase 0 Verification Pass (No migrations yet)

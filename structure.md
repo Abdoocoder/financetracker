@@ -1,3 +1,9 @@
+> ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
+> This file describes the project as of the version or date it names and is kept
+> for reference only. Current state lives in
+> [`HANDOFF_REPORT.md`](HANDOFF_REPORT.md) and
+> [`CHANGELOG.md`](CHANGELOG.md).
+
 # هيكل المشروع — FinanceTracker (Fajrak)
 
 ## Web — Next.js 16 App Router
