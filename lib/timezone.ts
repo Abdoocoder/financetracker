@@ -18,15 +18,19 @@ export function getLocalNow(): Date {
 
 export function getZonedHour(instant: Date | null | undefined, timeZone?: string | null): number {
   if (!instant) return 3
-  const tz = timeZone || undefined
+
+  // If no timezone is provided, fallback to the server offset explicitly.
+  // Do NOT rely on Intl.DateTimeFormat here, as it defaults to the CI machine's system timezone (usually UTC).
+  if (!timeZone) {
+    const serverOffset = Number(process.env.TIMEZONE_OFFSET_HOURS) || 3
+    return (instant.getUTCHours() + serverOffset + 24) % 24
+  }
 
   try {
-    // Use Intl when possible
     const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: tz,
+      timeZone,
       hour12: false,
       hour: '2-digit',
-      timeZoneName: undefined,
     })
     const parts = formatter.formatToParts(instant)
     const hourPart = parts.find((p) => p.type === 'hour')
@@ -35,11 +39,12 @@ export function getZonedHour(instant: Date | null | undefined, timeZone?: string
       if (!Number.isNaN(h)) return h % 24
     }
   } catch (e) {
-    // fall through to offset-based
+    // fallback if invalid timezone string (e.g., 'Not/AZone')
+    const serverOffset = Number(process.env.TIMEZONE_OFFSET_HOURS) || 3
+    return (instant.getUTCHours() + serverOffset + 24) % 24
   }
 
-  if (!tz) return (instant.getUTCHours() + 3) % 24 // default to UTC+3
-  return 3 // unknown timezone - fallback
+  return 3
 }
 
 export function getZonedHourFromLocalNow(
