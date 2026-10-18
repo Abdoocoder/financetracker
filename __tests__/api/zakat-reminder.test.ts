@@ -2,11 +2,12 @@
  * @jest-environment node
  */
 var mockFrom = jest.fn()
-var mockGetUser = jest.fn()
+var mockRpc = jest.fn()
 
 jest.mock('@/lib/supabase/admin', () => ({
   createAdminClient: jest.fn(() => ({
     from: (t: string) => mockFrom(t),
+    rpc: (fn: string, params: unknown) => mockRpc(fn, params),
   })),
 }))
 
@@ -28,15 +29,19 @@ function makeGetRequest(url = 'http://localhost/api/zakat-reminder') {
 
 function setupMock({
   profiles = [] as any[],
-  investments = [] as any[],
+  hauls = [] as any[],
 } = {}) {
   mockFrom.mockClear()
+  mockRpc.mockClear()
   ;(sendPushToUser as jest.Mock).mockClear()
 
   mockFrom.mockImplementation((table: string) => {
     if (table === 'profiles') return chain({ data: profiles, error: null })
-    if (table === 'investments') return chain({ data: investments, error: null })
     return chain()
+  })
+  mockRpc.mockImplementation((fn: string) => {
+    if (fn === 'get_zakat_hauls') return Promise.resolve({ data: hauls, error: null })
+    return Promise.resolve({ data: null, error: null })
   })
 }
 
@@ -56,11 +61,13 @@ function chain(data: any = { data: [], error: null }) {
   return obj
 }
 
+const profiles = [{ id: 'u1', full_name: 'أحمد علي' }] as any[]
+
 describe('GET /api/zakat-reminder', () => {
   it('returns 401 when cron auth fails', async () => {
     const { verifyCronAuth } = require('@/lib/cron-auth')
     verifyCronAuth.mockReturnValueOnce(false)
-    setupMock({ profiles: [], investments: [] })
+    setupMock({ profiles: [] })
     const res = await GET(makeGetRequest())
     expect(res.status).toBe(401)
   })
@@ -73,30 +80,80 @@ describe('GET /api/zakat-reminder', () => {
     expect(json.sent).toBe(0)
   })
 
-  it('sends zakat reminders for investments approaching haul', async () => {
-    const today = new Date()
-    const createdAt = new Date(today.getTime() - 300 * 24 * 60 * 60 * 1000) // 300 days ago
-    const haulDate = new Date(createdAt.getTime() + 354 * 24 * 60 * 60 * 1000)
-    const daysLeft = Math.ceil((haulDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000))
+  it('uses get_zakat_hauls RPC per user instead of inline math', async () => {
+    setupMock({ profiles, hauls: [] })
+    await GET(makeGetRequest())
+    expect(mockRpc).toHaveBeenCalledWith('get_zakat_hauls', { p_user_id: 'u1' })
+  })
 
+  it('sends a reminder when days_remaining is 30', async () => {
     setupMock({
-      profiles: [{ id: 'u1', full_name: 'أحمد علي' }] as any[],
-      investments: [
-        {
-          id: 'inv1',
-          name: 'ذهب',
-          symbol: 'GOOLD',
-          shares: 10,
-          current_price: 50,
-          created_at: createdAt.toISOString(),
-        },
-      ] as any[],
+      profiles,
+      hauls: [
+        { source: 'investment', label: 'GOOLD', value_usd: 500, days_remaining: 30 },
+      ],
     })
-
-    // Mock the daysLeft check - we need daysLeft to be 30, 7, or 0
-    // For testing, let's just verify the structure
     const res = await GET(makeGetRequest())
     const json = await res.json()
-    expect(json.ok).toBe(true)
+    expect(json.sent).toBe(1)
+    expect(sendPushToUser).toHaveBeenCalledWith(
+      'u1',
+      expect.stringContaining('شهر'),
+      expect.any(String),
+      '/dashboard/zakat',
+      'zakat-due',
+    )
+  })
+
+  it('sends a reminder when days_remaining is 7', async () => {
+    setupMock({
+      profiles,
+      hauls: [
+        { source: 'investment', label: 'ذهب', value_usd: 1000, days_remaining: 7 },
+      ],
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.sent).toBe(1)
+    expect(sendPushToUser).toHaveBeenCalledWith(
+      'u1',
+      expect.stringContaining('7'),
+      expect.any(String),
+      '/dashboard/zakat',
+      'zakat-due',
+    )
+  })
+
+  it('sends a due reminder on the haul day (days_remaining 0) using the RPC label', async () => {
+    setupMock({
+      profiles,
+      hauls: [
+        { source: 'holding', label: 'gold', asset_type: 'gold', grams: 10, value_usd: null, days_remaining: 0 },
+      ],
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.sent).toBe(1)
+    expect(sendPushToUser).toHaveBeenCalledWith(
+      'u1',
+      expect.stringContaining('gold'),
+      expect.stringContaining('الزكاة المستحقة'),
+      '/dashboard/zakat',
+      'zakat-due',
+    )
+  })
+
+  it('does NOT send when days_remaining is outside the notification window', async () => {
+    setupMock({
+      profiles,
+      hauls: [
+        { source: 'investment', label: 'GOOLD', value_usd: 500, days_remaining: 100 },
+        { source: 'investment', label: 'AAPL', value_usd: 200, days_remaining: 20 },
+      ],
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.sent).toBe(0)
+    expect(sendPushToUser).not.toHaveBeenCalled()
   })
 })

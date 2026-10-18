@@ -33,7 +33,7 @@ class FinanceService {
     return Map<String, dynamic>.from(response as Map);
   }
 
-  /// جلب ملخص الزكاة الفقهي باستخدام RPC المركزية
+  /// جلب ملخص الزكاة الفقهي باستخدام RPC المركزية (v2)
   static Future<Map<String, dynamic>> fetchZakatSummary({
     required double goldPrice,
     required double silverPrice,
@@ -48,5 +48,52 @@ class FinanceService {
       'p_usd_to_local_rate': usdToLocalRate,
     });
     return Map<String, dynamic>.from(response as Map);
+  }
+
+  /// جلب الحولات النشطة (استثمارات + ذهب/فضة) من RPC الموحد get_zakat_hauls.
+  /// مصدر الحول الوحيد — لا يُحسب الحول في الواجهة بعد الآن.
+  static Future<List<Map<String, dynamic>>> fetchZakatHauls() async {
+    final uid = _uid;
+    if (uid == null) return [];
+    final response = await _db.rpc('get_zakat_hauls', params: {'p_user_id': uid});
+    if (response is List) {
+      return response.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    }
+    return [];
+  }
+
+  /// مزامنة غرامات الذهب/الفضة إلى جدول zakat_holdings (لتصبح ضمن الوعاء).
+  /// الجدول لا يملك قيداً فريداً، فنحدّث الصف الموجود أو ننشئه.
+  /// الغرامات <= 0 تحذف الصف حتى لا تُحتسب дважды.
+  static Future<void> syncZakatHoldings({
+    required double goldGrams,
+    required double silverGrams,
+  }) async {
+    final uid = _uid;
+    if (uid == null) return;
+    final targets = {'gold': goldGrams, 'silver': silverGrams};
+    for (final entry in targets.entries) {
+      final existing = await _db
+          .from('zakat_holdings')
+          .select('id')
+          .eq('user_id', uid)
+          .eq('asset_type', entry.key)
+          .limit(1);
+      final rows = List<Map<String, dynamic>>.from(existing as List);
+      if (entry.value > 0) {
+        if (rows.isNotEmpty) {
+          await _db.from('zakat_holdings')
+              .update({'grams': entry.value}).eq('id', rows.first['id'] as String);
+        } else {
+          await _db.from('zakat_holdings').insert({
+            'user_id': uid,
+            'asset_type': entry.key,
+            'grams': entry.value,
+          });
+        }
+      } else if (rows.isNotEmpty) {
+        await _db.from('zakat_holdings').delete().eq('id', rows.first['id'] as String);
+      }
+    }
   }
 }

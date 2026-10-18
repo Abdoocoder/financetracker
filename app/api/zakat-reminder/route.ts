@@ -4,11 +4,21 @@ import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const HAUL_DAYS = 354
+
+// صيغة عنصر get_zakat_hauls (مصدر الحول الوحيد — راجع migration 20261019000000)
+interface HaulItem {
+  source: 'investment' | 'holding'
+  ref_id: string | null
+  label: string | null
+  asset_type: string | null
+  grams: number | null
+  value_usd: number | null
+  haul_date: string
+  days_remaining: number
+}
 
 async function sendZakatReminders(userId?: string) {
   const supabase = createAdminClient()
-  const today = new Date()
 
   // جلب كل المستخدمين (أو مستخدم واحد للاختبار)
   const profileQuery = supabase.from('profiles').select('id, full_name')
@@ -24,28 +34,23 @@ async function sendZakatReminders(userId?: string) {
     const uid = profile.id
     const name = profile.full_name?.split(' ')[0] ?? 'أخي'
 
-    // جلب كل استثمارات المستخدم
-    const { data: investments } = await supabase
-      .from('investments')
-      .select('id, name, symbol, shares, current_price, created_at')
-      .eq('user_id', uid)
+    // الحولات تأتي من RPC الموحد (استثمارات + ذهب/فضة)، وليس حساباً مضمراً هنا.
+    // service_role لا يحمل JWT => auth.uid() NULL => الحارس يسمح (بنفس نمط المسارات الخلفية).
+    const { data: hauls, error } = await supabase.rpc('get_zakat_hauls', {
+      p_user_id: uid,
+    })
 
-    if (!investments?.length) continue
+    if (error || !Array.isArray(hauls) || hauls.length === 0) continue
 
-    for (const inv of investments) {
-      if (!inv.created_at) continue
+    for (const haul of hauls as HaulItem[]) {
+      const daysLeft = haul.days_remaining
 
-      const createdAt = new Date(inv.created_at)
-      const haulDate = new Date(createdAt.getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
-      const daysLeft = Math.ceil((haulDate.getTime() - today.getTime()) / (24 * 60 * 60 * 1000))
-
-      // تنبيه عند: 30 يوم + 7 أيام + يوم الحول (0)
+      // تنبيه عند: 30 يوم + 7 أيام + يوم الحول (0) + يوم بعد الحول (-1)
       const shouldNotify = daysLeft === 30 || daysLeft === 7 || daysLeft === 0 || daysLeft === -1
-
       if (!shouldNotify) continue
 
-      const invName = inv.symbol ?? inv.name ?? 'الاستثمار'
-      const invValue = Number(inv.shares) * Number(inv.current_price)
+      const invName = haul.label ?? 'الاستثمار'
+      const invValue = Number(haul.value_usd ?? 0)
 
       let title: string
       let body: string
