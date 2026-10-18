@@ -193,6 +193,7 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
 9. **Do NOT anchor the `grep` calls in `mobile/fajrak_flutter/Makefile`.** `.env` stores
    Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
+10. **Zakat is centralized**: Never calculate Zakat (Nisab, 2.5%, Hawl) locally in Web or Mobile. Always use the get_zakat_summary and get_zakat_hauls RPCs.
 
 ### Naming Conventions
 - Components: PascalCase (`HeroBalanceCard.tsx`)

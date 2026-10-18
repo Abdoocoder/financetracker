@@ -12,8 +12,8 @@ Please email the maintainer at `<TODO: add security contact email>`. Do not open
 
 ## Current posture
 
-- Row Level Security is enabled on all 29 tables, and every policy keys on `auth.uid() = user_id`.
-- Internal RPCs (health score, sync, idempotency, account balances, zakat): `EXECUTE` revoked from `PUBLIC` and `anon`, granted only to `authenticated` and `service_role`. Verified on the production project `ujwcvtpwsaidljecqbaa` on 2026-10-18 via `proacl`.
+- Row Level Security is enabled on all 30 tables (including the new `zakat_holdings`), and every policy keys on `auth.uid() = user_id`.
+- Internal RPCs (health score, sync, idempotency, account balances, Zakat: `get_zakat_summary` and `get_zakat_hauls`): `EXECUTE` revoked from `PUBLIC` and `anon`, granted only to `authenticated` and `service_role`. Both Zakat RPCs additionally enforce owner verification (`auth.uid() IS NOT NULL AND auth.uid() IS DISTINCT FROM p_user_id` raises), while a NULL uid (service_role / cron) is allowed for background jobs. Verified on the production project `ujwcvtpwsaidljecqbaa` on 2026-10-18 via `proacl`.
 - `search_path = public` is pinned on all SECURITY DEFINER functions flagged by the Supabase linter.
 - Firebase Installation ID registration is enabled via the `firebase_messaging_installation_id_enabled` manifest meta-data.
 - BYOK keys are encrypted client-side (AES-256-GCM plus RSA-OAEP). The proxy receives an opaque envelope, not plaintext keys.

@@ -9,6 +9,22 @@ Versions in this file track the mobile app version in `mobile/fajrak_flutter/pub
 
 ## [Unreleased]
 
+### Added
+
+- **Unified Zakat Engine (v2)**: Centralized all Zakat calculation logic into PostgreSQL RPCs (`get_zakat_summary` v2 and `get_zakat_hauls`). The v2 summary keeps the v1 signature and keys, adds a `components` breakdown (`cash`, `investments`, `investment_cash`, `goals`, `gold`, `silver`, `other`, `debts`), a `GREATEST(…, 0)` clamp on negative nets, and an `engine_version` marker (migration `20261019000000_zakat_engine_v2.sql`).
+- **Zakat Holdings Table**: Added `zakat_holdings` (RLS-enabled, gold/silver by grams; real-estate/inventory/other by USD value) to track assets server-side so the RPC includes them in the zakatable base.
+- **Audit Columns**: Extended `zakat_history` with `engine_version`, `price_gold`, `price_silver`, `fx_rate`, and `nisab_effective`, making historical rows recomputable.
+- **Zakat test fixtures + verification harness**: `supabase/tests/zakat_fixtures.sql` (13 golden edge cases: Nisab boundaries, negative-net clamp, gold/silver-heavy Nisab, zero prices, holdings, high FX) and `supabase/tests/zakat_engine_v2_test.sql` (sample proof; intentionally not in `supabase/migrations/`).
+
+### Changed
+
+- **Web, Mobile, and Cron**: Removed all client-side Zakat math (Nisab, 2.5%, Hawl constants and helpers in TypeScript/Dart). The clients now act purely as input/display layers calling the unified RPCs; gold/silver grams entered by users are synced to `zakat_holdings` before each recalculation.
+- **Zakat Reminder Cron**: Fixed a bug where it ignored `purchase_date` for Hawl calculations (it used `created_at` + 354 days inline); `/api/zakat-reminder` now relies on the `get_zakat_hauls` RPC via the service-role client.
+
+### Fixed
+
+- Resolved the discrepancy where Web and Mobile could display different Zakat amounts due to local rounding/logic differences; both now render the same server-computed values.
+
 ### Security
 
 - **Anonymous clients can no longer call internal database RPCs.** Seven functions (health-score and sync RPCs such as `get_health_score` and `get_changed_records`) granted `EXECUTE` to `PUBLIC` by default, so any client holding the embeddable anon key could invoke them. Migration `supabase/migrations/20261018000000_linter_security_hardening.sql` revokes `PUBLIC` and `anon`, then grants `authenticated` and `service_role` explicitly (3db6ca2f, fca352be). Applied to production (project `ujwcvtpwsaidljecqbaa`) and verified on 2026-10-18 via `proacl`: all 14 internal RPCs now show `anon` EXECUTE revoked and `PUBLIC` EXECUTE revoked. Anon-key rotation remains outstanding and is tracked in `mobile/fajrak_flutter/INCIDENT.md`.
