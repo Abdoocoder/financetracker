@@ -1,0 +1,161 @@
+.card {
+  border-radius: 16px;
+  border: 1px solid var(--card-border, rgba(148, 163, 184, 0.25));
+  background: var(--card-bg, transparent);
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emoji {
+  font-size: 16px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* ── Countdown (active haul) ── */
+.countdownRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.ringWrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.ringDays {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ringLabel {
+  position: absolute;
+  bottom: 8px;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.countdownText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.daysRemaining {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.due {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ── Overdue ── */
+.overdueRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.overdueText {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.overdueDue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+/* ── Below Nisab ── */
+.belowRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.belowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.belowTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.belowSub {
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.calcButton {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--accent-green, #10b981);
+  background: var(--accent-green-dim, rgba(16, 185, 129, 0.12));
+  color: var(--accent-green-light, #10b981);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.calcButton:hover {
+  background: var(--accent-green-dim, rgba(16, 185, 129, 0.2));
+}
+
+/* ── Tone theming ── */
+.tone-safe .ringDays,
+.tone-safe .daysRemaining { color: var(--accent-green-light, #10b981); }
+
+.tone-soon .ringDays,
+.tone-soon .daysRemaining { color: var(--accent-orange-light, #f59e0b); }
+
+.tone-urgent .ringDays,
+.tone-urgent .daysRemaining { color: var(--accent-red-light, #ef4444); }
+
+.tone-overdue .overdueText { color: var(--accent-red-light, #ef4444); }

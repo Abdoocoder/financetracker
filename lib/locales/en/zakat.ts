@@ -45,4 +45,11 @@ export const enZakat = {
     zakat_gold_gram_hint: 'Jewelry and Bullion',
     zakat_invest_hint: '✅ Calculated from portfolio',
     zakat_haul_purchase_tip: '💡 Haul date not changing? Edit the investment in the Investments page and set the purchase date, then click Refresh.',
+    zakat_hawl_title: 'Zakat Hawl Status',
+    zakat_hawl_remaining: '{days} days remaining',
+    zakat_hawl_due: 'Due: {amount} {currency}',
+    zakat_hawl_overdue: 'Your Zakat is due',
+    zakat_hawl_below_nisab: 'Below Nisab',
+    zakat_hawl_calc_btn: 'Calculate your Zakat',
+    zakat_hawl_banner: '🕒 Current hawl: {days} days remaining (Due: {amount} {currency})',
 } as const

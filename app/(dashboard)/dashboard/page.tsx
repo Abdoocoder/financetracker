@@ -24,6 +24,8 @@ import { HeroBalanceCard } from '@/components/dashboard/HeroBalanceCard'
 import { MonthSummaryBanner } from '@/components/dashboard/MonthSummaryBanner'
 import { DashboardCustomizer } from '@/components/dashboard/DashboardCustomizer'
 import { useDashboardLayout } from '@/hooks/useDashboardLayout'
+import { useZakatHawl } from '@/hooks/useZakatHawl'
+import { ZakatHawlCard } from '@/components/dashboard/ZakatHawlCard'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonChart}`} /> })
 const CategoryBars = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.CategoryBars })), { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonSmall}`} /> })
@@ -44,6 +46,7 @@ export default function DashboardPage() {
   
   // Use the new TanStack Query based hook
   const { data, isLoading } = useDashboardData()
+  const { data: hawl } = useZakatHawl()
   
   const { accounts, totalBalance: accountsTotalBalance, loading: accountsLoading } = useAccounts(currentUser?.id)
   const [streakInfo, setStreakInfo] = useState<{ streak: number; loggedToday: boolean } | null>(null)
@@ -217,6 +220,14 @@ export default function DashboardPage() {
             <FinancialHealthCombined income={income} expenses={expenses} totalDebt={data?.totalDebt ?? 0} invValue={data?.invValue ?? 0} goalsSaved={data?.goalsSaved ?? 0} goalsTarget={data?.goalsTarget ?? 0} txCount={data?.txCount ?? 0} />
           </div>
         </Section>
+      )}
+
+      {show('zakat_hawl') && hawl && (
+        <ZakatHawlCard
+          daysRemaining={hawl.daysRemaining}
+          zakatDue={hawl.zakatDue}
+          currency={currency}
+        />
       )}
 
       {show('achievements') && (

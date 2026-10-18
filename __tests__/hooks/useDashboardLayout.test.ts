@@ -16,6 +16,7 @@ const DEFAULT_VISIBLE: CardId[] = [
   'budgets',
   'quick_links',
   'net_worth',
+  'zakat_hawl',
 ];
 
 const DEFAULT_HIDDEN: CardId[] = ['health', 'achievements', 'charts', 'simulator', 'challenges'];
@@ -73,10 +74,12 @@ describe('useDashboardLayout', () => {
   it('toggle prevents hiding the last visible non-required card', () => {
     const { result } = renderHook(() => useDashboardLayout());
 
-    const hideable = DEFAULT_VISIBLE.filter((id) => id !== REQUIRED_CARD);
+    // Hide every hideable card except net_worth, whatever the card count —
+    // then net_worth is the last visible one and must refuse to hide.
+    const toHide = DEFAULT_VISIBLE.filter((id) => id !== REQUIRED_CARD && id !== 'net_worth');
 
     act(() => {
-      hideable.slice(0, 7).forEach((id) => result.current.toggle(id));
+      toHide.forEach((id) => result.current.toggle(id));
     });
     expect(result.current.visibility.net_worth).toBe(true);
 

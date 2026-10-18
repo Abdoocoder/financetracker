@@ -16,6 +16,7 @@ export type CardId =
   | 'charts'
   | 'simulator'
   | 'challenges'
+  | 'zakat_hawl'
 
 export interface CardConfig {
   id: CardId
@@ -41,6 +42,7 @@ export const CARD_CONFIGS: CardConfig[] = [
   { id: 'charts',         labelAr: 'الرسوم البيانية',      labelEn: 'Charts & Analysis',  defaultVisible: false },
   { id: 'simulator',      labelAr: 'محاكي الثروة',         labelEn: 'Wealth Simulator',   defaultVisible: false },
   { id: 'challenges',     labelAr: 'التحديات',             labelEn: 'Challenges',         defaultVisible: false },
+  { id: 'zakat_hawl',     labelAr: 'حالة الحول (زكاة)',    labelEn: 'Zakat Hawl',         defaultVisible: true },
 ]
 
 const STORAGE_KEY = 'dashboard_layout_v1'
