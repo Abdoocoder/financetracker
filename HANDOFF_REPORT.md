@@ -68,7 +68,7 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 - **UNKNOWN-in-prod caveat:** the 4 prod-only tables' live RLS state cannot be proven from the repo (policies reference them, DDL missing) → treat as **UNKNOWN** until DB access is restored.
 - **Live drift (AUDIT_REPORT.md §4):** `profiles` has 25+ columns not in migrations; default currency in prod is **JOD** (not KWD); 6 RLS-initplan WARN advisories; 21 unused indexes across 14 tables.
 - **testimonials** policies (`legacy/010`, `011`, re-applied in `20260913135653_add_prod_only_schema.sql`): public SELECT `WHERE is_visible=true`; owner-only insert/update/delete — yet an external client is hammering `/rest/v1/testimonials` (incident), i.e. public read amplification, not a policy bypass.
-- Security-hardening migrations present: `advisor_function_lockdown`, `revoke_public_from_secdef_functions`, `verify_owner_in_user_rpcs`, `022_security_hardening`, `024_production_hardening`.
+- Security-hardening migrations present: `advisor_function_lockdown`, `revoke_public_from_secdef_functions`, `verify_owner_in_user_rpcs`, `022_security_hardening`, `024_production_hardening`, `20261018000000_linter_security_hardening` (revokes PUBLIC+anon EXECUTE on 7 internal RPCs with explicit grants to authenticated/service_role, pins `search_path`, drops dup index).
 - `supabase/config.toml` has `[auth] enabled = true`; **leaked-password protection is not enabled** (flagged as recommendation in AUDIT_REPORT.md:179).
 
 ## 4. Codebase Structure & Force-Unwrap Hotspots (RESOLVED in v3.44.0)

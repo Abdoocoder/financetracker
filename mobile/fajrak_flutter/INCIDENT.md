@@ -77,4 +77,10 @@
 
 ## Security Hardening Backlog
 
-- Linter report reviewed; anon EXECUTE privileges revoked on internal RPCs via migration `20261018000000_linter_security_hardening.sql`.
+- Linter report reviewed. Migration `supabase/migrations/20261018000000_linter_security_hardening.sql` committed (2026-10-17):
+  - **7 internal RPCs hardened:** `calculate_health_score`, `get_health_score`, `check_and_reserve_idempotency_key`, `complete_idempotency_key`, `cleanup_expired_idempotency_keys`, `get_changed_records`, `get_deleted_records`.
+  - Each gets `REVOKE EXECUTE ... FROM PUBLIC, anon` + explicit `GRANT ... TO authenticated, service_role`.
+  - **Why PUBLIC too:** PostgreSQL functions grant `EXECUTE` to `PUBLIC` by default, so revoking from `anon` alone is insufficient. The initial revision only revoked from `anon`; corrected in follow-up commit `fca352be`.
+  - `search_path = public` pinned on the 4 flagged functions (incl. `update_updated_at_column`).
+  - Duplicate index `health_score_history_user_date_uniq` dropped.
+- **Open:** verify the migration is applied in production (`npx supabase db push` or SQL editor) and re-check that mobile/web RPC flows still work after the grants are live.
