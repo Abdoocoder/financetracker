@@ -2,6 +2,22 @@
 
 .PHONY: help setup run run-web run-web-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
 
+# ── Shared --dart-define flags, read from .env at recipe run time ──
+# IMPORTANT: keep this as `=` (recursive expansion), NOT `:=`.
+# With `:=`, $$(grep …) collapses to $(…) at definition time and Make would
+# expand it as an empty variable — silently rebuilding with empty credentials
+# (the exact bug that made `make run-web` fail with 404 on /auth/v1/token).
+DART_DEFINES = \
+	--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
+	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
+
 # Default target
 help:
 	@echo "Fajrak Flutter Development Commands"
@@ -44,7 +60,7 @@ run:
 
 # Run Flutter web (basic)
 run-web:
-	flutter run -d chrome --web-port=33963 --web-hostname=0.0.0.0
+	flutter run -d chrome --web-port=33963 --web-hostname=0.0.0.0 $(DART_DEFINES)
 
 # Run CORS proxy server (run in separate terminal)
 run-proxy:
@@ -77,42 +93,15 @@ run-web-proxy:
 
 # Build production web
 build-web:
-	flutter build web --release \
-		--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
+	flutter build web --release $(DART_DEFINES)
 
 # Build release APK
 build-apk:
-	flutter build apk --release \
-		--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
+	flutter build apk --release $(DART_DEFINES)
 
 # Build release App Bundle
 build-bundle:
-	flutter build appbundle --release \
-		--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
-		--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
+	flutter build appbundle --release $(DART_DEFINES)
 
 # Run tests
 test:

@@ -42,6 +42,15 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
 
   static const double _troyOzToGram = 31.1035; // تحويل سعر الأونصة (منصة الأسعار فقط — ليس حساباً زكوياً)
 
+  /// تحويل قيمة سعر خام بأمان إلى double.
+  /// Safe price parsing: the live-price endpoints sometimes return numeric
+  /// values as Strings (e.g. "30.5") instead of num — never cast raw JSON to num.
+  double _parsePrice(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
+
   Future<void> _fetchLivePrices() async {
     if (!mounted) return;
     setState(() => _fetchingPrices = true);
@@ -59,14 +68,14 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       final goldRes = results[0] as http.Response;
       if (goldRes.statusCode == 200 && goldRes.body.isNotEmpty) {
         final d = json.decode(goldRes.body);
-        final priceOz = (d['chart']?['result']?[0]?['meta']?['regularMarketPrice'] as num?)?.toDouble() ?? 0;
+        final priceOz = _parsePrice(d['chart']?['result']?[0]?['meta']?['regularMarketPrice']);
         if (priceOz > 0) goldP = (priceOz / _troyOzToGram) * usdRate;
       }
 
       final silverRes = results[1] as http.Response;
       if (silverRes.statusCode == 200 && silverRes.body.isNotEmpty) {
         final d = json.decode(silverRes.body);
-        final priceOz = (d['chart']?['result']?[0]?['meta']?['regularMarketPrice'] as num?)?.toDouble() ?? 0;
+        final priceOz = _parsePrice(d['chart']?['result']?[0]?['meta']?['regularMarketPrice']);
         if (priceOz > 0) silverP = (priceOz / _troyOzToGram) * usdRate;
       }
 
@@ -75,8 +84,10 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
         final fbRes = await http.get(Uri.parse('https://freegoldapi.com/data/latest.json')).timeout(const Duration(seconds: 5)).catchError((_) => http.Response('', 404));
         if (fbRes.statusCode == 200 && fbRes.body.isNotEmpty) {
           final fb = json.decode(fbRes.body);
-          if (goldP == null && fb['gold'] != null) goldP = (fb['gold'] as num).toDouble() * usdRate;
-          if (silverP == null && fb['silver'] != null) silverP = (fb['silver'] as num).toDouble() * usdRate;
+          final goldVal = _parsePrice(fb['gold']);
+          final silverVal = _parsePrice(fb['silver']);
+          if (goldP == null && goldVal > 0) goldP = goldVal * usdRate;
+          if (silverP == null && silverVal > 0) silverP = silverVal * usdRate;
         }
       }
 
