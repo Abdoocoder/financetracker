@@ -113,12 +113,29 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 | `/api/gamification` | تحديث المستويات والشارات |
 | `/api/push-subscribe` | تسجيل توكنات Firebase FCM |
 | `/api/smart-notifications` | إرسال تنبيهات مخصصة بناءً على سلوك المستخدم |
-| `/api/zakat-reminder` | التنبيه باقتراب "حول" الزكاة |
+| `/api/zakat-reminder` | التنبيه باقتراب "حول" الزكاة — يعتمد الآن على RPC `get_zakat_hauls` (بدون حساب TS محلي) |
 | `/api/api-keys/create` | إنشاء PAT `fjk_live_...` |
 | `/api/api-keys/revoke` | إبطال PAT |
 | `/api/webhook/transaction` | قراءة/إنشاء المعاملات عبر PAT (REST) |
 | `/api/mcp` | خادم MCP المالي (Streamable HTTP) |
 | `/api/byok/proxy` | وكيل LLM BYOK الرفيع (Feature A) |
+
+---
+
+## 🗄️ قواعد قاعدة البيانات (Supabase RPCs) — محرك الزكاة الموحد (v2)
+
+آخر تحديث: 2026-10-19 · source: `supabase/migrations/20261019000000_zakat_engine_v2.sql`
+
+جميع حسابات الزكاة (النصاب، 2.5%، الحول) مركزية في قاعدة البيانات. الويب والموبايل طبقات إدخال/عرض فقط — يُمنع من إعادة الحساب محلياً.
+
+| الدالة (Function) | المعاملات (Parameters) | الوصف |
+|:------------------|:-----------------------|:------|
+| `get_zakat_summary` | `p_user_id`, `p_gold_price_per_gram`, `p_silver_price_per_gram`, `p_usd_to_local_rate` | ملخص الزكاة v2: يعيد JSON بمفاتيح v1 (`is_eligible`, `zakat_due`, `zakatable_assets`, `nisab_gold/silver/effective`) + تفصيل `components` (نقد، استثمارات، كاش استثمار، مدخرات، ذهب، فضة، أخرى، ديون) + `engine_version: 2`. يشمل `zakat_holdings` في الوعاء وي_CLAMP القيم السالبة بصفر |
+| `get_zakat_hauls` | `p_user_id` | مصفوفة JSON لكل الحولات النشطة (استثمارات + ذهب/فضة من `zakat_holdings`) بتاريخ الحول والأيام المتبقية — `COALESCE(purchase_date, created_at) + 354` |
+
+**الأمان:** كلا الدالتين `SECURITY DEFINER`؛ `EXECUTE` مسحوب من `PUBLIC`/`anon` ومنح لـ `authenticated` + `service_role` فقط. حارس الملكية: المستخدم المصادَق عليه لا يرى بيانات غيره؛ استدعاء `service_role` بلا JWT (cron) مسموح.
+
+**مسار `/api/zakat-reminder`:** يستدعي `get_zakat_hauls` عبر عميل `service_role` بدل الحساب المضمّن في TypeScript (كان يتجاهل `purchase_date`). نافذة التنبيه: 30 / 7 / 0 / −1 يوم من `days_remaining`.
 
 ---
 

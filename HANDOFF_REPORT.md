@@ -131,7 +131,7 @@ Store listing (ar + en) claims, mapped to implementation:
 | Listing claim | Evidence in repo |
 |---|---|
 | BYOK AI (NVIDIA/OpenAI/Anthropic/Gemini/OpenRouter), keys encrypted on device only | ✅ `lib/byok/` + `lib/services/byok/`, 6 providers per v3.43.1 notes |
-| Zakat calculator + 354-day hawl + history/reminders | ✅ RPCs + `zakat_history` table + `/api/zakat-reminder` |
+| Zakat calculator + 354-day hawl + history/reminders | ✅ Unified engine v2 RPCs (`get_zakat_summary`, `get_zakat_hauls`) + `zakat_holdings` (gold/silver tracking) + `zakat_history` + `/api/zakat-reminder` |
 | Halal investing (`is_halal`) | ✅ `investments.halal flag` |
 | FIRE number/simulation | ✅ `app/(dashboard)` fire route + `components/investments/wealth-simulator.tsx` |
 | Dashboard charts, Quick Add, 50/30/20 budgets, debts auto-deduct, goals, multi-account, multi-currency | ✅ features + tables |
@@ -147,7 +147,7 @@ Store listing (ar + en) claims, mapped to implementation:
 1. ✅ **Production DB outage — RESOLVED** (2026-10-17); post-mortem in `mobile/fajrak_flutter/INCIDENT.md`.
 2. ✅ **Backups — RESOLVED:** daily GitHub Actions → Cloudflare R2 (`fajrak-backups`) pipeline is live; 4 dumps retained (2026-10-14 → 2026-10-17).
 3. 🔴 **DB drift**: live schema ≠ migrations; `supabase db reset`/fresh migrate would destroy prod reality.
-4. 🔴 **Financial logic duplication** — 5–7 implementations of the same metric across web/mobile/SQL (ARCHITECTURE_AUDIT_VERIFIED).
+4. 🟡 **Financial logic duplication** — 5–7 implementations of the same metric across web/mobile/SQL (ARCHITECTURE_AUDIT_VERIFIED). **Zakat is now fully unified** in engine v2 (`get_zakat_summary` + `get_zakat_hauls` RPCs; clients are input/display only). Other metrics (e.g. health-score) may still be duplicated.
 5. 🟠 Hardcoded health-score thresholds / hardcoded `0` health score bug (partially fixed by `20261016114425` + `20261017000000` migrations).
 6. 🟠 **No feature flags** — every change ships all-or-nothing.
 7. 🟠 Leaked-password protection disabled in Supabase Auth.
