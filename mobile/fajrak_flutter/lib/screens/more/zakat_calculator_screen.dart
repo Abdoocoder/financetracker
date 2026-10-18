@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/currency_service.dart';
 import '../../services/finance_service.dart';
 import '../../widgets/common/calculator_disclaimer.dart';
+import '../../widgets/dashboard/zakat_hawl_card.dart';
 
 class ZakatCalculatorScreen extends StatefulWidget {
   const ZakatCalculatorScreen({super.key});
@@ -34,6 +35,10 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
   bool _fetchingPrices = false;
   Timer? _recalcDebounce;
   final int _currentYear = DateTime.now().year;
+  // ── Zakat Autopilot: شريط الحول النشط (RPC sync_zakat_haul_state) ──
+  // null = لا حول نشط أو فشلت المزامنة → الشريط مخفي
+  int? _hawlDays;
+  double _hawlDue = 0;
 
   static const double _troyOzToGram = 31.1035; // تحويل سعر الأونصة (منصة الأسعار فقط — ليس حساباً زكوياً)
 
@@ -133,10 +138,25 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
         'p_usd_to_local_rate': usdRate,
       });
 
+      // ── Zakat Autopilot: مزامنة حالة الحول للشريط العلوي (غير حرج) ──
+      int? hawlDays;
+      double hawlDue = 0;
+      try {
+        final hawl = await FinanceService.syncZakatHaulState();
+        if (hawl.isNotEmpty) {
+          hawlDays = (hawl['days_remaining'] as num?)?.toInt();
+          hawlDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
+        }
+      } catch (e) {
+        debugPrint('Zakat hawl sync failed: $e');
+      }
+
       if (mounted) {
         setState(() {
           _currency = currencyCode;
           _usdRate = usdRate;
+          _hawlDays = hawlDays;
+          _hawlDue = hawlDue;
           if (dashRes != null) {
             _cashCtrl.text = ((dashRes['total_accounts_balance'] ?? 0) + (dashRes['goals_saved'] ?? 0)).toStringAsFixed(0);
             _investmentsCtrl.text = ((dashRes['investments_value_local'] ?? 0) + (dashRes['investment_cash_local'] ?? 0)).toStringAsFixed(0);
@@ -150,6 +170,27 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
     } catch (e, s) {
       debugPrint('Error loading zakat data: $e $s');
     }
+  }
+
+  /// شريط "حولك الحالي" أعلى الصفحة — يظهر عند وجود حول نشط (أو متأخر)
+  /// وفق RPC sync_zakat_haul_state (نفس نص/ألوان بطاقة الداشبورد).
+  Widget _hawlBanner(ColorScheme cs) {
+    final tone = hawlToneFor(_hawlDays);
+    final color = hawlToneColor(tone, cs);
+    final amount = _fmt(_hawlDue);
+    final text = _hawlDays! <= 0
+        ? '⏰ ${'zakat_hawl_overdue'.tr()} (${'zakat_hawl_due'.tr(namedArgs: {'amount': amount, 'currency': _currency})})'
+        : 'zakat_hawl_banner'.tr(namedArgs: {'days': '$_hawlDays', 'amount': amount, 'currency': _currency});
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(text, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: color, height: 1.6)),
+    );
   }
 
   /// زر "احسب": مزامنة الغرامات إلى zakat_holdings ثم استدعاء المحرك الموحد.
@@ -272,6 +313,11 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
+          // ── Zakat Autopilot: شريط الحول النشط أعلى الصفحة ──
+          if (_hawlDays != null) ...[
+            _hawlBanner(cs),
+            const SizedBox(height: 16),
+          ],
           const CalculatorDisclaimer(storageKey: 'disclaimer_zakat'),
           // Haul Countdown Section (من RPC get_zakat_hauls — مصدر الحول الوحيد)
           if (_hauls.isNotEmpty) ...[

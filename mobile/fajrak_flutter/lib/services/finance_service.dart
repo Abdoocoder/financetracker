@@ -62,6 +62,16 @@ class FinanceService {
     return [];
   }
 
+  /// مزامنة حالة الحول عبر RPC الموحد sync_zakat_haul_state (Zakat Autopilot).
+  /// يعيد الحالة المحدّثة: days_remaining / zakat_due / nisab_reached_at ...
+  /// (ينشئ/يحدّث صف zakat_haul_state على الخادم — لا يُحسب الحول في الواجهة).
+  static Future<Map<String, dynamic>> syncZakatHaulState() async {
+    final uid = _uid;
+    if (uid == null) return {};
+    final response = await _db.rpc('sync_zakat_haul_state', params: {'p_user_id': uid});
+    return Map<String, dynamic>.from(response as Map);
+  }
+
   /// مزامنة غرامات الذهب/الفضة إلى جدول zakat_holdings (لتصبح ضمن الوعاء).
   /// الجدول لا يملك قيداً فريداً، فنحدّث الصف الموجود أو ننشئه.
   /// الغرامات <= 0 تحذف الصف حتى لا تُحتسب дважды.

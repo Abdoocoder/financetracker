@@ -16,6 +16,8 @@ enum DashCardId {
   gamification,
   simulator,
   challenges,
+  // append-only — persisted layout prefs index into this enum
+  zakatHawl,
 }
 
 class DashCardConfig {
@@ -47,6 +49,7 @@ const List<DashCardConfig> kDashCards = [
   DashCardConfig(id: DashCardId.gamification,  labelKey: 'dash_card_gamification',   defaultVisible: false),
   DashCardConfig(id: DashCardId.simulator,     labelKey: 'dash_card_simulator',      defaultVisible: false),
   DashCardConfig(id: DashCardId.challenges,    labelKey: 'dash_card_challenges',     defaultVisible: false),
+  DashCardConfig(id: DashCardId.zakatHawl,     labelKey: 'dash_card_zakat_hawl',     defaultVisible: true),
 ];
 
 const _kPrefsKey = 'dashboard_layout_v1';

@@ -10,6 +10,7 @@ import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
 import '../../widgets/dashboard/quick_links_card.dart';
 import '../../widgets/dashboard/gamification_card.dart';
+import '../../widgets/dashboard/zakat_hawl_card.dart';
 import '../../widgets/dashboard/wealth_simulator_card.dart';
 import '../../widgets/dashboard/challenges_card.dart';
 import '../../widgets/dashboard/dashboard_header.dart';
@@ -55,6 +56,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final double _foodSpending = 0, _entertainmentSpending = 0;
   String _stage = 'awareness';
   int _loadedTransactionVersion = 0;
+  // ── Zakat Autopilot: حالة الحول عبر RPC sync_zakat_haul_state ──
+  // null = لم تنجح المزامنة → البطاقة مخفية؛ false = تحت النصاب؛ true = عدّاد/مستحق
+  bool? _hawlNisabReached;
+  int? _hawlDaysRemaining;
+  double _hawlZakatDue = 0;
 
   @override
   void initState() { super.initState(); _load(); }
@@ -188,7 +194,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           'monthly_debt_commitments': 0.0, 'health_score': 0,
         };
       }
-      
+
+      // ── Zakat Autopilot: مزامنة حالة الحول (بطاقة غير حرجة — تُخفى عند الفشل) ──
+      bool? hawlNisabReached;
+      int? hawlDaysRemaining;
+      double hawlZakatDue = 0;
+      try {
+        final hawl = await FinanceService.syncZakatHaulState();
+        if (hawl.isNotEmpty) {
+          hawlNisabReached = hawl['nisab_reached_at'] != null;
+          hawlDaysRemaining = (hawl['days_remaining'] as num?)?.toInt();
+          hawlZakatDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
+        }
+      } catch (e) {
+        debugPrint('Dashboard hawl sync failed: $e');
+      }
+
       final netWorth = (dash['net_worth'] as num).toDouble();
       final totalDebt = (dash['total_debt_owed'] as num).toDouble();
       final totalReceivable = (dash['total_receivable'] as num).toDouble();
@@ -246,6 +267,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _prevExpenses = prevExpenses;
           _months6Data = months6;
           _categoryData = catData;
+          _hawlNisabReached = hawlNisabReached;
+          _hawlDaysRemaining = hawlDaysRemaining;
+          _hawlZakatDue = hawlZakatDue;
           _lastUpdated = DateTime.now();
           _loading = false;
         });
@@ -442,6 +466,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   RepaintBoundary(child: NetWorthCard(netWorth: _netWorth, invValue: _invValue, goalsSaved: _goalsSaved, totalDebt: _totalDebt, totalReceivable: _totalReceivable, currency: _currency)),
                 if (layout.isVisible(DashCardId.healthScore))
                   RepaintBoundary(child: DashboardHealthScore(score: _healthScore, colorScheme: colorScheme)),
+                if (layout.isVisible(DashCardId.zakatHawl) && _hawlNisabReached != null) ...[
+                  const SizedBox(height: 16),
+                  RepaintBoundary(
+                    child: ZakatHawlCard(
+                      // تحت النصاب (false) → daysRemaining: null → حالة "احسب زكاتك"
+                      daysRemaining: _hawlNisabReached! ? _hawlDaysRemaining : null,
+                      zakatDue: _hawlZakatDue,
+                      currency: _currency,
+                      onCalculateTap: () => Navigator.pushNamed(context, '/zakat-calculator'),
+                    ),
+                  ),
+                ],
                 if (layout.isVisible(DashCardId.stage)) ...[
                   const SizedBox(height: 16),
                   DashboardStageCard(stage: _stage),

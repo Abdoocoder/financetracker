@@ -45,4 +45,11 @@ export const arZakat = {
     zakat_gold_gram_hint: 'المصاغ والسبائك',
     zakat_invest_hint: '✅ محسوب من محفظتك تلقائياً',
     zakat_haul_purchase_tip: '💡 لم يتغير تاريخ الحول؟ عدّل الاستثمار في صفحة الاستثمارات وأدخل تاريخ الشراء، ثم اضغط تحديث.',
+    zakat_hawl_title: 'حالة الحول (Zakat Hawl)',
+    zakat_hawl_remaining: 'بقي {days} يوماً',
+    zakat_hawl_due: 'المستحق: {amount} {currency}',
+    zakat_hawl_overdue: 'حان موعد زكاتك',
+    zakat_hawl_below_nisab: 'أنت تحت النصاب',
+    zakat_hawl_calc_btn: 'احسب زكاتك',
+    zakat_hawl_banner: '🕒 حولك الحالي: بقي {days} يوماً (المستحق: {amount} {currency})',
 } as const

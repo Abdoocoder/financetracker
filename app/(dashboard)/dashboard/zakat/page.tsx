@@ -6,6 +6,8 @@ import { useI18n } from '@/lib/i18n'
 import { fetchExchangeRate } from '@/lib/currency'
 import type { ZakatHistory } from '@/types'
 import { CalculatorDisclaimer } from '@/components/ui/calculator-disclaimer'
+import { useZakatHawl } from '@/hooks/useZakatHawl'
+import { ZakatHawlBanner } from '@/components/dashboard/ZakatHawlBanner'
 
 // صيغة عنصر get_zakat_hauls (مصدر الحول الوحيد — راجع migration 20261019000000)
 interface HaulItem {
@@ -23,6 +25,7 @@ export default function ZakatPage() {
   const { t } = useI18n()
   const { user } = useUser()
   const supabase = useMemo(() => createClient(), [])
+  const hawl = useZakatHawl()
 
   const [goldGram, setGoldGram] = useState(0)
   const [goldPrice, setGoldPrice] = useState(30)
@@ -197,6 +200,13 @@ export default function ZakatPage() {
           {t('zakat_header_desc', { year: currentYear, nisab: fmt(nisab), currency })}
         </p>
       </div>
+
+      {/* ── شريط حول الزكاة (Autopilot) — يظهر فقط عند وجود حول نشط ── */}
+      <ZakatHawlBanner
+        daysRemaining={hawl.data?.daysRemaining ?? null}
+        zakatDue={hawl.data?.zakatDue ?? 0}
+        currency={currency}
+      />
 
       <CalculatorDisclaimer storageKey="disclaimer_zakat" />
 
