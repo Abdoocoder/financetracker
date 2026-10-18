@@ -159,6 +159,41 @@ describe('GET /api/gamification', () => {
     expect(res.status).toBe(401)
   })
 
+  it('returns 401 when a user_id query param is present but no Authorization header (production 401 repro)', async () => {
+    // The dashboard GamificationCard used to send ?user_id= with no Bearer
+    // token — the query param authenticates nothing.
+    const req = makeGetRequest('http://localhost/api/gamification?user_id=u1')
+    const res = await GET(req)
+    expect(res.status).toBe(401)
+  })
+
+  it('derives the user from the Bearer token, ignoring the user_id query param', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: { id: 'token-user' } }, error: null })
+    const eqCalls: any[][] = []
+    mockFrom.mockImplementation((table: string) => {
+      const data = table === 'user_stats'
+        ? { data: { total_points: 10, badges: [] }, error: null }
+        : { data: [], error: null }
+      const obj: any = {
+        select: () => obj,
+        eq: (...args: any[]) => { eqCalls.push(args); return obj },
+        single: () => obj,
+        then: (res: any, rej: any) => Promise.resolve(data).then(res, rej),
+        catch: (fn: any) => Promise.resolve(data).catch(fn),
+      }
+      return obj
+    })
+
+    const req = makeGetRequest('http://localhost/api/gamification?user_id=other-user', 'valid-token')
+    const res = await GET(req)
+    expect(res.status).toBe(200)
+    expect(mockGetUser).toHaveBeenCalledWith('valid-token')
+
+    // user_stats must be read for the token's user, not the query param
+    expect(eqCalls).toContainEqual(['id', 'token-user'])
+    expect(eqCalls).not.toContainEqual(['id', 'other-user'])
+  })
+
   it('returns user_stats with levelInfo', async () => {
     mockGetUser.mockResolvedValueOnce({ data: { user: { id: 'u1' } }, error: null })
     setupMock({

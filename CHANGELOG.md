@@ -32,6 +32,7 @@ notes and version-bump commits; see the note on links at the end of this file.
 ### Fixed
 
 - Resolved the discrepancy where Web and Mobile could display different Zakat amounts due to local rounding/logic differences; both now render the same server-computed values.
+- **Dashboard gamification 401s**: The `GamificationCard` called `/api/gamification` (GET and POST) without the required `Authorization: Bearer <jwt>` header — the GET even sent a `user_id` query param, which the route ignores (identity comes from the token). Both requests returned 401, so the Wealth Journey card silently failed to render. The card now fetches the session and attaches the token, matching every other caller (dashboard page, learn page, onboarding, mobile). Added regression tests at both seams: the route contract (`__tests__/api/gamification.test.ts` — 401 with query param but no token; token user wins over query param) and the component call site (`__tests__/components/GamificationCard.test.tsx`).
 
 ### Security
 
