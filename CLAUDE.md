@@ -76,10 +76,10 @@ npm run dev              # Start Next.js dev server (port 3000)
 
 # Mobile (separate build system — no npm script)
 cd mobile/fajrak_flutter && make run   # or: flutter run
-cd mobile/fajrak_flutter && make test  # Flutter tests (177 tests)
+cd mobile/fajrak_flutter && make test  # Flutter tests (186 tests)
 
 # Testing
-npm test                 # Run Jest tests (592 tests / 66 suites in __tests__/)
+npm test                 # Run Jest tests (626 tests / 71 suites in __tests__/)
 npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
 npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
 
@@ -194,6 +194,7 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
    Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
 10. **Zakat is centralized**: Never calculate Zakat (Nisab, 2.5%, Hawl) locally in Web or Mobile. Always use the get_zakat_summary and get_zakat_hauls RPCs.
+11. **Zakat Autopilot**: The Hawl state is managed by the sync_zakat_haul_state RPC. Never calculate Hawl logic in the UI; always read from this RPC or the zakat_haul_tracking table.
 
 ### Naming Conventions
 - Components: PascalCase (`HeroBalanceCard.tsx`)

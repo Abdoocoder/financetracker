@@ -199,9 +199,13 @@ lib/
 - **Network Security Config** — LAN CIDR allowances for local Ollama (no blanket cleartext)
 - **Smart notifications** with Firebase
 - **PDF reports** with charts
-- **Zakat & FIRE calculators**
+- **Zakat & FIRE calculators** — with **Zakat Autopilot**: DB-side Hawl state machine (`sync_zakat_haul_state` RPC), dashboard countdown card, Zakat-page banner, and due-date push reminders
 - **Arabic/English** localization with RTL support
 - **Material 3** theming with Cairo font
+
+## 🔮 Recent Updates (Unreleased)
+- **Zakat Autopilot**: dashboard "حالة الحول" countdown card (`ZakatHawlCard`) + Zakat-page banner, both rendered purely from the `sync_zakat_haul_state` RPC (no local Hawl math); daily `/api/zakat-autopilot` cron pushes a reminder when the Hawl is ≤ 7 days out
+- **Stability**: `make run-web` passes the shared `DART_DEFINES` credentials; live gold/silver prices parsed defensively (`_parsePrice` accepts `num` or `String` — fixes the Flutter Web crash)
 
 ## 🆕 Recent Updates (v3.44.0)
 - **AI Assistant**: proper Markdown rendering (migrated to `flutter_markdown_plus`), Arabic prompt tuning, JOD 3-decimal formatting
