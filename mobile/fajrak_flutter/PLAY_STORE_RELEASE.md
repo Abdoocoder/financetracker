@@ -1,3 +1,26 @@
+# Google Play Store Release Details - v3.45.0+64
+
+## Version Code: 64
+## Version Name: 3.45.0
+
+### 🌙 Added
+- **Zakat Autopilot:** Automatically tracks your wealth, starts the 354-day Hawl countdown when Nisab is reached, and sends proactive reminders.
+- **Unified Zakat Engine:** Web and Mobile now use a single, centralized PostgreSQL database engine for all Zakat calculations.
+- **Dashboard UI:** Added the new Zakat Hawl countdown card to Web and Mobile dashboards.
+
+### 🐛 Fixed
+- Fixed gamification 401 errors on the web dashboard.
+- Fixed web development credential issues (`make run-web`).
+- Fixed live gold/silver price parsing crashes on Flutter Web.
+
+---
+**بالعربية:**
+- **الطيار الآلي للزكاة:** تتبع تلقائي لثروتك، وبدء عداد الحول (354 يوماً) عند بلوغ النصاب، مع إشعارات استباقية.
+- **توحيد محرك الزكاة:** الويب والموبايل يستخدمان الآن محركاً مركزياً واحداً في قاعدة البيانات لجميع حسابات الزكاة.
+- **واجهة لوحة التحكم:** إضافة بطاقة العد التنازلي لحول الزكاة في لوحات التحكم للويب والموبايل.
+- **إصلاح الأخطاء:** إصلاح أخطاء المصادقة (401)، ومشاكل بيانات الاعتماد في بيئة الويب، وانهيار جلب أسعار الذهب/الفضة في Flutter Web.
+---
+
 # Google Play Store Release Details - v3.44.0+63
 
 **Fajrak v3.44.0 — Feature & Stability Release**
