@@ -4,25 +4,19 @@ import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 import { fetchExchangeRate } from '@/lib/currency'
-import type { Investment, ZakatHistory } from '@/types'
+import type { ZakatHistory } from '@/types'
 import { CalculatorDisclaimer } from '@/components/ui/calculator-disclaimer'
 
-const HAUL_DAYS = 354 // حول هجري
-const TROY_OZ_TO_GRAM = 31.1035
-
-function haulStart(inv: Investment): Date {
-  if (inv.purchase_date) return new Date(inv.purchase_date)
-  return new Date(inv.created_at)
-}
-
-function haulDaysLeft(inv: Investment): number {
-  const haulDate = new Date(haulStart(inv).getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
-  return Math.ceil((haulDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
-}
-
-function haulDueDate(inv: Investment): string {
-  const haulDate = new Date(haulStart(inv).getTime() + HAUL_DAYS * 24 * 60 * 60 * 1000)
-  return haulDate.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })
+// صيغة عنصر get_zakat_hauls (مصدر الحول الوحيد — راجع migration 20261019000000)
+interface HaulItem {
+  source: 'investment' | 'holding'
+  ref_id: string | null
+  label: string | null
+  asset_type: string | null
+  grams: number | null
+  value_usd: number | null
+  haul_date: string
+  days_remaining: number
 }
 
 export default function ZakatPage() {
@@ -39,17 +33,62 @@ export default function ZakatPage() {
   const [debtsOwed, setDebtsOwed] = useState(0)
   const [currency, setCurrency] = useState('JOD')
   const [history, setHistory] = useState<ZakatHistory[]>([])
-  const [invItems, setInvItems] = useState<Investment[]>([])
+  const [hauls, setHauls] = useState<HaulItem[]>([])
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [fetchingPrices, setFetchingPrices] = useState(false)
   const [zakatSummary, setZakatSummary] = useState<any>(null)
+  const [usdRate, setUsdRate] = useState(1)
   const currentYear = new Date().getFullYear()
+
+  // مزامنة غرام الذهب/الفضة إلى جدول zakat_holdings (لتقرأها المحرك v2).
+  // الجدول لا يملك قيداً فريداً (الترحيل متجمد) فنحدّث الصف الموجود أو ننشئه.
+  async function syncHoldings() {
+    if (!user) return
+    const targets = [
+      { asset_type: 'gold', grams: goldGram },
+      { asset_type: 'silver', grams: silverGram },
+    ]
+    for (const target of targets) {
+      const { data: existing } = await supabase
+        .from('zakat_holdings')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('asset_type', target.asset_type)
+        .limit(1)
+      if (target.grams > 0) {
+        if (existing?.length) {
+          await supabase.from('zakat_holdings')
+            .update({ grams: target.grams })
+            .eq('id', existing[0].id)
+        } else {
+          await supabase.from('zakat_holdings')
+            .insert({ user_id: user.id, asset_type: target.asset_type, grams: target.grams })
+        }
+      } else if (existing?.length) {
+        await supabase.from('zakat_holdings').delete().eq('id', existing[0].id)
+      }
+    }
+  }
+
+  async function loadZakat() {
+    if (!user) return
+    const [summaryRes, haulsRes] = await Promise.all([
+      supabase.rpc('get_zakat_summary', {
+        p_user_id: user.id,
+        p_gold_price_per_gram: goldPrice,
+        p_silver_price_per_gram: silverPrice,
+        p_usd_to_local_rate: usdRate,
+      }),
+      supabase.rpc('get_zakat_hauls', { p_user_id: user.id }),
+    ])
+    setZakatSummary(summaryRes.data)
+    if (Array.isArray(haulsRes.data)) setHauls(haulsRes.data as HaulItem[])
+  }
 
   async function loadData() {
     if (!user) return
-    const [invRes, profileRes, histRes] = await Promise.all([
-      supabase.from('investments').select('*').eq('user_id', user.id),
+    const [profileRes, histRes] = await Promise.all([
       supabase.from('profiles').select('currency').eq('id', user.id).single(),
       supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false }),
     ])
@@ -57,14 +96,14 @@ export default function ZakatPage() {
     const currencyCode = profileRes.data?.currency ?? 'JOD'
     setCurrency(currencyCode)
     setHistory(histRes.data ?? [])
-    setInvItems(invRes.data ?? [])
 
-    const usdToLocal = currencyCode !== 'USD' ? (await fetchExchangeRate('USD', currencyCode) ?? 1) : 1
-    
+    const rate = currencyCode !== 'USD' ? (await fetchExchangeRate('USD', currencyCode) ?? 1) : 1
+    setUsdRate(rate)
+
     // جلب البيانات المالية الموحدة للملء التلقائي
     const { data: dash } = await supabase.rpc('get_financial_dashboard', {
       p_user_id: user.id,
-      p_usd_to_local_rate: usdToLocal
+      p_usd_to_local_rate: rate
     })
 
     if (dash) {
@@ -74,37 +113,27 @@ export default function ZakatPage() {
       setDebtsOwed(dash.total_debt_owed ?? 0)
     }
 
-    const { data: zakat } = await supabase.rpc('get_zakat_summary', {
-      p_user_id: user.id,
-      p_gold_price_per_gram: goldPrice,
-      p_silver_price_per_gram: silverPrice,
-      p_usd_to_local_rate: usdToLocal
-    })
-    setZakatSummary(zakat)
+    await loadZakat()
   }
 
   useEffect(() => { loadData() }, [user])
 
+  // عند تغيير أي إدخال: مزامنة الغرامات إلى zakat_holdings ثم إعادة استدعاء
+  // المحرك الموحد. كل الحسابات تأتي من RPC — لا رياضيات محلية إطلاقاً.
   useEffect(() => {
-    async function updateZakat() {
+    const timer = setTimeout(async () => {
       if (!user) return
-      const usdToLocal = currency !== 'USD' ? (await fetchExchangeRate('USD', currency) ?? 1) : 1
-      const { data: zakat } = await supabase.rpc('get_zakat_summary', {
-        p_user_id: user.id,
-        p_gold_price_per_gram: goldPrice,
-        p_silver_price_per_gram: silverPrice,
-        p_usd_to_local_rate: usdToLocal
-      })
-      setZakatSummary(zakat)
-    }
-    const timer = setTimeout(updateZakat, 500)
+      await syncHoldings()
+      await loadZakat()
+    }, 500)
     return () => clearTimeout(timer)
   }, [goldPrice, silverPrice, goldGram, silverGram, cash, investments, debtsOwed])
 
+  // كل القيم من استجابة RPC v2 — لا نحسب نصاباً ولا زكاة في TypeScript
   const nisab = zakatSummary?.nisab_effective ?? 0
-  const totalZakatable = (zakatSummary?.zakatable_assets ?? 0) + (goldGram * goldPrice) + (silverGram * silverPrice)
-  const zakatDue = totalZakatable >= nisab ? totalZakatable * 0.025 : 0
-  const eligible = totalZakatable >= nisab
+  const totalZakatable = zakatSummary?.zakatable_assets ?? 0
+  const zakatDue = zakatSummary?.zakat_due ?? 0
+  const eligible = zakatSummary?.is_eligible ?? false
   const nisabGold = zakatSummary?.nisab_gold ?? 0
 
   const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 2 })
@@ -129,20 +158,22 @@ export default function ZakatPage() {
 
   useEffect(() => { fetchLivePrices() }, [user])
 
-  // استثمارات تقترب حولها (أقل من 60 يوم)
-  const urgentInv = invItems
-    .filter(i => i.created_at || i.purchase_date)
-    .map(i => ({ ...i, daysLeft: haulDaysLeft(i), dueDate: haulDueDate(i) }))
-    .sort((a, b) => a.daysLeft - b.daysLeft)
-
   async function handleSave() {
-    if (!user) return
+    if (!user || !zakatSummary) return
     setSaving(true)
+    // القيم كلها من استجابة RPC v2 + المدخلات المعلنة (الأسعار/سعر الصرف)
     await supabase.from('zakat_history').upsert({
       user_id: user.id, year: currentYear,
       gold_gram: goldGram, silver_gram: silverGram,
       cash, investments, debts_owed: debtsOwed,
-      total_zakatable: totalZakatable, zakat_due: zakatDue, is_paid: false,
+      total_zakatable: zakatSummary.zakatable_assets ?? 0,
+      zakat_due: zakatSummary.zakat_due ?? 0,
+      is_paid: false,
+      nisab_effective: zakatSummary.nisab_effective ?? null,
+      price_gold: goldPrice,
+      price_silver: silverPrice,
+      fx_rate: usdRate,
+      engine_version: zakatSummary.engine_version ?? 2,
     }, { onConflict: 'user_id,year' })
     const { data } = await supabase.from('zakat_history').select('*').eq('user_id', user.id).order('year', { ascending: false })
     setHistory(data ?? [])
@@ -169,8 +200,8 @@ export default function ZakatPage() {
 
       <CalculatorDisclaimer storageKey="disclaimer_zakat" />
 
-      {/* ── حول الاستثمارات ── */}
-      {urgentInv.length > 0 && (
+      {/* ── حول الأصول ── */}
+      {hauls.length > 0 && (
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 20, padding: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
@@ -185,27 +216,31 @@ export default function ZakatPage() {
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {urgentInv.map(inv => {
-              const overdue = inv.daysLeft < 0
-              const urgent = inv.daysLeft >= 0 && inv.daysLeft <= 30
-              const soon = inv.daysLeft > 30 && inv.daysLeft <= 60
+            {hauls.map(haul => {
+              const daysLeft = haul.days_remaining
+              const overdue = daysLeft < 0
+              const urgent = daysLeft >= 0 && daysLeft <= 30
+              const soon = daysLeft > 30 && daysLeft <= 60
               const color = overdue ? '#EF4444' : urgent ? '#F59E0B' : soon ? '#3B7EF6' : '#10B981'
               const bg = overdue ? 'rgba(239,68,68,0.06)' : urgent ? 'rgba(245,158,11,0.06)' : soon ? 'rgba(59,126,246,0.04)' : 'var(--bg-elevated)'
               const border = overdue ? 'rgba(239,68,68,0.2)' : urgent ? 'rgba(245,158,11,0.2)' : soon ? 'rgba(59,126,246,0.15)' : 'var(--border)'
-              const invValue = Number(inv.shares) * Number(inv.current_price)
+              const dueDate = new Date(haul.haul_date).toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric' })
+              const valueLabel = haul.source === 'holding' && haul.grams != null
+                ? `${fmt(Number(haul.grams))} g`
+                : `${fmt(Number(haul.value_usd ?? 0))} ${currency}`
               return (
-                <div key={inv.id} style={{ padding: '12px 14px', borderRadius: 14, background: bg, border: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={haul.ref_id} style={{ padding: '12px 14px', borderRadius: 14, background: bg, border: `1px solid ${border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>
-                      {inv.symbol ?? inv.name ?? t('inv_assets')}
+                      {haul.label ?? t('inv_assets')}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                      {fmt(invValue)} {currency} · {t('zakat_haul_due', { date: inv.dueDate })}
+                      {valueLabel} · {t('zakat_haul_due', { date: dueDate })}
                     </div>
                   </div>
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 18, fontWeight: 900, color, fontFamily: 'monospace' }}>
-                      {overdue ? t('zakat_overdue') : `${inv.daysLeft}`}
+                      {overdue ? t('zakat_overdue') : `${daysLeft}`}
                     </div>
                     {!overdue && <div style={{ fontSize: 10, color, fontWeight: 700 }}>{t('zakat_days')}</div>}
                   </div>
@@ -292,11 +327,11 @@ export default function ZakatPage() {
             </div>
           ))}
         </div>
-        <button onClick={handleSave} disabled={saving} style={{
+        <button onClick={handleSave} disabled={saving || !zakatSummary} style={{
           marginTop: 16, width: '100%', padding: '14px', borderRadius: 14,
           background: 'var(--accent-blue)', border: 'none', cursor: 'pointer',
           color: 'white', fontSize: 14, fontWeight: 800, fontFamily: 'inherit',
-          opacity: saving ? 0.7 : 1,
+          opacity: saving || !zakatSummary ? 0.7 : 1,
         }}>
           {saved ? t('zakat_saved') : saving ? t('zakat_saving') : t('zakat_save_btn')}
         </button>

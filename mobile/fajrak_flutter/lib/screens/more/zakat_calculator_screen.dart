@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
@@ -5,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../services/currency_service.dart';
+import '../../services/finance_service.dart';
 import '../../widgets/common/calculator_disclaimer.dart';
 
 class ZakatCalculatorScreen extends StatefulWidget {
@@ -24,31 +26,16 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
 
   String _currency = 'JOD';
   List<Map<String, dynamic>> _history = [];
-  List<Map<String, dynamic>> _invItems = [];
+  List<Map<String, dynamic>> _hauls = [];
+  Map<String, dynamic> _summary = {};
+  double _usdRate = 1.0;
   bool _saving = false;
   bool _saved = false;
   bool _fetchingPrices = false;
+  Timer? _recalcDebounce;
   final int _currentYear = DateTime.now().year;
 
-  static const int _haulDays = 354;
-  static const double _troyOzToGram = 31.1035;
-
-  // Uses purchase_date if available, falls back to created_at
-  DateTime _haulStart(Map<String, dynamic> inv) {
-    final pd = inv['purchase_date'];
-    if (pd != null) return DateTime.parse(pd.toString());
-    return DateTime.parse(inv['created_at'] as String);
-  }
-
-  int _daysLeft(Map<String, dynamic> inv) {
-    final haulDate = _haulStart(inv).add(const Duration(days: _haulDays));
-    return haulDate.difference(DateTime.now()).inDays;
-  }
-
-  String _haulDueDate(Map<String, dynamic> inv) {
-    final haulDate = _haulStart(inv).add(const Duration(days: _haulDays));
-    return '${haulDate.day}/${haulDate.month}/${haulDate.year}';
-  }
+  static const double _troyOzToGram = 31.1035; // تحويل سعر الأونصة (منصة الأسعار فقط — ليس حساباً زكوياً)
 
   Future<void> _fetchLivePrices() async {
     if (!mounted) return;
@@ -116,6 +103,7 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _recalcDebounce?.cancel();
     for (final c in [_goldGramCtrl, _goldPriceCtrl, _silverGramCtrl, _silverPriceCtrl, _cashCtrl, _investmentsCtrl, _debtsCtrl]) {
       c.dispose();
     }
@@ -129,17 +117,14 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
 
     try {
       final results = await Future.wait<dynamic>([
-        client.from('investments').select('id,name,symbol,shares,current_price,created_at,purchase_date').eq('user_id', user.id),
         client.from('profiles').select('currency').eq('id', user.id).single(),
         client.from('zakat_history').select('*').eq('user_id', user.id).order('year', ascending: false),
-        CurrencyService.fetchExchangeRate('USD', 'JOD'), // Temporary for rate calc
       ]);
 
-      final invList = results[0] as List;
-      final profile = results[1] as Map<String, dynamic>;
-      final history = results[2] as List;
+      final profile = results[0] as Map<String, dynamic>;
+      final history = results[1] as List;
       final String currencyCode = profile['currency'] as String? ?? 'JOD';
-      
+
       final double usdRate = await CurrencyService.fetchExchangeRate('USD', currencyCode) ?? 1.0;
 
       // جلب البيانات المالية الموحدة للملء التلقائي عبر RPC
@@ -151,19 +136,52 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       if (mounted) {
         setState(() {
           _currency = currencyCode;
+          _usdRate = usdRate;
           if (dashRes != null) {
             _cashCtrl.text = ((dashRes['total_accounts_balance'] ?? 0) + (dashRes['goals_saved'] ?? 0)).toStringAsFixed(0);
             _investmentsCtrl.text = ((dashRes['investments_value_local'] ?? 0) + (dashRes['investment_cash_local'] ?? 0)).toStringAsFixed(0);
             _debtsCtrl.text = (dashRes['total_debt_owed'] ?? 0).toStringAsFixed(0);
           }
           _history = history.cast<Map<String, dynamic>>();
-          _invItems = invList.cast<Map<String, dynamic>>();
         });
         _fetchLivePrices();
+        await _recalculate();
       }
     } catch (e, s) {
       debugPrint('Error loading zakat data: $e $s');
     }
+  }
+
+  /// زر "احسب": مزامنة الغرامات إلى zakat_holdings ثم استدعاء المحرك الموحد.
+  /// كل النصاب والزكاة يأتيان من RPC v2 — لا رياضيات محلية.
+  Future<void> _recalculate() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+    try {
+      await FinanceService.syncZakatHoldings(goldGrams: _goldGram, silverGrams: _silverGram);
+      final results = await Future.wait<dynamic>([
+        FinanceService.fetchZakatSummary(
+          goldPrice: _goldPrice,
+          silverPrice: _silverPrice,
+          usdToLocalRate: _usdRate,
+        ),
+        FinanceService.fetchZakatHauls(),
+      ]);
+      if (mounted) {
+        setState(() {
+          _summary = results[0] as Map<String, dynamic>;
+          _hauls = (results[1] as List).cast<Map<String, dynamic>>();
+        });
+      }
+    } catch (e, s) {
+      debugPrint('Zakat recalculate error: $e $s');
+    }
+  }
+
+  /// إعادة الحساب المؤجلة عند تعديل أي حقل (نفس سلوك الويب)
+  void _scheduleRecalculate() {
+    _recalcDebounce?.cancel();
+    _recalcDebounce = Timer(const Duration(milliseconds: 500), _recalculate);
   }
 
   double get _goldGram => double.tryParse(_goldGramCtrl.text) ?? 0;
@@ -174,20 +192,19 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
   double get _investments => double.tryParse(_investmentsCtrl.text) ?? 0;
   double get _debts => double.tryParse(_debtsCtrl.text) ?? 0;
 
-  double get _nisabGold => 85 * _goldPrice;
-  double get _nisabSilver => 595 * _silverPrice;
-  double get _nisab => _nisabGold < _nisabSilver ? _nisabGold : _nisabSilver;
-  double get _totalAssets => _goldGram * _goldPrice + _silverGram * _silverPrice + _cash + _investments;
-  double get _totalZakatable => (_totalAssets - _debts).clamp(0, double.infinity);
-  double get _zakatDue => _totalZakatable >= _nisab ? _totalZakatable * 0.025 : 0;
-  bool get _eligible => _totalZakatable >= _nisab;
+  // كل القيم الزكوية تأتي من استجابة RPC v2 — لا رياضيات محلية بعد الآن
+  double get _nisabGold => (_summary['nisab_gold'] as num?)?.toDouble() ?? 0;
+  double get _totalZakatable => (_summary['zakatable_assets'] as num?)?.toDouble() ?? 0;
+  double get _zakatDue => (_summary['zakat_due'] as num?)?.toDouble() ?? 0;
+  bool get _eligible => _summary['is_eligible'] == true;
 
   String _fmt(double n) => NumberFormat('#,##0.##', 'en').format(n);
 
   Future<void> _save() async {
     final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
+    if (user == null || _summary.isEmpty) return;
     setState(() => _saving = true);
+    // القيم كلها من استجابة RPC v2 + المدخلات المعلنة (الأسعار/سعر الصرف)
     await Supabase.instance.client.from('zakat_history').upsert({
       'user_id': user.id,
       'year': _currentYear,
@@ -199,6 +216,11 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       'total_zakatable': _totalZakatable,
       'zakat_due': _zakatDue,
       'is_paid': false,
+      'nisab_effective': (_summary['nisab_effective'] as num?)?.toDouble(),
+      'price_gold': _goldPrice,
+      'price_silver': _silverPrice,
+      'fx_rate': _usdRate,
+      'engine_version': (_summary['engine_version'] as num?)?.toInt() ?? 2,
     }, onConflict: 'user_id,year');
     await _load();
     if (mounted) setState(() { _saving = false; _saved = true; });
@@ -221,7 +243,10 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       TextFormField(
         controller: ctrl,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        onChanged: (_) => setState(() {}),
+        onChanged: (_) {
+          setState(() {});
+          _scheduleRecalculate();
+        },
         style: TextStyle(fontWeight: FontWeight.w700, color: cs.onSurface),
         decoration: InputDecoration(
           filled: true, fillColor: cs.surfaceContainerHighest,
@@ -248,8 +273,8 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
         padding: const EdgeInsets.all(16),
         child: Column(children: [
           const CalculatorDisclaimer(storageKey: 'disclaimer_zakat'),
-          // Haul Countdown Section
-          if (_invItems.isNotEmpty) ...[
+          // Haul Countdown Section (من RPC get_zakat_hauls — مصدر الحول الوحيد)
+          if (_hauls.isNotEmpty) ...[
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: cs.surface, borderRadius: BorderRadius.circular(20), border: Border.all(color: cs.outlineVariant)),
@@ -270,10 +295,15 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                   ),
                 ]),
                 const SizedBox(height: 12),
-                ..._invItems.where((i) => i['created_at'] != null || i['purchase_date'] != null).map((inv) {
-                  final days = _daysLeft(inv);
-                  final due = _haulDueDate(inv);
-                  final invValue = (inv['shares'] as num).toDouble() * (inv['current_price'] as num).toDouble();
+                ..._hauls.map((haul) {
+                  final days = (haul['days_remaining'] as num?)?.toInt() ?? 0;
+                  final haulDate = DateTime.tryParse(haul['haul_date'] as String? ?? '');
+                  final due = haulDate != null ? '${haulDate.day}/${haulDate.month}/${haulDate.year}' : '';
+                  final isHolding = haul['source'] == 'holding';
+                  final grams = (haul['grams'] as num?)?.toDouble();
+                  final valueLabel = isHolding && grams != null
+                      ? '${_fmt(grams)} g'
+                      : '${_fmt((haul['value_usd'] as num?)?.toDouble() ?? 0)} $_currency';
                   final overdue = days < 0;
                   final urgent = !overdue && days <= 30;
                   final soon = !overdue && days > 30 && days <= 60;
@@ -285,9 +315,9 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
                     decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12), border: Border.all(color: color.withValues(alpha: 0.25))),
                     child: Row(children: [
                       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(inv['symbol'] as String? ?? inv['name'] as String? ?? 'استثمار',
+                        Text(haul['label'] as String? ?? 'استثمار',
                           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: cs.onSurface)),
-                        Text('${_fmt(invValue)} $_currency · ${'zakat_haul_due'.tr(namedArgs: {'date': due})}',
+                        Text('$valueLabel · ${'zakat_haul_due'.tr(namedArgs: {'date': due})}',
                           style: TextStyle(fontSize: 10, color: cs.onSurfaceVariant)),
                       ])),
                       Column(children: [
