@@ -44,7 +44,7 @@ A comprehensive personal finance tracking application with:
   /locales              # i18n — ALL user-facing text in en/ar subdirectories
   /errors               # Typed error rescue map
 /supabase               # Supabase config and migrations
-  /migrations           # Database migrations (58 files: legacy 001-041 + 16 dated/numbered)
+  /migrations           # Database migrations (60 files: legacy 001-041 + 18 dated/numbered)
     /legacy             # Baseline migrations (001_initial.sql through 041_chats.sql)
   /functions            # Edge Functions (push-notification in Deno)
 /e2e                    # Playwright E2E tests (Page Object Model)
