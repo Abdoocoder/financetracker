@@ -43,22 +43,30 @@ export function GamificationCard() {
     supabase.from('transactions').select('id', { count: 'exact', head: true })
       .eq('user_id', user.id).eq('transaction_date', today)
       .then(({ count }) => setLoggedToday((count ?? 0) > 0))
-    // جلب البيانات الحالية
-    fetch(`/api/gamification?user_id=${user.id}`)
-      .then(r => r.json())
-      .then(d => { setData(d); setLoading(false) })
-      .catch(() => setLoading(false))
-
-    // تحديث الإنجازات في الخلفية
+    // جلب البيانات الحالية + تحديث الإنجازات في الخلفية
+    // Both calls require the Bearer token — the route authenticates via
+    // supabase.auth.getUser(jwt) and ignores any user_id query param.
     setUpdating(true)
-    fetch('/api/gamification', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id }),
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const token = session?.access_token
+      const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
+
+      fetch('/api/gamification', { headers: authHeaders })
+        .then(r => r.json())
+        .then(d => { setData(d); setLoading(false) })
+        .catch(() => setLoading(false))
+
+      if (!token) { setUpdating(false); return }
+
+      fetch('/api/gamification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ user_id: user.id }),
+      })
+        .then(r => r.json())
+        .then(d => { setData(d); setUpdating(false) })
+        .catch(() => setUpdating(false))
     })
-      .then(r => r.json())
-      .then(d => { setData(d); setUpdating(false) })
-      .catch(() => setUpdating(false))
   }, [user])
 
   if (loading || !data) return null
