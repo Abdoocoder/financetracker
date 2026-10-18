@@ -1,6 +1,6 @@
 # HANDOFF REPORT — FinanceTracker (Fajrak)
 
-**Last updated:** 2026-10-18 · **Current release:** 3.44.0+63 · **Single source of truth for project state**
+**Last updated:** 2026-10-21 · **Current release:** 3.44.0+63 · **Single source of truth for project state**
 Archived audits live in docs/archive/; open change history lives in CHANGELOG.md.
 
 **Prepared for:** external software architect
@@ -95,16 +95,16 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 - Status: **fixed in v3.44.0** — auth-state races (sign-out mid-session, session refresh failure) no longer throw a null-check crash; the add/edit/delete dialogs and list items now use null-safe early returns. (Legacy recommendation was `?.` + early-return or a `requireAuth()` helper.)
 
-## 5. Tests & Coverage (declared only — suites NOT run)
+## 5. Tests & Coverage (suites run 2026-10-21)
 
 | Source | Web (Jest) | Flutter | Playwright | Coverage |
 |---|---|---|---|---|
-| **Current (v3.44.0)** | **592 / 66 suites** | **177** | 7 specs | 44.85% stmts (last measured) |
+| **Current (verified 2026-10-21)** | **626 / 71 suites** | **186** | 7 specs | 44.85% stmts (last measured) |
 | `AUDIT_REPORT.md` (historical) | **561** | **135** | **7 specs** | — |
 | `DEEP_PROJECT_ANALYSIS.md` | **524 / 56 suites** | — | 7/7 (~46.5s) | **44.85% stmts** / 30.78% branch / 30.7% funcs / 48.07% lines |
 | On disk (files counted) | 62 test files | 20 test files | 7 specs | — |
 
-- **Current counts (v3.44.0): 592 web tests across 66 suites, 177 Flutter tests.** Older audits cite 561 / 524 / 135 — treat those as historical.
+- **Current counts (suites run 2026-10-21): 626 web tests across 71 suites, 186 Flutter tests** (Zakat Autopilot added suites on both sides). Older audits cite 592 / 561 / 524 / 135 — treat those as historical.
 - `mobile/AGENTS.md` says "`flutter test` runs 13 files" but **20 test files exist** → stale doc.
 - CLAUDE.md target is **80%+ coverage**; actual 44.85%; **dashboard pages 0%** (AUDIT_REPORT flags as Medium risk needing E2E).
 - Known test-infra quirk: Jest uses `forceExit` due to a documented worker leak (low risk, accepted).
@@ -131,7 +131,7 @@ Store listing (ar + en) claims, mapped to implementation:
 | Listing claim | Evidence in repo |
 |---|---|
 | BYOK AI (NVIDIA/OpenAI/Anthropic/Gemini/OpenRouter), keys encrypted on device only | ✅ `lib/byok/` + `lib/services/byok/`, 6 providers per v3.43.1 notes |
-| Zakat calculator + 354-day hawl + history/reminders | ✅ Unified engine v2 RPCs (`get_zakat_summary`, `get_zakat_hauls`) + `zakat_holdings` (gold/silver tracking) + `zakat_history` + `/api/zakat-reminder` |
+| Zakat calculator + 354-day hawl + history/reminders | ✅ Unified engine v2 RPCs (`get_zakat_summary`, `get_zakat_hauls`) + **Zakat Autopilot**: `sync_zakat_haul_state` state machine + `zakat_haul_tracking` (migration `20261021000000_zakat_autopilot.sql`) + daily `/api/zakat-autopilot` cron (Hawl countdown UI on Web + Mobile dashboards, Push when ≤ 7 days remain) + `zakat_holdings` (gold/silver tracking) + `zakat_history` + `/api/zakat-reminder` |
 | Halal investing (`is_halal`) | ✅ `investments.halal flag` |
 | FIRE number/simulation | ✅ `app/(dashboard)` fire route + `components/investments/wealth-simulator.tsx` |
 | Dashboard charts, Quick Add, 50/30/20 budgets, debts auto-deduct, goals, multi-account, multi-currency | ✅ features + tables |
@@ -147,7 +147,7 @@ Store listing (ar + en) claims, mapped to implementation:
 1. ✅ **Production DB outage — RESOLVED** (2026-10-17); post-mortem in `mobile/fajrak_flutter/INCIDENT.md`.
 2. ✅ **Backups — RESOLVED:** daily GitHub Actions → Cloudflare R2 (`fajrak-backups`) pipeline is live; 4 dumps retained (2026-10-14 → 2026-10-17).
 3. 🔴 **DB drift**: live schema ≠ migrations; `supabase db reset`/fresh migrate would destroy prod reality.
-4. 🟡 **Financial logic duplication** — 5–7 implementations of the same metric across web/mobile/SQL (ARCHITECTURE_AUDIT_VERIFIED). **Zakat is now fully unified** in engine v2 (`get_zakat_summary` + `get_zakat_hauls` RPCs; clients are input/display only). Other metrics (e.g. health-score) may still be duplicated.
+4. 🟡 **Financial logic duplication (non-Zakat)** — 5–7 implementations of the same metric across web/mobile/SQL (ARCHITECTURE_AUDIT_VERIFIED). Zakat is out of scope for this risk: it is fully unified in engine v2 + Autopilot (`get_zakat_summary`, `get_zakat_hauls`, `sync_zakat_haul_state`; clients are input/display only, Hawl state lives in `zakat_haul_tracking`). Other metrics (e.g. health-score) may still be duplicated.
 5. 🟠 Hardcoded health-score thresholds / hardcoded `0` health score bug (partially fixed by `20261016114425` + `20261017000000` migrations).
 6. 🟠 **No feature flags** — every change ships all-or-nothing.
 7. 🟠 Leaked-password protection disabled in Supabase Auth.
@@ -163,6 +163,8 @@ Store listing (ar + en) claims, mapped to implementation:
 ## 9. Release & Version Drift
 
 **Current release:** mobile **3.44.0+63** — shipped to Google Play (Submission ID 44, status "In review", Oct 17 2026 22:29).
+
+**Zakat Autopilot (Phase C) — complete and live** (2026-10-21): backend migration `20261021000000_zakat_autopilot.sql` (`sync_zakat_haul_state` + `zakat_haul_tracking`) is on `main`, the daily Vercel Cron `/api/zakat-autopilot` (`0 8 * * *`) is live, and the Hawl countdown UI has landed on the Web and Mobile dashboards and Zakat pages. Next phase: Agentic AI (Executive Assistant) — roadmap in `AGENTIC_AI_PLAN.md`.
 
 | Source | Declared version |
 |---|---|

@@ -17,6 +17,15 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 - **التحقق:** يتم التحقق من وجود `CRON_SECRET` في البيئة ومطابقته للـ Token المرسل.
 - **مثال:** `Authorization: Bearer YOUR_CRON_SECRET`
 
+**المهام المجدولة في `vercel.json`:**
+
+| المسار | الجدول الزمني (UTC) |
+|:-------|:-------------------|
+| `/api/auto-debt` | `0 3 * * *` |
+| `/api/auto-recurring` | `0 3 * * *` |
+| `/api/budget-alerts` | `0 4 * * *` |
+| `/api/zakat-autopilot` | `0 8 * * *` |
+
 ### 2. الوصول الخارجي — PAT (Personal Access Token)
 
 الوكلاء الخارجيون والواجهات الآلية (MCP server، webhook) يستخدمون مفاتيح وصول شخصية
@@ -114,6 +123,7 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 | `/api/push-subscribe` | تسجيل توكنات Firebase FCM |
 | `/api/smart-notifications` | إرسال تنبيهات مخصصة بناءً على سلوك المستخدم |
 | `/api/zakat-reminder` | التنبيه باقتراب "حول" الزكاة — يعتمد الآن على RPC `get_zakat_hauls` (بدون حساب TS محلي) |
+| `/api/zakat-autopilot` | cron يومي (08:00) — مزامنة آلة حالة الحول `sync_zakat_haul_state` لكل المستخدمين + إشعار Push عند اقتراب الموعد (≤ 7 أيام) |
 | `/api/api-keys/create` | إنشاء PAT `fjk_live_...` |
 | `/api/api-keys/revoke` | إبطال PAT |
 | `/api/webhook/transaction` | قراءة/إنشاء المعاملات عبر PAT (REST) |
@@ -122,9 +132,9 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 
 ---
 
-## 🗄️ قواعد قاعدة البيانات (Supabase RPCs) — محرك الزكاة الموحد (v2)
+## 🗄️ قواعد قاعدة البيانات (Supabase RPCs) — محرك الزكاة الموحد (v2) + Zakat Autopilot
 
-آخر تحديث: 2026-10-19 · source: `supabase/migrations/20261019000000_zakat_engine_v2.sql`
+آخر تحديث: 2026-10-21 · source: `supabase/migrations/20261019000000_zakat_engine_v2.sql` + `supabase/migrations/20261021000000_zakat_autopilot.sql`
 
 جميع حسابات الزكاة (النصاب، 2.5%، الحول) مركزية في قاعدة البيانات. الويب والموبايل طبقات إدخال/عرض فقط — يُمنع من إعادة الحساب محلياً.
 
@@ -132,16 +142,19 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 |:------------------|:-----------------------|:------|
 | `get_zakat_summary` | `p_user_id`, `p_gold_price_per_gram`, `p_silver_price_per_gram`, `p_usd_to_local_rate` | ملخص الزكاة v2: يعيد JSON بمفاتيح v1 (`is_eligible`, `zakat_due`, `zakatable_assets`, `nisab_gold/silver/effective`) + تفصيل `components` (نقد، استثمارات، كاش استثمار، مدخرات، ذهب، فضة، أخرى، ديون) + `engine_version: 2`. يشمل `zakat_holdings` في الوعاء وي_CLAMP القيم السالبة بصفر |
 | `get_zakat_hauls` | `p_user_id` | مصفوفة JSON لكل الحولات النشطة (استثمارات + ذهب/فضة من `zakat_holdings`) بتاريخ الحول والأيام المتبقية — `COALESCE(purchase_date, created_at) + 354` |
+| `sync_zakat_haul_state` | `p_user_id`, `p_gold_price` (افتراضي `30`), `p_silver_price` (افتراضي `0.35`), `p_fx_rate` (افتراضي `1.0`) | آلة حالة الحول (Zakat Autopilot): تستدعي `get_zakat_summary` كما هي وتُحدّث صف المستخدم في `zakat_haul_tracking` — فوق النصاب بلا حالة سابقة → بدء الساعة (`nisab_reached_at = الآن`، `current_haul_due_at = الآن + 354 يوماً`)؛ فوق النصاب وحول نشط → استمرار (الحول الجاري لا يُعاد أبداً)؛ تحت النصاب → مسح التاريخين (انقطاع الحول). تعيد JSON: `user_id`, `nisab_reached_at`, `current_haul_due_at`, `last_notified_at`, `days_remaining`, `is_eligible`, `zakatable_assets`, `nisab_effective`, `zakat_due`. لا تكتب `last_notified_at` — الختم مانع الإزعاج يكتبه المسار اليومي وحده |
 
-**الأمان:** كلا الدالتين `SECURITY DEFINER`؛ `EXECUTE` مسحوب من `PUBLIC`/`anon` ومنح لـ `authenticated` + `service_role` فقط. حارس الملكية: المستخدم المصادَق عليه لا يرى بيانات غيره؛ استدعاء `service_role` بلا JWT (cron) مسموح.
+**الأمان:** جميع الدوال `SECURITY DEFINER`؛ `EXECUTE` مسحوب من `PUBLIC`/`anon` ومنح لـ `authenticated` + `service_role` فقط. حارس الملكية: المستخدم المصادَق عليه لا يرى بيانات غيره؛ استدعاء `service_role` بلا JWT (cron) مسموح. جدول `zakat_haul_tracking`: RLS مفعّل والعميل يقرأ صفّه فقط — **بلا سياسة INSERT/UPDATE** (الكتابة من داخل الـ RPC أو عبر `service_role`)، فلا يستطيع توكن مخترق تزوير ساعته أو إعادة ضبطها.
 
 **مسار `/api/zakat-reminder`:** يستدعي `get_zakat_hauls` عبر عميل `service_role` بدل الحساب المضمّن في TypeScript (كان يتجاهل `purchase_date`). نافذة التنبيه: 30 / 7 / 0 / −1 يوم من `days_remaining`.
+
+**مسار `/api/zakat-autopilot` (Zakat Autopilot):** cron يومي (08:00 UTC في `vercel.json`) بمصادقة `verifyCronAuth`؛ يزامن `sync_zakat_haul_state` لكل مستخدم عبر `service_role`، ويرسل إشعار Push عربي (رابط عميق `/dashboard/zakat`) عندما `days_remaining ≤ 7` (اليوم الموعد / المتأخر / خلال ٧ أيام قادمة)، بحد أقصى إشعار واحد يومياً لكل مستخدم عبر ختم `last_notified_at`. يقبل `?userId=<uuid>` لمزامنة مستخدم واحد أثناء الاختبار. يستجيب بـ `{ ok, synced, notified }`.
 
 ---
 
 ## 🔑 مصفوفة المصادقة لكل نقطة اتصال (Endpoint auth matrix)
 
-Last synced: 2026-10-18 · source: `app/api/*/route.ts`. Auth derived from each route file (`verifyCronAuth`, `supabase.auth.getUser`, `verifyApiKey`); no parameters were invented.
+Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each route file (`verifyCronAuth`, `supabase.auth.getUser`, `verifyApiKey`); no parameters were invented.
 
 | المسار (Path) | الطريقة (Method) | المصادقة (Auth) |
 |:--------------|:-----------------|:-----------------|
@@ -178,13 +191,14 @@ Last synced: 2026-10-18 · source: `app/api/*/route.ts`. Auth derived from each 
 | `/api/testimonials` | GET | public (own testimonial via token, otherwise visible-only fields) |
 | `/api/webhook/transaction` | GET, POST | PAT (`fjk_live_...` via `verifyApiKey`) |
 | `/api/weekly-report` | GET | cron (`CRON_SECRET`) |
+| `/api/zakat-autopilot` | GET | cron (`CRON_SECRET` — `verifyCronAuth`; `?userId=` اختياري للاختبار على مستخدم واحد) |
 | `/api/zakat/prices` | GET | authenticated (Bearer token) |
 | `/api/zakat-reminder` | GET | cron (`CRON_SECRET`) |
 
 **ملاحظات:**
 
 - كل نقطة اتصال مذكورة في هذا المستند موجودة أيضاً في الشيفرة; لم يُعلَّم أي بند `⚠️ REMOVED`.
-- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat/prices`, `/api/testimonials`.
+- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat-autopilot`, `/api/zakat/prices`, `/api/testimonials`.
 
 ---
 
