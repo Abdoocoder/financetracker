@@ -1,3 +1,9 @@
+> ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
+> This file describes the project as of the version or date it names and is kept
+> for reference only. Current state lives in
+> [`HANDOFF_REPORT.md`](HANDOFF_REPORT.md) and
+> [`CHANGELOG.md`](CHANGELOG.md).
+
 # Fajrak Platform — Detailed Audit Report
 **Generated:** 2026-09-27
 **Version:** 3.42.0 (web) / 3.42.0+54 (Flutter)

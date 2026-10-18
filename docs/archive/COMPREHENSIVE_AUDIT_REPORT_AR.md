@@ -1,3 +1,9 @@
+> ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
+> This file describes the project as of the version or date it names and is kept
+> for reference only. Current state lives in
+> [`HANDOFF_REPORT.md`](../../HANDOFF_REPORT.md) and
+> [`CHANGELOG.md`](../../CHANGELOG.md).
+
 # تقرير المراجعة الشاملة لمشروع فجرك (Fajrak)
 
 **إصدار التقرير:** 2.0  
