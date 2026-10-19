@@ -160,10 +160,11 @@ Store listing (ar + en) claims, mapped to implementation:
 14. 🟡 Single-developer SPOF; no bus-factor docs beyond this handoff; no revenue to fund help.
 15. 🟡 Play `dev`/`eol`-suffixed Flutter plugins in production (see §6).
 16. ✅ **Zakat Autopilot audit bugs — RESOLVED** (2026-10-19 safety audit, test-first): (a) hardcoded Arabic push copy → localized from `profiles.lang`; (b) quiet-hours users were stamped `last_notified_at` without receiving a push → stamp now gated on actual delivery; (c) Hawl sync used stale default prices → clients pass live gold/silver/FX. Details in `mobile/fajrak_flutter/INCIDENT.md` §Security Hardening Backlog and `CHANGELOG.md` `[3.45.0+64]`.
+17. ✅ **Zakat live-price fallback — RESOLVED** (2026-10-19): freegoldapi.com/data/latest.json serves a JSON array (gold-only, ~8 months stale), not a `{gold, silver}` map. Replaced with `api.gold-api.com/price/{XAU,XAG}` (CORS-enabled, live, gold + silver, USD/troy-oz). Also decoupled the exchange-rate fetch from the Yahoo `Future.wait` — a Yahoo CORS failure no longer discards the real FX rate (was forcing `usdRate=1.0`). Commits: aba3df23, 6e05bc5a.
 
 ## 9. Release & Version Drift
 
-**Current release:** mobile **3.45.0+64** — version-bump commit `7269ffdd` (2026-10-19); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `PLAY_STORE_RELEASE.md` / `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
+**Current release:** mobile **3.45.0+64** — version-bump commit `7269ffdd` (2026-10-19); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
 
 **Zakat Autopilot (Phase C) — complete and live** (2026-10-21): backend migration `20261021000000_zakat_autopilot.sql` (`sync_zakat_haul_state` + `zakat_haul_tracking`) is on `main`, the daily Vercel Cron `/api/zakat-autopilot` (`0 8 * * *`) is live, and the Hawl countdown UI has landed on the Web and Mobile dashboards and Zakat pages. Next phase: Agentic AI (Executive Assistant) — roadmap in `AGENTIC_AI_PLAN.md`.
 
@@ -173,13 +174,13 @@ Store listing (ar + en) claims, mapped to implementation:
 | `mobile/fajrak_flutter/pubspec.yaml` | **3.45.0+64** |
 | `HANDOFF_REPORT.md` header | **3.45.0+64** |
 | `mobile/README.md` | 3.44.0+63 *(pending next store docs)* |
-| `mobile/PLAY_STORE_RELEASE.md` | 3.44.0+63 *(version code 63; next submission pending)* |
+| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.45.0+64** |
 | `package.json` (web) | 3.42.0 — **intentionally unchanged** |
 | `mobile/AGENTS.md` | 3.43.1+60 (stale) |
 | `structure.md` | 3.40.0+51 (stale) |
 
 - **Intentional decision:** the web app's `package.json` stays at **3.42.0** and is deliberately not bumped with mobile releases — web and mobile ship independently from the same repo, and the web bundle has not been re-released. This is a documented choice, not drift to be "fixed."
-- Mobile version sources are aligned at **3.45.0+64** for `VERSION` / `pubspec.yaml` / this handoff; the Play store docs (`PLAY_STORE_RELEASE.md`, `mobile/README.md`) lag until the next submission is recorded.
+- Mobile version sources are aligned at **3.45.0+64** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
 - Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → 3.44.0 (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety) → **3.45.0** (Zakat Engine v2 + Autopilot: backend, cron, countdown UI on Web + Mobile).
 - Build-process fragility: running `flutter build appbundle --release` directly (bypassing Makefile) silently ships a build with **no credentials → login fails** (documented past incident).
 - No changelog file at root; release history lives in `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md`.

@@ -36,7 +36,8 @@
 - **Conventional commits:** `feat:`, `fix:`, `chore:`, `docs:`, `security(db):`
 - **All user-facing strings must go through i18n** (web: `lib/locales/{en,ar}/`, mobile: `assets/i18n/`). Never hardcode strings.
 - **Every user-visible change gets an entry in `CHANGELOG.md`** under `[Unreleased]`.
-- **Never commit:** `.env`, `.env.local`, `google-services.json`, keystores, `mobile/fajrak_flutter/INCIDENT.md`
+- **Never commit:** `.env`, `.env.local`, `google-services.json`, keystores
+- **INCIDENT.md is tracked** and should be committed with doc updates (it holds public post-mortems). Do not re-add it to `.gitignore`.
 
 ## Critical Rules
 
@@ -57,6 +58,10 @@ Copied verbatim from the `## Critical Rules` section of `CLAUDE.md`:
 9. **Do NOT anchor the `grep` calls in `mobile/fajrak_flutter/Makefile`.** `.env` stores
    Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
+10. **Zakat is centralized**: Never calculate Zakat (Nisab, 2.5%, Hawl) locally in Web or Mobile. Always use the get_zakat_summary and get_zakat_hauls RPCs.
+11. **Zakat Autopilot**: The Hawl state is managed by the sync_zakat_haul_state RPC. Never calculate Hawl logic in the UI; always read from this RPC or the zakat_haul_tracking table.
+12. **Never send PII to Sentry.** Filter email/IP/passwords in `beforeSend` (`lib/services/sentry_service.dart`); drop events carrying `Authorization`/`Cookie` headers, and keep the mobile DSN out of web builds.
+13. **Always verify external-API mocks against the real endpoint.** Before writing a test that mocks an external API (Yahoo, gold-api, Supabase Auth, etc.), curl the real URL and paste the actual response shape into a comment next to the fixture, including the verification date. A mock that doesn't match reality locks in the wrong contract — the test goes green while production crashes (see the Zakat freegoldapi regression, 2026-10-19).
 
 ## Where to find what
 

@@ -90,3 +90,25 @@
   - **Fix C — Hawl sync now passes live prices.** `sync_zakat_haul_state` was invoked with only `p_user_id`, so the state machine evaluated Nisab against the stale defaults (gold 30 / silver 0.35 / fx 1.0) and a display read could wrongly start or clear the hawl clock. `hooks/useZakatHawl.ts` and `FinanceService.syncZakatHaulState()` accept optional live prices; the Zakat pages pass gold/silver/USD-rate. `get_zakat_hauls` was not used because it returns the per-investment haul list, not the aggregate tracking state the cards render — switching would require a schema change (out of scope).
   - **Still open:** anon-key rotation (§5) unchanged by these fixes.
 - **Sentry mobile integration added (release 3.45.0+64)** — mobile crashes now observable. `sentry_flutter` is wired at app-init (`SentryService.init` in `lib/main.dart`, skipped gracefully when no `SENTRY_DSN` dart-define is present) and in the global `ErrorHandler` (release mode only; handled errors are never rethrown, so Sentry's uncaught-exception handler never double-reports them). PII is stripped in `beforeSend` (email/IP, `password`/`anon_key`/`apikey`-style fields; events with `Authorization`/`Cookie` headers are dropped) per CLAUDE.md Critical Rule #12. The DSN is injected by the Makefile (`run`, `build-apk`, `build-bundle`) via unanchored grep on `.env`; web keeps its separate Sentry project. **Open:** create a Flutter project in Sentry (`abdoocoder-m2`) and put its DSN in `.env` — currently no Flutter project is registered, so events will not land until then. Anon-key rotation (§5) still open.
+
+## Runtime Bugs Resolved (2026-10-19)
+
+Three production-affecting runtime bugs found and fixed during the post-release hardening pass. All on origin/main.
+
+### 1. Zakat live-price fallback was broken (freegoldapi → gold-api.com)
+- **Symptom**: On web, tapping "Fetch Live Prices" threw `TypeError: "gold": type 'String' is not a subtype of type 'int'` at `zakat_calculator_screen.dart:87`. Gold/silver fields silently stayed at defaults (30 / 0.35).
+- **Root cause**: `freegoldapi.com/data/latest.json` returns a JSON **Array** of `{date, price, source}` historical records (gold-only, last record ~2026-02-20, ~8 months stale). The code did `fb['gold']` on a List — a TypeScript-style subscript on a Dart List throws.
+- **Fix**: Replaced with `api.gold-api.com/price/{XAU,XAG}` — CORS-enabled (`Access-Control-Allow-Origin: *`), live, keyless, returns `{"price": <num|String>, "symbol": "XAU"|"XAG"}`. Divides by 31.1035 g/oz for per-gram consistency.
+- **Commit**: aba3df23
+
+### 2. usdRate was silently discarded on web
+- **Symptom**: Web users in JOD/SAR/AED saw zakat amounts ~41% higher than correct (silent wrong number, no crash).
+- **Root cause**: `Future.wait([yahoo_gold, yahoo_silver, fetchExchangeRate]).catchError(→[404,404,1.0])`. Yahoo is always CORS-blocked on web, so the whole wait rejected and the real JOD rate from `open.er-api.com` (via Supabase) was replaced with 1.0.
+- **Fix**: Exchange-rate fetch is now a separate `Future` with its own `catchError` — Yahoo failure no longer touches `usdRate`.
+- **Commit**: aba3df23
+
+### 3. Zone mismatch on web boot (Sentry)
+- **Symptom**: `flutter run -d chrome` printed a debug-only assertion: `Zone mismatch. The Flutter bindings were initialized in a different zone than is now being used.` Non-fatal, debug-only, but noisy in Sentry.
+- **Root cause**: `WidgetsFlutterBinding.ensureInitialized()` ran in main()'s root zone; Sentry's web init uses `runZonedGuarded`, so `runApp` ran in the forked zone.
+- **Fix**: On web, skip the pre-Sentry binding init (`if (!kIsWeb)`); initialize inside `_bootstrapApp` which runs inside Sentry's zone. Native unchanged.
+- **Commit**: 6e05bc5a
