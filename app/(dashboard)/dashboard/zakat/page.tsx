@@ -25,7 +25,6 @@ export default function ZakatPage() {
   const { t } = useI18n()
   const { user } = useUser()
   const supabase = useMemo(() => createClient(), [])
-  const hawl = useZakatHawl()
 
   const [goldGram, setGoldGram] = useState(0)
   const [goldPrice, setGoldPrice] = useState(30)
@@ -43,6 +42,9 @@ export default function ZakatPage() {
   const [zakatSummary, setZakatSummary] = useState<any>(null)
   const [usdRate, setUsdRate] = useState(1)
   const currentYear = new Date().getFullYear()
+
+  // تمرير الأسعار الحيّة إلى مزامنة الحول حتى يقيّم النصاب بأسعار السوق الحقيقية
+  const hawl = useZakatHawl({ goldPrice, silverPrice, fxRate: usdRate })
 
   // مزامنة غرام الذهب/الفضة إلى جدول zakat_holdings (لتقرأها المحرك v2).
   // الجدول لا يملك قيداً فريداً (الترحيل متجمد) فنحدّث الصف الموجود أو ننشئه.

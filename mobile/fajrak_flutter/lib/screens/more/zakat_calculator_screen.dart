@@ -153,7 +153,11 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
       int? hawlDays;
       double hawlDue = 0;
       try {
-        final hawl = await FinanceService.syncZakatHaulState();
+        final hawl = await FinanceService.syncZakatHaulState(
+          goldPrice: _goldPrice,
+          silverPrice: _silverPrice,
+          usdToLocalRate: usdRate,
+        );
         if (hawl.isNotEmpty) {
           hawlDays = (hawl['days_remaining'] as num?)?.toInt();
           hawlDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
