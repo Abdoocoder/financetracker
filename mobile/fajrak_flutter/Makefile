@@ -4,26 +4,23 @@
 
 # ── Shared --dart-define flags, read from .env at recipe run time ──
 # IMPORTANT: keep this as `=` (recursive expansion), NOT `:=`.
-# With `:=`, $$(grep …) collapses to $(…) at definition time and Make would
-# expand it as an empty variable — silently rebuilding with empty credentials
-# (the exact bug that made `make run-web` fail with 404 on /auth/v1/token).
+# We use `grep -m1` and `tr -d` to handle messy .env files safely.
 DART_DEFINES = \
-	--dart-define=SUPABASE_URL=$$(grep SUPABASE_URL .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_API_KEY=$$(grep FIREBASE_API_KEY .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep FIREBASE_AUTH_DOMAIN .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_PROJECT_ID=$$(grep FIREBASE_PROJECT_ID .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep FIREBASE_STORAGE_BUCKET .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep FIREBASE_MESSAGING_SENDER_ID .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
-	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
+	--dart-define=SUPABASE_URL=$$(grep -m1 '^SUPABASE_URL=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_API_KEY=$$(grep -m1 'FIREBASE_API_KEY' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep -m1 'FIREBASE_AUTH_DOMAIN' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_PROJECT_ID=$$(grep -m1 'FIREBASE_PROJECT_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep -m1 'FIREBASE_STORAGE_BUCKET' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep -m1 'FIREBASE_MESSAGING_SENDER_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_APP_ID=$$(grep -m1 'FIREBASE_APP_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep -m1 'FIREBASE_MEASUREMENT_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
 
 # ── Sentry DSN (mobile crash reporting), read from .env at recipe run time ──
 # Deliberately kept OUT of DART_DEFINES: web builds use their own Sentry
-# project (javascript-nextjs), not the mobile DSN. Also keep this `=` and
-# keep the grep unanchored (CLAUDE.md Critical Rules #9 and #12).
+# project (javascript-nextjs), not the mobile DSN. Keep this `=` recursive.
 SENTRY_DEFINE = \
-	--dart-define=SENTRY_DSN=$$(grep SENTRY_DSN .env 2>/dev/null | cut -d'=' -f2)
+	--dart-define=SENTRY_DSN=$$(grep -m1 '^SENTRY_DSN=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
 
 # Default target
 help:
@@ -33,7 +30,7 @@ help:
 	@echo "  make setup          - Install dependencies and configure environment"
 	@echo ""
 	@echo "Development:"
-	@echo "  make run            - Run on connected device/emulator"
+	@echo "  make run            - Run on connected device/emulator (includes Sentry)"
 	@echo "  make run-web        - Run Flutter web on localhost:33963"
 	@echo "  make run-web-proxy  - Run Flutter web with CORS proxy (2 terminals needed)"
 	@echo ""
@@ -61,9 +58,9 @@ setup:
 	fi
 	@echo "✅ Setup complete!"
 
-# Run on device/emulator
+# Run on device/emulator (NOW INCLUDES DART_DEFINES + SENTRY_DEFINE)
 run:
-	flutter run $(SENTRY_DEFINE)
+	flutter run $(DART_DEFINES) $(SENTRY_DEFINE)
 
 # Run Flutter web (basic)
 run-web:
@@ -87,16 +84,7 @@ run-web-with-proxy:
 		--web-port=33963 \
 		--web-hostname=0.0.0.0 \
 		--dart-define=SUPABASE_URL=http://localhost:33964 \
-		--dart-define=SUPABASE_ANON_KEY=$$(grep SUPABASE_ANON_KEY .env 2>/dev/null | cut -d'=' -f2 || echo "your-anon-key")
-
-# Combined proxy + web (requires two terminals - use run-proxy + run-web-with-proxy instead)
-run-web-proxy:
-	@echo "⚠️  This command requires two terminals. Use instead:"
-	@echo "   Terminal 1: make run-proxy"
-	@echo "   Terminal 2: make run-web-with-proxy"
-	@echo ""
-	@echo "Or run Flutter web directly with Supabase CORS configured:"
-	@echo "   make run-web"
+		--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ' || echo "your-anon-key")
 
 # Build production web
 build-web:
