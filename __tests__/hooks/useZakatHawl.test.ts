@@ -126,4 +126,23 @@ describe('useZakatHawl', () => {
     expect(mockRpc).not.toHaveBeenCalled()
     expect(result.current.fetchStatus).toBe('idle')
   })
+
+  it('passes real prices through to the RPC when provided (no stale defaults)', async () => {
+    renderHook(() => useZakatHawl({ goldPrice: 105, silverPrice: 1.2, fxRate: 0.71 }), {
+      wrapper: makeWrapper(),
+    })
+    await waitFor(() => expect(mockRpc).toHaveBeenCalled())
+    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', {
+      p_user_id: 'user-1',
+      p_gold_price: 105,
+      p_silver_price: 1.2,
+      p_fx_rate: 0.71,
+    })
+  })
+
+  it('falls back to RPC defaults when no prices are provided', async () => {
+    renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
+    await waitFor(() => expect(mockRpc).toHaveBeenCalled())
+    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', { p_user_id: 'user-1' })
+  })
 })

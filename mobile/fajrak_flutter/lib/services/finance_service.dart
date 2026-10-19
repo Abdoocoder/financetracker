@@ -65,10 +65,20 @@ class FinanceService {
   /// مزامنة حالة الحول عبر RPC الموحد sync_zakat_haul_state (Zakat Autopilot).
   /// يعيد الحالة المحدّثة: days_remaining / zakat_due / nisab_reached_at ...
   /// (ينشئ/يحدّث صف zakat_haul_state على الخادم — لا يُحسب الحول في الواجهة).
-  static Future<Map<String, dynamic>> syncZakatHaulState() async {
+  /// تمرير الأسعار الحيّة (إن توفّرت) يجعل النصاب يُقيَّم بأسعار السوق بدل
+  /// الافتراضيات القديمة (ذهب 30 / فضة 0.35 / سعر صرف 1.0).
+  static Future<Map<String, dynamic>> syncZakatHaulState({
+    double? goldPrice,
+    double? silverPrice,
+    double? usdToLocalRate,
+  }) async {
     final uid = _uid;
     if (uid == null) return {};
-    final response = await _db.rpc('sync_zakat_haul_state', params: {'p_user_id': uid});
+    final params = <String, dynamic>{'p_user_id': uid};
+    if (goldPrice != null) params['p_gold_price'] = goldPrice;
+    if (silverPrice != null) params['p_silver_price'] = silverPrice;
+    if (usdToLocalRate != null) params['p_fx_rate'] = usdToLocalRate;
+    final response = await _db.rpc('sync_zakat_haul_state', params: params);
     return Map<String, dynamic>.from(response as Map);
   }
 
