@@ -51,44 +51,73 @@ class _ZakatCalculatorScreenState extends State<ZakatCalculatorScreen> with Widg
     return double.tryParse(v.toString()) ?? 0.0;
   }
 
+  // ── Fallback sources: gold-api.com — CORS-enabled، حيّ (تحديث كل ثوانٍ)،
+  // ذهب وفضة معاً. ملاحظة: freegoldapi.com/data/latest.json لا يصلح كمصدر:
+  // يرجع List من سجلات تاريخية (ذهب فقط — آخرها 2026-02-20، أي تقادم بـ 8 أشهر). ──
+  static const String _goldApiXauUrl = 'https://api.gold-api.com/price/XAU';
+  static const String _goldApiXagUrl = 'https://api.gold-api.com/price/XAG';
+
+  /// جلب سعر معدن من gold-api.com (USD للأونصة) → سعر الغرام × سعر الصرف.
+  /// الاستجابة المتوقعة: {"price": num أو String, "symbol": "XAU" أو "XAG", ...}.
+  /// يرجع null عند أي شكل غير متوقع أو فشل — لا يرمي أخطاء أبداً.
+  Future<double?> _fetchMetalPricePerGram(String url, double usdRate) async {
+    try {
+      final res =
+          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 5));
+      if (res.statusCode != 200 || res.body.isEmpty) return null;
+      final d = json.decode(res.body);
+      if (d is! Map) return null; // شكل غير متوقع — لا نكرر أخطاء الـ subscript
+      final priceOz = _parsePrice(d['price']);
+      if (priceOz <= 0) return null;
+      return (priceOz / _troyOzToGram) * usdRate;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> _fetchLivePrices() async {
     if (!mounted) return;
     setState(() => _fetchingPrices = true);
     try {
+      // سعر الصرف مستقل عن مسارات Yahoo — فشل Yahoo (CORS دائماً على الويب)
+      // كان يرمي Future.wait كاملاً ويستبدل السعر الحقيقي من open.er-api.com بـ 1.0.
+      final usdRateFuture = CurrencyService.fetchExchangeRate('USD', _currency);
+
       final results = await Future.wait([
         http.get(Uri.parse('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?interval=1d&range=1d'), headers: {'User-Agent': 'Mozilla/5.0'}).timeout(const Duration(seconds: 10)),
         http.get(Uri.parse('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?interval=1d&range=1d'), headers: {'User-Agent': 'Mozilla/5.0'}).timeout(const Duration(seconds: 10)),
-        CurrencyService.fetchExchangeRate('USD', _currency),
-      ]).catchError((e) => [http.Response('', 404), http.Response('', 404), 1.0]);
+      ]).catchError((e) => [http.Response('', 404), http.Response('', 404)]);
 
-      double usdRate = results[2] as double? ?? 1.0;
+      double usdRate = await usdRateFuture ?? 1.0;
       double? goldP;
       double? silverP;
 
-      final goldRes = results[0] as http.Response;
+      final goldRes = results[0];
       if (goldRes.statusCode == 200 && goldRes.body.isNotEmpty) {
         final d = json.decode(goldRes.body);
         final priceOz = _parsePrice(d['chart']?['result']?[0]?['meta']?['regularMarketPrice']);
         if (priceOz > 0) goldP = (priceOz / _troyOzToGram) * usdRate;
       }
 
-      final silverRes = results[1] as http.Response;
+      final silverRes = results[1];
       if (silverRes.statusCode == 200 && silverRes.body.isNotEmpty) {
         final d = json.decode(silverRes.body);
         final priceOz = _parsePrice(d['chart']?['result']?[0]?['meta']?['regularMarketPrice']);
         if (priceOz > 0) silverP = (priceOz / _troyOzToGram) * usdRate;
       }
 
-      // Fallback Source: FreeGoldAPI
-      if (goldP == null || silverP == null) {
-        final fbRes = await http.get(Uri.parse('https://freegoldapi.com/data/latest.json')).timeout(const Duration(seconds: 5)).catchError((_) => http.Response('', 404));
-        if (fbRes.statusCode == 200 && fbRes.body.isNotEmpty) {
-          final fb = json.decode(fbRes.body);
-          final goldVal = _parsePrice(fb['gold']);
-          final silverVal = _parsePrice(fb['silver']);
-          if (goldP == null && goldVal > 0) goldP = goldVal * usdRate;
-          if (silverP == null && silverVal > 0) silverP = silverVal * usdRate;
-        }
+      // Fallback Source: gold-api.com — Yahoo محجوب بـ CORS على الويب دائماً،
+      // يعني هذا المصدر هو المسار الأساسي فعلياً في المتصفح.
+      final needsGold = goldP == null;
+      final needsSilver = silverP == null;
+      if (needsGold || needsSilver) {
+        final fb = await Future.wait([
+          if (needsGold) _fetchMetalPricePerGram(_goldApiXauUrl, usdRate),
+          if (needsSilver) _fetchMetalPricePerGram(_goldApiXagUrl, usdRate),
+        ]);
+        var i = 0;
+        if (needsGold) goldP = fb[i++];
+        if (needsSilver) silverP = fb[i++];
       }
 
       if (mounted) {

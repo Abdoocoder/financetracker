@@ -44,27 +44,60 @@ Widget _app(Widget child) {
   );
 }
 
+// ── Live-price endpoint fixtures, matching what the REAL endpoints serve ──
+
+/// gold-api.com XAU/XAG: a single JSON object, USD per troy ounce.
+/// The XAU `price` is deliberately a JSON **String** so the parse at the new
+/// call site goes through `_parsePrice` (the historical String/num bug class).
+const String _goldApiXauBody = '{"currency":"USD","name":"Gold",'
+    '"price":"4161.299805","symbol":"XAU"}';
+const String _goldApiXagBody = '{"currency":"USD","name":"Silver",'
+    '"price":57.643002,"symbol":"XAG"}';
+
+/// freegoldapi.com/data/latest.json: the REAL shape is a JSON **Array** of
+/// {date, price, source} history records — never a {"gold","silver"} map.
+/// This fixture reproduces the production crash: `fb['gold']` on a List threw
+/// `TypeError: "gold": type 'String' is not a subtype of type 'int'`.
+const String _freeGoldApiRealBody = '[{"date":"1258-01-01","price":0.89,'
+    '"source":"measuringworth_british (GBP)"},'
+    '{"date":"2026-02-20","price":5059.3,"source":"yahoo_finance"}]';
+
 /// Simulates the `make run-web` (Chrome) failure mode reported in production:
-///  - Yahoo Finance: CORS-blocked in the browser → request fails (here: non-200)
-///  - FreeGoldAPI fallback: 200, but numeric fields arrive as JSON **Strings**
-///    ("gold": "3012.45") — the historical `as num` cast threw
-///    `TypeError: "gold": type 'String' is not a subtype of type 'num'`
-///  - exchange-rate API: success, JOD = 1.0 for deterministic expectations
+///  - Yahoo Finance: CORS-blocked in the browser → the request **throws**
+///  - gold-api.com: live gold+silver objects (USD/oz), CORS-enabled
+///  - freegoldapi: real array shape (kept as a route so the pre-fix crash
+///    path stays reproducible)
+///  - exchange-rate API: JOD rate ≠ 1.0 so a discarded rate is detectable
 Future<http.Response> _livePricesHandler(http.Request request) async {
   final url = request.url.toString();
   if (url.contains('query1.finance.yahoo.com')) {
-    return http.Response('{"chart":null}', 404);
+    // Browser CORS failure rejects the request; it does not return a status.
+    throw http.ClientException('Blocked by CORS');
+  }
+  if (url.contains('api.gold-api.com/price/XAU')) {
+    return http.Response(
+      _goldApiXauBody,
+      200,
+      headers: {'content-type': 'application/json'},
+    );
+  }
+  if (url.contains('api.gold-api.com/price/XAG')) {
+    return http.Response(
+      _goldApiXagBody,
+      200,
+      headers: {'content-type': 'application/json'},
+    );
   }
   if (url.contains('freegoldapi.com')) {
     return http.Response(
-      jsonEncode({'gold': '3012.45', 'silver': '36.12'}),
+      _freeGoldApiRealBody,
       200,
       headers: {'content-type': 'application/json'},
     );
   }
   if (url.contains('open.er-api.com')) {
     return http.Response(
-      jsonEncode({'result': 'success', 'rates': {'JOD': 1.0}}),
+      jsonEncode({'result': 'success', 'rates': {'JOD': 0.709}}),
       200,
       headers: {'content-type': 'application/json'},
     );
@@ -93,7 +126,7 @@ void main() {
   });
 
   testWidgets(
-    'live prices: FreeGoldAPI String prices fill gold/silver fields when Yahoo is CORS-blocked',
+    'live prices: web CORS mode — gold-api fallback fills gold/silver per gram, exchange rate preserved',
     (tester) async {
       await http.runWithClient(() async {
         await tester.pumpWidget(_app(const ZakatCalculatorScreen()));
@@ -107,18 +140,29 @@ void main() {
         await tester.tap(fetchButton);
         await tester.pumpAndSettle();
 
-        // Regression lock: before the defensive `_parsePrice` fix the
-        // `(fb['gold'] as num)` cast threw a TypeError, the catch swallowed it,
-        // and these fields silently kept their defaults ('30' / '0.35').
+        // Regression lock for two production bugs at once:
+        //  1. freegoldapi serves a List — `fb['gold']` threw a TypeError and
+        //     the fields silently kept their defaults ('30' / '0.35').
+        //  2. Yahoo's CORS failure rejected the whole Future.wait and the
+        //     catchError replaced the real JOD rate with 1.0.
+        // Expected values mirror the endpoint contract: USD per troy ounce
+        // ÷ 31.1035 g/oz × JOD rate — computed independently of the code.
+        const double troyOzToGram = 31.1035;
+        const double jodRate = 0.709;
+        final expectedGold = (4161.299805 / troyOzToGram) * jodRate;
+        final expectedSilver = (57.643002 / troyOzToGram) * jodRate;
+
         expect(
-          find.text('3012.45'),
+          find.text(expectedGold.toStringAsFixed(2)),
           findsOneWidget,
-          reason: 'gold price String "3012.45" must parse, not crash the fetch',
+          reason: 'gold must come from gold-api XAU ÷ g/oz × JOD rate — '
+              'not stay at the default and not use a discarded rate of 1.0',
         );
         expect(
-          find.text('36.12'),
+          find.text(expectedSilver.toStringAsFixed(2)),
           findsOneWidget,
-          reason: 'silver price String "36.12" must parse, not crash the fetch',
+          reason: 'silver must come from gold-api XAG ÷ g/oz × JOD rate — '
+              'the old freegoldapi endpoint has no silver data at all',
         );
       }, () => MockClient(_livePricesHandler));
     },
