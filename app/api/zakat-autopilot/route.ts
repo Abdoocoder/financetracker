@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPushToUser } from '@/lib/push-send'
 import { verifyCronAuth } from '@/lib/cron-auth'
+import { ar } from '@/lib/locales/ar'
+import { en } from '@/lib/locales/en'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
@@ -24,8 +26,8 @@ interface HaulState {
 async function syncZakatAutopilot(userId?: string) {
   const supabase = createAdminClient()
 
-  // جلب كل المستخدمين (أو مستخدم واحد للاختبار)
-  const profileQuery = supabase.from('profiles').select('id, full_name')
+  // جلب كل المستخدمين (أو مستخدم واحد للاختبار) — مع لغة الواجهة للإشعارات
+  const profileQuery = supabase.from('profiles').select('id, full_name, lang')
   const { data: profiles } = userId
     ? await profileQuery.eq('id', userId)
     : await profileQuery
@@ -38,7 +40,9 @@ async function syncZakatAutopilot(userId?: string) {
 
   for (const profile of profiles) {
     const uid = profile.id
-    const name = profile.full_name?.split(' ')[0] ?? 'أخي'
+    const userLang: 'ar' | 'en' = profile.lang === 'en' ? 'en' : 'ar'
+    const m = userLang === 'en' ? en : ar
+    const name = profile.full_name?.split(' ')[0] ?? (userLang === 'en' ? 'Dear' : 'أخي')
 
     // آلة حالة الحول: تعيد الحالة محدّثة (تبدأ الساعة أو تُكملها أو تُلغيها).
     // service_role لا يحمل JWT => auth.uid() NULL => الحارس يسمح (نمط المسارات الخلفية).
@@ -58,18 +62,31 @@ async function syncZakatAutopilot(userId?: string) {
     const lastNotified = state.last_notified_at?.slice(0, 10) ?? null
     if (lastNotified === today) continue
 
-    const dueLabel = Math.round(Number(state.zakat_due ?? 0)).toLocaleString('ar')
+    const dueLabel = Math.round(Number(state.zakat_due ?? 0)).toLocaleString(
+      userLang === 'en' ? 'en-US' : 'ar'
+    )
 
+    // اختيار العنوان والنص حسب اللغة وحالة الحول (مستحق اليوم/قريب)
+    let title: string
     let body: string
+    const fill = (s: string) =>
+      s.replace('{name}', name).replace('{amount}', dueLabel).replace('{days}', String(daysRemaining))
+
     if (daysRemaining <= 0) {
-      body = `اليوم موعد زكاة ${name} — المبلغ المستحق ${dueLabel}، لا تؤخر أداءها`
+      title = m.zakat_autopilot_push_title_due
+      body = fill(m.zakat_autopilot_push_body_due)
     } else if (daysRemaining === 1) {
-      body = `${name}، بقي يوم واحد على حول زكاتك — المبلغ المستحق ~${dueLabel}`
+      title = m.zakat_autopilot_push_title_approaching
+      body = fill(m.zakat_autopilot_push_body_approaching_one)
     } else {
-      body = `${name}، بقي ${daysRemaining} أيام على حول زكاتك — المبلغ المستحق ~${dueLabel}`
+      title = m.zakat_autopilot_push_title_approaching
+      body = fill(m.zakat_autopilot_push_body_approaching)
     }
 
-    await sendPushToUser(uid, 'اقترب حول زكاتك 🌙', body, '/dashboard/zakat', 'zakat-due')
+    // يعيد sendPushToUser عدد الإشعارات المُرسلة فعلياً (0 عند ساعات الهادئة
+    // أو عدم وجود اشتراك أو كبح). لا نختم last_notified_at إلا عند الإرسال.
+    const delivered = await sendPushToUser(uid, title, body, '/dashboard/zakat', 'zakat-due')
+    if (delivered <= 0) continue
 
     // ختم مانع الإزعاج اليومي في جدول التتبع (service_role يتجاوز RLS)
     const { error: updateError } = await supabase

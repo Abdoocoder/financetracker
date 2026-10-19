@@ -215,6 +215,130 @@ describe('GET /api/zakat-autopilot', () => {
     expect((sendPushToUser as jest.Mock).mock.calls[0][0]).toBe(USER_B)
   })
 
+  it('sends localized (English) push copy when profile.lang is en', async () => {
+    setupMock({
+      profiles: [{ id: USER_A, full_name: 'John Smith', lang: 'en' }],
+      states: { [USER_A]: haulState({ days_remaining: 5, last_notified_at: null }) },
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.notified).toBe(1)
+    const [, title, body] = (sendPushToUser as jest.Mock).mock.calls[0]
+    expect(title).toBe('Your Zakat hawl is approaching 🌙')
+    expect(body).toContain('days')
+    expect(body).toContain('John') // الاسم بيانات، القالب إنجليزي
+    expect(body).toContain('128') // 127.5 rounded, en-locale grouping
+  })
+
+  it('falls back to Arabic push copy when lang is missing or ar', async () => {
+    setupMock({
+      profiles: [
+        { id: USER_A, full_name: 'أحمد', lang: 'ar' },
+        { id: USER_B, full_name: 'سارة' }, // بلا lang => ar
+      ],
+      states: {
+        [USER_A]: haulState({ days_remaining: 4, last_notified_at: null }),
+        [USER_B]: haulState({ user_id: USER_B, days_remaining: 6, last_notified_at: null }),
+      },
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.notified).toBe(2)
+    for (const call of (sendPushToUser as jest.Mock).mock.calls) {
+      const [, title, body] = call
+      expect(title).toBe('اقترب حول زكاتك 🌙')
+      expect(body).toMatch(/[؀-ۿ]/) // النسخة العربية تحتفظ بالنص العربي
+    }
+  })
+
+  it('uses the due wording (اليوم موعد) when days_remaining <= 0 in ar', async () => {
+    setupMock({
+      profiles: [{ id: USER_A, full_name: 'أحمد', lang: 'ar' }],
+      states: { [USER_A]: haulState({ days_remaining: 0, last_notified_at: null }) },
+    })
+    await GET(makeGetRequest())
+    const [, title, body] = (sendPushToUser as jest.Mock).mock.calls[0]
+    expect(title).toBe('اليوم موعد زكاتك 🌙')
+    expect(body).toContain('اليوم موعد زكاة')
+    expect(body).toContain('أحمد')
+  })
+
+  it('uses the due wording (Today is) when days_remaining <= 0 in en', async () => {
+    setupMock({
+      profiles: [{ id: USER_A, full_name: 'John Smith', lang: 'en' }],
+      states: { [USER_A]: haulState({ days_remaining: 0, last_notified_at: null }) },
+    })
+    await GET(makeGetRequest())
+    const [, title, body] = (sendPushToUser as jest.Mock).mock.calls[0]
+    expect(title).toBe('Today is your Zakat due date 🌙')
+    expect(body).toContain('John')
+    expect(body).not.toMatch(/[؀-ۿ]/)
+  })
+
+  it('uses the singular "one day" wording when days_remaining === 1', async () => {
+    setupMock({
+      profiles: [
+        { id: USER_A, full_name: 'أحمد', lang: 'ar' },
+        { id: USER_B, full_name: 'Jane', lang: 'en' },
+      ],
+      states: {
+        [USER_A]: haulState({ days_remaining: 1, last_notified_at: null }),
+        [USER_B]: haulState({ user_id: USER_B, days_remaining: 1, last_notified_at: null }),
+      },
+    })
+    await GET(makeGetRequest())
+    const calls = (sendPushToUser as jest.Mock).mock.calls
+    const arBody = calls.find(c => c[0] === USER_A)[2]
+    const enBody = calls.find(c => c[0] === USER_B)[2]
+    expect(arBody).toContain('بقي يوم واحد')
+    expect(enBody).toContain('one day')
+  })
+
+  it('does NOT stamp last_notified_at when the push was suppressed (quiet hours)', async () => {
+    // sendPushToUser يعيد 0 عند ساعات الهادئة/الإشعارات المعطّلة/عدم وجود أجهزة
+    ;(sendPushToUser as jest.Mock).mockResolvedValueOnce(0)
+    setupMock({
+      profiles: [{ id: USER_A, full_name: 'أحمد' }],
+      states: { [USER_A]: haulState({ days_remaining: 3, last_notified_at: null }) },
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    // الإشعار كُبح => لا يُحسب ولا يُختم
+    expect(json.notified).toBe(0)
+    expect(sendPushToUser).toHaveBeenCalledTimes(1)
+    expect(updateCalls).toHaveLength(0)
+  })
+
+  it('stamps last_notified_at only when the push is actually delivered', async () => {
+    ;(sendPushToUser as jest.Mock).mockResolvedValue(1)
+    setupMock({
+      profiles: [{ id: USER_A, full_name: 'أحمد' }],
+      states: { [USER_A]: haulState({ days_remaining: 2, last_notified_at: null }) },
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.notified).toBe(1)
+    expect(updateCalls).toHaveLength(1)
+    expect(updateCalls[0].last_notified_at).toBeTruthy()
+  })
+
+  it('does not stamp users who are silent (out of window / already notified)', async () => {
+    setupMock({
+      profiles: [
+        { id: USER_A, full_name: 'أحمد' }, // خارج النافذة (30 يوم)
+        { id: USER_B, full_name: 'سارة' }, // أُشعر اليوم بالفعل
+      ],
+      states: {
+        [USER_A]: haulState({ days_remaining: 30, last_notified_at: null }),
+        [USER_B]: haulState({ user_id: USER_B, days_remaining: 3, last_notified_at: new Date().toISOString() }),
+      },
+    })
+    const res = await GET(makeGetRequest())
+    const json = await res.json()
+    expect(json.notified).toBe(0)
+    expect(updateCalls).toHaveLength(0)
+  })
+
   it('targets a single user when a valid userId param is passed', async () => {
     setupMock({
       profiles: [{ id: USER_A, full_name: 'أحمد' }],
