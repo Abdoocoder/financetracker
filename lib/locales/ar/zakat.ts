@@ -52,4 +52,9 @@ export const arZakat = {
     zakat_hawl_below_nisab: 'أنت تحت النصاب',
     zakat_hawl_calc_btn: 'احسب زكاتك',
     zakat_hawl_banner: '🕒 حولك الحالي: بقي {days} يوماً (المستحق: {amount} {currency})',
+    zakat_autopilot_push_title_due: 'اليوم موعد زكاتك 🌙',
+    zakat_autopilot_push_body_due: 'اليوم موعد زكاة {name} — المبلغ المستحق {amount}، لا تؤخر أداءها',
+    zakat_autopilot_push_title_approaching: 'اقترب حول زكاتك 🌙',
+    zakat_autopilot_push_body_approaching: '{name}، بقي {days} أيام على حول زكاتك — المبلغ المستحق ~{amount}',
+    zakat_autopilot_push_body_approaching_one: '{name}، بقي يوم واحد على حول زكاتك — المبلغ المستحق ~{amount}',
 } as const

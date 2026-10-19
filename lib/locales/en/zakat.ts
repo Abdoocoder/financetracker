@@ -52,4 +52,9 @@ export const enZakat = {
     zakat_hawl_below_nisab: 'Below Nisab',
     zakat_hawl_calc_btn: 'Calculate your Zakat',
     zakat_hawl_banner: '🕒 Current hawl: {days} days remaining (Due: {amount} {currency})',
+    zakat_autopilot_push_title_due: 'Today is your Zakat due date 🌙',
+    zakat_autopilot_push_body_due: 'Today is the due date for {name}’s Zakat — amount due {amount}. Do not delay it.',
+    zakat_autopilot_push_title_approaching: 'Your Zakat hawl is approaching 🌙',
+    zakat_autopilot_push_body_approaching: '{name}, {days} days left until your Zakat hawl — amount due ~{amount}',
+    zakat_autopilot_push_body_approaching_one: '{name}, one day left until your Zakat hawl — amount due ~{amount}',
 } as const
