@@ -84,6 +84,7 @@ dependencies:
   # Path
   path: ^1.9.0
   flutter_markdown_plus: ^1.0.12
+  sentry_flutter: ^8.14.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

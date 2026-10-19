@@ -18,6 +18,13 @@ DART_DEFINES = \
 	--dart-define=FIREBASE_APP_ID=$$(grep FIREBASE_APP_ID .env 2>/dev/null | cut -d'=' -f2) \
 	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep FIREBASE_MEASUREMENT_ID .env 2>/dev/null | cut -d'=' -f2)
 
+# ── Sentry DSN (mobile crash reporting), read from .env at recipe run time ──
+# Deliberately kept OUT of DART_DEFINES: web builds use their own Sentry
+# project (javascript-nextjs), not the mobile DSN. Also keep this `=` and
+# keep the grep unanchored (CLAUDE.md Critical Rules #9 and #12).
+SENTRY_DEFINE = \
+	--dart-define=SENTRY_DSN=$$(grep SENTRY_DSN .env 2>/dev/null | cut -d'=' -f2)
+
 # Default target
 help:
 	@echo "Fajrak Flutter Development Commands"
@@ -56,7 +63,7 @@ setup:
 
 # Run on device/emulator
 run:
-	flutter run
+	flutter run $(SENTRY_DEFINE)
 
 # Run Flutter web (basic)
 run-web:
@@ -97,11 +104,11 @@ build-web:
 
 # Build release APK
 build-apk:
-	flutter build apk --release $(DART_DEFINES)
+	flutter build apk --release $(DART_DEFINES) $(SENTRY_DEFINE)
 
 # Build release App Bundle
 build-bundle:
-	flutter build appbundle --release $(DART_DEFINES)
+	flutter build appbundle --release $(DART_DEFINES) $(SENTRY_DEFINE)
 
 # Run tests
 test:

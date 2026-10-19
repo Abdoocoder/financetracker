@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../services/analytics_service.dart';
+import '../services/sentry_service.dart';
 import 'dart:developer' as dev;
 import 'dart:io';
 
@@ -38,6 +39,17 @@ class ErrorHandler {
       error.runtimeType.toString(),
       errorMessage,
       {'developer_message': developerMessage},
+    );
+
+    // Report to Sentry — release builds only (debug stays quiet; no DSN
+    // is a no-op too). Handled errors are never rethrown, so Sentry's
+    // uncaught-exception handler won't see them again: no duplicates.
+    SentryService.captureReport(
+      error,
+      stackTrace: st,
+      screen: (context?.mounted ?? false)
+          ? ModalRoute.of(context!)?.settings.name
+          : null,
     );
 
     if (context != null && context.mounted) {
