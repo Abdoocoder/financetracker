@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app_state.dart';
 import 'providers/dashboard_layout_provider.dart';
@@ -35,10 +36,18 @@ import 'screens/help/help_screen.dart';
 import 'screens/learn/learn_screen.dart';
 import 'utils/error_handler.dart';
 import 'services/notification_service.dart';
+import 'services/sentry_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Initialize Sentry first (crash reporting) so init-time failures are
+  // captured too. Gracefully skipped when no SENTRY_DSN dart-define is
+  // present (e.g. `flutter run` without defines) — the app just boots.
+  await SentryService.init(appRunner: _bootstrapApp);
+}
+
+Future<void> _bootstrapApp() async {
   // Initialize Easy Localization
   await EasyLocalization.ensureInitialized();
 
@@ -136,6 +145,8 @@ class _MyAppState extends State<MyApp> {
           title: 'Fajrak',
           debugShowCheckedModeBanner: false,
           navigatorKey: navigatorKey,
+          // Crashes and traces include the current route.
+          navigatorObservers: [SentryNavigatorObserver()],
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,

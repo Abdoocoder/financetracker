@@ -195,6 +195,7 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
 10. **Zakat is centralized**: Never calculate Zakat (Nisab, 2.5%, Hawl) locally in Web or Mobile. Always use the get_zakat_summary and get_zakat_hauls RPCs.
 11. **Zakat Autopilot**: The Hawl state is managed by the sync_zakat_haul_state RPC. Never calculate Hawl logic in the UI; always read from this RPC or the zakat_haul_tracking table.
+12. **Never send PII to Sentry.** Filter email/IP/passwords in `beforeSend` (`lib/services/sentry_service.dart`); drop events carrying `Authorization`/`Cookie` headers, and keep the mobile DSN out of web builds.
 
 ### Naming Conventions
 - Components: PascalCase (`HeroBalanceCard.tsx`)

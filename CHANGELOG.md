@@ -14,6 +14,12 @@ lagged behind the mobile version (currently `3.42.0` vs mobile `3.44.0+63`) — 
 `HANDOFF_REPORT.md` §9. Versions before 3.42.0 are recorded in summary form from release
 notes and version-bump commits; see the note on links at the end of this file.
 
+## [Unreleased]
+
+### Added
+
+- **Observability**: Sentry Flutter integrated for mobile crash reporting (app-init + global ErrorHandler, PII filtered in `beforeSend`; skipped gracefully when no `SENTRY_DSN` is provided).
+
 ## [3.45.0+64] - 2026-10-19
 
 Release commit `7269ffdd` (chore(release): bump version to 3.45.0+64 and update store notes, 2026-10-19). This release delivers the Zakat Engine v2, the full Zakat Autopilot stack (backend, cron, and countdown UI on Web + Mobile), and the associated security hardening. The web `package.json` intentionally stays at `3.42.0` — see `HANDOFF_REPORT.md` §9.
