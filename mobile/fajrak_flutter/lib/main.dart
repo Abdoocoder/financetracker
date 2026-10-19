@@ -39,7 +39,14 @@ import 'services/notification_service.dart';
 import 'services/sentry_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // على الويب Sentry يشغّل appRunner داخل runZonedGuarded (منطقة جديدة لالتقاط
+  // الأخطاء) — تهيئة الـ binding هنا في الـ root zone كانت تسبب "Zone mismatch"
+  // لأن runApp يشتغل داخل المنطقة المفتوحة. لذلك على الويب نترك Sentry يهيّئ
+  // الـ binding داخل منطقته (WidgetsFlutterBindingIntegration)؛ native لا يفتح
+  // منطقة أصلاً (PlatformDispatcher.onError مدعوم) فالتهيئة هنا آمنة كما هي.
+  if (!kIsWeb) {
+    WidgetsFlutterBinding.ensureInitialized();
+  }
 
   // Initialize Sentry first (crash reporting) so init-time failures are
   // captured too. Gracefully skipped when no SENTRY_DSN dart-define is
@@ -48,6 +55,10 @@ Future<void> main() async {
 }
 
 Future<void> _bootstrapApp() async {
+  // idempotent: على الويب مع DSN الـ binding منشأ بالفعل داخل منطقة Sentry؛
+  // بدون DSN أو على native يُنشأ هنا — ودائماً في نفس منطقة runApp.
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Initialize Easy Localization
   await EasyLocalization.ensureInitialized();
 
