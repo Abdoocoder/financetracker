@@ -175,6 +175,10 @@ class _AlertsScreenState extends State<AlertsScreen> {
     }
   }
 
+  void _navigateToAddTransaction() {
+    Navigator.pushNamed(context, '/transactions/add');
+  }
+
   IconData _getIcon(String? type) {
     switch (type) {
       case 'warning':
@@ -183,6 +187,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
         return Icons.emoji_events_outlined;
       case 'motivation':
         return Icons.lightbulb_outlined;
+      case 'ai':
+        return Icons.smart_toy;
       default:
         return Icons.notifications_outlined;
     }
@@ -196,8 +202,56 @@ class _AlertsScreenState extends State<AlertsScreen> {
         return AppColors.success;
       case 'motivation':
         return AppColors.purple;
+      case 'ai':
+        return AppColors.primary;
       default:
         return AppColors.primary;
+    }
+  }
+
+  AlertActionType _getActionType(Map<String, dynamic> alert) {
+    final title = (alert['title'] ?? '').toString().toLowerCase();
+    final msg = (alert['message'] ?? '').toString().toLowerCase();
+    final type = (alert['type'] ?? '').toString().toLowerCase();
+
+    // Budget/warning alerts -> View Details
+    if (type == 'warning' ||
+        title.contains('ميزانية') ||
+        msg.contains('ميزانية') ||
+        title.contains('تجاوز') ||
+        msg.contains('تجاوز') ||
+        title.contains('حد') ||
+        msg.contains('حد')) {
+      return AlertActionType.viewDetails;
+    }
+
+    // Reminder alerts (debt, transaction recording) -> Add Transaction
+    if (title.contains('تذكير') ||
+        msg.contains('تذكير') ||
+        title.contains('سجل') ||
+        msg.contains('سجل') ||
+        title.contains('معاملة') ||
+        msg.contains('معاملة') ||
+        title.contains('قسط') ||
+        msg.contains('قسط') ||
+        title.contains('دين') ||
+        msg.contains('دين')) {
+      return AlertActionType.addTransaction;
+    }
+
+    return AlertActionType.none;
+  }
+
+  void _handleActionTap(AlertActionType actionType, Map<String, dynamic> alert) {
+    switch (actionType) {
+      case AlertActionType.viewDetails:
+        _navigateAlert(alert);
+        break;
+      case AlertActionType.addTransaction:
+        _navigateToAddTransaction();
+        break;
+      case AlertActionType.none:
+        break;
     }
   }
 
@@ -206,6 +260,12 @@ class _AlertsScreenState extends State<AlertsScreen> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final unreadCount = _alerts.where((a) => a['is_read'] == false).length;
+
+    // Calculate counts per filter type
+    final warningCount = _alerts.where((a) => a['type'] == 'warning').length;
+    final achievementCount = _alerts.where((a) => a['type'] == 'achievement').length;
+    final motivationCount = _alerts.where((a) => a['type'] == 'motivation').length;
+
     final filtered = _alerts.where((a) {
       if (_filter == 'unread') return a['is_read'] == false;
       if (_filter == 'warning') return a['type'] == 'warning';
@@ -217,61 +277,80 @@ class _AlertsScreenState extends State<AlertsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-          title: Text('alerts_title'.tr(),
-              style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  color: colorScheme.onSurface)),
-          iconTheme: IconThemeData(color: colorScheme.onSurface)),
+        title: Text('alerts_title'.tr(),
+            style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: colorScheme.onSurface)),
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+        actions: [
+          AlertActions(
+            unreadCount: unreadCount,
+            hasAlerts: _alerts.isNotEmpty,
+            onMarkAllRead: _markAllRead,
+            onDeleteAll: _deleteAll,
+            colorScheme: colorScheme,
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: _loading
           ? Center(child: CircularProgressIndicator(color: colorScheme.primary))
           : RefreshIndicator(
               onRefresh: _load,
               color: colorScheme.primary,
               backgroundColor: colorScheme.surface,
-              child: SingleChildScrollView(
+              child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          AlertHeader(
-                            totalCount: _alerts.length,
-                            unreadCount: unreadCount,
-                            colorScheme: colorScheme,
-                          ),
-                          AlertActions(
-                            unreadCount: unreadCount,
-                            hasAlerts: _alerts.isNotEmpty,
-                            onMarkAllRead: _markAllRead,
-                            onDeleteAll: _deleteAll,
-                            colorScheme: colorScheme,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      AIGeneratorCard(
+                slivers: [
+                  // AI Generator Compact Banner
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: AIGeneratorCard(
                         generating: _generating,
                         onGenerate: _generateAlerts,
                         colorScheme: colorScheme,
+                        compact: true,
                       ),
-                      const SizedBox(height: 20),
-                      AlertFilterTabs(
+                    ),
+                  ),
+                  // Filter Tabs with badges
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                      child: AlertFilterTabs(
                         currentFilter: _filter,
                         totalCount: _alerts.length,
                         unreadCount: unreadCount,
+                        warningCount: warningCount,
+                        achievementCount: achievementCount,
+                        motivationCount: motivationCount,
                         onFilterChanged: (v) => setState(() => _filter = v),
                         colorScheme: colorScheme,
                       ),
-                      const SizedBox(height: 16),
-                      if (filtered.isEmpty)
-                        Center(
-                            child: Padding(
+                    ),
+                  ),
+                  // Unread indicator (only shows when there are unread)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: AlertHeader(
+                        unreadCount: unreadCount,
+                        colorScheme: colorScheme,
+                      ),
+                    ),
+                  ),
+                  // Alert List
+                  if (filtered.isEmpty)
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 40),
-                          child: Column(children: [
-                            Icon(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
                                 _filter == 'all'
                                     ? Icons.notifications_none
                                     : _filter == 'warning'
@@ -279,34 +358,56 @@ class _AlertsScreenState extends State<AlertsScreen> {
                                         : _filter == 'achievement'
                                             ? Icons.emoji_events_outlined
                                             : Icons.lightbulb_outline,
-                                size: 40, color: colorScheme.onSurfaceVariant),
-                            const SizedBox(height: 12),
-                            Text('alerts_empty'.tr(),
+                                size: 48,
+                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                              const SizedBox(height: 16),
+                              Text(
+                                'alerts_empty'.tr(),
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontSize: 14)),
-                          ]),
-                        ))
-                      else
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: filtered.length,
-                          itemBuilder: (context, i) {
-                            final alert = filtered[i];
-                            return AlertListItem(
-                              alert: alert,
-                              color: _getColor(alert['type'] as String?),
-                              icon: _getIcon(alert['type'] as String?),
-                              onTap: () => _navigateAlert(alert),
-                              onDelete: () => _deleteAlert(alert['id'].toString()),
-                              colorScheme: colorScheme,
-                            );
-                          },
+                                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                    ]),
+                      ),
+                    )
+                  else
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final alert = filtered[index];
+                          final actionType = _getActionType(alert);
+                          return AlertListItem(
+                            alert: alert,
+                            color: _getColor(alert['type'] as String?),
+                            icon: _getIcon(alert['type'] as String?),
+                            onTap: () => _navigateAlert(alert),
+                            onDelete: () => _deleteAlert(alert['id'].toString()),
+                            colorScheme: colorScheme,
+                            actionType: actionType,
+                            onActionTap: () => _handleActionTap(actionType, alert),
+                          );
+                        },
+                        childCount: filtered.length,
+                      ),
+                    ),
+                  // Bottom padding for FAB space if needed
+                  const SliverToBoxAdapter(child: SizedBox(height: 80)),
+                ],
               ),
             ),
+      // FAB for AI Generator (alternative to banner)
+      floatingActionButton: _alerts.isNotEmpty
+          ? null
+          : AIGeneratorFAB(
+              generating: _generating,
+              onGenerate: _generateAlerts,
+              colorScheme: colorScheme,
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

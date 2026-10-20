@@ -5,6 +5,9 @@ class AlertFilterTabs extends StatelessWidget {
   final String currentFilter;
   final int totalCount;
   final int unreadCount;
+  final int warningCount;
+  final int achievementCount;
+  final int motivationCount;
   final Function(String) onFilterChanged;
   final ColorScheme colorScheme;
 
@@ -13,6 +16,9 @@ class AlertFilterTabs extends StatelessWidget {
     required this.currentFilter,
     required this.totalCount,
     required this.unreadCount,
+    required this.warningCount,
+    required this.achievementCount,
+    required this.motivationCount,
     required this.onFilterChanged,
     required this.colorScheme,
   });
@@ -21,36 +27,73 @@ class AlertFilterTabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(children: [
-        _filterTab('all', '${'alerts_filter_all'.tr()} ($totalCount)'),
-        _filterTab('unread', '${'alerts_filter_unread'.tr()} ($unreadCount)'),
-        _filterTab('warning', 'alerts_filter_warning'.tr()),
-        _filterTab('achievement', 'alerts_filter_achievement'.tr()),
-        _filterTab('motivation', 'alerts_filter_motivation'.tr()),
-      ]),
+      child: Row(
+        children: [
+          _filterTab('all', 'alerts_filter_all'.tr(), totalCount),
+          _filterTab('unread', 'alerts_filter_unread'.tr(), unreadCount),
+          _filterTab('warning', 'alerts_filter_warning'.tr(), warningCount),
+          _filterTab('achievement', 'alerts_filter_achievement'.tr(), achievementCount),
+          _filterTab('motivation', 'alerts_filter_motivation'.tr(), motivationCount),
+        ],
+      ),
     );
   }
 
-  Widget _filterTab(String key, String label) => Padding(
-        padding: const EdgeInsets.only(left: 8),
-        child: GestureDetector(
-          onTap: () => onFilterChanged(key),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: currentFilter == key ? colorScheme.primary : colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                  color: currentFilter == key
-                      ? colorScheme.primary
-                      : colorScheme.outlineVariant),
+  Widget _filterTab(String key, String label, int count) {
+    final isSelected = currentFilter == key;
+    final hasCount = count > 0;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 8),
+      child: GestureDetector(
+        onTap: () => onFilterChanged(key),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? colorScheme.primary : colorScheme.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.outlineVariant,
             ),
-            child: Text(label,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
                 style: TextStyle(
-                    color: currentFilter == key ? Colors.white : colorScheme.onSurfaceVariant,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700)),
+                  color: isSelected ? Colors.white : colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (hasCount) ...[
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.white.withValues(alpha: 0.2)
+                        : colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    count.toString(),
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : colorScheme.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
 }

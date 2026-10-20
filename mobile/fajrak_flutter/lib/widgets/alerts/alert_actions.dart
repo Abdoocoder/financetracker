@@ -20,23 +20,51 @@ class AlertActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
-      if (unreadCount > 0)
-        TextButton(
-            onPressed: onMarkAllRead,
-            child: Text('alerts_mark_all_read'.tr(),
-                style: TextStyle(
-                    color: colorScheme.primary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900))),
-      if (hasAlerts)
-        TextButton(
-            onPressed: onDeleteAll,
-            child: Text('alerts_delete_all'.tr(),
+    if (!hasAlerts) return const SizedBox.shrink();
+
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant, size: 20),
+      tooltip: 'more_options'.tr(),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      itemBuilder: (context) => [
+        if (unreadCount > 0)
+          PopupMenuItem<String>(
+            value: 'mark_all_read',
+            child: Row(
+              children: [
+                Icon(Icons.done_all, size: 18, color: colorScheme.primary),
+                const SizedBox(width: 12),
+                Text(
+                  'alerts_mark_all_read'.tr(),
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        PopupMenuItem<String>(
+          value: 'delete_all',
+          child: Row(
+            children: [
+              Icon(Icons.delete_sweep_outlined, size: 18, color: AppColors.error),
+              const SizedBox(width: 12),
+              Text(
+                'alerts_delete_all'.tr(),
                 style: const TextStyle(
-                    color: AppColors.error,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900))),
-    ]);
+                  color: AppColors.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+      onSelected: (value) {
+        if (value == 'mark_all_read') onMarkAllRead();
+        if (value == 'delete_all') onDeleteAll();
+      },
+    );
   }
 }
