@@ -19,7 +19,7 @@ financetracker/
 │   ├── migrations/         # 60+ SQL migrations (legacy + current)
 │   └── functions/          # Deno Edge Functions (push notifications)
 ├── observability/          # OTel, Grafana dashboards, alerts, runbooks
-├── docs/                   # Project documentation (PRDs, audit reports, plans)
+├── docs/                   # Project documentation (PRDs, audit reports, plans, agent lessons)
 ├── scripts/                # Build/CI helper scripts
 ├── .github/workflows/      # CI/CD pipelines
 ├── e2e/                    # Playwright E2E tests

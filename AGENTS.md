@@ -25,7 +25,7 @@ AI chat is BYOK: the user's own LLM key, encrypted on device — conversation co
 2. The matching `docs/domain/*.md` for the subsystem you are touching (router below).
 3. `CLAUDE.md` — full commands, conventions, and rules.
 
-Need a file-level directory map? → `docs/REPO_INDEX.md`. Live project state, risks, release history? → `HANDOFF_REPORT.md`.
+Need a file-level directory map? → `docs/REPO_INDEX.md`. Live project state, risks, release history? → `HANDOFF_REPORT.md`. Verifying a quote against a file before calling an agent wrong? → `docs/PROMPTS.md`.
 
 ## Subsystem router
 | If your task touches… | Read |
