@@ -1,13 +1,17 @@
 # Fajrak Flutter Development Makefile
 
-.PHONY: help setup setup-linux run run-web run-web-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
+.PHONY: help setup setup-linux run run-web run-proxy run-web-with-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
 
 # ── Shared --dart-define flags, read from .env at recipe run time ──
-# IMPORTANT: keep this as `=` (recursive expansion), NOT `:=`.
+# IMPORTANT: keep these as `=` (recursive expansion), NOT `:=`.
 # We use `grep -m1` and `tr -d` to handle messy .env files safely.
-DART_DEFINES = \
+# Split Supabase / Firebase so `run-web-with-proxy` can swap the Supabase
+# origin without dropping the Firebase defines (it used to lose them).
+SUPABASE_DEFINES = \
 	--dart-define=SUPABASE_URL=$$(grep -m1 '^SUPABASE_URL=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
+
+FIREBASE_DEFINES = \
 	--dart-define=FIREBASE_API_KEY=$$(grep -m1 'FIREBASE_API_KEY' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
 	--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep -m1 'FIREBASE_AUTH_DOMAIN' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
 	--dart-define=FIREBASE_PROJECT_ID=$$(grep -m1 'FIREBASE_PROJECT_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
@@ -15,6 +19,14 @@ DART_DEFINES = \
 	--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep -m1 'FIREBASE_MESSAGING_SENDER_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
 	--dart-define=FIREBASE_APP_ID=$$(grep -m1 'FIREBASE_APP_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
 	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep -m1 'FIREBASE_MEASUREMENT_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
+
+# Origin of the Next.js app that serves /api/* (read by
+# lib/services/api_base_url.dart). Production by default; the proxy
+# target overrides it so the browser only talks to localhost:33964.
+API_BASE_URL ?= https://fajrak.com
+
+DART_DEFINES = $(SUPABASE_DEFINES) $(FIREBASE_DEFINES) \
+	--dart-define=API_BASE_URL=$(API_BASE_URL)
 
 # ── Sentry DSN (mobile crash reporting), read from .env at recipe run time ──
 # Deliberately kept OUT of DART_DEFINES: web builds use their own Sentry
@@ -33,7 +45,8 @@ help:
 	@echo "Development:"
 	@echo "  make run            - Run on connected device/emulator (includes Sentry)"
 	@echo "  make run-web        - Run Flutter web on localhost:33963"
-	@echo "  make run-web-proxy  - Run Flutter web with CORS proxy (2 terminals needed)"
+	@echo "  make run-proxy      - Start the dev CORS proxy on localhost:33964"
+	@echo "  make run-web-with-proxy - Run Flutter web against the proxy (2 terminals)"
 	@echo ""
 	@echo "Building:"
 	@echo "  make build-web      - Build production web bundle"
@@ -88,7 +101,8 @@ run-web:
 # Run CORS proxy server (run in separate terminal)
 run-proxy:
 	@echo "🚀 Starting CORS Proxy on http://localhost:33964"
-	@echo "   Forwards to: https://ujwcvtpwsaidljecqbaa.supabase.co"
+	@echo "   /api/*  → https://fajrak.com"
+	@echo "   other   → https://ujwcvtpwsaidljecqbaa.supabase.co"
 	@echo ""
 	dart run dev_proxy.dart
 
@@ -103,7 +117,9 @@ run-web-with-proxy:
 		--web-port=33963 \
 		--web-hostname=0.0.0.0 \
 		--dart-define=SUPABASE_URL=http://localhost:33964 \
-		--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ' || echo "your-anon-key")
+		--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ' || echo "your-anon-key") \
+		--dart-define=API_BASE_URL=http://localhost:33964 \
+		$(FIREBASE_DEFINES)
 
 # Build production web
 build-web:
