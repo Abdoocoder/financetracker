@@ -1255,8 +1255,8 @@ No web counterpart is needed: the change is mobile-only and adds no new strings.
 
 ## Correction log
 
-Two corrections were raised against the first draft of this plan. Both are
-resolved in **Amendment 1** above.
+Corrections were raised during and after execution. All are resolved below,
+in the order they were found.
 
 ### Correction A — "the Flutter test count is wrong (177/186 vs the real number)"
 
@@ -1400,3 +1400,121 @@ now asserts that the banner exists in both populated and empty states. The
 (verified by grep AIGeneratorFAB → empty). A runtime assertion on
 FloatingActionButton was considered and rejected — a future subclass would
 slip past find.byType, and the structural guarantee is stronger.
+
+### Correction F — the push gate is accidental, and the fix spans 7 edits not 3 (found 2026-10-22)
+
+**Ruled: the `if (fcmSent + webSent > 0)` gate at
+`supabase/functions/push-notification/index.ts:226` is accidental** — a
+deliberate code edit whose *policy* consequence was never intended. This is a
+scope correction: the "3-change patch" proposed on 2026-10-22 is insufficient,
+and the work is now tracked separately as **Track D** (own session, own
+migration, own verification).
+
+#### Why "accidental", not "intended"
+
+The gate had no author, no review, and no rationale:
+
+| Signal | Finding |
+|---|---|
+| Introducing commit | `c71bb00f9e39701c6204032b92910ef69a67a489` (2026-04-08) |
+| Author | `skylineontheway` — drive-by, not a repo maintainer |
+| Shape | 20-file bundle; the gate is one line inside an unrelated sweep |
+| PR | none |
+| `CHANGELOG.md` entry | none |
+| Justification comment | none |
+| History | `git log -S "fcmSent + webSent"` returns **only** that commit; `5c3df729` and `fe7bc3a9` never touched it |
+
+The same commit's own comment says the Edge Function *"handles writing to
+`alerts`"* (`app/api/alerts/route.ts:121-122`) — with **no mention of the write
+being conditional on delivery**. Read together, the comment and the gate
+contradict each other; the comment describes the intent, the gate is the
+accident.
+
+Corroborating evidence that the gate is the outlier, not the rule:
+
+- `app/api/auto-debt/route.ts:47/56` and `:117/128` and
+  `app/api/smart-notifications/route.ts:197` insert into `alerts`
+  **unconditionally**, with no reference to any push result.
+- The budget DB triggers (`trg_check_budget_limits`,
+  `check_budget_limits_trigger`) also insert `alerts` unconditionally.
+- **12 of the 14** files that call `sendPushToUser` write no `alerts` row of
+  their own — they depend *entirely* on the Edge Function for in-app alerts.
+  That is precisely what makes the gate user-visible: no subscription → no
+  in-app alert at all.
+- `docs/domain/background-and-jobs.md:29` does document the gate ("Only if at
+  least one send succeeded"), **but** that doc was written `d0dc9e9c`
+  (2026-10-21) — **6.5 months after** the gate. It is a retrofit description of
+  existing behaviour, not a rationale. The same file's golden rule at
+  `:34-35` ("every alert is written regardless of delivery") is directly
+  contradicted by the gate *and* by the four direct-write producers, i.e. the
+  doc was never reconciled.
+
+Production impact, measured read-only against `ujwcvtpwsaidljecqbaa`
+(`fajrak`), last 60 days:
+
+| Metric | Value |
+|---|---|
+| `notification_history` rows / distinct users | 2,523 / 51 |
+| …of which from users with **no current** push subscription | 1,423 rows from 38 users |
+| `alerts` rows | 1,580 (1,577 `reminder`, 3 `warning`) |
+| …of which from users with **no current** push subscription | 644 rows from 10 users |
+
+Caveat: subscriptions may have been deleted *after* the rows were written, so
+these are an upper bound — but 10 users holding 644 in-app alerts while
+deliverable push history exists is consistent with the gate firing on
+already-subscribed-at-the-time users, i.e. the loss is real, not hypothetical.
+
+#### Corrected fix scope — 7 edits
+
+| # | File:line | Edit |
+|---|---|---|
+| 1 | `lib/push-send.ts:156` | drop the `subCount === 0` early return (**primary blocker**) |
+| 2 | `lib/push-send.ts:142`, `:147` | drop the disabled / quiet-hours early returns (the Edge Function re-checks both) |
+| 3 | `supabase/functions/push-notification/index.ts:133` | drop the no-subscriptions return |
+| 4 | `supabase/functions/push-notification/index.ts:89-121` | move the `alerts` insert **above** the disabled / quiet-hours returns |
+| 5 | `supabase/functions/push-notification/index.ts:226` | drop the gate |
+| 6 | `supabase/functions/push-notification/index.ts:227` | check and log the insert error (currently unchecked) |
+| 7 | `app/api/auto-debt/route.ts:56,128` + `app/api/smart-notifications/route.ts:197` | remove the direct inserts (single write path; fixes the duplicate) |
+
+Edit 1 is the one that actually unblocks users; the previously proposed
+"fix line 226" was **necessary but not sufficient**.
+
+#### Track D Phase 0 — schema prerequisites (must land first)
+
+1. **Migration:** add the `fingerprint` column **and** a unique
+   `(user_id, fingerprint)` index to `public.alerts`. Prod today has
+   **neither** (`public.alerts` = `id, user_id, type, frequency, title,
+   message, is_read, is_active, trigger_condition, scheduled_for,
+   created_at`; indexes = `alerts_pkey`, `idx_alerts_user_id`,
+   `idx_alerts_user_unread`). The doc comments at `lib/push-send.ts:104-107`
+   claim this unique index exists — they are stale, and the `23505` branch at
+   `push-send.ts:178` is **dead code in prod** (`notification_history` only has
+   the non-unique `idx_notification_history_user_fingerprint`).
+2. **Fix `app/api/smart-notifications/route.ts:197`** — `type: 'info'` violates
+   prod's `alerts_type_check`, which permits only
+   `warning | motivation | reminder | achievement`. Those inserts are failing
+   silently today (`Promise.allSettled` at `:196`).
+3. **Fix `supabase/migrations/20261017160000_zero_budget_trigger_guard.sql`** if
+   it is live — it inserts `type='budget'` **and** `fingerprint`, both invalid
+   against the prod schema. Also note prod carries **two** budget triggers on
+   `transactions` (`trg_check_budget_limits` on INSERT OR UPDATE and
+   `check_budget_limits_trigger` on INSERT), so de-duplication matters
+   independent of the gate.
+
+#### Decisions resolved by the user (2026-10-22 — do not re-litigate in Track D)
+
+1. **Quiet hours** → alerts still appear. Delivery policy is not data
+   retention; suppressing a push must not suppress the in-app record.
+   **Category disabled** → suppress both (an explicit opt-out is a data
+   decision, not a delivery one).
+2. **`zakat-autopilot` `last_notified_at`** (`app/api/zakat-autopilot/route.ts:86-95`)
+   → stamp on **any alert written**, not only on push success. It currently
+   consumes `delivered`, which is why it drifts when push is blocked.
+3. **Duplicate producers** → remove the direct inserts (edit 7). One write
+   path. Accepted consequence: alert **titles change** to the Edge Function's
+   push titles.
+
+Track D also has to re-check the two other `sent`-consumers — `alerted++` in
+`app/api/budget-alerts/route.ts:65-76`, and the `sent` surfaced to callers by
+`app/api/push-test/route.ts:39` and `app/api/push-send/route.ts:14` — since
+after these edits `sent` no longer implies "an alert was written".
