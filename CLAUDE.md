@@ -78,12 +78,16 @@ npm run dev              # Start Next.js dev server (port 3000)
 
 # Mobile (separate build system — no npm script)
 cd mobile/fajrak_flutter && make run   # or: flutter run
-cd mobile/fajrak_flutter && make test  # Flutter tests (186 tests)
+cd mobile/fajrak_flutter && make test  # Flutter tests (208 tests)
 
 # Testing
-npm test                 # Run Jest tests (626 tests / 71 suites in __tests__/)
+npm test                 # Run Jest tests (636 tests / 71 suites in __tests__/)
 npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
 npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
+
+# (Counts are current as of 2026-10-22 and verified in PROJECT_CONTEXT.md §4)
+# Re-measure with `npx jest --ci` and `flutter test`; both print the total.
+# Never copy these numbers into another doc — link to PROJECT_CONTEXT.md §4.
 
 # Database (Supabase CLI directly — not wrapped in npm scripts)
 npx supabase db push     # Apply migrations
