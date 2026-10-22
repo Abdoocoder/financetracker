@@ -1162,6 +1162,20 @@ commit.
 Also confirm no test reached the network: the run must complete in seconds, with
 no `SocketException` and no HTTP retries.
 
+> **What `alerts_screen_test.dart` does not cover (verified 2026-10-22):** none of
+> the 8 tests taps Generate and none mocks `http`, so `_generateAlerts` is never
+> executed. 8/8 proves **no regression in the surrounding screen** (filter tabs,
+> swipe-delete, read state, RTL); it does **not** prove the alert-generation
+> wiring. That path is verified manually: `make run-proxy` in one terminal,
+> `make run-web-with-proxy` in another, then DevTools → Network on a Generate
+> click. Expect a real production write — see
+> `docs/domain/ui-and-mobile.md:104-113`.
+>
+> **Baseline moved after this plan was written:** `flutter test` prints **208**
+> as of 2026-10-22 — `test/services/api_base_url_test.dart` added 2 tests
+> (`feat(mobile): make API origin configurable via --dart-define`). Task 6's
+> expected total is therefore 208, not 206 (8 stubs → 8 real tests keeps it flat).
+
 **Commit:** none (verification only).
 
 ---
@@ -1192,13 +1206,15 @@ No web counterpart is needed: the change is mobile-only and adds no new strings.
 ## Out of scope (tracked separately, do not do in this change)
 
 1. **Typed alert routing.** `_navigateAlert` / `_getActionType` route on Arabic
-   substrings (`alerts_screen.dart:161-175`, `:219-238`), which silently fails
+   substrings (`alerts_screen.dart:151-205`, `:207-238`), which silently fails
    for English content (`docs/domain/ui-and-mobile.md:98-102`). The durable fix is
    a typed field on the `alerts` row. This needs a migration + a web change and
    owner sign-off.
-2. **The `POST https://fajrak.com/api/alerts` call** (`alerts_screen.dart:130-136`)
-   has no test — it needs a session and a real endpoint. `docs/domain/ui-and-mobile.md:103-105`
-   notes that local builds hit production. Rule 13 of the repo's critical rules
+2. **The `POST {API_BASE_URL}/api/alerts` call** (`alerts_screen.dart:125-131`)
+   has no test — it needs a session and a real endpoint. `docs/domain/ui-and-mobile.md:104-113`
+   notes that the origin is configurable (default `https://fajrak.com`) but the
+   route writes through `createAdminClient()`, so local builds still write
+   production rows. Rule 13 of the repo's critical rules
    applies if a mock is ever written for it: verify against the live endpoint
    and paste the real response shape + verification date next to the fixture.
 3. **Per-item `ValueListenableBuilder` read state** (a true scoped rebuild

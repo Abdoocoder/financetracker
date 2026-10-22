@@ -53,7 +53,8 @@ stateful screen plus 5 stateless widgets in `lib/widgets/alerts/`:
   `message` (for example `ميزانية`, `دين`, `قسط`). English alert text falls through
   to `none` (no button) and no navigation. See §5.
 - **AI generator**: `_generateAlerts` POSTs the user's session token to
-  `https://fajrak.com/api/alerts`. The route (`app/api/alerts/route.ts`) is
+  `${defaultApiBaseUrl()}/api/alerts` (`lib/services/api_base_url.dart`; the
+  origin is overridable, see §5). The route (`app/api/alerts/route.ts`) is
   rule-based (income ratio, debt load, portfolio PnL, goal progress), not an LLM:
   it computes insights, then sends them through `sendPushToUser`, and the Edge
   Function writes them into `alerts`.
@@ -100,9 +101,16 @@ stateful screen plus 5 stateless widgets in `lib/widgets/alerts/`:
   alert category, will silently get no navigation and no action button. The durable
   fix is routing on a typed field instead of `title.contains(...)`; do not add more
   keyword branches without the owner's sign-off.
-- **Hardcoded origin**: the mobile AI generator calls
-  `https://fajrak.com/api/alerts` directly, so local/dev builds still hit production.
-  Be aware when testing the flow.
+- **Configurable API origin, but the write is still production**: the mobile
+  generator calls `${defaultApiBaseUrl()}/api/alerts`
+  (`lib/services/api_base_url.dart`): `--dart-define=API_BASE_URL` first, then
+  dotenv, then `https://fajrak.com`. `make run-web-with-proxy` sets it to
+  `http://localhost:33964`, where `dev_proxy.dart` forwards `/api/*` to
+  `https://fajrak.com` — the request travels through localhost but **still
+  executes against production**. `app/api/alerts/route.ts` uses
+  `createAdminClient()` + `generateAlerts(user.id)`, so pressing Generate in a
+  dev build writes real `alerts` rows for the logged-in user. Be aware when
+  testing the flow.
 - **Provider rebuilds**: `AppState.notifyListeners()` rebuilds every consumer
   (unread badge, theme, language). Alerts mutations must update `AppState` through
   `loadUnreadAlerts()` / `decrementUnreadAlerts()` / `clearUnreadAlerts()` after the
