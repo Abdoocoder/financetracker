@@ -43,6 +43,12 @@ jobs:
       # wasted ~30s and could rewrite the lockfile, defeating that guarantee.
       - run: npm ci
 
+      # PROJECT_CONTEXT.md §4 owns the test counts; this fails when the suites and
+      # the doc disagree. Jest half only — Flutter lives in the `mobile` job below,
+      # which is why the script is split by flag instead of run wholesale here.
+      - name: Validate test counts (web)
+        run: python3 scripts/validate_test_counts.py --web
+
       - name: Lint
         run: npm run lint
 
@@ -91,3 +97,10 @@ jobs:
       # preinstalled on ubuntu-latest.
       - name: Test
         run: flutter test
+
+      # Flutter half of the test-count guard. Runs here because this is the only
+      # job with a Flutter SDK. `working-directory` is reset to the repo root,
+      # which the job-level default (mobile/fajrak_flutter) would otherwise apply.
+      - name: Validate test counts (mobile)
+        working-directory: ${{ github.workspace }}
+        run: python3 scripts/validate_test_counts.py --flutter
