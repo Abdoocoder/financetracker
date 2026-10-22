@@ -1,12 +1,12 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Data access for the Alerts screen.
+/// طبقة الوصول للبيانات لشاشة التنبيهات.
 ///
-/// Every method talks to Supabase directly; RLS (golden rule 1) scopes the
-/// rows to `auth.uid()`. The class uses instance methods (not static ones) so
-/// tests can inject a fake subclass — same pattern as `ByokService`.
+/// كل تابع يتعامل مع Supabase مباشرة؛ وقاعدة RLS (القاعدة الذهبية 1) تقيّد
+/// الصفوف على `auth.uid()`. استُخدمت توابع instance (وليست static) حتى يتمكّن
+/// ملف الاختبار من حقن subclass وهمية — نفس نمط `ByokService`.
 class AlertsService {
-  /// Loads the user's alerts, newest first.
+  /// جلب تنبيهات المستخدم الحالي، الأحدث أولًا.
   Future<List<Map<String, dynamic>>> fetchAlerts() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return [];
@@ -18,6 +18,7 @@ class AlertsService {
     return List<Map<String, dynamic>>.from(data);
   }
 
+  /// تعليم تنبيه واحد كمقروء.
   Future<void> markRead(String id) async {
     await Supabase.instance.client
         .from('alerts')
@@ -25,6 +26,7 @@ class AlertsService {
         .eq('id', id);
   }
 
+  /// تعليم كل التنبيهات كمقروءة.
   Future<void> markAllRead() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
@@ -35,10 +37,12 @@ class AlertsService {
         .eq('is_read', false);
   }
 
+  /// حذف تنبيه واحد.
   Future<void> deleteAlert(String id) async {
     await Supabase.instance.client.from('alerts').delete().eq('id', id);
   }
 
+  /// حذف كل التنبيهات.
   Future<void> deleteAll() async {
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) return;
