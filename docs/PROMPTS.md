@@ -15,6 +15,13 @@ separates the two.
 
 ## Quote Test — Verification Pitfalls
 
+> ⚠️ **Two recipes originally suggested for this section were WRONG when
+> executed** (`tr -d '\n'` glues words; `grep -F "AppState through"` fails
+> because backticks are literal). They are preserved below as examples of
+> anti-patterns. **Only commands in the
+> [Command matrix](#command-matrix) table are safe to copy** — and those are
+> validated by `scripts/validate_prompts.py`.
+
 ### Pitfall 1: grep -F is line-based
 
 A multi-line quote (wrapped paragraph) will ALWAYS fail `grep -F`, even when
@@ -138,6 +145,13 @@ the wrong lesson.
 Verified 2026-10-21 against `docs/domain/ui-and-mobile.md` (the quote spans lines
 107-108) and against the fixtures described below. Every row is copy-pasteable and
 was executed; the exit code in the third column is the observed one.
+
+> Run `python3 scripts/validate_prompts.py` after editing this file.
+> Non-zero exit = a documented command no longer produces its
+> documented exit code.
+>
+> The same script re-checks the Pitfall commands and the worked example at the
+> end of this file, so a stale command anywhere in the document fails the run.
 
 | # | Command | Exit | Meaning |
 |---|---|---|---|
