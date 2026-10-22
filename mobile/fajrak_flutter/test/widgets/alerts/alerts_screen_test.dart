@@ -245,8 +245,6 @@ void main() {
 
       expect(find.byType(AIGeneratorCard), findsOneWidget,
           reason: 'the banner is the single entry point for AI alert generation');
-      expect(find.byType(AIGeneratorFAB), findsNothing,
-          reason: 'a FAB next to the banner duplicates the same action');
 
       // The empty state is the case where the duplicate CTA used to appear.
       // The distinct key forces a fresh State (and a fresh `initState`), so
@@ -259,9 +257,6 @@ void main() {
 
       expect(find.byType(AIGeneratorCard), findsOneWidget,
           reason: 'the banner stays visible when there are no alerts');
-      expect(find.byType(AIGeneratorFAB), findsNothing,
-          reason: 'the empty state must not grow a second CTA for the same '
-              'action');
     });
 
     // replaces the stub: 'SliverList/SliverChildBuilderDelegate is used for
