@@ -372,20 +372,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                         childCount: filtered.length,
                       ),
                     ),
-                  // Bottom padding for FAB space if needed
-                  const SliverToBoxAdapter(child: SizedBox(height: 80)),
                 ],
               ),
             ),
-      // FAB for AI Generator (alternative to banner)
-      floatingActionButton: _alerts.isNotEmpty
-          ? null
-          : AIGeneratorFAB(
-              generating: _generating,
-              onGenerate: _generateAlerts,
-              colorScheme: colorScheme,
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
