@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import '../../app_state.dart';
+import '../../services/alerts_service.dart';
 import '../../services/analytics_service.dart';
 import '../../utils/error_handler.dart';
 import '../../widgets/alerts/ai_generator_card.dart';
@@ -15,7 +16,11 @@ import '../../widgets/alerts/alert_header.dart';
 import '../../widgets/alerts/alert_list_item.dart';
 
 class AlertsScreen extends StatefulWidget {
-  const AlertsScreen({super.key});
+  const AlertsScreen({super.key, this.service});
+
+  // Data-access seam for tests. Accepted but not wired yet — the screen keeps
+  // its direct Supabase calls until Task 2.
+  final AlertsService? service;
 
   @override
   State<AlertsScreen> createState() => _AlertsScreenState();
@@ -35,9 +40,11 @@ class _AlertsScreenState extends State<AlertsScreen> {
   }
 
   Future<void> _load() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
     try {
+      // Guard inside the try so `finally` always clears `_loading` — otherwise a
+      // signed-out user stares at an endless spinner.
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
       final data = await Supabase.instance.client
           .from('alerts')
           .select('*')
