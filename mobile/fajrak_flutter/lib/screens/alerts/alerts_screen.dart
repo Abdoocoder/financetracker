@@ -18,8 +18,8 @@ import '../../widgets/alerts/alert_list_item.dart';
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key, this.service});
 
-  // Data-access seam for tests. Accepted but not wired yet — the screen keeps
-  // its direct Supabase calls until Task 2.
+  // Data-access seam for tests. Defaults to the real AlertsService; tests
+  // inject a fake subclass.
   final AlertsService? service;
 
   @override
@@ -32,6 +32,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
   String _filter = 'all';
   bool _generating = false;
 
+  /// Data-access seam: the real service in production, a fake in tests.
+  late final AlertsService _service = widget.service ?? AlertsService();
+
   @override
   void initState() {
     super.initState();
@@ -41,20 +44,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Future<void> _load() async {
     try {
-      // Guard inside the try so `finally` always clears `_loading` — otherwise a
-      // signed-out user stares at an endless spinner.
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) return;
-      final data = await Supabase.instance.client
-          .from('alerts')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', ascending: false);
+      final data = await _service.fetchAlerts();
       if (mounted) {
-        setState(() {
-          _alerts = List<Map<String, dynamic>>.from(data);
-          _loading = false;
-        });
+        setState(() => _alerts = data);
       }
     } catch (e, st) {
       if (mounted) ErrorHandler.handle(e, st: st, context: context, developerMessage: 'Load Alerts');
@@ -64,14 +56,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
   }
 
   Future<void> _markAllRead() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
     try {
-      await Supabase.instance.client
-          .from('alerts')
-          .update({'is_read': true})
-          .eq('user_id', user.id)
-          .eq('is_read', false);
+      await _service.markAllRead();
       if (mounted) {
         setState(() {
           for (var a in _alerts) {
@@ -87,9 +73,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Future<void> _markRead(String id) async {
     try {
-      await Supabase.instance.client
-          .from('alerts')
-          .update({'is_read': true}).eq('id', id);
+      await _service.markRead(id);
       if (mounted) {
         setState(() {
           final idx = _alerts.indexWhere((a) => a['id'].toString() == id);
@@ -103,10 +87,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
   }
 
   Future<void> _deleteAll() async {
-    final user = Supabase.instance.client.auth.currentUser;
-    if (user == null) return;
     try {
-      await Supabase.instance.client.from('alerts').delete().eq('user_id', user.id);
+      await _service.deleteAll();
       if (mounted) {
         setState(() => _alerts.clear());
         context.read<AppState>().clearUnreadAlerts();
@@ -118,7 +100,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   Future<void> _deleteAlert(String id) async {
     try {
-      await Supabase.instance.client.from('alerts').delete().eq('id', id);
+      await _service.deleteAlert(id);
       if (mounted) {
         setState(() => _alerts.removeWhere((a) => a['id'].toString() == id));
         context.read<AppState>().loadUnreadAlerts();
