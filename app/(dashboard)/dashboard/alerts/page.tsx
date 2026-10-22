@@ -220,7 +220,7 @@ export default function AlertsPage() {
 
   const filterTabs: { key: 'all' | 'unread' | 'warning' | 'achievement'; label: string }[] = [
     { key: 'all', label: lang === 'en' ? `All (${alerts.length})` : `الكل (${alerts.length})` },
-    { key: 'unread', label: lang === 'en' ? `Unread (${unreadCount})` : `غير مقروء (${unreadCount})` },
+    { key: 'unread', label: t('alerts_unread_count').replace('{}', String(unreadCount)) },
     { key: 'warning', label: lang === 'en' ? '⚠️ Warnings' : '⚠️ تحذيرات' },
     { key: 'achievement', label: lang === 'en' ? '🏆 Achievements' : '🏆 إنجازات' },
   ]
@@ -246,7 +246,7 @@ export default function AlertsPage() {
             <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{alerts.length} تنبيه</span>
             {unreadCount > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full font-bold badge-red">
-                {unreadCount} غير مقروء
+                {t('alerts_unread_count').replace('{}', String(unreadCount))}
               </span>
             )}
           </div>
