@@ -331,7 +331,6 @@
   "budget_insight_goal_near": "You are about to achieve your {} goal! ({} remaining)",
   "alerts_title": "Alerts",
   "alerts_count": "{} Alerts",
-  "alerts_unread_count": "{} Unread",
   "alerts_mark_all_read": "Mark all as read",
   "alerts_delete_all": "Delete all",
   "alerts_ai_title": "Smart Financial Assistant",

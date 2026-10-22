@@ -24,6 +24,25 @@ notes and version-bump commits; see the note on links at the end of this file.
 
 - **Zakat live prices on Web**: the metal-price fallback crashed silently (`TypeError` at `fb['gold']`) because `freegoldapi.com/data/latest.json` serves a JSON array of historical records (gold only, ~8 months stale) — not the `{"gold","silver"}` map the code expected. The fallback now uses `api.gold-api.com` (CORS-enabled, live gold + silver, USD/troy-oz → per-gram). Also decoupled the exchange-rate fetch from the Yahoo `Future.wait`: previously any Yahoo failure (always, on Web, due to CORS) discarded the real FX rate and forced `usdRate = 1.0`, producing wrong-currency zakat amounts. Regression test rewritten against the real endpoint shapes.
 - **Web debug boot (Sentry)**: fixed the `Zone mismatch` assertion on `flutter run -d chrome` — on Web, Sentry runs `appRunner` inside `runZonedGuarded`, so the Flutter binding is now initialized there (and on native as before) instead of the root zone before Sentry init.
+- **Alerts screen (mobile)**: signed-out users no longer see an infinite
+  spinner. `_load()` used to return before its `try/finally`, so `_loading`
+  never cleared; the guard is now inside the `try` and `finally` always
+  clears the flag. The load logic now lives in `AlertsService.fetchAlerts`.
+
+### Changed
+
+- **Alerts screen (mobile)**: the AI alert generator is a single compact
+  banner — the duplicate floating button (previously shown next to the
+  banner when the list was empty) and its 80 px spacer are gone. The unread
+  counter pill was removed because the "unread" filter tab already shows
+  the same number. The screen's data access moved into `AlertsService`. The
+  8 placeholder widget tests (all `expect(true, isTrue)`) are replaced by
+  real behavioural tests.
+
+### Removed
+
+- `alerts_unread_count` (mobile `ar.json` / `en.json`) — the label for the
+  deleted `AlertHeader`; no longer referenced in code.
 
 ## [3.45.0+64] - 2026-10-19
 
