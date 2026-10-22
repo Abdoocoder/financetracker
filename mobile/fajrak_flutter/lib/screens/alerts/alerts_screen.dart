@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import '../../app_state.dart';
 import '../../services/alerts_service.dart';
 import '../../services/analytics_service.dart';
+import '../../services/api_base_url.dart';
 import '../../utils/error_handler.dart';
 import '../../widgets/alerts/ai_generator_card.dart';
 import '../../widgets/alerts/alert_actions.dart';
@@ -115,8 +116,14 @@ class _AlertsScreenState extends State<AlertsScreen> {
       final session = Supabase.instance.client.auth.currentSession;
       if (session == null) throw Exception('No session');
 
+      // Origin comes from API_BASE_URL (see services/api_base_url.dart):
+      // production by default, the local dev proxy under
+      // `make run-web-with-proxy` so the browser request never needs CORS.
+      // NOTE: this writes real rows to whichever environment the JWT
+      // belongs to. Under make run-web-with-proxy, a dev Generate click
+      // creates production alerts for the current user.
       final response = await http.post(
-        Uri.parse('https://fajrak.com/api/alerts'),
+        Uri.parse('${defaultApiBaseUrl()}/api/alerts'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${session.accessToken}',
