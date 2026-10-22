@@ -56,10 +56,12 @@ When running `flutter run -d chrome`, the app runs on `http://localhost:33963` a
 
 ### Solution 2: Use Development Proxy (Alternative)
 ```bash
-make run-web-proxy
+make run-web-with-proxy
 ```
 
-This starts a local proxy on port 33964 that forwards requests to Supabase with proper CORS headers.
+This starts a local proxy on port 33964 that forwards `/api/*` to
+`https://fajrak.com` and everything else to Supabase, with CORS headers your
+browser will accept. It needs `make run-proxy` running in another terminal.
 
 ## 🏃 Running the App
 
@@ -77,8 +79,8 @@ flutter run -d <device_id>
 # Basic web run (requires Supabase CORS fix)
 make run-web
 
-# With CORS proxy (workaround)
-make run-web-proxy
+# With CORS proxy (run `make run-proxy` in another terminal first)
+make run-web-with-proxy
 ```
 
 ### Web with Custom Environment
