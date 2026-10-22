@@ -15,6 +15,13 @@ const String _webApiUrl = 'https://fajrak.com';
 const int _proxyPort = 33964; // Proxy runs on this port
 const int _flutterPort = 33963; // Flutter web runs on this port
 
+/// Fallback for requests that carry no `Access-Control-Request-Headers` hint
+/// (simple/non-preflight requests). Preflights are answered by echoing the
+/// browser's own list — see [_addCorsHeaders].
+const String _defaultAllowHeaders = 'Content-Type, Authorization, apikey, '
+    'x-client-info, x-supabase-api-version, accept-profile, content-profile, '
+    'prefer, range';
+
 void main(List<String> args) async {
   print('🚀 Starting Fajrak Development Proxy');
   print('   Supabase URL: $_supabaseUrl');
@@ -117,16 +124,43 @@ void main(List<String> args) async {
 /// also sets `Allow-Credentials: true` — the wildcard made every browser
 /// response unusable. Echoing the caller keeps the pair legal; `Vary: Origin`
 /// stops a cache from replaying one origin's response to another.
+///
+/// `Access-Control-Allow-Headers` is **echoed** from the browser's
+/// `Access-Control-Request-Headers`, not matched against a whitelist. The
+/// Supabase SDKs keep adding request headers (`x-supabase-api-version`, `Range`,
+/// `Prefer`, `accept-profile`, …); a fixed list fails the preflight the first
+/// time one appears, and the browser only reports "Request header field X is
+/// not allowed" — which reads like a bug in whatever request you were making,
+/// not in the proxy.
 void _addCorsHeaders(HttpRequest request) {
   final response = request.response;
   final origin =
       request.headers.value('origin') ?? 'http://localhost:$_flutterPort';
   response.headers.set('Access-Control-Allow-Origin', origin);
-  response.headers.set('Vary', 'Origin');
   response.headers.set(
       'Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers',
-      'Content-Type, Authorization, apikey, x-client-info');
+
+  // `headers[...]` (not `.value`) because `.value` throws on a repeated header,
+  // and a 500 on OPTIONS is indistinguishable from a CORS policy rejection.
+  final requested = request.headers['access-control-request-headers']
+      ?.join(',')
+      .replaceAll(RegExp(r'[\r\n]'), '')
+      .trim();
+  response.headers.set(
+    'Access-Control-Allow-Headers',
+    (requested != null && requested.isNotEmpty)
+        ? requested
+        : _defaultAllowHeaders,
+  );
+
+  // Response headers the SDKs actually read. CORS filters these out unless they
+  // are exposed: gotrue selects the modern `code` error field only when it can
+  // see x-supabase-api-version (gotrue/src/fetch.dart:76), and postgrest reads
+  // content-range for `.count()`.
+  response.headers.set('Access-Control-Expose-Headers',
+      'content-range, etag, x-supabase-api-version, x-total-count');
+
+  response.headers.set('Vary', 'Origin, Access-Control-Request-Headers');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
   response.headers.set('Access-Control-Max-Age', '86400');
 }
