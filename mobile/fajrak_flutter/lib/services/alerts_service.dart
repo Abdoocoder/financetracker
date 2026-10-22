@@ -1,31 +1,47 @@
-/// خدمة التنبيهات — طبقة الوصول للبيانات لشاشة التنبيهات.
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+/// Data access for the Alerts screen.
 ///
-/// الاستعلامات الحقيقية تُضاف في Task 2. حتى ذلك الحين يرمي كل تابع
-/// `UnimplementedError` عمدًا حتى يتمكّن ملف الاختبار من التصريف وتُظهر
-/// جولة Task 1 (RED) رسائل تأكيد حقيقية بدل خطأ "تعذّر تحميل الملف".
+/// Every method talks to Supabase directly; RLS (golden rule 1) scopes the
+/// rows to `auth.uid()`. The class uses instance methods (not static ones) so
+/// tests can inject a fake subclass — same pattern as `ByokService`.
 class AlertsService {
-  /// جلب تنبيهات المستخدم الحالي
+  /// Loads the user's alerts, newest first.
   Future<List<Map<String, dynamic>>> fetchAlerts() async {
-    throw UnimplementedError('not implemented yet — Task 2');
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return [];
+    final data = await Supabase.instance.client
+        .from('alerts')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(data);
   }
 
-  /// تعليم تنبيه واحد كمقروء
   Future<void> markRead(String id) async {
-    throw UnimplementedError('not implemented yet — Task 2');
+    await Supabase.instance.client
+        .from('alerts')
+        .update({'is_read': true})
+        .eq('id', id);
   }
 
-  /// تعليم كل التنبيهات كمقروءة
   Future<void> markAllRead() async {
-    throw UnimplementedError('not implemented yet — Task 2');
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+    await Supabase.instance.client
+        .from('alerts')
+        .update({'is_read': true})
+        .eq('user_id', user.id)
+        .eq('is_read', false);
   }
 
-  /// حذف تنبيه واحد
   Future<void> deleteAlert(String id) async {
-    throw UnimplementedError('not implemented yet — Task 2');
+    await Supabase.instance.client.from('alerts').delete().eq('id', id);
   }
 
-  /// حذف كل التنبيهات
   Future<void> deleteAll() async {
-    throw UnimplementedError('not implemented yet — Task 2');
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+    await Supabase.instance.client.from('alerts').delete().eq('user_id', user.id);
   }
 }
