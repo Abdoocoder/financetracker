@@ -99,6 +99,8 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 | Source | Web (Jest) | Flutter | Playwright | Coverage |
 |---|---|---|---|---|
+> ⚠️ **SUPERSEDED (2026-10-22):** The test counts below (626/186) are outdated. See `PROJECT_CONTEXT.md` §4 for the authoritative counts.
+
 | **Current (verified 2026-10-21)** | **626 / 71 suites** | **186** | 7 specs | 44.85% stmts (last measured) |
 | `AUDIT_REPORT.md` (historical) | **561** | **135** | **7 specs** | — |
 | `DEEP_PROJECT_ANALYSIS.md` | **524 / 56 suites** | — | 7/7 (~46.5s) | **44.85% stmts** / 30.78% branch / 30.7% funcs / 48.07% lines |
