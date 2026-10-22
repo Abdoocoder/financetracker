@@ -178,11 +178,11 @@ def main():
           'grep -Pzo "Alerts mutations must update [\\x60]?AppState[\\x60]? through" "$F"')
 
     # Pitfall 3 prose
-    claim("P3 fragment matches and prints line 107", "0",
+    claim("P3 fragment matches and prints line 115", "0",
           'grep -n -F "Alerts mutations must update" "$F"',
-          stdout_has="107:  (unread badge, theme, language). Alerts mutations must update `AppState` through")
-    claim("P3 sed range reads 107-108", "0",
-          "sed -n '107,108p' \"$F\"", stdout_has="`loadUnreadAlerts()` / `decrementUnreadAlerts()`")
+          stdout_has="115:  (unread badge, theme, language). Alerts mutations must update `AppState` through")
+    claim("P3 sed range reads 115-116", "0",
+          "sed -n '115,116p' \"$F\"", stdout_has="`loadUnreadAlerts()` / `decrementUnreadAlerts()`")
 
     print()
     print(f"RESULT: {passed} passed, {failed} failed")

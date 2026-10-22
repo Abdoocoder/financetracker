@@ -1,3 +1,5 @@
+> ⚠️ **STOP:** Before reading this file, you MUST read `AGENTS.md` and `PROJECT_CONTEXT.md`. This is mandatory for all agents.
+
 # FinanceTracker (Fajrak) - Project Context
 
 ## Overview
