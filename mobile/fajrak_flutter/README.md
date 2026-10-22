@@ -232,6 +232,71 @@ lib/
 | macOS    | ⚠️     |
 | Windows  | ⚠️     |
 
+### Linux desktop build
+
+The `sentry_flutter` plugin vendors the `sentry-native` C++ SDK and builds it via CMake on
+the Linux target. That CMake step requires the **libcurl and zlib development packages** —
+the runtime packages alone are not enough, and the failure looks unrelated to Sentry.
+
+There are two distinct error signatures. They have different causes, and fixing one does
+not fix the other.
+
+**1. The development package is missing entirely**
+
+```
+Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR AsynchDNS)
+```
+
+No `curl/curl.h`, no link-time `libcurl.so`, no `libcurl.pc`.
+
+**2. The library was found but the feature list is empty**
+
+```
+Could NOT find CURL (missing: AsynchDNS) (found version "8.18.0")
+```
+
+`CURL_INCLUDE_DIR` and `CURL_LIBRARY` were already cached from an earlier configure, but
+`pkg-config` could not resolve `libcurl`, so CMake fell back to `curl-config` — which the
+runtime package does not ship. Cached values hide the real problem, so the build reports
+only the missing feature.
+
+Install the prerequisites once per machine:
+
+```bash
+cd mobile/fajrak_flutter
+make setup-linux        # clang cmake ninja-build pkg-config libgtk-3-dev \
+                        # libstdc++-12-dev liblzma-dev libcurl4-openssl-dev zlib1g-dev
+```
+
+or directly:
+
+```bash
+sudo apt-get install -y libcurl4-openssl-dev zlib1g-dev
+```
+
+Verify the install:
+
+```bash
+pkg-config --variable=supported_features libcurl | tr ' ' '\n' | grep -x AsynchDNS
+command -v curl-config
+```
+
+Both commands must succeed. Then drop the stale cache — a failed configure keeps the
+resolved paths:
+
+```bash
+rm -rf build/linux
+```
+
+> Do not work around this by exporting a hand-extracted libcurl prefix through
+> `PKG_CONFIG_PATH`. It only works in shells that export it, and every other terminal
+> reproduces signature 2 above.
+
+> `sentry_flutter` 8.14.2 vendors `sentry-native` 0.7.20, which still contains
+> `find_package(CURL REQUIRED COMPONENTS AsynchDNS)`. Upstream removed that check in
+> `sentry-native` 0.8.5 ([PR #1206](https://github.com/getsentry/sentry-native/pull/1206)),
+> so upgrading `sentry_flutter` to 9.x/10.x drops the requirement altogether.
+
 ## 🤝 Contributing
 
 1. Follow `flutter_lints` style guide

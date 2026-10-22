@@ -7,6 +7,18 @@
 - **Android SDK.** `mobile/fajrak_flutter/android/app/build.gradle.kts` sets `targetSdk = flutter.targetSdkVersion` (Flutter-pinned; the migration to target SDK 35 is recorded in `CHANGELOG.md` under `[3.42.2+57]`).
 - **Supabase CLI 2.116.0** (`supabase --version` on 2026-10-18).
 - **JDK 17 or newer.**
+- **Linux desktop build deps** (only for `flutter run -d linux` / `flutter build linux`):
+  `sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev liblzma-dev libcurl4-openssl-dev zlib1g-dev`.
+  The last two are required by the `sentry_flutter` plugin, which vendors `sentry-native`
+  and builds it via CMake with `find_package(CURL REQUIRED COMPONENTS AsynchDNS)`. Without the
+  *development* packages the build fails with `Could NOT find CURL (missing: CURL_LIBRARY
+  CURL_INCLUDE_DIR AsynchDNS)`. `cd mobile/fajrak_flutter && make setup-linux` installs the
+  full list; `libcurl4-openssl-dev` also pulls the whole `Requires.private` chain that
+  `libcurl.pc` declares, so no extra packages are needed.
+  If you see `Could NOT find CURL (missing: AsynchDNS) (found version "8.18.0")` instead,
+  the `CURL_*` values are stale in `build/linux/x64/debug/CMakeCache.txt` — install the dev
+  package, then `rm -rf build/linux` and rebuild. See the Linux desktop section of
+  `mobile/fajrak_flutter/README.md`.
 
 ## Setup
 

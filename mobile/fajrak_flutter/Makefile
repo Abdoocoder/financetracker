@@ -1,6 +1,6 @@
 # Fajrak Flutter Development Makefile
 
-.PHONY: help setup run run-web run-web-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
+.PHONY: help setup setup-linux run run-web run-web-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
 
 # ── Shared --dart-define flags, read from .env at recipe run time ──
 # IMPORTANT: keep this as `=` (recursive expansion), NOT `:=`.
@@ -28,6 +28,7 @@ help:
 	@echo ""
 	@echo "Setup:"
 	@echo "  make setup          - Install dependencies and configure environment"
+	@echo "  make setup-linux    - Install Linux desktop build prerequisites (apt)"
 	@echo ""
 	@echo "Development:"
 	@echo "  make run            - Run on connected device/emulator (includes Sentry)"
@@ -57,6 +58,24 @@ setup:
 		echo "📝 Created .env from .env.example - please edit with your credentials"; \
 	fi
 	@echo "✅ Setup complete!"
+
+# Install Linux desktop build prerequisites.
+# Needed for `flutter run -d linux` / `flutter build linux`.
+# The toolchain list is Flutter's own Linux desktop requirement; libcurl4-openssl-dev
+# and zlib1g-dev are required by the sentry_flutter plugin, which vendors sentry-native
+# via CMake (sentry-native -> find_package(CURL REQUIRED COMPONENTS AsynchDNS)).
+# Without the *development* package the configure step fails with:
+#   Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR AsynchDNS)
+# After installing, delete the stale configure cache before rebuilding:
+#   rm -rf build/linux
+setup-linux:
+	@echo "🔧 Installing Linux desktop build prerequisites..."
+	sudo apt-get update -y
+	sudo apt-get install -y \
+		clang cmake ninja-build pkg-config \
+		libgtk-3-dev libstdc++-12-dev liblzma-dev \
+		libcurl4-openssl-dev zlib1g-dev
+	@echo "✅ Linux desktop prerequisites installed"
 
 # Run on device/emulator (NOW INCLUDES DART_DEFINES + SENTRY_DEFINE)
 run:

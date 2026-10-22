@@ -22,6 +22,26 @@ notes and version-bump commits; see the note on links at the end of this file.
 
 ### Fixed
 
+- **Linux desktop build (mobile)**: `flutter run -d linux` / `flutter build linux` failed at
+  the CMake configure step. Two signatures were hit:
+  - `Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR AsynchDNS)` — only the
+    libcurl **runtime** package (`libcurl4t64`) was installed: no `curl/curl.h`, no
+    link-time `libcurl.so`, no `libcurl.pc`.
+  - `Could NOT find CURL (missing: AsynchDNS) (found version "8.18.0")` — the same root
+    cause after a partial fix, masked by `CURL_*` values already cached in
+    `build/linux/x64/debug/CMakeCache.txt`. `pkg-config` could not resolve `libcurl`, so
+    CMake fell back to `curl-config`, which the runtime package does not ship.
+
+  Cause: the `sentry_flutter` plugin vendors `sentry-native` and builds it via CMake, and that build
+  calls `find_package(CURL REQUIRED COMPONENTS AsynchDNS)`. Fix: install the development
+  packages (`libcurl4-openssl-dev`, `zlib1g-dev` — the former pulls the whole
+  `Requires.private` chain through apt) and delete `build/linux` so the stale cache is
+  discarded. Added `make setup-linux` in `mobile/fajrak_flutter/Makefile` to install the
+  full Linux desktop toolchain, prerequisite and troubleshooting docs in
+  `mobile/fajrak_flutter/README.md`, and a prerequisites bullet in `CONTRIBUTING.md`.
+  Upstream removed the compile-time `AsynchDNS` check in `sentry-native` 0.8.5
+  ([PR #1206](https://github.com/getsentry/sentry-native/pull/1206)); our vendored copy is
+  0.7.20, so only `sentry_flutter` 9.x/10.x removes the requirement entirely.
 - **Zakat live prices on Web**: the metal-price fallback crashed silently (`TypeError` at `fb['gold']`) because `freegoldapi.com/data/latest.json` serves a JSON array of historical records (gold only, ~8 months stale) — not the `{"gold","silver"}` map the code expected. The fallback now uses `api.gold-api.com` (CORS-enabled, live gold + silver, USD/troy-oz → per-gram). Also decoupled the exchange-rate fetch from the Yahoo `Future.wait`: previously any Yahoo failure (always, on Web, due to CORS) discarded the real FX rate and forced `usdRate = 1.0`, producing wrong-currency zakat amounts. Regression test rewritten against the real endpoint shapes.
 - **Web debug boot (Sentry)**: fixed the `Zone mismatch` assertion on `flutter run -d chrome` — on Web, Sentry runs `appRunner` inside `runZonedGuarded`, so the Flutter binding is now initialized there (and on native as before) instead of the root zone before Sentry init.
 - **Alerts screen (mobile)**: signed-out users no longer see an infinite
