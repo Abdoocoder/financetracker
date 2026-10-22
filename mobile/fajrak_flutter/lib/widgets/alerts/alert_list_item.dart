@@ -116,6 +116,7 @@ class AlertListItem extends StatelessWidget {
                         ),
                         if (!isRead)
                           Container(
+                            key: const Key('alert-unread-dot'),
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
