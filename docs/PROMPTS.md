@@ -6,6 +6,12 @@
 > **Audience:** agents and reviewers working in this repo.
 > **Purpose:** record verification traps that produce false accusations, so a failed
 > tool call is never mistaken for a fabricated quote.
+>
+> **Re-verified 2026-10-22:** `docs/domain/ui-and-mobile.md` shifted by +8 lines, so the
+> worked example now anchors at **114-116** (was 106-108). **Line numbers drift — the
+> fragment is the stable key.** Re-derive the number with `grep -n` before trusting any
+> number written here, and bump these anchors (plus `scripts/validate_prompts.py`) when
+> the target file moves.
 
 Lessons are appended here as they are learned. Each section names the tool call that
 returns a false negative, the call that replaces it, and the observable that
@@ -31,8 +37,8 @@ verbatim. This is a false negative, NOT fabrication.
 
 ```bash
 # 1. Locate the line number, then read the range — always works.
-grep -n -F "Alerts mutations must update" file.md   # → 107
-sed -n '107,108p' file.md                            # eyeball the range
+grep -n -F "Alerts mutations must update" file.md   # → 115
+sed -n '115,116p' file.md                            # eyeball the range
 
 # 2. Or match across the break in one call. -z makes the file one record,
 #    -P enables PCRE, and [ \t]*\n[ \t]* bridges exactly one line break
@@ -42,7 +48,7 @@ grep -Pzo "Alerts mutations must update \`AppState\` through[ \t]*\n[ \t]*\`load
 ```
 
 **Observed:** this quote is verbatim in `docs/domain/ui-and-mobile.md` but spans
-lines 107-108:
+lines 115-116:
 
 ```text
 Alerts mutations must update `AppState` through `loadUnreadAlerts()`
@@ -118,12 +124,12 @@ grep -n -F "Alerts mutations must update" file.md
 exits **0** and prints:
 
 ```text
-107:  (unread badge, theme, language). Alerts mutations must update `AppState` through
+115:  (unread badge, theme, language). Alerts mutations must update `AppState` through
 ```
 
 The fragment sits at the tail of a longer line that also carries a bullet prefix.
 The `-n` variant returns the line number, so the surrounding range can be read
-directly with `sed -n '107,108p'`.
+directly with `sed -n '115,116p'`.
 
 ### Rule of thumb
 
@@ -143,7 +149,7 @@ the wrong lesson.
 ## Command matrix
 
 Verified 2026-10-21 against `docs/domain/ui-and-mobile.md` (the quote spans lines
-107-108) and against the fixtures described below. Every row is copy-pasteable and
+115-116) and against the fixtures described below. Every row is copy-pasteable and
 was executed; the exit code in the third column is the observed one.
 
 > Run `python3 scripts/validate_prompts.py` after editing this file.
@@ -160,7 +166,7 @@ was executed; the exit code in the third column is the observed one.
 | 3 | `grep -Pzo "alpha beta\.[ \t]*\n[ \t]*gamma delta" "$GAP"` | 1 | Correctly rejects a paragraph gap |
 | 4 | `grep -Fq "Alerts mutations must update AppState through" "$F"` | 1 | **False negative** — backticks are literal |
 | 5 | `tr -d '\140' < "$F" \| grep -Fq "Alerts mutations must update AppState through"` | 0 | Backticks stripped, single-line fragment |
-| 6 | `grep -n -F "Alerts mutations must update" "$F"` | 0 | Fragment search, prints line `107` |
+| 6 | `grep -n -F "Alerts mutations must update" "$F"` | 0 | Fragment search, prints line `115` |
 | 7 | ``rg -U -F "Alerts mutations must update \`AppState\` through \`loadUnreadAlerts()\`" "$F"`` | 1 | `-U` does not join lines |
 | 8 | `rg -U -F $'Alerts mutations must update \x60AppState\x60 through\n  \x60loadUnreadAlerts()\x60' "$F"` | 0 | Matches when the pattern carries the newline |
 | 9 | ``tr '\n' ' ' < "$F" \| grep -Fq "Alerts mutations must update \`AppState\` through \`loadUnreadAlerts()\`"`` | 1 | Translate keeps the indent: 3 spaces, not 1 |
@@ -196,19 +202,19 @@ The worked example above uses a real line from this repo: `docs/domain/ui-and-mo
 section 5, "Provider rebuilds". The source reads:
 
 ```text
-106: - **Provider rebuilds**: `AppState.notifyListeners()` rebuilds every consumer
-107:   (unread badge, theme, language). Alerts mutations must update `AppState` through
-108:   `loadUnreadAlerts()` / `decrementUnreadAlerts()` / `clearUnreadAlerts()` after the
+114: - **Provider rebuilds**: `AppState.notifyListeners()` rebuilds every consumer
+115:   (unread badge, theme, language). Alerts mutations must update `AppState` through
+116:   `loadUnreadAlerts()` / `decrementUnreadAlerts()` / `clearUnreadAlerts()` after the
 ```
 
-The full sentence has all three pitfalls at once — it wraps across 107-108, it
+The full sentence has all three pitfalls at once — it wraps across 115-116, it
 carries backticks around `AppState` and `loadUnreadAlerts()`, and its first clause is
-preceded by a bullet prefix on line 106. That makes it a good regression case.
+preceded by a bullet prefix on line 114. That makes it a good regression case.
 
 ```bash
 F=docs/domain/ui-and-mobile.md
 
-# Pitfall 1 — exits 1: the sentence is wrapped across lines 107-108
+# Pitfall 1 — exits 1: the sentence is wrapped across lines 115-116
 grep -Fq "Alerts mutations must update \`AppState\` through \`loadUnreadAlerts()\`" "$F"
 
 # Pitfall 1 corrected — exits 0
@@ -225,5 +231,5 @@ grep -Pzo "Alerts mutations must update [\x60]?AppState[\x60]? through[ \t]*\n[ 
 
 # Pitfall 3 — exits 0, prints the line number so the range can be read
 grep -n -F "Alerts mutations must update" "$F"
-sed -n '107,108p' "$F"
+sed -n '115,116p' "$F"
 ```

@@ -22,6 +22,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # Docs rot silently: PROMPTS.md's line anchors drifted by 8 lines and
+      # nothing caught it because these validators only ever ran locally.
+      # Guard them here so a moved anchor fails CI instead of misleading an
+      # agent mid-investigation. ripgrep is preinstalled on ubuntu-latest, but
+      # install it explicitly so the validators never depend on that staying true.
+      - name: Run Prompts Validator
+        run: |
+          sudo apt-get update && sudo apt-get install -y ripgrep
+          python3 scripts/validate_prompts.py
+          python3 scripts/render_check_prompts.py
+
       - uses: actions/setup-node@v5
         with:
           node-version: 22
