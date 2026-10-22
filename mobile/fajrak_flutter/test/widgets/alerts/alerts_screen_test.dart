@@ -9,7 +9,6 @@ import 'package:fajrak/screens/alerts/alerts_screen.dart';
 import 'package:fajrak/services/alerts_service.dart';
 import 'package:fajrak/widgets/alerts/ai_generator_card.dart';
 import 'package:fajrak/widgets/alerts/alert_filter_tabs.dart';
-import 'package:fajrak/widgets/alerts/alert_header.dart';
 import 'package:fajrak/widgets/alerts/alert_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -147,9 +146,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AlertFilterTabs), findsOneWidget);
-      expect(find.byType(AlertHeader), findsNothing,
-          reason: 'the unread count is already shown by the "unread" filter '
-              'badge; a second pill is a duplicate of the same number');
       expect(
         find.descendant(
           of: find.byType(AlertFilterTabs),

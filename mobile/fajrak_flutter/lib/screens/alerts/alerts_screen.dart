@@ -12,7 +12,6 @@ import '../../utils/error_handler.dart';
 import '../../widgets/alerts/ai_generator_card.dart';
 import '../../widgets/alerts/alert_actions.dart';
 import '../../widgets/alerts/alert_filter_tabs.dart';
-import '../../widgets/alerts/alert_header.dart';
 import '../../widgets/alerts/alert_list_item.dart';
 
 class AlertsScreen extends StatefulWidget {
@@ -315,16 +314,6 @@ class _AlertsScreenState extends State<AlertsScreen> {
                         achievementCount: achievementCount,
                         motivationCount: motivationCount,
                         onFilterChanged: (v) => setState(() => _filter = v),
-                        colorScheme: colorScheme,
-                      ),
-                    ),
-                  ),
-                  // Unread indicator (only shows when there are unread)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: AlertHeader(
-                        unreadCount: unreadCount,
                         colorScheme: colorScheme,
                       ),
                     ),
