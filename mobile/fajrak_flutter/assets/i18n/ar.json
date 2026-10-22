@@ -331,7 +331,6 @@
   "budget_insight_goal_near": "أنت على وشك تحقيق هدف {}! ({} متبقي)",
   "alerts_title": "التنبيهات",
   "alerts_count": "{} تنبيه",
-  "alerts_unread_count": "{} غير مقروء",
   "alerts_mark_all_read": "تحديد الكل كمقروء",
   "alerts_delete_all": "حذف الكل",
   "wealth_expected_yield": "العائد السنوي المتوقع",
