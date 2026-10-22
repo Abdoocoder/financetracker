@@ -110,7 +110,7 @@ stateful screen plus 5 stateless widgets in `lib/widgets/alerts/`:
   executes against production**. `app/api/alerts/route.ts` uses
   `createAdminClient()` + `generateAlerts(user.id)`, so pressing Generate in a
   dev build writes real `alerts` rows for the logged-in user. Be aware when
-  testing the flow.
+  testing the flow. (CORS header whitelist issue resolved in `7a900477`.)
 - **Provider rebuilds**: `AppState.notifyListeners()` rebuilds every consumer
   (unread badge, theme, language). Alerts mutations must update `AppState` through
   `loadUnreadAlerts()` / `decrementUnreadAlerts()` / `clearUnreadAlerts()` after the
