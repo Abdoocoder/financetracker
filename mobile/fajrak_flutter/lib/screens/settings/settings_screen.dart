@@ -1,5 +1,6 @@
 import '../../utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -152,6 +153,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 12),
                   const TestimonialCard(),
                   const SizedBox(height: 40),
+                  if (kDebugMode)
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          throw StateError("SENTRY VERIFICATION TEST — safe to ignore");
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('🚨 Trigger Sentry Test Crash'),
+                      ),
+                    ),
+                  const SizedBox(height: 16),
                   Center(
                     child: Text(
                       '🌄 — $_appVersion',
