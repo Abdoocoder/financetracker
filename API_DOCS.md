@@ -106,6 +106,15 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 - **بيئة العمل:** `BYOK_PRIVATE_KEY` (خاص، خادم فقط) + `NEXT_PUBLIC_BYOK_PUBLIC_KEY` + `NEXT_PUBLIC_BYOK_KEK_ID` (عام، آمن للمتصفح) — وضّح في `.env.example`.
 - **التسجيل:** بلا مفاتيح — `bodyBytes` + `bodySha256` فقط، لا يَرصد رؤوس المصادقة أبداً؛ النواتج التفصيلية (نص الطلب الممرَّر وتوقيت إتلاف المفتاح) معطّلة افتراضياً وتُفعَّل بـ `BYOK_PROXY_DEBUG=true`.
 
+### 9. وكيل BYOK مع أدوات (`/api/byok/agent`)
+حلقة وكيل على الخادم (المرحلة 2) تشارك المصادقة والغلاف والتحديد مع `/api/byok/proxy`، لكنها تملك الحلقة بدل تمرير البايتات الأصلية.
+- **النموذج:** POST — `{ providerId, keyId, env, payload, model, systemPrompt?, messages: [{role, content}], confirmation? }`؛ الاستجابة `text/event-stream` بأحداث موحّدة: `delta` / `trace` / `tool_result` / `confirmation_required` / `error` / `done` (الأخير دائماً).
+- **القراءة:** أدوات القراءة (`get_financial_snapshot`, `get_spending_breakdown`) تُنفَّذ فوراً بجلسة المستخدم نفسه (`auth.uid() = user_id`) — لا `service_role`.
+- **الكتابة:** أدوات الكتابة (`create_transaction`) **لا تُنفَّذ** باقتراح النموذج؛ تُعاد `confirmation_required` بوسائطها الدقيقة، ولا يُكتب شيء حتى يعيد العميل `confirmation: { tool, args }` بعد موافقة المستخدم الصريحة.
+- **الحدود:** 3 جولات نموذج كحد أقصى (`iteration_limit`)، ورسائل `user`/`assistant` فقط (لا `system`/`tool` من العميل)، و`maxDuration = 120`.
+- **التسجيل:** `api_audit_log` لكل استدعاء أداة (`action` = اسم الأداة، `apiKeyId = null`) — بلا مفاتيح أو رؤوس مصادقة.
+- **المزوّدون:** `kind === 'proxy'` فقط؛ المزوّدون المباشرون (Ollama) يبقون على مسارهم الحالي.
+
 ---
 
 ## 📋 القائمة الكاملة لنقاط الاتصال المكتشفة
@@ -129,6 +138,7 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 | `/api/webhook/transaction` | قراءة/إنشاء المعاملات عبر PAT (REST) |
 | `/api/mcp` | خادم MCP المالي (Streamable HTTP) |
 | `/api/byok/proxy` | وكيل LLM BYOK الرفيع (Feature A) |
+| `/api/byok/agent` | حلقة وكيل خادمية بأدوات مالية + بوابة تأكيد للكتابة (المرحلة 2) |
 
 ---
 
@@ -172,6 +182,7 @@ Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each 
 | `/api/budget-alerts` | POST | cron (`CRON_SECRET`) |
 | `/api/byok/config` | GET | public (runtime BYOK config + RSA public key) |
 | `/api/byok/proxy` | POST | authenticated (Bearer session token) |
+| `/api/byok/agent` | POST | authenticated (Bearer session token) |
 | `/api/confirm` | GET | public (email/sensitive-operation confirmation link) |
 | `/api/daily-reminder` | GET | cron (`CRON_SECRET`) |
 | `/api/evening-reminder` | GET | cron (`CRON_SECRET`) |

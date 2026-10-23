@@ -32,10 +32,12 @@ class _FakeByokService extends ByokService {
   _FakeByokService();
 
   int chatCalls = 0;
+  int agentCalls = 0;
   String? capturedProviderId;
   String? capturedKeyId;
   List<ChatMsg>? capturedMessages;
   String? capturedModel;
+  Map<String, dynamic>? capturedConfirmation;
   bool stopWasRequested = false;
   String errorCode = '';
   Completer<void>? release;
@@ -72,6 +74,63 @@ class _FakeByokService extends ByokService {
     }
     stopWasRequested = isStopped?.call() ?? false;
   }
+
+  /// Proxy providers now go through `/api/byok/agent`; this fake mirrors the
+  /// server's normalized event stream so the screen's trace/confirmation
+  /// rendering can be exercised without a network.
+  @override
+  Future<void> chatAgent({
+    required String providerId,
+    String? keyId,
+    String systemPrompt = '',
+    required List<ChatMsg> messages,
+    String? model,
+    Map<String, dynamic>? confirmation,
+    required void Function(AgentEvent) onEvent,
+    bool Function()? isStopped,
+    Duration? stallTimeout,
+  }) async {
+    agentCalls++;
+    capturedProviderId = providerId;
+    capturedKeyId = keyId;
+    capturedMessages = messages;
+    capturedModel = model;
+    capturedConfirmation = confirmation;
+    if (errorCode.isNotEmpty) {
+      throw ByokChatException(errorCode);
+    }
+    if (confirmation != null) {
+      // Confirmed turn: the server executes the write and finishes with text.
+      onEvent(const AgentEvent(type: 'delta', text: 'Saved'));
+      onEvent(const AgentEvent(type: 'done'));
+      return;
+    }
+    if (agentEvents.isNotEmpty) {
+      // Emit the first event, hold until [release] completes, then the rest —
+      // so tests can observe the in-flight trace / confirmation state.
+      onEvent(agentEvents.first);
+      if (release != null) {
+        await release!.future;
+      }
+      for (final event in agentEvents.skip(1)) {
+        onEvent(event);
+      }
+      return;
+    }
+    if (deltas.isNotEmpty) {
+      onEvent(AgentEvent(type: 'delta', text: deltas.first));
+    }
+    if (release != null) {
+      await release!.future;
+    }
+    for (final d in deltas.skip(1)) {
+      onEvent(AgentEvent(type: 'delta', text: d));
+    }
+    stopWasRequested = isStopped?.call() ?? false;
+  }
+
+  /// When set, replaces the default delta stream (e.g. trace or confirmation).
+  List<AgentEvent> agentEvents = const [];
 }
 
 Widget _app(Widget child) {
@@ -116,6 +175,18 @@ IconButton _sendIcon(WidgetTester tester) => tester.widget<IconButton>(
         matching: find.byType(IconButton),
       ),
     );
+
+Future<void> _selectProvider(WidgetTester tester, String label) async {
+  final providerDropdown = find.descendant(
+    of: find.byWidgetPredicate(
+        (w) => w is InputDecorator && w.decoration.labelText == 'Provider'),
+    matching: find.byType(DropdownButton<String>),
+  );
+  await tester.tap(providerDropdown);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label).last);
+  await tester.pumpAndSettle();
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -249,13 +320,148 @@ void main() {
     await tester.tap(find.byIcon(Icons.send_rounded));
     await tester.pump();
 
-    expect(service.chatCalls, 1);
+    expect(service.agentCalls, 1);
     expect(service.capturedProviderId, 'openai');
     expect(service.capturedKeyId, 'k-openai');
 
     service.release!.complete();
     await tester.pump();
     expect(find.text('Sure!'), findsOneWidget);
+  });
+
+  testWidgets('agent turn shows the tool trace while a tool runs',
+      (tester) async {
+    final service = _FakeByokService()
+      ..release = Completer<void>()
+      ..agentEvents = const [
+        AgentEvent(
+            type: 'trace', tool: 'get_spending_breakdown', status: 'running'),
+        AgentEvent(type: 'delta', text: 'طعامك'),
+        AgentEvent(
+            type: 'trace', tool: 'get_spending_breakdown', status: 'done'),
+        AgentEvent(type: 'done'),
+      ];
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-openai', providerId: 'openai', keyName: 'My OpenAI'),
+      ]),
+    );
+    await _selectProvider(tester, 'OpenAI');
+    await tester.enterText(find.byType(TextField).last, 'كم صرفت على الطعام؟');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.pump();
+
+    // The agent route is used for proxy providers, not the direct chat path.
+    expect(service.agentCalls, 1);
+    expect(service.chatCalls, 0);
+    expect(find.text('Checking your spending breakdown…'), findsOneWidget);
+
+    service.release!.complete();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Checking your spending breakdown…'), findsNothing);
+    expect(find.text('طعامك'), findsOneWidget);
+  });
+
+  testWidgets('a write tool pauses for confirmation and executes on confirm',
+      (tester) async {
+    final service = _FakeByokService()
+      ..agentEvents = const [
+        AgentEvent(
+          type: 'confirmation_required',
+          tool: 'create_transaction',
+          args: {'type': 'expense', 'amount': 120.5, 'category': 'food'},
+        ),
+        AgentEvent(type: 'done'),
+      ];
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-openai', providerId: 'openai', keyName: 'My OpenAI'),
+      ]),
+    );
+    await _selectProvider(tester, 'OpenAI');
+    await tester.enterText(find.byType(TextField).last, 'أضف مصروف 120.5 طعام');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Confirm this action'), findsOneWidget);
+    expect(find.text('Action: New transaction'), findsOneWidget);
+    expect(find.text('Amount'), findsOneWidget);
+    expect(find.text('Category'), findsOneWidget);
+    expect(find.text('Nothing is saved until you confirm.'), findsOneWidget);
+    expect(service.capturedConfirmation, isNull);
+
+    await tester.tap(find.widgetWithText(FilledButton, 'Confirm'));
+    await tester.pumpAndSettle();
+
+    expect(service.agentCalls, 2);
+    expect(service.capturedConfirmation!['tool'], 'create_transaction');
+    final args = service.capturedConfirmation!['args'] as Map<String, dynamic>;
+    expect(args['amount'], 120.5);
+    expect(args['category'], 'food');
+    expect(find.text('Confirm this action'), findsNothing);
+    expect(find.text('Saved'), findsOneWidget);
+  });
+
+  testWidgets('cancelling a paused write saves nothing and shows a notice',
+      (tester) async {
+    final service = _FakeByokService()
+      ..agentEvents = const [
+        AgentEvent(
+          type: 'confirmation_required',
+          tool: 'create_transaction',
+          args: {'amount': 120.5, 'category': 'food'},
+        ),
+        AgentEvent(type: 'done'),
+      ];
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-openai', providerId: 'openai', keyName: 'My OpenAI'),
+      ]),
+    );
+    await _selectProvider(tester, 'OpenAI');
+    await tester.enterText(find.byType(TextField).last, 'أضف مصروف');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Confirm this action'), findsNothing);
+    expect(find.text('Action cancelled — nothing was saved.'), findsOneWidget);
+    expect(service.agentCalls, 1);
+    expect(service.capturedConfirmation, isNull);
+  });
+
+  testWidgets('a failed tool shows the tool error banner', (tester) async {
+    final service = _FakeByokService()
+      ..agentEvents = const [
+        AgentEvent(type: 'trace', tool: 'get_budget', status: 'running'),
+        AgentEvent(type: 'tool_result', tool: 'get_budget', ok: false),
+        AgentEvent(type: 'done'),
+      ];
+    await _pumpApp(
+      tester,
+      _screen(service, keys: const [
+        ChatKeyRow(id: 'k-openai', providerId: 'openai', keyName: 'My OpenAI'),
+      ]),
+    );
+    await _selectProvider(tester, 'OpenAI');
+    await tester.enterText(find.byType(TextField).last, 'ميزانيتي؟');
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.send_rounded));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.text('The assistant could not complete that step. Try again.'),
+        findsOneWidget);
+    expect(find.text('Working with get_budget…'), findsNothing);
   });
 
   testWidgets('switching provider reselects that provider key and disables send',

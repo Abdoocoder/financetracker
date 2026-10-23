@@ -167,3 +167,43 @@ export async function byokChat(options: ByokChatOptions): Promise<Response> {
 }
 
 export { BYOK_PROXY_LIMIT_PER_MIN }
+
+export interface ByokAgentOptions {
+  providerId: string
+  providerKey: string
+  model: string
+  systemPrompt: string
+  /** Conversation so far — text only; the server owns tool history. */
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  /** User approval for a paused write tool (from a `confirmation_required` event). */
+  confirmation?: { tool: string; args: Record<string, unknown> }
+  signal?: AbortSignal
+  keyId?: string
+}
+
+/**
+ * Encrypt the provider key and run one agent turn through `/api/byok/agent`.
+ * The server owns the tool loop and answers with normalized SSE events — read
+ * them with `readAgentStream` from `lib/byok/chat`.
+ */
+export async function byokAgent(options: ByokAgentOptions): Promise<Response> {
+  const envelope = await buildEnvelope(options.providerKey, options.keyId)
+
+  return fetch('/api/byok/agent', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      providerId: options.providerId,
+      keyId: envelope.keyId,
+      env: envelope.env,
+      payload: envelope.payload,
+      model: options.model,
+      systemPrompt: options.systemPrompt,
+      messages: options.messages,
+      confirmation: options.confirmation,
+    }),
+    signal: options.signal,
+    // Session cookie rides along automatically.
+    credentials: 'same-origin',
+  })
+}

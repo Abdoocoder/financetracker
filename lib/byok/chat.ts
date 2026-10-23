@@ -8,6 +8,10 @@
  * can be unit-tested without a browser.
  */
 
+import { parseAgentEvent, type AgentEvent } from '@/lib/agent/events'
+
+export type { AgentEvent }
+
 export interface ChatMsg {
   role: 'user' | 'assistant'
   content: string
@@ -100,6 +104,36 @@ export async function readStream(
       } catch {
         // malformed frame — skip
       }
+    }
+  }
+}
+
+/**
+ * Consume the agent route's normalized SSE stream (`/api/byok/agent`).
+ * Unlike `readStream`, frames already carry `{ type, ... }` — the server owns
+ * provider parsing. Malformed/unknown frames are skipped.
+ */
+export async function readAgentStream(
+  res: Response,
+  onEvent: (event: AgentEvent) => void
+): Promise<void> {
+  if (!res.body) throw new Error('No response body')
+  const reader = res.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    buffer += decoder.decode(value, { stream: true })
+    const lines = buffer.split('\n')
+    buffer = lines.pop() ?? ''
+    for (const raw of lines) {
+      const line = raw.trim()
+      if (!line.startsWith('data:')) continue
+      const data = line.slice(5).trim()
+      if (!data) continue
+      const event = parseAgentEvent(data)
+      if (event) onEvent(event)
     }
   }
 }

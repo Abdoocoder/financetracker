@@ -53,6 +53,26 @@ Older docs say "7 providers"; the code defines **6** — trust the code and fix 
   (runbook `byok-proxy-sse-stalled.md`).
 - System prompt with user financial context is injected server-side (`lib/byok/system-prompt.ts`).
 
+### Agent route (`/api/byok/agent` — Phase 2)
+
+Same auth, envelope, KEK and rate-limit path as the proxy, but the server **owns the
+loop** instead of relaying bytes:
+
+- Input: `{providerId, keyId, env, payload, model, systemPrompt?, messages, confirmation?}`;
+  output: normalized SSE (`delta`, `trace`, `tool_result`, `confirmation_required`,
+  `error`, `done` — always last). Contract: `lib/agent/events.ts`.
+- `lib/agent/loop.ts` is pure/testable (injected `callModel` / `executeTool` / `getTool`),
+  bounded to **3 model turns**; `lib/agent/providers.ts` normalizes OpenAI-compatible,
+  Anthropic and Gemini request bodies + streamed/JSON tool calls.
+- **Read tools** (`get_financial_snapshot`, `get_spending_breakdown`) execute as the
+  signed-in user through the RLS session client — never service-role.
+- **Write tools** (`create_transaction`) never execute on the model's say-so: the loop
+  returns `confirmation_required` with the exact args, and only a client-sent
+  `confirmation: {tool, args}` (after explicit user approval) executes it with
+  `confirmed: true`. `create_transaction` also enforces `confirmed` itself.
+- Client-direct providers (Ollama) are rejected here and keep the direct path; the proxy
+  route is unchanged for plain chat.
+
 ## 5. MCP server (`app/api/mcp/route.ts`)
 
 - Transport: Streamable HTTP (MCP SDK), methods GET/POST/DELETE/OPTIONS.
@@ -75,6 +95,10 @@ Older docs say "7 providers"; the code defines **6** — trust the code and fix 
 - Chat UI: `screens/chat/chat_screen.dart` (provider/model selector, streaming bubbles);
   web counterpart `app/(dashboard)/dashboard/chat/` + `components/dashboard/ChatAssistant`.
 - The mobile proxy path uses the same `/api/byok/proxy` route — there is no second backend.
+- Proxy-provider chat goes through `/api/byok/agent` on both clients (`ByokService.chatAgent`);
+  `services/byok/chat.dart` mirrors the web SSE event contract (`AgentEvent`, `readAgentStream`),
+  and `chat_screen.dart` renders the tool trace + confirmation card. Ollama stays on the
+  client-direct path.
 
 ## 7. Known wording/compliance gap
 

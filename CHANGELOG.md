@@ -18,6 +18,16 @@ notes and version-bump commits; see the note on links at the end of this file.
 
 ### Added
 
+- **Agentic AI (Phase 2)**: server-side agent loop at `/api/byok/agent`. The route owns a
+  bounded (3 model turns) `model → tool → model` loop over `lib/agent/tools.ts`. Read tools
+  (`get_financial_snapshot`, `get_spending_breakdown`) execute as the signed-in user through
+  RLS; write tools (`create_transaction`) never run on the model's say-so — the stream pauses
+  with `confirmation_required` and the write executes only after the user approves the exact
+  args. Web chat and the Flutter chat screen now show a live tool trace (e.g. "Checking your
+  spending breakdown…") and a confirmation card with Confirm/Cancel; strings are localized in
+  both locales. Provider request/stream shapes are normalized in `lib/agent/providers.ts`, and
+  `/api/byok/proxy` is unchanged for plain chat. Client-direct providers (Ollama) keep their
+  existing direct path.
 - **Observability**: Sentry Flutter integrated for mobile crash reporting (app-init + global ErrorHandler, PII filtered in `beforeSend`; skipped gracefully when no `SENTRY_DSN` is provided).
 
 ### Fixed
