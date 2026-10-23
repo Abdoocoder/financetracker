@@ -5,10 +5,10 @@ import { useUser } from '@/lib/user-context'
 import { useI18n } from '@/lib/i18n'
 import { createClient } from '@/lib/supabase/client'
 import { useAccounts } from '@/hooks/useAccounts'
-import { SUPPORTED_PROVIDERS, type ByokProvider } from '@/lib/byok/providers'
-import { byokChat } from '@/lib/byok/client'
+import { SUPPORTED_PROVIDERS } from '@/lib/byok/providers'
+import { byokAgent } from '@/lib/byok/client'
 import { getProviderKey, hasProviderKey, isVaultUnavailable } from '@/lib/byok/vault'
-import { buildChatBody, readStream, type ChatMsg } from '@/lib/byok/chat'
+import { buildChatBody, readAgentStream, readStream, type ChatMsg } from '@/lib/byok/chat'
 import { buildChatFormatRules } from '@/lib/byok/system-prompt'
 import { formatAmount } from '@/lib/currency'
 
@@ -19,11 +19,40 @@ interface ByokKeyRow {
     hasKey?: boolean
 }
 
+interface PendingConfirmation {
+    tool: string
+    args: Record<string, unknown>
+}
+
 const PROVIDERS = Object.values(SUPPORTED_PROVIDERS)
+
+/** Tool name → trace line. Unknown tools fall back to `chat_trace_generic`. */
+const TRACE_KEYS: Record<string, string> = {
+    get_spending_breakdown: 'chat_trace_spending',
+    get_financial_snapshot: 'chat_trace_snapshot',
+    create_transaction: 'chat_trace_transaction',
+}
+
+/** Tool name → human label shown on the confirmation card. */
+const TOOL_LABEL_KEYS: Record<string, string> = {
+    get_spending_breakdown: 'chat_tool_spending',
+    get_financial_snapshot: 'chat_tool_snapshot',
+    create_transaction: 'chat_tool_transaction',
+}
+
+/** Confirmation card rows, in display order. */
+const CONFIRM_FIELDS: ReadonlyArray<readonly [string, string]> = [
+    ['type', 'chat_confirm_type'],
+    ['amount', 'chat_confirm_amount'],
+    ['currency', 'chat_confirm_currency'],
+    ['category', 'chat_confirm_category'],
+    ['transaction_date', 'chat_confirm_date'],
+    ['description', 'chat_confirm_description'],
+]
 
 export default function ChatAssistant() {
     const { user, profile } = useUser()
-    const { t } = useI18n()
+    const { t, tCategory } = useI18n()
     const supabase = useMemo(() => createClient(), [])
     const { totalBalance, loading: balancesLoading } = useAccounts(user?.id)
 
@@ -36,6 +65,9 @@ export default function ChatAssistant() {
     const [input, setInput] = useState('')
     const [sending, setSending] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [notice, setNotice] = useState<string | null>(null)
+    const [trace, setTrace] = useState<string | null>(null)
+    const [pending, setPending] = useState<PendingConfirmation | null>(null)
     const [vaultUnavailable, setVaultUnavailable] = useState(false)
     const abortRef = useRef<AbortController | null>(null)
     const bottomRef = useRef<HTMLDivElement | null>(null)
@@ -115,7 +147,7 @@ export default function ChatAssistant() {
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages, sending])
+    }, [messages, sending, trace, pending])
 
     const systemPrompt = useMemo(() => {
         const parts = [t('chat_financial_context')]
@@ -132,6 +164,163 @@ export default function ChatAssistant() {
         return `${base}\n\n${rules}`
     }, [t, balancesLoading, totalBalance, monthly, currency])
 
+    const appendDelta = useCallback((delta: string) => {
+        setMessages(prev => {
+            const copy = [...prev]
+            const last = copy[copy.length - 1]
+            if (last && last.role === 'assistant') {
+                copy[copy.length - 1] = { role: 'assistant', content: last.content + delta }
+            }
+            return copy
+        })
+    }, [])
+
+    const dropEmptyAssistant = useCallback(() => {
+        setMessages(prev => {
+            const copy = [...prev]
+            if (copy.length && copy[copy.length - 1].content === '') copy.pop()
+            return copy
+        })
+    }, [])
+
+    const showError = useCallback((code: string) => {
+        if (code === 'no-key') setError(t('chat_error_no_key'))
+        else if (code === 'unauthorized') setError(t('chat_error_unauthorized'))
+        else if (code === 'gone') setError(t('chat_error_gone'))
+        else if (code === 'ollama-cors') setError(t('chat_error_ollama_cors'))
+        else if (code === 'rate_limited') setError(t('chat_error_rate_limited'))
+        else if (code === 'iteration_limit') setError(t('chat_error_loop'))
+        else if (code === 'invalid_args' || code === 'invalid_confirmation' || code === 'tool') {
+            setError(t('chat_error_tool'))
+        } else setError(t('chat_error_generic'))
+    }, [t])
+
+    /** Agent route (proxy providers): the server owns the tools + write gate. */
+    const runAgentTurn = useCallback(async (
+        history: ChatMsg[],
+        confirmation?: PendingConfirmation
+    ) => {
+        if (!provider || !selectedKey) return
+        setSending(true)
+        setError(null)
+        setNotice(null)
+        setTrace(null)
+        setPending(null)
+
+        const abort = new AbortController()
+        abortRef.current = abort
+        let failed = false
+
+        try {
+            setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+            const providerKey = await getProviderKey(selectedKey.id)
+            if (!providerKey) throw new Error('no-key')
+
+            const res = await byokAgent({
+                providerId: provider.id,
+                providerKey,
+                model: model || provider.defaultModel,
+                systemPrompt,
+                messages: history,
+                confirmation,
+                signal: abort.signal,
+            })
+
+            if (abort.signal.aborted) return
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) throw new Error('unauthorized')
+                if (res.status === 429) throw new Error('rate_limited')
+                throw new Error('generic')
+            }
+
+            await readAgentStream(res, event => {
+                switch (event.type) {
+                    case 'delta':
+                        appendDelta(event.text)
+                        break
+                    case 'trace':
+                        setTrace(event.status === 'running' ? event.tool : null)
+                        break
+                    case 'tool_result':
+                        setTrace(null)
+                        if (!event.ok) {
+                            failed = true
+                            setError(t('chat_error_tool'))
+                        }
+                        break
+                    case 'confirmation_required':
+                        // Paused — nothing was written. The card asks the user.
+                        setTrace(null)
+                        setPending({ tool: event.tool, args: event.args })
+                        break
+                    case 'error':
+                        failed = true
+                        setTrace(null)
+                        showError(event.code)
+                        break
+                    case 'done':
+                        setTrace(null)
+                        break
+                }
+            })
+
+            if (failed) dropEmptyAssistant()
+        } catch (err) {
+            if (abort.signal.aborted) return
+            showError(err instanceof Error ? err.message : 'generic')
+            dropEmptyAssistant()
+        } finally {
+            setSending(false)
+            setTrace(null)
+            abortRef.current = null
+        }
+    }, [provider, selectedKey, model, systemPrompt, appendDelta, dropEmptyAssistant, showError, t])
+
+    /** Ollama local — direct from the browser (no proxy, no key, no tools). */
+    const runDirectTurn = useCallback(async (history: ChatMsg[]) => {
+        if (!provider) return
+        setSending(true)
+        setError(null)
+        setNotice(null)
+        setTrace(null)
+        setPending(null)
+
+        const abort = new AbortController()
+        abortRef.current = abort
+
+        try {
+            setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+
+            const body = buildChatBody(provider, systemPrompt, history, model || provider.defaultModel, true)
+            const url = provider.baseUrl.endsWith('/v1')
+                ? `${provider.baseUrl}/chat/completions`
+                : provider.baseUrl
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: abort.signal,
+            })
+
+            if (abort.signal.aborted) return
+            if (!res.ok) {
+                if (res.status === 401 || res.status === 403) throw new Error('unauthorized')
+                // Upstream model/endpoint retired (e.g. NVIDIA NIM returns 410 Gone).
+                if (res.status === 410) throw new Error('gone')
+                throw new Error('ollama-cors')
+            }
+
+            await readStream(res, provider.id, appendDelta)
+        } catch (err) {
+            if (abort.signal.aborted) return
+            showError(err instanceof Error ? err.message : 'generic')
+            dropEmptyAssistant()
+        } finally {
+            setSending(false)
+            abortRef.current = null
+        }
+    }, [provider, systemPrompt, model, appendDelta, dropEmptyAssistant, showError])
+
     const send = useCallback(async () => {
         const text = input.trim()
         if (!text || sending) return
@@ -145,83 +334,24 @@ export default function ChatAssistant() {
         const nextMessages = [...messages, userMsg]
         setMessages(nextMessages)
         setInput('')
-        setSending(true)
         setError(null)
+        setNotice(null)
+        setPending(null)
 
-        const abort = new AbortController()
-        abortRef.current = abort
+        if (provider.kind === 'clientDirect') await runDirectTurn(nextMessages)
+        else await runAgentTurn(nextMessages)
+    }, [input, sending, provider, selectedKey, messages, t, runAgentTurn, runDirectTurn])
 
-        try {
-            const assistantMsg: ChatMsg = { role: 'assistant', content: '' }
-            setMessages(prev => [...prev, assistantMsg])
-            const appendDelta = (delta: string) => {
-                setMessages(prev => {
-                    const copy = [...prev]
-                    const last = copy[copy.length - 1]
-                    if (last && last.role === 'assistant') {
-                        copy[copy.length - 1] = { role: 'assistant', content: last.content + delta }
-                    }
-                    return copy
-                })
-            }
+    /** User approved the paused write — execute it and let the model finish. */
+    const confirmPending = useCallback(async () => {
+        if (!pending || sending) return
+        await runAgentTurn(messages, { tool: pending.tool, args: pending.args })
+    }, [pending, sending, messages, runAgentTurn])
 
-            const history = nextMessages
-            const body = buildChatBody(provider, systemPrompt, history, model || provider.defaultModel, true)
-
-            let res: Response
-            if (provider.kind === 'clientDirect') {
-                // Ollama local — direct from the browser (no proxy, no key).
-                const url = provider.baseUrl.endsWith('/v1')
-                    ? `${provider.baseUrl}/chat/completions`
-                    : provider.baseUrl
-                res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body),
-                    signal: abort.signal,
-                })
-            } else {
-                const providerKey = await getProviderKey(selectedKey!.id)
-                if (!providerKey) throw new Error('no-key')
-                res = await byokChat({
-                    providerId: provider.id,
-                    providerKey,
-                    body,
-                    stream: true,
-                    signal: abort.signal,
-                })
-            }
-
-            if (abort.signal.aborted) return
-            if (!res.ok) {
-                if (res.status === 401 || res.status === 403) throw new Error('unauthorized')
-                // Upstream model/endpoint retired (e.g. NVIDIA NIM returns 410 Gone).
-                if (res.status === 410) throw new Error('gone')
-                // Proxy 502 → upstream rejected the malformed body; show generic + CORS hint for ollama.
-                if (provider.kind === 'clientDirect') throw new Error('ollama-cors')
-                throw new Error('generic')
-            }
-
-            await readStream(res, provider.id, appendDelta)
-        } catch (err) {
-            if (abort.signal.aborted) return
-            const code = err instanceof Error ? err.message : 'generic'
-            if (code === 'no-key') setError(t('chat_error_no_key'))
-            else if (code === 'unauthorized') setError(t('chat_error_unauthorized'))
-            else if (code === 'gone') setError(t('chat_error_gone'))
-            else if (code === 'ollama-cors') setError(t('chat_error_ollama_cors'))
-            else setError(t('chat_error_generic'))
-            // Drop the empty assistant bubble on failure so the user can retry.
-            setMessages(prev => {
-                const copy = [...prev]
-                if (copy.length && copy[copy.length - 1].content === '') copy.pop()
-                return copy
-            })
-        } finally {
-            setSending(false)
-            abortRef.current = null
-        }
-    }, [input, sending, provider, selectedKey, messages, systemPrompt, model, t])
+    const cancelPending = useCallback(() => {
+        setPending(null)
+        setNotice(t('chat_confirm_cancelled'))
+    }, [t])
 
     const stop = useCallback(() => {
         abortRef.current?.abort()
@@ -230,7 +360,25 @@ export default function ChatAssistant() {
     const clear = useCallback(() => {
         setMessages([])
         setError(null)
+        setNotice(null)
+        setTrace(null)
+        setPending(null)
     }, [])
+
+    /** Render one confirmation-card value without trusting the model's shape. */
+    const renderConfirmValue = useCallback((field: string, value: unknown): string => {
+        if (value == null || value === '') return '—'
+        if (field === 'type') {
+            return value === 'income' ? t('trans_income') : t('trans_expense')
+        }
+        if (field === 'amount') {
+            const n = Number(value)
+            return Number.isFinite(n) ? formatAmount(n, currency) : String(value)
+        }
+        if (field === 'category') return tCategory(String(value))
+        if (field === 'transaction_date') return String(value)
+        return String(value)
+    }, [t, tCategory, currency])
 
     const greeting: ChatMsg[] = messages.length
         ? messages
@@ -322,6 +470,28 @@ export default function ChatAssistant() {
                         {m.content || (sending ? <span style={{ color: 'var(--text-muted)' }}>{t('chat_thinking')}</span> : '')}
                     </div>
                 ))}
+                {trace && (
+                    <div
+                        aria-live="polite"
+                        style={{
+                            alignSelf: 'flex-start',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            padding: '8px 12px',
+                            borderRadius: 14,
+                            fontSize: 12,
+                            color: 'var(--text-muted)',
+                            background: 'var(--bg-elevated)',
+                            border: '1px dashed var(--border)',
+                        }}
+                    >
+                        <span aria-hidden="true">⏳</span>
+                        <span>
+                            {t(TRACE_KEYS[trace] ?? 'chat_trace_generic', { tool: trace })}
+                        </span>
+                    </div>
+                )}
                 {messages.length === 0 && !sending && (
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', marginTop: 8 }}>
                         {t('chat_context_label')}: {t('chat_context_included')}
@@ -329,6 +499,64 @@ export default function ChatAssistant() {
                 )}
                 <div ref={bottomRef} />
             </div>
+
+            {pending && (
+                <div
+                    role="group"
+                    aria-label={t('chat_confirm_title')}
+                    style={{
+                        marginTop: 10,
+                        padding: 14,
+                        borderRadius: 16,
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--accent-blue)',
+                    }}
+                >
+                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>
+                        {t('chat_confirm_title')}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {t('chat_confirm_tool', {
+                            tool: t(TOOL_LABEL_KEYS[pending.tool] ?? 'chat_tool_generic'),
+                        })}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 14px', marginTop: 10, fontSize: 13 }}>
+                        {CONFIRM_FIELDS.filter(([field]) => pending.args[field] != null && pending.args[field] !== '').map(([field, labelKey]) => (
+                            <div key={field} style={{ display: 'contents' }}>
+                                <span style={{ color: 'var(--text-muted)' }}>{t(labelKey)}</span>
+                                <span style={{ color: 'var(--text-primary)' }}>{renderConfirmValue(field, pending.args[field])}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
+                        {t('chat_confirm_hint')}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                        <button
+                            onClick={confirmPending}
+                            disabled={sending}
+                            aria-label={t('chat_confirm_yes')}
+                            style={{ background: 'var(--accent-blue)', color: 'var(--text-primary)', border: 'none', borderRadius: 12, padding: '8px 18px', cursor: sending ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13 }}
+                        >
+                            {t('chat_confirm_yes')}
+                        </button>
+                        <button
+                            onClick={cancelPending}
+                            disabled={sending}
+                            aria-label={t('chat_confirm_no')}
+                            style={{ background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 12, padding: '8px 16px', cursor: sending ? 'not-allowed' : 'pointer', fontSize: 13 }}
+                        >
+                            {t('chat_confirm_no')}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {notice && (
+                <div style={{ fontSize: 12, color: 'var(--text-muted)', padding: '8px 12px', background: 'var(--bg-elevated)', borderRadius: 12, marginTop: 8 }}>
+                    {notice}
+                </div>
+            )}
 
             {error && (
                 <div style={{ fontSize: 12, color: 'var(--accent-red-light)', padding: '8px 12px', background: 'var(--accent-red-dim)', borderRadius: 12, marginTop: 8 }}>⚠️ {error}</div>

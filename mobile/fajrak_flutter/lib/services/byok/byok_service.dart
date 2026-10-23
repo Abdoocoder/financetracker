@@ -123,6 +123,103 @@ class ByokService {
     );
   }
 
+  /// Run one agent turn through `/api/byok/agent` (proxy providers only).
+  ///
+  /// The server owns the tool loop and streams normalized [AgentEvent]s:
+  /// `delta` (assistant text), `trace` (tool running), `tool_result`,
+  /// `confirmation_required` (a write tool was paused for approval), `error`
+  /// and a terminal `done`. Pass [confirmation] back — exactly as received —
+  /// to execute a paused write and finish the turn.
+  ///
+  /// Throws [ByokChatException] for pre-stream failures (`no-key`,
+  /// `unauthorized`, `rate-limit`, `timeout`, `generic`).
+  Future<void> chatAgent({
+    required String providerId,
+    String? keyId,
+    String systemPrompt = '',
+    required List<ChatMsg> messages,
+    String? model,
+    Map<String, dynamic>? confirmation,
+    required void Function(AgentEvent) onEvent,
+    bool Function()? isStopped,
+    Duration? stallTimeout,
+  }) async {
+    final provider = getProvider(providerId);
+    if (provider == null || provider.isClientDirect) {
+      throw const ByokChatException('generic');
+    }
+    final resolvedKeyId = keyId ?? provider.id;
+    final resolvedModel = model ?? provider.defaultModel;
+    final resolvedStallTimeout = stallTimeout ?? stallTimeoutFor(provider.id);
+
+    final rawKey = await _vault.getProviderKey(resolvedKeyId);
+    if (rawKey == null || rawKey.isEmpty) {
+      throw const ByokChatException('no-key');
+    }
+
+    final config = await _envelopeConfig();
+    final envelope = await buildEnvelope(
+      rawKey,
+      keyId: config.keyId,
+      publicKeyPem: config.publicKeyPem,
+    );
+
+    final token = await _tokenProvider();
+    if (token == null || token.isEmpty) {
+      throw const ByokChatException('unauthorized');
+    }
+
+    final proxyBody = <String, dynamic>{
+      'providerId': provider.id,
+      'keyId': envelope.keyId,
+      'env': envelope.env,
+      'payload': envelope.payload,
+      'model': resolvedModel,
+      'systemPrompt': systemPrompt,
+      'messages':
+          messages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+      if (confirmation != null) 'confirmation': confirmation,
+    };
+
+    final base = _proxyBaseUrl.replaceAll(RegExp(r'/+$'), '');
+    final request = http.Request('POST', Uri.parse('$base/api/byok/agent'))
+      ..headers['content-type'] = 'application/json'
+      ..headers['accept'] = 'text/event-stream'
+      ..headers['authorization'] = 'Bearer $token'
+      ..body = jsonEncode(proxyBody);
+
+    http.StreamedResponse res;
+    try {
+      res = await _http.send(request);
+    } on TimeoutException {
+      if (isStopped?.call() ?? false) return;
+      throw const ByokChatException('timeout');
+    }
+
+    final errorCode = _mapProxyStatus(res.statusCode);
+    if (errorCode != null) {
+      if (errorCode == 'generic') {
+        await _logProxyFailure(res);
+      }
+      throw ByokChatException(errorCode);
+    }
+
+    try {
+      await readAgentStream(
+        res,
+        onEvent,
+        isStopped: isStopped,
+        stallTimeout: resolvedStallTimeout,
+      );
+    } on TimeoutException {
+      if (isStopped?.call() ?? false) return;
+      throw const ByokChatException('timeout');
+    } on http.ClientException {
+      if (isStopped?.call() ?? false) return;
+      throw const ByokChatException('generic');
+    }
+  }
+
   /// Resolve the KEK id + RSA public key used to build the envelope.
   ///
   /// Priority: constructor-injected values (tests) → compile-time

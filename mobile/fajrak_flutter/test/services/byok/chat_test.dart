@@ -171,4 +171,176 @@ void main() {
       );
     });
   });
+
+  group('AgentEvent.fromJson', () {
+    test('delta carries text only', () {
+      final e = AgentEvent.fromJson({'type': 'delta', 'text': 'مرحبا'})!;
+      expect(e.type, 'delta');
+      expect(e.text, 'مرحبا');
+      expect(e.tool, isNull);
+      expect(e.ok, isFalse);
+    });
+
+    test('trace carries tool + status', () {
+      final running =
+          AgentEvent.fromJson({'type': 'trace', 'tool': 'get_budget', 'status': 'running'})!;
+      expect(running.tool, 'get_budget');
+      expect(running.status, 'running');
+
+      final done = AgentEvent.fromJson(
+          {'type': 'trace', 'tool': 'get_budget', 'status': 'done'})!;
+      expect(done.status, 'done');
+    });
+
+    test('tool_result carries ok=true only for a real true', () {
+      final ok =
+          AgentEvent.fromJson({'type': 'tool_result', 'tool': 't', 'ok': true})!;
+      expect(ok.ok, isTrue);
+
+      final failed = AgentEvent.fromJson(
+          {'type': 'tool_result', 'tool': 't', 'ok': 'nope'})!;
+      expect(failed.ok, isFalse);
+    });
+
+    test('confirmation_required keeps the tool args', () {
+      final e = AgentEvent.fromJson({
+        'type': 'confirmation_required',
+        'tool': 'create_transaction',
+        'args': {'amount': 120.5, 'category': 'food'},
+      })!;
+      expect(e.tool, 'create_transaction');
+      expect(e.args['amount'], 120.5);
+      expect(e.args['category'], 'food');
+    });
+
+    test('missing / non-map args default to an empty map', () {
+      final missing =
+          AgentEvent.fromJson({'type': 'confirmation_required', 'tool': 't'})!;
+      expect(missing.args, isEmpty);
+
+      final wrongType = AgentEvent.fromJson({
+        'type': 'confirmation_required',
+        'tool': 't',
+        'args': ['nope'],
+      })!;
+      expect(wrongType.args, isEmpty);
+    });
+
+    test('error carries code + message', () {
+      final e = AgentEvent.fromJson({
+        'type': 'error',
+        'code': 'rate_limited',
+        'message': 'slow down',
+      })!;
+      expect(e.code, 'rate_limited');
+      expect(e.message, 'slow down');
+    });
+
+    test('unknown / malformed shapes return null', () {
+      expect(AgentEvent.fromJson({}), isNull);
+      expect(AgentEvent.fromJson({'type': 42}), isNull);
+      // Unknown event types still parse — the client ignores what it cannot
+      // render, matching web `parseAgentEvent`.
+      expect(AgentEvent.fromJson({'type': 'mystery'}), isNotNull);
+    });
+  });
+
+  group('readAgentStream', () {
+    String frame(Map<String, dynamic> json) => 'data: ${jsonEncode(json)}\n\n';
+
+    test('emits every event in order', () async {
+      final body = frame({'type': 'trace', 'tool': 'get_budget', 'status': 'running'}) +
+          frame({'type': 'delta', 'text': 'ميزانيتك'}) +
+          frame({'type': 'tool_result', 'tool': 'get_budget', 'ok': true}) +
+          frame({'type': 'done'});
+      final streamed = http.StreamedResponse(
+        Stream.fromIterable([utf8.encode(body)]),
+        200,
+      );
+
+      final events = <AgentEvent>[];
+      await readAgentStream(streamed, events.add);
+
+      expect(events.map((e) => e.type).toList(),
+          ['trace', 'delta', 'tool_result', 'done']);
+      expect(events[1].text, 'ميزانيتك');
+      expect(events[2].ok, isTrue);
+    });
+
+    test('tolerates malformed frames and splits mid-frame', () async {
+      const a = 'data: {"type":"delta","text":"t';
+      const b = 'ok"}\n\njunk\n\ndata: {"type":"done"}\n\n';
+      final streamed = http.StreamedResponse(
+        Stream.fromIterable([utf8.encode(a), utf8.encode(b)]),
+        200,
+      );
+
+      final events = <AgentEvent>[];
+      await readAgentStream(streamed, events.add);
+
+      expect(events.map((e) => e.type).toList(), ['delta', 'done']);
+      expect(events.first.text, 'tok');
+    });
+
+    test('ignores non-data lines and blank payloads', () async {
+      const body = ': keep-alive\n\ndata: \n\nevent: ping\n\n'
+          'data: {"type":"done"}\n\n';
+      final streamed = http.StreamedResponse(
+        Stream.fromIterable([utf8.encode(body)]),
+        200,
+      );
+
+      final events = <AgentEvent>[];
+      await readAgentStream(streamed, events.add);
+
+      expect(events.map((e) => e.type).toList(), ['done']);
+    });
+
+    test('non-200 throws ClientException', () async {
+      final streamed = http.StreamedResponse(
+        Stream.fromIterable([utf8.encode('')]),
+        500,
+      );
+
+      await expectLater(
+        readAgentStream(streamed, (_) {}),
+        throwsA(isA<http.ClientException>()),
+      );
+    });
+
+    test('silent stall throws TimeoutException', () async {
+      final streamed = http.StreamedResponse(
+        Stream.periodic(const Duration(seconds: 25), (_) => utf8.encode('x')),
+        200,
+      );
+
+      await expectLater(
+        readAgentStream(
+          streamed,
+          (_) {},
+          stallTimeout: const Duration(milliseconds: 50),
+        ),
+        throwsA(isA<TimeoutException>()),
+      );
+    });
+
+    test('stop flag swallows a racing TimeoutException', () async {
+      final streamed = http.StreamedResponse(
+        Stream.periodic(const Duration(seconds: 25), (_) => utf8.encode('x')),
+        200,
+      );
+      var stopped = false;
+      Timer(const Duration(milliseconds: 10), () => stopped = true);
+
+      await expectLater(
+        readAgentStream(
+          streamed,
+          (_) {},
+          isStopped: () => stopped,
+          stallTimeout: const Duration(milliseconds: 200),
+        ),
+        completes,
+      );
+    });
+  });
 }

@@ -73,6 +73,9 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _stopRequested = false;
   String _assistantPartial = '';
   String? _errorKey;
+  String? _noticeKey;
+  String? _traceTool;
+  Map<String, dynamic>? _pendingConfirmation;
   bool _loadingKeys = true;
   bool _loadingContext = true;
   bool _atBottom = true;
@@ -247,7 +250,29 @@ class _ChatScreenState extends State<ChatScreen> {
         'vault' => 'chat_error_vault',
         'rate-limit' => 'chat_error_rate_limit',
         'timeout' => 'chat_error_timeout',
+        // Agent route codes (mirror web `AgentErrorCode`).
+        'rate_limited' => 'chat_error_rate_limited',
+        'iteration_limit' => 'chat_error_loop',
+        'invalid_args' => 'chat_error_tool',
+        'invalid_confirmation' => 'chat_error_tool',
+        'tool' => 'chat_error_tool',
         _ => 'chat_error_generic',
+      };
+
+  /// Tool name → trace line, mirroring web `TRACE_KEYS`.
+  String _traceText(String tool) => switch (tool) {
+        'get_spending_breakdown' => 'chat_trace_spending'.tr(),
+        'get_financial_snapshot' => 'chat_trace_snapshot'.tr(),
+        'create_transaction' => 'chat_trace_transaction'.tr(),
+        _ => 'chat_trace_generic'.tr(namedArgs: {'tool': tool}),
+      };
+
+  /// Tool name → human label on the confirmation card.
+  String _agentToolLabel(String tool) => switch (tool) {
+        'get_spending_breakdown' => 'chat_tool_spending'.tr(),
+        'get_financial_snapshot' => 'chat_tool_snapshot'.tr(),
+        'create_transaction' => 'chat_tool_transaction'.tr(),
+        _ => 'chat_tool_generic'.tr(),
       };
 
   void _scrollToLatest() {
@@ -261,11 +286,125 @@ class _ChatScreenState extends State<ChatScreen> {
     if (!_canSend) return;
     final text = _inputController.text.trim();
     _inputController.clear();
+    _messages.add(ChatMsg(role: 'user', content: text));
+    if (_needsKey) {
+      await _sendAgent();
+    } else {
+      await _sendDirect();
+    }
+  }
+
+  /// Proxy providers: the server owns the tool loop (`/api/byok/agent`).
+  ///
+  /// Pass [confirmation] — exactly as received — to execute a paused write
+  /// tool and finish the turn. Nothing is written before that.
+  Future<void> _sendAgent({Map<String, dynamic>? confirmation}) async {
+    if (_sending) return;
     _sending = true;
     _stopRequested = false;
     _errorKey = null;
+    _noticeKey = null;
+    _traceTool = null;
+    _pendingConfirmation = null;
     _assistantPartial = '';
-    _messages.add(ChatMsg(role: 'user', content: text));
+    setState(() {});
+    _scrollToLatest();
+    try {
+      await _service.chatAgent(
+        providerId: _providerId,
+        keyId: _keyId,
+        systemPrompt: _buildSystemPrompt(),
+        messages: List.of(_messages),
+        model: _selectedModel.isEmpty ? null : _selectedModel,
+        confirmation: confirmation,
+        onEvent: (event) {
+          if (!mounted) return;
+          switch (event.type) {
+            case 'delta':
+              setState(() => _assistantPartial += event.text ?? '');
+              _scrollToLatest();
+            case 'trace':
+              setState(() => _traceTool =
+                  event.status == 'running' ? event.tool : null);
+            case 'tool_result':
+              setState(() {
+                _traceTool = null;
+                if (!event.ok) _errorKey = 'chat_error_tool';
+              });
+            case 'confirmation_required':
+              setState(() {
+                _traceTool = null;
+                _pendingConfirmation = {
+                  'tool': event.tool ?? '',
+                  'args': event.args,
+                };
+              });
+            case 'error':
+              setState(() {
+                _traceTool = null;
+                _errorKey = _codeToErrorKey(event.code ?? 'generic');
+              });
+            case 'done':
+              setState(() => _traceTool = null);
+          }
+        },
+        isStopped: () => _stopRequested,
+      );
+    } on ByokConfigException {
+      if (!mounted) return;
+      setState(() => _errorKey = 'chat_error_config_missing');
+    } on ByokChatException catch (e) {
+      if (!mounted) return;
+      setState(() => _errorKey = _codeToErrorKey(e.code));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _errorKey = 'chat_error_generic');
+    } finally {
+      if (mounted) {
+        final partial = _assistantPartial.trim();
+        setState(() {
+          _sending = false;
+          _stopRequested = false;
+          _traceTool = null;
+          if (_errorKey == null && partial.isNotEmpty) {
+            _messages.add(ChatMsg(role: 'assistant', content: partial));
+          }
+          _assistantPartial = '';
+        });
+        _scrollToLatest();
+      }
+    }
+  }
+
+  /// User approved the paused write — execute it and let the model finish.
+  Future<void> _confirmPending() async {
+    final pending = _pendingConfirmation;
+    if (pending == null || _sending) return;
+    final tool = pending['tool'];
+    final args = pending['args'];
+    if (tool is! String || tool.isEmpty || args is! Map<String, dynamic>) {
+      return;
+    }
+    await _sendAgent(confirmation: {'tool': tool, 'args': args});
+  }
+
+  void _cancelPending() {
+    setState(() {
+      _pendingConfirmation = null;
+      _noticeKey = 'chat_confirm_cancelled';
+    });
+  }
+
+  /// clientDirect providers (Ollama): browser/device talks to the model
+  /// directly — no proxy, no key, no server tools.
+  Future<void> _sendDirect() async {
+    _sending = true;
+    _stopRequested = false;
+    _errorKey = null;
+    _noticeKey = null;
+    _traceTool = null;
+    _pendingConfirmation = null;
+    _assistantPartial = '';
     setState(() {});
     _scrollToLatest();
     try {
@@ -318,6 +457,9 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.clear();
       _assistantPartial = '';
       _errorKey = null;
+      _noticeKey = null;
+      _traceTool = null;
+      _pendingConfirmation = null;
     });
   }
 
@@ -374,6 +516,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   ? _buildEmptyState(theme: theme, colorScheme: colorScheme)
                   : _buildMessageList(theme: theme, colorScheme: colorScheme),
             ),
+            if (_noticeKey != null)
+              _buildNotice(theme: theme, colorScheme: colorScheme),
+            if (_pendingConfirmation != null)
+              _buildConfirmationCard(theme: theme, colorScheme: colorScheme),
             if (_errorKey != null)
               _buildErrorBanner(theme: theme, colorScheme: colorScheme),
             _buildComposer(theme: theme, colorScheme: colorScheme),
@@ -549,7 +695,7 @@ class _ChatScreenState extends State<ChatScreen> {
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
       children: [
-        if (_sending)
+        if (_sending && (_assistantPartial.isNotEmpty || _traceTool == null))
           MessageBubble(
             isUser: false,
             content: _assistantPartial.isEmpty
@@ -558,6 +704,7 @@ class _ChatScreenState extends State<ChatScreen> {
             thinking: _assistantPartial.isEmpty,
             theme: theme,
           ),
+        if (_traceTool != null) _buildTraceLine(theme: theme),
         for (final m in _messages.reversed)
           MessageBubble(
             isUser: m.role == 'user',
@@ -565,6 +712,158 @@ class _ChatScreenState extends State<ChatScreen> {
             theme: theme,
           ),
       ],
+    );
+  }
+
+  static const List<(String, String)> _confirmFields = [
+    ('type', 'chat_confirm_type'),
+    ('amount', 'chat_confirm_amount'),
+    ('currency', 'chat_confirm_currency'),
+    ('category', 'chat_confirm_category'),
+    ('transaction_date', 'chat_confirm_date'),
+    ('description', 'chat_confirm_description'),
+  ];
+
+  /// Render one confirmation-card value without trusting the model's shape.
+  String _confirmValue(String field, dynamic value) {
+    if (value == null || value == '') return '—';
+    if (field == 'type') {
+      return value == 'income' ? 'trans_income'.tr() : 'trans_expense'.tr();
+    }
+    if (field == 'amount') {
+      final n = value is num
+          ? value.toDouble()
+          : double.tryParse(value.toString());
+      return n == null ? value.toString() : CurrencyService.formatAmount(n, _currency);
+    }
+    return value.toString();
+  }
+
+  Widget _buildTraceLine({required ThemeData theme}) {
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                _traceText(_traceTool!),
+                style: theme.textTheme.bodySmall,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotice({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+  }) {
+    if (_noticeKey == null) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(_noticeKey!.tr(), style: theme.textTheme.bodySmall),
+    );
+  }
+
+  Widget _buildConfirmationCard({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+  }) {
+    final pending = _pendingConfirmation;
+    if (pending == null) return const SizedBox.shrink();
+    final tool = pending['tool'] is String ? pending['tool'] as String : '';
+    final args = pending['args'] is Map<String, dynamic>
+        ? pending['args'] as Map<String, dynamic>
+        : const <String, dynamic>{};
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.primary),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('chat_confirm_title'.tr(), style: theme.textTheme.titleSmall),
+          const SizedBox(height: 2),
+          Text(
+            'chat_confirm_tool'.tr(
+              namedArgs: {'tool': _agentToolLabel(tool)},
+            ),
+            style: theme.textTheme.bodySmall,
+          ),
+          const SizedBox(height: 10),
+          for (final (field, labelKey) in _confirmFields)
+            if (args[field] != null && args[field] != '')
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 96,
+                      child: Text(
+                        labelKey.tr(),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        _confirmValue(field, args[field]),
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          const SizedBox(height: 6),
+          Text('chat_confirm_hint'.tr(), style: theme.textTheme.bodySmall),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: _sending ? null : _confirmPending,
+                  child: Text('chat_confirm_yes'.tr()),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _sending ? null : _cancelPending,
+                  child: Text('chat_confirm_no'.tr()),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

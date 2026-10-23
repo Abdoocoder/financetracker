@@ -1,7 +1,8 @@
 /**
  * @jest-environment node
  */
-import { buildChatBody, extractDelta, readStream } from '@/lib/byok/chat'
+import { buildChatBody, extractDelta, readAgentStream, readStream } from '@/lib/byok/chat'
+import type { AgentEvent } from '@/lib/agent/events'
 
 describe('buildChatBody', () => {
   const msgs = [
@@ -125,6 +126,61 @@ describe('readStream', () => {
 
   it('throws when the response has no body', async () => {
     await expect(readStream(new Response(null, { status: 200 }), 'openai', () => {})).rejects.toThrow(
+      'No response body'
+    )
+  })
+})
+
+describe('readAgentStream', () => {
+  function sseResponse(chunks: string[]): Response {
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const c of chunks) controller.enqueue(new TextEncoder().encode(c))
+        controller.close()
+      },
+    })
+    return new Response(stream, { status: 200 })
+  }
+
+  it('delivers normalized agent events in order, including done', async () => {
+    const frames = [
+      { type: 'delta', text: 'Let me check.' },
+      { type: 'trace', tool: 'get_spending_breakdown', status: 'running' },
+      { type: 'tool_result', tool: 'get_spending_breakdown', ok: true },
+      { type: 'delta', text: 'You spent 10.' },
+      { type: 'done' },
+    ]
+    const body = frames.map((f) => `data: ${JSON.stringify(f)}\n\n`).join('')
+
+    const seen: AgentEvent[] = []
+    await readAgentStream(sseResponse([body]), (e) => seen.push(e))
+    expect(seen).toEqual(frames)
+  })
+
+  it('rejoins frames split across network chunks', async () => {
+    const seen: AgentEvent[] = []
+    await readAgentStream(
+      sseResponse(['data: {"type":"delta","te', 'xt":"Hel"}\n\ndata: {"type":"done"}\n\n']),
+      (e) => seen.push(e)
+    )
+    expect(seen).toEqual([{ type: 'delta', text: 'Hel' }, { type: 'done' }])
+  })
+
+  it('ignores malformed and unknown frames', async () => {
+    const seen: AgentEvent[] = []
+    await readAgentStream(
+      sseResponse([
+        'data: not-json\n\n',
+        'data: {"no":"type"}\n\n',
+        'data: {"type":"delta","text":"ok"}\n\n',
+      ]),
+      (e) => seen.push(e)
+    )
+    expect(seen).toEqual([{ type: 'delta', text: 'ok' }])
+  })
+
+  it('throws when the response has no body', async () => {
+    await expect(readAgentStream(new Response(null, { status: 200 }), () => {})).rejects.toThrow(
       'No response body'
     )
   })

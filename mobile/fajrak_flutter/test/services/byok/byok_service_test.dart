@@ -465,4 +465,287 @@ void main() {
       );
     });
   });
+
+  group('agent path', () {
+    // Response shapes follow `lib/agent/events.ts` (verified 2026-10-23 against
+    // the route contract in `__tests__/api/byok-agent.test.ts`).
+    String agentSse(List<Map<String, dynamic>> events) => events
+        .map((e) => 'data: ${jsonEncode(e)}\n\n')
+        .join();
+
+    /// SSE bodies carry Arabic text, so they must be UTF-8 bytes — a plain
+    /// `http.Response(String)` defaults to latin1 and throws on non-ASCII.
+    http.Response agentResponse(List<Map<String, dynamic>> events) =>
+        http.Response.bytes(
+          utf8.encode(agentSse(events)),
+          200,
+          headers: {'content-type': 'text/event-stream; charset=utf-8'},
+        );
+
+    test('POSTs envelope + Bearer JWT to /api/byok/agent and streams events',
+        () async {
+      late http.Request captured;
+      final client = MockClient((req) async {
+        captured = req;
+        return agentResponse([
+          {'type': 'trace', 'tool': 'get_budget', 'status': 'running'},
+          {'type': 'delta', 'text': 'ميزانيتك '},
+          {'type': 'delta', 'text': 'جيدة'},
+          {'type': 'trace', 'tool': 'get_budget', 'status': 'done'},
+          {'type': 'tool_result', 'tool': 'get_budget', 'ok': true},
+          {'type': 'done'},
+        ]);
+      });
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-ant-test');
+      final svc = service(client, store: store);
+
+      final events = <AgentEvent>[];
+      await svc.chatAgent(
+        providerId: 'anthropic',
+        keyId: 'rec-1',
+        systemPrompt: 'You are Fajrak.',
+        messages: providerChat,
+        model: 'claude-sonnet-4-6',
+        onEvent: events.add,
+      );
+
+      expect(events.map((e) => e.type).toList(), [
+        'trace',
+        'delta',
+        'delta',
+        'trace',
+        'tool_result',
+        'done',
+      ]);
+      expect(events[1].text, 'ميزانيتك ');
+      expect(captured.method, 'POST');
+      expect(captured.url.toString(), '$testProxyBase/api/byok/agent');
+      expect(captured.headers['authorization'], 'Bearer test-jwt');
+      expect(captured.headers['accept'], 'text/event-stream');
+      expect(captured.headers.containsKey('x-api-key'), isFalse);
+
+      final body = jsonDecode(captured.body) as Map<String, dynamic>;
+      expect(body['providerId'], 'anthropic');
+      expect(body['keyId'], testKekId);
+      expect(body['env'], isNotEmpty);
+      expect(body['payload'], isNotEmpty);
+      expect(body['model'], 'claude-sonnet-4-6');
+      expect(body['systemPrompt'], 'You are Fajrak.');
+      expect(body['messages'], [
+        {'role': 'user', 'content': 'Hello'},
+        {'role': 'assistant', 'content': 'Hi there'},
+      ]);
+      // The agent route builds the provider body server-side.
+      expect(body.containsKey('body'), isFalse);
+      expect(body.containsKey('stream'), isFalse);
+      expect(body.containsKey('confirmation'), isFalse);
+    });
+
+    test('confirmation is passed through verbatim', () async {
+      late http.Request captured;
+      final client = MockClient((req) async {
+        captured = req;
+        return agentResponse([
+          {'type': 'delta', 'text': 'تم'},
+          {'type': 'done'},
+        ]);
+      });
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
+      final svc = service(client, store: store);
+
+      final confirmation = {
+        'tool': 'create_transaction',
+        'args': {'amount': 120.5, 'category': 'food', 'type': 'expense'},
+      };
+      final events = <AgentEvent>[];
+      await svc.chatAgent(
+        providerId: 'openai',
+        keyId: 'rec-1',
+        messages: providerChat,
+        model: 'gpt-5.4-mini',
+        confirmation: confirmation,
+        onEvent: events.add,
+      );
+
+      final body = jsonDecode(captured.body) as Map<String, dynamic>;
+      expect(body['confirmation'], confirmation);
+      expect(events.map((e) => e.type).toList(), ['delta', 'done']);
+    });
+
+    test('confirmation_required surfaces tool + args', () async {
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
+      final svc = service(
+        MockClient((req) async => agentResponse([
+              {
+                'type': 'confirmation_required',
+                'tool': 'create_transaction',
+                'args': {'amount': 120.5, 'category': 'food'},
+              },
+              {'type': 'done'},
+            ])),
+        store: store,
+      );
+
+      final events = <AgentEvent>[];
+      await svc.chatAgent(
+        providerId: 'openai',
+        keyId: 'rec-1',
+        messages: providerChat,
+        onEvent: events.add,
+      );
+
+      expect(events.first.type, 'confirmation_required');
+      expect(events.first.tool, 'create_transaction');
+      expect(events.first.args['amount'], 120.5);
+    });
+
+    test('clientDirect provider (ollama) is rejected without any HTTP', () async {
+      var calls = 0;
+      final svc = service(MockClient((req) async {
+        calls++;
+        return http.Response('', 200);
+      }));
+
+      await expectLater(
+        svc.chatAgent(
+          providerId: 'ollama',
+          messages: providerChat,
+          onEvent: (_) {},
+        ),
+        throwsA(isA<ByokChatException>()
+            .having((e) => e.code, 'code', 'generic')),
+      );
+      expect(calls, 0);
+    });
+
+    test('unknown provider is rejected without any HTTP', () async {
+      var calls = 0;
+      final svc = service(MockClient((req) async {
+        calls++;
+        return http.Response('', 200);
+      }));
+
+      await expectLater(
+        svc.chatAgent(
+          providerId: 'nope',
+          messages: providerChat,
+          onEvent: (_) {},
+        ),
+        throwsA(isA<ByokChatException>()
+            .having((e) => e.code, 'code', 'generic')),
+      );
+      expect(calls, 0);
+    });
+
+    test('missing local key throws no-key without any HTTP', () async {
+      var calls = 0;
+      final svc = service(MockClient((req) async {
+        calls++;
+        return http.Response('', 200);
+      }));
+
+      await expectLater(
+        svc.chatAgent(
+          providerId: 'openai',
+          keyId: 'rec-missing',
+          messages: providerChat,
+          onEvent: (_) {},
+        ),
+        throwsA(isA<ByokChatException>()
+            .having((e) => e.code, 'code', 'no-key')),
+      );
+      expect(calls, 0);
+    });
+
+    test('null session token throws unauthorized without any HTTP', () async {
+      var calls = 0;
+      final client = MockClient((req) async {
+        calls++;
+        return http.Response('', 200);
+      });
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
+      final svc = service(client, store: store, token: () async => null);
+
+      await expectLater(
+        svc.chatAgent(
+          providerId: 'openai',
+          keyId: 'rec-1',
+          messages: providerChat,
+          onEvent: (_) {},
+        ),
+        throwsA(isA<ByokChatException>()
+            .having((e) => e.code, 'code', 'unauthorized')),
+      );
+      expect(calls, 0);
+    });
+
+    for (final (status, code) in [
+      (401, 'unauthorized'),
+      (429, 'rate-limit'),
+      (500, 'generic'),
+    ]) {
+      test('agent $status -> $code', () async {
+        final store = InMemorySecureStore();
+        await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
+        final svc = service(
+          MockClient((req) async => http.Response('{}', status)),
+          store: store,
+        );
+
+        await expectLater(
+          svc.chatAgent(
+            providerId: 'openai',
+            keyId: 'rec-1',
+            messages: providerChat,
+            onEvent: (_) {},
+          ),
+          throwsA(
+              isA<ByokChatException>().having((e) => e.code, 'code', code)),
+        );
+      });
+    }
+
+    test('silent stall without stop -> timeout', () async {
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
+      final svc = service(StallingClient(), store: store);
+
+      await expectLater(
+        svc.chatAgent(
+          providerId: 'openai',
+          keyId: 'rec-1',
+          messages: providerChat,
+          onEvent: (_) {},
+          stallTimeout: const Duration(milliseconds: 50),
+        ),
+        throwsA(isA<ByokChatException>()
+            .having((e) => e.code, 'code', 'timeout')),
+      );
+    });
+
+    test('stop swallows a racing timeout', () async {
+      final store = InMemorySecureStore();
+      await ByokVault(store).saveProviderKey('rec-1', 'sk-openai');
+      final svc = service(StallingClient(), store: store);
+
+      var stopped = false;
+      Timer(const Duration(milliseconds: 10), () => stopped = true);
+
+      await expectLater(
+        svc.chatAgent(
+          providerId: 'openai',
+          keyId: 'rec-1',
+          messages: providerChat,
+          onEvent: (_) {},
+          isStopped: () => stopped,
+          stallTimeout: const Duration(milliseconds: 200),
+        ),
+        completes,
+      );
+    });
+  });
 }

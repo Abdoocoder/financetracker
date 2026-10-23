@@ -168,3 +168,95 @@ Future<void> readStream(
     rethrow;
   }
 }
+
+/// One normalized event from `/api/byok/agent` — mirrors web
+/// `lib/agent/events.ts`. The server owns the tool loop, so the client only
+/// renders what it receives.
+///
+///   delta                 incremental assistant text
+///   trace                 a tool is running / finished
+///   tool_result           a tool returned (ok / failed)
+///   confirmation_required a write tool is paused for explicit user approval
+///   error                 a stable code (see [code])
+///   done                  terminal event — always last
+class AgentEvent {
+  final String type;
+  final String? text;
+  final String? tool;
+  final String? status;
+  final bool ok;
+  final Map<String, dynamic> args;
+  final String? code;
+  final String? message;
+
+  const AgentEvent({
+    required this.type,
+    this.text,
+    this.tool,
+    this.status,
+    this.ok = false,
+    this.args = const {},
+    this.code,
+    this.message,
+  });
+
+  /// Parse one JSON frame. Returns null for an unknown/malformed shape.
+  static AgentEvent? fromJson(Map<String, dynamic> json) {
+    final type = json['type'];
+    if (type is! String) return null;
+    final rawArgs = json['args'];
+    return AgentEvent(
+      type: type,
+      text: json['text'] is String ? json['text'] as String : null,
+      tool: json['tool'] is String ? json['tool'] as String : null,
+      status: json['status'] is String ? json['status'] as String : null,
+      ok: json['ok'] == true,
+      args: rawArgs is Map<String, dynamic> ? rawArgs : const {},
+      code: json['code'] is String ? json['code'] as String : null,
+      message: json['message'] is String ? json['message'] as String : null,
+    );
+  }
+}
+
+/// Read the agent route's normalized SSE stream.
+///
+/// Mirrors [readStream]'s stall protection: a silence gap longer than
+/// [stallTimeout] throws [TimeoutException] unless [isStopped] reports true.
+Future<void> readAgentStream(
+  http.StreamedResponse res,
+  void Function(AgentEvent) onEvent, {
+  bool Function()? isStopped,
+  Duration? stallTimeout,
+}) async {
+  if (res.statusCode != 200) {
+    throw http.ClientException('HTTP ${res.statusCode}');
+  }
+  final body = res.stream.timeout(stallTimeout ?? kDefaultStallTimeout);
+  var buffer = '';
+  try {
+    await for (final chunk in body) {
+      if (isStopped?.call() ?? false) return;
+      buffer += utf8.decode(chunk, allowMalformed: true);
+      final lines = buffer.split('\n');
+      buffer = lines.removeLast();
+      for (final raw in lines) {
+        final line = raw.trim();
+        if (!line.startsWith('data:')) continue;
+        final data = line.substring(5).trim();
+        if (data.isEmpty) continue;
+        try {
+          final parsed = jsonDecode(data);
+          if (parsed is Map<String, dynamic>) {
+            final event = AgentEvent.fromJson(parsed);
+            if (event != null) onEvent(event);
+          }
+        } catch (_) {
+          // malformed frame — skip
+        }
+      }
+    }
+  } on TimeoutException {
+    if (isStopped?.call() ?? false) return;
+    rethrow;
+  }
+}
