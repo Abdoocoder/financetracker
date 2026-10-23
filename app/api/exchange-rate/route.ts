@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit } from '@/lib/rate-limit'
 import { createAdminClient } from '@/lib/supabase/admin'
-
-const CURRENCY_RE = /^[A-Z]{3}$/
+import { lookupExchangeRate } from '@/lib/exchange-rate'
 
 export async function GET(request: NextRequest) {
   const rl = rateLimit(request, { limit: 30, windowMs: 60_000, identifier: 'exchange-rate' })
@@ -20,27 +19,22 @@ export async function GET(request: NextRequest) {
   const base = (searchParams.get('base') || 'JOD').toUpperCase()
   const target = (searchParams.get('target') || 'USD').toUpperCase()
 
-  if (!CURRENCY_RE.test(base) || !CURRENCY_RE.test(target)) {
+  const result = await lookupExchangeRate(base, target)
+
+  if (!result.ok) {
+    if (result.reason === 'upstream_error') {
+      return NextResponse.json({ error: 'Failed to fetch exchange rate' }, { status: 500 })
+    }
+    if (result.reason === 'unknown_target') {
+      return NextResponse.json({ error: 'Invalid currency code' }, { status: 404 })
+    }
     return NextResponse.json({ error: 'Invalid currency code' }, { status: 400 })
   }
 
-  try {
-    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`, {
-      next: { revalidate: 3600 }
-    })
-    const data = await res.json()
-
-    if (data.result === 'error') {
-      return NextResponse.json({ error: 'Invalid currency code' }, { status: 400 })
-    }
-
-    const rate = data.rates[target]
-    if (!rate) {
-      return NextResponse.json({ error: 'Invalid currency code' }, { status: 404 })
-    }
-
-    return NextResponse.json({ base, target, rate, time_last_update_utc: data.time_last_update_utc })
-  } catch {
-    return NextResponse.json({ error: 'Failed to fetch exchange rate' }, { status: 500 })
-  }
+  return NextResponse.json({
+    base: result.base,
+    target: result.target,
+    rate: result.rate,
+    time_last_update_utc: result.lastUpdated,
+  })
 }
