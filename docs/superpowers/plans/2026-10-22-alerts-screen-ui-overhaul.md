@@ -1518,3 +1518,33 @@ Track D also has to re-check the two other `sent`-consumers — `alerted++` in
 `app/api/budget-alerts/route.ts:65-76`, and the `sent` surfaced to callers by
 `app/api/push-test/route.ts:39` and `app/api/push-send/route.ts:14` — since
 after these edits `sent` no longer implies "an alert was written".
+
+
+### Correction G — `supabase db reset --local` fails at 042 on a fresh machine (found 2026-10-24)
+
+`supabase db reset --local` fails at
+`supabase/migrations/042_emergency_performance_idx.sql` with
+`ERROR: relation "public.transactions" does not exist (SQLSTATE 42P01)`.
+
+Root cause: `042` creates an index on `public.transactions`, but
+`transactions` is created by `supabase/migrations/legacy/001_initial.sql`.
+`db reset` only replays files in `supabase/migrations/` — it does not
+descend into `legacy/`. So `042` runs before `transactions` exists.
+
+This is Gotcha #1 (DB drift) manifesting in local dev: migrations are not
+the schema of record, and a fresh `db reset` cannot reconstruct the schema
+without the legacy files.
+
+Not in scope for Track D. Proposed follow-up (F9):
+
+- (a) Move `legacy/*.sql` into `migrations/` with timestamps that sort
+  before `042`, or
+- (b) Add a `supabase/config.toml` `[db.migrations]` include directive, or
+- (c) Document the workaround in `CONTRIBUTING.md`.
+
+For Track D, migration `20261024120000_alerts_fingerprint_unique.sql` was
+verified by visual syntax review only. It touches only `public.alerts`
+(which exists in prod and local), uses idempotent DDL
+(`ADD COLUMN IF NOT EXISTS`, `CREATE UNIQUE INDEX IF NOT EXISTS ... WHERE
+fingerprint IS NOT NULL`), and depends on no other migration. Full
+verification is deferred to Phase B (against the linked project).
