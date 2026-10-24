@@ -1,355 +1,470 @@
 /**
  * @jest-environment node
  */
-var mockFrom = jest.fn()
-var mockRpc = jest.fn()
-var updateCalls: any[] = []
+import { NextRequest } from 'next/server'
+import { GET } from '@/app/api/zakat-autopilot/route'
+
+jest.mock('@/lib/zakat-prices', () => ({
+  fetchZakatPrices: jest.fn(),
+}))
 
 jest.mock('@/lib/supabase/admin', () => ({
-  createAdminClient: jest.fn(() => ({
-    from: (t: string) => mockFrom(t),
-    rpc: (fn: string, args: any) => mockRpc(fn, args),
-  })),
+  createAdminClient: jest.fn(),
 }))
 
-jest.mock('@/lib/push-send', () => ({
-  sendPushToUser: jest.fn().mockResolvedValue(1),
-}))
+import { fetchZakatPrices } from '@/lib/zakat-prices'
+import { createAdminClient } from '@/lib/supabase/admin'
 
-jest.mock('@/lib/cron-auth', () => ({
-  verifyCronAuth: jest.fn().mockReturnValue(true),
-}))
+const mockFetchZakatPrices = fetchZakatPrices as jest.MockedFunction<typeof fetchZakatPrices>
+const mockCreateAdminClient = createAdminClient as jest.MockedFunction<typeof createAdminClient>
 
-import { GET } from '@/app/api/zakat-autopilot/route'
-import { NextRequest } from 'next/server'
-import { sendPushToUser } from '@/lib/push-send'
+describe('/api/zakat-autopilot', () => {
+  const originalEnv = process.env.CRON_SECRET
 
-const USER_A = '11111111-1111-4111-8111-111111111111'
-const USER_B = '22222222-2222-4222-8222-222222222222'
-
-function makeGetRequest(url = 'http://localhost/api/zakat-autopilot') {
-  return new NextRequest(url)
-}
-
-function chain(data: any = { data: [], error: null }) {
-  const obj: any = {
-    then: (resolve: any) => Promise.resolve(data).then(resolve),
-    catch: (reject: any) => Promise.resolve(data).catch(reject),
-    finally: (fn: any) => Promise.resolve(data).finally(fn),
-  }
-  const methods = [
-    'select', 'insert', 'update', 'delete', 'upsert',
-    'eq', 'neq', 'gt', 'gte', 'lt', 'lte',
-    'order', 'limit', 'single', 'maybeSingle',
-    'is', 'in', 'match', 'textSearch', 'head',
-  ]
-  methods.forEach(m => { obj[m] = () => chain(data) })
-  return obj
-}
-
-// صيغة JSON التي يعيدها RPC sync_zakat_haul_state
-function haulState(overrides: any = {}) {
-  return {
-    user_id: USER_A,
-    nisab_reached_at: '2026-01-01T00:00:00.000000+00:00',
-    current_haul_due_at: '2026-12-20T00:00:00.000000+00:00',
-    last_notified_at: null,
-    days_remaining: 300,
-    is_eligible: true,
-    zakatable_assets: 5100,
-    nisab_effective: 208.25,
-    zakat_due: 127.5,
-    ...overrides,
-  }
-}
-
-function setupMock({
-  profiles = [] as any[],
-  states = {} as Record<string, any>,
-  rpcError = null as any,
-} = {}) {
-  mockFrom.mockClear()
-  mockRpc.mockClear()
-  updateCalls = []
-  ;(sendPushToUser as jest.Mock).mockClear()
-
-  mockFrom.mockImplementation((table: string) => {
-    if (table === 'profiles') return chain({ data: profiles, error: null })
-    if (table === 'zakat_haul_tracking') {
-      return {
-        update: (payload: any) => {
-          updateCalls.push(payload)
-          return chain({ data: null, error: null })
-        },
-      }
-    }
-    return chain()
+  beforeEach(() => {
+    process.env.CRON_SECRET = 'test-secret'
+    jest.clearAllMocks()
   })
 
-  // لكل مستخدم حالة RPC مختلفة؛ rpcError يُرجع خطأً لجميع المستخدمين
-  mockRpc.mockImplementation((_fn: string, args: any) => {
-    if (rpcError) return Promise.resolve({ data: null, error: rpcError })
-    const state = states[args.p_user_id]
-    if (!state) return Promise.resolve({ data: null, error: { message: 'no state' } })
-    return Promise.resolve({ data: state, error: null })
+  afterAll(() => {
+    process.env.CRON_SECRET = originalEnv
   })
-}
 
-describe('GET /api/zakat-autopilot', () => {
-  it('returns 401 when cron auth fails', async () => {
-    const { verifyCronAuth } = require('@/lib/cron-auth')
-    verifyCronAuth.mockReturnValueOnce(false)
-    setupMock({ profiles: [] })
-    const res = await GET(makeGetRequest())
+  it('returns 401 when cron secret is missing', async () => {
+    const req = new NextRequest('http://localhost/api/zakat-autopilot')
+    const res = await GET(req)
     expect(res.status).toBe(401)
   })
 
-  it('returns ok:true with synced=0 notified=0 when no profiles', async () => {
-    setupMock({ profiles: [] })
-    const res = await GET(makeGetRequest())
+  it('returns 401 when cron secret is wrong', async () => {
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer wrong-secret' },
+    })
+    const res = await GET(req)
+    expect(res.status).toBe(401)
+  })
+
+  it('syncs both users with live prices when all prices succeed', async () => {
+    mockFetchZakatPrices
+      .mockResolvedValueOnce({
+        gold: 85.5,
+        silver: 1.05,
+        rate: 0.306,
+        currency: 'KWD',
+        timestamp: new Date().toISOString(),
+      })
+      .mockResolvedValueOnce({
+        gold: 85.5,
+        silver: 1.05,
+        rate: 0.709,
+        currency: 'JOD',
+        timestamp: new Date().toISOString(),
+      })
+
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn(() => ({
+        select: jest.fn(() => ({
+          not: jest.fn(() => Promise.resolve({
+            data: [
+              { id: 'user-kwd', currency: 'KWD' },
+              { id: 'user-jod', currency: 'JOD' },
+            ],
+            error: null,
+          })),
+        })),
+      })),
+      rpc: mockRpc,
+    } as any)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    const res = await GET(req)
     const json = await res.json()
-    expect(json.ok).toBe(true)
+
+    expect(res.status).toBe(200)
+    expect(json.synced).toBe(2)
+    expect(json.skipped).toBe(0)
+    expect(json.failed).toBe(0)
+    expect(mockRpc).toHaveBeenCalledTimes(2)
+
+    // Verify prices passed to RPC are live (not stale defaults)
+    // mockRpc.mock.calls returns [[rpcName, params], ...]
+    const calls = mockRpc.mock.calls
+    calls.forEach((call) => {
+      const args = call[1] // Second argument is the params object
+      expect(args.p_gold_price).toBeGreaterThan(0)
+      expect(args.p_silver_price).toBeGreaterThan(0)
+      expect(args.p_fx_rate).toBeGreaterThan(0)
+      // Not the stale defaults: gold=30, silver=0.35, fx=1.0
+      expect(args.p_gold_price).not.toBe(30)
+      expect(args.p_silver_price).not.toBe(0.35)
+      expect(args.p_fx_rate).not.toBe(1.0)
+    })
+  })
+
+  it('skips user when their currency price fetch fails', async () => {
+    mockFetchZakatPrices
+      .mockResolvedValueOnce({
+        gold: 85.5,
+        silver: 1.05,
+        rate: 0.306,
+        currency: 'KWD',
+        timestamp: new Date().toISOString(),
+      })
+      .mockRejectedValueOnce(new Error('price fetch failed'))
+
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn(() => ({
+        select: jest.fn(() => ({
+          not: jest.fn(() => Promise.resolve({
+            data: [
+              { id: 'user-kwd', currency: 'KWD' },
+              { id: 'user-jod', currency: 'JOD' },
+            ],
+            error: null,
+          })),
+        })),
+      })),
+      rpc: mockRpc,
+    } as any)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    const res = await GET(req)
+    const json = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(json.synced).toBe(1)
+    expect(json.skipped).toBe(1)
+    expect(json.failed).toBe(0)
+    expect(mockRpc).toHaveBeenCalledTimes(1)
+    // Check the second argument (params object) of the RPC call
+    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', expect.objectContaining({
+      p_user_id: 'user-kwd',
+    }))
+  })
+
+  // --- NEW TESTS: cover new route behavior (price fetching + RPC dispatch) ---
+
+  it('returns 200 with zero counts when there are no users', async () => {
+    const mockRpc = jest.fn()
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({ data: [], error: null }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    const res = await GET(req)
+    const json = await res.json()
+
+    expect(res.status).toBe(200)
     expect(json.synced).toBe(0)
-    expect(json.notified).toBe(0)
+    expect(json.skipped).toBe(0)
+    expect(json.failed).toBe(0)
+    expect(json.currencies).toEqual([])
     expect(mockRpc).not.toHaveBeenCalled()
   })
 
-  it('syncs state via the RPC and sends a push when within the 7-day window', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد علي' }],
-      states: { [USER_A]: haulState({ days_remaining: 5, last_notified_at: null }) },
-    })
-    const res = await GET(makeGetRequest())
-    const json = await res.json()
-    expect(json.ok).toBe(true)
-    expect(json.synced).toBe(1)
-    expect(json.notified).toBe(1)
-    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', { p_user_id: USER_A })
-    expect(sendPushToUser).toHaveBeenCalledTimes(1)
-    const [uid, title, body, url, tag] = (sendPushToUser as jest.Mock).mock.calls[0]
-    expect(uid).toBe(USER_A)
-    expect(title).toBe('اقترب حول زكاتك 🌙')
-    expect(body).toContain('5')
-    expect(body).toContain('128') // 127.5 مستديم لأقرب رقم
-    expect(url).toBe('/dashboard/zakat')
-    expect(tag).toBe('zakat-due')
-    // ختم مانع الإزعاج يُكتب في جدول التتبع
-    expect(updateCalls).toHaveLength(1)
-    expect(updateCalls[0].last_notified_at).toBeTruthy()
-  })
-
-  it('treats overdue/today (days_remaining <= 0) as inside the window', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: { [USER_A]: haulState({ days_remaining: 0, last_notified_at: null }) },
-    })
-    const res = await GET(makeGetRequest())
-    const json = await res.json()
-    expect(json.notified).toBe(1)
-    expect(sendPushToUser).toHaveBeenCalledTimes(1)
-    expect(updateCalls).toHaveLength(1)
-  })
-
-  it('does not send a second push when already notified today', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: {
-        [USER_A]: haulState({ days_remaining: 5, last_notified_at: new Date().toISOString() }),
-      },
-    })
-    const res = await GET(makeGetRequest())
-    const json = await res.json()
-    expect(json.synced).toBe(1)
-    expect(json.notified).toBe(0)
-    expect(sendPushToUser).not.toHaveBeenCalled()
-    expect(updateCalls).toHaveLength(0)
-  })
-
-  it('syncs but stays silent when the haul is further than 7 days away', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: { [USER_A]: haulState({ days_remaining: 30, last_notified_at: null }) },
-    })
-    const res = await GET(makeGetRequest())
-    const json = await res.json()
-    expect(json.synced).toBe(1)
-    expect(json.notified).toBe(0)
-    expect(sendPushToUser).not.toHaveBeenCalled()
-  })
-
-  it('stays silent when the wealth is below Nisab (days_remaining null)', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: {
-        [USER_A]: haulState({
-          nisab_reached_at: null,
-          current_haul_due_at: null,
-          days_remaining: null,
-          is_eligible: false,
-          zakatable_assets: 100,
-          zakat_due: 0,
+  it('returns 500 when the profiles query fails', async () => {
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({ data: null, error: { message: 'db down' } }),
         }),
-      },
+      }),
+      rpc: jest.fn(),
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
     })
-    const res = await GET(makeGetRequest())
+    const res = await GET(req)
+    expect(res.status).toBe(500)
+  })
+
+  it('fetches prices once per distinct currency (dedupes shared currencies)', async () => {
+    mockFetchZakatPrices.mockResolvedValue({
+      gold: 85.5, silver: 1.05, rate: 0.306, currency: 'KWD', timestamp: 'x',
+    })
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [
+              { id: 'u1', currency: 'KWD' },
+              { id: 'u2', currency: 'KWD' },
+              { id: 'u3', currency: 'KWD' },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    await GET(req)
+    expect(mockFetchZakatPrices).toHaveBeenCalledTimes(1)
+    expect(mockRpc).toHaveBeenCalledTimes(3)
+  })
+
+  it('fetches prices separately for each distinct currency', async () => {
+    mockFetchZakatPrices.mockImplementation(async (currency: string) => ({
+      gold: 85.5, silver: 1.05, rate: currency === 'KWD' ? 0.306 : 0.709,
+      currency, timestamp: 'x',
+    }))
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [
+              { id: 'u1', currency: 'KWD' },
+              { id: 'u2', currency: 'JOD' },
+              { id: 'u3', currency: 'SAR' },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    await GET(req)
+    expect(mockFetchZakatPrices).toHaveBeenCalledTimes(3)
+  })
+
+  it('continues syncing other users when one RPC call fails', async () => {
+    mockFetchZakatPrices.mockResolvedValue({
+      gold: 85.5, silver: 1.05, rate: 0.306, currency: 'KWD', timestamp: 'x',
+    })
+    const rpc = jest.fn()
+      .mockResolvedValueOnce({ error: { message: 'fail one' } })
+      .mockResolvedValueOnce({ error: null })
+      .mockResolvedValueOnce({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [
+              { id: 'u1', currency: 'KWD' },
+              { id: 'u2', currency: 'KWD' },
+              { id: 'u3', currency: 'KWD' },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      rpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    const res = await GET(req)
     const json = await res.json()
-    expect(json.synced).toBe(1)
-    expect(json.notified).toBe(0)
-    expect(sendPushToUser).not.toHaveBeenCalled()
+    expect(json.synced).toBe(2)
+    expect(json.failed).toBe(1)
   })
 
-  it('skips a user whose sync RPC errors and keeps processing', async () => {
-    // USER_A بلا حالة في الـ mock => الخطأ يعود من الـ RPC، USER_B تنجح
-    setupMock({
-      profiles: [
-        { id: USER_A, full_name: 'أحمد' },
-        { id: USER_B, full_name: 'سارة' },
-      ],
-      states: { [USER_B]: haulState({ user_id: USER_B, days_remaining: 3, last_notified_at: null }) },
+  it('reports prices_ok and prices_missing per currency', async () => {
+    mockFetchZakatPrices
+      .mockResolvedValueOnce({ gold: 85.5, silver: 1.05, rate: 0.306, currency: 'KWD', timestamp: 'x' })
+      .mockRejectedValueOnce(new Error('yahoo down'))
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [
+              { id: 'u1', currency: 'KWD' },
+              { id: 'u2', currency: 'JOD' },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
     })
-    const res = await GET(makeGetRequest())
+    const res = await GET(req)
     const json = await res.json()
-    expect(json.synced).toBe(1)
-    expect(json.notified).toBe(1)
-    expect(sendPushToUser).toHaveBeenCalledTimes(1)
-    expect((sendPushToUser as jest.Mock).mock.calls[0][0]).toBe(USER_B)
+    expect(json.prices_ok).toContain('KWD')
+    expect(json.prices_missing).toContain('JOD')
   })
 
-  it('sends localized (English) push copy when profile.lang is en', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'John Smith', lang: 'en' }],
-      states: { [USER_A]: haulState({ days_remaining: 5, last_notified_at: null }) },
+  it('skips ALL users when every price fetch fails', async () => {
+    mockFetchZakatPrices.mockRejectedValue(new Error('network down'))
+    const mockRpc = jest.fn()
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [
+              { id: 'u1', currency: 'KWD' },
+              { id: 'u2', currency: 'JOD' },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
     })
-    const res = await GET(makeGetRequest())
+    const res = await GET(req)
     const json = await res.json()
-    expect(json.notified).toBe(1)
-    const [, title, body] = (sendPushToUser as jest.Mock).mock.calls[0]
-    expect(title).toBe('Your Zakat hawl is approaching 🌙')
-    expect(body).toContain('days')
-    expect(body).toContain('John') // الاسم بيانات، القالب إنجليزي
-    expect(body).toContain('128') // 127.5 rounded, en-locale grouping
+    expect(json.synced).toBe(0)
+    expect(json.skipped).toBe(2)
+    expect(mockRpc).not.toHaveBeenCalled()
   })
 
-  it('falls back to Arabic push copy when lang is missing or ar', async () => {
-    setupMock({
-      profiles: [
-        { id: USER_A, full_name: 'أحمد', lang: 'ar' },
-        { id: USER_B, full_name: 'سارة' }, // بلا lang => ar
-      ],
-      states: {
-        [USER_A]: haulState({ days_remaining: 4, last_notified_at: null }),
-        [USER_B]: haulState({ user_id: USER_B, days_remaining: 6, last_notified_at: null }),
-      },
+  it('treats zero-price response as missing and skips those users', async () => {
+    mockFetchZakatPrices.mockResolvedValue({
+      gold: 0, silver: 0, rate: 0, currency: 'KWD', timestamp: 'x',
     })
-    const res = await GET(makeGetRequest())
+    const mockRpc = jest.fn()
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [{ id: 'u1', currency: 'KWD' }],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    const res = await GET(req)
     const json = await res.json()
-    expect(json.notified).toBe(2)
-    for (const call of (sendPushToUser as jest.Mock).mock.calls) {
-      const [, title, body] = call
-      expect(title).toBe('اقترب حول زكاتك 🌙')
-      expect(body).toMatch(/[؀-ۿ]/) // النسخة العربية تحتفظ بالنص العربي
-    }
+    expect(json.synced).toBe(0)
+    expect(json.skipped).toBe(1)
+    expect(mockRpc).not.toHaveBeenCalled()
   })
 
-  it('uses the due wording (اليوم موعد) when days_remaining <= 0 in ar', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد', lang: 'ar' }],
-      states: { [USER_A]: haulState({ days_remaining: 0, last_notified_at: null }) },
+  it('never passes stale default prices to the RPC', async () => {
+    mockFetchZakatPrices.mockResolvedValue({
+      gold: 85.5, silver: 1.05, rate: 0.306, currency: 'KWD', timestamp: 'x',
     })
-    await GET(makeGetRequest())
-    const [, title, body] = (sendPushToUser as jest.Mock).mock.calls[0]
-    expect(title).toBe('اليوم موعد زكاتك 🌙')
-    expect(body).toContain('اليوم موعد زكاة')
-    expect(body).toContain('أحمد')
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [{ id: 'u1', currency: 'KWD' }],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
+    })
+    await GET(req)
+    const call = mockRpc.mock.calls[0]
+    const params = call[1]
+    expect(params.p_gold_price).not.toBe(30)
+    expect(params.p_silver_price).not.toBe(0.35)
+    expect(params.p_fx_rate).not.toBe(1.0)
+    expect(params.p_gold_price).toBe(85.5)
   })
 
-  it('uses the due wording (Today is) when days_remaining <= 0 in en', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'John Smith', lang: 'en' }],
-      states: { [USER_A]: haulState({ days_remaining: 0, last_notified_at: null }) },
+  it('rejects requests with empty Authorization header', async () => {
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: '' },
     })
-    await GET(makeGetRequest())
-    const [, title, body] = (sendPushToUser as jest.Mock).mock.calls[0]
-    expect(title).toBe('Today is your Zakat due date 🌙')
-    expect(body).toContain('John')
-    expect(body).not.toMatch(/[؀-ۿ]/)
+    const res = await GET(req)
+    expect(res.status).toBe(401)
   })
 
-  it('uses the singular "one day" wording when days_remaining === 1', async () => {
-    setupMock({
-      profiles: [
-        { id: USER_A, full_name: 'أحمد', lang: 'ar' },
-        { id: USER_B, full_name: 'Jane', lang: 'en' },
-      ],
-      states: {
-        [USER_A]: haulState({ days_remaining: 1, last_notified_at: null }),
-        [USER_B]: haulState({ user_id: USER_B, days_remaining: 1, last_notified_at: null }),
-      },
+  it('rejects requests with malformed Authorization header', async () => {
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'test-secret' },
     })
-    await GET(makeGetRequest())
-    const calls = (sendPushToUser as jest.Mock).mock.calls
-    const arBody = calls.find(c => c[0] === USER_A)[2]
-    const enBody = calls.find(c => c[0] === USER_B)[2]
-    expect(arBody).toContain('بقي يوم واحد')
-    expect(enBody).toContain('one day')
+    const res = await GET(req)
+    expect(res.status).toBe(401)
   })
 
-  it('does NOT stamp last_notified_at when the push was suppressed (quiet hours)', async () => {
-    // sendPushToUser يعيد 0 عند ساعات الهادئة/الإشعارات المعطّلة/عدم وجود أجهزة
-    ;(sendPushToUser as jest.Mock).mockResolvedValueOnce(0)
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: { [USER_A]: haulState({ days_remaining: 3, last_notified_at: null }) },
+  it('returns correct currencies list even when some fetches fail', async () => {
+    mockFetchZakatPrices
+      .mockResolvedValueOnce({ gold: 85, silver: 1, rate: 0.3, currency: 'KWD', timestamp: 'x' })
+      .mockRejectedValueOnce(new Error('fail'))
+      .mockResolvedValueOnce({ gold: 100, silver: 1.2, rate: 0.7, currency: 'SAR', timestamp: 'x' })
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [
+              { id: 'u1', currency: 'KWD' },
+              { id: 'u2', currency: 'JOD' },
+              { id: 'u3', currency: 'SAR' },
+            ],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
+
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
     })
-    const res = await GET(makeGetRequest())
+    const res = await GET(req)
     const json = await res.json()
-    // الإشعار كُبح => لا يُحسب ولا يُختم
-    expect(json.notified).toBe(0)
-    expect(sendPushToUser).toHaveBeenCalledTimes(1)
-    expect(updateCalls).toHaveLength(0)
+    expect(json.currencies).toEqual(expect.arrayContaining(['KWD', 'JOD', 'SAR']))
+    expect(json.currencies).toHaveLength(3)
   })
 
-  it('stamps last_notified_at only when the push is actually delivered', async () => {
-    ;(sendPushToUser as jest.Mock).mockResolvedValue(1)
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: { [USER_A]: haulState({ days_remaining: 2, last_notified_at: null }) },
+  it('does not throw when profile currency is null (filtered by query)', async () => {
+    mockFetchZakatPrices.mockResolvedValue({
+      gold: 85, silver: 1, rate: 0.3, currency: 'KWD', timestamp: 'x',
     })
-    const res = await GET(makeGetRequest())
-    const json = await res.json()
-    expect(json.notified).toBe(1)
-    expect(updateCalls).toHaveLength(1)
-    expect(updateCalls[0].last_notified_at).toBeTruthy()
-  })
+    const mockRpc = jest.fn().mockResolvedValue({ error: null })
+    mockCreateAdminClient.mockReturnValue({
+      from: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          not: jest.fn().mockResolvedValue({
+            data: [{ id: 'u1', currency: 'KWD' }],
+            error: null,
+          }),
+        }),
+      }),
+      rpc: mockRpc,
+    } as unknown as ReturnType<typeof createAdminClient>)
 
-  it('does not stamp users who are silent (out of window / already notified)', async () => {
-    setupMock({
-      profiles: [
-        { id: USER_A, full_name: 'أحمد' }, // خارج النافذة (30 يوم)
-        { id: USER_B, full_name: 'سارة' }, // أُشعر اليوم بالفعل
-      ],
-      states: {
-        [USER_A]: haulState({ days_remaining: 30, last_notified_at: null }),
-        [USER_B]: haulState({ user_id: USER_B, days_remaining: 3, last_notified_at: new Date().toISOString() }),
-      },
+    const req = new NextRequest('http://localhost/api/zakat-autopilot', {
+      headers: { authorization: 'Bearer test-secret' },
     })
-    const res = await GET(makeGetRequest())
-    const json = await res.json()
-    expect(json.notified).toBe(0)
-    expect(updateCalls).toHaveLength(0)
-  })
-
-  it('targets a single user when a valid userId param is passed', async () => {
-    setupMock({
-      profiles: [{ id: USER_A, full_name: 'أحمد' }],
-      states: { [USER_A]: haulState({ days_remaining: 2, last_notified_at: null }) },
-    })
-    const res = await GET(
-      makeGetRequest(`http://localhost/api/zakat-autopilot?userId=${USER_A}`)
-    )
-    const json = await res.json()
-    expect(json.ok).toBe(true)
-    expect(json.synced).toBe(1)
-    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', { p_user_id: USER_A })
+    const res = await GET(req)
+    expect(res.status).toBe(200)
+    expect(mockRpc).toHaveBeenCalledTimes(1)
   })
 })

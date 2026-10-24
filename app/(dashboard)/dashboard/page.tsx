@@ -25,6 +25,7 @@ import { MonthSummaryBanner } from '@/components/dashboard/MonthSummaryBanner'
 import { DashboardCustomizer } from '@/components/dashboard/DashboardCustomizer'
 import { useDashboardLayout } from '@/hooks/useDashboardLayout'
 import { useZakatHawl } from '@/hooks/useZakatHawl'
+import type { ZakatPrices } from '@/lib/zakat-prices'
 import { ZakatHawlCard } from '@/components/dashboard/ZakatHawlCard'
 
 const MiniBarChart = nextDynamic(() => import('@/components/dashboard/Charts').then(m => ({ default: m.MiniBarChart })), { ssr: false, loading: () => <div className={`skeleton ${styles.skeletonChart}`} /> })
@@ -44,9 +45,31 @@ export default function DashboardPage() {
   const queryClient = useQueryClient()
   const { visibility, toggle, reset, show } = useDashboardLayout()
   
+  // Currency must be declared before useEffect that uses it
+  const currency = profile?.currency ?? 'JOD'
+  
   // Use the new TanStack Query based hook
   const { data, isLoading } = useDashboardData()
-  const { data: hawl } = useZakatHawl()
+  
+  // Prices state, added just before the existing useZakatHawl call:
+  const [prices, setPrices] = useState<ZakatPrices | null>(null)
+
+  useEffect(() => {
+    if (!currentUser?.id) return
+    let cancelled = false
+    fetch(`/api/zakat/prices?currency=${encodeURIComponent(currency)}`)
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`prices ${r.status}`)))
+      .then((p: ZakatPrices) => { if (!cancelled) setPrices(p) })
+      .catch(err => console.error('[dashboard] prices fetch failed', err))
+    return () => { cancelled = true }
+  }, [currentUser?.id, currency])
+
+  const { data: hawl } = useZakatHawl({
+    goldPrice: prices?.gold ?? 0,
+    silverPrice: prices?.silver ?? 0,
+    fxRate: prices?.rate ?? 0,
+    enabled: !!prices,
+  })
   
   const { accounts, totalBalance: accountsTotalBalance, loading: accountsLoading } = useAccounts(currentUser?.id)
   const [streakInfo, setStreakInfo] = useState<{ streak: number; loggedToday: boolean } | null>(null)
@@ -88,7 +111,6 @@ export default function DashboardPage() {
   const realExpenses = expenses - debtPayments
   const monthlyDebtCommitments = data?.monthlyDebtCommitments ?? 0
   const netAfterDebts = net - monthlyDebtCommitments
-  const currency = profile?.currency ?? 'JOD'
   const name = data?.name || currentUser?.user_metadata?.full_name || ''
   const firstName = name.split(' ')[0]
   // Use accounts balance only when at least one account has a real (non-zero) balance.
