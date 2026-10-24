@@ -58,7 +58,18 @@ Migration `20261021000000_zakat_autopilot.sql` encodes the fiqh Hawl rules as a 
 - When writing tests that mock these endpoints, curl the live URL and paste the real response
   shape + date into a comment beside the fixture.
 
-## 5. Cron and notification flow
+## 5. Live Price Fetching (v3.46.0+)
+
+**Clients MUST NOT compute Zakat**, but they MUST fetch the inputs (prices) and pass them to the RPC.
+
+- Web: `lib/zakat-prices.ts` exports `fetchZakatPrices()` → returns `{ goldPrice, silverPrice, fxRate }` in user's local currency
+- Mobile: `lib/services/metal_price_service.dart` exports `fetchZakatPrices()` with identical contract
+- Cron: `/api/zakat-autopilot` calls `fetchZakatPrices()` once per currency (KWD, JOD, SAR) and passes live prices to `sync_zakat_haul_state`
+- **Failure mode:** if price fetching fails for a user, the cron **skips that user** — it does NOT fall back to RPC defaults ($30/0.35/1.0)
+- Source: `api.gold-api.com/price/{XAU,XAG}` for gold (XAU) and silver (XAG) in USD/troy-oz; FX from `/api/exchange-rate`
+- Test fixtures for these endpoints must be verified live (CLAUDE.md rule 13) — paste real response + date
+
+## 6. Cron and notification flow
 
 1. Daily Vercel cron `0 8 * * *` → `/api/zakat-autopilot` (secret: `ZAKAT_AUTOPILOT_SECRET`).
 2. Route iterates users, calls `sync_zakat_haul_state` with **live** prices (never stale
@@ -69,7 +80,7 @@ Migration `20261021000000_zakat_autopilot.sql` encodes the fiqh Hawl rules as a 
    successful delivery.
 5. Separate `/api/zakat-reminder` cron handles haul reminders (GitHub Actions schedule).
 
-## 6. Where the code lives
+## 7. Where the code lives
 
 | Piece | Location |
 |---|---|
@@ -78,11 +89,13 @@ Migration `20261021000000_zakat_autopilot.sql` encodes the fiqh Hawl rules as a 
 | DB unit tests (pgTAP) | `supabase/tests/zakat_*.sql` |
 | Web calculator | `app/(dashboard)/dashboard/zakat/page.tsx` |
 | Web Hawl card | `components/dashboard/ZakatHawlCard.tsx` |
+| Live price fetcher (web) | `lib/zakat-prices.ts` |
+| Live price fetcher (mobile) | `mobile/fajrak_flutter/lib/services/metal_price_service.dart` |
 | Prices + autopilot routes | `app/api/zakat/prices/`, `app/api/zakat-autopilot/`, `app/api/zakat-reminder/` |
 | Mobile calculator | `mobile/fajrak_flutter/lib/screens/more/zakat_calculator_screen.dart` |
 | Zakat tables | `zakat_history`, `zakat_holdings`, `zakat_haul_tracking` |
 
-## 7. FIRE and halal investing
+## 8. FIRE and halal investing
 
 - **FIRE**: `/dashboard/fire` (web) and `more/fire_calculator_screen.dart` (mobile) with
   Lean/Normal/Fat modes; the simulation layer is `components/investments/wealth-simulator.tsx`
@@ -94,7 +107,7 @@ Migration `20261021000000_zakat_autopilot.sql` encodes the fiqh Hawl rules as a 
   ("Halal Investor"). It is a label only — no screening logic lives in the repo; do not add
   screening data sources without an ADR.
 
-## 8. Checklist before touching this domain
+## 9. Checklist before touching this domain
 
 - [ ] No Zakat/Nisab/Hawl math added to web or mobile — RPC only.
 - [ ] Any new price source verified live (rule 13) with the response shape documented.

@@ -114,6 +114,18 @@ MCP Client → /api/mcp → Unified Tools Layer → Supabase RPC / Queries → P
 - Shared `lib/unified-tools` provides: `getAccountBalances`, `getCashflowSummary`, `createTransaction`, idempotency
 - Idempotency keys prevent duplicate transactions from retries
 
+### 8. **Zakat Flow (Live Price Fetching)**
+```
+User Dashboard / Cron → lib/zakat-prices.ts (web) / metal_price_service.dart (mobile) 
+  → api.gold-api.com/price/{XAU,XAG} + /api/exchange-rate 
+  → sync_zakat_haul_state(p_user_id, p_gold_price, p_silver_price, p_fx_rate)
+```
+- Web dashboard (`components/dashboard/ZakatHawlCard.tsx`), Mobile dashboard (`zakat_calculator_screen.dart`), and daily cron (`/api/zakat-autopilot`) all call `lib/zakat-prices.ts` / `metal_price_service.dart`
+- `lib/zakat-prices.ts` exports `fetchZakatPrices()` returning `{ goldPrice, silverPrice, fxRate }` in user's currency
+- RPC defaults ($30 gold, 0.35 silver, 1.0 FX) are **stale fixtures** — never rely on them; always pass live prices
+- If price fetching fails, cron skips the user (does not fall back to defaults)
+- Gold/silver: `api.gold-api.com/price/{XAU,XAG}` (CORS-enabled, USD/troy-oz); FX: `/api/exchange-rate` (decoupled from Yahoo stock-price `Future.wait`)
+
 ## Key Abstractions
 
 | Abstraction | Location | Purpose |
@@ -191,6 +203,7 @@ MCP Client → /api/mcp → Unified Tools Layer → Supabase RPC / Queries → P
 - **Rate Limiting**: Per-user proxy limits via `proxy_usage` table + `bump_proxy_usage` RPC
 - **CSP & Security Headers**: Configured in `next.config.mjs` (frame denial, HSTS, permissions policy)
 - **Idempotency**: `check_and_reserve_idempotency_key` RPC prevents duplicate mutations
+- **Anon grants revoked**: `anon` INSERT/UPDATE/DELETE/TRUNCATE revoked on all public tables (2026-10-25). `anon` has SELECT only on `testimonials`. RLS is the only write gatekeeper.
 
 ## Deployment & Operations
 

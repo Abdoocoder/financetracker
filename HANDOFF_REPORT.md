@@ -1,10 +1,10 @@
 # HANDOFF REPORT — FinanceTracker (Fajrak)
 
-**Last updated:** 2026-10-24 · **Current release:** 3.45.0+64 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
+**Last updated:** 2026-10-25 · **Current release:** 3.46.0+65 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
 Archived audits live in docs/archive/; open change history lives in CHANGELOG.md.
 
 **Prepared for:** external software architect
-**Date:** 2026-10-24
+**Date:** 2026-10-25
 **Method:** read-only repository reconnaissance (no source files modified, no package managers or test suites run, `node_modules/` etc. not read)
 
 ---
@@ -14,7 +14,7 @@ Archived audits live in docs/archive/; open change history lives in CHANGELOG.md
 - Repo is a dual-client personal-finance product: **Next.js 16 web app** + **Flutter mobile app**, both on one **Supabase** (PostgreSQL 17, Auth, RLS, RPCs, Realtime, Edge Functions) backend, deployed via Vercel/Firebase Hosting and Google Play.
 - Target market: Arabic-speaking users, primarily **Kuwait & the Gulf**; product identity is "**Fajrak** — Islamic finance coach" (zakat, halal investing, FIRE), while repo/tooling is named "FinanceTracker" — an unresolved identity mismatch.
 - Production incident: RESOLVED — see `mobile/fajrak_flutter/INCIDENT.md` (post-mortem). Outage ran ≥2026-10-11 → 2026-10-17; daily backups + zero-budget trigger guard now in place.
-- **Push notifications (Edge Function v15, deployed 2026-10-24)**: alerts are now written to the `alerts` table BEFORE quiet-hours/subscription checks (A.2b). The function self-heals missing `fingerprint` by querying `notification_history` (F22). **Known issue:** 10,235 existing alerts have `fingerprint = NULL` (all rows); backfill is pending. The unique index `(user_id, fingerprint) WHERE fingerprint IS NOT NULL` does not reject these.
+- **Push notifications (Edge Function v15, deployed 2026-10-24)**: alerts are now written to the `alerts` table BEFORE quiet-hours/subscription checks (A.2b). The function self-heals missing `fingerprint` by querying `notification_history` (F22). Backfill complete: 6,436 duplicate alerts removed, 3,799 fingerprints assigned. Unique index `(user_id, fingerprint) WHERE fingerprint IS NOT NULL` now enforces dedup.
 - **Database drift is the #1 technical risk**: live prod has columns/tables not in migrations (`user_stats`, `testimonials`, `saving_challenges`, `health_score_history`, 25+ extra `profiles` columns) — `supabase db reset` would destroy prod reality.
 - Schema defines **29 tables; all 29 have `ENABLE ROW LEVEL SECURITY`** in migrations — but live-prod RLS state for the 4 unmigrated tables is UNKNOWN (policies exist, table DDL does not).
 - `currentUser!` force-unwrap: **FIXED in v3.44.0** — all 11 occurrences in 10 files under `mobile/fajrak_flutter/lib/` replaced with null-safe early returns (historical list retained in §4).
@@ -22,8 +22,9 @@ Archived audits live in docs/archive/; open change history lives in CHANGELOG.md
 - Financial calculations are **duplicated 5–7× per metric** across web/mobile/SQL (per ARCHITECTURE_AUDIT_VERIFIED) with some hardcoded health-score thresholds (partially addressed by migration `20261017000000`).
 - Dependency issues (declared versions only): 8 moderate `@opentelemetry` vulns (documented), accidental runtime deps `install`/`npx` in `package.json`, Flutter `flutter_local_notifications: ^23.0.0-dev.3` (dev prerelease) and `sqlcipher_flutter_libs: ^0.7.0+eol` in a shipping app.
 - Release: mobile **3.44.0+63** shipped to Google Play (Submission ID 44, status "In review"); web `package.json` remains **3.42.0**. Historical version drift across five sources is documented in §9.
-- Security posture: RLS-first design is sound; open items are **leaked-password protection disabled**, pending anon-key rotation, no feature flags, and BYOK "keys never leave device" store copy vs the envelope actually POSTed to the proxy (wording needs legal review).
-- Process reality: **single-developer SPOF**, no revenue/subscriptions, ~58 migration files (legacy 001–041 + 12 dated + 042–048 with numbering gaps 020/044–046), and multiple overlapping audit documents with conflicting numbers.
+- **v3.46.0 Fixed critical Zakat religious-accuracy bug**: `sync_zakat_haul_state` now receives live gold/silver/FX prices via `lib/zakat-prices.ts` and `metal_price_service.dart` from the cron and both dashboards. Previously computed Hawl at stale defaults ($30/g gold) — 2.7x under current price.
+- Security posture: RLS-first design is sound; open items are **leaked-password protection disabled**, pending anon-key rotation, no feature flags, and BYOK "keys never leave device" store copy vs the envelope actually POSTed to the proxy (wording needs legal review). `anon` write grants revoked on all public tables.
+- Process reality: **single-developer SPOF**, no revenue/subscriptions, ~58 migration files (legacy 001–041 + 12 dated + 042–043, 047–048 with numbering gaps 020/044–046), and multiple overlapping audit documents with conflicting numbers.
 - Toolchain is documented green: lint, typecheck, Jest (592), Playwright, `next build`, `flutter analyze`, 177 Flutter tests all pass per audits (not re-verified in this recon).
 - Biggest structural gaps for a new architect: DB-not-managed-by-migrations, duplicated calculation logic, and version/identity drift. (The production outage is **resolved** — see `mobile/fajrak_flutter/INCIDENT.md`.)
 
@@ -70,9 +71,11 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 - **RLS verdict:** 29/29 tables have `ENABLE ROW LEVEL SECURITY` in migrations; policy pattern is `auth.uid() = user_id` (wrapped as `(select auth.uid())` after perf migrations `20260908045741`/`20260914000000`).
 - **UNKNOWN-in-prod caveat:** the 4 prod-only tables' live RLS state cannot be proven from the repo (policies reference them, DDL missing) → treat as **UNKNOWN** until DB access is restored.
-- **Live drift (AUDIT_REPORT.md §4):** `profiles` has **16 extra columns (verified recon-2)** not in migrations; default currency in prod is **JOD** (not KWD); 6 RLS-initplan WARN advisories; 21 unused indexes across 14 tables.
+- **Live drift (AUDIT_REPORT.md §4):** `profiles` has **16 extra columns (verified recon-2)** not in migrations; default currency in prod changed **JOD → KWD** (2026-10-25); 6 RLS-initplan WARN advisories; 21 unused indexes across 14 tables.
+- **alerts** table: backfill complete — 6,436 duplicate rows removed, 3,799 fingerprints assigned; unique index `(user_id, fingerprint) WHERE fingerprint IS NOT NULL` now enforces dedup.
 - **testimonials** policies (`legacy/010`, `011`, re-applied in `20260913135653_add_prod_only_schema.sql`): public SELECT `WHERE is_visible=true`; owner-only insert/update/delete — yet an external client is hammering `/rest/v1/testimonials` (incident), i.e. public read amplification, not a policy bypass.
 - Security-hardening migrations present: `advisor_function_lockdown`, `revoke_public_from_secdef_functions`, `verify_owner_in_user_rpcs`, `022_security_hardening`, `024_production_hardening`, `20261018000000_linter_security_hardening` (revokes PUBLIC+anon EXECUTE on 7 internal RPCs with explicit grants to authenticated/service_role, pins `search_path`, drops dup index).
+- **Anon grants revoked** (2026-10-25): `anon` INSERT/UPDATE/DELETE/TRUNCATE revoked on all public tables. `anon` has SELECT only on `testimonials`. No app flows affected.
 - `supabase/config.toml` has `[auth] enabled = true`; **leaked-password protection is not enabled** (flagged as recommendation in AUDIT_REPORT.md:179).
 
 ## 4. Codebase Structure & Force-Unwrap Hotspots (RESOLVED in v3.44.0)
@@ -151,7 +154,7 @@ Store listing (ar + en) claims, mapped to implementation:
 8. 🟠 Coverage 44.85% vs 80% target; dashboard pages 0%.
 9. 🟠 8 moderate npm vulns (`@opentelemetry` transitive).
 10. 🟠 Anon key rotation still pending (post-incident) — key is embedded in clients.
-11. 🟡 Identity/currency inconsistencies: FinanceTracker vs Fajrak; **KWD (CLAUDE.md) vs JOD (prod default)** vs "Kuwait/Gulf" (PRODUCT.md).
+11. 🟡 Identity/currency inconsistencies: FinanceTracker vs Fajrak; **KWD (CLAUDE.md) vs KWD (prod default as of 2026-10-25)** vs "Kuwait/Gulf" (PRODUCT.md).
 12. 🟡 Version drift across 5 documents (see §9).
 13. 🟡 **Makefile fragility:** `mobile/fajrak_flutter/Makefile` extracts Firebase keys from `.env` via **unanchored** `grep`, matching `FLUTTER_FIREBASE_*` by substring. Anchoring the grep (`^FIREBASE_*`) would silently break web builds.
 14. 🟡 Single-developer SPOF; no bus-factor docs beyond this handoff; no revenue to fund help.
@@ -164,25 +167,25 @@ Store listing (ar + en) claims, mapped to implementation:
 
 ## 9. Release & Version Drift
 
-**Current release:** mobile **3.45.0+64** — version-bump commit `7269ffdd` (2026-10-19); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
+**Current release:** mobile **3.46.0+65** — version-bump commit (2026-10-25); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
 
 **Zakat Autopilot (Phase C) — complete and live** (2026-10-21): backend migration `20261021000000_zakat_autopilot.sql` (`sync_zakat_haul_state` + `zakat_haul_tracking`) is on `main`, the daily Vercel Cron `/api/zakat-autopilot` (`0 8 * * *`) is live, and the Hawl countdown UI has landed on the Web and Mobile dashboards and Zakat pages. Next phase: Agentic AI (Executive Assistant) — roadmap in `AGENTIC_AI_PLAN.md`.
 
 | Source | Declared version |
 |---|---|
-| `VERSION` (root) | **3.45.0+64** |
-| `mobile/fajrak_flutter/pubspec.yaml` | **3.45.0+64** |
-| `HANDOFF_REPORT.md` header | **3.45.0+64** |
+| `VERSION` (root) | **3.46.0+65** |
+| `mobile/fajrak_flutter/pubspec.yaml` | **3.46.0+65** |
+| `HANDOFF_REPORT.md` header | **3.46.0+65** |
 | `mobile/README.md` | 3.44.0+63 *(pending next store docs)* |
-| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.45.0+64** |
+| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.46.0+65** |
 | `package.json` (web) | 3.42.0 — **intentionally unchanged** |
 | `mobile/AGENTS.md` | 3.43.1+60 (stale) |
 | `structure.md` | 3.40.0+51 (stale) |
 | `push-notification` Edge Function | **v15** (deployed 2026-10-24 13:36:52 UTC) |
 
 - **Intentional decision:** the web app's `package.json` stays at **3.42.0** and is deliberately not bumped with mobile releases — web and mobile ship independently from the same repo, and the web bundle has not been re-released. This is a documented choice, not drift to be "fixed."
-- Mobile version sources are aligned at **3.45.0+64** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
-- Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → 3.44.0 (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety) → **3.45.0** (Zakat Engine v2 + Autopilot: backend, cron, countdown UI on Web + Mobile).
+- Mobile version sources are aligned at **3.46.0+65** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
+- Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → 3.44.0 (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety) → **3.45.0** (Zakat Engine v2 + Autopilot: backend, cron, countdown UI on Web + Mobile) → **3.46.0** (Zakat live prices, alerts dedup, anon grants revoked, currency onboarding KWD default).
 - **Push-notification Edge Function** is versioned separately: v14 (pre-Track D) → **v15** (A.2b + A.3 + F22 self-heal, deployed 2026-10-24).
 - Build-process fragility: running `flutter build appbundle --release` directly (bypassing Makefile) silently ships a build with **no credentials → login fails** (documented past incident).
 - No changelog file at root; release history lives in `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md`.

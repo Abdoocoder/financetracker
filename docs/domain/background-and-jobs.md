@@ -64,6 +64,7 @@ All schedules are **UTC** (Amman is UTC+3; the workflow comments show local time
 - Route-level flow: the workflow sends `Authorization: Bearer $CRON_SECRET`
   (see `app/api/smart-notifications/route.ts`, which fans out to the reminder
   routes with its own secret header).
+- **Zakat Autopilot (`/api/zakat-autopilot`):** fetches prices once per currency (KWD, JOD, SAR) via `lib/zakat-prices.ts` and passes live prices to `sync_zakat_haul_state`. If price fetching fails for a user, the cron **skips that user** (does not fall back to RPC defaults).
 - Adding a cron: add the schedule in `vercel.json` or the workflow **and** guard the
   route with `verifyCronAuth`; update the table above.
 
