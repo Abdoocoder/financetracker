@@ -134,5 +134,5 @@ export function detectCurrency(): DetectionResult {
 
   // 3. Fallback
   const isArabic = (typeof navigator !== 'undefined' ? navigator.language : '').startsWith('ar')
-  return { currency: isArabic ? 'JOD' : 'USD', confidence: 'low', countryName: '' }
+  return { currency: isArabic ? 'KWD' : 'USD', confidence: 'low', countryName: '' }
 }
