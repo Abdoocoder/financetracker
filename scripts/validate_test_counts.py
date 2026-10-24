@@ -121,10 +121,19 @@ def measure_flutter() -> int | None:
         print("\n".join(output.splitlines()[-20:]), file=sys.stderr)
         return None
 
-    # `00:06 +208: All tests passed!`
+    # Two reporter formats:
+    #   compact (local default): `00:06 +208: All tests passed!`
+    #   github (auto-selected when GITHUB_ACTIONS=true): `🎉 208 tests passed.`
+    # The github reporter omits the `+N:` prefix; the fallback counters below
+    # also fail on it, so match the numeric phrase directly.
+    # The negative lookahead rejects `N tests passed, M failed.` (failed runs
+    # are already filtered by the returncode check, but this keeps the regex
+    # honest if that ever changes).
     match = re.search(r"\+(\d+): All tests passed!", output)
     if not match:
-        # Fallback: the highest running counter anywhere in the output.
+        match = re.search(r"(\d+)\s+tests?\s+passed\.?(?!\s*,)", output)
+    if not match:
+        # Fallback: highest +N counter (compact reporter for partial output).
         counters = [int(n) for n in re.findall(r"\+(\d+):", output)]
         if not counters:
             fail("could not parse a test total from `flutter test` output")
