@@ -167,6 +167,18 @@ export default function AlertsPage() {
       else {
         toast.success(data.message)
         await load()
+
+        // F16: alert is written by an async chain (notification_history →
+        // webhook → Edge Function → alerts.insert), typically 500-2000ms
+        // after the POST returns. Poll briefly to catch it.
+        // Stop early when the list grows; stop after 3 tries (1.8s) — if
+        // nothing appeared, dedupe likely blocked (F13).
+        for (let i = 0; i < 3; i++) {
+          await new Promise(r => setTimeout(r, 600))
+          const prev = alerts.length
+          await load()
+          if (alerts.length > prev) break
+        }
       }
     } catch { toast.error(lang === 'en' ? 'Connection error' : 'خطأ في الاتصال') }
     setGenerating(false)

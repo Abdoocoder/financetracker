@@ -137,6 +137,19 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   style: const TextStyle())));
           _load();
           context.read<AppState>().loadUnreadAlerts();
+
+          // F16: alert is written by an async chain (notification_history →
+          // webhook → Edge Function → alerts.insert), typically 500-2000ms
+          // after the POST returns. Poll briefly to catch it.
+          // Stop early when the list grows; stop after 3 tries (1.8s) — if
+          // nothing appeared, dedupe likely blocked (F13).
+          for (int i = 0; i < 3; i++) {
+            await Future.delayed(const Duration(milliseconds: 600));
+            if (!mounted) return;
+            final prevCount = _alerts.length;
+            await _load();
+            if (_alerts.length > prevCount) break;
+          }
         } else {
           throw Exception('Failed to generate alerts: ${response.statusCode}');
         }
