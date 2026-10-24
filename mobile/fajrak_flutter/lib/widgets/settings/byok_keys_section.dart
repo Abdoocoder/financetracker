@@ -792,31 +792,44 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
           ),
         ),
         const SizedBox(height: 10),
-        DropdownButtonFormField<String>(
-          initialValue: _newProvider.isEmpty ? null : _newProvider,
-          decoration: _inputDecoration(
-            colorScheme,
-            'settings_byok_keys_select_provider'.tr(),
-          ),
-          items: [
-            for (final p in _proxyProviders)
-              DropdownMenuItem(
-                value: p.id,
-                child: Text('${p.name} — ${p.defaultModel}'),
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                initialValue: _newProvider.isEmpty ? null : _newProvider,
+                decoration: _inputDecoration(
+                  colorScheme,
+                  'settings_byok_keys_select_provider'.tr(),
+                ),
+                items: [
+                  for (final p in _proxyProviders)
+                    DropdownMenuItem(
+                      value: p.id,
+                      child: Text('${p.name} — ${p.defaultModel}'),
+                    ),
+                ],
+                onChanged: (v) => setState(() => _newProvider = v ?? ''),
+                style: TextStyle(fontSize: 13, color: colorScheme.onSurface),
+                isExpanded: true,
               ),
+            ),
           ],
-          onChanged: (v) => setState(() => _newProvider = v ?? ''),
-          style: TextStyle(fontSize: 13, color: colorScheme.onSurface),
         ),
         const SizedBox(height: 10),
-        TextField(
-          controller: _nameCtrl,
-          onChanged: (_) => setState(() {}),
-          decoration: _inputDecoration(
-            colorScheme,
-            'settings_byok_keys_name_placeholder'.tr(),
-          ),
-          style: TextStyle(fontSize: 13, color: colorScheme.onSurface),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _nameCtrl,
+                onChanged: (_) => setState(() {}),
+                decoration: _inputDecoration(
+                  colorScheme,
+                  'settings_byok_keys_name_placeholder'.tr(),
+                ),
+                style: TextStyle(fontSize: 13, color: colorScheme.onSurface),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
         Row(
