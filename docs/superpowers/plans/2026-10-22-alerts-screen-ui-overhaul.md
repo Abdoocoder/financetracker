@@ -1548,3 +1548,20 @@ verified by visual syntax review only. It touches only `public.alerts`
 (`ADD COLUMN IF NOT EXISTS`, `CREATE UNIQUE INDEX IF NOT EXISTS ... WHERE
 fingerprint IS NOT NULL`), and depends on no other migration. Full
 verification is deferred to Phase B (against the linked project).
+
+
+### Correction H — Phase 0.2 (type: 'info') is folded into Phase A.3 (found 2026-10-24)
+
+An investigation of `smart-notifications:199` and `auto-debt:130` found
+both use `type: 'info'`, which is invalid against prod's
+`alerts_type_check` (`warning | motivation | reminder | achievement`).
+Both are inside inserts that fail silently today (Promise.allSettled).
+
+Decision: do NOT fix the type in place. Phase A.3 removes the entire
+`from('alerts').insert(...)` call from both files, so the type literal
+disappears with it. After A.3, alerts are written by the Edge Function
+via `TAG_TO_ALERT_TYPE[category]`, which maps the `weekly` push category
+to `reminder` — the semantically correct value. Fixing the type first
+would be a fix-then-delete.
+
+This is Correction H, not a Phase 0.2 step. Phase 0.2 is closed.
