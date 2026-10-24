@@ -22,4 +22,6 @@ export const arAlerts = {
     alerts_filter_achievement: '🏆 إنجازات',
     alerts_filter_motivation: '💡 نصائح',
     alerts_generate_success: 'تم إرسال طلب التوليد بنجاح',
+    alerts_generate_none: 'لا توجد تنبيهات جديدة — كل شيء محدّث',
+    alerts_generate_pending: 'جاري توليد {count} تنبيه...',
 } as const

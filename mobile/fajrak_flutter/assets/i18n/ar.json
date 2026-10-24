@@ -347,6 +347,8 @@
   "alerts_filter_motivation": "💡 نصائح",
   "alerts_empty": "لا توجد تنبيهات. فعّل حدود الميزانية أو تذكيرات الديون لتلقي التنبيهات.",
   "alerts_generate_success": "تم إرسال طلب التوليد بنجاح",
+  "alerts_generate_none": "لا توجد تنبيهات جديدة — كل شيء محدّث",
+  "alerts_generate_pending": "جاري توليد {count} تنبيه...",
   "alerts_auto": "يعمل تلقائياً يومياً الساعة 7:00 صباحاً",
   "alerts_unread": "غير مقروء",
   "learn_title": "درس اليوم",
