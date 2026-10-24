@@ -233,3 +233,36 @@ grep -Pzo "Alerts mutations must update [\x60]?AppState[\x60]? through[ \t]*\n[ 
 grep -n -F "Alerts mutations must update" "$F"
 sed -n '115,116p' "$F"
 ```
+
+---
+
+## Pitfall 4: easy_localization `.tr(args:)` does not support named placeholders
+
+**Discovered:** 2026-10-24 (F20 fix in `mobile/fajrak_flutter/lib/screens/alerts/alerts_screen.dart:150`)
+
+`easy_localization`'s `.tr(args:)` method only substitutes **positional** placeholders (`%s`, `%1$s`, etc.). It does **not** substitute named placeholders like `{count}`.
+
+**Wrong:**
+```dart
+// i18n value: "Generating {count} alert(s)..."
+'alerts_generate_pending'.tr(args: {'count': candidates})
+// Result: "Generating {count} alert(s)..."  (literal, not substituted)
+```
+
+**Correct:**
+```dart
+// i18n value: "Generating {count} alert(s)..."
+'alerts_generate_pending'.tr().replaceAll('{count}', candidates.toString())
+// Result: "Generating 3 alert(s)..."
+```
+
+**Or use positional in the i18n file:**
+```json
+"alerts_generate_pending": "Generating %s alert(s)..."
+```
+```dart
+'alerts_generate_pending'.tr(args: [candidates])
+// Result: "Generating 3 alert(s)..."
+```
+
+This is a common trap because the JSON format visually looks like it supports `{named}` placeholders, but the Dart implementation only handles `%s`-style formatting.

@@ -1637,3 +1637,53 @@ for fresh tokens, verify `FCM_SERVICE_ACCOUNT` secret via Supabase dashboard
 → Edge Functions → Secrets.
 
 Not in Track D scope. F18.
+
+### Correction L — F22: 10,235 alerts with NULL fingerprint (found 2026-10-24)
+
+Production query against `ujwcvtpwsaidljecqbaa` revealed:
+
+```
+null_fp = 10235, non_null_fp = 0
+```
+
+All 10,235 alerts in the `alerts` table have `fingerprint = NULL`. The unique
+index `(user_id, fingerprint)` created in migration
+`20261024120000_alerts_fingerprint_unique.sql` has a `WHERE fingerprint IS NOT
+NULL` predicate, so it does not reject these rows — but the dedupe logic
+depends on fingerprint being present.
+
+Root cause: the webhook payload template in Supabase Dashboard (for the
+`notification_history` INSERT trigger) omits `record.fingerprint`. The Edge
+Function receives `payload.record.fingerprint` as `null` and
+`payload.record.data.fingerprint` as `null`.
+
+Fix (deployed as Version 15 at 2026-10-24 13:36:52 UTC): the Edge Function
+self-heals by querying `notification_history` by `historyId` when the payload
+lacks a fingerprint (lines 85-94 in `supabase/functions/push-notification/index.ts`).
+This ensures new alerts get a fingerprint even if the webhook template is
+misconfigured.
+
+Backfill for the 10,235 existing NULL rows is a separate future task (not in
+Track D scope). The self-heal only applies to alerts generated after the fix.
+
+### Correction M — F20: easy_localization placeholder interpolation (found 2026-10-24)
+
+Mobile was showing literal `"Generating {count} alert(s)..."` because
+`easy_localization`'s `.tr(args:)` expects **positional** placeholders (`%s`,
+`%1$s`), not named (`{count}`). The code at
+`mobile/fajrak_flutter/lib/screens/alerts/alerts_screen.dart:150` uses:
+
+```dart
+'alerts_generate_pending'.tr().replaceAll('{count}', candidates.toString())
+```
+
+This is a new pitfall worth recording in `docs/PROMPTS.md` — `.tr(args: [val])`
+only works with `%s` in the JSON value. For named placeholders, use `.tr()` then
+`.replaceAll('{key}', val)`.
+
+### Correction N — F21: http timeouts deferred (observed 2026-10-24)
+
+No timeouts on `http.post` in `_generateAlerts()` or on the service
+`_load()` call. During a network hiccup, the spinner can remain stuck
+indefinitely (observed 30+ minutes). Deferred as future work — not applied in
+this session.

@@ -1,7 +1,7 @@
 # Domain: Background and Jobs (Push, Crons, Offline Sync, Gamification)
 
 > Layer 2 deep dive. Entry points: `AGENTS.md` → `PROJECT_CONTEXT.md` → this file.
-> Last verified 2026-10-20.
+> Last verified 2026-10-24.
 
 ## 1. Push pipeline
 
@@ -26,13 +26,24 @@ One entry point, one queue table, one delivery function:
    `url`, `tag`, and `badgeCount` (unread `alerts` + 1).
 5. Stale tokens (`UNREGISTERED`/`INVALID_ARGUMENT` on FCM, `410`/`404` on Web Push)
    are deleted from `push_subscriptions`.
-6. Only if at least one send succeeded, a row is inserted into `alerts`
-   (in-app display), with `type` derived from `TAG_TO_ALERT_TYPE`
-   (`BudgetAlert`/`ZakatAlert`/`SecurityAlert` → `warning`, `SavingGoal` →
-   `achievement`, else `reminder`).
+6. **The Edge Function writes the `alerts` row BEFORE quiet-hours and
+   subscription checks** (since A.2b, commit 9214c2ef). The insert happens at
+   line 116-135 of `supabase/functions/push-notification/index.ts`. If the
+   insert succeeds (or hits the fingerprint unique index `23505`), the function
+   proceeds to delivery but returns `alert_written: true` regardless of push
+   outcome. The `type` is derived from `TAG_TO_ALERT_TYPE` (extended in
+   `push-notification/index.ts:21-32` to include `SystemUpdate`, `debt-reminder`,
+   `debt-paid`, `debt-auto`, `weekly`).
+7. Stale tokens (`UNREGISTERED`/`INVALID_ARGUMENT` on FCM, `410`/`404` on Web Push)
+   are deleted from `push_subscriptions`.
+8. **Fingerprint self-heal (F22, v15):** if the webhook payload omits
+   `fingerprint` (custom Dashboard template), the function queries
+   `notification_history` by `historyId` to recover it (lines 85-94).
 
 Golden rule 7: **any new notification path must go through `sendPushToUser`** so
 quiet hours, masking, dedupe, and `alerts` display are honored exactly once.
+**Distinction:** "delivery" (push, may fail or be skipped) vs "data record"
+(alerts row, always written for eligible categories).
 
 ## 2. Crons
 

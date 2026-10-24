@@ -59,6 +59,17 @@ notes and version-bump commits; see the note on links at the end of this file.
   spinner. `_load()` used to return before its `try/finally`, so `_loading`
   never cleared; the guard is now inside the `try` and `finally` always
   clears the flag. The load logic now lives in `AlertsService.fetchAlerts`.
+- **Alerts generation (mobile + web)**: after pressing Generate, the UI now
+  polls 3× at 600 ms intervals to catch alerts written asynchronously via the
+  webhook → Edge Function chain (F16). Previously the list appeared empty
+  until pull-to-refresh.
+- **Alerts generating toast (mobile)**: fixed `{count}` placeholder
+  interpolation — `easy_localization`'s `.tr(args:)` only supports positional
+  (`%s`) placeholders; the fix uses `.tr().replaceAll('{count}', val)` (F20).
+- **Push notifications**: the Edge Function (v15) now self-heals missing
+  `fingerprint` by querying `notification_history` when the webhook payload
+  omits it. This fixes 10,235 existing alerts with `fingerprint = NULL`
+  (F22). Backfill for historical rows is pending.
 
 ### Changed
 
