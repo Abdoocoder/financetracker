@@ -165,19 +165,23 @@ export default function AlertsPage() {
       const data = await res.json()
       if (!res.ok) toast.error(data.error ?? (lang === 'en' ? 'An error occurred' : 'حدث خطأ'))
       else {
-        toast.success(data.message)
-        await load()
-
-        // F16: alert is written by an async chain (notification_history →
-        // webhook → Edge Function → alerts.insert), typically 500-2000ms
-        // after the POST returns. Poll briefly to catch it.
-        // Stop early when the list grows; stop after 3 tries (1.8s) — if
-        // nothing appeared, dedupe likely blocked (F13).
-        for (let i = 0; i < 3; i++) {
-          await new Promise(r => setTimeout(r, 600))
-          const prev = alerts.length
+        const candidates = data.candidates ?? data.generated ?? 0
+        if (candidates === 0) {
+          // No candidates found — honest feedback, no poll needed.
+          toast.info(t('alerts_generate_none'))
+        } else {
+          // Candidates found. Writes happen asynchronously via webhook →
+          // Edge Function. Poll briefly (F16) to catch them.
+          toast.info(t('alerts_generate_pending', { count: candidates }))
           await load()
-          if (alerts.length > prev) break
+
+          // F16: poll 3×600ms for the async writes
+          for (let i = 0; i < 3; i++) {
+            await new Promise(r => setTimeout(r, 600))
+            const prev = alerts.length
+            await load()
+            if (alerts.length > prev) break
+          }
         }
       }
     } catch { toast.error(lang === 'en' ? 'Connection error' : 'خطأ في الاتصال') }

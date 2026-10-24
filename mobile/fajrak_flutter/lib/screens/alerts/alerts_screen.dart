@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
@@ -132,23 +134,31 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
       if (mounted) {
         if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('alerts_generate_success'.tr(),
-                  style: const TextStyle())));
-          _load();
-          context.read<AppState>().loadUnreadAlerts();
+          final Map<String, dynamic> data = jsonDecode(response.body);
+          final int candidates = data['candidates'] ?? data['generated'] ?? 0;
 
-          // F16: alert is written by an async chain (notification_history →
-          // webhook → Edge Function → alerts.insert), typically 500-2000ms
-          // after the POST returns. Poll briefly to catch it.
-          // Stop early when the list grows; stop after 3 tries (1.8s) — if
-          // nothing appeared, dedupe likely blocked (F13).
-          for (int i = 0; i < 3; i++) {
-            await Future.delayed(const Duration(milliseconds: 600));
-            if (!mounted) return;
-            final prevCount = _alerts.length;
-            await _load();
-            if (_alerts.length > prevCount) break;
+          if (candidates == 0) {
+            // No candidates found — honest feedback, no poll needed.
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('alerts_generate_none'.tr(),
+                    style: const TextStyle())));
+          } else {
+            // Candidates found. Writes happen asynchronously via webhook →
+            // Edge Function. Poll briefly (F16) to catch them.
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text('alerts_generate_pending'.tr(args: [candidates.toString()]),
+                    style: const TextStyle())));
+            _load();
+            context.read<AppState>().loadUnreadAlerts();
+
+            // F16: poll 3×600ms for the async writes
+            for (int i = 0; i < 3; i++) {
+              await Future.delayed(const Duration(milliseconds: 600));
+              if (!mounted) return;
+              final prevCount = _alerts.length;
+              await _load();
+              if (_alerts.length > prevCount) break;
+            }
           }
         } else {
           throw Exception('Failed to generate alerts: ${response.statusCode}');

@@ -25,7 +25,7 @@ async function generateAlerts(userId?: string) {
   const month = now.getMonth() + 1
   const query = supabase.from('profiles').select('id, monthly_income, full_name')
   const { data: profiles } = userId ? await query.eq('id', userId) : await query
-  if (!profiles?.length) return 0
+  if (!profiles?.length) return { candidates: 0 }
 
   // pre-fetch existing alerts for all users in one query to avoid per-user checks
   const since20h = new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString()
@@ -140,15 +140,16 @@ async function generateAlerts(userId?: string) {
       }
     }
   }
-  return toInsert.length
+  // Return candidates count; actual inserts happen asynchronously via webhook → Edge Function
+  return { candidates: toInsert.length }
 }
 
 export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const count = await generateAlerts()
-  return NextResponse.json({ ok: true, generated: count })
+  const result = await generateAlerts()
+  return NextResponse.json({ ok: true, generated: result.candidates, candidates: result.candidates })
 }
 
 export async function POST(request: NextRequest) {
@@ -159,8 +160,11 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
     const { data: { user }, error } = await supabase.auth.getUser(token)
     if (error || !user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    const count = await generateAlerts(user.id)
-    return NextResponse.json({ ok: true, generated: count, message: count > 0 ? `✅ تم توليد ${count} تنبيه جديد` : 'ℹ️ لا تنبيهات جديدة — كل شيء محدّث' })
+    const result = await generateAlerts(user.id)
+    const msg = result.candidates > 0
+      ? `✅ تم العثور على ${result.candidates} تنبيه مرشح — جاري الإرسال...`
+      : 'ℹ️ لا تنبيهات جديدة — كل شيء محدّث'
+    return NextResponse.json({ ok: true, generated: result.candidates, candidates: result.candidates, message: msg })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

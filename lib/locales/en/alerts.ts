@@ -22,4 +22,6 @@ export const enAlerts = {
     alerts_filter_achievement: '🏆 Achievements',
     alerts_filter_motivation: '💡 Tips',
     alerts_generate_success: 'Generation request sent successfully',
+    alerts_generate_none: 'No new alerts — everything up to date',
+    alerts_generate_pending: 'Generating {count} alert(s)...',
 } as const
