@@ -176,6 +176,18 @@ export async function getAccountBalances(
 
 /**
  * Aggregates income and expense totals over an optional date range.
+ *
+ * NOTE: This is a TypeScript helper that queries `transactions` directly via
+ * PostgREST. There is intentionally NO `get_cashflow_summary` RPC in the
+ * database — the aggregation is simple enough that PostgREST handles it, and
+ * it needs to run with different client contexts (MCP tool with PAT-scoped
+ * admin client, agent tool with JWT-scoped client). Adding an RPC would
+ * require either two grants layers or a caller-context branch.
+ *
+ * Do not "fix" this by adding an RPC unless you can prove a perf win over
+ * PostgREST's aggregation on a narrow index scan.
+ *
+ * Confirmed 2026-10-24 (recon-4): zero callers of `rpc('get_cashflow_summary', ...)`.
  */
 export async function getCashflowSummary(
   userId: string,
