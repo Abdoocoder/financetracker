@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../app_state.dart';
 import '../../services/currency_service.dart';
 import '../../services/accounts_service.dart';
+import '../../services/metal_price_service.dart';
 import '../../widgets/dashboard/charts_card.dart';
 import '../../widgets/dashboard/budget_progress_card.dart';
 import '../../widgets/dashboard/quick_links_card.dart';
@@ -195,16 +196,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
         };
       }
 
-      // ── Zakat Autopilot: مزامنة حالة الحول (بطاقة غير حرجة — تُخفى عند الفشل) ──
+      // ── Zakat Autopilot: مزامنة حالة الحول بأسعار حية ──
       bool? hawlNisabReached;
       int? hawlDaysRemaining;
       double hawlZakatDue = 0;
       try {
-        final hawl = await FinanceService.syncZakatHaulState();
-        if (hawl.isNotEmpty) {
-          hawlNisabReached = hawl['nisab_reached_at'] != null;
-          hawlDaysRemaining = (hawl['days_remaining'] as num?)?.toInt();
-          hawlZakatDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
+        final currencyCode = _currency;
+        final fxRate = await CurrencyService.fetchExchangeRate('USD', currencyCode);
+        final goldLocal = fxRate != null ? await MetalPriceService.fetchLocalPerGram('XAU', fxRate) : null;
+        final silverLocal = fxRate != null ? await MetalPriceService.fetchLocalPerGram('XAG', fxRate) : null;
+        if (fxRate != null && goldLocal != null && silverLocal != null) {
+          final hawl = await FinanceService.syncZakatHaulState(
+            goldPrice: goldLocal,
+            silverPrice: silverLocal,
+            usdToLocalRate: fxRate,
+          );
+          if (hawl.isNotEmpty) {
+            hawlNisabReached = hawl['nisab_reached_at'] != null;
+            hawlDaysRemaining = (hawl['days_remaining'] as num?)?.toInt();
+            hawlZakatDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
+          }
+        } else {
+          debugPrint('[dashboard] hawl sync skipped — live prices unavailable');
         }
       } catch (e) {
         debugPrint('Dashboard hawl sync failed: $e');
