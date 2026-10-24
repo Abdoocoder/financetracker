@@ -21,9 +21,13 @@ const vapidPrivateKey    = Deno.env.get('VAPID_PRIVATE_KEY')!
 const TAG_TO_ALERT_TYPE: Record<string, string> = {
   BudgetAlert:   'warning',
   DebtReminder:  'reminder',
+  'debt-reminder': 'warning',
   SavingGoal:    'achievement',
   SystemUpdate:  'reminder',
+  'debt-paid':     'achievement',
+  'debt-auto':     'reminder',
   SecurityAlert: 'warning',
+  'weekly':        'reminder',
   ZakatAlert:    'warning',
 }
 
