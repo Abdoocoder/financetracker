@@ -1,3 +1,27 @@
+# Google Play Store Release Details - v3.46.0+65
+
+## Version Code: 65
+## Version Name: 3.46.0
+
+### 🌙 Added
+- **Zakat: Live Prices** — Daily sync now fetches real-time gold (XAU), silver (XAG), and FX rates; dashboards display live Nisab values.
+- **Currency Onboarding Default** — New users get their detected local currency (KWD fallback for Gulf), avoiding manual selection.
+
+### 🐛 Fixed
+- **Alerts Deduplication** — Fingerprint backfill removed 6,436 duplicate alert rows; 3,799 unique keys assigned.
+- **Security Hardening** — Revoked all `anon` write grants on public tables; RLS is the only write path.
+- **Zakat Autopilot** — Live prices now passed to `sync_zakat_haul_state` RPC for accurate Hawl calculations.
+
+---
+**بالعربية:**
+- **الزكاة: أسعار حية** — المزامنة اليومية تجلب أسعار الذهب (XAU) والفضة (XAG) ومعدلات الصرف في الوقت الحقيقي؛ لوحات التحكم تعرض قيم النصاب المباشرة.
+- **عملة الترحيب الافتراضية** — المستخدمون الجدد يحصلون على العملة المحلية المكتشفة (KWD كخيار احتياطي للخليج)، مما يلغي الاختيار اليدوي.
+- **إزالة تكرار التنبيهات** — إعادة ملء البصمات أزالت 6,436 صف تنبيه مكرر؛ تم تعيين 3,799 مفتاح فريد.
+- **تعزيز الأمان** — إلغاء جميع منح الكتابة للمستخدم `anon` على الجداول العامة؛ RLS هو مسار الكتابة الوحيد.
+- **الطيار الآلي للزكاة** — الأسعار الحية تُمرر الآن إلى RPC `sync_zakat_haul_state` لحسابات حول دقيقة.
+
+---
+
 # Google Play Store Release Details - v3.45.0+64
 
 ## Version Code: 64
