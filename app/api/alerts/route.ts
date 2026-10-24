@@ -120,6 +120,7 @@ async function generateAlerts(userId?: string) {
   }
   // sendPushToUser يكتب في notification_history → Edge Function تتولى
   // إرسال الإشعار والكتابة في alerts. لا نكتب في alerts هنا مباشرة.
+  let sent = 0
   if (toInsert.length > 0) {
     const byUser = new Map<string, typeof toInsert>()
     for (const a of toInsert) {
@@ -136,12 +137,13 @@ async function generateAlerts(userId?: string) {
           .map((a) => String(a.title))
           .join(' • ')
           .slice(0, 100)
-        await sendPushToUser(uid, title, message, '/dashboard/alerts', 'finance-daily')
+        const r = await sendPushToUser(uid, title, message, '/dashboard/alerts', 'finance-daily')
+        if (r > 0) sent++
       }
     }
   }
-  // Return candidates count; actual inserts happen asynchronously via webhook → Edge Function
-  return { candidates: toInsert.length }
+  // Return candidates count and sent count; actual inserts happen asynchronously via webhook → Edge Function
+  return { candidates: toInsert.length, sent }
 }
 
 export async function GET(request: NextRequest) {
@@ -161,10 +163,11 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser(token)
     if (error || !user) return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     const result = await generateAlerts(user.id)
-    const msg = result.candidates > 0
-      ? `✅ تم العثور على ${result.candidates} تنبيه مرشح — جاري الإرسال...`
+    const sent = result.sent ?? 0
+    const msg = sent > 0
+      ? `✅ تم إرسال ${sent} تنبيه جديد`
       : 'ℹ️ لا تنبيهات جديدة — كل شيء محدّث'
-    return NextResponse.json({ ok: true, generated: result.candidates, candidates: result.candidates, message: msg })
+    return NextResponse.json({ ok: true, generated: result.candidates, candidates: result.candidates, sent, message: msg })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

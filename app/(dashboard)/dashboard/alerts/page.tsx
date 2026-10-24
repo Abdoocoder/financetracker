@@ -166,16 +166,17 @@ export default function AlertsPage() {
       if (!res.ok) toast.error(data.error ?? (lang === 'en' ? 'An error occurred' : 'حدث خطأ'))
       else {
         const candidates = data.candidates ?? data.generated ?? 0
-        if (candidates === 0) {
-          // No candidates found — honest feedback, no poll needed.
+        const sent = data.sent ?? 0
+        if (sent === 0) {
+          // Nothing was dispatched — honest feedback, no poll needed.
           toast.info(t('alerts_generate_none'))
+          await load()
         } else {
-          // Candidates found. Writes happen asynchronously via webhook →
-          // Edge Function. Poll briefly (F16) to catch them.
-          toast.info(t('alerts_generate_pending', { count: candidates }))
+          // Sent > 0: show pending with SENT count (not candidates)
+          toast.info(t('alerts_generate_pending', { count: sent }))
           await load()
 
-          // F16: poll 3×600ms for the async writes
+          // F16: poll 3×600ms for the async writes (only when something was dispatched)
           for (let i = 0; i < 3; i++) {
             await new Promise(r => setTimeout(r, 600))
             const prev = alerts.length
