@@ -1,3 +1,17 @@
+// Behavior changes as of Track D Phase A.1 (2026-10-24):
+// push-send.ts no longer performs pre-filter checks for disabled
+// categories, quiet hours, or missing subscriptions. Those checks
+// live in the Edge Function (supabase/functions/push-notification).
+// Tests for them were removed here and will be added in Phase A.2
+// against the Edge Function.
+//
+// What push-send.ts does now:
+//   1. Compute fingerprint
+//   2. Dedupe check (fingerprint pre-check)
+//   3. Insert notification_history
+//   4. Handle 23505
+//   5. Return 1 on success, 0 on failure/dedup
+
 const mockSupabaseInstance = {
   from: jest.fn(),
   select: jest.fn(),
@@ -68,9 +82,7 @@ describe('sendPushToUser', () => {
   const resolveNext = (result: any) =>
     mockSupabaseInstance.then.mockImplementationOnce(fn => Promise.resolve(fn(result)))
 
-  it('should insert and return 1 when prefs allow, subscription exists, fingerprint is new', async () => {
-    resolveNext({ data: null, error: null })                       // notification_preferences
-    resolveNext({ count: 1, error: null })                          // push_subscriptions
+  it('should insert and return 1 when fingerprint is new', async () => {
     resolveNext({ count: 0, error: null })                          // dedupe fingerprint
     resolveNext({ error: null })                                    // insert
 
@@ -79,58 +91,14 @@ describe('sendPushToUser', () => {
     expect(result).toBe(1)
     const fromCalls = mockSupabaseInstance.from.mock.calls.map(c => c[0])
     expect(fromCalls).toEqual([
-      'notification_preferences',
-      'push_subscriptions',
       'notification_history', // dedupe fingerprint check
       'notification_history', // insert
     ])
-    expect(mockSupabaseInstance.select).toHaveBeenCalledWith('enabled, quiet_start, quiet_end, profiles(timezone)')
     expect(mockSupabaseInstance.select).toHaveBeenCalledWith('id', { count: 'exact', head: true })
     expect(mockSupabaseInstance.insert).toHaveBeenCalled()
   })
 
-  it('should return 0 without insert when the category is disabled in preferences', async () => {
-    resolveNext({ data: [{ enabled: false, quiet_start: null, quiet_end: null }], error: null })
-
-    const result = await sendPushToUser('user-1', 'Title', 'Message', '/dashboard', 'budget', mockSupabaseInstance)
-
-    expect(result).toBe(0)
-    expect(mockSupabaseInstance.insert).not.toHaveBeenCalled()
-  })
-
-  it('should return 0 without insert when now is inside quiet hours (explicit timezone)', async () => {
-    jest.useFakeTimers().setSystemTime(new Date('2026-09-07T12:30:00Z'))
-    resolveNext({ data: [{ enabled: true, quiet_start: '12:00', quiet_end: '13:00', profiles: { timezone: 'UTC' } }], error: null })
-
-    const result = await sendPushToUser('user-1', 'Title', 'Message', '/dashboard', 'budget', mockSupabaseInstance)
-
-    expect(result).toBe(0)
-    expect(mockSupabaseInstance.insert).not.toHaveBeenCalled()
-  })
-
-  it('should default timezone to Asia/Amman when profile join is missing', async () => {
-    jest.useFakeTimers().setSystemTime(new Date('2026-09-07T09:30:00Z')) // 12:30 in Amman (UTC+3)
-    resolveNext({ data: [{ enabled: true, quiet_start: '12:00', quiet_end: '13:00', profiles: null }], error: null })
-
-    const result = await sendPushToUser('user-1', 'Title', 'Message', '/dashboard', 'budget', mockSupabaseInstance)
-
-    expect(result).toBe(0)
-    expect(mockSupabaseInstance.insert).not.toHaveBeenCalled()
-  })
-
-  it('should return 0 without insert when the user has no push subscriptions', async () => {
-    resolveNext({ data: null, error: null })
-    resolveNext({ count: 0, error: null })
-
-    const result = await sendPushToUser('user-1', 'Title', 'Message', '/dashboard', 'budget', mockSupabaseInstance)
-
-    expect(result).toBe(0)
-    expect(mockSupabaseInstance.insert).not.toHaveBeenCalled()
-  })
-
   it('should skip insert when the fingerprint was already sent today', async () => {
-    resolveNext({ data: null, error: null })
-    resolveNext({ count: 1, error: null })
     resolveNext({ count: 1, error: null }) // dedupe hit
 
     const result = await sendPushToUser('user-1', 'Title', 'Message', '/dashboard', 'budget', mockSupabaseInstance)
@@ -140,8 +108,6 @@ describe('sendPushToUser', () => {
   })
 
   it('should proceed to insert when the dedupe check fails', async () => {
-    resolveNext({ data: null, error: null })
-    resolveNext({ count: 1, error: null })
     resolveNext({ count: 0, error: { code: '500', message: 'Server error' } })
     resolveNext({ error: null })
 
@@ -152,8 +118,6 @@ describe('sendPushToUser', () => {
   })
 
   it('should return 0 on duplicate insert error (23505)', async () => {
-    resolveNext({ data: null, error: null })
-    resolveNext({ count: 1, error: null })
     resolveNext({ count: 0, error: null })
     resolveNext({ error: { code: '23505' } })
 
@@ -163,8 +127,6 @@ describe('sendPushToUser', () => {
   })
 
   it('should return 0 on other database errors', async () => {
-    resolveNext({ data: null, error: null })
-    resolveNext({ count: 1, error: null })
     resolveNext({ count: 0, error: null })
     resolveNext({ error: { code: '500', message: 'Server error' } })
 
