@@ -146,7 +146,8 @@ class _AlertsScreenState extends State<AlertsScreen> {
             // Candidates found. Writes happen asynchronously via webhook →
             // Edge Function. Poll briefly (F16) to catch them.
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('alerts_generate_pending'.tr(args: [candidates.toString()]),
+                content: Text(
+                    'alerts_generate_pending'.tr().replaceAll('{count}', candidates.toString()),
                     style: const TextStyle())));
             _load();
             context.read<AppState>().loadUnreadAlerts();
