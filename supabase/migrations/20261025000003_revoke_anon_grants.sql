@@ -3,7 +3,7 @@ begin;
 do $$
 declare t record;
 begin
-  for t in select tablename from pg_tables where schemaname = 'public' loop
+  for t in select table_name from information_schema.tables where table_schema = 'public' loop
     execute format('revoke all on public.%I from anon', t.tablename);
   end loop;
 end $$;
