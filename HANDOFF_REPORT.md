@@ -70,7 +70,7 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 - **RLS verdict:** 29/29 tables have `ENABLE ROW LEVEL SECURITY` in migrations; policy pattern is `auth.uid() = user_id` (wrapped as `(select auth.uid())` after perf migrations `20260908045741`/`20260914000000`).
 - **UNKNOWN-in-prod caveat:** the 4 prod-only tables' live RLS state cannot be proven from the repo (policies reference them, DDL missing) → treat as **UNKNOWN** until DB access is restored.
-- **Live drift (AUDIT_REPORT.md §4):** `profiles` has 25+ columns not in migrations; default currency in prod is **JOD** (not KWD); 6 RLS-initplan WARN advisories; 21 unused indexes across 14 tables.
+- **Live drift (AUDIT_REPORT.md §4):** `profiles` has **16 extra columns (verified recon-2)** not in migrations; default currency in prod is **JOD** (not KWD); 6 RLS-initplan WARN advisories; 21 unused indexes across 14 tables.
 - **testimonials** policies (`legacy/010`, `011`, re-applied in `20260913135653_add_prod_only_schema.sql`): public SELECT `WHERE is_visible=true`; owner-only insert/update/delete — yet an external client is hammering `/rest/v1/testimonials` (incident), i.e. public read amplification, not a policy bypass.
 - Security-hardening migrations present: `advisor_function_lockdown`, `revoke_public_from_secdef_functions`, `verify_owner_in_user_rpcs`, `022_security_hardening`, `024_production_hardening`, `20261018000000_linter_security_hardening` (revokes PUBLIC+anon EXECUTE on 7 internal RPCs with explicit grants to authenticated/service_role, pins `search_path`, drops dup index).
 - `supabase/config.toml` has `[auth] enabled = true`; **leaked-password protection is not enabled** (flagged as recommendation in AUDIT_REPORT.md:179).
@@ -100,18 +100,12 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 | Source | Web (Jest) | Flutter | Playwright | Coverage |
 |---|---|---|---|---|
-> ⚠️ **SUPERSEDED (2026-10-22):** The test counts below (626/186) are outdated. See `PROJECT_CONTEXT.md` §4 for the authoritative counts.
-
-| **Current (verified 2026-10-21)** | **626 / 71 suites** | **186** | 7 specs | 44.85% stmts (last measured) |
+| **Current (verified 2026-10-24)** | **695 / 76 suites** | **260** | 6 specs | 44.85% stmts (last measured) |
 | `AUDIT_REPORT.md` (historical) | **561** | **135** | **7 specs** | — |
 | `DEEP_PROJECT_ANALYSIS.md` | **524 / 56 suites** | — | 7/7 (~46.5s) | **44.85% stmts** / 30.78% branch / 30.7% funcs / 48.07% lines |
 | On disk (files counted) | 62 test files | 20 test files | 7 specs | — |
 
-- **Current counts (suites run 2026-10-21): 626 web tests across 71 suites, 186 Flutter tests** (Zakat Autopilot added suites on both sides). Older audits cite 592 / 561 / 524 / 135 — treat those as historical.
-- `mobile/AGENTS.md` says "`flutter test` runs 13 files" but **20 test files exist** → stale doc.
-- CLAUDE.md target is **80%+ coverage**; actual 44.85%; **dashboard pages 0%** (AUDIT_REPORT flags as Medium risk needing E2E).
-- Known test-infra quirk: Jest uses `forceExit` due to a documented worker leak (low risk, accepted).
-- Flutter tests are pure-Dart (no live Supabase/Firebase), Arabic descriptions for repository tests, i18n key-parity test (`test/i18n_keys_test.dart`).
+- **Authoritative counts:** 695 tests / 76 Jest suites / 25 Flutter test files / 6 Playwright specs. See PROJECT_CONTEXT.md §4.
 
 ## 6. Dependency Status (declared versions only — no package-manager runs)
 
@@ -141,7 +135,7 @@ Store listing (ar + en) claims, mapped to implementation:
 | Learn & earn: lessons, streaks, **18 badges**, levels | ✅ gamification (`/api/gamification`, `user_stats`, `daily-lessons.ts`) |
 | Arabic/EN + RTL, dark/light, CSV + monthly PDF, smart alerts | ✅ i18n, PDF service, push/cron routes |
 | "Keys never sent to our servers" | ⚠️ architecture POSTs an **RSA-OAEP envelope + payload** to `{proxy}/api/byok/proxy` — technically wrapped, but verify store-copy wording |
-| "No ad tracking" / AD_ID permission | ⚠️ AD_ID permission added for Firebase Analytics compliance (Play requirement) — reconcile messaging |
+| "No ad tracking" / AD_ID permission | ⚠️ **AD_ID permission: NOT present in any manifest (source, merged, or build artifacts).** Firebase Analytics is not a declared dependency. |
 
 - Store identity: ar name "فجرك — مدربك المالي الذكي", en "Fajrak — Smart Finance Coach", category Finance, rating Everyone, site fajrak.com. Last documented release: **v3.44.0** (Oct 17, 2026) "Feature & Stability Release", version code 63 (Submission ID 44, status "In review"). Previous: v3.43.1 (Oct 16, 2026) "Production Hotfix" (FCM splash hang + transactions crash), version code 60, target SDK 35, min SDK 21.
 
@@ -164,6 +158,9 @@ Store listing (ar + en) claims, mapped to implementation:
 15. 🟡 Play `dev`/`eol`-suffixed Flutter plugins in production (see §6).
 16. ✅ **Zakat Autopilot audit bugs — RESOLVED** (2026-10-19 safety audit, test-first): (a) hardcoded Arabic push copy → localized from `profiles.lang`; (b) quiet-hours users were stamped `last_notified_at` without receiving a push → stamp now gated on actual delivery; (c) Hawl sync used stale default prices → clients pass live gold/silver/FX. Details in `mobile/fajrak_flutter/INCIDENT.md` §Security Hardening Backlog and `CHANGELOG.md` `[3.45.0+64]`.
 17. ✅ **Zakat live-price fallback — RESOLVED** (2026-10-19): freegoldapi.com/data/latest.json serves a JSON array (gold-only, ~8 months stale), not a `{gold, silver}` map. Replaced with `api.gold-api.com/price/{XAU,XAG}` (CORS-enabled, live, gold + silver, USD/troy-oz). Also decoupled the exchange-rate fetch from the Yahoo `Future.wait` — a Yahoo CORS failure no longer discards the real FX rate (was forcing `usdRate=1.0`). Commits: aba3df23, 6e05bc5a.
+18. ✅ **Zakat live prices passed to sync_zakat_haul_state** (PR #1, 2026-10-25)
+19. ✅ **Alerts fingerprint backfilled:** 6,436 dupes removed, 3,799 keys assigned (PR #2, 2026-10-25)
+20. ✅ **Anon write grants revoked on all public tables** (PR #4, 2026-10-25)
 
 ## 9. Release & Version Drift
 
