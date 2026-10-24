@@ -1565,3 +1565,75 @@ to `reminder` — the semantically correct value. Fixing the type first
 would be a fix-then-delete.
 
 This is Correction H, not a Phase 0.2 step. Phase 0.2 is closed.
+
+### Correction I — F16: UI polls before webhook completes (found 2026-10-24)
+
+Track D is verified working (user pressed Generate, alert appeared after
+pull-to-refresh). But the alert is not visible in the list immediately:
+the client calls `_load()` / `load()` ~50ms after the POST 200, while
+the alert is written by an async chain:
+
+  notification_history.insert (sync, ~50ms)
+    → DB webhook (async, ~100ms)
+    → Edge Function (async, ~300-1500ms)
+    → alerts.insert
+
+The window is 500-2000ms. Users perceive the toast as success but the
+list as empty.
+
+Verified behavior 2026-10-24:
+- Mobile `_generateAlerts()` calls `_load()` immediately after 200
+- Web `generateNow()` awaits `load()` immediately after 200
+- Neither client polls or subscribes to realtime for the alerts table
+  (grep confirmed zero hits for `onPostgresChanges` / `RealtimeChannel` in
+  mobile alerts screen and web alerts page)
+
+Fix candidates:
+- (A) Poll after `_load()`: 3× at 600ms until `_alerts.length` increases.
+  ~5 lines per client, no backend changes.
+- (B) Supabase Realtime subscription filtered by `user_id`. ~30 lines per
+  client, more robust, also covers cron-generated alerts.
+- (C) `FirebaseMessaging.onMessage` → `_load()`. Only works for push-enabled
+  users; does not cover the no-push case A.2b just enabled.
+
+Recommendation: A for speed, B long-term. Defer to Track E.
+
+### Correction J — F17: stale push_subscriptions accumulate (found 2026-10-24)
+
+Edge Function logs during the manual Generate test on 2026-10-24 showed:
+  `[push] user=453fa35e-... fcm=15 web=4`
+
+One active device, 18 stale subscriptions (uninstalled apps, cleared
+browser data). Every Generate call attempts 19 sends, most fail:
+  - FCM: `401 Third party auth error` (one case)
+  - Web Push: `400/401/403` (several cases)
+
+These inflate logs, waste FCM quota, and slow the function. Not a
+correctness bug — the alert is still written once — but noise.
+
+Fix: add a cron (or extend the existing `invalidTokens` cleanup in the
+Edge Function) to prune `push_subscriptions` whose token hasn't refreshed
+in N days. FCM sends return specific error codes for dead tokens
+(`UNREGISTERED`, `INVALID_ARGUMENT`) that should trigger deletion.
+
+Not in Track D scope. F17.
+
+### Correction K — F18: FCM 401 Third party auth error (found 2026-10-24)
+
+One of the 15 FCM sends failed with `401 Third party auth error`. This
+is the service account JWT (`getFcmAccessToken` in the Edge Function),
+not the user's token. Two possible causes:
+
+1. The service account JSON in `FCM_SERVICE_ACCOUNT` env var has been
+   rotated at Google but not re-set in Supabase secrets.
+2. The stale subscription belongs to a project that no longer has the
+   app; FCM rejects at the project level, not token level.
+
+Evidence: 14/15 FCM sends succeeded in the same call, so it is not a
+system-wide auth failure. Likely a stale token or an old sender ID.
+
+Fix: when F17's cleanup runs, these 401s will disappear. If they persist
+for fresh tokens, verify `FCM_SERVICE_ACCOUNT` secret via Supabase dashboard
+→ Edge Functions → Secrets.
+
+Not in Track D scope. F18.
