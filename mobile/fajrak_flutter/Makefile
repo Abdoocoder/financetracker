@@ -128,7 +128,9 @@ build-web:
 # Build release APK
 build-apk:
 	flutter build apk --release $(DART_DEFINES) $(SENTRY_DEFINE)
-
+# Run on connected Android / mobile device (includes DART_DEFINES + SENTRY_DEFINE)
+run-device:
+	flutter run -d 1381970537000198 $(DART_DEFINES) $(SENTRY_DEFINE)
 # Build release App Bundle
 build-bundle:
 	flutter build appbundle --release $(DART_DEFINES) $(SENTRY_DEFINE)
