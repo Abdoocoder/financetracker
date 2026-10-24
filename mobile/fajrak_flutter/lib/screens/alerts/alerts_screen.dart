@@ -135,24 +135,24 @@ class _AlertsScreenState extends State<AlertsScreen> {
       if (mounted) {
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = jsonDecode(response.body);
-          final int candidates = data['candidates'] ?? data['generated'] ?? 0;
+          final int sent = data['sent'] ?? 0;
 
-          if (candidates == 0) {
-            // No candidates found — honest feedback, no poll needed.
+          if (sent == 0) {
+            // Nothing was dispatched — honest feedback, no poll needed.
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text('alerts_generate_none'.tr(),
                     style: const TextStyle())));
+            _load();
           } else {
-            // Candidates found. Writes happen asynchronously via webhook →
-            // Edge Function. Poll briefly (F16) to catch them.
+            // Sent > 0: show pending with SENT count (not candidates)
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
-                    'alerts_generate_pending'.tr().replaceAll('{count}', candidates.toString()),
+                    'alerts_generate_pending'.tr().replaceAll('{count}', sent.toString()),
                     style: const TextStyle())));
             _load();
             context.read<AppState>().loadUnreadAlerts();
 
-            // F16: poll 3×600ms for the async writes
+            // F16: poll 3×600ms for the async writes (only when something was dispatched)
             for (int i = 0; i < 3; i++) {
               await Future.delayed(const Duration(milliseconds: 600));
               if (!mounted) return;
