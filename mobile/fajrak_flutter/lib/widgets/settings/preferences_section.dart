@@ -83,7 +83,7 @@ class _PreferencesSectionState extends State<PreferencesSection> {
               ),
             ),
             trailing: Icon(Icons.arrow_forward_ios, size: 14, color: colorScheme.onSurfaceVariant),
-            onTap: () => Navigator.pushNamed(context, '/settings/notifications'),
+            onTap: () => Navigator.pushNamed(context, '/notification-settings'),
           ),
         ),
       ],
