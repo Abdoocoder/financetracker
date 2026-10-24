@@ -95,7 +95,7 @@ describe('lib/detectCurrency', () => {
    });
 
    const result = detectCurrency();
-   expect(result.currency).toBe('JOD');
+   expect(result.currency).toBe('KWD');
    expect(result.confidence).toBe('low');
 
    global.Intl = originalIntl;

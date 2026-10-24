@@ -354,7 +354,14 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<Step>(1)
   const [saving, setSaving] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(true)
-  const [profile, setProfile] = useState<Profile>({ fullName: '', monthlyIncome: '', currency: 'JOD' })
+  const [profile, setProfile] = useState<Profile>(() => {
+    const detected = typeof window !== 'undefined' ? detectCurrency() : null
+    return {
+      fullName: '',
+      monthlyIncome: '',
+      currency: detected?.confidence === 'high' ? detected.currency : 'KWD',
+    }
+  })
   const [tx, setTx] = useState<FirstTransaction>({ type: 'expense', amount: '', category: '', description: '' })
   const [detectedInfo, setDetectedInfo] = useState<DetectionResult | null>(null)
   const ar = lang === 'ar'
