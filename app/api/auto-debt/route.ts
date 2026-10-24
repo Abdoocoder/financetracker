@@ -51,17 +51,6 @@ async function processAutoDebts() {
         '/dashboard/debts',
         'debt-reminder'
       )
-
-      // إضافة تنبيه داخل التطبيق
-      await supabase.from('alerts').insert({
-        user_id: debt.user_id,
-        type: 'warning',
-        title: `💳 تذكير: قسط ${debt.name}`,
-        message: `قسط ${debt.name} (${debt.monthly_payment.toFixed(0)} JOD) يستحق اليوم — يرجى الدفع وتسجيله في التطبيق.`,
-        frequency: 'once',
-        is_read: false,
-        is_active: true,
-      })
     }
   }
 
@@ -123,19 +112,6 @@ async function processAutoDebts() {
       '/dashboard/debts',
       isPaid ? 'debt-paid' : 'debt-auto'
     )
-
-    // تنبيه للمستخدم
-    await supabase.from('alerts').insert({
-      user_id: debt.user_id,
-      type: isPaid ? 'achievement' : 'info',
-      title: isPaid ? `🎉 تم سداد ${debt.name} بالكامل!` : `💳 دفعة ${debt.name} تلقائية`,
-      message: isPaid
-        ? `مبروك! أنهيت سداد دين "${debt.name}" بالكامل.`
-        : `تم خصم ${payment.toFixed(0)} JOD من دين "${debt.name}". المتبقي: ${newRemaining.toFixed(0)} JOD`,
-      frequency: 'once',
-      is_read: false,
-      is_active: true,
-    })
 
     count++
   }

@@ -194,13 +194,6 @@ async function weeklyReport() {
 
     await Promise.allSettled([
       sendPushToUser(p.id, title, body, '/dashboard', 'weekly'),
-      supabase.from('alerts').insert({
-        user_id: p.id,
-        type: thisExpenses < lastTotal ? 'achievement' : 'info',
-        title: `تقريرك الأسبوعي 📊`,
-        message: `سجّلت ${txCount} معاملة هذا الأسبوع.\n💸 الإنفاق: ${thisExpenses.toFixed(0)} JOD${topCat ? ` (أكثر فئة: ${topCat[0]})` : ''}\n📍 مرحلتك: ${stage}\n🎯 الخطوة التالية: ${nextStep}${streak > 0 ? `\n🔥 سلسلة الدروس: ${streak} يوم` : ''}`,
-        frequency: 'weekly', is_read: false, is_active: true,
-      }),
     ])
   }))
 }
