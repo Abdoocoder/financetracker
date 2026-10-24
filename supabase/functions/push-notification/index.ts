@@ -73,7 +73,8 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 })
     }
 
-    const { id: historyId, user_id, title, body, category, data: recordData } = payload.record
+    const { id: historyId, user_id, title, body, category, data: recordData, fingerprint: recordFingerprint } = payload.record
+    const fingerprint = recordFingerprint ?? recordData?.fingerprint ?? null
     const url = recordData?.url ?? '/dashboard'
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
@@ -88,7 +89,35 @@ Deno.serve(async (req: Request) => {
 
     if (pref?.enabled === false) {
       console.log(`[push] user=${user_id} category=${category} disabled by preference`)
-      return new Response(JSON.stringify({ skipped: 'disabled' }), { status: 200 })
+      return new Response(JSON.stringify({ skipped: 'disabled', alert_written: false }), { status: 200 })
+    }
+
+    // إخفاء الأرقام إذا طلب المستخدم ذلك
+    let finalBody = body
+    if (pref?.mask_sensitive_data) {
+      finalBody = body.replace(/\d+(\.\d+)?/g, '***')
+    }
+
+    // ── كتابة في alerts للعرض داخل التطبيق (قبل فحص الساعات الهادئة/الاشتراكات) ──
+    const { error: alertErr } = await supabase.from('alerts').insert({
+      user_id,
+      title,
+      message: finalBody,
+      type: TAG_TO_ALERT_TYPE[category] ?? 'reminder',
+      frequency: 'once',
+      is_read: false,
+      is_active: true,
+      ...(fingerprint ? { fingerprint } : {}),
+    })
+    let alertWritten = true
+    if (alertErr) {
+      if (alertErr.code === '23505') {
+        // Duplicate fingerprint — alert exists from a previous webhook.
+        // Treat as written (idempotent success).
+      } else {
+        alertWritten = false
+        console.error('[push] alerts insert failed:', alertErr.message)
+      }
     }
 
     // تحقق من الساعات الهادئة — حسب المنطقة الزمنية للمستخدم (وليس UTC)
@@ -112,14 +141,8 @@ Deno.serve(async (req: Request) => {
         : hhmm >= quietStart || hhmm < quietEnd
       if (inQuiet) {
         console.log(`[push] user=${user_id} in quiet hours`)
-        return new Response(JSON.stringify({ skipped: 'quiet_hours' }), { status: 200 })
+        return new Response(JSON.stringify({ skipped: 'quiet_hours', alert_written: alertWritten }), { status: 200 })
       }
-    }
-
-    // إخفاء الأرقام إذا طلب المستخدم ذلك
-    let finalBody = body
-    if (pref?.mask_sensitive_data) {
-      finalBody = body.replace(/\d+(\.\d+)?/g, '***')
     }
 
     // ── جلب كل الاشتراكات ──────────────────────────────────────
@@ -130,7 +153,7 @@ Deno.serve(async (req: Request) => {
 
     if (!subscriptions?.length) {
       console.log(`[push] No subscriptions for user=${user_id}`)
-      return new Response(JSON.stringify({ message: 'No subscriptions' }), { status: 200 })
+      return new Response(JSON.stringify({ message: 'No subscriptions', alert_written: alertWritten }), { status: 200 })
     }
 
     const { count: unread } = await supabase
@@ -139,7 +162,7 @@ Deno.serve(async (req: Request) => {
       .eq('user_id', user_id)
       .eq('is_read', false)
 
-    const badgeCount = (unread ?? 0) + 1
+    const badgeCount = unread ?? 0
     const webPayload = JSON.stringify({ title, message: finalBody, url, tag: category, badgeCount })
 
     let fcmSent = 0
@@ -222,23 +245,10 @@ Deno.serve(async (req: Request) => {
       await supabase.from('push_subscriptions').delete().in('endpoint', invalidTokens)
     }
 
-    // ── كتابة في alerts للعرض داخل التطبيق ───────────────────
-    if (fcmSent + webSent > 0) {
-      await supabase.from('alerts').insert({
-        user_id,
-        title,
-        message: finalBody,
-        type: TAG_TO_ALERT_TYPE[category] ?? 'reminder',
-        frequency: 'once',
-        is_read: false,
-        is_active: true,
-      })
-    }
-
     console.log(`[push] user=${user_id} fcm=${fcmSent} web=${webSent}`)
 
     return new Response(
-      JSON.stringify({ success: true, fcm: fcmSent, web: webSent }),
+      JSON.stringify({ success: true, fcm: fcmSent, web: webSent, alert_written: alertWritten }),
       { headers: { 'Content-Type': 'application/json' } }
     )
 
