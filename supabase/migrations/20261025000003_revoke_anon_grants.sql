@@ -4,7 +4,7 @@ do $$
 declare t record;
 begin
   for t in select table_name from information_schema.tables where table_schema = 'public' loop
-    execute format('revoke all on public.%I from anon', t.tablename);
+    execute format('revoke all on public.%I from anon', t.table_name);
   end loop;
 end $$;
 
