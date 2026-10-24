@@ -33,7 +33,7 @@ describe('useZakatHawl', () => {
     mockUseUser.mockReturnValue({ user: { id: 'user-1' }, profile: null })
   })
 
-  it('calls sync_zakat_haul_state with the current user id', async () => {
+  it('calls sync_zakat_haul_state with the current user id and prices', async () => {
     mockRpc.mockResolvedValue({
       data: {
         nisab_reached_at: '2026-01-01T00:00:00Z',
@@ -47,11 +47,11 @@ describe('useZakatHawl', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
+    const { result } = renderHook(() => useZakatHawl({ goldPrice: 105, silverPrice: 1.2, fxRate: 0.71 }), { wrapper: makeWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', { p_user_id: 'user-1' })
+    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', { p_user_id: 'user-1', p_gold_price: 105, p_silver_price: 1.2, p_fx_rate: 0.71 })
     expect(result.current.data).toEqual({
       nisabReachedAt: '2026-01-01T00:00:00Z',
       currentHaulDueAt: '2026-12-20T00:00:00Z',
@@ -75,7 +75,7 @@ describe('useZakatHawl', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
+    const { result } = renderHook(() => useZakatHawl({ goldPrice: 105, silverPrice: 1.2, fxRate: 0.71 }), { wrapper: makeWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -100,7 +100,7 @@ describe('useZakatHawl', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
+    const { result } = renderHook(() => useZakatHawl({ goldPrice: 105, silverPrice: 1.2, fxRate: 0.71 }), { wrapper: makeWrapper() })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
@@ -111,7 +111,7 @@ describe('useZakatHawl', () => {
   it('surfaces an RPC error instead of rendering stale state', async () => {
     mockRpc.mockResolvedValue({ data: null, error: { message: 'permission denied' } })
 
-    const { result } = renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
+    const { result } = renderHook(() => useZakatHawl({ goldPrice: 105, silverPrice: 1.2, fxRate: 0.71 }), { wrapper: makeWrapper() })
 
     await waitFor(() => expect(result.current.isError).toBe(true))
     expect(result.current.data).toBeUndefined()
@@ -120,7 +120,7 @@ describe('useZakatHawl', () => {
   it('is disabled (RPC not called) when there is no user', async () => {
     mockUseUser.mockReturnValue({ user: null, profile: null })
 
-    const { result } = renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
+    const { result } = renderHook(() => useZakatHawl({ goldPrice: 105, silverPrice: 1.2, fxRate: 0.71 }), { wrapper: makeWrapper() })
 
     await new Promise((r) => setTimeout(r, 50))
     expect(mockRpc).not.toHaveBeenCalled()
@@ -140,9 +140,10 @@ describe('useZakatHawl', () => {
     })
   })
 
-  it('falls back to RPC defaults when no prices are provided', async () => {
-    renderHook(() => useZakatHawl(), { wrapper: makeWrapper() })
-    await waitFor(() => expect(mockRpc).toHaveBeenCalled())
-    expect(mockRpc).toHaveBeenCalledWith('sync_zakat_haul_state', { p_user_id: 'user-1' })
+  it('is disabled when prices are not valid (enabled=false)', async () => {
+    const { result } = renderHook(() => useZakatHawl({ goldPrice: 0, silverPrice: 0, fxRate: 0 }), { wrapper: makeWrapper() })
+    await new Promise((r) => setTimeout(r, 50))
+    expect(mockRpc).not.toHaveBeenCalled()
+    expect(result.current.fetchStatus).toBe('idle')
   })
 })

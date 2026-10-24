@@ -1,110 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { sendPushToUser } from '@/lib/push-send'
-import { verifyCronAuth } from '@/lib/cron-auth'
-import { ar } from '@/lib/locales/ar'
-import { en } from '@/lib/locales/en'
+import { fetchZakatPrices, type ZakatPrices } from '@/lib/zakat-prices'
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+export const runtime = 'nodejs'
+export const maxDuration = 60
 
-// نافذة التنبيه: اليوم (0) أو المتأخر (< 0) أو خلال ٧ أيام قادمة
-const NOTIFY_WINDOW_DAYS = 7
-
-// صيغة JSON التي يعيدها RPC sync_zakat_haul_state (migration 20261021000000)
-interface HaulState {
-  user_id: string
-  nisab_reached_at: string | null
-  current_haul_due_at: string | null
-  last_notified_at: string | null
-  days_remaining: number | null
-  is_eligible: boolean
-  zakatable_assets: number
-  nisab_effective: number
-  zakat_due: number
-}
-
-async function syncZakatAutopilot(userId?: string) {
+export async function GET(req: NextRequest) {
+  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
   const supabase = createAdminClient()
+  const { data: users, error: userErr } = await supabase
+    .from('profiles').select('id, currency').not('currency', 'is', null)
+  if (userErr) return NextResponse.json({ error: userErr.message }, { status: 500 })
 
-  // جلب كل المستخدمين (أو مستخدم واحد للاختبار) — مع لغة الواجهة للإشعارات
-  const profileQuery = supabase.from('profiles').select('id, full_name, lang')
-  const { data: profiles } = userId
-    ? await profileQuery.eq('id', userId)
-    : await profileQuery
+  const cache = new Map<string, ZakatPrices>()
+  const distinctCurrencies = [...new Set(users.map(u => u.currency))]
+  await Promise.all(distinctCurrencies.map(async (currency) => {
+    try {
+      const p = await fetchZakatPrices(currency)
+      if (p.gold > 0 && p.silver > 0 && p.rate > 0) cache.set(currency, p)
+    } catch (err) { console.error(`[zakat-autopilot] prices failed for ${currency}`, err) }
+  }))
 
-  if (!profiles?.length) return { synced: 0, notified: 0 }
-
-  let synced = 0
-  let notified = 0
-  const today = new Date().toISOString().slice(0, 10)
-
-  for (const profile of profiles) {
-    const uid = profile.id
-    const userLang: 'ar' | 'en' = profile.lang === 'en' ? 'en' : 'ar'
-    const m = userLang === 'en' ? en : ar
-    const name = profile.full_name?.split(' ')[0] ?? (userLang === 'en' ? 'Dear' : 'أخي')
-
-    // آلة حالة الحول: تعيد الحالة محدّثة (تبدأ الساعة أو تُكملها أو تُلغيها).
-    // service_role لا يحمل JWT => auth.uid() NULL => الحارس يسمح (نمط المسارات الخلفية).
-    const { data, error } = await supabase.rpc('sync_zakat_haul_state', {
-      p_user_id: uid,
+  let synced = 0, skipped = 0, failed = 0
+  for (const u of users) {
+    const prices = cache.get(u.currency)
+    if (!prices) { skipped++; continue }
+    const { error } = await supabase.rpc('sync_zakat_haul_state', {
+      p_user_id: u.id, p_gold_price: prices.gold,
+      p_silver_price: prices.silver, p_fx_rate: prices.rate,
     })
-    if (error || !data) continue
-    synced++
-
-    const state = data as unknown as HaulState
-    const daysRemaining = state.days_remaining
-
-    // لا حول قادم (الوعاء تحت النصاب) أو خارج نافذة الـ ٧ أيام => صمت
-    if (typeof daysRemaining !== 'number' || daysRemaining > NOTIFY_WINDOW_DAYS) continue
-
-    // مانع الإزعاج: إشعار واحد كحد أقصى في اليوم الواحد لكل مستخدم
-    const lastNotified = state.last_notified_at?.slice(0, 10) ?? null
-    if (lastNotified === today) continue
-
-    const dueLabel = Math.round(Number(state.zakat_due ?? 0)).toLocaleString(
-      userLang === 'en' ? 'en-US' : 'ar'
-    )
-
-    // اختيار العنوان والنص حسب اللغة وحالة الحول (مستحق اليوم/قريب)
-    let title: string
-    let body: string
-    const fill = (s: string) =>
-      s.replace('{name}', name).replace('{amount}', dueLabel).replace('{days}', String(daysRemaining))
-
-    if (daysRemaining <= 0) {
-      title = m.zakat_autopilot_push_title_due
-      body = fill(m.zakat_autopilot_push_body_due)
-    } else if (daysRemaining === 1) {
-      title = m.zakat_autopilot_push_title_approaching
-      body = fill(m.zakat_autopilot_push_body_approaching_one)
-    } else {
-      title = m.zakat_autopilot_push_title_approaching
-      body = fill(m.zakat_autopilot_push_body_approaching)
-    }
-
-    // يعيد sendPushToUser عدد الإشعارات المُرسلة فعلياً (0 عند ساعات الهادئة
-    // أو عدم وجود اشتراك أو كبح). لا نختم last_notified_at إلا عند الإرسال.
-    const delivered = await sendPushToUser(uid, title, body, '/dashboard/zakat', 'zakat-due')
-    if (delivered <= 0) continue
-
-    // ختم مانع الإزعاج اليومي في جدول التتبع (service_role يتجاوز RLS)
-    const { error: updateError } = await supabase
-      .from('zakat_haul_tracking')
-      .update({ last_notified_at: new Date().toISOString() })
-      .eq('user_id', uid)
-    if (!updateError) notified++
+    if (error) { failed++; console.error(`[zakat-autopilot] user=${u.id}`, error) }
+    else synced++
   }
-
-  return { synced, notified }
-}
-
-export async function GET(request: NextRequest) {
-  if (!verifyCronAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  const rawId = request.nextUrl.searchParams.get('userId')
-  const userId = rawId && UUID_RE.test(rawId) ? rawId : undefined
-  const { synced, notified } = await syncZakatAutopilot(userId)
-  return NextResponse.json({ ok: true, synced, notified })
+  return NextResponse.json({ synced, skipped, failed, currencies: distinctCurrencies,
+    prices_ok: [...cache.keys()],
+    prices_missing: distinctCurrencies.filter(c => !cache.has(c)) })
 }
