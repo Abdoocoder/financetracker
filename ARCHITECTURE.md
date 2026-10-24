@@ -3,7 +3,7 @@
 
 ## System Overview
 
-FinanceTracker (Fajrak) is a comprehensive personal finance tracking application built as a full-stack TypeScript monorepo. It provides transaction management, budgeting, debt tracking, investment monitoring, zakat calculation, and AI-assisted financial insights. The system follows a **serverless, edge-first architecture** with Next.js 15+ App Router on Vercel, Supabase (PostgreSQL + Auth + Realtime + Edge Functions) as the backend, and a Flutter 3.x mobile app sharing the same Supabase backend. Key architectural principles include **Row Level Security (RLS)** for multi-tenant data isolation, **RPC functions** for complex database operations, **Bring Your Own Key (BYOK)** pattern for AI integration, and **Server Components by default** with selective client-side interactivity.
+FinanceTracker (Fajrak) is a comprehensive personal finance tracking application built as a full-stack TypeScript monorepo. It provides transaction management, budgeting, debt tracking, investment monitoring, zakat calculation, and AI-assisted financial insights. The system follows a **serverless, edge-first architecture** with Next.js 16 App Router on Vercel, Supabase (PostgreSQL + Auth + Realtime + Edge Functions) as the backend, and a Flutter 3.x mobile app sharing the same Supabase backend. Key architectural principles include **Row Level Security (RLS)** for multi-tenant data isolation, **RPC functions** for complex database operations, **Bring Your Own Key (BYOK)** pattern for AI integration, and **Server Components by default** with selective client-side interactivity.
 
 ## Component Diagram
 
@@ -157,7 +157,7 @@ MCP Client → /api/mcp → Unified Tools Layer → Supabase RPC / Queries → P
 │   ├── errors/                   # Error boundary, toast helpers
 │   └── moderation/               # Content moderation utilities
 ├── supabase/                     # Supabase backend configuration
-│   ├── migrations/               # SQL migrations (40+), versioned, run via CLI
+│   ├── migrations/               # SQL migrations (64 migrations: 42 legacy + 22 dated), versioned, run via CLI
 │   ├── functions/                # Deno Edge Functions (push-notification)
 │   └── config.toml               # Local dev config (ports, auth settings)
 ├── types/                        # Shared TypeScript types (single source of truth)

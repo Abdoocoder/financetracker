@@ -60,5 +60,8 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 - **Latest feature:** Zakat Autopilot (Phase C) complete and live — engine v2 + `zakat_haul_tracking` state machine + daily `/api/zakat-autopilot` cron + Hawl countdown UI on Web and Mobile.
 - **Next phase:** Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 - **Resolved:** prod DB outage (2026-10-17, `INCIDENT.md`), daily backups to Cloudflare R2, `currentUser!` force-unwraps (v3.44.0), Zakat live-price fallback.
+- ✅ Zakat live prices passed to `sync_zakat_haul_state` (PR #1, 2026-10-25)
+- ✅ Alerts fingerprint backfilled: 6,436 dupes removed, 3,799 keys assigned (PR #2, 2026-10-25)
+- ✅ Anon write grants revoked on all public tables (PR #4, 2026-10-25)
 - **Open risks:** anon key rotation (pending post-incident), leaked-password protection disabled, no feature flags, financial-metric duplication outside Zakat, 8 moderate `@opentelemetry` transitive vulns. Full list: `HANDOFF_REPORT.md` §8.
 - **Process:** single-developer SPOF, no monetization; conventional commits, squash-merge to main.
