@@ -78,10 +78,20 @@ Deno.serve(async (req: Request) => {
     }
 
     const { id: historyId, user_id, title, body, category, data: recordData, fingerprint: recordFingerprint } = payload.record
-    const fingerprint = recordFingerprint ?? recordData?.fingerprint ?? null
+    let fingerprint = recordFingerprint ?? recordData?.fingerprint ?? null
     const url = recordData?.url ?? '/dashboard'
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // F22: webhook payload may omit fingerprint (custom template).
+    // Fall back to reading it directly from notification_history by id.
+    if (!fingerprint && historyId) {
+      const { data: hist } = await supabase
+        .from('notification_history')
+        .select('fingerprint')
+        .eq('id', historyId)
+        .maybeSingle()
+      fingerprint = hist?.fingerprint ?? null
+    }
 
     // ── تحقق من تفضيلات المستخدم ──────────────────────────────
     const { data: pref } = await supabase
