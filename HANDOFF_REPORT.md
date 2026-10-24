@@ -1,10 +1,10 @@
 # HANDOFF REPORT — FinanceTracker (Fajrak)
 
-**Last updated:** 2026-10-19 · **Current release:** 3.45.0+64 · **Single source of truth for project state**
+**Last updated:** 2026-10-24 · **Current release:** 3.45.0+64 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
 Archived audits live in docs/archive/; open change history lives in CHANGELOG.md.
 
 **Prepared for:** external software architect
-**Date:** 2026-10-17
+**Date:** 2026-10-24
 **Method:** read-only repository reconnaissance (no source files modified, no package managers or test suites run, `node_modules/` etc. not read)
 
 ---
@@ -14,10 +14,11 @@ Archived audits live in docs/archive/; open change history lives in CHANGELOG.md
 - Repo is a dual-client personal-finance product: **Next.js 16 web app** + **Flutter mobile app**, both on one **Supabase** (PostgreSQL 17, Auth, RLS, RPCs, Realtime, Edge Functions) backend, deployed via Vercel/Firebase Hosting and Google Play.
 - Target market: Arabic-speaking users, primarily **Kuwait & the Gulf**; product identity is "**Fajrak** — Islamic finance coach" (zakat, halal investing, FIRE), while repo/tooling is named "FinanceTracker" — an unresolved identity mismatch.
 - Production incident: RESOLVED — see `mobile/fajrak_flutter/INCIDENT.md` (post-mortem). Outage ran ≥2026-10-11 → 2026-10-17; daily backups + zero-budget trigger guard now in place.
+- **Push notifications (Edge Function v15, deployed 2026-10-24)**: alerts are now written to the `alerts` table BEFORE quiet-hours/subscription checks (A.2b). The function self-heals missing `fingerprint` by querying `notification_history` (F22). **Known issue:** 10,235 existing alerts have `fingerprint = NULL` (all rows); backfill is pending. The unique index `(user_id, fingerprint) WHERE fingerprint IS NOT NULL` does not reject these.
 - **Database drift is the #1 technical risk**: live prod has columns/tables not in migrations (`user_stats`, `testimonials`, `saving_challenges`, `health_score_history`, 25+ extra `profiles` columns) — `supabase db reset` would destroy prod reality.
 - Schema defines **29 tables; all 29 have `ENABLE ROW LEVEL SECURITY`** in migrations — but live-prod RLS state for the 4 unmigrated tables is UNKNOWN (policies exist, table DDL does not).
 - `currentUser!` force-unwrap: **FIXED in v3.44.0** — all 11 occurrences in 10 files under `mobile/fajrak_flutter/lib/` replaced with null-safe early returns (historical list retained in §4).
-- Tests (declared, not re-run): **592 Jest** (66 suites) and **177 Flutter**; **7 Playwright**; coverage **44.85% stmts**, dashboard pages **0%** vs 80% target (older docs cite 561/524 Jest — see §5).
+- **Tests (re-run 2026-10-24):** **695 web tests** / 76 Jest suites (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
 - Financial calculations are **duplicated 5–7× per metric** across web/mobile/SQL (per ARCHITECTURE_AUDIT_VERIFIED) with some hardcoded health-score thresholds (partially addressed by migration `20261017000000`).
 - Dependency issues (declared versions only): 8 moderate `@opentelemetry` vulns (documented), accidental runtime deps `install`/`npx` in `package.json`, Flutter `flutter_local_notifications: ^23.0.0-dev.3` (dev prerelease) and `sqlcipher_flutter_libs: ^0.7.0+eol` in a shipping app.
 - Release: mobile **3.44.0+63** shipped to Google Play (Submission ID 44, status "In review"); web `package.json` remains **3.42.0**. Historical version drift across five sources is documented in §9.
@@ -180,10 +181,12 @@ Store listing (ar + en) claims, mapped to implementation:
 | `package.json` (web) | 3.42.0 — **intentionally unchanged** |
 | `mobile/AGENTS.md` | 3.43.1+60 (stale) |
 | `structure.md` | 3.40.0+51 (stale) |
+| `push-notification` Edge Function | **v15** (deployed 2026-10-24 13:36:52 UTC) |
 
 - **Intentional decision:** the web app's `package.json` stays at **3.42.0** and is deliberately not bumped with mobile releases — web and mobile ship independently from the same repo, and the web bundle has not been re-released. This is a documented choice, not drift to be "fixed."
 - Mobile version sources are aligned at **3.45.0+64** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
 - Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → 3.44.0 (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety) → **3.45.0** (Zakat Engine v2 + Autopilot: backend, cron, countdown UI on Web + Mobile).
+- **Push-notification Edge Function** is versioned separately: v14 (pre-Track D) → **v15** (A.2b + A.3 + F22 self-heal, deployed 2026-10-24).
 - Build-process fragility: running `flutter build appbundle --release` directly (bypassing Makefile) silently ships a build with **no credentials → login fails** (documented past incident).
 - No changelog file at root; release history lives in `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md`.
 
