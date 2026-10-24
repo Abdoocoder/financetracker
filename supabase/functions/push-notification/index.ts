@@ -93,30 +93,13 @@ Deno.serve(async (req: Request) => {
       fingerprint = hist?.fingerprint ?? null
     }
 
-    // ── تحقق من تفضيلات المستخدم ──────────────────────────────
-    const { data: pref } = await supabase
-      .from('notification_preferences')
-      .select('enabled, quiet_start, quiet_end, mask_sensitive_data, profiles(timezone)')
-      .eq('user_id', user_id)
-      .eq('category', category)
-      .maybeSingle()
-
-    if (pref?.enabled === false) {
-      console.log(`[push] user=${user_id} category=${category} disabled by preference`)
-      return new Response(JSON.stringify({ skipped: 'disabled', alert_written: false }), { status: 200 })
-    }
-
-    // إخفاء الأرقام إذا طلب المستخدم ذلك
-    let finalBody = body
-    if (pref?.mask_sensitive_data) {
-      finalBody = body.replace(/\d+(\.\d+)?/g, '***')
-    }
-
-    // ── كتابة في alerts للعرض داخل التطبيق (قبل فحص الساعات الهادئة/الاشتراكات) ──
+    // ── كتابة في alerts للعرض داخل التطبيق (أولاً، قبل أي فلاتر) ──
+    // نكتب التنبيه في قاعدة البيانات للعرض داخل التطبيق بغض النظر عن تفضيلات الإرسال
+    // هذا يضمن ظهور التنبيهات في شاشة التنبيهات حتى لو عطل المستخدم الإشعارات المرسلة
     const { error: alertErr } = await supabase.from('alerts').insert({
       user_id,
       title,
-      message: finalBody,
+      message: body,
       type: TAG_TO_ALERT_TYPE[category] ?? 'reminder',
       frequency: 'once',
       is_read: false,
@@ -132,6 +115,26 @@ Deno.serve(async (req: Request) => {
         alertWritten = false
         console.error('[push] alerts insert failed:', alertErr.message)
       }
+    }
+
+    // ── تحقق من تفضيلات المستخدم (للإرسال فقط، ليس للعرض في التطبيق) ──────────────────────────────
+    const { data: pref } = await supabase
+      .from('notification_preferences')
+      .select('enabled, quiet_start, quiet_end, mask_sensitive_data, profiles(timezone)')
+      .eq('user_id', user_id)
+      .eq('category', category)
+      .maybeSingle()
+
+    // إذا كانت الإشعارات معطلة لهذه الفئة، نتخطى الإرسال لكن التنبيه موجود في قاعدة البيانات
+    if (pref?.enabled === false) {
+      console.log(`[push] user=${user_id} category=${category} disabled by preference (alert written: ${alertWritten})`)
+      return new Response(JSON.stringify({ skipped: 'disabled', alert_written: alertWritten }), { status: 200 })
+    }
+
+    // إخفاء الأرقام إذا طلب المستخدم ذلك (للإرسال فقط)
+    let finalBody = body
+    if (pref?.mask_sensitive_data) {
+      finalBody = body.replace(/\d+(\.\d+)?/g, '***')
     }
 
     // تحقق من الساعات الهادئة — حسب المنطقة الزمنية للمستخدم (وليس UTC)
