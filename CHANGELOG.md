@@ -32,6 +32,7 @@ notes and version-bump commits; see the note on links at the end of this file.
 
 ### Fixed
 
+- **Sentry debug button removed from mobile settings**: The debug-only "Trigger Sentry Test Crash" button (`kDebugMode` guard) was removed from `lib/screens/settings/settings_screen.dart`. It could not reach the Sentry reporting path (debug-only button + release-only `captureReport` = no overlap) and was a UI distractor. `SENTRY_DSN` added to `mobile/fajrak_flutter/.env.example` for documentation; without it, Sentry init is skipped entirely per `lib/services/sentry_service.dart`.
 - **Linux desktop build (mobile)**: `flutter run -d linux` / `flutter build linux` failed at
   the CMake configure step. Two signatures were hit:
   - `Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR AsynchDNS)` — only the
