@@ -27,6 +27,9 @@
 ### Internal
 - Deploy: `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` now targets preview as well as
   production; documented in `.env.example` and HANDOFF_REPORT §13.
+- Docs: web test counts reconciled to 710 tests / 77 suites across
+  PROJECT_CONTEXT §4, HANDOFF_REPORT, CLAUDE.md, CONTRIBUTING.md and
+  `docs/ci-cd.md` (the CI count guard compares the suites to §4).
 - Docs: reconciled test counts (695/76/25/6), removed stale AD_ID claim,
   corrected profiles column count.
 - DB: added baseline snapshot for review (not a runnable migration).

@@ -38,12 +38,12 @@
 
 ## Tests
 
-- **Web unit and integration:** `npm test` (695 tests across 76 suites in `__tests__/`)
+- **Web unit and integration:** `npm test` (710 tests across 77 suites in `__tests__/`)
 - **Web end-to-end:** `npm run test:e2e` (Playwright, needs a running dev server)
 - **Mobile:** `cd mobile/fajrak_flutter && flutter test` (260 tests)
 - **Full health check:** `npm run doctor` (audit + lint + typecheck + test coverage + build)
 
-> Counts are current as of 2026-10-22 and verified in `PROJECT_CONTEXT.md` §4. This
+> Counts are current as of 2026-10-25 and verified in `PROJECT_CONTEXT.md` §4. This
 > paragraph deliberately does not cite `CLAUDE.md` as its source: cross-referencing two
 > docs let the numbers drift apart silently for weeks (592/177 vs 626/186 vs 636/206).
 > Re-measure with `npx jest --ci` and `flutter test`.

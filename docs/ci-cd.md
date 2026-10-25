@@ -11,7 +11,7 @@ Workflow: `.github/workflows/ci.yml` (or equivalent)
 | Job | Purpose | Key Steps |
 |-----|---------|-----------|
 | `lint-test-build` | Full web health check | `npm ci` → `npm run lint` → `npm run typecheck` → `npm test` → `npm run build` |
-| `validate_test_counts` | Enforces test count integrity | Runs `npm test -- --listTests 2>/dev/null | wc -l` and `flutter test --list 2>/dev/null | grep -c "test/"`; fails if counts ≠ 695 web / 260 Flutter |
+| `validate_test_counts` | Enforces test count integrity | Runs the Jest suite and fails when totals disagree with PROJECT_CONTEXT.md §4 (Flutter half runs in the mobile job) |
 
 **Required status checks for merge:** Both jobs must pass. No bypass.
 
@@ -162,4 +162,4 @@ The Makefile reads `FLUTTER_FIREBASE_*` and `FLUTTER_SUPABASE_*` from `.env` (un
 | Flutter build fails with "Could NOT find CURL" | Missing `libcurl4-openssl-dev` on Linux | `sudo apt install libcurl4-openssl-dev && rm -rf build/linux && flutter build` |
 | Vercel deploy fails "CRON_SECRET not set" | Missing env var in Vercel Dashboard | Add `CRON_SECRET` to Production env |
 | Playwright tests flaky | Timing / race conditions | Add `await expect(locator).toBeVisible({ timeout: 10000 })` |
-| `npm test` shows 695 → 694 | Test file deleted or renamed | Check `__tests__/` for missing test; restore or update count in `validate_test_counts` |
+| `npm test` shows 710 → 709 | Test file deleted or renamed | Check `__tests__/` for missing test; restore or update count in `validate_test_counts` |
