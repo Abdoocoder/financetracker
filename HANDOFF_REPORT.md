@@ -228,3 +228,38 @@ Store listing (ar + en) claims, mapped to implementation:
 8. **Money**: is monetization (subscription/IAP) planned — it determines whether to prioritize paywall/auth work, feature flags, and higher test bars?
 9. **BYOK store wording**: is "keys never sent to our servers" acceptable given the proxy receives an RSA-OAEP envelope, or should copy be reworded?
 10. **Scope of help**: what should an incoming architect own first — incident recovery, calc-deduplication (single source of truth for finance math), or coverage/feature-flag safety net?
+
+## 13. Environment Variables
+
+Web env vars live in Vercel (production + preview) and, for local work, in a
+git-ignored `.env`. `.env.example` lists every one with safe placeholders.
+
+| Variable | Scope | Required for | Notes |
+|---|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | All data access | Anon key rotation is still recommended (INCIDENT.md). |
+| `SUPABASE_SERVICE_ROLE_KEY` | server only | Crons, webhooks, admin paths | Never expose to the client bundle. |
+| `CRON_SECRET` | server only | Authenticating scheduled routes | Mismatch silently 401s every cron. |
+| `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN` | client + server | Error reporting | Invalid DSN disables Sentry with a console warning. |
+| `SENTRY_AUTH_TOKEN` | build only | Source-map upload | Absent token → unsymbolicated stack traces. |
+| `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` | build + runtime | Stable Server Action IDs | See below. |
+| `BYOK_*` / `NEXT_PUBLIC_BYOK_*` | server / client | BYOK crypto | See `docs/domain/byok-ai.md`. |
+
+### `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`
+
+**Required for Server Actions to remain stable across deployments.** Next.js
+encrypts Server Action IDs with this key. With no key configured it generates a
+random one per build, so each deploy changes every action ID; browsers still
+running the previous build then POST a stale ID and the request fails with
+`Failed to find Server Action` (deployment skew).
+
+- **Configured in Vercel** as a `sensitive` variable targeting **production and
+  preview**. Preview must match production, otherwise preview deployments
+  generate their own random key and reintroduce the skew.
+- **Format**: base64-encoded 32 bytes (`openssl rand -base64 32`). Next.js runs
+  `atob(key)` and imports the result as an AES-GCM key, so a malformed value
+  fails the build rather than silently falling back.
+- **Rotating it** invalidates in-flight Server Action POSTs from already-loaded
+  pages until those clients reload — rotate during low traffic.
+- Sentry noise from stale action IDs on routes that *do* have Server Actions is
+  left visible on purpose; only probes aimed at the action-less landing route
+  are dropped (`lib/sentry-filters.ts`, rule 12 PII redaction lives there too).
