@@ -10,6 +10,8 @@
   Unique index now enforces dedup.
 - Currency: onboarding uses `detectCurrency()` (high-confidence), falls back
   to KWD. Prod DB default changed JOD → KWD.
+- Fixed a debug-only Sentry "Zone mismatch" warning on Flutter web by ensuring
+  the Flutter binding is initialized inside Sentry's zone.
 
 ### Security
 - DB: revoked `anon` INSERT/UPDATE/DELETE/TRUNCATE on all tables. `anon` has

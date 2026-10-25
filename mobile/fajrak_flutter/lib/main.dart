@@ -45,7 +45,10 @@ Future<void> main() async {
   // الـ binding داخل منطقته (WidgetsFlutterBindingIntegration)؛ native لا يفتح
   // منطقة أصلاً (PlatformDispatcher.onError مدعوم) فالتهيئة هنا آمنة كما هي.
   if (!kIsWeb) {
-    WidgetsFlutterBinding.ensureInitialized();
+    // SentryWidgetsFlutterBinding (not the plain binding) so Sentry's native
+    // frames-tracking integration is active: it only attaches when the
+    // binding was created by Sentry. Created here, before SentryFlutter.init.
+    SentryWidgetsFlutterBinding.ensureInitialized();
   }
 
   // Initialize Sentry first (crash reporting) so init-time failures are

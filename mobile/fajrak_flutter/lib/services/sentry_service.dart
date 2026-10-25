@@ -75,7 +75,7 @@ class SentryService {
     required FutureOr<void> Function() appRunner,
   }) async {
     if (!isEnabled) {
-      appRunner();
+      await appRunner();
       return;
     }
     final release = await _resolveRelease();
