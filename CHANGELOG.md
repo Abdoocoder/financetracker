@@ -16,6 +16,19 @@
   Remaining and accepted: `fast-uri@3.1.8` (moderate; the fix is a `4.x` major
   bump through `ajv`) plus dev-only `solid-js`/`seroval` criticals, which
   cannot be patched without leaving `solid-js`'s `~1.5.4` range.
+- DB: hardened the internal bookkeeping tables against self-tampering
+  (`supabase/migrations/20261026000001_harden_internal_tables.sql`).
+  `authenticated` no longer holds `UPDATE`/`DELETE`/`TRUNCATE` on
+  `api_audit_log` (the API audit trail) or `idempotency_keys` (transaction
+  de-duplication), and holds `SELECT` only on `proxy_usage` (the BYOK
+  rate-limit counter). Previously a user could `UPDATE proxy_usage.count = 0`
+  to reset their own bucket and bypass the 30 req/min proxy cap, or `DELETE`
+  their audit rows. Because `proxy_usage` writes now require owner rights,
+  `bump_proxy_usage()` became `SECURITY DEFINER`; it is zero-argument and
+  resolves the row from `auth.uid()`, so a caller can only bump their own
+  bucket. `api_audit_log` INSERT was deliberately kept — the BYOK agent route
+  writes audit rows with the caller's session client. No application logic
+  changed.
 
 ## [3.46.0] — 2026-10-25
 
