@@ -1,5 +1,22 @@
 # Changelog
 
+## [Unreleased]
+
+### Security
+- Dependencies: patched **14 critical** and **41 high** advisories in production
+  dependencies (`npm audit --omit=dev`: 74 → 1). Upgraded `next@16.4.3`
+  (pulls `sharp@0.35.5`), `@sentry/nextjs@10.76.2`, `dompurify@3.4.17`,
+  `@modelcontextprotocol/server@2.4.0`, `zod@4.6.7`. Added same-major
+  `overrides` for `@grpc/grpc-js@^1.14.6`, `source-map-js@^1.2.2`,
+  `jsdom → undici@^8.12.3`, and `handlebars@^4.7.10`. Removed the unused direct
+  `npx@^10.2.2` dependency — its bundled `npm@5.1.0` tree (`request`,
+  `tar@2.2.1`, `form-data@2.1.4`, `minimist`, `hawk`, `hoek`, `boom`, …)
+  accounted for most of the critical findings and was never imported.
+  No application logic changed.
+  Remaining and accepted: `fast-uri@3.1.8` (moderate; the fix is a `4.x` major
+  bump through `ajv`) plus dev-only `solid-js`/`seroval` criticals, which
+  cannot be patched without leaving `solid-js`'s `~1.5.4` range.
+
 ## [3.46.0] — 2026-10-25
 
 ### Fixed
