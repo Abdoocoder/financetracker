@@ -38,7 +38,7 @@
 
 ## Tests
 
-- **Web unit and integration:** `npm test` (710 tests across 77 suites in `__tests__/`)
+- **Web unit and integration:** `npm test` (741 tests across 78 suites in `__tests__/`)
 - **Web end-to-end:** `npm run test:e2e` (Playwright, needs a running dev server)
 - **Mobile:** `cd mobile/fajrak_flutter && flutter test` (260 tests)
 - **Full health check:** `npm run doctor` (audit + lint + typecheck + test coverage + build)

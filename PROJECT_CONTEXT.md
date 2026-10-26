@@ -60,7 +60,7 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 
 - **Mobile release:** `3.46.0+65` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play's last *documented* submission is v3.44.0+63 (Submission ID 44, status "In review" at handoff); `mobile/README.md` still reads 3.44.0+63.
 - **Web version:** `package.json` = 3.42.0 — intentionally not bumped with mobile releases.
-- **Tests (re-run 2026-10-25):** **710 web tests / 77 Jest suites** (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
+- **Tests (re-run 2026-10-25):** **741 web tests / 78 Jest suites** (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
 - **Latest feature:** Zakat Autopilot (Phase C) complete and live — engine v2 + `zakat_haul_tracking` state machine + daily `/api/zakat-autopilot` cron + Hawl countdown UI on Web and Mobile.
 - **Next phase:** Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 - **Resolved:** prod DB outage (2026-10-17, `INCIDENT.md`), daily backups to Cloudflare R2, `currentUser!` force-unwraps (v3.44.0), Zakat live-price fallback.
