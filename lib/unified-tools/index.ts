@@ -140,12 +140,16 @@ export async function getProfileCurrency(userId: string, ctx?: ToolContext): Pro
  * Increments the per-user proxy usage counter for the current minute window.
  * Used by BYOK proxy to enforce 30 req/min limit.
  * Returns the current count after increment.
+ *
+ * `public.bump_proxy_usage()` takes NO arguments and resolves the bucket from
+ * `auth.uid()`, so this requires the caller's session (RLS) client — passing an
+ * admin client would leave `auth.uid()` null and the insert would fail. Since
+ * migration 20261026124600 the counter table is SELECT-only for `authenticated`
+ * and every write goes through this RPC.
  */
-export async function bumpProxyUsage(userId: string, ctx?: ToolContext): Promise<number> {
+export async function bumpProxyUsage(ctx: ToolContext): Promise<number> {
   const supabase = resolveClient(ctx)
-  const { data, error } = await supabase.rpc('bump_proxy_usage', {
-    p_user_id: userId,
-  })
+  const { data, error } = await supabase.rpc('bump_proxy_usage')
   if (error) throw error
   return data as number
 }

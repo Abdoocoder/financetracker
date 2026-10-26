@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+- Fixed a dead code path in `lib/unified-tools` that called `bump_proxy_usage`
+  with the wrong signature. The RPC takes no arguments (it derives the bucket
+  from `auth.uid()`), so `bumpProxyUsage()` now passes none and requires the
+  caller's session client instead of silently falling back to the admin client.
+  Also aligned the local migration filename with the version recorded in prod
+  (`20261026124600_harden_internal_tables.sql`), so `supabase db push` does not
+  try to re-apply it.
+
 ### Security
 - Dependencies: patched **14 critical** and **41 high** advisories in production
   dependencies (`npm audit --omit=dev`: 74 → 1). Upgraded `next@16.4.3`
@@ -17,7 +26,7 @@
   bump through `ajv`) plus dev-only `solid-js`/`seroval` criticals, which
   cannot be patched without leaving `solid-js`'s `~1.5.4` range.
 - DB: hardened the internal bookkeeping tables against self-tampering
-  (`supabase/migrations/20261026000001_harden_internal_tables.sql`).
+  (`supabase/migrations/20261026124600_harden_internal_tables.sql`).
   `authenticated` no longer holds `UPDATE`/`DELETE`/`TRUNCATE` on
   `api_audit_log` (the API audit trail) or `idempotency_keys` (transaction
   de-duplication), and holds `SELECT` only on `proxy_usage` (the BYOK

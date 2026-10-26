@@ -1,4 +1,7 @@
--- Migration: 20261026000001_harden_internal_tables.sql
+-- Migration: 20261026124600_harden_internal_tables.sql
+-- (Originally authored locally as 20261026000001_harden_internal_tables.sql;
+--  the Supabase management API recorded it under its own apply timestamp,
+--  2026-10-26 12:46:00 UTC, which this filename now matches.)
 -- Purpose: stop end users from mutating their own internal bookkeeping rows.
 --
 -- VERIFIED against prod (fajrak, project ujwcvtpwsaidljecqbaa) on 2026-10-26
