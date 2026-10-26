@@ -13,6 +13,10 @@ import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from '@/types'
 import {
   getAccountBalances,
   getCashflowSummary,
+  getBudgets,
+  getDebts,
+  getGoals,
+  getRecentTransactions,
   createTransaction,
   validateCategory,
   getValidCategories,
@@ -26,16 +30,20 @@ import {
 /**
  * Fajrak MCP Server (Feature B)
  *
- * Exposes three Model Context Protocol tools over Streamable HTTP using the
+ * Exposes seven Model Context Protocol tools over Streamable HTTP using the
  * v2 `@modelcontextprotocol/server` SDK. Authentication uses the same
  * Personal Access Token (PAT) system as the REST webhook — `fjk_live_…`
  * tokens checked via `verifyApiKey` — with a per-key rate limit and mandated
  * `api_audit_log` entries.
  *
  * Scope vocabulary matches the existing API (not colon-style):
- *   - get_balances         → read_balances
- *   - get_cashflow_summary → read_transactions
- *   - create_transaction   → create_transaction
+ *   - get_balances             → read_balances
+ *   - get_cashflow_summary     → read_transactions
+ *   - get_debts                → read_balances
+ *   - get_budgets              → read_transactions
+ *   - get_goals                → read_balances
+ *   - get_recent_transactions  → read_transactions
+ *   - create_transaction       → create_transaction
  *
  * The SDK performs no token verification of its own (`createMcpHandler`'
  * `authInfo` is strict pass-through), so this route authenticates + rate
@@ -64,6 +72,15 @@ const createTransactionSchema = z.object({
   transaction_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
   account_id: z.string().uuid().optional().nullable(),
   idempotency_key: z.string().min(1).max(128).optional(),
+})
+const getDebtsSchema = z.object({})
+const getBudgetsSchema = z.object({
+  year: z.number().int().min(2000).max(2100).optional(),
+  month: z.number().int().min(1).max(12).optional(),
+})
+const getGoalsSchema = z.object({})
+const getRecentTransactionsSchema = z.object({
+  limit: z.number().int().min(1).max(50).optional(),
 })
 
 // ══════════════════════════════════════════════════════════
@@ -114,6 +131,10 @@ function audit(
 const TOOL_SCOPES: Record<string, string> = {
   get_balances: 'read_balances',
   get_cashflow_summary: 'read_transactions',
+  get_debts: 'read_balances',
+  get_budgets: 'read_transactions',
+  get_goals: 'read_balances',
+  get_recent_transactions: 'read_transactions',
   create_transaction: 'create_transaction',
 }
 
@@ -208,6 +229,99 @@ const mcpHandler = createMcpHandler((mcpCtx: McpRequestContext) => {
       return {
         content: [{ type: 'text', text: JSON.stringify(summary) }],
         structuredContent: summary,
+      }
+    }
+  )
+
+  // ── get_debts ────────────────────────────────────────────
+  server.registerTool(
+    'get_debts',
+    {
+      title: 'Get Debts',
+      description:
+        "List the authenticated user's active debts and receivables with remaining balance, monthly payment, end date and next due date. Amounts are in the profile currency. Requires the 'read_balances' scope.",
+      inputSchema: getDebtsSchema,
+    },
+    async (_args, ctx) => {
+      const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'read_balances')
+      const debts = await getDebts(userId)
+      audit(keyId, userId, 'read_balances', { tool: 'get_debts', count: debts.length })
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: true, debts }) }],
+        structuredContent: { ok: true, debts },
+      }
+    }
+  )
+
+  // ── get_budgets ──────────────────────────────────────────
+  server.registerTool(
+    'get_budgets',
+    {
+      title: 'Get Budgets',
+      description:
+        "Return the authenticated user's budgets for one month: per-category limit, spend, remaining and percent used. Only categories with a budget row are returned; defaults to the current month. Requires the 'read_transactions' scope.",
+      inputSchema: getBudgetsSchema,
+    },
+    async (args, ctx) => {
+      const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'read_transactions')
+      const now = new Date()
+      const year = args.year ?? now.getUTCFullYear()
+      const month = args.month ?? now.getUTCMonth() + 1
+      const budgets = await getBudgets(userId, year, month)
+      audit(keyId, userId, 'read_transactions', {
+        tool: 'get_budgets',
+        year,
+        month,
+        count: budgets.length,
+      })
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: true, budgets }) }],
+        structuredContent: { ok: true, budgets },
+      }
+    }
+  )
+
+  // ── get_goals ────────────────────────────────────────────
+  server.registerTool(
+    'get_goals',
+    {
+      title: 'Get Savings Goals',
+      description:
+        "List the authenticated user's savings goals with target amount, current amount, target date and percent complete. Amounts are in the profile currency. Requires the 'read_balances' scope.",
+      inputSchema: getGoalsSchema,
+    },
+    async (_args, ctx) => {
+      const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'read_balances')
+      const goals = await getGoals(userId)
+      audit(keyId, userId, 'read_balances', { tool: 'get_goals', count: goals.length })
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: true, goals }) }],
+        structuredContent: { ok: true, goals },
+      }
+    }
+  )
+
+  // ── get_recent_transactions ──────────────────────────────
+  server.registerTool(
+    'get_recent_transactions',
+    {
+      title: 'Get Recent Transactions',
+      description:
+        "Return the authenticated user's most recent income and expense transactions, newest first, including the base-currency amount and the original amount/currency entered. Transfers and soft-deleted rows are excluded. Requires the 'read_transactions' scope.",
+      inputSchema: getRecentTransactionsSchema,
+    },
+    async (args, ctx) => {
+      const { userId, keyId } = requireScope(ctx, mcpCtx.authInfo, 'read_transactions')
+      const limit = args.limit ?? 10
+      const transactions = await getRecentTransactions(userId, limit)
+      audit(keyId, userId, 'read_transactions', {
+        tool: 'get_recent_transactions',
+        limit,
+        count: transactions.length,
+      })
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: true, transactions }) }],
+        structuredContent: { ok: true, transactions },
       }
     }
   )

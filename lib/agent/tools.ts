@@ -27,7 +27,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { fetchExchangeRateServer } from '@/lib/exchange-rate'
 import {
   createTransaction,
+  getBudgets,
+  getDebts,
+  getGoals,
   getProfileCurrency,
+  getRecentTransactions,
   getValidCategories,
   sanitizeDescription,
   validateCategory,
@@ -219,6 +223,130 @@ const getFinancialSnapshotTool: AgentTool = {
 }
 
 // ============================================================
+// Phase 1 read tools — debts, budgets, goals, recent transactions
+// ============================================================
+//
+// Each tool is a pure pass-through to an RPC (the executors do no math), which
+// keeps a single source of truth for balances and aggregation. Scopes follow
+// the existing PAT vocabulary; all four are reads and never need confirmation.
+
+const getDebtsSchema = z.strictObject({})
+
+const getDebtsTool: AgentTool = {
+  name: 'get_debts',
+  description:
+    "List the user's active debts and receivables: remaining balance, monthly payment, end date and next due date. Unpaid and soft-deleted rows are handled by the server. Amounts are in the user's profile currency. Use this for questions like 'how much debt do I still owe?' or 'which payment is due next?'.",
+  kind: 'read',
+  scope: 'read_balances',
+  requiresConfirmation: false,
+  parameters: {
+    type: 'object',
+    properties: {},
+    required: [],
+    additionalProperties: false,
+  },
+  schema: getDebtsSchema,
+  async execute(args, ctx) {
+    getDebtsSchema.parse(args)
+    return getDebts(ctx.userId, { client: ctx.client })
+  },
+}
+
+const getBudgetsSchema = z.strictObject({
+  year: z.number().int().min(2000).max(2100).optional(),
+  month: z.number().int().min(1).max(12).optional(),
+})
+
+const getBudgetsTool: AgentTool = {
+  name: 'get_budgets',
+  description:
+    "Return the user's budgets for one month: each category's limit, actual spend, remaining amount and percent used. Only categories that have a budget are returned. Amounts are in the user's profile currency. Defaults to the current month. Use this for questions like 'am I over budget?' or 'how much is left for food this month?'.",
+  kind: 'read',
+  scope: 'read_transactions',
+  requiresConfirmation: false,
+  parameters: {
+    type: 'object',
+    properties: {
+      year: {
+        type: 'integer',
+        minimum: 2000,
+        maximum: 2100,
+        description: 'Gregorian year, e.g. 2026. Defaults to the current year.',
+      },
+      month: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 12,
+        description: 'Month number 1-12. Defaults to the current month.',
+      },
+    },
+    required: [],
+    additionalProperties: false,
+  },
+  schema: getBudgetsSchema,
+  async execute(args, ctx) {
+    const input = getBudgetsSchema.parse(args)
+    const now = new Date()
+    const year = input.year ?? now.getUTCFullYear()
+    const month = input.month ?? now.getUTCMonth() + 1
+    return getBudgets(ctx.userId, year, month, { client: ctx.client })
+  },
+}
+
+const getGoalsSchema = z.strictObject({})
+
+const getGoalsTool: AgentTool = {
+  name: 'get_goals',
+  description:
+    "List the user's savings goals with target amount, amount saved so far, target date and percent complete. Amounts are in the user's profile currency. Use this for questions like 'how close am I to my goal?' or 'when will I finish saving for X?'.",
+  kind: 'read',
+  scope: 'read_balances',
+  requiresConfirmation: false,
+  parameters: {
+    type: 'object',
+    properties: {},
+    required: [],
+    additionalProperties: false,
+  },
+  schema: getGoalsSchema,
+  async execute(args, ctx) {
+    getGoalsSchema.parse(args)
+    return getGoals(ctx.userId, { client: ctx.client })
+  },
+}
+
+const getRecentTransactionsSchema = z.strictObject({
+  limit: z.number().int().min(1).max(50).optional(),
+})
+
+const getRecentTransactionsTool: AgentTool = {
+  name: 'get_recent_transactions',
+  description:
+    "Return the user's most recent income and expense transactions, newest first: base-currency amount, type, category, description, date, plus the original amount and currency the user entered. Transfers are excluded and soft-deleted rows are hidden. Defaults to 10 rows (max 50). Use this for questions like 'what did I spend on yesterday?' or 'show my last transactions'.",
+  kind: 'read',
+  scope: 'read_transactions',
+  requiresConfirmation: false,
+  parameters: {
+    type: 'object',
+    properties: {
+      limit: {
+        type: 'integer',
+        minimum: 1,
+        maximum: 50,
+        description: 'How many transactions to return (1-50). Defaults to 10.',
+      },
+    },
+    required: [],
+    additionalProperties: false,
+  },
+  schema: getRecentTransactionsSchema,
+  async execute(args, ctx) {
+    const input = getRecentTransactionsSchema.parse(args)
+    return getRecentTransactions(ctx.userId, input.limit ?? 10, { client: ctx.client })
+  },
+}
+
+// ============================================================
 // create_transaction (write — confirmation-gated)
 // ============================================================
 
@@ -338,6 +466,10 @@ const createTransactionTool: AgentTool = {
 export const AGENT_TOOLS: readonly AgentTool[] = [
   getSpendingBreakdownTool,
   getFinancialSnapshotTool,
+  getDebtsTool,
+  getBudgetsTool,
+  getGoalsTool,
+  getRecentTransactionsTool,
   createTransactionTool,
 ]
 

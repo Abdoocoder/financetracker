@@ -232,6 +232,115 @@ export async function getCashflowSummary(
 }
 
 // ============================================================
+// Read tools (shared by MCP + agent registry)
+// ============================================================
+//
+// Phase 1 agent read tools. All aggregation lives in the RPCs added by
+// `supabase/migrations/20261026130000_agent_read_tools.sql`; these helpers only
+// pass `p_user_id` through and normalise `null` to `[]`, so the MCP (service
+// role) and agent (RLS) paths cannot drift apart.
+//
+// Amounts are in the profile (base) currency. `original_amount` /
+// `original_currency` on a transaction row preserve the entered value
+// (Critical Rule 6).
+
+/** Active debt/receivable row returned by `get_debts`. */
+export interface DebtRow {
+  id: string
+  name: string
+  /** `debts.original_amount` */
+  total_amount: number
+  /** `debts.remaining_amount` */
+  remaining_balance: number
+  monthly_payment: number
+  /** `debts.due_date` */
+  end_date: string | null
+  /** Next instalment date, derived from `payment_day`. */
+  next_due_date: string | null
+  debt_type: 'owed' | 'receivable' | null
+  is_paid: boolean
+  priority: number | null
+}
+
+/** Budgeted category row returned by `get_budgets`. */
+export interface BudgetRow {
+  category: string
+  monthly_limit: number
+  spent: number
+  remaining: number | null
+  /** Spend as a percentage of the limit (1 decimal). */
+  percentage: number | null
+}
+
+/** Savings goal row returned by `get_goals`. */
+export interface GoalRow {
+  id: string
+  name: string
+  target_amount: number
+  current_amount: number
+  target_date: string | null
+  percentage: number | null
+}
+
+/** Recent transaction row returned by `get_recent_transactions`. */
+export interface RecentTransactionRow {
+  id: string
+  /** Base-currency amount (the stored `transactions.amount`). */
+  amount: number
+  type: 'income' | 'expense'
+  category: string
+  description: string | null
+  /** `transactions.transaction_date` */
+  date: string
+  original_amount: number | null
+  original_currency: string | null
+}
+
+export async function getDebts(userId: string, ctx?: ToolContext): Promise<DebtRow[]> {
+  const supabase = resolveClient(ctx)
+  const { data, error } = await supabase.rpc('get_debts', { p_user_id: userId })
+  if (error) throw error
+  return (data as DebtRow[]) ?? []
+}
+
+export async function getBudgets(
+  userId: string,
+  year: number,
+  month: number,
+  ctx?: ToolContext
+): Promise<BudgetRow[]> {
+  const supabase = resolveClient(ctx)
+  const { data, error } = await supabase.rpc('get_budgets', {
+    p_user_id: userId,
+    p_year: year,
+    p_month: month,
+  })
+  if (error) throw error
+  return (data as BudgetRow[]) ?? []
+}
+
+export async function getGoals(userId: string, ctx?: ToolContext): Promise<GoalRow[]> {
+  const supabase = resolveClient(ctx)
+  const { data, error } = await supabase.rpc('get_goals', { p_user_id: userId })
+  if (error) throw error
+  return (data as GoalRow[]) ?? []
+}
+
+export async function getRecentTransactions(
+  userId: string,
+  limit = 10,
+  ctx?: ToolContext
+): Promise<RecentTransactionRow[]> {
+  const supabase = resolveClient(ctx)
+  const { data, error } = await supabase.rpc('get_recent_transactions', {
+    p_user_id: userId,
+    p_limit: limit,
+  })
+  if (error) throw error
+  return (data as RecentTransactionRow[]) ?? []
+}
+
+// ============================================================
 // Transaction Creation (used by MCP + agent create_transaction)
 // ============================================================
 

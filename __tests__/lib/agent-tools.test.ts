@@ -95,10 +95,14 @@ afterAll(() => {
 })
 
 describe('registry shape', () => {
-  it('exposes exactly the three MVP tools', () => {
+  it('exposes the built-in tools plus the Phase 1 read tools', () => {
     expect(AGENT_TOOLS.map((t) => t.name).sort()).toEqual([
       'create_transaction',
+      'get_budgets',
+      'get_debts',
       'get_financial_snapshot',
+      'get_goals',
+      'get_recent_transactions',
       'get_spending_breakdown',
     ])
   })

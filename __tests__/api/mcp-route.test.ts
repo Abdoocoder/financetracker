@@ -26,6 +26,10 @@ jest.mock('@/lib/api-keys', () => ({
 jest.mock('@/lib/unified-tools', () => ({
   getAccountBalances: jest.fn(),
   getCashflowSummary: jest.fn(),
+  getDebts: jest.fn(),
+  getBudgets: jest.fn(),
+  getGoals: jest.fn(),
+  getRecentTransactions: jest.fn(),
   createTransaction: jest.fn(),
   validateCategory: jest.fn(),
   getValidCategories: jest.fn(),
@@ -155,6 +159,10 @@ beforeEach(() => {
     net: 0,
     transaction_count: 0,
   })
+  ;(unifiedTools.getDebts as jest.Mock).mockReset().mockResolvedValue([])
+  ;(unifiedTools.getBudgets as jest.Mock).mockReset().mockResolvedValue([])
+  ;(unifiedTools.getGoals as jest.Mock).mockReset().mockResolvedValue([])
+  ;(unifiedTools.getRecentTransactions as jest.Mock).mockReset().mockResolvedValue([])
   ;(unifiedTools.createTransaction as jest.Mock).mockReset().mockResolvedValue({
     id: 'tx-new-1',
     type: 'expense',
@@ -318,12 +326,37 @@ describe('HTTP-level scope gate (PRD §5.4 — 403 Forbidden)', () => {
 })
 
 describe('registerTool surface', () => {
-  it('registers exactly the three required tools with names', () => {
+  it('registers the base tools plus the Phase 1 read tools', () => {
     expect(Object.keys(registeredTools).sort()).toEqual([
       'create_transaction',
       'get_balances',
+      'get_budgets',
       'get_cashflow_summary',
+      'get_debts',
+      'get_goals',
+      'get_recent_transactions',
     ])
+  })
+
+  it('gates every new read tool at the HTTP layer', async () => {
+    const cases: Array<[string, string]> = [
+      ['get_debts', 'read_balances'],
+      ['get_goals', 'read_balances'],
+      ['get_budgets', 'read_transactions'],
+      ['get_recent_transactions', 'read_transactions'],
+    ]
+
+    for (const [toolName, requiredScope] of cases) {
+      ;(verifyApiKey as jest.Mock).mockResolvedValue({
+        ...mockKeyData,
+        scopes: requiredScope === 'read_balances' ? ['read_transactions'] : ['read_balances'],
+      })
+      const res = await POST(makeToolCall(toolName))
+      expect(res.status).toBe(403)
+      expect((await res.json()).required_scope).toBe(requiredScope)
+    }
+
+    expect(mcpFetch).not.toHaveBeenCalled()
   })
 })
 
@@ -457,6 +490,90 @@ describe('scope gating in tool callbacks', () => {
     expect(OPTIONS).toBe(POST)
     expect(DELETE).toBe(POST)
     expect(GET).toBe(POST)
+  })
+})
+
+describe('Phase 1 read tools', () => {
+  const fullAuth = {
+    clientId: 'user-1',
+    scopes: ['create_transaction', 'read_transactions', 'read_balances'],
+    extra: { keyId: 'key-id-1', rateLimitPerMin: 10 },
+  }
+
+  it('get_debts reads through the shared helper and audits the call', async () => {
+    const debts = [{ id: 'debt-1', remaining_balance: 4000 }]
+    ;(unifiedTools.getDebts as jest.Mock).mockResolvedValue(debts)
+
+    const result = await invokeTool('get_debts', {}, { ...fullAuth })
+
+    expect(unifiedTools.getDebts).toHaveBeenCalledWith('user-1')
+    expect(result.structuredContent).toEqual({ ok: true, debts })
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'read_balances',
+        userId: 'user-1',
+        apiKeyId: 'key-id-1',
+        payload: expect.objectContaining({ tool: 'get_debts', count: 1 }),
+      })
+    )
+  })
+
+  it('get_goals reads through the shared helper', async () => {
+    const goals = [{ id: 'goal-1', percentage: 25 }]
+    ;(unifiedTools.getGoals as jest.Mock).mockResolvedValue(goals)
+
+    const result = await invokeTool('get_goals', {}, { ...fullAuth })
+
+    expect(unifiedTools.getGoals).toHaveBeenCalledWith('user-1')
+    expect(result.structuredContent).toEqual({ ok: true, goals })
+    expect(unifiedTools.writeAuditLog).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'read_balances', payload: expect.objectContaining({ tool: 'get_goals' }) })
+    )
+  })
+
+  it('get_budgets defaults to the current UTC month', async () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2026-10-23T12:00:00.000Z'))
+    try {
+      ;(unifiedTools.getBudgets as jest.Mock).mockResolvedValue([])
+      await invokeTool('get_budgets', {}, { ...fullAuth })
+      expect(unifiedTools.getBudgets).toHaveBeenCalledWith('user-1', 2026, 10)
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('get_budgets passes an explicit year/month through', async () => {
+    ;(unifiedTools.getBudgets as jest.Mock).mockResolvedValue([])
+    await invokeTool('get_budgets', { year: 2025, month: 12 }, { ...fullAuth })
+    expect(unifiedTools.getBudgets).toHaveBeenCalledWith('user-1', 2025, 12)
+  })
+
+  it('get_recent_transactions defaults to 10 and honours an explicit limit', async () => {
+    const transactions = [{ id: 'tx-1', amount: 8.86 }]
+    ;(unifiedTools.getRecentTransactions as jest.Mock).mockResolvedValue(transactions)
+
+    const result = await invokeTool('get_recent_transactions', {}, { ...fullAuth })
+    expect(unifiedTools.getRecentTransactions).toHaveBeenCalledWith('user-1', 10)
+    expect(result.structuredContent).toEqual({ ok: true, transactions })
+
+    await invokeTool('get_recent_transactions', { limit: 25 }, { ...fullAuth })
+    expect(unifiedTools.getRecentTransactions).toHaveBeenLastCalledWith('user-1', 25)
+  })
+
+  it('each new read tool throws inside the callback without its scope', async () => {
+    const noScopes = { clientId: 'user-1', scopes: [], extra: { keyId: 'k1' } }
+
+    await expect(invokeTool('get_debts', {}, noScopes)).rejects.toThrow('read_balances')
+    await expect(invokeTool('get_goals', {}, noScopes)).rejects.toThrow('read_balances')
+    await expect(invokeTool('get_budgets', {}, noScopes)).rejects.toThrow('read_transactions')
+    await expect(invokeTool('get_recent_transactions', {}, noScopes)).rejects.toThrow(
+      'read_transactions'
+    )
+    expect(unifiedTools.getDebts).not.toHaveBeenCalled()
+    expect(unifiedTools.getGoals).not.toHaveBeenCalled()
+    expect(unifiedTools.getBudgets).not.toHaveBeenCalled()
+    expect(unifiedTools.getRecentTransactions).not.toHaveBeenCalled()
   })
 })
 

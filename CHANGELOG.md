@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Added
+- Agent read tools (Phase 1): four new `SECURITY DEFINER` RPCs —
+  `get_debts`, `get_budgets`, `get_goals`, `get_recent_transactions`
+  (`supabase/migrations/20261026130000_agent_read_tools.sql`). Each checks
+  `auth.uid() = p_user_id` and is granted to `authenticated` and `service_role`
+  only. Exposed to the in-app agent registry (`lib/agent/tools.ts`) and the MCP
+  server (`app/api/mcp/route.ts`) as read-only, non-confirming tools scoped to
+  `read_balances` / `read_transactions`. `get_budgets` reuses
+  `get_spending_breakdown` so budget math stays in one place.
+
 ### Fixed
 - Fixed a dead code path in `lib/unified-tools` that called `bump_proxy_usage`
   with the wrong signature. The RPC takes no arguments (it derives the bucket
