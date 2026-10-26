@@ -81,3 +81,4 @@ fajrak_backups/
 secure_configs/
 **/client_secret_*.json
 **/credentials.json
+strix_runs/
