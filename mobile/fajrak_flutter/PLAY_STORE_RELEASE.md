@@ -1,3 +1,19 @@
+# Google Play Store Release Details - v3.47.1+67
+
+## Version Code: 67
+## Version Name: 3.47.1
+
+### 🛠️ Fixed
+- **Critical Hotfix:** Fixed an issue where the app could crash on startup on some Android devices due to missing Firebase configuration during the build process.
+- Added native crash reporting (Sentry tombstones) for better diagnostics.
+
+---
+**بالعربية:**
+- **إصلاح عاجل:** تم إصلاح مشكلة قد تؤدي إلى انهيار التطبيق عند التشغيل على بعض أجهزة الأندرويد بسبب نقص إعدادات Firebase أثناء البناء.
+- تمت إضافة تقارير انهيار أصلية (Sentry tombstones) لتشخيص أفضل.
+
+---
+
 # Google Play Store Release Details - v3.47.0+66
 
 ## Version Code: 66

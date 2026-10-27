@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.47.1] — 2026-10-27
+
+### Fixed
+- **Critical Hotfix:** Fixed app crash on startup on Android devices due to missing Firebase configuration during build (`.env` contained placeholder values instead of actual Firebase credentials from `google-services.json`).
+- Added Sentry tombstone metadata (`io.sentry.tombstone.enable`) to `AndroidManifest.xml` for native crash diagnostics.
+
 ## [3.47.0] — 2026-10-27
 
 ### Added
