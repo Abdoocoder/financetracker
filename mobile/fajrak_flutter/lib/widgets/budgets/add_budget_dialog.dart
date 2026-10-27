@@ -152,8 +152,11 @@ class _AddBudgetDialogState extends State<AddBudgetDialog> {
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(cat['icon'] as String,
-                              style: const TextStyle(fontSize: 20)),
+                          Icon(cat['icon'] as IconData,
+                              size: 20,
+                              color: isSelected
+                                  ? colorScheme.primary
+                                  : colorScheme.onSurfaceVariant),
                           const SizedBox(height: 4),
                           Text(cat['label'] as String,
                               style: TextStyle(

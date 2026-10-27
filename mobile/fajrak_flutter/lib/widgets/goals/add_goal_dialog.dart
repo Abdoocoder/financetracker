@@ -35,7 +35,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
     _targetCtrl = TextEditingController(text: widget.existing?['target_amount']?.toString() ?? '');
     _currentCtrl = TextEditingController(text: widget.existing?['current_amount']?.toString() ?? '0');
     _selectedIcon = int.tryParse(widget.existing?['icon']?.toString() ?? '') ?? Icons.track_changes.codePoint;
-    _deadlineDate = widget.existing?['deadline'] as String? ?? '';
+    _deadlineDate = widget.existing?['target_date'] as String? ?? widget.existing?['deadline'] as String? ?? '';
   }
 
   @override
@@ -95,7 +95,7 @@ class _AddGoalDialogState extends State<AddGoalDialog> {
       'icon': _selectedIcon.toString(),
       'target_amount': target,
       'current_amount': current,
-      'deadline': _deadlineDate.isEmpty ? null : _deadlineDate,
+      'target_date': _deadlineDate.isEmpty ? null : _deadlineDate,
     };
     try {
       if (widget.existing != null) {

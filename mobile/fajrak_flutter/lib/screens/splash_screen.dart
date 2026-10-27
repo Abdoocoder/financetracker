@@ -42,23 +42,63 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _checkUser() async {
     try {
-      final user = Supabase.instance.client.auth.currentUser;
+      var user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        try {
+          final session = await Supabase.instance.client.auth.refreshSession();
+          user = session.session?.user ?? Supabase.instance.client.auth.currentUser;
+        } catch (_) {
+          // ignore refresh errors here
+        }
+      }
       if (mounted) {
         if (user == null) {
           Navigator.pushReplacementNamed(context, '/login');
         } else {
-          final res = await Supabase.instance.client
-              .from('profiles')
-              .select('onboarding_done')
-              .eq('id', user.id)
-              .maybeSingle();
+          try {
+            final res = await Supabase.instance.client
+                .from('profiles')
+                .select('onboarding_done')
+                .eq('id', user.id)
+                .maybeSingle();
 
-          if (mounted) {
-            if (res != null && res['onboarding_done'] == true) {
-              Navigator.pushReplacementNamed(context, '/main');
-            } else {
-              Navigator.pushReplacementNamed(context, '/onboarding');
+            if (mounted) {
+              if (res != null && res['onboarding_done'] == true) {
+                Navigator.pushReplacementNamed(context, '/main');
+              } else {
+                Navigator.pushReplacementNamed(context, '/onboarding');
+              }
             }
+          } catch (e) {
+            final msg = e.toString().toLowerCase();
+            if (msg.contains('refresh_token_already_used')) {
+              await Future.delayed(const Duration(seconds: 1));
+              if (!mounted) return;
+              try {
+                final session = await Supabase.instance.client.auth.refreshSession();
+                user = session.session?.user ?? Supabase.instance.client.auth.currentUser;
+                if (user == null) {
+                  if (mounted) Navigator.pushReplacementNamed(context, '/login');
+                  return;
+                }
+                final res = await Supabase.instance.client
+                    .from('profiles')
+                    .select('onboarding_done')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                if (mounted) {
+                  if (res != null && res['onboarding_done'] == true) {
+                    Navigator.pushReplacementNamed(context, '/main');
+                  } else {
+                    Navigator.pushReplacementNamed(context, '/onboarding');
+                  }
+                }
+                return;
+              } catch (_) {
+                // fall through to outer catch
+              }
+            }
+            rethrow;
           }
         }
       }

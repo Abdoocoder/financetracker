@@ -110,6 +110,38 @@ class SentryService {
   /// merged, so it sees every breadcrumb. Returns null to drop the event.
   @visibleForTesting
   static SentryEvent? beforeSend(SentryEvent event, Hint? hint) {
+    // Drop expected BYOK chat cancellations/noise
+    final exceptions = event.exceptions;
+    if (exceptions != null) {
+      for (final value in exceptions) {
+        final type = value.type?.toLowerCase() ?? '';
+        final message = value.value?.toLowerCase() ?? '';
+        if (type.contains('byokchat') && message.contains('gone')) {
+          return null;
+        }
+        if (message.contains('byokchat') && message.contains('(gone)')) {
+          return null;
+        }
+        if (message.contains('stream closed')) {
+          return null;
+        }
+      }
+    }
+    final throwable = event.throwable;
+    if (throwable != null) {
+      final type = throwable.runtimeType.toString().toLowerCase();
+      final message = throwable.toString().toLowerCase();
+      if (type.contains('byokchat') && message.contains('gone')) {
+        return null;
+      }
+      if (message.contains('byokchat') && message.contains('(gone)')) {
+        return null;
+      }
+      if (message.contains('stream closed')) {
+        return null;
+      }
+    }
+
     // Auth material in request headers → drop the entire event.
     final headers = event.request?.headers;
     if (headers != null) {
