@@ -81,7 +81,7 @@ cd mobile/fajrak_flutter && make run   # or: flutter run
 cd mobile/fajrak_flutter && make test  # Flutter tests (260 tests)
 
 # Testing
-npm test                 # Run Jest tests (741 tests / 78 suites in __tests__/)
+npm test                 # Run Jest tests (743 tests / 80 suites in __tests__/)
 npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
 npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
 
