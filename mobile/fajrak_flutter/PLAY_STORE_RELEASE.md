@@ -1,3 +1,17 @@
+# Google Play Store Release Details - v3.47.2+68
+
+## Version Code: 68
+## Version Name: 3.47.2
+
+### 🛠️ Fixed
+- **Performance Hotfix:** Fixed a 504 Gateway Timeout error that occurred on some devices when opening the dashboard. The Zakat sync now runs in the background without blocking the UI, and API calls are parallelized for faster load times.
+
+---
+**بالعربية:**
+- **إصلاح عاجل للأداء:** تم إصلاح خطأ مهلة الاتصال (504) الذي كان يظهر عند فتح لوحة التحكم. أصبحت مزامنة الزكاة تعمل في الخلفية دون إبطاء الواجهة، وتم تسريع جلب البيانات.
+
+---
+
 # Google Play Store Release Details - v3.47.1+67
 
 ## Version Code: 67
