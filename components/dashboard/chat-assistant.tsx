@@ -31,13 +31,29 @@ const TRACE_KEYS: Record<string, string> = {
     get_spending_breakdown: 'chat_trace_spending',
     get_financial_snapshot: 'chat_trace_snapshot',
     create_transaction: 'chat_trace_transaction',
+    get_debts: 'chat_trace_debts',
+    get_budgets: 'chat_trace_budgets',
+    get_goals: 'chat_trace_goals',
+    get_recent_transactions: 'chat_trace_transactions',
 }
 
-/** Tool name → human label shown on the confirmation card. */
+/** Tool name → human label shown on the confirmation card / tool card. */
 const TOOL_LABEL_KEYS: Record<string, string> = {
     get_spending_breakdown: 'chat_tool_spending',
     get_financial_snapshot: 'chat_tool_snapshot',
     create_transaction: 'chat_tool_transaction',
+    get_debts: 'chat_tool_debts',
+    get_budgets: 'chat_tool_budgets',
+    get_goals: 'chat_tool_goals',
+    get_recent_transactions: 'chat_tool_transactions',
+}
+
+/** Tool name → deep link path and i18n key for the "Go to…" button. */
+const TOOL_DEEP_LINKS: Record<string, { path: string; labelKey: string }> = {
+    get_debts: { path: '/dashboard/debts', labelKey: 'chat_go_to_debts' },
+    get_budgets: { path: '/dashboard/budgets', labelKey: 'chat_go_to_budgets' },
+    get_goals: { path: '/dashboard/goals', labelKey: 'chat_go_to_goals' },
+    get_recent_transactions: { path: '/dashboard/transactions', labelKey: 'chat_go_to_transactions' },
 }
 
 /** Confirmation card rows, in display order. */
@@ -67,6 +83,7 @@ export default function ChatAssistant() {
     const [error, setError] = useState<string | null>(null)
     const [notice, setNotice] = useState<string | null>(null)
     const [trace, setTrace] = useState<string | null>(null)
+    const [completedTools, setCompletedTools] = useState<string[]>([])
     const [pending, setPending] = useState<PendingConfirmation | null>(null)
     const [vaultUnavailable, setVaultUnavailable] = useState(false)
     const abortRef = useRef<AbortController | null>(null)
@@ -242,6 +259,10 @@ export default function ChatAssistant() {
                         setTrace(event.status === 'running' ? event.tool : null)
                         break
                     case 'tool_result':
+                        // Tool finished successfully — add to completed tools for deep link
+                        if (event.ok && TOOL_DEEP_LINKS[event.tool]) {
+                            setCompletedTools(prev => [...new Set([...prev, event.tool])])
+                        }
                         setTrace(null)
                         if (!event.ok) {
                             failed = true
@@ -337,6 +358,7 @@ export default function ChatAssistant() {
         setError(null)
         setNotice(null)
         setPending(null)
+        setCompletedTools([])
 
         if (provider.kind === 'clientDirect') await runDirectTurn(nextMessages)
         else await runAgentTurn(nextMessages)
@@ -478,18 +500,74 @@ export default function ChatAssistant() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: 8,
-                            padding: '8px 12px',
+                            padding: '10px 14px',
                             borderRadius: 14,
                             fontSize: 12,
-                            color: 'var(--text-muted)',
+                            color: 'var(--text-primary)',
                             background: 'var(--bg-elevated)',
-                            border: '1px dashed var(--border)',
+                            border: '1px solid var(--accent-blue)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                         }}
                     >
-                        <span aria-hidden="true">⏳</span>
+                        <span aria-hidden="true" style={{ display: 'flex' }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+                            </svg>
+                        </span>
                         <span>
                             {t(TRACE_KEYS[trace] ?? 'chat_trace_generic', { tool: trace })}
                         </span>
+                    </div>
+                )}
+                {completedTools.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignSelf: 'flex-start', width: '100%' }}>
+                        {completedTools.map((tool) => {
+                            const deepLink = TOOL_DEEP_LINKS[tool]
+                            if (!deepLink) return null
+                            return (
+                                <div key={tool} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 10,
+                                    padding: '10px 14px',
+                                    borderRadius: 14,
+                                    fontSize: 13,
+                                    color: 'var(--text-primary)',
+                                    background: 'var(--bg-card)',
+                                    border: '1px solid var(--border)',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                                }}>
+                                    <span aria-hidden="true" style={{ color: 'var(--accent-green)', fontWeight: 600 }}>✓</span>
+                                    <span style={{ flex: 1, color: 'var(--text-secondary)' }}>
+                                        {t(TOOL_LABEL_KEYS[tool] ?? 'chat_tool_generic')} {t('chat_tool_done')}
+                                    </span>
+                                    <Link
+                                        href={deepLink.path}
+                                        style={{
+                                            fontSize: 12,
+                                            fontWeight: 600,
+                                            color: 'var(--accent-blue)',
+                                            textDecoration: 'none',
+                                            padding: '6px 12px',
+                                            borderRadius: 8,
+                                            border: '1px solid var(--accent-blue)',
+                                            background: 'transparent',
+                                            transition: 'all 0.15s ease',
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'var(--accent-blue)'
+                                            e.currentTarget.style.color = 'var(--text-primary)'
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'transparent'
+                                            e.currentTarget.style.color = 'var(--accent-blue)'
+                                        }}
+                                    >
+                                        {t(deepLink.labelKey)}
+                                    </Link>
+                                </div>
+                            )
+                        })}
                     </div>
                 )}
                 {messages.length === 0 && !sending && (

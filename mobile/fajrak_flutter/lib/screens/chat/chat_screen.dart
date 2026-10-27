@@ -76,6 +76,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String? _noticeKey;
   String? _traceTool;
   Map<String, dynamic>? _pendingConfirmation;
+  final Set<String> _completedTools = <String>{};
   bool _loadingKeys = true;
   bool _loadingContext = true;
   bool _atBottom = true;
@@ -264,16 +265,32 @@ class _ChatScreenState extends State<ChatScreen> {
         'get_spending_breakdown' => 'chat_trace_spending'.tr(),
         'get_financial_snapshot' => 'chat_trace_snapshot'.tr(),
         'create_transaction' => 'chat_trace_transaction'.tr(),
+        'get_debts' => 'chat_trace_debts'.tr(),
+        'get_budgets' => 'chat_trace_budgets'.tr(),
+        'get_goals' => 'chat_trace_goals'.tr(),
+        'get_recent_transactions' => 'chat_trace_transactions'.tr(),
         _ => 'chat_trace_generic'.tr(namedArgs: {'tool': tool}),
       };
 
-  /// Tool name → human label on the confirmation card.
+  /// Tool name → human label on the confirmation card / tool card.
   String _agentToolLabel(String tool) => switch (tool) {
         'get_spending_breakdown' => 'chat_tool_spending'.tr(),
         'get_financial_snapshot' => 'chat_tool_snapshot'.tr(),
         'create_transaction' => 'chat_tool_transaction'.tr(),
+        'get_debts' => 'chat_tool_debts'.tr(),
+        'get_budgets' => 'chat_tool_budgets'.tr(),
+        'get_goals' => 'chat_tool_goals'.tr(),
+        'get_recent_transactions' => 'chat_tool_transactions'.tr(),
         _ => 'chat_tool_generic'.tr(),
       };
+
+  /// Tool name → deep link route and label key.
+  static final Map<String, ({String route, String labelKey})> _toolDeepLinks = {
+    'get_debts': (route: '/debts', labelKey: 'chat_go_to_debts'),
+    'get_budgets': (route: '/budgets', labelKey: 'chat_go_to_budgets'),
+    'get_goals': (route: '/goals', labelKey: 'chat_go_to_goals'),
+    'get_recent_transactions': (route: '/transactions', labelKey: 'chat_go_to_transactions'),
+  };
 
   void _scrollToLatest() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -287,6 +304,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _inputController.text.trim();
     _inputController.clear();
     _messages.add(ChatMsg(role: 'user', content: text));
+    _completedTools.clear();
     if (_needsKey) {
       await _sendAgent();
     } else {
@@ -329,6 +347,9 @@ class _ChatScreenState extends State<ChatScreen> {
             case 'tool_result':
               setState(() {
                 _traceTool = null;
+                if (event.ok && _toolDeepLinks.containsKey(event.tool)) {
+                  _completedTools.add(event.tool!);
+                }
                 if (!event.ok) _errorKey = 'chat_error_tool';
               });
             case 'confirmation_required':
@@ -460,6 +481,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _noticeKey = null;
       _traceTool = null;
       _pendingConfirmation = null;
+      _completedTools.clear();
     });
   }
 
@@ -704,7 +726,17 @@ class _ChatScreenState extends State<ChatScreen> {
             thinking: _assistantPartial.isEmpty,
             theme: theme,
           ),
-        if (_traceTool != null) _buildTraceLine(theme: theme),
+        if (_traceTool != null) _buildTraceLine(theme: theme, colorScheme: colorScheme),
+        // Completed tool cards with deep links (this turn's activity).
+        if (_completedTools.isNotEmpty)
+          for (final tool in _completedTools)
+            if (_toolDeepLinks.containsKey(tool))
+              _buildToolCard(
+                theme: theme,
+                colorScheme: colorScheme,
+                tool: tool,
+                isRunning: false,
+              ),
         for (final m in _messages.reversed)
           MessageBubble(
             isUser: m.role == 'user',
@@ -739,34 +771,100 @@ class _ChatScreenState extends State<ChatScreen> {
     return value.toString();
   }
 
-  Widget _buildTraceLine({required ThemeData theme}) {
+  Widget _buildToolCard({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+    required String tool,
+    required bool isRunning,
+  }) {
+    final deepLink = _toolDeepLinks[tool];
+    final label = _agentToolLabel(tool);
+    final doneText = 'chat_tool_done'.tr();
+    final goToText = deepLink?.labelKey.tr();
+
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
+          color: isRunning ? colorScheme.primaryContainer : colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isRunning ? colorScheme.primary : colorScheme.outlineVariant,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            const SizedBox(width: 8),
+            if (isRunning) ...[
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 10),
+            ] else ...[
+              Icon(
+                Icons.check_circle_rounded,
+                color: colorScheme.tertiary,
+                size: 18,
+              ),
+              const SizedBox(width: 10),
+            ],
             Flexible(
               child: Text(
-                _traceText(_traceTool!),
-                style: theme.textTheme.bodySmall,
+                isRunning ? _traceText(tool) : '$label $doneText',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: isRunning ? colorScheme.onPrimaryContainer : colorScheme.onSurface,
+                  fontWeight: isRunning ? FontWeight.w500 : FontWeight.normal,
+                ),
               ),
             ),
+            if (!isRunning && goToText != null) ...[
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(deepLink!.route);
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: colorScheme.primary,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: colorScheme.primary),
+                  ),
+                  textStyle: theme.textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                child: Text(goToText),
+              ),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTraceLine({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+  }) {
+    if (_traceTool == null) return const SizedBox.shrink();
+    return _buildToolCard(
+      theme: theme,
+      colorScheme: theme.colorScheme,
+      tool: _traceTool!,
+      isRunning: true,
     );
   }
 

@@ -11,6 +11,15 @@
   server (`app/api/mcp/route.ts`) as read-only, non-confirming tools scoped to
   `read_balances` / `read_transactions`. `get_budgets` reuses
   `get_spending_breakdown` so budget math stays in one place.
+- Agent tool-call cards (Phase 3): the web BYOK chat and the Flutter chat now
+  render a real tool card instead of the generic `chat_trace_generic` line —
+  a spinner with a tool-specific label while the tool runs, then a ✓ card with
+  a deep-link button ("Go to Debts / الانتقال إلى الديون", plus budgets, goals,
+  and transactions) once `tool_result` arrives. Deep links point at
+  `/dashboard/{debts,budgets,goals,transactions}` (web) and the matching named
+  routes (mobile). New i18n keys: `chat_go_to_*` and `chat_tool_done` in
+  `lib/locales/{en,ar}/chat.ts` and `assets/i18n/{en,ar}.json`. UI-only change;
+  the agent loop and tool layer are untouched.
 
 ### Fixed
 - Fixed a dead code path in `lib/unified-tools` that called `bump_proxy_usage`
