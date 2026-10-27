@@ -1,3 +1,25 @@
+# Google Play Store Release Details - v3.47.0+66
+
+## Version Code: 66
+## Version Name: 3.47.0
+
+### 🚀 Added
+- **Proactive AI Agent:** Your financial assistant now works in the background! It automatically checks your budgets, debts, and spending trends every morning and sends you smart alerts.
+- **Improved BYOK Setup:** Easier API key setup with direct links to providers, free model badges, and instant key validation.
+- **Smart Tool Cards:** The AI assistant now displays interactive cards in the chat when it's fetching data, with quick links to the relevant dashboard pages.
+
+### 🛠️ Fixed
+- Security hardening for audit logs and rate limits.
+
+---
+**بالعربية:**
+- **الوكيل الاستباقي للذكاء الاصطناعي:** مساعدك المالي يعمل الآن في الخلفية! يتحقق تلقائياً من ميزانياتك وديونك واتجاهات إنفاقك كل صباح ويرسل لك تنبيهات ذكية.
+- **تحسين إعداد BYOK:** إعداد أسهل لمفاتيح API مع روابط مباشرة للمزودين، شارات النماذج المجانية، والتحقق الفوري من المفتاح.
+- **بطاقات الأدوات الذكية:** يعرض مساعد الذكاء الاصطناعي الآن بطاقات تفاعلية في الدردشة عند جلب البيانات، مع روابط سريعة لصفحات لوحة التحكم ذات الصلة.
+- **إصلاحات:** تعزيز الأمان لسجلات التدقيق والحدود القصوى للطلبات.
+
+---
+
 # Google Play Store Release Details - v3.46.0+65
 
 ## Version Code: 65
