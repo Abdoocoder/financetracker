@@ -239,23 +239,27 @@ void main() {
     expect(find.textContaining('Fajrak assistant'), findsNothing);
   });
 
-  testWidgets('maps a no-key error to the chat error banner', (tester) async {
+  testWidgets('maps a no-key error to the interactive key required card', (tester) async {
     final service = _FakeByokService()
       ..errorCode = 'no-key'
       ..release = Completer<void>();
     await _pumpApp(tester, _screen(service));
 
+    // Use default provider (Ollama) which is clientDirect - send button enabled without key
     await tester.enterText(find.byType(TextField).last, 'Hello');
     await tester.pump();
     await tester.tap(find.byIcon(Icons.send_rounded));
     await tester.pump();
     service.release!.complete();
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500)); // Extra pump for error UI
 
-    expect(
-      find.textContaining('No API key is stored for this provider'),
-      findsOneWidget,
-    );
+    // Verify the new interactive card is shown with title and buttons
+    expect(find.text('API Key Required'), findsOneWidget);
+    expect(find.text('You need an API key to chat with the assistant.'), findsOneWidget);
+    expect(find.text('Add Key Now'), findsOneWidget);
+    // Ollama doesn't have a key URL, so Get Free Key button should not show
+    expect(find.text('Get Free Key'), findsNothing);
     expect(find.byIcon(Icons.send_rounded), findsOneWidget);
   });
 

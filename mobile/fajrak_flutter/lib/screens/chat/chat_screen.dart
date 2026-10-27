@@ -716,6 +716,113 @@ class _ChatScreenState extends State<ChatScreen> {
     required ThemeData theme,
     required ColorScheme colorScheme,
   }) {
+    // Check if provider needs a key and user has no keys for this provider
+    final needsKey = _needsKey && !_hasKeysForProvider && !_loadingKeys;
+
+    if (needsKey) {
+      final keyUrl = _getProviderKeyUrl(providerId: _providerId);
+
+      return ListView(
+        reverse: true,
+        controller: _scrollController,
+        padding: const EdgeInsets.all(24),
+        children: [
+          const SizedBox(height: 48),
+          Icon(
+            Icons.chat_bubble_outline,
+            size: 80,
+            color: colorScheme.primary.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'chat_welcome_no_key'.tr(),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'chat_key_required_msg'.tr(),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.key, size: 20),
+                  label: Text('chat_add_key_now'.tr()),
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    textStyle: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              if (keyUrl != null) ...[
+                const SizedBox(width: 16),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _launchUrl(keyUrl),
+                    icon: const Icon(Icons.open_in_new, size: 20),
+                    label: Text('chat_get_free_key'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.primary,
+                      side: BorderSide(color: colorScheme.primary, width: 2),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: theme.textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 24),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'chat_context_label'.tr(),
+                  style: theme.textTheme.labelLarge,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'chat_context_included'.tr(),
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     return ListView(
       reverse: true,
       controller: _scrollController,
@@ -1014,6 +1121,12 @@ class _ChatScreenState extends State<ChatScreen> {
     required ColorScheme colorScheme,
   }) {
     if (_errorKey == null) return const SizedBox.shrink();
+
+    // Show interactive card for missing API key error
+    if (_errorKey == 'chat_error_no_key') {
+      return _buildKeyRequiredCard(theme: theme, colorScheme: colorScheme);
+    }
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1036,6 +1149,99 @@ class _ChatScreenState extends State<ChatScreen> {
             icon: const Icon(Icons.close, size: 18),
             tooltip: 'chat_clear'.tr(),
             onPressed: () => setState(() => _errorKey = null),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKeyRequiredCard({
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+  }) {
+    final keyUrl = _getProviderKeyUrl(providerId: _providerId);
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline,
+                  color: colorScheme.error, size: 24),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'chat_key_required_title'.tr(),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: colorScheme.error, size: 20),
+                onPressed: () => setState(() => _errorKey = null),
+                tooltip: 'chat_clear'.tr(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'chat_key_required_msg'.tr(),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.key, size: 18),
+                  label: Text('chat_add_key_now'.tr()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colorScheme.error,
+                    foregroundColor: colorScheme.onError,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              if (keyUrl != null) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _launchUrl(keyUrl),
+                    icon: const Icon(Icons.open_in_new, size: 18),
+                    label: Text('chat_get_free_key'.tr()),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: colorScheme.error,
+                      side: BorderSide(color: colorScheme.error),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
