@@ -39,7 +39,7 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 | 1 | Islamic Finance (Zakat, Hawl, FIRE, halal) | `docs/domain/islamic-finance.md` | `supabase/migrations/20261019000000_zakat_engine_v2.sql`, `20261021000000_zakat_autopilot.sql`; `app/(dashboard)/dashboard/zakat/`, `dashboard/fire/`; mobile `more/zakat_calculator_screen.dart` |
 | 2 | BYOK AI + MCP | `docs/domain/byok-ai.md` | `lib/byok/*`, `app/api/byok/proxy/route.ts`, `app/api/mcp/route.ts`, `lib/unified-tools/index.ts`; mobile `lib/services/byok/` |
 | 3 | Data model (29 tables, RLS, crons) | `docs/domain/data-model.md` | `supabase/migrations/` (58 files), `vercel.json`, `.github/workflows/smart-notifications.yml` |
-| 4 | Observability & Security | `docs/domain/observability-and-security.md` | `observability/` (OTel, dashboards, runbooks), `sentry.*.config.ts`, `instrumentation-client.ts`, mobile `lib/services/sentry_service.dart`, `SECURITY.md` |
+| 4 | Observability & Security | `docs/domain/observability-and-security.md` | `observability/` (OTel, dashboards, runbooks), `sentry.*.config.ts`, `instrumentation-client.ts`, mobile `lib/services/sentry_service.dart`, `SECURITY.md`, `docs/security-definer-audit.md` |
 | 5 | Push notifications | `docs/domain/background-and-jobs.md` | `supabase/functions/push-notification/index.ts`, `lib/push-send.ts`, `app/api/push-*`, `notification_preferences` |
 | 6 | Offline sync | `docs/domain/background-and-jobs.md` | mobile `lib/database/app_database.dart` (Drift), `lib/services/sync_service.dart`, `sync_queue` table |
 | 7 | Gamification | `docs/domain/background-and-jobs.md` | `app/api/gamification/route.ts`, `lib/daily-lessons.ts`, `user_stats`, `saving_challenges`; mobile `utils/level_ladder.dart` |
@@ -68,5 +68,6 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 - ✅ Alerts fingerprint backfilled: 6,436 dupes removed, 3,799 keys assigned (PR #2, 2026-10-25)
 - ✅ Anon write grants revoked on all public tables (PR #4, 2026-10-25)
 - ✅ Security P0/P1/P2 resolved in v3.47.0: 14 critical + 41 high npm advisories patched; internal tables hardened (`api_audit_log`, `idempotency_keys`, `proxy_usage`); `bump_proxy_usage` made SECURITY DEFINER.
+- ✅ **Supabase Security Advisor WARNs audited (2026-10-27):** 21 `authenticated_security_definer_function_executable` WARNs investigated — 15 False Positives (safe by design: SECURITY DEFINER + owner guard + pinned search_path + revoked PUBLIC/anon), 6 True Positives fixed via `20261027000000_fix_missing_owner_guards.sql` (missing owner guards on `calculate_health_score`, `get_health_score`, `check_and_reserve_idempotency_key`, `complete_idempotency_key`, `get_changed_records`, `get_deleted_records`). See `docs/security-definer-audit.md`.
 - **Open risks:** anon key rotation (pending post-incident), leaked-password protection disabled, no feature flags, financial-metric duplication outside Zakat, 8 moderate `@opentelemetry` transitive vulns. Full list: `HANDOFF_REPORT.md` §8.
 - **Process:** single-developer SPOF, no monetization; conventional commits, squash-merge to main.
