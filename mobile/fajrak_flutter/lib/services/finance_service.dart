@@ -7,6 +7,30 @@ class FinanceService {
     return user?.id;
   }
 
+  /// Retry wrapper for Supabase RPC calls with exponential backoff.
+  /// Handles cold-start gateway timeouts (504) on Supabase nano/free tier.
+  static Future<T> _rpcWithRetry<T>(
+    String function,
+    Map<String, dynamic> params, {
+    int maxRetries = 2,
+    Duration baseDelay = const Duration(milliseconds: 500),
+  }) async {
+    for (int attempt = 0; ; attempt++) {
+      try {
+        final response = await _db.rpc(function, params: params);
+        return response as T;
+      } catch (e) {
+        final isRetryable = e.toString().toLowerCase().contains('504') ||
+            e.toString().toLowerCase().contains('gateway timeout') ||
+            e.toString().toLowerCase().contains('socketexception') ||
+            e.toString().toLowerCase().contains('timeout');
+        if (!isRetryable || attempt >= maxRetries) rethrow;
+        final delay = baseDelay * (1 << attempt); // 500ms, 1s, 2s...
+        await Future.delayed(delay);
+      }
+    }
+  }
+
   /// جلب ملخص الشهر الحالي الموحّد (income/expenses/debt_payments/net)
   static Future<Map<String, dynamic>> fetchMonthlyFinancialSummary({
     int? year,
@@ -26,11 +50,11 @@ class FinanceService {
   static Future<Map<String, dynamic>> fetchFinancialDashboard(double usdToLocalRate) async {
     final uid = _uid;
     if (uid == null) return {};
-    final response = await _db.rpc('get_financial_dashboard', params: {
+    final response = await _rpcWithRetry<Map>('get_financial_dashboard', {
       'p_user_id': uid,
       'p_usd_to_local_rate': usdToLocalRate,
     });
-    return Map<String, dynamic>.from(response as Map);
+    return Map<String, dynamic>.from(response);
   }
 
   /// جلب ملخص الزكاة الفقهي باستخدام RPC المركزية (v2)
@@ -78,8 +102,8 @@ class FinanceService {
     if (goldPrice != null) params['p_gold_price'] = goldPrice;
     if (silverPrice != null) params['p_silver_price'] = silverPrice;
     if (usdToLocalRate != null) params['p_fx_rate'] = usdToLocalRate;
-    final response = await _db.rpc('sync_zakat_haul_state', params: params);
-    return Map<String, dynamic>.from(response as Map);
+    final response = await _rpcWithRetry<Map>('sync_zakat_haul_state', params);
+    return Map<String, dynamic>.from(response);
   }
 
   /// مزامنة غرامات الذهب/الفضة إلى جدول zakat_holdings (لتصبح ضمن الوعاء).

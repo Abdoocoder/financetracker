@@ -183,7 +183,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final usdToLocal = currency != 'USD'
           ? (await CurrencyService.fetchExchangeRate('USD', currency) ?? 1.0)
           : 1.0;
-      // Financial dashboard via RPC — fallback to zeros if function not available
+
+      // Financial dashboard via RPC — fetch ONCE, reuse for both UI and Zakat sync
       Map<String, dynamic> dash;
       try {
         dash = await FinanceService.fetchFinancialDashboard(usdToLocal);
@@ -194,33 +195,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           'total_debt_owed': 0.0, 'total_receivable': 0.0,
           'monthly_debt_commitments': 0.0, 'health_score': 0,
         };
-      }
-
-      // ── Zakat Autopilot: مزامنة حالة الحول بأسعار حية ──
-      bool? hawlNisabReached;
-      int? hawlDaysRemaining;
-      double hawlZakatDue = 0;
-      try {
-        final currencyCode = _currency;
-        final fxRate = await CurrencyService.fetchExchangeRate('USD', currencyCode);
-        final goldLocal = fxRate != null ? await MetalPriceService.fetchLocalPerGram('XAU', fxRate) : null;
-        final silverLocal = fxRate != null ? await MetalPriceService.fetchLocalPerGram('XAG', fxRate) : null;
-        if (fxRate != null && goldLocal != null && silverLocal != null) {
-          final hawl = await FinanceService.syncZakatHaulState(
-            goldPrice: goldLocal,
-            silverPrice: silverLocal,
-            usdToLocalRate: fxRate,
-          );
-          if (hawl.isNotEmpty) {
-            hawlNisabReached = hawl['nisab_reached_at'] != null;
-            hawlDaysRemaining = (hawl['days_remaining'] as num?)?.toInt();
-            hawlZakatDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
-          }
-        } else {
-          debugPrint('[dashboard] hawl sync skipped — live prices unavailable');
-        }
-      } catch (e) {
-        debugPrint('Dashboard hawl sync failed: $e');
       }
 
       final netWorth = (dash['net_worth'] as num).toDouble();
@@ -280,16 +254,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _prevExpenses = prevExpenses;
           _months6Data = months6;
           _categoryData = catData;
-          _hawlNisabReached = hawlNisabReached;
-          _hawlDaysRemaining = hawlDaysRemaining;
-          _hawlZakatDue = hawlZakatDue;
           _lastUpdated = DateTime.now();
           _loading = false;
         });
       }
+
+      // ── Zakat Autopilot: run in background AFTER UI is rendered ──
+      // This avoids blocking the dashboard load on external API calls (metal prices)
+      // and prevents the double get_financial_dashboard RPC call.
+      _loadZakatHawlInBackground(currency, usdToLocal, dash);
     } catch (e) {
       debugPrint('Dashboard _loadPhase2 error: $e');
       if (mounted) setState(() { _loading = false; _hasError = true; });
+    }
+  }
+
+  /// Background Zakat Hawl sync — runs after dashboard UI is shown.
+  /// Fetches live metal prices in parallel, then calls sync_zakat_haul_state.
+  /// Does not block the main dashboard load.
+  Future<void> _loadZakatHawlInBackground(String currency, double usdToLocal, Map<String, dynamic> dash) async {
+    try {
+      // Fetch FX rate and metal prices IN PARALLEL
+      final results = await Future.wait<dynamic>([
+        CurrencyService.fetchExchangeRate('USD', currency),
+        MetalPriceService.fetchLocalPerGram('XAU', usdToLocal),
+        MetalPriceService.fetchLocalPerGram('XAG', usdToLocal),
+      ]);
+
+      final fxRate = results[0] as double?;
+      final goldLocal = results[1] as double?;
+      final silverLocal = results[2] as double?;
+
+      if (fxRate != null && goldLocal != null && silverLocal != null) {
+        final hawl = await FinanceService.syncZakatHaulState(
+          goldPrice: goldLocal,
+          silverPrice: silverLocal,
+          usdToLocalRate: fxRate,
+        );
+        if (hawl.isNotEmpty && mounted) {
+          setState(() {
+            _hawlNisabReached = hawl['nisab_reached_at'] != null;
+            _hawlDaysRemaining = (hawl['days_remaining'] as num?)?.toInt();
+            _hawlZakatDue = ((hawl['zakat_due'] as num?) ?? 0).toDouble();
+          });
+        }
+      } else {
+        debugPrint('[dashboard] hawl sync skipped — live prices unavailable');
+      }
+    } catch (e) {
+      debugPrint('Dashboard background hawl sync failed: $e');
     }
   }
 
