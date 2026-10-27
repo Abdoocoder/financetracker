@@ -1,6 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
+    "timeout": {
+      "startup": 120000,
+      "execution": 60000
+    },
     "servers": {
       "dart": {
         "type": "local",
@@ -10,6 +14,18 @@
         ],
         "timeout": {
           "startup": 90000
+        }
+      },
+      "memory": {
+        "type": "local",
+        "command": [
+          "npx",
+          "-y",
+          "@modelcontextprotocol/server-memory"
+        ],
+        "timeout": {
+          "startup": 120000,
+          "execution": 30000
         }
       }
     }
