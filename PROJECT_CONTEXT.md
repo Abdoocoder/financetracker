@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — Fajrak Map & Current State
 
 > Layer 1 of the Project Brain. Read after `AGENTS.md`, before `CLAUDE.md`.
-> Last verified against the repo: **2026-10-20**. When this file disagrees with the code, trust the code and update this file.
+> Last verified against the repo: **2026-10-27**. When this file disagrees with the code, trust the code and update this file.
 
 ## 1. High-level architecture
 
@@ -60,8 +60,8 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 
 - **Mobile release:** `3.46.0+65` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play's last *documented* submission is v3.44.0+63 (Submission ID 44, status "In review" at handoff); `mobile/README.md` still reads 3.44.0+63.
 - **Web version:** `package.json` = 3.42.0 — intentionally not bumped with mobile releases.
-- **Tests (re-run 2026-10-25):** **743 web tests / 80 Jest suites** (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
-- **Latest feature:** Zakat Autopilot (Phase C) complete and live — engine v2 + `zakat_haul_tracking` state machine + daily `/api/zakat-autopilot` cron + Hawl countdown UI on Web and Mobile.
+- **Tests (re-run 2026-10-27):** **752 web tests / 81 Jest suites** (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
+- **Latest feature:** Proactive Agent (Phase 4) complete — daily cron `/api/agent/proactive` analyzes budgets, debts, and spending trends, generates deduplicated insights via `notification_history` fingerprints, and pushes alerts via FCM/Web Push.
 - **Next phase:** Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 - **Resolved:** prod DB outage (2026-10-17, `INCIDENT.md`), daily backups to Cloudflare R2, `currentUser!` force-unwraps (v3.44.0), Zakat live-price fallback.
 - ✅ Zakat live prices passed to `sync_zakat_haul_state` (PR #1, 2026-10-25)
