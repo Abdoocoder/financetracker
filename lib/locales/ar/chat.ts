@@ -63,4 +63,9 @@ export const arChat = {
     chat_error_rate_limited: 'طلبات كثيرة جدًا. انتظر دقيقة ثم حاول مجددًا.',
     chat_error_tool: 'تعذّر على المساعد إكمال هذه الخطوة. حاول مجددًا.',
     chat_error_loop: 'استغرق المساعد خطوات كثيرة. أعد صياغة سؤالك.',
+    settings_byok_keys_testing: 'جارٍ اختبار المفتاح...',
+    settings_byok_keys_test_ok: 'المفتاح صالح!',
+    settings_byok_keys_test_fail: 'مفتاح غير صالح',
+    settings_byok_get_api_key: 'احصل على مفتاح API ↗',
+    chat_free_badge: 'مجاني',
 } as const

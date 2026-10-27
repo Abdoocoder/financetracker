@@ -81,6 +81,48 @@ export function BYOKKeysSection() {
     return fullKey.slice(0, 8) + "..."
   }
 
+  const getProviderKeyUrl = (providerId: string): string | null => {
+    switch (providerId) {
+      case 'nvidia-nim':
+        return 'https://build.nvidia.com/'
+      case 'openai':
+        return 'https://platform.openai.com/api-keys'
+      case 'anthropic':
+        return 'https://console.anthropic.com/settings/keys'
+      case 'openrouter':
+        return 'https://openrouter.ai/keys'
+      case 'gemini':
+        return 'https://aistudio.google.com/app/apikey'
+      default:
+        return null
+    }
+  }
+
+  const validateKey = async (providerId: string, rawKey: string): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      const { buildEnvelope } = await import("@/lib/byok/client")
+      const envelope = await buildEnvelope(rawKey)
+      const res = await fetch('/api/byok/validate', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          providerId,
+          keyId: envelope.keyId,
+          env: envelope.env,
+          payload: envelope.payload,
+        }),
+      })
+      if (!res.ok) {
+        return { ok: false, error: 'Validation failed' }
+      }
+      const data = await res.json()
+      return data
+    } catch (err) {
+      return { ok: false, error: (err as Error).message || 'Validation failed' }
+    }
+  }
+
   const handleSave = async () => {
     if (!user) return
     if (saving) return
@@ -89,6 +131,16 @@ export function BYOKKeysSection() {
     const keyId = crypto.randomUUID()
     const rawKey = newKeyValue.trim()
     try {
+      // Validate key before saving
+      toast.info(t("settings_byok_keys_testing") || "Testing key...")
+      const validation = await validateKey(newKeyProvider, rawKey)
+      if (!validation.ok) {
+        toast.error(validation.error || t("settings_byok_keys_test_fail") || "Invalid key")
+        setSaving(false)
+        return
+      }
+      toast.success(t("settings_byok_keys_test_ok") || "Key works!")
+
       // 1. Encrypt into the local IndexedDB vault FIRST (AD-3: browser-only).
       await saveProviderKey(keyId, rawKey)
 
@@ -412,6 +464,29 @@ export function BYOKKeysSection() {
               ))}
             </select>
           </div>
+          {newKeyProvider && (() => {
+            const url = getProviderKeyUrl(newKeyProvider)
+            return url ? (
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  alignSelf: "flex-start",
+                  padding: "7px 12px",
+                  borderRadius: 8,
+                  background: "rgba(59,126,246,0.1)",
+                  border: "1px solid rgba(59,126,246,0.2)",
+                  color: "var(--accent-blue-light)",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                }}
+              >
+                {t("settings_byok_get_api_key") || "Get API Key ↗"}
+              </a>
+            ) : null
+          })()}
           <input
             value={newKeyName}
             onChange={e => setNewKeyName(e.target.value)}

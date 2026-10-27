@@ -238,7 +238,7 @@ void main() {
     await tester.tap(find.byType(DropdownButtonFormField<String>));
     await tester.pumpAndSettle();
     await tester.tap(
-      find.text('NVIDIA NIM — nvidia/nemotron-3-ultra-550b-a55b'),
+      find.text('NVIDIA NIM — meta/llama-3.1-8b-instruct'),
     );
     await tester.pumpAndSettle();
 
@@ -247,6 +247,8 @@ void main() {
     await tester.enterText(fields.at(1), 'nvapi-abcdef0123456789');
     await tester.pumpAndSettle();
 
+    // Scroll to the Add Key button (it may be off-screen due to the Get API Key button)
+    await tester.ensureVisible(find.text('+ Add Key'));
     await tester.tap(find.text('+ Add Key'));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));

@@ -9,6 +9,7 @@ class ByokProvider {
   final String baseUrl;
   final String defaultModel;
   final List<String> availableModels;
+  final List<String> freeModels;
   final ByokAuth auth;
   final String authHeaderName;
   final Map<String, String> defaultHeaders;
@@ -20,6 +21,7 @@ class ByokProvider {
     required this.baseUrl,
     required this.defaultModel,
     required this.availableModels,
+    this.freeModels = const [],
     required this.auth,
     required this.authHeaderName,
     this.defaultHeaders = const {},
@@ -55,8 +57,9 @@ const SUPPORTED_PROVIDERS = <String, ByokProvider>{
     name: 'NVIDIA NIM',
     kind: 'proxy',
     baseUrl: 'https://integrate.api.nvidia.com/v1/chat/completions',
-    defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b',
+    defaultModel: 'meta/llama-3.1-8b-instruct',
     availableModels: [
+      'meta/llama-3.1-8b-instruct',
       'nvidia/nemotron-3-ultra-550b-a55b',
       'nvidia/nemotron-3-super-120b-a12b',
       'meta/llama-3.1-70b-instruct',
@@ -64,6 +67,7 @@ const SUPPORTED_PROVIDERS = <String, ByokProvider>{
       'mistralai/mistral-nemotron',
       'google/gemma-2-27b-it',
     ],
+    freeModels: const ['meta/llama-3.1-8b-instruct', 'google/gemma-2-27b-it', 'meta/llama-3.1-70b-instruct'],
     auth: ByokAuth.bearer,
     authHeaderName: 'authorization',
   ),
@@ -74,6 +78,7 @@ const SUPPORTED_PROVIDERS = <String, ByokProvider>{
     baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
     defaultModel: 'auto',
     availableModels: ['auto', 'openai/gpt-5.4-mini', 'anthropic/claude-sonnet-4-6', 'meta/llama-3.1-405b-instruct'],
+    freeModels: const ['meta/llama-3.1-405b-instruct'],
     auth: ByokAuth.bearer,
     authHeaderName: 'authorization',
   ),

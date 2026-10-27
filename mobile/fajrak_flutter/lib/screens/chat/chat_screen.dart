@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../services/accounts_service.dart';
 import '../../services/byok/byok_service.dart';
@@ -11,6 +12,7 @@ import '../../services/byok/prompt_rules.dart';
 import '../../services/currency_service.dart';
 import '../../services/finance_service.dart';
 import '../../screens/settings/settings_screen.dart';
+import '../../utils/app_colors.dart';
 import '../../utils/error_handler.dart';
 import 'message_bubble.dart';
 
@@ -561,6 +563,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final provider = getProvider(_providerId);
     final models = provider?.availableModels ?? [];
+    final freeModels = provider?.freeModels ?? const <String>[];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -626,7 +629,30 @@ class _ChatScreenState extends State<ChatScreen> {
                   for (final m in models)
                     DropdownMenuItem<String>(
                       value: m,
-                      child: Text(m, overflow: TextOverflow.ellipsis),
+                      child: Row(
+                        children: [
+                          Text(m, overflow: TextOverflow.ellipsis),
+                          if (freeModels.contains(m)) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.success.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                              ),
+                              child: Text(
+                                'byok_free_badge'.tr(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.success,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                 ],
                 onChanged: (v) {
@@ -643,18 +669,36 @@ class _ChatScreenState extends State<ChatScreen> {
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 4),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: TextButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                  );
-                },
-                icon: const Icon(Icons.key, size: 18),
-                label: Text('chat_setup_keys'.tr()),
-              ),
+            Wrap(
+              spacing: 8,
+              children: [
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.key, size: 18),
+                    label: Text('chat_setup_keys'.tr()),
+                  ),
+                ),
+                if (_getProviderKeyUrl(providerId: _providerId) != null)
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _launchUrl(_getProviderKeyUrl(providerId: _providerId)!),
+                      icon: const Icon(Icons.open_in_new, size: 16),
+                      label: Text('byok_get_api_key'.tr()),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ] else if (!_needsKey) ...[
             const SizedBox(height: 8),
@@ -1056,6 +1100,30 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  String? _getProviderKeyUrl({required String providerId}) {
+    switch (providerId) {
+      case 'nvidia-nim':
+        return 'https://build.nvidia.com/';
+      case 'openai':
+        return 'https://platform.openai.com/api-keys';
+      case 'anthropic':
+        return 'https://console.anthropic.com/settings/keys';
+      case 'openrouter':
+        return 'https://openrouter.ai/keys';
+      case 'gemini':
+        return 'https://aistudio.google.com/app/apikey';
+      default:
+        return null;
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
 

@@ -459,11 +459,14 @@ export default function ChatAssistant() {
                         onChange={e => setModel(e.target.value)}
                         style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: 10, padding: '6px 10px', fontSize: 14, width: 220 }}
                     >
-                        {provider?.availableModels?.map(m => (
-                            <option key={m} value={m}>{m}</option>
-                        )) || (
-                            <option value={provider?.defaultModel ?? ''}>{provider?.defaultModel ?? t('chat_auto_model')}</option>
-                        )}
+                        {(provider?.availableModels?.length ? provider.availableModels : [provider?.defaultModel ?? '']).map(m => {
+                            const isFree = provider?.freeModels?.includes(m)
+                            return (
+                                <option key={m} value={m}>
+                                    {m}{isFree ? ` (${t('chat_free_badge') || 'Free'})` : ''}
+                                </option>
+                            )
+                        })}
                     </select>
                 </div>
                 {(vaultUnavailable && needsKey) && (

@@ -63,4 +63,9 @@ export const enChat = {
     chat_error_rate_limited: 'Too many requests. Wait a minute and try again.',
     chat_error_tool: 'The assistant could not complete that step. Try again.',
     chat_error_loop: 'The assistant took too many steps. Try rephrasing your question.',
+    settings_byok_keys_testing: 'Testing key...',
+    settings_byok_keys_test_ok: 'Key works!',
+    settings_byok_keys_test_fail: 'Invalid key',
+    settings_byok_get_api_key: 'Get API Key ↗',
+    chat_free_badge: 'Free',
 } as const

@@ -34,6 +34,8 @@ export interface ByokProvider {
   defaultModel: string
   /** Available models for this provider (shown in UI model selector). */
   availableModels?: string[]
+  /** Models that are free to use (no/low cost). */
+  freeModels?: string[]
   auth: ProviderAuth
   /** Extra headers to always add (e.g. anthropic-version). Overridden by the request if present. */
   defaultHeaders?: Record<string, string>
@@ -73,8 +75,9 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     name: 'NVIDIA NIM',
     kind: 'proxy',
     baseUrl: 'https://integrate.api.nvidia.com/v1/chat/completions',
-    defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b',
+    defaultModel: 'meta/llama-3.1-8b-instruct',
     availableModels: [
+      'meta/llama-3.1-8b-instruct',
       'nvidia/nemotron-3-ultra-550b-a55b',
       'nvidia/nemotron-3-super-120b-a12b',
       'meta/llama-3.1-70b-instruct',
@@ -82,6 +85,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
       'mistralai/mistral-nemotron',
       'google/gemma-2-27b-it',
     ],
+    freeModels: ['meta/llama-3.1-8b-instruct', 'google/gemma-2-27b-it', 'meta/llama-3.1-70b-instruct'],
     auth: { kind: 'bearer' },
     authHeaderName: 'authorization',
   },
@@ -92,6 +96,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
     defaultModel: 'auto',
     availableModels: ['auto', 'openai/gpt-5.4-mini', 'anthropic/claude-sonnet-4-6', 'meta/llama-3.1-405b-instruct'],
+    freeModels: ['meta/llama-3.1-405b-instruct'],
     auth: { kind: 'bearer' },
     authHeaderName: 'authorization',
   },

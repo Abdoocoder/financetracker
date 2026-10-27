@@ -1,16 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fajrak/services/byok/byok_service.dart';
 import 'package:fajrak/services/byok/chat.dart';
 import 'package:fajrak/services/byok/key_save_error.dart';
 import 'package:fajrak/services/byok/providers.dart';
+import 'package:fajrak/services/byok/envelope.dart';
 import 'package:fajrak/utils/app_colors.dart';
 import 'package:fajrak/utils/error_handler.dart';
 import 'package:fajrak/widgets/common/confirm_dialog.dart';
 import 'package:fajrak/widgets/settings/settings_accordion.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 /// BYOK keys section (Phase 7) — mirrors web `components/settings/byok-keys-section.tsx`.
@@ -193,8 +199,18 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
       return;
     }
 
-    _saving = true;
-    setState(() {});
+    // Validate key before saving
+    setState(() => _saving = true);
+    _showToast('byok_testing_key');
+    final validation = await _validateKey(_newProvider, rawKey);
+    if (!validation.ok) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      _showToast(validation.error ?? 'byok_key_invalid');
+      return;
+    }
+    _showToast('byok_key_valid', success: true);
+
     final keyId = const Uuid().v4();
     var metadataSaved = false;
     try {
@@ -222,6 +238,47 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
     } finally {
       _saving = false;
       if (mounted) setState(() {});
+    }
+  }
+
+  Future<({bool ok, String? error})> _validateKey(String providerId, String rawKey) async {
+    try {
+      final envelope = await buildEnvelope(rawKey);
+      final res = await http.post(
+        Uri.parse('${dotenv.env['PROXY_BASE_URL'] ?? 'https://fajrak.app'}/api/byok/validate'),
+        headers: {
+          'content-type': 'application/json',
+          'authorization': 'Bearer ${Supabase.instance.client.auth.currentSession?.accessToken ?? ''}',
+        },
+        body: jsonEncode({
+          'providerId': providerId,
+          'keyId': envelope.keyId,
+          'env': envelope.env,
+          'payload': envelope.payload,
+        }),
+      ).timeout(const Duration(seconds: 10));
+      if (res.statusCode >= 400) {
+        // 401/403 = invalid key, 429 = rate limited but key might be valid
+        if (res.statusCode == 401 || res.statusCode == 403) {
+          return (ok: false, error: 'byok_key_invalid'.tr());
+        }
+        // For other errors (rate limit, server error), allow save with warning
+        return (ok: true, error: null);
+      }
+      final data = jsonDecode(res.body);
+      if (data['ok'] == true) {
+        return (ok: true, error: null);
+      }
+      return (ok: false, error: data['error']?.toString() ?? 'byok_key_invalid'.tr());
+    } on TimeoutException {
+      // Validation timed out - allow save with warning
+      return (ok: true, error: null);
+    } on SocketException {
+      // Network error - allow save with warning
+      return (ok: true, error: null);
+    } catch (e) {
+      // Any other error - allow save with warning (don't block on validation issues)
+      return (ok: true, error: null);
     }
   }
 
@@ -815,6 +872,24 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
             ),
           ],
         ),
+        if (_newProvider.isNotEmpty && _getProviderKeyUrl(_newProvider) != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: OutlinedButton.icon(
+                onPressed: () => _launchUrl(_getProviderKeyUrl(_newProvider)!),
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: Text('byok_get_api_key'.tr()),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(color: AppColors.primary),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ),
         const SizedBox(height: 10),
         Row(
           children: [
@@ -931,5 +1006,29 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
       danger: true,
       onConfirm: () => _handleRemove(key),
     );
+  }
+
+  String? _getProviderKeyUrl(String providerId) {
+    switch (providerId) {
+      case 'nvidia-nim':
+        return 'https://build.nvidia.com/';
+      case 'openai':
+        return 'https://platform.openai.com/api-keys';
+      case 'anthropic':
+        return 'https://console.anthropic.com/settings/keys';
+      case 'openrouter':
+        return 'https://openrouter.ai/keys';
+      case 'gemini':
+        return 'https://aistudio.google.com/app/apikey';
+      default:
+        return null;
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
