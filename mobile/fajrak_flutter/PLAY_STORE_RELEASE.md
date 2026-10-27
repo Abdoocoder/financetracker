@@ -1,14 +1,20 @@
-# Google Play Store Release Details - v3.47.2+68
+# Google Play Store Release Details - v3.47.3+69
 
-## Version Code: 68
-## Version Name: 3.47.2
+## Version Code: 69
+## Version Name: 3.47.3
 
 ### 🛠️ Fixed
-- **Performance Hotfix:** Fixed a 504 Gateway Timeout error that occurred on some devices when opening the dashboard. The Zakat sync now runs in the background without blocking the UI, and API calls are parallelized for faster load times.
+- **Critical Stability Fixes:** Resolved several app crashes, including a startup crash on some Android devices, a crash when adding a budget, and an issue that prevented saving savings goals.
+- **Authentication:** Fixed a session race condition that occasionally logged users out unexpectedly.
+
+### ✨ Improved
+- **Guided Chat Experience:** If you haven't added an API key yet, the AI assistant now shows a helpful card with a direct button to add your key or get a free one, instead of a generic error message.
 
 ---
 **بالعربية:**
-- **إصلاح عاجل للأداء:** تم إصلاح خطأ مهلة الاتصال (504) الذي كان يظهر عند فتح لوحة التحكم. أصبحت مزامنة الزكاة تعمل في الخلفية دون إبطاء الواجهة، وتم تسريع جلب البيانات.
+- **إصلاحات استقرار حرجة:** تم حل عدة أعطال في التطبيق، بما في ذلك انهيار عند بدء التشغيل على بعض أجهزة أندرويد، وانهيار عند إضافة ميزانية، ومشكلة كانت تمنع حفظ أهداف الادخار.
+- **المصادقة:** تم إصلاح خطأ نادر كان يؤدي إلى تسجيل خروج المستخدم فجأة.
+- **تجربة دردشة موجهة:** إذا لم تقم بإضافة مفتاح API بعد، يعرض المساعد الذكي الآن بطاقة مساعدة مع زر مباشر لإضافة المفتاح أو الحصول على مفتاح مجاني، بدلاً من رسالة خطأ عامة.
 
 ---
 
