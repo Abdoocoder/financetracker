@@ -221,10 +221,46 @@ test('ar.json and en.json have identical keys', () {
 
 ### Current State
 
-**No CI/CD pipeline detected.** The project does not have:
-- `.github/workflows/*.yml` files
-- `.gitlab-ci.yml`
-- Any other CI configuration files
+**CI/CD pipelines detected in `.github/workflows/`:**
+
+| Workflow File | Trigger | Description |
+|---------------|---------|-------------|
+| `lint-test-build.yml` | Push/PR to `main` | Main CI: web (lint, typecheck, test, build) + mobile (flutter analyze, test) |
+| `smart-notifications.yml` | Scheduled (cron, 7× daily) + manual | Triggers smart notifications API endpoint |
+| `supabase-backup.yml` | Daily at 02:00 UTC + manual | PostgreSQL 17 backup (schema + data) → Cloudflare R2 |
+| `supabase-validate.yml` | Push to `main` + manual | Migration structure guard + isolated schema validation (local DB) |
+
+#### `lint-test-build.yml` — Main CI Pipeline
+
+**Trigger:** Push/PR to `main` branch  
+**Jobs:**
+1. **`lint-typecheck-test`** (web) — `ubuntu-latest`, Node 22:
+   - Validate prompts (`scripts/validate_prompts.py`, `scripts/render_check_prompts.py`)
+   - Validate test counts (web) — `scripts/validate_test_counts.py --web`
+   - `npm ci` → `npm run lint` → `npm run typecheck` → `npm run test` → `npm run build`
+2. **`mobile`** (Flutter) — `ubuntu-latest`, Flutter 3.47.6 stable:
+   - `flutter pub get` → `dart run build_runner build --delete-conflicting-outputs`
+   - `flutter analyze` → `flutter test`
+   - Validate test counts (mobile) — `scripts/validate_test_counts.py --flutter`
+
+**Concurrency:** Cancels superseded runs on same ref.
+
+#### `smart-notifications.yml` — Scheduled Notifications
+
+**Trigger:** 7 cron schedules daily (UTC times mapping to UTC+3 local) + `workflow_dispatch`  
+**Job:** Calls `https://fajrak.com/api/smart-notifications` with `CRON_SECRET` bearer token.
+
+#### `supabase-backup.yml` — Daily Database Backup
+
+**Trigger:** Daily 02:00 UTC + `workflow_dispatch`  
+**Job:** Installs PostgreSQL 17 client, runs `pg_dump` (schema-only, data-only with inserts, custom format), verifies non-empty, uploads `full_backup.dump` to GitHub Artifacts (30-day retention) and Cloudflare R2.
+
+#### `supabase-validate.yml` — Migration Validation
+
+**Trigger:** Push to `main` + `workflow_dispatch`  
+**Jobs:**
+1. **`guard`** — Blocks real `supabase db push` (without `--dry-run`) in any workflow; validates migration naming (`NNN_snake_case.sql` or `YYYYMMDDHHMMSS_snake_case.sql`); checks legacy archive count (expects 42).
+2. **`validate-sql`** (needs: `guard`) — Boots empty local Supabase DB, best-effort replays legacy migrations (001–041), strictly applies top-level migrations, runs advisory `supabase db lint`.
 
 ### Local Quality Gates
 
@@ -242,15 +278,16 @@ This runs:
 5. `npm run test:coverage` — Tests with coverage
 6. `npm run build` — Production build
 
-### Recommended CI Setup
+### CI Test Stages Summary
 
-When adding CI, consider these test stages:
-
-1. **Web Unit/Integration** — `npm test` (Jest)
-2. **Web E2E** — `npm run test:e2e` (Playwright, needs dev server)
-3. **Mobile Unit/Widget** — `cd mobile/fajrak_flutter && flutter test`
-4. **Static Analysis** — `npm run lint` + `npm run typecheck` + `cd mobile/fajrak_flutter && flutter analyze`
-5. **Security Audit** — `npm audit --omit=dev --audit-level=high`
+The existing CI covers:
+1. **Web Unit/Integration** — `npm test` (Jest) ✅
+2. **Web Lint/Typecheck/Build** — `npm run lint`, `npm run typecheck`, `npm run build` ✅
+3. **Mobile Analyze/Test** — `flutter analyze`, `flutter test` ✅
+4. **Test Count Validation** — `scripts/validate_test_counts.py` (web + mobile) ✅
+5. **Prompt Validation** — `scripts/validate_prompts.py` ✅
+6. **Migration Validation** — Isolated schema check ✅
+7. **Scheduled Operations** — Notifications cron, DB backup ✅
 
 ### Test Counts (as of 2026-10-25)
 

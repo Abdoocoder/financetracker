@@ -73,7 +73,7 @@ User → Next.js (Server Component) → Supabase Auth (PKCE) → JWT in HttpOnly
 Server Component → createServerClient() → Supabase RPC / Query Builder → PostgreSQL (RLS applied) → Typed Response
 ```
 - All user-scoped queries go through RLS policies; no manual `user_id` filtering needed
-- Complex aggregations use PostgreSQL RPC functions (e.g., `get_account_balances`, `get_cashflow_summary`)
+- Complex aggregations use PostgreSQL RPC functions (e.g., `get_account_balances`) and TypeScript helpers (e.g., `getCashflowSummary` in `lib/unified-tools/index.ts`)
 - Server Components render with data; minimal client-side hydration
 
 ### 3. **Mutation Flow (API Routes)**
@@ -86,7 +86,7 @@ Client Action → API Route Handler → createServerClient() / createAdminClient
 
 ### 4. **Real-time Sync Flow**
 ```
-Database Change (INSERT/UPDATE/DELETE) → Supabase Realtime (PostgreSQL WAL) → WebSocket → Web Client (useRealtime) / Mobile (Realtime client) → Local State Update
+Database Change (INSERT/UPDATE/DELETE) → Supabase Realtime (PostgreSQL WAL) → WebSocket → Web Client (supabase.channel().on('postgres_changes')) / Mobile (on-demand queries) → Local State Update
 ```
 
 ### 5. **Push Notification Flow**
@@ -100,7 +100,7 @@ Trigger (Cron, Webhook, User Action) → Supabase Edge Function (push-notificati
 
 ### 6. **AI Chat Flow (BYOK)**
 ```
-User Message → API Route (/api/byok/chat) → Rate Limit Check (bump_proxy_usage) → 
+User Message → API Route (/api/byok/proxy, /api/byok/agent) → Rate Limit Check (bump_proxy_usage) → 
   Validate User API Key (vault) → Proxy to LLM Provider → Stream Response → Client
 ```
 - Users store encrypted API keys in `user_byok_keys` (AES-GCM via Web Crypto API)
@@ -120,7 +120,7 @@ User Dashboard / Cron → lib/zakat-prices.ts (web) / metal_price_service.dart (
   → api.gold-api.com/price/{XAU,XAG} + /api/exchange-rate 
   → sync_zakat_haul_state(p_user_id, p_gold_price, p_silver_price, p_fx_rate)
 ```
-- Web dashboard (`components/dashboard/ZakatHawlCard.tsx`), Mobile dashboard (`zakat_calculator_screen.dart`), and daily cron (`/api/zakat-autopilot`) all call `lib/zakat-prices.ts` / `metal_price_service.dart`
+- Web dashboard (`components/dashboard/ZakatHawlCard.tsx`), Mobile dashboard (`mobile/fajrak_flutter/lib/screens/more/zakat_calculator_screen.dart`), and daily cron (`/api/zakat-autopilot`) all call `lib/zakat-prices.ts` / `metal_price_service.dart`
 - `lib/zakat-prices.ts` exports `fetchZakatPrices()` returning `{ goldPrice, silverPrice, fxRate }` in user's currency
 - RPC defaults ($30 gold, 0.35 silver, 1.0 FX) are **stale fixtures** — never rely on them; always pass live prices
 - If price fetching fails, cron skips the user (does not fall back to defaults)
@@ -136,7 +136,7 @@ User Dashboard / Cron → lib/zakat-prices.ts (web) / metal_price_service.dart (
 | **BYOK Vault** | `lib/byok/vault.ts`, `chat.ts` | Encrypt/decrypt user API keys; provider-agnostic chat completion streaming |
 | **Custom Data Hooks** | `hooks/useTransactions.ts`, `useDashboardData.ts`, `useAccounts.ts` | Encapsulate TanStack Query + Supabase patterns; consistent caching, invalidation |
 | **Type Definitions** | `types/index.ts` | Single source of truth for all domain entities (Account, Transaction, Debt, Investment, etc.) |
-| **I18n Provider** | `lib/i18n.tsx`, `lib/i18n-server.ts` | Server/client translation with `next-intl` pattern; RTL support for Arabic |
+| **I18n Provider** | `lib/i18n.tsx`, `lib/i18n-server.ts` | Custom server/client translation implementation (next-intl-like pattern); RTL support for Arabic |
 | **Theme Context** | `lib/theme-context.tsx` | SSR-safe theme (light/dark/system) with early inline script to prevent flash |
 
 ## Directory Structure Rationale
@@ -169,7 +169,7 @@ User Dashboard / Cron → lib/zakat-prices.ts (web) / metal_price_service.dart (
 │   ├── errors/                   # Error boundary, toast helpers
 │   └── moderation/               # Content moderation utilities
 ├── supabase/                     # Supabase backend configuration
-│   ├── migrations/               # SQL migrations (64 migrations: 42 legacy + 22 dated), versioned, run via CLI
+│   ├── migrations/               # SQL migrations (68 migrations: 42 legacy + 26 dated), versioned, run via CLI
 │   ├── functions/                # Deno Edge Functions (push-notification)
 │   └── config.toml               # Local dev config (ports, auth settings)
 ├── types/                        # Shared TypeScript types (single source of truth)
@@ -198,17 +198,17 @@ User Dashboard / Cron → lib/zakat-prices.ts (web) / metal_price_service.dart (
 ## Security Architecture
 
 - **RLS Everywhere**: All user tables have `user_id` + policies; no `WHERE user_id = ?` in application code
-- **Service Role Isolation**: `createAdminClient()` only in API routes after `getUser()` verification; throws if imported client-side
+- **Service Role Isolation**: `createAdminClient()` only in API routes after `supabase.auth.getUser()` verification; throws if imported client-side
 - **BYOK Encryption**: User API keys encrypted with AES-GCM (Web Crypto API); keys never logged
 - **Rate Limiting**: Per-user proxy limits via `proxy_usage` table + `bump_proxy_usage` RPC
-- **CSP & Security Headers**: Configured in `next.config.mjs` (frame denial, HSTS, permissions policy)
+- **Security Headers**: Configured in `next.config.mjs` (X-Frame-Options: DENY, HSTS, Permissions-Policy, X-Content-Type-Options, Referrer-Policy); no Content-Security-Policy header configured
 - **Idempotency**: `check_and_reserve_idempotency_key` RPC prevents duplicate mutations
 - **Anon grants revoked**: `anon` INSERT/UPDATE/DELETE/TRUNCATE revoked on all public tables (2026-10-25). `anon` has SELECT only on `testimonials`. RLS is the only write gatekeeper.
 
 ## Deployment & Operations
 
 - **Platform**: Vercel (Next.js) + Supabase (managed PostgreSQL)
-- **Cron Jobs**: Defined in `vercel.json` (auto-debt, auto-recurring, budget-alerts)
+- **Cron Jobs**: Defined in `vercel.json` (auto-debt, auto-recurring, budget-alerts, zakat-autopilot)
 - **Edge Functions**: Supabase Deno functions for push notifications
 - **Observability**: Sentry (errors, traces, session replay) + OpenTelemetry (metrics, traces) → Grafana
 - **Environment Variables**: `.env.local` for local; Vercel/Supabase dashboard for production

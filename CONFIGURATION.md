@@ -13,8 +13,8 @@ This document covers all environment variables, configuration files, required se
 |----------|----------|---------|-------------|
 | **App Config** |
 | `NEXT_PUBLIC_APP_URL` | Yes | `http://localhost:3000` | Public URL of the deployed application (used for absolute URLs in emails, webhooks, etc.) |
-| `NEXT_PUBLIC_APP_NAME` | No | `Fajrak FinanceTracker` | Display name shown in UI and notifications |
-| `TIMEZONE_OFFSET_HOURS` | No | `3` | Server timezone offset in hours (used by cron jobs for date calculations) |
+| `NEXT_PUBLIC_APP_NAME` | No | `Fajrak FinanceTracker` | Display name shown in UI and notifications <!-- VERIFY: defined in .env.example but not referenced in source code --> |
+| `TIMEZONE_OFFSET_HOURS` | No | `3` | Server timezone offset in hours (used by cron routes: `auto-salary`, `evening-reminder`, `streak-alert`, `new-user-nudge`) |
 | **Supabase Config** |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | — | Supabase project URL (e.g., `https://xxxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | — | Supabase anonymous/public key for client-side access |
@@ -89,7 +89,7 @@ headers: [
 
 **Notable environment-dependent settings:**
 - `org` / `project`: Read from `SENTRY_ORG` / `SENTRY_PROJECT` (with defaults)
-- `tunnelRoute`: Read from `SENTRY_TUNEL_ROUTE` (default `/monitoring`)
+- `tunnelRoute`: Read from `SENTRY_TUNNEL_ROUTE` (default `/monitoring`)
 - `silent`: `!process.env.CI` (only upload source maps in CI)
 
 ### `tailwind.config.js`
@@ -115,12 +115,12 @@ Sentry SDK configuration for server, edge, and client runtimes.
 
 | Variable | Validation Location | Error Behavior |
 |----------|---------------------|----------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | `lib/supabase/client.ts:10`, `lib/supabase/server.ts:19`, `lib/supabase/admin.ts:24` | Throws `Error` on client/admin creation |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Same as above | Throws `Error` on client/admin creation |
-| `SUPABASE_SERVICE_ROLE_KEY` | `lib/supabase/admin.ts:25` | Throws `Error: "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars. Admin client cannot be constructed."` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `lib/supabase/client.ts:10`, `lib/supabase/server.ts:19`, `lib/supabase/admin.ts:27-31` | Client: non-null assertion (`!`) passes `undefined` to SDK (throws at runtime). Admin: explicit check at lines 27-31 throws `Error: "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars. Admin client cannot be constructed."` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `lib/supabase/client.ts:11`, `lib/supabase/server.ts:20` | Non-null assertion (`!`) — passes `undefined` to client creator if unset; Supabase SDK throws at runtime |
+| `SUPABASE_SERVICE_ROLE_KEY` | `lib/supabase/admin.ts:27-31` | Throws `Error: "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars. Admin client cannot be constructed."` |
 | `CRON_SECRET` | `lib/cron-auth.ts:15-21` | Throws `Error: "CRON_SECRET is not set. Configure it in your environment variables."` (fail-loud) |
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | `lib/firebase.ts:5` | Firebase init fails silently; push notifications break |
-| `NEXT_PUBLIC_SENTRY_DSN` | `instrumentation-client.ts:8`, `sentry.server.config.ts:8` | Sentry disabled; no error but no monitoring |
+| `NEXT_PUBLIC_SENTRY_DSN` | `instrumentation-client.ts:8`, `sentry.server.config.ts:10` | Client: validates `NEXT_PUBLIC_SENTRY_DSN` only. Server: validates `SENTRY_DSN \|\| NEXT_PUBLIC_SENTRY_DSN` (falls back to `SENTRY_DSN`). Sentry disabled if invalid; no error but no monitoring |
 
 ### Optional with Defaults
 
@@ -149,7 +149,7 @@ Defaults are defined inline at the point of use:
 | `SENTRY_PROJECT` | `'javascript-nextjs'` | `next.config.mjs:52` |
 | `SENTRY_TUNNEL_ROUTE` | `'/monitoring'` | `next.config.mjs:65` |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `'http://localhost:4318'` | `observability/otel/index.ts:24` |
-| Sentry `tracesSampleRate` | `1.0` (dev) / `0.1` (prod) | `sentry.server.config.ts:19`, `sentry.edge.config.ts:20` |
+| Sentry `tracesSampleRate` | `1.0` (dev) / `0.1` (prod) | `sentry.server.config.ts:21`, `sentry.edge.config.ts:22` |
 | Playwright `retries` | `2` (CI) / `1` (local) | `playwright.config.ts:24` |
 | Playwright `workers` | `1` (CI) / `2` (local) | `playwright.config.ts:26` |
 
@@ -162,10 +162,9 @@ The project uses explicit `.env.*` files for environment-specific configuration:
 | File | Purpose | Variables Overridden |
 |------|---------|---------------------|
 | `.env.local` | Local development overrides (gitignored) | All variables — developer-specific secrets |
-| `.env.e2e` | E2E test environment (local Supabase) | `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`, `SUPABASE_SERVICE_ROLE_KEY=...`, `E2E_TEST_EMAIL`, `E2E_TEST_PASSWORD` |
-| `.env.local.e2e-backup` | Backup of local E2E config | Same as `.env.e2e` |
+| `.env.local.e2e-backup` | Backup of local E2E config (template for `.env.e2e`) | `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`, `SUPABASE_SERVICE_ROLE_KEY=...`, `E2E_TEST_EMAIL`, `E2E_TEST_PASSWORD` |
 
-**No `.env.development`, `.env.production`, or `.env.test` files exist.** Environment differences are handled via:
+**No `.env.development`, `.env.production`, `.env.test`, or `.env.e2e` files exist.** Environment differences are handled via:
 - `NODE_ENV` checks in code (`process.env.NODE_ENV === 'production'`)
 - Vercel project settings (production/preview environment variables in dashboard)
 - CI/CD pipeline injects secrets at deploy time
@@ -185,3 +184,4 @@ Production and preview values are configured in the Vercel dashboard under **Pro
 <!-- VERIFY: Firebase project IDs (web: fajrak-f7df1, mobile: fajrak) may differ per platform -->
 <!-- VERIFY: VAPID keys must be generated as a pair; public key goes to NEXT_PUBLIC_VAPID_PUBLIC_KEY -->
 <!-- VERIFY: BYOK RSA keypair must be generated with OpenSSL; private key never leaves server -->
+<!-- VERIFY: NEXT_PUBLIC_APP_NAME defined in .env.example but not referenced in source code -->

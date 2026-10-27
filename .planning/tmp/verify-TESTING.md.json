@@ -1,0 +1,14 @@
+{
+  "doc_path": "docs/TESTING.md",
+  "claims_checked": 42,
+  "claims_passed": 41,
+  "claims_failed": 1,
+  "failures": [
+    {
+      "line": 224,
+      "claim": "No CI/CD pipeline detected",
+      "expected": "no CI/CD pipeline",
+      "actual": "CI/CD pipeline files found in .github/workflows/ (lint-test-build.yml, smart-notifications.yml, supabase-backup.yml, supabase-validate.yml)"
+    }
+  ]
+}

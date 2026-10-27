@@ -59,6 +59,7 @@ Copy the example file and fill in real values:
 ```bash
 cp .env.example .env
 # Edit .env with your credentials (see CONFIGURATION.md for the full list)
+<!-- VERIFY: .env.example exists at repo root -->
 ```
 
 **Minimum required variables for local development:**
@@ -130,7 +131,7 @@ make run
 flutter run $(DART_DEFINES) $(SENTRY_DEFINE)
 ```
 
-The `make run` command injects Supabase and Firebase credentials from the root `.env` via `--dart-define` flags. **Never run `flutter build appbundle --release` directly** — it bypasses the credential injection and produces a build that cannot authenticate (see `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` v3.42.2 and `HANDOFF_REPORT.md`).
+The `make run` command injects Supabase and Firebase credentials from the root `.env` via `--dart-define` flags. **Never run `flutter build appbundle --release` directly** — it bypasses the credential injection and produces a build that cannot authenticate (see `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` v3.42.2 and `HANDOFF_REPORT.md`). <!-- VERIFY: PLAY_STORE_RELEASE.md documents the credential injection fix -->
 
 **Run Flutter Web (for rapid iteration):**
 
@@ -156,7 +157,7 @@ make run-web-with-proxy
 | **Firebase auth fails on mobile** | `google-services.json` missing or wrong package name | Ensure file is at `mobile/fajrak_flutter/android/app/google-services.json` and package name matches `com.fajrak.app` (or your configured ID). |
 | **Push notifications don't arrive** | VAPID keys or Firebase config missing | Verify all `NEXT_PUBLIC_FIREBASE_*`, `VAPID_*`, and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` are set. Check `notification_preferences` quiet hours in the app. |
 | **Zakat calculations show stale prices** | RPC defaults ($30/0.35/1.0) used instead of live prices | The app fetches live gold/silver/FX via `lib/zakat-prices.ts` (web) or `metal_price_service.dart` (mobile) and passes them to `sync_zakat_haul_state`. Ensure network access for price APIs. |
-| **TypeScript errors on `npm run typecheck`** | Generated types out of sync | Run `npx supabase gen types typescript --project-id <ref> > types/supabase.ts` (or pull from Supabase dashboard). |
+| **TypeScript errors on `npm run typecheck`** | Generated types out of sync | Run `npx supabase gen types typescript --project-id <ref> > types/supabase.ts` (or pull from Supabase dashboard). <!-- VERIFY: types/supabase.ts is a generated file, not committed to repo --> |
 | **E2E tests fail to authenticate** | `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` not set | Create a dedicated test user in Supabase Auth and add credentials to `.env`. |
 
 ---

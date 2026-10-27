@@ -1,0 +1,14 @@
+{
+  "doc_path": "docs/guides/development.md",
+  "claims_checked": 46,
+  "claims_passed": 45,
+  "claims_failed": 1,
+  "failures": [
+    {
+      "line": 31,
+      "claim": ".env.example",
+      "expected": "file exists",
+      "actual": "file not found at .env.example (also not found in mobile/fajrak_flutter/.env.example); Makefile line 70 attempts to copy it but it doesn't exist; CONTRIBUTING.md line 27 also claims it exists"
+    }
+  ]
+}
