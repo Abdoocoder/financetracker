@@ -60,7 +60,7 @@ async function runProactiveCheck() {
     .gt('monthly_income', 0)
 
   if (profilesError) throw profilesError
-  if (!profiles?.length) return { ok: true, processed: 0, insights: 0 }
+  if (!profiles?.length) return { processed: 0, insights: 0 }
 
   let totalInsights = 0
 
