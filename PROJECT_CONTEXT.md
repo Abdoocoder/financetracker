@@ -56,16 +56,17 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 6. **Zakat prices must be passed explicitly.** The RPC defaults ($30/0.35/1.0) are stale fixtures. Any new caller MUST fetch live prices via `lib/zakat-prices.ts` (web) or `metal_price_service.dart` (mobile) and pass them to `sync_zakat_haul_state`.
 7. **Migration History Repair:** If you delete a migration file that was already applied to prod, CI will fail with "Remote migration versions not found". Run `supabase migration repair --status reverted <timestamp>` to fix.
 
-## 4. Current state (verified 2026-10-25)
+## 4. Current state (verified 2026-10-27)
 
-- **Mobile release:** `3.46.0+65` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play's last *documented* submission is v3.44.0+63 (Submission ID 44, status "In review" at handoff); `mobile/README.md` still reads 3.44.0+63.
+- **Mobile release:** `3.47.0+66` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play submission v3.47.0+66 completed; `mobile/README.md` still reads 3.44.0+63.
 - **Web version:** `package.json` = 3.42.0 — intentionally not bumped with mobile releases.
 - **Tests (re-run 2026-10-27):** **752 web tests / 81 Jest suites** (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
-- **Latest feature:** Proactive Agent (Phase 4) complete — daily cron `/api/agent/proactive` analyzes budgets, debts, and spending trends, generates deduplicated insights via `notification_history` fingerprints, and pushes alerts via FCM/Web Push.
+- **Latest feature:** Agentic AI Phases 1–4 COMPLETE (v3.47.0) — Proactive Agent cron (`/api/agent/proactive`), unified tool layer (`lib/agent/tools.ts`), interactive tool-call UI cards, Smart BYOK validation (`/api/byok/validate`), and security hardening (P0/P1/P2).
 - **Next phase:** Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 - **Resolved:** prod DB outage (2026-10-17, `INCIDENT.md`), daily backups to Cloudflare R2, `currentUser!` force-unwraps (v3.44.0), Zakat live-price fallback.
 - ✅ Zakat live prices passed to `sync_zakat_haul_state` (PR #1, 2026-10-25)
 - ✅ Alerts fingerprint backfilled: 6,436 dupes removed, 3,799 keys assigned (PR #2, 2026-10-25)
 - ✅ Anon write grants revoked on all public tables (PR #4, 2026-10-25)
+- ✅ Security P0/P1/P2 resolved in v3.47.0: 14 critical + 41 high npm advisories patched; internal tables hardened (`api_audit_log`, `idempotency_keys`, `proxy_usage`); `bump_proxy_usage` made SECURITY DEFINER.
 - **Open risks:** anon key rotation (pending post-incident), leaked-password protection disabled, no feature flags, financial-metric duplication outside Zakat, 8 moderate `@opentelemetry` transitive vulns. Full list: `HANDOFF_REPORT.md` §8.
 - **Process:** single-developer SPOF, no monetization; conventional commits, squash-merge to main.

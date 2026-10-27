@@ -96,6 +96,36 @@ daily lesson. Plus `supabase-backup.yml` — nightly `supabase db dump` → Clou
 - Adding a cron: new route under `app/api/` + secret via cron-auth + schedule entry in
   `vercel.json` **or** a workflow + a row in this table.
 
+## 6b. notification_history Fingerprint Logic (v3.46.0+) & Proactive Insights (v3.47.0+)
+
+### notification_history fingerprint deduplication
+
+The `notification_history` table is the single write path for all notifications (cron alerts, AI-generated insights, proactive agent pushes). A unique index enforces deduplication:
+
+```sql
+CREATE UNIQUE INDEX notification_history_user_fingerprint_uidx
+ON notification_history (user_id, fingerprint)
+WHERE fingerprint IS NOT NULL;
+```
+
+- **Fingerprint composition**: SHA-256 of `{user_id, rule_type, entity_id, date}` (e.g., `budget:groceries:2026-10-27`).
+- **Write path**: All producers (cron routes, AI generator, achievement awards, proactive agent) call `sendPushToUser()` in `lib/push-send.ts`, which generates the fingerprint, checks `notification_preferences` (enabled, quiet hours), and inserts into `notification_history`. The unique index rejects races as `23505` (treated as success).
+- **Self-heal (F22, Edge Function v15)**: If a webhook payload omits `fingerprint` (custom Dashboard template), the Edge Function queries `notification_history` by `historyId` to recover it before delivery.
+
+### Proactive Agent Insights (v3.47.0)
+
+The daily cron `/api/agent/proactive` generates insights via deterministic rules and writes them through the same `notification_history` path:
+
+| Rule Type | Trigger | Entity ID | Fingerprint Example |
+|---|---|---|---|
+| `budget_high` | `spent / limit > 0.9` | budget_id | `sha256(user_id + "budget_high" + budget_id + "2026-10-27")` |
+| `debt_due` | `due_date <= now + 3 days` | debt_id | `sha256(user_id + "debt_due" + debt_id + "2026-10-27")` |
+| `spending_up` | WoW increase > 20% | category | `sha256(user_id + "spending_up" + "food" + "2026-10-27")` |
+
+- **Deduplication**: Same fingerprint logic prevents duplicate alerts across days.
+- **Delivery**: Inserts into `notification_history` → triggers push-notification Edge Function → writes `alerts` row (A.2b pattern) → FCM/Web Push delivery.
+- **Quiet Hours**: Respected via `notification_preferences` check in `sendPushToUser()` before insert.
+
 ## 7. Checklist before touching this domain
 
 - [ ] Prod schema diffed before trusting any migration output; no `db reset` near prod.

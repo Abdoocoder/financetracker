@@ -1,7 +1,7 @@
 # Domain: BYOK AI + MCP Server
 
 > Layer 2 deep dive. Entry points: `AGENTS.md` → `PROJECT_CONTEXT.md` → this file.
-> Last verified 2026-10-20.
+> Last verified 2026-10-27.
 
 ## 1. What Feature A (BYOK) and Feature B (MCP) are
 
@@ -11,9 +11,10 @@
 - **MCP server** — the same financial data exposed as 3 tools over Model Context Protocol
   (Streamable HTTP), authenticated with Personal Access Tokens (PATs), so external AI agents
   (Claude, etc.) can read balances and create transactions on the user's behalf.
-- Both share one server-side layer: `lib/unified-tools/index.ts` (balances, cashflow, create
-  transaction, idempotency, audit logging, category validation). **Business logic for AI goes
-  there, once** — never inside the proxy or MCP route.
+- **Proactive Agent** — daily cron (`/api/agent/proactive`) analyzes budgets, debts, and spending trends; generates deduplicated insights via `notification_history` fingerprints; pushes alerts via FCM/Web Push.
+- All three share one server-side layer: `lib/unified-tools/index.ts` (balances, cashflow, create
+  transaction, idempotency, audit logging, category validation) + `lib/agent/tools.ts` (agent-specific tools). **Business logic for AI goes
+  there, once** — never inside the proxy, MCP route, or proactive cron.
 
 ## 2. Envelope encryption (device side)
 
@@ -107,7 +108,56 @@ envelope** to the proxy. Technically wrapped, not plaintext — but the copy nee
 (open question in `HANDOFF_REPORT.md` §12). Do not strengthen the marketing claim in code
 comments or UI strings without the owner's sign-off.
 
-## 8. Checklist before touching this domain
+## 8. BYOK Validation Flow (`/api/byok/validate`)
+
+**New in v3.47.0** — Instant key validation before saving.
+
+- **Endpoint**: `POST /api/byok/validate`
+- **Auth**: Supabase session (Bearer token)
+- **Input**: `{ providerId, apiKey, baseUrl? }`
+- **Flow**:
+  1. Client sends plaintext key (never stored) to validation endpoint
+  2. Server makes a minimal test request to the provider's `/models` or `/chat/completions` endpoint
+  3. On success: returns `{ valid: true, model: string, provider: string }` — key can be encrypted and saved
+  4. On failure: returns `{ valid: false, error: string, code: 'INVALID_KEY' | 'RATE_LIMITED' | 'NETWORK_ERROR' }`
+- **Security**: Key is used in-memory only for the test request; never logged, never persisted. Envelope encryption happens *after* validation passes, in the client.
+- **Rate limit**: Shares the `bump_proxy_usage` counter (30 req/min per user).
+
+## 9. Smart BYOK UX — Deep Links & Free Model Badges
+
+**New in v3.47.0** — Improved provider onboarding in Settings.
+
+- **Deep Links**: Each provider in the BYOK settings screen now shows a "Get API Key" button linking directly to the provider's console:
+  - OpenAI → `https://platform.openai.com/api-keys`
+  - Anthropic → `https://console.anthropic.com/settings/keys`
+  - Google AI Studio → `https://aistudio.google.com/apikey`
+  - OpenRouter → `https://openrouter.ai/settings/keys`
+  - NVIDIA NIM → `https://build.nvidia.com/explore/discover`
+  - Ollama → `https://ollama.com/download` (local, no key needed)
+- **Free Model Badges**: Providers offering free tiers display a "Free tier available" badge in the provider selector:
+  - OpenRouter (free models via `openrouter/auto`)
+  - Google Gemini (free tier: 15 RPM, 1M tokens/day)
+  - Ollama (completely free, runs locally)
+  - NVIDIA NIM (free tier for development)
+- **Implementation**: `lib/byok/providers.ts` extended with `consoleUrl` and `hasFreeTier` fields; mobile mirrors in `lib/services/byok/providers.dart`. UI reads these fields to render badges and links.
+
+## 10. Proactive Agent (`/api/agent/proactive`)
+
+**New in v3.47.0 (Agentic AI Phase 4)** — Daily automated financial insights.
+
+- **Endpoint**: `POST /api/agent/proactive` (Cron only — guarded by `verifyCronAuth` with `CRON_SECRET`)
+- **Schedule**: Daily 06:00 UTC via `vercel.json`
+- **Analysis Rules** (deterministic, no LLM):
+  1. **Budget > 90%**: Any budget category where `spent / limit > 0.9`
+  2. **Debt Due**: Debt payments due within 3 days (`due_date <= now + 3 days`)
+  3. **Spending Up**: Week-over-week spending increase > 20% in any category
+- **Deduplication**: SHA-256 fingerprint = `hash(user_id + rule_type + entity_id + date)`. Checks `notification_history` for existing fingerprint before inserting.
+- **Delivery**: Inserts into `notification_history` (triggers push-notification Edge Function via DB webhook). Writes `alerts` row before quiet-hours check (A.2b pattern from push pipeline).
+- **Quiet Hours**: Respects `notification_preferences.quiet_hours_start/end` and `profiles.timezone` (default `Asia/Amman`).
+- **Response**: `{ ok: true, analyzed: number, insights_generated: number, pushed: number }`
+- **Shared Tool Layer**: Uses `lib/agent/tools.ts` read tools (`get_budgets`, `get_debts`, `get_spending_breakdown`) — same tools as the in-app agent.
+
+## 11. Checklist before touching this domain
 
 - [ ] New provider added to **both** `providers.ts` and `providers.dart`, with a fixed `baseUrl`
       (never client-controlled) — SSRF boundary intact.

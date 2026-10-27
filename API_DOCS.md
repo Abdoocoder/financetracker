@@ -115,6 +115,36 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 - **التسجيل:** `api_audit_log` لكل استدعاء أداة (`action` = اسم الأداة، `apiKeyId = null`) — بلا مفاتيح أو رؤوس مصادقة.
 - **المزوّدون:** `kind === 'proxy'` فقط؛ المزوّدون المباشرون (Ollama) يبقون على مسارهم الحالي.
 
+### 10. التحقق من مفتاح BYOK (`/api/byok/validate`)
+التحقق الفوري من مفتاح API قبل الحفظ — يُستخدم في شاشة إعدادات BYOK.
+- **الطريقة:** `POST`
+- **المصادقة:** جلسة Supabase (Bearer token)
+- **المدخلات:** `{ providerId, apiKey, baseUrl? }`
+- **التدفق:**
+  1. العميل يرسل المفتاح النصي (لا يُخزّن أبداً) لنقطة التحقق
+  2. الخادم يجري طلب اختبار بسيط لنقطة `/models` أو `/chat/completions` الخاصة بالمزوّد
+  3. عند النجاح: يعيد `{ valid: true, model: string, provider: string }` — يمكن تشفير المفتاح وحفظه
+  4. عند الفشل: يعيد `{ valid: false, error: string, code: 'INVALID_KEY' | 'RATE_LIMITED' | 'NETWORK_ERROR' }`
+- **الأمان:** المفتاح يستخدم في الذاكرة فقط لطلب الاختبار؛ لا يُسجّل أبداً، لا يُحفظ. التشفير بالغلاف يحدث *بعد* نجاح التحقق، في العميل.
+- **حد المعدل:** يشارك عداد `bump_proxy_usage` (30 طلب/دقيقة لكل مستخدم).
+
+### 11. الوكيل الاستباقي (`/api/agent/proactive`)
+مهمة يومية مؤتمتة تحلل الميزانيات والديون واتجاهات الإنفاق وتُرسل تنبيهات ذكية.
+- **الطريقة:** `POST`
+- **المصادقة:** `CRON_SECRET` عبر `verifyCronAuth` (مهمة Vercel Cron فقط)
+- **الجدول:** يومي 06:00 UTC (مُعرّف في `vercel.json`)
+- **قواعد التحليل** (حتمية، لا LLM):
+  1. **الميزانية > 90%**: أي فئة ميزانية حيث `spent / limit > 0.9`
+  2. **دَين مستحق**: أقساط ديون مستحقة خلال 3 أيام (`due_date <= now + 3 days`)
+  3. **الإنفاق يرتفع**: زيادة أسبوعية > 20% في أي فئة
+- **إزالة التكرار**: بصمة SHA-256 = `hash(user_id + rule_type + entity_id + date)`. يتحقق من `notification_history` للبصمة الموجودة قبل الإدراج.
+- **التسليم**: يُدرج في `notification_history` (يُشغّل Edge Function الإشعارات عبر webhook قاعدة البيانات). يكتب صف `alerts` قبل فحص ساعات الهدوء (نمط A.2b من خط أنابيب الإشعارات).
+- **ساعات الهدوء**: يحترم `notification_preferences.quiet_hours_start/end` و `profiles.timezone` (افتراضي `Asia/Amman`).
+- **الاستجابة:** `{ ok: true, analyzed: number, insights_generated: number, pushed: number }`
+- **طبقة الأدوات المشتركة**: يستخدم أدوات القراءة من `lib/agent/tools.ts` (`get_budgets`, `get_debts`, `get_spending_breakdown`) — نفس أدوات الوكيل داخل التطبيق.
+
+### 12. وكيل BYOK (محدث) — المسارات الكاملة
+
 ---
 
 ## 📋 القائمة الكاملة لنقاط الاتصال المكتشفة
@@ -139,6 +169,8 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 | `/api/mcp` | خادم MCP المالي (Streamable HTTP) |
 | `/api/byok/proxy` | وكيل LLM BYOK الرفيع (Feature A) |
 | `/api/byok/agent` | حلقة وكيل خادمية بأدوات مالية + بوابة تأكيد للكتابة (المرحلة 2) |
+| `/api/byok/validate` | التحقق الفوري من مفتاح BYOK قبل الحفظ |
+| `/api/agent/proactive` | الوكيل الاستباقي — تحليل يومي للميزانيات/الديون/الإنفاق (Cron فقط) |
 
 ---
 
@@ -183,6 +215,8 @@ Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each 
 | `/api/byok/config` | GET | public (runtime BYOK config + RSA public key) |
 | `/api/byok/proxy` | POST | authenticated (Bearer session token) |
 | `/api/byok/agent` | POST | authenticated (Bearer session token) |
+| `/api/byok/validate` | POST | authenticated (Bearer session token) |
+| `/api/agent/proactive` | POST | cron (`CRON_SECRET` — `verifyCronAuth`) |
 | `/api/confirm` | GET | public (email/sensitive-operation confirmation link) |
 | `/api/daily-reminder` | GET | cron (`CRON_SECRET`) |
 | `/api/evening-reminder` | GET | cron (`CRON_SECRET`) |
@@ -209,7 +243,7 @@ Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each 
 **ملاحظات:**
 
 - كل نقطة اتصال مذكورة في هذا المستند موجودة أيضاً في الشيفرة; لم يُعلَّم أي بند `⚠️ REMOVED`.
-- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat-autopilot`, `/api/zakat/prices`, `/api/testimonials`.
+- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat-autopilot`, `/api/zakat/prices`, `/api/testimonials`, `/api/byok/validate`, `/api/agent/proactive`.
 
 ---
 

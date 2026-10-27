@@ -1,6 +1,6 @@
 # FinanceTracker (Fajrak)
 
-**Version:** 3.45.0+64
+**Version:** 3.47.0+66
 
 A comprehensive personal finance tracking application with:
 - **Next.js 16+ App Router** frontend (TypeScript, React 19, Tailwind CSS)
@@ -17,7 +17,8 @@ A comprehensive personal finance tracking application with:
 - Investment tracking and wealth simulation (stocks, ETFs, crypto, halal flag)
 - Zakat calculation with **Zakat Autopilot** — automatic Hawl tracking, countdown cards, and due-date push reminders (gold, silver, cash, investments, debts)
 - Financial health scoring (centralized RPC: `get_health_score()`)
-- AI chat assistant (BYOK - Bring Your Own Key, envelope encryption)
+- **Proactive AI Agent** — daily cron analyzes budgets, debts, spending trends and pushes smart alerts via FCM/Web Push
+- **Smart BYOK** — instant key validation, provider deep links, free model badges, and envelope encryption
 - Push notifications (web: VAPID + SW; mobile: Firebase FCM via Edge Function)
 - Gamification (streaks, challenges, achievements)
 - PDF reports and data export
@@ -66,10 +67,17 @@ A comprehensive personal finance tracking application with:
 - **AI**: BYOK pattern for LLM integration, MCP server
 - **Push**: Firebase FCM (mobile), Web Push VAPID (browser)
 
-## Recent Updates (Unreleased)
-- **Zakat Autopilot (Phase C)**: Zakat is now fully automated end-to-end — a database state machine (`sync_zakat_haul_state` RPC + `zakat_haul_tracking`) starts each user's Hawl the moment their wealth crosses the Nisab and tracks it for 354 days; a daily Vercel Cron (`/api/zakat-autopilot`, 08:00 UTC) syncs the state and pushes a reminder when the due date is ≤ 7 days away. Web and Mobile dashboards show a live "Zakat Hawl" countdown card (green > 60 days / orange 7–60 / red ≤ 7) with the amount due, and both Zakat pages show a current-Hawl banner.
-- **AI Assistant → Executive Assistant (Agentic AI)**: the BYOK AI chat is being upgraded to an agentic "Executive Assistant" with tool calling over live financial data. Roadmap: `AGENTIC_AI_PLAN.md` (Phase 1 Tools → Phase 2 Parsing → Phase 3 UI → Phase 4 Security).
-- **Stability**: `make run-web` now passes Supabase/Firebase credentials (`DART_DEFINES`); the Zakat calculator tolerates String-typed live gold/silver prices (Flutter Web crash fix); the gamification card no longer fires 401s (missing Bearer token).
+## Recent Updates (v3.47.0)
+- **Proactive AI Agent (Agentic AI Phase 4)**: Daily cron `/api/agent/proactive` analyzes budgets (>90% threshold), debt due dates, and spending trends; generates deduplicated insights via `notification_history` fingerprints; pushes alerts via FCM/Web Push respecting quiet hours.
+- **Smart BYOK UX**: Added `/api/byok/validate` for instant key validation; provider deep links in settings; free model badges; improved error handling.
+- **Agentic Tool Cards**: Chat now renders interactive tool cards with spinners and deep-link buttons ("Go to Debts", "Go to Budgets", etc.) when the agent fetches live data.
+- **Security Hardening**: Patched 14 critical + 41 high npm advisories; revoked `anon` write grants on all tables; hardened internal tables (`api_audit_log`, `idempotency_keys`, `proxy_usage`) against self-tampering; Sentry PII filtering enhanced.
+
+## Recent Updates (v3.46.0)
+- **Zakat**: `sync_zakat_haul_state` now receives live gold/silver/FX prices in the daily cron and both dashboards. Previously computed Hawl at stale defaults ($30/g gold) — 2.7x under current price.
+- **Alerts**: Backfilled 3,799 fingerprints, removed 6,436 duplicate alerts. Unique index now enforces dedup.
+- **Currency**: Onboarding uses `detectCurrency()` (high-confidence), falls back to KWD. Prod DB default changed JOD → KWD.
+- **Fixed**: Debug-only Sentry "Zone mismatch" warning on Flutter web by ensuring the Flutter binding is initialized inside Sentry's zone.
 
 ## Recent Updates (v3.44.0)
 - **AI Assistant**: proper Markdown rendering + Arabic prompt tuning + JOD 3-decimal formatting

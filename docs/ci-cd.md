@@ -81,9 +81,9 @@ npx supabase migration list
 
 | Artifact | Command / Location | Notes |
 |----------|-------------------|-------|
-| Root `VERSION` | `echo "3.46.0+65" > VERSION` | Single source of truth for mobile |
-| `pubspec.yaml` | Edit `version: 3.46.0+65` | Must match `VERSION` exactly |
-| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | Add entry under `## [3.46.0+65]` | Release notes for Play Console |
+| Root `VERSION` | `echo "3.47.0+66" > VERSION` | Single source of truth for mobile |
+| `pubspec.yaml` | Edit `version: 3.47.0+66` | Must match `VERSION` exactly |
+| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | Add entry under `## [3.47.0+66]` | Release notes for Play Console |
 | `package.json` (web) | **Do not bump** — stays at 3.42.0 | Web ships independently |
 
 ### 4.2 Building Flutter AAB (Release Bundle)
@@ -119,7 +119,7 @@ The Makefile reads `FLUTTER_FIREBASE_*` and `FLUTTER_SUPABASE_*` from `.env` (un
 - [ ] `VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned
 - [ ] `HANDOFF_REPORT.md` header updated with new version
 - [ ] `PROJECT_CONTEXT.md` §4 updated with new version
-- [ ] `CHANGELOG.md` has `[3.46.0]` section with Fixed/Security/Internal entries
+- [ ] `CHANGELOG.md` has `[3.47.0]` section with Fixed/Security/Internal entries
 - [ ] Mobile README updated after Play Store approval
 - [ ] Vercel deployment healthy (check Functions, Edge, Analytics tabs)
 
@@ -162,4 +162,4 @@ The Makefile reads `FLUTTER_FIREBASE_*` and `FLUTTER_SUPABASE_*` from `.env` (un
 | Flutter build fails with "Could NOT find CURL" | Missing `libcurl4-openssl-dev` on Linux | `sudo apt install libcurl4-openssl-dev && rm -rf build/linux && flutter build` |
 | Vercel deploy fails "CRON_SECRET not set" | Missing env var in Vercel Dashboard | Add `CRON_SECRET` to Production env |
 | Playwright tests flaky | Timing / race conditions | Add `await expect(locator).toBeVisible({ timeout: 10000 })` |
-| `npm test` shows 743 → 742 | Test file deleted or renamed | Check `__tests__/` for missing test; restore or update count in `validate_test_counts` |
+| `npm test` shows 752 → 751 | Test file deleted or renamed | Check `__tests__/` for missing test; restore or update count in `validate_test_counts` |

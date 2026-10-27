@@ -64,7 +64,7 @@ test/
 
 | Command | Description |
 |---------|-------------|
-| `npm test` | Run all unit and integration tests (743 tests across 80 suites) |
+| `npm test` | Run all unit and integration tests (752 tests across 81 suites) |
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run test:coverage` | Run tests with coverage report |
 | `npm run test:e2e` | Run Playwright E2E tests (requires dev server on port 3000) |
@@ -289,12 +289,12 @@ The existing CI covers:
 6. **Migration Validation** — Isolated schema check ✅
 7. **Scheduled Operations** — Notifications cron, DB backup ✅
 
-### Test Counts (as of 2026-10-25)
+### Test Counts (as of 2026-10-27)
 
 | Platform | Test Type | Count |
 |----------|-----------|-------|
-| Web | Unit + Integration | 743 tests across 80 suites |
-| Web | E2E | Playwright tests in `e2e/` |
+| Web | Unit + Integration | 752 tests across 81 suites |
+| Web | E2E | 7 Playwright specs in `e2e/` |
 | Mobile | Unit + Widget | 260 tests |
 
 > Re-measure with `npx jest --ci` and `flutter test` as counts may change.
