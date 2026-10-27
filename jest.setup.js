@@ -1,6 +1,24 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
+const { ReadableStream, TransformStream } = require('node:stream/web')
+const { TextEncoder, TextDecoder } = require('node:util')
+if (typeof global.ReadableStream === 'undefined') global.ReadableStream = ReadableStream
+if (typeof global.TextEncoder === 'undefined') global.TextEncoder = TextEncoder
+if (typeof global.TextDecoder === 'undefined') global.TextDecoder = TextDecoder
+try {
+    const { Response, Request, Headers } = require('undici')
+    if (typeof global.Response === 'undefined') global.Response = Response
+    if (typeof global.Request === 'undefined') global.Request = Request
+    if (typeof global.Headers === 'undefined') global.Headers = Headers
+} catch (e) {
+    // ignore
+}
+
+if (typeof Element !== 'undefined' && !Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = function () {}
+}
+
 // Mock window.matchMedia
 if (typeof window !== 'undefined') {
     Object.defineProperty(window, 'matchMedia', {
@@ -41,34 +59,43 @@ jest.mock('next/navigation', () => ({
 }))
 
 // Mock Supabase
-jest.mock('@supabase/supabase-js', () => ({
-    createClient: jest.fn(() => ({
-        from: jest.fn(() => ({
-            select: jest.fn(() => ({
-                eq: jest.fn(() => ({
-                    order: jest.fn(() => ({
-                        limit: jest.fn(() => Promise.resolve({ data: [], error: null, count: 0 })),
-                    })),
-                    single: jest.fn(() => Promise.resolve({ data: null, error: null })),
-                    limit: jest.fn(() => Promise.resolve({ data: [], error: null })),
-                })),
-                single: jest.fn(() => Promise.resolve({ data: null, error: null })),
-            })),
-            update: jest.fn(() => ({
-                eq: jest.fn(() => Promise.resolve({ error: null })),
-            })),
-            insert: jest.fn(() => Promise.resolve({ data: null, error: null })),
-            delete: jest.fn(() => ({
-                eq: jest.fn(() => Promise.resolve({ error: null })),
-            })),
+jest.mock('@supabase/supabase-js', () => {
+    const createChain = (result = { data: [], error: null }) => {
+        const chain = {
+            select: jest.fn(() => chain),
+            insert: jest.fn(() => chain),
+            update: jest.fn(() => chain),
+            delete: jest.fn(() => chain),
+            eq: jest.fn(() => chain),
+            neq: jest.fn(() => chain),
+            gt: jest.fn(() => chain),
+            gte: jest.fn(() => chain),
+            lt: jest.fn(() => chain),
+            lte: jest.fn(() => chain),
+            like: jest.fn(() => chain),
+            ilike: jest.fn(() => chain),
+            in: jest.fn(() => chain),
+            is: jest.fn(() => chain),
+            order: jest.fn(() => chain),
+            limit: jest.fn(() => Promise.resolve(result)),
+            range: jest.fn(() => Promise.resolve(result)),
+            single: jest.fn(() => Promise.resolve(result)),
+            maybeSingle: jest.fn(() => Promise.resolve(result)),
+            then: (resolve) => Promise.resolve(result).then(resolve),
+        }
+        return chain
+    }
+    return {
+        createClient: jest.fn(() => ({
+            from: jest.fn(() => createChain({ data: [], error: null })),
+            auth: {
+                getSession: jest.fn(() => Promise.resolve({ data: { session: null }, error: null })),
+                getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+                onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+            },
         })),
-        auth: {
-            getSession: jest.fn(() => Promise.resolve({ data: { session: null }, error: null })),
-            getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
-            onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
-        },
-    })),
-}))
+    }
+})
 
 // Mock Firebase Admin
 const mockMessagingSend = jest.fn(() => Promise.resolve('mock-message-id'))
