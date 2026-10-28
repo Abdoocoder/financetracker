@@ -207,7 +207,7 @@ psql "$SUPABASE_DB_URL" -f backup_critical_20261025_143000.sql
 - [ ] `HANDOFF_REPORT.md` header updated with new version
 - [ ] `PROJECT_CONTEXT.md` §4 updated with new version and test counts
 - [ ] `CHANGELOG.md` has `[x.y.z]` section with Fixed/Security/Internal entries
-- [ ] Mobile `README.md` version updated to match `pubspec.yaml` (currently 3.47.0+66)
+- [ ] Mobile `README.md` version updated to match `pubspec.yaml` (currently 3.47.6+72)
 - [ ] Vercel deployment healthy (check Functions, Edge, Analytics tabs)
 - [ ] Sentry receiving test events (trigger a test error in staging)
 - [ ] Cron jobs executed (check Vercel Cron Jobs dashboard)

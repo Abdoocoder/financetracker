@@ -81,9 +81,9 @@ npx supabase migration list
 
 | Artifact | Command / Location | Notes |
 |----------|-------------------|-------|
-| Root `VERSION` | `echo "3.47.0+66" > VERSION` | Single source of truth for mobile |
-| `pubspec.yaml` | Edit `version: 3.47.0+66` | Must match `VERSION` exactly |
-| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | Add entry under `## [3.47.0+66]` | Release notes for Play Console |
+| Root `VERSION` | `echo "3.47.6+72" > VERSION` | Single source of truth for mobile |
+| `pubspec.yaml` | Edit `version: 3.47.6+72` | Must match `VERSION` exactly |
+| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | Add entry under `## [3.47.6+72]` | Release notes for Play Console |
 | `package.json` (web) | **Do not bump** — stays at 3.42.0 | Web ships independently |
 
 ### 4.2 Building Flutter AAB (Release Bundle)

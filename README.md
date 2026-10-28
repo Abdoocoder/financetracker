@@ -1,6 +1,6 @@
 # FinanceTracker (Fajrak)
 
-**Version:** 3.47.0+66
+**Version:** 3.47.6+72
 
 A comprehensive personal finance tracking application with:
 - **Next.js 16+ App Router** frontend (TypeScript, React 19, Tailwind CSS)

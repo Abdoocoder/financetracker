@@ -58,9 +58,9 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 
 ## 4. Current state (verified 2026-10-27)
 
-- **Mobile release:** `3.47.0+66` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play submission v3.47.0+66 completed; `mobile/README.md` still reads 3.44.0+63.
+- **Mobile release:** `3.47.6+72` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play submission v3.47.6+72 completed; `mobile/README.md` still reads 3.44.0+63.
 - **Web version:** `package.json` = 3.42.0 — intentionally not bumped with mobile releases.
-- **Tests (re-run 2026-10-27):** **752 web tests / 81 Jest suites** (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
+- **Tests (re-run 2026-10-28):** **752 web tests / 81 Jest suites** (all passing), **325 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
 - **Latest feature:** Agentic AI Phases 1–4 COMPLETE (v3.47.0) — Proactive Agent cron (`/api/agent/proactive`), unified tool layer (`lib/agent/tools.ts`), interactive tool-call UI cards, Smart BYOK validation (`/api/byok/validate`), and security hardening (P0/P1/P2).
 - **Next phase:** Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 - **Resolved:** prod DB outage (2026-10-17, `INCIDENT.md`), daily backups to Cloudflare R2, `currentUser!` force-unwraps (v3.44.0), Zakat live-price fallback.

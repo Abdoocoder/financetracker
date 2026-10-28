@@ -1,6 +1,6 @@
 # HANDOFF REPORT — FinanceTracker (Fajrak)
 
-**Last updated:** 2026-10-27 · **Current release:** 3.47.0+66 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
+**Last updated:** 2026-10-28 · **Current release:** 3.47.6+72 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
 Archived audits live in docs/archive/; open change history lives in CHANGELOG.md.
 
 **Prepared for:** external software architect
@@ -18,7 +18,7 @@ Archived audits live in docs/archive/; open change history lives in CHANGELOG.md
 - **Database drift is the #1 technical risk**: live prod has columns/tables not in migrations (`user_stats`, `testimonials`, `saving_challenges`, `health_score_history`, 25+ extra `profiles` columns) — `supabase db reset` would destroy prod reality.
 - Schema defines **29 tables; all 29 have `ENABLE ROW LEVEL SECURITY`** in migrations — but live-prod RLS state for the 4 unmigrated tables is UNKNOWN (policies exist, table DDL does not).
 - `currentUser!` force-unwrap: **FIXED in v3.44.0** — all 11 occurrences in 10 files under `mobile/fajrak_flutter/lib/` replaced with null-safe early returns (historical list retained in §4).
-- **Tests (re-run 2026-10-27):** **752 web tests** / 81 Jest suites (all passing), **260 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
+- **Tests (re-run 2026-10-28):** **752 web tests** / 81 Jest suites (all passing), **325 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
 - **Agentic AI Phases 1–4 COMPLETE (v3.47.0)**: Proactive Agent cron (`/api/agent/proactive`), unified tool layer (`lib/agent/tools.ts`), tool-call UI cards, and security hardening all shipped. See `AGENTIC_AI_PLAN.md` and new `docs/agentic-ai.md`.
 - Financial calculations are **duplicated 5–7× per metric** across web/mobile/SQL (per ARCHITECTURE_AUDIT_VERIFIED) with some hardcoded health-score thresholds (partially addressed by migration `20261017000000`).
 - Dependency issues (declared versions only): 8 moderate `@opentelemetry` vulns (documented), accidental runtime deps `install`/`npx` in `package.json`, Flutter `flutter_local_notifications: ^23.0.0-dev.3` (dev prerelease) and `sqlcipher_flutter_libs: ^0.7.0+eol` in a shipping app.
@@ -26,7 +26,7 @@ Archived audits live in docs/archive/; open change history lives in CHANGELOG.md
 - **v3.46.0 Fixed critical Zakat religious-accuracy bug**: `sync_zakat_haul_state` now receives live gold/silver/FX prices via `lib/zakat-prices.ts` and `metal_price_service.dart` from the cron and both dashboards. Previously computed Hawl at stale defaults ($30/g gold) — 2.7x under current price.
 - Security posture: RLS-first design is sound; open items are **leaked-password protection disabled**, pending anon-key rotation, no feature flags, and BYOK "keys never leave device" store copy vs the envelope actually POSTed to the proxy (wording needs legal review). `anon` write grants revoked on all public tables.
 - Process reality: **single-developer SPOF**, no revenue/subscriptions, ~58 migration files (legacy 001–041 + 12 dated + 042–043, 047–048 with numbering gaps 020/044–046), and multiple overlapping audit documents with conflicting numbers.
-- Toolchain is documented green: lint, typecheck, Jest, Playwright, `next build`, `flutter analyze`, 260 Flutter tests all pass.
+- Toolchain is documented green: lint, typecheck, Jest, Playwright, `next build`, `flutter analyze`, 325 Flutter tests all pass.
 - Biggest structural gaps for a new architect: DB-not-managed-by-migrations, duplicated calculation logic, and version/identity drift. (The production outage is **resolved** — see `mobile/fajrak_flutter/INCIDENT.md`.)
 
 ---
@@ -169,24 +169,24 @@ Store listing (ar + en) claims, mapped to implementation:
 
 ## 9. Release & Version Drift
 
-**Current release:** mobile **3.47.0+66** — version-bump commit (2026-10-27); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
+**Current release:** mobile **3.47.6+72** — version-bump commit (2026-10-28); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
 
 **Zakat Autopilot (Phase C) — complete and live** (2026-10-21): backend migration `20261021000000_zakat_autopilot.sql` (`sync_zakat_haul_state` + `zakat_haul_tracking`) is on `main`, the daily Vercel Cron `/api/zakat-autopilot` (`0 8 * * *`) is live, and the Hawl countdown UI has landed on the Web and Mobile dashboards and Zakat pages. **Agentic AI Phases 1-4 — complete and live** (2026-10-27): Proactive Agent cron, unified tools, tool-call UI, and security hardening shipped in v3.47.0. Next phase: Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 
 | Source | Declared version |
 |---|---|
-| `VERSION` (root) | **3.47.0+66** |
-| `mobile/fajrak_flutter/pubspec.yaml` | **3.47.0+66** |
-| `HANDOFF_REPORT.md` header | **3.47.0+66** |
+| `VERSION` (root) | **3.47.6+72** |
+| `mobile/fajrak_flutter/pubspec.yaml` | **3.47.6+72** |
+| `HANDOFF_REPORT.md` header | **3.47.6+72** |
 | `mobile/README.md` | 3.44.0+63 *(pending next store docs)* |
-| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.47.0+66** |
+| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.47.6+72** |
 | `package.json` (web) | 3.42.0 — **intentionally unchanged** |
 | `mobile/AGENTS.md` | 3.43.1+60 (stale) |
 | `structure.md` | 3.40.0+51 (stale) |
 | `push-notification` Edge Function | **v15** (deployed 2026-10-24 13:36:52 UTC) |
 
 - **Intentional decision:** the web app's `package.json` stays at **3.42.0** and is deliberately not bumped with mobile releases — web and mobile ship independently from the same repo, and the web bundle has not been re-released. This is a documented choice, not drift to be "fixed."
-- Mobile version sources are aligned at **3.47.0+66** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
+- Mobile version sources are aligned at **3.47.6+72** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
 - Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → 3.44.0 (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety) → **3.45.0** (Zakat Engine v2 + Autopilot: backend, cron, countdown UI on Web + Mobile) → **3.46.0** (Zakat live prices, alerts dedup, anon grants revoked, currency onboarding KWD default) → **3.47.0** (Proactive AI Agent, Smart BYOK, Agentic Tool Cards, Security Hardening P0/P1/P2).
 - **Push-notification Edge Function** is versioned separately: v14 (pre-Track D) → **v15** (A.2b + A.3 + F22 self-heal, deployed 2026-10-24).
 - Build-process fragility: running `flutter build appbundle --release` directly (bypassing Makefile) silently ships a build with **no credentials → login fails** (documented past incident).

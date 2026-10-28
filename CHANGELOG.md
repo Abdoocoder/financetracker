@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [3.47.6] — 2026-10-28
 
 ### Fixed
 - **Mobile deep links:** backend `action_url` / FCM `url` values now resolve through one shared normaliser (`mobile/fajrak_flutter/lib/utils/route_normalizer.dart`). `/dashboard?quick=1` opens the Dashboard and focuses the quick-add amount field, `/dashboard?tab=spending` lands on the Transactions tab, and `/dashboard/zakat` reaches the Zakat calculator. Previously every alert tap or push that carried a web URL either opened the wrong screen or silently did nothing.

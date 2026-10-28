@@ -78,7 +78,7 @@ npm run dev              # Start Next.js dev server (port 3000)
 
 # Mobile (separate build system — no npm script)
 cd mobile/fajrak_flutter && make run   # or: flutter run
-cd mobile/fajrak_flutter && make test  # Flutter tests (260 tests)
+cd mobile/fajrak_flutter && make test  # Flutter tests (325 tests)
 
 # Testing
 npm test                 # Run Jest tests (752 tests / 81 suites in __tests__/)

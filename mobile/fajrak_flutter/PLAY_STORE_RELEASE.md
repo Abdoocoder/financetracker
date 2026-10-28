@@ -1,3 +1,21 @@
+# Google Play Store Release Details - v3.47.6+72
+
+## Version Code: 72
+## Version Name: 3.47.6
+
+### 🛠️ Fixed
+- **Alerts Navigation:** Fixed a critical bug where the "View Details" button on alerts (budget warnings, debt reminders, spending alerts, and AI-generated insights) failed to open the correct screen. Now reliably navigates to Budgets, Debts, Goals, Investments, Transactions, or Zakat based on the alert type.
+- **Push Notification Deep Links:** Tapping a push notification now correctly opens the intended screen instead of silently navigating to the Dashboard. This includes quick-add shortcuts, spending alerts, and debt reminders.
+- **Quick Add Shortcut:** Tapping a "quick add" alert or push notification now immediately opens the Quick Add panel with the amount field focused, so you can log transactions in one tap.
+
+---
+**بالعربية:**
+- **التنقل من التنبيهات:** تم إصلاح خطأ حرج كان يجعل زر "عرض التفاصيل" في التنبيهات (تحذيرات الميزانية، تذكيرات الديون، تنبيهات الإنفاق، وإشعارات AI) لا يفتح الشاشة الصحيحة. الآن يفتح التطبيق الشاشة المناسبة (الميزانية، الديون، الأهداف، الاستثمارات، المعاملات، أو الزكاة) بناءً على نوع التنبيه.
+- **الروابط المباشرة للإشعارات:** الضغط على إشعار منبثق يفتح الآن الشاشة المقصودة بدلاً من الانتقال الصامت للوحة التحكم. يشمل ذلك اختصارات الإضافة السريعة، تنبيهات الإنفاق، وتذكيرات الديون.
+- **اختصار الإضافة السريعة:** الضغط على تنبيه أو إشعار "إضافة سريعة" يفتح الآن لوحة الإضافة السريعة فوراً مع تفعيل حقل المبلغ، لتسجيل المعاملات بضغطة واحدة.
+
+---
+
 # Google Play Store Release Details - v3.47.5+71
 
 ## Version Code: 71
