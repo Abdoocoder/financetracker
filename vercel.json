@@ -4,6 +4,7 @@
     { "path": "/api/auto-recurring", "schedule": "0 3 * * *" },
     { "path": "/api/budget-alerts",  "schedule": "0 4 * * *" },
     { "path": "/api/zakat-autopilot", "schedule": "0 8 * * *" },
-    { "path": "/api/agent/proactive", "schedule": "0 6 * * *" }
+    { "path": "/api/agent/proactive", "schedule": "0 6 * * *" },
+    { "path": "/api/cleanup-notifications", "schedule": "0 2 * * 0" }
   ]
 }
