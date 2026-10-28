@@ -558,9 +558,6 @@ class _ChatScreenState extends State<ChatScreen> {
     required ColorScheme colorScheme,
     required String providerName,
   }) {
-    final showKeyRow =
-        _needsKey && !_hasKeysForProvider && !_loadingKeys;
-
     final provider = getProvider(_providerId);
     final models = provider?.availableModels ?? [];
     final freeModels = provider?.freeModels ?? const <String>[];
@@ -764,7 +761,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => _launchUrl(keyUrl),
                     icon: const Icon(Icons.open_in_new, size: 20),
-                    label: Text('chat_get_free_key'.tr()),
+                    label: Text(_hasFreeTier(providerId: _providerId)
+                        ? 'chat_get_free_key'.tr()
+                        : 'chat_get_api_key'.tr()),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: colorScheme.primary,
                       side: BorderSide(color: colorScheme.primary, width: 2),
@@ -1106,11 +1105,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }) {
     if (_errorKey == null) return const SizedBox.shrink();
 
-    // Show interactive card for missing API key error
-    if (_errorKey == 'chat_error_no_key') {
-      return _buildKeyRequiredCard(theme: theme, colorScheme: colorScheme);
-    }
-
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1133,99 +1127,6 @@ class _ChatScreenState extends State<ChatScreen> {
             icon: const Icon(Icons.close, size: 18),
             tooltip: 'chat_clear'.tr(),
             onPressed: () => setState(() => _errorKey = null),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeyRequiredCard({
-    required ThemeData theme,
-    required ColorScheme colorScheme,
-  }) {
-    final keyUrl = _getProviderKeyUrl(providerId: _providerId);
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colorScheme.errorContainer.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.error.withValues(alpha: 0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline,
-                  color: colorScheme.error, size: 24),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'chat_key_required_title'.tr(),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.error,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.close, color: colorScheme.error, size: 20),
-                onPressed: () => setState(() => _errorKey = null),
-                tooltip: 'chat_clear'.tr(),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'chat_key_required_msg'.tr(),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.key, size: 18),
-                  label: Text('chat_add_key_now'.tr()),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: colorScheme.error,
-                    foregroundColor: colorScheme.onError,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              if (keyUrl != null) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _launchUrl(keyUrl),
-                    icon: const Icon(Icons.open_in_new, size: 18),
-                    label: Text('chat_get_free_key'.tr()),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colorScheme.error,
-                      side: BorderSide(color: colorScheme.error),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ],
           ),
         ],
       ),

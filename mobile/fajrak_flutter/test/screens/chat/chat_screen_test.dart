@@ -239,7 +239,7 @@ void main() {
     expect(find.textContaining('Fajrak assistant'), findsNothing);
   });
 
-  testWidgets('maps a no-key error to the interactive key required card', (tester) async {
+  testWidgets('maps a no-key error to a simple error banner', (tester) async {
     final service = _FakeByokService()
       ..errorCode = 'no-key'
       ..release = Completer<void>();
@@ -254,12 +254,8 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500)); // Extra pump for error UI
 
-    // Verify the new interactive card is shown with title and buttons
-    expect(find.text('API Key Required'), findsOneWidget);
-    expect(find.text('You need an API key to chat with the assistant.'), findsOneWidget);
-    expect(find.text('Add Key Now'), findsOneWidget);
-    // Ollama doesn't have a key URL, so Get Free Key button should not show
-    expect(find.text('Get Free Key'), findsNothing);
+    // Verify a simple error banner is shown with the error message
+    expect(find.text('No API key is stored for this provider on this device. Add one in Settings to continue.'), findsOneWidget);
     expect(find.byIcon(Icons.send_rounded), findsOneWidget);
   });
 
