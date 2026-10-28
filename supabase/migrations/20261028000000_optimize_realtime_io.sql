@@ -5,9 +5,17 @@
 -- Related: Supabase IO Forensics report (2026-10-28)
 -- =============================================
 
--- 1. Remove notification_history from realtime publication
+-- 1. Remove notification_history from realtime publication (idempotent)
 -- This stops 1.29M list_changes() polls/day on this table
-ALTER PUBLICATION supabase_realtime DROP TABLE public.notification_history;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND tablename = 'notification_history'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime DROP TABLE public.notification_history;
+  END IF;
+END $$;
 
 -- 2. Create cleanup function for old notifications (90-day retention)
 -- Only service_role (crons) can execute this
