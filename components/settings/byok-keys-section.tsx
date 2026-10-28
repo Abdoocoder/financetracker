@@ -452,6 +452,7 @@ export function BYOKKeysSection() {
             <select
               value={newKeyProvider}
               onChange={e => setNewKeyProvider(e.target.value)}
+              aria-label={t("settings_byok_keys_select_provider") || "Select provider"}
               style={{
                 flex: 1, padding: "11px 14px", borderRadius: 12,
                 background: "var(--bg-secondary)", border: "1px solid var(--border)",

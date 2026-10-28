@@ -64,7 +64,7 @@ test/
 
 | Command | Description |
 |---------|-------------|
-| `npm test` | Run all unit and integration tests (752 tests across 81 suites) |
+| `npm test` | Run all unit and integration tests (756 tests across 82 suites) |
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run test:coverage` | Run tests with coverage report |
 | `npm run test:e2e` | Run Playwright E2E tests (requires dev server on port 3000) |
@@ -293,7 +293,7 @@ The existing CI covers:
 
 | Platform | Test Type | Count |
 |----------|-----------|-------|
-| Web | Unit + Integration | 752 tests across 81 suites |
+| Web | Unit + Integration | 756 tests across 82 suites |
 | Web | E2E | 7 Playwright specs in `e2e/` |
 | Mobile | Unit + Widget | 260 tests |
 

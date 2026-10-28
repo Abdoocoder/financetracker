@@ -162,4 +162,4 @@ The Makefile reads `FLUTTER_FIREBASE_*` and `FLUTTER_SUPABASE_*` from `.env` (un
 | Flutter build fails with "Could NOT find CURL" | Missing `libcurl4-openssl-dev` on Linux | `sudo apt install libcurl4-openssl-dev && rm -rf build/linux && flutter build` |
 | Vercel deploy fails "CRON_SECRET not set" | Missing env var in Vercel Dashboard | Add `CRON_SECRET` to Production env |
 | Playwright tests flaky | Timing / race conditions | Add `await expect(locator).toBeVisible({ timeout: 10000 })` |
-| `npm test` shows 752 → 751 | Test file deleted or renamed | Check `__tests__/` for missing test; restore or update count in `validate_test_counts` |
+| `npm test` shows 756 → 755 | Test file deleted or renamed | Check `__tests__/` for missing test; restore or update count in `validate_test_counts` |

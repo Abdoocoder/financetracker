@@ -18,7 +18,7 @@ Archived audits live in docs/archive/; open change history lives in CHANGELOG.md
 - **Database drift is the #1 technical risk**: live prod has columns/tables not in migrations (`user_stats`, `testimonials`, `saving_challenges`, `health_score_history`, 25+ extra `profiles` columns) — `supabase db reset` would destroy prod reality.
 - Schema defines **29 tables; all 29 have `ENABLE ROW LEVEL SECURITY`** in migrations — but live-prod RLS state for the 4 unmigrated tables is UNKNOWN (policies exist, table DDL does not).
 - `currentUser!` force-unwrap: **FIXED in v3.44.0** — all 11 occurrences in 10 files under `mobile/fajrak_flutter/lib/` replaced with null-safe early returns (historical list retained in §4).
-- **Tests (re-run 2026-10-28):** **752 web tests** / 81 Jest suites (all passing), **325 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 44.85% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
+- **Tests (re-run 2026-10-29):** **756 web tests** / 82 Jest suites (all passing), **325 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 49.91% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
 - **Agentic AI Phases 1–4 COMPLETE (v3.47.0)**: Proactive Agent cron (`/api/agent/proactive`), unified tool layer (`lib/agent/tools.ts`), tool-call UI cards, and security hardening all shipped. See `AGENTIC_AI_PLAN.md` and new `docs/agentic-ai.md`.
 - Financial calculations are **duplicated 5–7× per metric** across web/mobile/SQL (per ARCHITECTURE_AUDIT_VERIFIED) with some hardcoded health-score thresholds (partially addressed by migration `20261017000000`).
 - Dependency issues (declared versions only): 8 moderate `@opentelemetry` vulns (documented), accidental runtime deps `install`/`npx` in `package.json`, Flutter `flutter_local_notifications: ^23.0.0-dev.3` (dev prerelease) and `sqlcipher_flutter_libs: ^0.7.0+eol` in a shipping app.
@@ -104,12 +104,12 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 | Source | Web (Jest) | Flutter | Playwright | Coverage |
 |---|---|---|---|---|
-| **Current (verified 2026-10-27)** | **752 / 81 suites** | **260** | 7 specs | 44.85% stmts (last measured) |
+| **Current (verified 2026-10-29)** | **756 / 82 suites** | **325** | 7 specs | 49.91% stmts (last measured) |
 | `AUDIT_REPORT.md` (historical) | **561** | **135** | **7 specs** | — |
 | `DEEP_PROJECT_ANALYSIS.md` | **524 / 56 suites** | — | 7/7 (~46.5s) | **44.85% stmts** / 30.78% branch / 30.7% funcs / 48.07% lines |
 | On disk (files counted) | 62 test files | 20 test files | 7 specs | — |
 
-- **Authoritative counts:** 752 tests / 81 Jest suites / 25 Flutter test files / 7 Playwright specs. See PROJECT_CONTEXT.md §4.
+- **Authoritative counts:** 756 tests / 82 Jest suites / 25 Flutter test files / 7 Playwright specs. See PROJECT_CONTEXT.md §4.
 
 ## 6. Dependency Status (declared versions only — no package-manager runs)
 
