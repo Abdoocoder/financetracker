@@ -662,36 +662,20 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          if (_needsKey && showKeyRow) ...[
+          if (_needsKey && !_hasKeysForProvider && !_loadingKeys) ...[
             const SizedBox(height: 8),
-            Text(
-              'chat_setup_keys_hint'.tr(namedArgs: {'provider': providerName}),
-              style: theme.textTheme.bodySmall,
-            ),
-            const SizedBox(height: 4),
             Wrap(
               spacing: 8,
               children: [
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: TextButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SettingsScreen()),
-                      );
-                    },
-                    icon: const Icon(Icons.key, size: 18),
-                    label: Text('chat_setup_keys'.tr()),
-                  ),
-                ),
                 if (_getProviderKeyUrl(providerId: _providerId) != null)
                   Align(
                     alignment: AlignmentDirectional.centerStart,
                     child: OutlinedButton.icon(
                       onPressed: () => _launchUrl(_getProviderKeyUrl(providerId: _providerId)!),
                       icon: const Icon(Icons.open_in_new, size: 16),
-                      label: Text('byok_get_api_key'.tr()),
+                      label: Text(_hasFreeTier(providerId: _providerId)
+                          ? 'byok_get_api_key'.tr()
+                          : 'chat_get_api_key'.tr()),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.primary,
                         side: BorderSide(color: AppColors.primary),
@@ -1306,6 +1290,16 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  bool _hasFreeTier({required String providerId}) {
+    switch (providerId) {
+      case 'nvidia-nim':
+      case 'openrouter':
+        return true;
+      default:
+        return false;
+    }
   }
 
   String? _getProviderKeyUrl({required String providerId}) {

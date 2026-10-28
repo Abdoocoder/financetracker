@@ -77,9 +77,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // 5. Make a minimal validation request
+    // 5. Make a minimal validation request using GET /v1/models where possible
     const headers = new Headers()
-    headers.set('content-type', 'application/json')
     headers.set('accept', 'application/json')
 
     // Inject auth
@@ -92,40 +91,53 @@ export async function POST(request: NextRequest) {
       if (!headers.has(h)) headers.set(h, v)
     }
 
-    // Build minimal body for validation
-    let validationBody: any
-    if (provider.id === 'anthropic') {
-      validationBody = {
-        model: provider.defaultModel,
-        max_tokens: 1,
-        messages: [{ role: 'user', content: 'hi' }],
-      }
-    } else if (provider.id === 'gemini') {
-      validationBody = {
-        contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
-        generationConfig: { maxOutputTokens: 1 },
-      }
-      // For Gemini, the URL includes the model; use a minimal generateContent
-    } else {
-      // OpenAI-compatible
-      validationBody = {
-        model: provider.defaultModel,
-        messages: [{ role: 'user', content: 'hi' }],
-        max_tokens: 1,
-      }
-    }
+    let upstreamUrl: string
+    let method = 'GET'
+    let body: string | undefined
 
-    // For Gemini use the models.list or a minimal call; construct URL
-    let upstreamUrl = provider.baseUrl
-    if (provider.id === 'gemini') {
-      // Try to use a known small model for validation
-      upstreamUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
+    if (provider.id === 'openai') {
+      upstreamUrl = 'https://api.openai.com/v1/models'
+    } else if (provider.id === 'openrouter') {
+      upstreamUrl = 'https://openrouter.ai/api/v1/models'
+    } else if (provider.id === 'anthropic') {
+      upstreamUrl = 'https://api.anthropic.com/v1/models'
+    } else if (provider.id === 'nvidia-nim') {
+      upstreamUrl = 'https://integrate.api.nvidia.com/v1/models'
+    } else if (provider.id === 'gemini') {
+      // Gemini uses different model listing; try models.list
+      upstreamUrl = 'https://generativelanguage.googleapis.com/v1beta/models'
+      // x-goog-api-key works as query or header; header already set
+    } else {
+      // Fallback to a minimal POST completion
+      method = 'POST'
+      headers.set('content-type', 'application/json')
+      if (provider.id === 'anthropic') {
+        upstreamUrl = provider.baseUrl
+        body = JSON.stringify({
+          model: provider.defaultModel,
+          max_tokens: 1,
+          messages: [{ role: 'user', content: 'hi' }],
+        })
+      } else if (provider.id === 'gemini') {
+        upstreamUrl = `https://generativelanguage.googleapis.com/v1beta/models/${provider.defaultModel}:generateContent`
+        body = JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
+          generationConfig: { maxOutputTokens: 1 },
+        })
+      } else {
+        upstreamUrl = provider.baseUrl
+        body = JSON.stringify({
+          model: provider.defaultModel,
+          messages: [{ role: 'user', content: 'hi' }],
+          max_tokens: 1,
+        })
+      }
     }
 
     const upstream = await fetch(upstreamUrl, {
-      method: 'POST',
+      method,
       headers,
-      body: JSON.stringify(validationBody),
+      ...(body ? { body } : {}),
       redirect: 'error',
       signal: AbortSignal.timeout(15000),
     })
@@ -137,11 +149,8 @@ export async function POST(request: NextRequest) {
       return json({ ok: false, error: 'Invalid key' }, 200)
     }
     if (upstream.status === 429) {
-      // Rate limited but key might be valid; treat as ok but note
       return json({ ok: true, warning: 'rate_limited' }, 200)
     }
-    // For other errors, try to be lenient? Or report false
-    // Some providers might behave differently
     return json({ ok: false, error: 'Validation failed' }, 200)
   } catch (err) {
     const msg = (err as Error).message

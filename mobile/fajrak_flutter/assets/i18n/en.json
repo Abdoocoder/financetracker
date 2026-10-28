@@ -1046,5 +1046,6 @@
   "zakat_hawl_overdue": "Your Zakat is due",
   "zakat_hawl_below_nisab": "Below Nisab",
   "zakat_hawl_calc_btn": "Calculate Zakat",
-  "zakat_hawl_banner": "🕒 Current hawl: {days} days remaining (Due: {amount} {currency})"
+  "zakat_hawl_banner": "🕒 Current hawl: {days} days remaining (Due: {amount} {currency})",
+  "chat_get_api_key": "Get API Key"
 }

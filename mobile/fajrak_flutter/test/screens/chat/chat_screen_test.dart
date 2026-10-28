@@ -281,11 +281,7 @@ void main() {
     await tester.tap(find.text('OpenAI').last);
     await tester.pumpAndSettle();
 
-    expect(
-      find.textContaining('You need a saved API key to chat with OpenAI.'),
-      findsOneWidget,
-    );
-    expect(find.text('Add BYOK keys'), findsOneWidget);
+    expect(find.text('Get API Key'), findsOneWidget);
     expect(_sendIcon(tester).onPressed, isNull);
   });
 
@@ -533,7 +529,7 @@ void main() {
 
     // OpenAI has no key of its own: must show the hint and stay disabled
     // rather than borrowing the Gemini key.
-    expect(find.text('Add BYOK keys'), findsOneWidget);
+    expect(find.text('Get API Key'), findsOneWidget);
     await tester.enterText(find.byType(TextField).last, 'Hi');
     await tester.pump();
     expect(_sendIcon(tester).onPressed, isNull);
