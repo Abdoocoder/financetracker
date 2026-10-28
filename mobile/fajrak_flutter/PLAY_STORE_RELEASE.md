@@ -1,20 +1,22 @@
-# Google Play Store Release Details - v3.47.4+70
+# Google Play Store Release Details - v3.47.5+71
 
-## Version Code: 70
-## Version Name: 3.47.4
+## Version Code: 71
+## Version Name: 3.47.5
 
 ### 🛠️ Fixed
-- **AI Assistant Models:** Corrected the list of available AI models for OpenAI, Anthropic, and NVIDIA to match their official current APIs (removing old/invalid model names that caused connection errors).
-- **Chat Experience:** Removed a duplicate warning message that appeared when no API key was configured, providing a cleaner and more focused interface.
-- **Get API Key Button:** Fixed the "Get API Key" button text to correctly say "Get API Key" for paid providers (like OpenAI) and "Get Free Key" only for providers with free tiers (like NVIDIA and OpenRouter).
+- **Improved Chat Interface:** Fixed duplicate warning messages and corrected button text for adding API keys.
+- **App Stability:** Resolved crashes related to adding budgets and saving savings goals.
+- **Performance:** Reduced background notification frequency, leading to faster app performance and lower battery usage.
 
 ---
 **بالعربية:**
-- **نماذج المساعد الذكي:** تصحيح قائمة النماذج المتاحة لـ OpenAI و Anthropic و NVIDIA لتطابق واجهات الـ API الرسمية (إزالة أسماء النماذج القديمة/غير الصالحة التي كانت تسبب أخطاء اتصال).
-- **تجربة الدردشة:** إزالة رسالة التحذير المكررة التي كانت تظهر عند عدم وجود مفتاح API، لتوفير واجهة أنظف وأكثر تركيزاً.
-- **زر "احصل على مفتاح API":** تصحيح نص زر الحصول على المفتاح ليقول "احصل على مفتاح API" لمزودي الخدمة المدفوعين (مثل OpenAI) و "احصل على مفتاح مجاني" فقط لمزودي الخدمة الذين لديهم طبقة مجانية (مثل NVIDIA و OpenRouter).
+- **تحسين واجهة الدردشة:** إزالة رسائل التحذير المكررة وتصحيح نصوص أزرار إضافة مفاتيح API.
+- **استقرار التطبيق:** حل أعطال متعلقة بإضافة الميزانيات وحفظ أهداف الادخار.
+- **الأداء:** تقليل تكرار الإشعارات في الخلفية، مما يؤدي إلى أداء أسرع واستهلاك أقل للبطارية.
 
 ---
+
+# Google Play Store Release Details - v3.47.4+70
 
 # Google Play Store Release Details - v3.47.1+67
 
