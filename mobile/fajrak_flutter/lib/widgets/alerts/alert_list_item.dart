@@ -160,22 +160,28 @@ class AlertListItem extends StatelessWidget {
                         ),
                         if (actionType != AlertActionType.none &&
                             onActionTap != null)
-                          TextButton(
-                            onPressed: onActionTap,
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 6),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              actionType == AlertActionType.viewDetails
-                                  ? 'view_details'.tr()
-                                  : 'add_transaction'.tr(),
-                              style: TextStyle(
-                                color: colorScheme.primary,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
+                          // Wrap in GestureDetector with opaque behavior to prevent
+                          // the outer GestureDetector (onTap) from also firing.
+                          GestureDetector(
+                            onTap: onActionTap,
+                            behavior: HitTestBehavior.opaque,
+                            child: TextButton(
+                              onPressed: onActionTap,
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: Text(
+                                actionType == AlertActionType.viewDetails
+                                    ? 'view_details'.tr()
+                                    : 'add_transaction'.tr(),
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ),
                           ),

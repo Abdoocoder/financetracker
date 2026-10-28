@@ -174,24 +174,49 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
   void _navigateAlert(Map<String, dynamic> alert) {
     if (alert['is_read'] == false) _markRead(alert['id'].toString());
-    final title = (alert['title'] ?? '').toString().toLowerCase();
-    final msg = (alert['message'] ?? '').toString().toLowerCase();
 
-    if (title.contains('دين') || msg.contains('دين') || title.contains('قسط')) {
-      Navigator.pushNamed(context, '/debts');
-    } else if (title.contains('ميزانية') || msg.contains('ميزانية')) {
-      Navigator.pushNamed(context, '/budgets');
-    } else if (title.contains('عدد الأهداف') || msg.contains('عدد الأهداف')) {
-      Navigator.pushNamed(context, '/goals');
-    } else if (title.contains('استثمار') || msg.contains('استثمار')) {
-      Navigator.pushNamed(context, '/investments');
-    } else if (title.contains('معاملة') ||
-        msg.contains('معاملة') ||
-        msg.contains('مصاريف')) {
-      Navigator.pushNamed(context, '/transactions');
-    } else if (title.contains('درس') || msg.contains('تعلم')) {
-      Navigator.pushNamed(context, '/learn');
+    // PRIORITY 1: Use stored action_url from backend
+    final actionUrl = alert['action_url'] as String?;
+    if (actionUrl != null && actionUrl.isNotEmpty) {
+      final route = _normalizeRoute(actionUrl);
+      Navigator.pushNamed(context, route);
+      return;
     }
+
+    // PRIORITY 2: Fallback to keyword matching (existing logic)
+    final route = _inferRouteFromText(
+      (alert['title'] ?? '').toString().toLowerCase(),
+      (alert['message'] ?? '').toString().toLowerCase(),
+    );
+    if (route != null) {
+      Navigator.pushNamed(context, route);
+    } else {
+      // PRIORITY 3: Visible fallback instead of silent failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('alerts_no_details'.tr())),
+      );
+    }
+  }
+
+  String _normalizeRoute(String url) {
+    // Map web URLs to Flutter named routes
+    if (url.contains('/budgets')) return '/budgets';
+    if (url.contains('/debts')) return '/debts';
+    if (url.contains('/goals')) return '/goals';
+    if (url.contains('/investments')) return '/investments';
+    if (url.contains('/transactions')) return '/transactions';
+    if (url.contains('/learn')) return '/learn';
+    return '/dashboard';
+  }
+
+  String? _inferRouteFromText(String title, String msg) {
+    if (title.contains('دين') || msg.contains('دين') || title.contains('قسط')) return '/debts';
+    if (title.contains('ميزانية') || msg.contains('ميزانية')) return '/budgets';
+    if (title.contains('هدف') || msg.contains('هدف')) return '/goals';
+    if (title.contains('استثمار') || msg.contains('استثمار')) return '/investments';
+    if (title.contains('معاملة') || msg.contains('معاملة') || msg.contains('مصاريف')) return '/transactions';
+    if (title.contains('درس') || msg.contains('تعلم')) return '/learn';
+    return null;
   }
 
   void _navigateToAddTransaction() {
@@ -232,29 +257,25 @@ class _AlertsScreenState extends State<AlertsScreen> {
     final title = (alert['title'] ?? '').toString().toLowerCase();
     final msg = (alert['message'] ?? '').toString().toLowerCase();
     final type = (alert['type'] ?? '').toString().toLowerCase();
+    final hasActionUrl = (alert['action_url'] as String?)?.isNotEmpty ?? false;
 
-    // Budget/warning alerts -> View Details
+    // PRIORITY: If backend provides a URL, show "View Details"
+    if (hasActionUrl) return AlertActionType.viewDetails;
+
+    // Budget/warning alerts -> View Details (CHECK BUDGET FIRST)
     if (type == 'warning' ||
-        title.contains('ميزانية') ||
-        msg.contains('ميزانية') ||
-        title.contains('تجاوز') ||
-        msg.contains('تجاوز') ||
-        title.contains('حد') ||
-        msg.contains('حد')) {
+        title.contains('ميزانية') || msg.contains('ميزانية') ||
+        title.contains('تجاوز') || msg.contains('تجاوز') ||
+        title.contains('حد') || msg.contains('حد')) {
       return AlertActionType.viewDetails;
     }
 
-    // Reminder alerts (debt, transaction recording) -> Add Transaction
-    if (title.contains('تذكير') ||
-        msg.contains('تذكير') ||
-        title.contains('سجل') ||
-        msg.contains('سجل') ||
-        title.contains('معاملة') ||
-        msg.contains('معاملة') ||
-        title.contains('قسط') ||
-        msg.contains('قسط') ||
-        title.contains('دين') ||
-        msg.contains('دين')) {
+    // Reminder (CHECK AFTER budget so budget takes precedence)
+    if (title.contains('تذكير') || msg.contains('تذكير') ||
+        title.contains('سجل') || msg.contains('سجل') ||
+        title.contains('معاملة') || msg.contains('معاملة') ||
+        title.contains('قسط') || msg.contains('قسط') ||
+        title.contains('دين') || msg.contains('دين')) {
       return AlertActionType.addTransaction;
     }
 

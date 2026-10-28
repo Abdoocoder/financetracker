@@ -343,6 +343,7 @@
   "alerts_filter_achievement": "🏆 Achievements",
   "alerts_filter_motivation": "💡 Tips",
   "alerts_empty": "No alerts. Set up budget limits or debt reminders to get notified.",
+  "alerts_no_details": "No additional details available",
   "alerts_generate_success": "Generation request sent successfully",
   "alerts_generate_none": "No new alerts — everything up to date",
   "alerts_generate_pending": "Generating {count} alert(s)...",

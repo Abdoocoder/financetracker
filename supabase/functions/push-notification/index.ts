@@ -104,6 +104,7 @@ Deno.serve(async (req: Request) => {
       frequency: 'once',
       is_read: false,
       is_active: true,
+      action_url: url,  // ← NEW: persist navigation URL
       ...(fingerprint ? { fingerprint } : {}),
     })
     let alertWritten = true
