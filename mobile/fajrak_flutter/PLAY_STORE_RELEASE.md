@@ -1,20 +1,18 @@
-# Google Play Store Release Details - v3.47.3+69
+# Google Play Store Release Details - v3.47.4+70
 
-## Version Code: 69
-## Version Name: 3.47.3
+## Version Code: 70
+## Version Name: 3.47.4
 
 ### 🛠️ Fixed
-- **Critical Stability Fixes:** Resolved several app crashes, including a startup crash on some Android devices, a crash when adding a budget, and an issue that prevented saving savings goals.
-- **Authentication:** Fixed a session race condition that occasionally logged users out unexpectedly.
-
-### ✨ Improved
-- **Guided Chat Experience:** If you haven't added an API key yet, the AI assistant now shows a helpful card with a direct button to add your key or get a free one, instead of a generic error message.
+- **AI Assistant Models:** Corrected the list of available AI models for OpenAI, Anthropic, and NVIDIA to match their official current APIs (removing old/invalid model names that caused connection errors).
+- **Chat Experience:** Removed a duplicate warning message that appeared when no API key was configured, providing a cleaner and more focused interface.
+- **Get API Key Button:** Fixed the "Get API Key" button text to correctly say "Get API Key" for paid providers (like OpenAI) and "Get Free Key" only for providers with free tiers (like NVIDIA and OpenRouter).
 
 ---
 **بالعربية:**
-- **إصلاحات استقرار حرجة:** تم حل عدة أعطال في التطبيق، بما في ذلك انهيار عند بدء التشغيل على بعض أجهزة أندرويد، وانهيار عند إضافة ميزانية، ومشكلة كانت تمنع حفظ أهداف الادخار.
-- **المصادقة:** تم إصلاح خطأ نادر كان يؤدي إلى تسجيل خروج المستخدم فجأة.
-- **تجربة دردشة موجهة:** إذا لم تقم بإضافة مفتاح API بعد، يعرض المساعد الذكي الآن بطاقة مساعدة مع زر مباشر لإضافة المفتاح أو الحصول على مفتاح مجاني، بدلاً من رسالة خطأ عامة.
+- **نماذج المساعد الذكي:** تصحيح قائمة النماذج المتاحة لـ OpenAI و Anthropic و NVIDIA لتطابق واجهات الـ API الرسمية (إزالة أسماء النماذج القديمة/غير الصالحة التي كانت تسبب أخطاء اتصال).
+- **تجربة الدردشة:** إزالة رسالة التحذير المكررة التي كانت تظهر عند عدم وجود مفتاح API، لتوفير واجهة أنظف وأكثر تركيزاً.
+- **زر "احصل على مفتاح API":** تصحيح نص زر الحصول على المفتاح ليقول "احصل على مفتاح API" لمزودي الخدمة المدفوعين (مثل OpenAI) و "احصل على مفتاح مجاني" فقط لمزودي الخدمة الذين لديهم طبقة مجانية (مثل NVIDIA و OpenRouter).
 
 ---
 
