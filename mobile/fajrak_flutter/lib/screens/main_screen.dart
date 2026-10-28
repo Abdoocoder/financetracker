@@ -7,10 +7,11 @@ import 'transactions/transactions_screen.dart';
 import 'debts/debts_screen.dart';
 import 'accounts/accounts_screen.dart';
 import 'more/more_screen.dart';
+import '../utils/route_normalizer.dart';
 import '../widgets/main_screen/main_bottom_nav_bar.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key, this.initialTab = 4});
+  const MainScreen({super.key, this.initialTab = kDashboardTab});
 
   final int initialTab;
 
@@ -24,13 +25,22 @@ class _MainScreenState extends State<MainScreen> {
   // Track which tabs have been visited — only build a screen on first visit.
   late final List<bool> _visited;
 
-  static const List<Widget> _screens = [
-    MoreScreen(),
-    AccountsScreen(),
-    DebtsScreen(),
-    TransactionsScreen(),
-    DashboardScreen(),
+  /// Lets this shell ask the Dashboard to reveal and focus Quick Add when a
+  /// `/dashboard?quick=1` deep link arrives.
+  final GlobalKey<DashboardScreenState> _dashboardKey =
+      GlobalKey<DashboardScreenState>();
+
+  late final List<Widget> _screens = <Widget>[
+    const MoreScreen(),
+    const AccountsScreen(),
+    const DebtsScreen(),
+    const TransactionsScreen(),
+    DashboardScreen(key: _dashboardKey),
   ];
+
+  /// Last argument map applied, so a rebuild triggered by locale/theme/Provider
+  /// changes cannot re-run a one-shot navigation (e.g. re-focusing Quick Add).
+  Object? _handledArgs;
 
   @override
   void initState() {
@@ -47,15 +57,29 @@ class _MainScreenState extends State<MainScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is Map && args['tab'] is int) {
-      final tab = args['tab'] as int;
-      if (tab != _currentIndex) {
-        setState(() {
-          _currentIndex = tab;
-          _visited[tab] = true;
-        });
-      }
-    }
+    if (identical(args, _handledArgs)) return;
+    _handledArgs = args;
+    if (args == null) return;
+    _applyRouteArguments(args);
+  }
+
+  /// Handles `{'tab': 'spending', 'quickAdd': true}` style arguments produced by
+  /// [normalizeRouteWithArgs] (and the legacy integer form).
+  void _applyRouteArguments(Object args) {
+    final wantsQuickAdd = routeArgsRequestQuickAdd(args);
+    // Quick Add lives on the Dashboard, so an explicit request wins over a
+    // conflicting `tab` (`/dashboard?quick=1&tab=spending`).
+    final tab = wantsQuickAdd
+        ? kDashboardTab
+        : resolveMainTabIndex(args, fallback: widget.initialTab);
+    setState(() {
+      _currentIndex = tab;
+      _visited[tab] = true;
+    });
+    if (!wantsQuickAdd) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _dashboardKey.currentState?.openQuickAdd();
+    });
   }
 
   void _onTabSelected(int index) {

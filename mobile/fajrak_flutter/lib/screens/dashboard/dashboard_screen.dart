@@ -33,10 +33,17 @@ import 'package:provider/provider.dart';
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen> {
+  /// Anchor for the Quick Add panel so deep links can scroll it into view.
+  final GlobalKey _quickAddKey = GlobalKey();
+
+  /// Drives the caret for `/dashboard?quick=1` deep links.
+  final FocusNode _quickAddFocusNode = FocusNode();
+  bool _quickAddPending = false;
+
   bool _accountsLoading = true;
   bool _loading = true;
   bool _hasError = false;
@@ -66,10 +73,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() { super.initState(); _load(); }
 
+  @override
+  void dispose() {
+    _quickAddFocusNode.dispose();
+    super.dispose();
+  }
+
+  /// Opens the Quick Add panel: scrolls it into view and lands the caret in the
+  /// amount field. Used by [MainScreen] when a `/dashboard?quick=1` deep link
+  /// arrives (backend `action_url` / FCM `url`).
+  void openQuickAdd() {
+    if (!mounted) return;
+    _quickAddPending = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _focusQuickAdd());
+  }
+
+  void _focusQuickAdd() {
+    if (!mounted || !_quickAddPending) return;
+    final target = _quickAddKey.currentContext;
+    if (target == null) {
+      // The panel is only built after the first data phase succeeds. Leave the
+      // request pending — the next [_load] re-arms it — so tapping "retry" on
+      // the error card still lands the caret in the amount field.
+      return;
+    }
+    _quickAddPending = false;
+    Scrollable.ensureVisible(
+      target,
+      duration: const Duration(milliseconds: 300),
+      alignment: 0.1,
+    );
+    _quickAddFocusNode.requestFocus();
+  }
+
   Future<void> _load() async {
     setState(() { _accountsLoading = true; _loading = true; _hasError = false; });
     await _loadPhase1();
     await _loadPhase2();
+    // A deep link requested Quick Add before the panel existed (still loading,
+    // or a failed load). One-shot retry once the load settles.
+    if (_quickAddPending) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _focusQuickAdd());
+    }
   }
 
   /// Phase 1 — accounts only (fast, shows hero card immediately)
@@ -467,7 +512,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 16),
 
               // ── 5. Quick Add — always visible (required) ──────────
-              DashboardQuickAdd(currency: _currency, onAdd: _quickAdd, colorScheme: colorScheme),
+              KeyedSubtree(
+                key: _quickAddKey,
+                child: DashboardQuickAdd(
+                  currency: _currency,
+                  onAdd: _quickAdd,
+                  colorScheme: colorScheme,
+                  focusNode: _quickAddFocusNode,
+                ),
+              ),
               const SizedBox(height: 16),
 
               // ── 6. Recent Transactions ────────────────────────────

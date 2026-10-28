@@ -12,6 +12,7 @@ import '../../services/alerts_service.dart';
 import '../../services/analytics_service.dart';
 import '../../services/api_base_url.dart';
 import '../../utils/error_handler.dart';
+import '../../utils/route_normalizer.dart';
 import '../../widgets/alerts/ai_generator_card.dart';
 import '../../widgets/alerts/alert_actions.dart';
 import '../../widgets/alerts/alert_filter_tabs.dart';
@@ -175,38 +176,51 @@ class _AlertsScreenState extends State<AlertsScreen> {
   void _navigateAlert(Map<String, dynamic> alert) {
     if (alert['is_read'] == false) _markRead(alert['id'].toString());
 
-    // PRIORITY 1: Use stored action_url from backend
-    final actionUrl = alert['action_url'] as String?;
-    if (actionUrl != null && actionUrl.isNotEmpty) {
-      final route = _normalizeRoute(actionUrl);
-      Navigator.pushNamed(context, route);
+    // PRIORITY 1: the backend contract URL. Stored `action_url` values are web
+    // paths (`/dashboard/alerts`, `/dashboard?quick=1`); the normaliser owns the
+    // web → Flutter route mapping (lib/utils/route_normalizer.dart).
+    final normalized = normalizeRouteWithArgs(alert['action_url'] as String?);
+    if (!normalized.isFallback) {
+      _pushNamed(normalized.route, normalized.arguments);
       return;
     }
 
-    // PRIORITY 2: Fallback to keyword matching (existing logic)
+    // PRIORITY 2: legacy alerts with no (or an unrecognised) URL — keyword
+    // matching.
     final route = _inferRouteFromText(
       (alert['title'] ?? '').toString().toLowerCase(),
       (alert['message'] ?? '').toString().toLowerCase(),
     );
     if (route != null) {
-      Navigator.pushNamed(context, route);
-    } else {
-      // PRIORITY 3: Visible fallback instead of silent failure
+      _pushNamed(route, const <String, dynamic>{});
+      return;
+    }
+
+    // PRIORITY 3: Visible fallback instead of silent failure
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('alerts_no_details'.tr())),
+    );
+  }
+
+  /// Pushes a named route, degrading to the usual "no details" snackbar when
+  /// the route is missing. A stale `action_url` must never throw out of the
+  /// alert list.
+  void _pushNamed(String route, Map<String, dynamic> arguments) {
+    try {
+      Navigator.pushNamed(
+        context,
+        route,
+        arguments: arguments.isEmpty ? null : arguments,
+      );
+    } catch (e, st) {
+      // Reported without a `context` so ErrorHandler logs to analytics/Sentry
+      // without adding a second snackbar on top of the one below.
+      ErrorHandler.handle(e, st: st, developerMessage: 'alert nav → $route');
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('alerts_no_details'.tr())),
       );
     }
-  }
-
-  String _normalizeRoute(String url) {
-    // Map web URLs to Flutter named routes
-    if (url.contains('/budgets')) return '/budgets';
-    if (url.contains('/debts')) return '/debts';
-    if (url.contains('/goals')) return '/goals';
-    if (url.contains('/investments')) return '/investments';
-    if (url.contains('/transactions')) return '/transactions';
-    if (url.contains('/learn')) return '/learn';
-    return '/dashboard';
   }
 
   String? _inferRouteFromText(String title, String msg) {
@@ -220,7 +234,10 @@ class _AlertsScreenState extends State<AlertsScreen> {
   }
 
   void _navigateToAddTransaction() {
-    Navigator.pushNamed(context, '/transactions/add');
+    // `/transactions/add` was never a registered route; the normaliser turns it
+    // into `/transactions` + `addTransaction`, and the screen opens its sheet.
+    final target = normalizeRouteWithArgs('/transactions/add');
+    _pushNamed(target.route, target.arguments);
   }
 
   IconData _getIcon(String? type) {

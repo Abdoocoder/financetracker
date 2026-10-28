@@ -58,6 +58,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   final ScrollController _scrollController = ScrollController();
 
+  /// Last route-argument map applied, so locale/theme/Provider rebuilds cannot
+  /// re-open the add sheet.
+  Object? _handledArgs;
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +93,20 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     // Web has no local sync queue — refresh straight from Supabase.
     if (!kIsWeb) await SyncService.fullSync();
     if (mounted) _load(reset: true);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // `/transactions/add` (backend `action_url` / FCM url) opens the add sheet
+    // instead of pushing a route that never existed.
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (identical(args, _handledArgs)) return;
+    _handledArgs = args;
+    if (args is! Map || args['addTransaction'] != true) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _showAddDialog();
+    });
   }
 
   @override

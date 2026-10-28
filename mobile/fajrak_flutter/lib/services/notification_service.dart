@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/foundation.dart';
 import '../main.dart';
 import '../utils/error_handler.dart';
+import '../utils/route_normalizer.dart';
 
 // Top-level background handler for Firebase Messaging
 // Must be a top-level function (not a static method) to work on Android
@@ -196,12 +197,15 @@ class NotificationService {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
 
-    int tab = 4; // default: Dashboard
-    if (url.contains('/dashboard/transactions')) tab = 3;
-    if (url.contains('/budgets')) tab = 1;
-    if (url.contains('/debts')) tab = 2;
-
-    nav.pushNamed('/main', arguments: {'tab': tab});
+    // The backend sends web URLs (`/dashboard/alerts`, `/dashboard?quick=1`,
+    // `/budgets`). The shared normaliser owns that mapping — do not re-implement
+    // per-screen heuristics here (the previous version sent every `/budgets`
+    // push to the Accounts tab).
+    final normalized = normalizeRouteWithArgs(url);
+    nav.pushNamed(
+      normalized.route,
+      arguments: normalized.arguments.isEmpty ? null : normalized.arguments,
+    );
   }
 
   static Future<void> saveToken({String? newToken}) async {

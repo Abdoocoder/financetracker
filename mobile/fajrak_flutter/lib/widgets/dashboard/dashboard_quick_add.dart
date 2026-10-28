@@ -8,11 +8,16 @@ class DashboardQuickAdd extends StatefulWidget {
   final Future<void> Function(String type, double amount, String category, {double? originalAmount, String? originalCurrency, double? exchangeRate}) onAdd;
   final ColorScheme colorScheme;
 
+  /// Optional external focus node so the Dashboard can land the caret in the
+  /// amount field when a `/dashboard?quick=1` deep link arrives.
+  final FocusNode? focusNode;
+
   const DashboardQuickAdd({
     super.key,
     required this.currency,
     required this.onAdd,
     required this.colorScheme,
+    this.focusNode,
   });
 
   @override
@@ -119,7 +124,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
                 child: Text(_getCategoryName(cat), style: TextStyle(color: selected ? widget.colorScheme.primary : widget.colorScheme.onSurfaceVariant, fontSize: 12)))); })),
         const SizedBox(height: 12),
         Row(children: [
-          Expanded(child: TextField(controller: _amountController, keyboardType: TextInputType.number, textAlign: TextAlign.right,
+          Expanded(child: TextField(controller: _amountController, focusNode: widget.focusNode, keyboardType: TextInputType.number, textAlign: TextAlign.right,
             style: TextStyle(color: widget.colorScheme.onSurface),
             decoration: InputDecoration(hintText: 'trans_amount'.tr(), hintStyle: TextStyle(color: widget.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)), filled: true, fillColor: widget.colorScheme.surface, border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: widget.colorScheme.outlineVariant)), enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: widget.colorScheme.outlineVariant)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)))),
           const SizedBox(width: 8),

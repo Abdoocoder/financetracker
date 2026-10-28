@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- **Mobile deep links:** backend `action_url` / FCM `url` values now resolve through one shared normaliser (`mobile/fajrak_flutter/lib/utils/route_normalizer.dart`). `/dashboard?quick=1` opens the Dashboard and focuses the quick-add amount field, `/dashboard?tab=spending` lands on the Transactions tab, and `/dashboard/zakat` reaches the Zakat calculator. Previously every alert tap or push that carried a web URL either opened the wrong screen or silently did nothing.
+- **Mobile push taps:** `NotificationService.handleMessage` stopped mapping `/budgets` to the Accounts tab and no longer drops the route when the payload has no tab; it now honours the normalised route (a contract test keeps every emitted route registered in `lib/main.dart`).
+- **Mobile alert actions:** the "add transaction" button no longer pushes the never-registered `/transactions/add` route — it opens `/transactions` and lets the screen open its add sheet. Unrecognised `action_url` values fall through to keyword inference, and an alert with no usable target shows the localized `alerts_no_details` snackbar instead of failing silently.
+
 ## [3.47.1] — 2026-10-27
 
 ### Fixed
