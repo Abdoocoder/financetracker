@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+- **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
+  sentry_flutter ^10.2.0. Drops ~1% of devices still on Android 7.x.
+
 ### Fixed
 - **BYOK NVIDIA validation never validated anything.** NVIDIA's `GET /v1/models` is public — it answers `200` with no key and with a bogus key — so every string "passed". `POST /api/byok/validate` now probes a real one-token completion against `nvidia/nemotron-3.5-bolt-e4b` (`max_tokens: 1`, `temperature: 0`, never `max_completion_tokens`, which NVIDIA rejects). Verified live against `integrate.api.nvidia.com` on 2026-10-29.
 - **BYOK key errors told users the wrong thing.** `401`/`403` from the validate route is the *session*, not the provider key, and is now reported as "sign in again"; upstream `404` → model problem, `410` → model retired, `5xx` → provider outage. Both clients return i18n keys, so no provider/route English text reaches an Arabic UI. Web mapping lives in `lib/byok/validation.ts`, mobile in `lib/services/byok/error_keys.dart`.

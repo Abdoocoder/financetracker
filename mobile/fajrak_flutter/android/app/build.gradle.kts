@@ -42,7 +42,10 @@ android {
         applicationId = "com.fajrak.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // sentry_flutter ^10.2.0 requires minSdk 26 (Android 8.0).
+        // Android 7.x is <1% of active devices (2026) — acceptable tradeoff
+        // for keeping the supported Sentry major version.
+        minSdk = 26
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
