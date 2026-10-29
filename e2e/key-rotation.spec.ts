@@ -14,19 +14,29 @@ test.describe('BYOK Keys Section', () => {
   });
 
   test.afterEach(async ({ page }) => {
-    // Clean up any keys created during the test to avoid state pollution
-    const revokeButtons = page.getByRole('button', { name: /حذف|remove/i });
-    const count = await revokeButtons.count();
-    for (let i = 0; i < count; i++) {
-      try {
-        await revokeButtons.first().click();
-        const confirmButton = page.getByRole('button', { name: /حذف|remove/i }).last();
-        await confirmButton.click();
-        // Wait for toast to confirm removal
-        await page.locator('[role="status"], [role="alert"]').first().waitFor({ timeout: 5000 });
-      } catch {
-        // Ignore cleanup errors
+    try {
+      // Close any open modals/dialogs first
+      await page.keyboard.press('Escape');
+      
+      // Find and click all revoke buttons safely
+      const revokeButtons = page.getByRole('button', { name: /حذف|remove/i });
+      const count = await revokeButtons.count();
+      
+      for (let i = 0; i < count; i++) {
+        // Always click the first one as the list shrinks after each removal
+        const btn = revokeButtons.nth(0);
+        await btn.click({ timeout: 3000 }).catch(() => {});
+        
+        // Handle confirmation dialog if it appears
+        const confirmBtn = page.getByRole('button', { name: /حذف|remove/i }).last();
+        if (await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+          await confirmBtn.click({ timeout: 3000 }).catch(() => {});
+        }
+        // Brief wait for UI to update
+        await page.waitForTimeout(300);
       }
+    } catch (e) {
+      console.log('[afterEach] Cleanup skipped or failed:', e);
     }
   });
 
