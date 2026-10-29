@@ -23,6 +23,11 @@ export const enChat = {
     chat_error_ollama_cors: 'Ollama rejected the request. Enable CORS on Ollama (OLLAMA_ORIGINS) to chat from the web.',
     chat_error_unauthorized: 'Your key was rejected by the provider.',
     chat_error_gone: 'This model or endpoint has been removed by the provider (HTTP 410). Choose another model or provider.',
+    // The upstream 404 is relayed verbatim by the proxy — usually a stale
+    // catalogue entry or a key without access to that model.
+    chat_error_model_not_found: 'The provider does not recognise this model (HTTP 404). Choose another model from the list.',
+    // The provider itself is failing (relayed 5xx).
+    chat_error_provider_down: 'The provider is having an outage right now. Try again in a moment.',
     chat_error_vault: 'The local key vault could not be opened. Re-add your key in Settings.',
     chat_context_label: 'Financial context',
     chat_context_included: 'Balances and this month\'s summary are attached to your conversation.',

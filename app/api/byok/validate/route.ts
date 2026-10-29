@@ -8,7 +8,7 @@
 
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { getProvider } from '@/lib/byok/providers'
+import { getProvider, NVIDIA_VALIDATION_MODEL } from '@/lib/byok/providers'
 import { unwrapProviderKeyWithRotation, zeroBytes, isKekConfigured } from '@/lib/byok/envelope'
 import { BYOK_PROXY_LIMIT_PER_MIN } from '@/lib/byok/types'
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
   try {
     key = await unwrapProviderKeyWithRotation(reqBody.keyId, reqBody.env, reqBody.payload)
   } catch (err) {
-    return json({ ok: false, error: 'Invalid key or envelope' }, 200)
+    return json({ ok: false, code: 'envelope', error: 'Invalid key or envelope' }, 200)
   }
 
   try {
@@ -95,14 +95,26 @@ export async function POST(request: NextRequest) {
     let method = 'GET'
     let body: string | undefined
 
-    if (provider.id === 'openai') {
+    if (provider.id === 'nvidia-nim') {
+      // NVIDIA's `GET /v1/models` is PUBLIC — it answers 200 without any key,
+      // so it can never validate a key. Probe a tiny real completion instead.
+      // NVIDIA only accepts `max_tokens` (OpenAI's `max_completion_tokens` is
+      // rejected). Verified live 2026-10-29 against integrate.api.nvidia.com.
+      method = 'POST'
+      headers.set('content-type', 'application/json')
+      upstreamUrl = provider.baseUrl
+      body = JSON.stringify({
+        model: NVIDIA_VALIDATION_MODEL,
+        messages: [{ role: 'user', content: 'hi' }],
+        max_tokens: 1,
+        temperature: 0,
+      })
+    } else if (provider.id === 'openai') {
       upstreamUrl = 'https://api.openai.com/v1/models'
     } else if (provider.id === 'openrouter') {
       upstreamUrl = 'https://openrouter.ai/api/v1/models'
     } else if (provider.id === 'anthropic') {
       upstreamUrl = 'https://api.anthropic.com/v1/models'
-    } else if (provider.id === 'nvidia-nim') {
-      upstreamUrl = 'https://integrate.api.nvidia.com/v1/models'
     } else if (provider.id === 'gemini') {
       // Gemini uses different model listing; try models.list
       upstreamUrl = 'https://generativelanguage.googleapis.com/v1beta/models'
@@ -145,20 +157,35 @@ export async function POST(request: NextRequest) {
     if (upstream.ok) {
       return json({ ok: true }, 200)
     }
+    // 401/403 = the key itself was rejected (auth failure, per NVIDIA's live
+    // `{"status":403,"title":"Forbidden","detail":"Authorization failed"}`).
     if (upstream.status === 401 || upstream.status === 403) {
-      return json({ ok: false, error: 'Invalid key' }, 200)
+      return json({ ok: false, code: 'auth', error: 'Invalid key' }, 200)
     }
     if (upstream.status === 429) {
-      return json({ ok: true, warning: 'rate_limited' }, 200)
+      return json({ ok: true, code: 'rate-limited', warning: 'rate_limited' }, 200)
     }
-    return json({ ok: false, error: 'Validation failed' }, 200)
+    // 404 on NVIDIA is `404 page not found` (text/plain) for an unknown slug —
+    // and can also mean the key lacks access to that model endpoint.
+    if (upstream.status === 404) {
+      return json({ ok: false, code: 'model-not-found', error: 'Model not found' }, 200)
+    }
+    // 410 = the model reached end of life upstream (e.g. meta/llama-3.1-8b-instruct
+    // on 2026-08-26). The catalogue must move on, not the user's key.
+    if (upstream.status === 410) {
+      return json({ ok: false, code: 'model-unavailable', error: 'Model unavailable' }, 200)
+    }
+    if (upstream.status >= 500) {
+      return json({ ok: false, code: 'provider-down', error: 'Provider unavailable' }, 200)
+    }
+    return json({ ok: false, code: 'validation-failed', error: 'Validation failed' }, 200)
   } catch (err) {
     const msg = (err as Error).message
     if (msg.includes('aborted')) {
-      return json({ ok: false, error: 'Timeout' }, 200)
+      return json({ ok: false, code: 'timeout', error: 'Timeout' }, 200)
     }
     console.error('[byok/validate] error', msg)
-    return json({ ok: false, error: 'Validation error' }, 200)
+    return json({ ok: false, code: 'validation-failed', error: 'Validation error' }, 200)
   } finally {
     // key is string we can't zero, but it's not retained
   }

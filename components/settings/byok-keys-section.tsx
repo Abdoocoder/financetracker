@@ -7,6 +7,7 @@ import { useI18n } from "@/lib/i18n"
 import { toast } from "@/components/ui/toast"
 import { ConfirmDialog } from "@/components/ui/confirm-dialog"
 import { getProvider, SUPPORTED_PROVIDERS } from "@/lib/byok/providers"
+import { classifyValidationResponse, type ValidationVerdict } from "@/lib/byok/validation"
 import { saveProviderKey, getProviderKey, deleteProviderKey, hasProviderKey } from "@/lib/byok/vault"
 
 interface BYOKKeyRecord {
@@ -98,11 +99,24 @@ export function BYOKKeysSection() {
     }
   }
 
-  const validateKey = async (providerId: string, rawKey: string): Promise<{ ok: boolean; error?: string }> => {
+  /**
+   * Validates `rawKey` against the app proxy **before** it is persisted.
+   *
+   * Returns an i18n KEY (never a translated string, and never the route's raw
+   * English `error` field, so the UI stays localised) plus `ok`.
+   *
+   * `ok: false` is reserved for a *definitive* verdict — see
+   * `classifyValidationResponse`. Failures on our own side (missing client
+   * config, network, timeout) fail open: they say nothing about the key, and
+   * blocking the save on our own outage is worse than saving a key the user can
+   * test afterwards.
+   */
+  const validateKey = async (providerId: string, rawKey: string): Promise<ValidationVerdict> => {
+    let res: Response
     try {
       const { buildEnvelope } = await import("@/lib/byok/client")
       const envelope = await buildEnvelope(rawKey)
-      const res = await fetch('/api/byok/validate', {
+      res = await fetch('/api/byok/validate', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         credentials: 'same-origin',
@@ -113,14 +127,13 @@ export function BYOKKeysSection() {
           payload: envelope.payload,
         }),
       })
-      if (!res.ok) {
-        return { ok: false, error: 'Validation failed' }
-      }
-      const data = await res.json()
-      return data
-    } catch (err) {
-      return { ok: false, error: (err as Error).message || 'Validation failed' }
+    } catch {
+      // Our config is missing/unreachable, or the browser blocked Web Crypto —
+      // not evidence about the key.
+      return { ok: true }
     }
+
+    return classifyValidationResponse(res.status, await res.text())
   }
 
   const handleSave = async () => {
@@ -135,7 +148,9 @@ export function BYOKKeysSection() {
       toast.info(t("settings_byok_keys_testing") || "Testing key...")
       const validation = await validateKey(newKeyProvider, rawKey)
       if (!validation.ok) {
-        toast.error(validation.error || t("settings_byok_keys_test_fail") || "Invalid key")
+        // `validation.errorKey` is an i18n key, so no raw provider/route error
+        // text ever reaches the toast.
+        toast.error(t(validation.errorKey ?? 'byok_validate_failed_generic'))
         setSaving(false)
         return
       }

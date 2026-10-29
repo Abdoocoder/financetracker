@@ -167,4 +167,55 @@ describe('ChatAssistant component', () => {
       expect(link?.getAttribute('href')).toBe('/dashboard/budgets')
     })
   })
+
+  /**
+   * Regression (2026-10-29): `/api/byok/agent` relays the provider's status
+   * verbatim, but the chat UI collapsed every non-401/429 failure into
+   * "Something went wrong". A dead NVIDIA model (410), an unknown slug (404) and
+   * a provider outage (5xx) are three different, actionable problems.
+   */
+  describe('maps upstream statuses to actionable messages', () => {
+    const cases: Array<[number, RegExp]> = [
+      [404, /does not recognise this model/i],
+      [410, /has been removed by the provider/i],
+      [500, /having an outage right now/i],
+      [503, /having an outage right now/i],
+    ]
+
+    it.each(cases)('HTTP %i shows its own message', async (status, copy) => {
+      ;(byokAgent as jest.Mock).mockResolvedValue(
+        new Response('{}', { status }) as any
+      )
+
+      render(
+        <I18nProvider>
+          <ChatAssistant />
+        </I18nProvider>
+      )
+
+      const providerSelect = await screen.findByLabelText(/Provider/i)
+      fireEvent.change(providerSelect, { target: { value: 'openai' } })
+      await waitFor(() => {
+        const keySelect = screen.queryByLabelText(/API key/i)
+        if (keySelect) {
+          fireEvent.change(keySelect, { target: { value: 'k1' } })
+        }
+      })
+      await new Promise(r => setTimeout(r, 100))
+      const input = await screen.findByPlaceholderText(/Ask about your finances/i)
+      fireEvent.change(input, { target: { value: 'hello' } })
+      await waitFor(() => {
+        expect(screen.getByLabelText(/Send/i)).not.toBeDisabled()
+      })
+      fireEvent.click(screen.getByLabelText(/Send/i))
+
+      await waitFor(() => {
+        expect(screen.getByText(copy)).toBeInTheDocument()
+      })
+      // The generic fallback must NOT be what the user sees.
+      expect(
+        screen.queryByText(/Something went wrong while talking to the model/i)
+      ).toBeNull()
+    })
+  })
 })

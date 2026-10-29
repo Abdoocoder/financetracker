@@ -62,6 +62,63 @@ void main() {
     });
   });
 
+  group('nvidia-nim catalogue', () {
+    // Live evidence 2026-10-29: GET https://integrate.api.nvidia.com/v1/models
+    // no longer lists the three previous entries, and calling
+    // meta/llama-3.1-8b-instruct returns HTTP 410 (end of life 2026-08-26).
+    const liveSlugs = [
+      'nvidia/nemotron-3-super-120b-a12b',
+      'nvidia/nemotron-3-ultra-550b-a55b',
+      'nvidia/nemotron-3.5-lightning-30b-a3b',
+      'nvidia/nemotron-3.5-bolt-e4b',
+      'nvidia/nemotron-nano-3-30b-a3b',
+      'openai/gpt-oss-20b',
+      'deepseek-ai/deepseek-v4.1-flash',
+      'moonshotai/kimi-k2.6',
+      'z-ai/glm-5.3-flash',
+      'mistralai/mistral-large',
+      'nvidia/llama-3.1-nemotron-70b-instruct',
+      'google/gemma-4-31b-it',
+    ];
+    const retiredSlugs = [
+      'meta/llama-3.1-8b-instruct',
+      'meta/llama-3.1-70b-instruct',
+      'mistralai/mixtral-8x7b-instruct-v0.1',
+    ];
+
+    test('offers the live catalogue and no retired models', () {
+      final nvidia = SUPPORTED_PROVIDERS['nvidia-nim']!;
+      expect(nvidia.availableModels, liveSlugs);
+      for (final retired in retiredSlugs) {
+        expect(nvidia.availableModels, isNot(contains(retired)));
+      }
+    });
+
+    test('defaults to a model it offers', () {
+      final nvidia = SUPPORTED_PROVIDERS['nvidia-nim']!;
+      expect(nvidia.defaultModel, 'nvidia/nemotron-3-super-120b-a12b');
+      expect(nvidia.availableModels, contains(nvidia.defaultModel));
+    });
+
+    test('has no duplicate models', () {
+      final nvidia = SUPPORTED_PROVIDERS['nvidia-nim']!;
+      expect(
+        nvidia.availableModels.toSet().length,
+        nvidia.availableModels.length,
+      );
+    });
+
+    test('claims no free models it cannot verify', () {
+      expect(SUPPORTED_PROVIDERS['nvidia-nim']!.freeModels, isEmpty);
+    });
+
+    test('matches the web catalogue slugs', () {
+      // Mirrored by hand from lib/byok/providers.ts — both clients switch models
+      // through the same proxy, so drift means one client calls a dead slug.
+      expect(SUPPORTED_PROVIDERS['nvidia-nim']!.availableModels, liveSlugs);
+    });
+  });
+
   group('getProvider', () {
     test('returns the registered provider for "openai"', () {
       final p = getProvider('openai');

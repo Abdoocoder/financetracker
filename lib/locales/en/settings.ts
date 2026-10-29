@@ -115,4 +115,11 @@ export const enSettings = {
     settings_byok_keys_vault_unavailable: 'The local key vault could not be opened (private browsing / unsupported browser). Saving or testing keys is disabled.',
     settings_byok_keys_show_key: 'Show key',
     settings_byok_keys_hide_key: 'Hide key',
+    // Key-validation verdicts. The validate route answers HTTP 200 + a machine
+    // `code` for every key verdict, so these are the only messages the UI needs.
+    byok_keys_save_failed_auth: 'Your session expired or was rejected. Sign in again, then retry.',
+    byok_validate_failed_auth: 'The provider rejected this key. Check that it was copied in full and is still active.',
+    byok_validate_failed_model: 'Your key could not reach the model this app tests with. Try again later, or use another provider.',
+    byok_validate_failed_unavailable: 'The provider is unavailable right now. Try again in a moment.',
+    byok_validate_failed_generic: 'Couldn\'t verify this key. Try again.',
 } as const

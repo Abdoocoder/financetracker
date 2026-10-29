@@ -284,6 +284,11 @@ export async function POST(request: NextRequest) {
         if (upstream.status === 401 || upstream.status === 403) {
           throw new UpstreamError('unauthorized')
         }
+        // Keep the three actionable distinctions the chat UI can act on
+        // instead of collapsing every failure into a generic "upstream".
+        if (upstream.status === 404) throw new UpstreamError('model-not-found')
+        if (upstream.status === 410) throw new UpstreamError('gone')
+        if (upstream.status >= 500) throw new UpstreamError('provider-down')
         if (upstream.status === 429) throw new UpstreamError('rate_limited')
         throw new UpstreamError('upstream')
       }

@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- **BYOK NVIDIA validation never validated anything.** NVIDIA's `GET /v1/models` is public — it answers `200` with no key and with a bogus key — so every string "passed". `POST /api/byok/validate` now probes a real one-token completion against `nvidia/nemotron-3.5-bolt-e4b` (`max_tokens: 1`, `temperature: 0`, never `max_completion_tokens`, which NVIDIA rejects). Verified live against `integrate.api.nvidia.com` on 2026-10-29.
+- **BYOK key errors told users the wrong thing.** `401`/`403` from the validate route is the *session*, not the provider key, and is now reported as "sign in again"; upstream `404` → model problem, `410` → model retired, `5xx` → provider outage. Both clients return i18n keys, so no provider/route English text reaches an Arabic UI. Web mapping lives in `lib/byok/validation.ts`, mobile in `lib/services/byok/error_keys.dart`.
+- **Chat swallowed actionable failures.** The agent route collapsed every upstream failure into a generic "Something went wrong". It now emits `model-not-found` (404), `gone` (410) and `provider-down` (5xx), and both clients render them (`chat_error_model_not_found`, `chat_error_provider_down`).
+- **Mobile key validation dialled `https://fajrak.app`** — a host with no `/api/*` routes — and built the envelope with no config, so it threw before sending and the catch-all silently reported success. It now uses `defaultApiBaseUrl()` (`https://fajrak.com`) and `/api/byok/config`.
+- **Mobile settings toasts queued instead of replacing**, so the "Testing key…" status hid the verdict behind it for seconds; the result now replaces the status.
+- **NVIDIA model catalogue rebuilt** from the live model list (12 slugs) on both clients, dropping `meta/llama-3.1-8b-instruct` (HTTP 410, end-of-life 2026-08-26) and the other retired entries that guaranteed a chat failure. New default: `nvidia/nemotron-3-super-120b-a12b`. The per-model "Free" badge is dropped for NVIDIA rather than asserting pricing that could not be verified.
+
 ## [3.47.6] — 2026-10-28
 
 ### Fixed

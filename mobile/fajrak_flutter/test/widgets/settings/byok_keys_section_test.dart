@@ -238,7 +238,7 @@ void main() {
     await tester.tap(find.byType(DropdownButtonFormField<String>));
     await tester.pumpAndSettle();
     await tester.tap(
-      find.text('NVIDIA NIM — meta/llama-3.1-8b-instruct'),
+      find.text('NVIDIA NIM — nvidia/nemotron-3-super-120b-a12b'),
     );
     await tester.pumpAndSettle();
 

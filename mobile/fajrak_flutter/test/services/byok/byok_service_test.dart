@@ -317,7 +317,7 @@ void main() {
       );
     });
 
-    test('proxy 500 -> generic', () async {
+    test('proxy 500 -> provider-down', () async {
       final store = InMemorySecureStore();
       await ByokVault(store).saveProviderKey('rec-1', 'sk-ant-test');
       final svc = service(
@@ -335,7 +335,7 @@ void main() {
           onDelta: (_) {},
         ),
         throwsA(isA<ByokChatException>()
-            .having((e) => e.code, 'code', 'generic')),
+            .having((e) => e.code, 'code', 'provider-down')),
       );
     });
 
@@ -685,8 +685,10 @@ void main() {
 
     for (final (status, code) in [
       (401, 'unauthorized'),
+      (404, 'model-not-found'),
+      (410, 'gone'),
       (429, 'rate-limit'),
-      (500, 'generic'),
+      (500, 'provider-down'),
     ]) {
       test('agent $status -> $code', () async {
         final store = InMemorySecureStore();

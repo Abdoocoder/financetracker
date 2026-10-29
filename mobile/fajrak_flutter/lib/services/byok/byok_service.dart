@@ -198,7 +198,7 @@ class ByokService {
 
     final errorCode = _mapProxyStatus(res.statusCode);
     if (errorCode != null) {
-      if (errorCode == 'generic') {
+      if (errorCode == 'generic' || errorCode == 'provider-down') {
         await _logProxyFailure(res);
       }
       throw ByokChatException(errorCode);
@@ -313,7 +313,7 @@ class ByokService {
 
     final errorCode = _mapProxyStatus(res.statusCode);
     if (errorCode != null) {
-      if (errorCode == 'generic') {
+      if (errorCode == 'generic' || errorCode == 'provider-down') {
         await _logProxyFailure(res);
       }
       throw ByokChatException(errorCode);
@@ -397,11 +397,24 @@ class ByokService {
   }
 
   /// Map a proxy HTTP status to an error code, or null for 200.
+  ///
+  /// The proxy relays upstream provider statuses verbatim, so:
+  ///  - 401/403 = the provider rejected the decrypted key (or, before the
+  ///    request reached the provider, a bad session),
+  ///  - 404 = the model slug is unknown to that provider (e.g. a retired
+  ///    NVIDIA catalogue entry, which answers `404 page not found`),
+  ///  - 410 = the model reached end of life upstream,
+  ///  - 5xx = the provider is down/unreachable.
+  ///
+  /// Distinguishing these keeps "Something went wrong" from hiding an
+  /// actionable problem (pick another model, provider outage, dead key).
   String? _mapProxyStatus(int status) {
     if (status == 200) return null;
     if (status == 401 || status == 403) return 'unauthorized';
+    if (status == 404) return 'model-not-found';
     if (status == 410) return 'gone';
     if (status == 429) return 'rate-limit';
+    if (status >= 500) return 'provider-down';
     return 'generic';
   }
 

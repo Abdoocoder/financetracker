@@ -17,6 +17,13 @@ export type AgentErrorCode =
   | 'invalid_args'
   | 'iteration_limit'
   | 'unauthorized'
+  // The upstream endpoint/model slug does not exist (relayed 404) — usually a
+  // stale catalogue entry, or a key without access to that model.
+  | 'model-not-found'
+  // The provider retired the model/endpoint (relayed 410, e.g. NVIDIA NIM).
+  | 'gone'
+  // The provider itself is failing (relayed 5xx).
+  | 'provider-down'
   | 'rate_limited'
   | 'upstream'
   | 'internal'
@@ -54,6 +61,9 @@ export const AGENT_ERROR_CODES: readonly AgentErrorCode[] = [
   'invalid_args',
   'iteration_limit',
   'unauthorized',
+  'model-not-found',
+  'gone',
+  'provider-down',
   'rate_limited',
   'upstream',
   'internal',

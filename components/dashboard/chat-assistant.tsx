@@ -204,8 +204,13 @@ export default function ChatAssistant() {
         if (code === 'no-key') setError(t('chat_error_no_key'))
         else if (code === 'unauthorized') setError(t('chat_error_unauthorized'))
         else if (code === 'gone') setError(t('chat_error_gone'))
+        // The proxy relays the upstream 404 verbatim — a stale model slug or a
+        // key without access to that model endpoint.
+        else if (code === 'model-not-found') setError(t('chat_error_model_not_found'))
+        // The provider itself is failing (relayed 5xx).
+        else if (code === 'provider-down') setError(t('chat_error_provider_down'))
         else if (code === 'ollama-cors') setError(t('chat_error_ollama_cors'))
-        else if (code === 'rate_limited') setError(t('chat_error_rate_limited'))
+        else if (code === 'rate_limited' || code === 'rate-limit') setError(t('chat_error_rate_limited'))
         else if (code === 'iteration_limit') setError(t('chat_error_loop'))
         else if (code === 'invalid_args' || code === 'invalid_confirmation' || code === 'tool') {
             setError(t('chat_error_tool'))
@@ -246,7 +251,10 @@ export default function ChatAssistant() {
             if (abort.signal.aborted) return
             if (!res.ok) {
                 if (res.status === 401 || res.status === 403) throw new Error('unauthorized')
+                if (res.status === 410) throw new Error('gone')
+                if (res.status === 404) throw new Error('model-not-found')
                 if (res.status === 429) throw new Error('rate_limited')
+                if (res.status >= 500) throw new Error('provider-down')
                 throw new Error('generic')
             }
 
@@ -328,6 +336,9 @@ export default function ChatAssistant() {
                 if (res.status === 401 || res.status === 403) throw new Error('unauthorized')
                 // Upstream model/endpoint retired (e.g. NVIDIA NIM returns 410 Gone).
                 if (res.status === 410) throw new Error('gone')
+                // Ollama answers 404 for a model it does not have locally.
+                if (res.status === 404) throw new Error('model-not-found')
+                if (res.status >= 500) throw new Error('provider-down')
                 throw new Error('ollama-cors')
             }
 

@@ -7,6 +7,7 @@ import '../../services/accounts_service.dart';
 import '../../services/byok/byok_service.dart';
 import '../../services/byok/chat.dart';
 import '../../services/byok/envelope.dart';
+import '../../services/byok/error_keys.dart';
 import '../../services/byok/providers.dart';
 import '../../services/byok/prompt_rules.dart';
 import '../../services/currency_service.dart';
@@ -244,24 +245,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return '$context\n\n${ChatPromptRules.buildChatFormatRules(plainText: false)}';
   }
 
-  String _codeToErrorKey(String code) => switch (code) {
-        'no-key' => 'chat_error_no_key',
-        'insecure' => 'chat_error_insecure',
-        'ollama-cors' => 'chat_error_ollama_cors',
-        'unauthorized' => 'chat_error_unauthorized',
-        'gone' => 'chat_error_gone',
-        'vault' => 'chat_error_vault',
-        'rate-limit' => 'chat_error_rate_limit',
-        'timeout' => 'chat_error_timeout',
-        // Agent route codes (mirror web `AgentErrorCode`).
-        'rate_limited' => 'chat_error_rate_limited',
-        'iteration_limit' => 'chat_error_loop',
-        'invalid_args' => 'chat_error_tool',
-        'invalid_confirmation' => 'chat_error_tool',
-        'tool' => 'chat_error_tool',
-        _ => 'chat_error_generic',
-      };
-
   /// Tool name → trace line, mirroring web `TRACE_KEYS`.
   String _traceText(String tool) => switch (tool) {
         'get_spending_breakdown' => 'chat_trace_spending'.tr(),
@@ -365,7 +348,7 @@ class _ChatScreenState extends State<ChatScreen> {
             case 'error':
               setState(() {
                 _traceTool = null;
-                _errorKey = _codeToErrorKey(event.code ?? 'generic');
+                _errorKey = chatErrorKey(event.code ?? 'generic');
               });
             case 'done':
               setState(() => _traceTool = null);
@@ -378,7 +361,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() => _errorKey = 'chat_error_config_missing');
     } on ByokChatException catch (e) {
       if (!mounted) return;
-      setState(() => _errorKey = _codeToErrorKey(e.code));
+      setState(() => _errorKey = chatErrorKey(e.code));
     } catch (_) {
       if (!mounted) return;
       setState(() => _errorKey = 'chat_error_generic');
@@ -449,7 +432,7 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() => _errorKey = 'chat_error_config_missing');
     } on ByokChatException catch (e) {
       if (!mounted) return;
-      setState(() => _errorKey = _codeToErrorKey(e.code));
+      setState(() => _errorKey = chatErrorKey(e.code));
     } catch (_) {
       if (!mounted) return;
       setState(() => _errorKey = 'chat_error_generic');

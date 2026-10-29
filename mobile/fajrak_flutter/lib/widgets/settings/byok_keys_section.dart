@@ -3,17 +3,18 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fajrak/services/api_base_url.dart';
 import 'package:fajrak/services/byok/byok_service.dart';
 import 'package:fajrak/services/byok/chat.dart';
 import 'package:fajrak/services/byok/key_save_error.dart';
 import 'package:fajrak/services/byok/providers.dart';
 import 'package:fajrak/services/byok/envelope.dart';
+import 'package:fajrak/services/byok/error_keys.dart';
 import 'package:fajrak/utils/app_colors.dart';
 import 'package:fajrak/utils/error_handler.dart';
 import 'package:fajrak/widgets/common/confirm_dialog.dart';
 import 'package:fajrak/widgets/settings/settings_accordion.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,11 +26,21 @@ import 'package:uuid/uuid.dart';
 /// test / remove keys. Keys themselves are stored only in the device secure
 /// vault (AD-3) and never sent to Supabase.
 class ByokKeysSection extends StatefulWidget {
-  const ByokKeysSection({super.key, this.vault, this.service});
+  const ByokKeysSection({
+    super.key,
+    this.vault,
+    this.service,
+    this.httpClient,
+  });
 
   /// Injectable for widget tests (defaults to the real device vault + service).
   final ByokVault? vault;
   final ByokService? service;
+
+  /// HTTP client used for key validation (defaults to a real one). Injectable
+  /// so tests can stub `/api/byok/config` + `/api/byok/validate` without a
+  /// network.
+  final http.Client? httpClient;
 
   @override
   State<ByokKeysSection> createState() => _ByokKeysSectionState();
@@ -60,6 +71,7 @@ class _ByokKey {
 class _ByokKeysSectionState extends State<ByokKeysSection> {
   late final ByokVault _vault;
   late final ByokService _service;
+  late final http.Client _http;
   late final TextEditingController _nameCtrl;
   late final TextEditingController _valueCtrl;
 
@@ -81,6 +93,7 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
     super.initState();
     _vault = widget.vault ?? ByokVault();
     _service = widget.service ?? ByokService();
+    _http = widget.httpClient ?? http.Client();
     _nameCtrl = TextEditingController();
     _valueCtrl = TextEditingController();
     _proxyProviders = SUPPORTED_PROVIDERS.values
@@ -241,45 +254,121 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
     }
   }
 
-  Future<({bool ok, String? error})> _validateKey(String providerId, String rawKey) async {
+  /// Validates [rawKey] against the app proxy **before** it is persisted.
+  ///
+  /// Returns an i18n KEY (never a translated/English string, so the UI stays
+  /// localised) plus `ok`. `ok:false` is reserved for a *definitive* rejection
+  /// by the provider — an invalid key, a rejected session, a missing model, or
+  /// a provider outage. Failures on our own side (config lookup, network,
+  /// timeout) fail open: they say nothing about the key, and blocking a save on
+  /// our outage is worse than saving a key the user can test later.
+  ///
+  /// Note this deliberately uses [defaultApiBaseUrl] (`https://fajrak.com`), the
+  /// same origin [ByokService] posts to. The previous implementation defaulted
+  /// to `https://fajrak.app`, a host that serves no `/api/*` routes at all.
+  Future<({bool ok, String? error})> _validateKey(
+    String providerId,
+    String rawKey,
+  ) async {
+    final base = defaultApiBaseUrl().replaceAll(RegExp(r'/+$'), '');
     try {
-      final envelope = await buildEnvelope(rawKey);
-      final res = await http.post(
-        Uri.parse('${dotenv.env['PROXY_BASE_URL'] ?? 'https://fajrak.app'}/api/byok/validate'),
-        headers: {
-          'content-type': 'application/json',
-          'authorization': 'Bearer ${Supabase.instance.client.auth.currentSession?.accessToken ?? ''}',
-        },
-        body: jsonEncode({
-          'providerId': providerId,
-          'keyId': envelope.keyId,
-          'env': envelope.env,
-          'payload': envelope.payload,
-        }),
-      ).timeout(const Duration(seconds: 10));
-      if (res.statusCode >= 400) {
-        // 401/403 = invalid key, 429 = rate limited but key might be valid
-        if (res.statusCode == 401 || res.statusCode == 403) {
-          return (ok: false, error: 'byok_key_invalid'.tr());
-        }
-        // For other errors (rate limit, server error), allow save with warning
-        return (ok: true, error: null);
-      }
-      final data = jsonDecode(res.body);
-      if (data['ok'] == true) {
-        return (ok: true, error: null);
-      }
-      return (ok: false, error: data['error']?.toString() ?? 'byok_key_invalid'.tr());
+      // Mobile builds have no `--dart-define` BYOK values and `.env` is not an
+      // asset, so `buildEnvelope(rawKey)` always threw ByokConfigException here
+      // and the catch below silently reported "key works" for every string.
+      // Resolve the KEK id + public key from the server instead.
+      final config = await ByokConfigResolver(
+        httpClient: _http,
+        proxyBaseUrl: base,
+      ).resolve();
+      final envelope = await buildEnvelope(
+        rawKey,
+        keyId: config.keyId,
+        publicKeyPem: config.publicKeyPem,
+      );
+
+      final token =
+          Supabase.instance.client.auth.currentSession?.accessToken ?? '';
+      final res = await _http
+          .post(
+            Uri.parse('$base/api/byok/validate'),
+            headers: {
+              'content-type': 'application/json',
+              'authorization': 'Bearer $token',
+            },
+            body: jsonEncode({
+              'providerId': providerId,
+              'keyId': envelope.keyId,
+              'env': envelope.env,
+              'payload': envelope.payload,
+            }),
+          )
+          // The route itself allows up to 60s; a real one-token completion on a
+          // cold provider can take a while, so don't cut it off too early.
+          .timeout(const Duration(seconds: 20));
+
+      return _classifyValidationResponse(res.statusCode, res.body);
+    } on ByokConfigException {
+      // Our config is missing/unreachable — not evidence about the key.
+      return (ok: true, error: null);
     } on TimeoutException {
-      // Validation timed out - allow save with warning
       return (ok: true, error: null);
     } on SocketException {
-      // Network error - allow save with warning
       return (ok: true, error: null);
-    } catch (e) {
-      // Any other error - allow save with warning (don't block on validation issues)
+    } catch (_) {
       return (ok: true, error: null);
     }
+  }
+
+  /// Maps the `/api/byok/validate` response to an i18n key.
+  ///
+  /// The route answers **HTTP 200** for every validation verdict (`{ok, code}`),
+  /// so a 401/403 here is the *session* being rejected — never the provider key.
+  /// Treating it as "invalid key" told users their perfectly good NVIDIA key was
+  /// wrong whenever their session had simply expired.
+  ({bool ok, String? error}) _classifyValidationResponse(
+    int statusCode,
+    String body,
+  ) {
+    if (statusCode == 401 || statusCode == 403) {
+      return (ok: false, error: 'byok_keys_save_failed_auth');
+    }
+    if (statusCode >= 500) {
+      return (ok: false, error: 'byok_validate_failed_unavailable');
+    }
+    // Edge/CDN rate limiting (the route itself always answers 200 for a
+    // verdict). Temporary, and says nothing about the key — fail open.
+    if (statusCode == 429) return (ok: true, error: null);
+    if (statusCode >= 400) {
+      return (ok: false, error: 'byok_validate_failed_generic');
+    }
+
+    Map<String, dynamic>? data;
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) data = decoded;
+    } catch (_) {
+      // Non-JSON body from a proxy/CDN — treat as an inconclusive validation.
+    }
+    if (data == null) return (ok: true, error: null);
+    if (data['ok'] == true) return (ok: true, error: null);
+
+    // Rate limiting is temporary and says nothing about the key — fail open,
+    // exactly like web `classifyValidationResponse`. Blocking a save here would
+    // tell a user their key is wrong because they tapped too fast.
+    final code = data['code']?.toString();
+    if (code == 'rate-limited' || code == 'rate_limited') {
+      return (ok: true, error: null);
+    }
+
+    return (
+      ok: false,
+      error: switch (code) {
+        'auth' => 'byok_validate_failed_auth',
+        'model-not-found' || 'model-unavailable' => 'byok_validate_failed_model',
+        'provider-down' => 'byok_validate_failed_unavailable',
+        _ => 'byok_validate_failed_generic',
+      },
+    );
   }
 
   /// Encrypts the raw key into the device vault FIRST (AD-3: device-only), then
@@ -402,6 +491,20 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
           });
         }
       } catch (_) {}
+    } on ByokConfigException {
+      if (!mounted) return;
+      setState(() => _testingId = null);
+      _showToast('chat_error_config_missing');
+    } on ByokChatException catch (e) {
+      if (!mounted) return;
+      setState(() => _testingId = null);
+      // Surface the real cause (dead model, rejected key, outage) instead of a
+      // blanket "test failed" that gives the user nothing to act on.
+      _showToast(chatErrorKey(e.code));
+      ErrorHandler.handle(
+        e,
+        developerMessage: 'ByokKeys Test',
+      );
     } catch (e) {
       if (mounted) {
         setState(() => _testingId = null);
@@ -445,6 +548,11 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
 
   void _showToast(String key, {bool success = false}) {
     if (!mounted) return;
+    // `ScaffoldMessenger` QUEUES snack bars, so a status toast ("Testing
+    // key...") would hide the result behind it for its full duration — the
+    // user would tap Add Key and see the verdict several seconds late. Replace
+    // the current toast instead of queuing behind it.
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(key.tr()),
@@ -465,6 +573,7 @@ class _ByokKeysSectionState extends State<ByokKeysSection> {
       ByokSaveFailure.database => 'byok_keys_save_failed_database',
       ByokSaveFailure.unknown => 'byok_keys_save_failed_unknown',
     };
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Column(

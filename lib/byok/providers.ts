@@ -45,6 +45,20 @@ export interface ByokProvider {
 }
 
 /**
+ * Model used to validate an NVIDIA NIM key.
+ *
+ * Must be a model that exists in the LIVE catalogue and that every NVIDIA key
+ * can call. NVIDIA's `GET /v1/models` is public (it answers 200 with no key at
+ * all), so validation has to spend one real completion: see
+ * `app/api/byok/validate/route.ts`.
+ *
+ * Verified present in https://integrate.api.nvidia.com/v1/models on 2026-10-29.
+ * It is also listed in `nvidia-nim.availableModels` — a test asserts that, so
+ * the probe can never drift to a slug the UI does not offer.
+ */
+export const NVIDIA_VALIDATION_MODEL = 'nvidia/nemotron-3.5-bolt-e4b'
+
+/**
  * Fixed allowlist. Changing hosts here is a security decision (SSRF surface) —
  * never derive `baseUrl` from client input.
  */
@@ -75,13 +89,27 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     name: 'NVIDIA NIM',
     kind: 'proxy',
     baseUrl: 'https://integrate.api.nvidia.com/v1/chat/completions',
-    defaultModel: 'meta/llama-3.1-8b-instruct',
+    // Catalogue + validation probe verified against the LIVE
+    // https://integrate.api.nvidia.com/v1/models list on 2026-10-29. The three
+    // previous entries (meta/llama-3.1-8b-instruct, meta/llama-3.1-70b-instruct,
+    // mistralai/mixtral-8x7b-instruct-v0.1) are retired: llama-3.1-8b returns
+    // HTTP 410 (end of life 2026-08-26) and none of them appear in the live
+    // list, so every chat attempt failed with "provider returned 410/generic".
+    defaultModel: 'nvidia/nemotron-3-super-120b-a12b',
     availableModels: [
-      'meta/llama-3.1-8b-instruct',
-      'meta/llama-3.1-70b-instruct',
-      'mistralai/mixtral-8x7b-instruct-v0.1',
+      'nvidia/nemotron-3-super-120b-a12b',
+      'nvidia/nemotron-3-ultra-550b-a55b',
+      'nvidia/nemotron-3.5-lightning-30b-a3b',
+      'nvidia/nemotron-3.5-bolt-e4b',
+      'nvidia/nemotron-nano-3-30b-a3b',
+      'openai/gpt-oss-20b',
+      'deepseek-ai/deepseek-v4.1-flash',
+      'moonshotai/kimi-k2.6',
+      'z-ai/glm-5.3-flash',
+      'mistralai/mistral-large',
+      'nvidia/llama-3.1-nemotron-70b-instruct',
+      'google/gemma-4-31b-it',
     ],
-    freeModels: ['meta/llama-3.1-8b-instruct', 'meta/llama-3.1-70b-instruct'],
     auth: { kind: 'bearer' },
     authHeaderName: 'authorization',
   },

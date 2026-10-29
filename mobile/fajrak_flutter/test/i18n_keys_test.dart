@@ -36,6 +36,9 @@ class I18n {
     'chat_error_insecure',
     'chat_error_ollama_cors',
     'chat_error_unauthorized',
+    'chat_error_gone',
+    'chat_error_model_not_found',
+    'chat_error_provider_down',
     'chat_error_vault',
     'chat_context_label',
     'chat_context_included',
@@ -73,6 +76,10 @@ class I18n {
     'settings_byok_keys_not_local',
     'settings_byok_keys_no_local',
     'settings_byok_keys_vault_unavailable',
+    'byok_validate_failed_auth',
+    'byok_validate_failed_model',
+    'byok_validate_failed_unavailable',
+    'byok_validate_failed_generic',
   ];
 
   static const String moreAiChatKey = 'more_ai_chat';
