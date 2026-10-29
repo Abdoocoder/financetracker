@@ -1,3 +1,31 @@
+# Google Play Store Release Details - v3.47.7+73
+
+## Version Code: 73
+## Version Name: 3.47.7
+
+### 🛠️ Fixed
+- **Supabase Gateway Timeout (504):** Added PostgrestClientOptions with 30s timeout, 3 retries, and retryable status codes {504, 502, 503, 408, 429} to fix cold-start timeouts on Supabase free tier.
+- **Android minSdk Bump:** Raised minSdk from 24 to 26 for sentry_flutter 10.x compatibility.
+- **BYOK Security:** Corrected NVIDIA validation probe, expanded model catalogue, mapped errors properly.
+- **Sentry DSN:** Fixed Sentry DSN source configuration and set 550B default model.
+- **Test Assets:** Added test-assets flag for CI.
+
+### 📝 Updated
+- **Test Counts:** Synced test counts in documentation (798 web / 347 Flutter).
+- **E2E Resilience:** Improved global-setup with networkidle wait, force-click login, extended redirect timeouts, and debug logging.
+
+---
+**بالعربية:**
+- **مهلة Supabase (504):** تمت إضافة PostgrestClientOptions مع مهلة 30 ثانية، 3 محاولات، وأكواد حالة قابلة لإعادة المحاولة {504, 502, 503, 408, 429} لإصلاح مهلة البدء البارد على المستوى المجاني من Supabase.
+- **رفع minSdk للأندرويد:** تم رفع minSdk من 24 إلى 26 للتوافق مع sentry_flutter 10.x.
+- **أمان BYOK:** تم تصحيح فحص التحقق من NVIDIA، توسيع كتالوج النماذج، وتخطيط الأخطاء بشكل صحيح.
+- **مصدر DSN الخاص بـ Sentry:** تم تصحيح مصدر DSN الخاص بـ Sentry وتعيين النموذج الافتراضي 550B.
+- **أصول الاختبار:** تمت إضافة علم test-assets للـ CI.
+- **أعداد الاختبارات:** تمت مزامنة أعداد الاختبارات في الوثائق (798 ويب / 347 فلتر).
+- **مرونة E2E:** تم تحسين global-setup مع انتظار networkidle، نقرة قسرية للتسجيل، تمديد مهلة إعادة التوجيه، وتسجيل تصحيح الأخطاء.
+
+---
+
 # Google Play Store Release Details - v3.47.6+72
 
 ## Version Code: 72
