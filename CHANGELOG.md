@@ -14,6 +14,28 @@
 - **Mobile settings toasts queued instead of replacing**, so the "Testing key…" status hid the verdict behind it for seconds; the result now replaces the status.
 - **NVIDIA model catalogue rebuilt** from the live model list (12 slugs) on both clients, dropping `meta/llama-3.1-8b-instruct` (HTTP 410, end-of-life 2026-08-26) and the other retired entries that guaranteed a chat failure. New default: `nvidia/nemotron-3-super-120b-a12b`. The per-model "Free" badge is dropped for NVIDIA rather than asserting pricing that could not be verified.
 
+### Security
+- **Repo made PRIVATE** and sensitive audit documents (`DEEPSEEK_BRIEFING.md`, `INVESTIGATION_REPORT.md`) scrubbed from Git history via `git filter-repo` (2026-10-29).
+- 891 local agent config files untracked via `.gitignore` (`.agents/`, `.opencode/`, `.claude/`, `.cursor/`, `.gemini/`, `.continue/`, `.taskmaster/`, `.planning/`, `.trae/`, `.kilo/`, `.vscode/`, build outputs).
+- Live RLS audit verified: 4 prod-only tables strictly `auth.uid()`, 1 table (`testimonials`) intentional public read. Anon key deemed safe, not rotated.
+- Hardcoded client keys removed from `.env.example`.
+
+### Test
+- **E2E flaky tests fixed**: `key-rotation.spec.ts` afterEach hook hardened with try/catch, Escape key, short timeouts. `byok-chat-flow.spec.ts` Ollama tests skipped when not configured. No flaky tests remain.
+
+## [3.47.7+73] — 2026-10-29
+
+### Fixed
+- **Supabase Gateway Timeout (504)**: Added PostgrestClientOptions with 30s timeout, 3 retries, and retryable status codes {504, 502, 503, 408, 429} to fix cold-start timeouts on Supabase free tier.
+- **Android minSdk bump**: 24 → 26 for sentry_flutter 10.x compatibility.
+- **BYOK Security**: Corrected NVIDIA validation probe, expanded model catalogue, mapped errors properly.
+- **Sentry DSN**: Fixed Sentry DSN source configuration and set 550B default model.
+- **Test Assets**: Added test-assets flag for CI.
+
+### Documentation
+- Test counts synced in documentation (798 web / 347 Flutter).
+- E2E resilience: Improved global-setup with networkidle wait, force-click login, extended redirect timeouts, and debug logging.
+
 ## [3.47.6] — 2026-10-28
 
 ### Fixed

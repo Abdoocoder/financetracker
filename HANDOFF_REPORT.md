@@ -1,6 +1,6 @@
 # HANDOFF REPORT — FinanceTracker (Fajrak)
 
-**Last updated:** 2026-10-28 · **Current release:** 3.47.6+72 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
+**Last updated:** 2026-10-28 · **Current release:** 3.47.7+73 · **Push-notification Edge Function:** v15 · **Single source of truth for project state**
 Archived audits live in docs/archive/; open change history lives in CHANGELOG.md.
 
 **Prepared for:** external software architect
@@ -104,7 +104,7 @@ All 29 tables defined in `supabase/migrations/*.sql`:
 
 | Source | Web (Jest) | Flutter | Playwright | Coverage |
 |---|---|---|---|---|
-| **Current (verified 2026-10-29)** | **798 / 85 suites** | **347** | 7 specs | 49.91% stmts (last measured) |
+| **Current (verified 2026-10-29)** | **798 / 85 suites** | **347** | **4 passed, 2 skipped, 0 flaky** | 49.91% stmts (last measured) |
 | `AUDIT_REPORT.md` (historical) | **561** | **135** | **7 specs** | — |
 | `DEEP_PROJECT_ANALYSIS.md` | **524 / 56 suites** | — | 7/7 (~46.5s) | **44.85% stmts** / 30.78% branch / 30.7% funcs / 48.07% lines |
 | On disk (files counted) | 62 test files | 20 test files | 7 specs | — |
@@ -154,7 +154,7 @@ Store listing (ar + en) claims, mapped to implementation:
 7. 🟠 Leaked-password protection disabled in Supabase Auth.
 8. 🟠 Coverage 44.85% vs 80% target; dashboard pages 0%.
 9. 🟠 8 moderate npm vulns (`@opentelemetry` transitive).
-10. 🟠 Anon key rotation still pending (post-incident) — key is embedded in clients.
+10. ✅ **Anon key rotation deemed unnecessary (2026-10-29):** Live RLS audit via Supabase MCP confirmed 4 prod-only tables strictly enforce `auth.uid()`, and `testimonials` has intentional public read (`is_visible = true`). Key is safe by design.
 11. 🟡 Identity/currency inconsistencies: FinanceTracker vs Fajrak; **KWD (CLAUDE.md) vs KWD (prod default as of 2026-10-25)** vs "Kuwait/Gulf" (PRODUCT.md).
 12. 🟡 Version drift across 5 documents (see §9).
 13. 🟡 **Makefile fragility:** `mobile/fajrak_flutter/Makefile` extracts Firebase keys from `.env` via **unanchored** `grep`, matching `FLUTTER_FIREBASE_*` by substring. Anchoring the grep (`^FIREBASE_*`) would silently break web builds.
@@ -169,24 +169,24 @@ Store listing (ar + en) claims, mapped to implementation:
 
 ## 9. Release & Version Drift
 
-**Current release:** mobile **3.47.6+72** — version-bump commit (2026-10-28); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
+**Current release:** mobile **3.47.7+73** — version-bump commit (2026-10-28); `VERSION` file, `pubspec.yaml`, and this header are now aligned. `mobile/README.md` may still read 3.44.0+63 until the next store submission is documented.
 
 **Zakat Autopilot (Phase C) — complete and live** (2026-10-21): backend migration `20261021000000_zakat_autopilot.sql` (`sync_zakat_haul_state` + `zakat_haul_tracking`) is on `main`, the daily Vercel Cron `/api/zakat-autopilot` (`0 8 * * *`) is live, and the Hawl countdown UI has landed on the Web and Mobile dashboards and Zakat pages. **Agentic AI Phases 1-4 — complete and live** (2026-10-27): Proactive Agent cron, unified tools, tool-call UI, and security hardening shipped in v3.47.0. Next phase: Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 
 | Source | Declared version |
 |---|---|
-| `VERSION` (root) | **3.47.6+72** |
-| `mobile/fajrak_flutter/pubspec.yaml` | **3.47.6+72** |
-| `HANDOFF_REPORT.md` header | **3.47.6+72** |
+| `VERSION` (root) | **3.47.7+73** |
+| `mobile/fajrak_flutter/pubspec.yaml` | **3.47.7+73** |
+| `HANDOFF_REPORT.md` header | **3.47.7+73** |
 | `mobile/README.md` | 3.44.0+63 *(pending next store docs)* |
-| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.47.6+72** |
+| `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` | **3.47.7+73** |
 | `package.json` (web) | 3.42.0 — **intentionally unchanged** |
 | `mobile/AGENTS.md` | 3.43.1+60 (stale) |
 | `structure.md` | 3.40.0+51 (stale) |
 | `push-notification` Edge Function | **v15** (deployed 2026-10-24 13:36:52 UTC) |
 
 - **Intentional decision:** the web app's `package.json` stays at **3.42.0** and is deliberately not bumped with mobile releases — web and mobile ship independently from the same repo, and the web bundle has not been re-released. This is a documented choice, not drift to be "fixed."
-- Mobile version sources are aligned at **3.47.6+72** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
+- Mobile version sources are aligned at **3.47.7+73** for `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` / this handoff; only `mobile/README.md` still lags at 3.44.0+63 until the next submission is recorded.
 - Release cadence: 3.42.2 (Play compliance + auth/`--dart-define` build fix) → 3.43.0 (gamification API, 6 BYOK providers, restored 4 DB RPCs) → 3.43.1 (FCM splash hang, DB init crash) → 3.44.0 (AI formatting, timezone-aware alerts, zero-budget guard, Firebase FID, null-safety) → **3.45.0** (Zakat Engine v2 + Autopilot: backend, cron, countdown UI on Web + Mobile) → **3.46.0** (Zakat live prices, alerts dedup, anon grants revoked, currency onboarding KWD default) → **3.47.0** (Proactive AI Agent, Smart BYOK, Agentic Tool Cards, Security Hardening P0/P1/P2).
 - **Push-notification Edge Function** is versioned separately: v14 (pre-Track D) → **v15** (A.2b + A.3 + F22 self-heal, deployed 2026-10-24).
 - Build-process fragility: running `flutter build appbundle --release` directly (bypassing Makefile) silently ships a build with **no credentials → login fails** (documented past incident).
@@ -238,7 +238,7 @@ git-ignored `.env`. `.env.example` lists every one with safe placeholders.
 
 | Variable | Scope | Required for | Notes |
 |---|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | All data access | Anon key rotation is still recommended (INCIDENT.md). |
+| `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | All data access | Anon key safe by design — see SECURITY.md (2026-10-29 RLS audit). |
 | `SUPABASE_SERVICE_ROLE_KEY` | server only | Crons, webhooks, admin paths | Never expose to the client bundle. |
 | `CRON_SECRET` | server only | Authenticating scheduled routes | Mismatch silently 401s every cron. |
 | `NEXT_PUBLIC_SENTRY_DSN` / `SENTRY_DSN` | client + server | Error reporting | Invalid DSN disables Sentry with a console warning. |

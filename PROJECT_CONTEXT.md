@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — Fajrak Map & Current State
 
 > Layer 1 of the Project Brain. Read after `AGENTS.md`, before `CLAUDE.md`.
-> Last verified against the repo: **2026-10-27**. When this file disagrees with the code, trust the code and update this file.
+> Last verified against the repo: **2026-10-29**. When this file disagrees with the code, trust the code and update this file.
 
 ## 1. High-level architecture
 
@@ -56,11 +56,11 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 6. **Zakat prices must be passed explicitly.** The RPC defaults ($30/0.35/1.0) are stale fixtures. Any new caller MUST fetch live prices via `lib/zakat-prices.ts` (web) or `metal_price_service.dart` (mobile) and pass them to `sync_zakat_haul_state`.
 7. **Migration History Repair:** If you delete a migration file that was already applied to prod, CI will fail with "Remote migration versions not found". Run `supabase migration repair --status reverted <timestamp>` to fix.
 
-## 4. Current state (verified 2026-10-27)
+## 4. Current state (verified 2026-10-29)
 
-- **Mobile release:** `3.47.6+72` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play submission v3.47.6+72 completed; `mobile/README.md` still reads 3.44.0+63.
+- **Mobile release:** `3.47.7+73` (`VERSION`, `pubspec.yaml`, `PLAY_STORE_RELEASE.md` aligned). Google Play submission v3.47.7+73 completed; `mobile/README.md` still reads 3.44.0+63.
 - **Web version:** `package.json` = 3.42.0 — intentionally not bumped with mobile releases.
-- **Tests (re-run 2026-10-29):** **798 web tests / 85 Jest suites** (all passing), **347 Flutter tests** (all passing), 7 Playwright specs. Coverage last measured 49.91% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
+- **Tests (re-run 2026-10-29):** **798 web tests / 85 Jest suites** (all passing), **347 Flutter tests** (all passing), **Playwright: 4 passed, 2 skipped, 0 flaky** (Ollama-dependent tests skipped). Coverage last measured 49.91% vs an 80% target; dashboard pages ~0%. This bullet is the **single source of truth** for test counts — other docs must link here, never restate the numbers.
 - **Latest feature:** Agentic AI Phases 1–4 COMPLETE (v3.47.0) — Proactive Agent cron (`/api/agent/proactive`), unified tool layer (`lib/agent/tools.ts`), interactive tool-call UI cards, Smart BYOK validation (`/api/byok/validate`), and security hardening (P0/P1/P2).
 - **Next phase:** Agentic AI Executive Assistant — roadmap in `AGENTIC_AI_PLAN.md`.
 - **Resolved:** prod DB outage (2026-10-17, `INCIDENT.md`), daily backups to Cloudflare R2, `currentUser!` force-unwraps (v3.44.0), Zakat live-price fallback.
@@ -69,5 +69,6 @@ Both clients are input/display layers; **all finance math lives in Supabase RPCs
 - ✅ Anon write grants revoked on all public tables (PR #4, 2026-10-25)
 - ✅ Security P0/P1/P2 resolved in v3.47.0: 14 critical + 41 high npm advisories patched; internal tables hardened (`api_audit_log`, `idempotency_keys`, `proxy_usage`); `bump_proxy_usage` made SECURITY DEFINER.
 - ✅ **Supabase Security Advisor WARNs audited (2026-10-27):** 21 `authenticated_security_definer_function_executable` WARNs investigated — 15 False Positives (safe by design: SECURITY DEFINER + owner guard + pinned search_path + revoked PUBLIC/anon), 6 True Positives fixed via `20261027000000_fix_missing_owner_guards.sql` (missing owner guards on `calculate_health_score`, `get_health_score`, `check_and_reserve_idempotency_key`, `complete_idempotency_key`, `get_changed_records`, `get_deleted_records`). See `docs/security-definer-audit.md`.
-- **Open risks:** anon key rotation (pending post-incident), leaked-password protection disabled, no feature flags, financial-metric duplication outside Zakat, 8 moderate `@opentelemetry` transitive vulns. Full list: `HANDOFF_REPORT.md` §8.
+- ✅ **Security scrub & history rewrite (2026-10-29):** Repo made private, sensitive audit docs (`DEEPSEEK_BRIEFING.md`, `INVESTIGATION_REPORT.md`) removed from Git history via `git filter-repo`, 891 agent configs untracked. Live RLS audit verified: 4 prod-only tables strictly `auth.uid()`, 1 table (`testimonials`) intentional public read. Anon key deemed safe, not rotated.
+- **Open risks:** leaked-password protection disabled, no feature flags, financial-metric duplication outside Zakat, 8 moderate `@opentelemetry` transitive vulns. Full list: `HANDOFF_REPORT.md` §8.
 - **Process:** single-developer SPOF, no monetization; conventional commits, squash-merge to main.

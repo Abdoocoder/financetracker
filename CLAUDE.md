@@ -195,7 +195,7 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
    CREATE TABLE migration (`user_stats`, `testimonials`, `saving_challenges`,
    `health_score_history`, 25+ extra `profiles` columns). Never run `supabase db reset`
    against prod, and diff schema against prod before trusting migration output.
-   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key rotation still recommended).
+   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key verified safe via RLS audit 2026-10-29).
 9. **Do NOT anchor the `grep` calls in `mobile/fajrak_flutter/Makefile`.** `.env` stores
    Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
@@ -203,6 +203,7 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
 11. **Zakat Autopilot**: The Hawl state is managed by the sync_zakat_haul_state RPC. Never calculate Hawl logic in the UI; always read from this RPC or the zakat_haul_tracking table.
 12. **Never send PII to Sentry.** Filter email/IP/passwords in `beforeSend` (`lib/services/sentry_service.dart`); drop events carrying `Authorization`/`Cookie` headers, and keep the mobile DSN out of web builds.
 13. **Always verify external-API mocks against the real endpoint.** Before writing a test that mocks an external API (Yahoo, gold-api, Supabase Auth, etc.), curl the real URL and paste the actual response shape into a comment next to the fixture, including the verification date. A mock that doesn't match reality locks in the wrong contract — the test goes green while production crashes (see the Zakat freegoldapi regression, 2026-10-19).
+14. **Never commit local agent configs or sensitive docs.** `.agents/`, `.opencode/`, `.claude/`, `.cursor/`, `.gemini/`, `.continue/`, `.taskmaster/`, `.planning/`, `.trae/`, `.kilo/`, `.vscode/`, `DEEPSEEK_BRIEFING.md`, `INVESTIGATION_REPORT.md`, and build outputs (`brag-output/`, `coverage/`, `playwright-report/`, `test-results/`) were scrubbed from Git history on 2026-10-29. These must never be committed.
 
 ### Naming Conventions
 - Components: PascalCase (`HeroBalanceCard.tsx`)

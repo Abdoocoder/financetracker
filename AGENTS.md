@@ -19,6 +19,7 @@ AI chat is BYOK: the user's own LLM key, encrypted on device — conversation co
 11. Hawl state lives only in `sync_zakat_haul_state` / `zakat_haul_tracking` — the UI reads it, never computes it.
 12. Never send PII to Sentry — `beforeSend` filters on both clients; drop events carrying `Authorization`/`Cookie`.
 13. Verify mocks of external APIs against the live endpoint; paste the real response shape + verification date next to the fixture.
+14. **Never commit local agent configs or sensitive docs.** `.agents/`, `.opencode/`, `.claude/`, `.cursor/`, `.gemini/`, `.continue/`, `.taskmaster/`, `.planning/`, `.trae/`, `.kilo/`, `.vscode/`, `DEEPSEEK_BRIEFING.md`, `INVESTIGATION_REPORT.md`, and build outputs (`brag-output/`, `coverage/`, `playwright-report/`, `test-results/`) were scrubbed from Git history on 2026-10-29. These must never be committed.
 
 ## Reading order (mandatory before writing code)
 1. `PROJECT_CONTEXT.md` — architecture, subsystem router, gotchas, current state.
