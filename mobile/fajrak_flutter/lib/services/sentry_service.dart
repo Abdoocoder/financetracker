@@ -169,7 +169,19 @@ class SentryService {
       } else if (data is Map) {
         data = _scrubMap(data.cast<String, dynamic>());
       }
-      request = request.copyWith(headers: scrubbedHeaders, data: data);
+      // In sentry 10.x, SentryRequest doesn't have copyWith; create new instance
+      request = SentryRequest(
+        url: request.url,
+        method: request.method,
+        queryString: request.queryString,
+        cookies: request.cookies,
+        fragment: request.fragment,
+        apiTarget: request.apiTarget,
+        data: data,
+        headers: scrubbedHeaders,
+        env: request.env,
+        unknown: request.unknown,
+      );
     }
 
     // Scrub breadcrumbs (rebuilt, never mutated in place — scope instances
@@ -188,7 +200,36 @@ class SentryService {
           .toList();
     }
 
-    return event.copyWith(user: user, request: request, breadcrumbs: breadcrumbs);
+    // In sentry 10.x, SentryEvent doesn't have copyWith; create new instance
+    return SentryEvent(
+      eventId: event.eventId,
+      timestamp: event.timestamp,
+      modules: event.modules,
+      tags: event.tags,
+      extra: event.extra,
+      fingerprint: event.fingerprint,
+      breadcrumbs: breadcrumbs,
+      exceptions: event.exceptions,
+      threads: event.threads,
+      sdk: event.sdk,
+      platform: event.platform,
+      logger: event.logger,
+      serverName: event.serverName,
+      release: event.release,
+      dist: event.dist,
+      environment: event.environment,
+      message: event.message,
+      transaction: event.transaction,
+      throwable: event.throwableMechanism,
+      level: event.level,
+      culprit: event.culprit,
+      user: user,
+      contexts: event.contexts,
+      request: request,
+      debugMeta: event.debugMeta,
+      type: event.type,
+      unknown: event.unknown,
+    );
   }
 
   /// Reports a handled error (from ErrorHandler). Debug builds are skipped

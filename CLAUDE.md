@@ -78,10 +78,10 @@ npm run dev              # Start Next.js dev server (port 3000)
 
 # Mobile (separate build system — no npm script)
 cd mobile/fajrak_flutter && make run   # or: flutter run
-cd mobile/fajrak_flutter && make test  # Flutter tests (325 tests)
+cd mobile/fajrak_flutter && make test  # Flutter tests (347 tests)
 
 # Testing
-npm test                 # Run Jest tests (756 tests / 82 suites in __tests__/)
+npm test                 # Run Jest tests (798 tests / 85 suites in __tests__/)
 npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
 npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
 

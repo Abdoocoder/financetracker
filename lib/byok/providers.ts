@@ -95,7 +95,7 @@ export const SUPPORTED_PROVIDERS: Record<string, ByokProvider> = {
     // mistralai/mixtral-8x7b-instruct-v0.1) are retired: llama-3.1-8b returns
     // HTTP 410 (end of life 2026-08-26) and none of them appear in the live
     // list, so every chat attempt failed with "provider returned 410/generic".
-    defaultModel: 'nvidia/nemotron-3-super-120b-a12b',
+    defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b',
     availableModels: [
       'nvidia/nemotron-3-super-120b-a12b',
       'nvidia/nemotron-3-ultra-550b-a55b',

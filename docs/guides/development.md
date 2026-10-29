@@ -51,7 +51,7 @@ cd mobile/fajrak_flutter && flutter pub get
 | `npm run start` | Start production server (after `build`) |
 | `npm run lint` | Run ESLint (`eslint.config.mjs`) |
 | `npm run typecheck` | TypeScript strict check (`tsconfig.typecheck.json`) |
-| `npm run test` | Run Jest unit/integration tests (756 tests, 82 suites) |
+| `npm run test` | Run Jest unit/integration tests (798 tests, 85 suites) |
 | `npm run test:watch` | Jest in watch mode |
 | `npm run test:coverage` | Jest with coverage report |
 | `npm run test:e2e` | Playwright E2E tests (needs running dev server) |

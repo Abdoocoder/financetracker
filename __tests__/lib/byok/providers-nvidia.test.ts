@@ -73,7 +73,7 @@ describe('nvidia-nim catalogue', () => {
 
   it('defaults to a model it actually offers', () => {
     expect(models).toContain(nvidia.defaultModel)
-    expect(nvidia.defaultModel).toBe('nvidia/nemotron-3-super-120b-a12b')
+    expect(nvidia.defaultModel).toBe('nvidia/nemotron-3-ultra-550b-a55b')
   })
 
   it('validates with a live model that the UI also offers', () => {

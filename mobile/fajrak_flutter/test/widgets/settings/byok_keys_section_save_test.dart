@@ -39,7 +39,7 @@ class _MapAssetLoader extends AssetLoader {
 
 late Map<String, Map<String, dynamic>> _translations;
 
-const _nvidiaLabel = 'NVIDIA NIM — nvidia/nemotron-3-super-120b-a12b';
+const _nvidiaLabel = 'NVIDIA NIM — nvidia/nemotron-3-ultra-550b-a55b';
 
 const _user = {
   'id': 'test-user-id',

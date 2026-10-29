@@ -96,7 +96,7 @@ void main() {
 
     test('defaults to a model it offers', () {
       final nvidia = SUPPORTED_PROVIDERS['nvidia-nim']!;
-      expect(nvidia.defaultModel, 'nvidia/nemotron-3-super-120b-a12b');
+      expect(nvidia.defaultModel, 'nvidia/nemotron-3-ultra-550b-a55b');
       expect(nvidia.availableModels, contains(nvidia.defaultModel));
     });
 

@@ -63,7 +63,7 @@ const SUPPORTED_PROVIDERS = <String, ByokProvider>{
     name: 'NVIDIA NIM',
     kind: 'proxy',
     baseUrl: 'https://integrate.api.nvidia.com/v1/chat/completions',
-    defaultModel: 'nvidia/nemotron-3-super-120b-a12b',
+    defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b',
     availableModels: [
       'nvidia/nemotron-3-super-120b-a12b',
       'nvidia/nemotron-3-ultra-550b-a55b',
