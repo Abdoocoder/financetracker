@@ -82,3 +82,32 @@ secure_configs/
 **/client_secret_*.json
 **/credentials.json
 strix_runs/
+
+# Sensitive docs — security backlog + investigation findings
+DEEPSEEK_BRIEFING.md
+INVESTIGATION_REPORT.md
+
+# Agent configs — sys-prompts and skills are private
+.agents/
+.opencode/
+.claude/
+.claude-flow/
+.cursor/
+.gemini/
+.continue/
+.taskmaster/
+.planning/
+.trae/
+.kilo/
+.vscode/
+
+# Build/audit outputs
+brag-output/
+brag-output-*/
+coverage/
+coverage_report*.txt
+current_coverage.txt
+test-results/
+playwright-report/
+*.log
+*_err.txt
