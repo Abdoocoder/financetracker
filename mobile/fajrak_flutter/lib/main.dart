@@ -82,10 +82,17 @@ Future<void> _bootstrapApp() async {
     await Firebase.initializeApp();
   }
 
-  // Initialize Supabase
+  // Initialize Supabase with timeout and retry for gateway 504 errors
+  // Fixes: PostgrestException 504 Gateway Timeout on Supabase free tier cold starts
   await Supabase.initialize(
     url: const String.fromEnvironment('SUPABASE_URL'),
     publishableKey: const String.fromEnvironment('SUPABASE_ANON_KEY'),
+    postgrestOptions: const PostgrestClientOptions(
+      requestTimeout: Duration(seconds: 30),
+      retryEnabled: true,
+      retryCount: 3,
+      retryableStatusCodes: {504, 502, 503, 408, 429},
+    ),
   );
 
   // Initialize notification service — wrapped in a timeout so a hang
