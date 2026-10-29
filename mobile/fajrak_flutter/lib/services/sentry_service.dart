@@ -170,6 +170,7 @@ class SentryService {
         data = _scrubMap(data.cast<String, dynamic>());
       }
       // In sentry 10.x, SentryRequest doesn't have copyWith; create new instance
+      // `unknown` is internal in 10.x — omit to avoid invalid_use_of_internal_member
       request = SentryRequest(
         url: request.url,
         method: request.method,
@@ -180,7 +181,6 @@ class SentryService {
         data: data,
         headers: scrubbedHeaders,
         env: request.env,
-        unknown: request.unknown,
       );
     }
 
@@ -201,12 +201,12 @@ class SentryService {
     }
 
     // In sentry 10.x, SentryEvent doesn't have copyWith; create new instance
+    // `extra` is deprecated (use `contexts`), `unknown` is internal — omit both
     return SentryEvent(
       eventId: event.eventId,
       timestamp: event.timestamp,
       modules: event.modules,
       tags: event.tags,
-      extra: event.extra,
       fingerprint: event.fingerprint,
       breadcrumbs: breadcrumbs,
       exceptions: event.exceptions,
@@ -228,7 +228,6 @@ class SentryService {
       request: request,
       debugMeta: event.debugMeta,
       type: event.type,
-      unknown: event.unknown,
     );
   }
 
