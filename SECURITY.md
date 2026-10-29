@@ -46,6 +46,7 @@ Please email the maintainer at `<TODO: add security contact email>`. Do not open
 
 - Row Level Security is enabled on all 30 tables (including the new `zakat_holdings`), and every policy keys on `auth.uid() = user_id`.
 - Internal RPCs (health score, sync, idempotency, account balances, Zakat: `get_zakat_summary` and `get_zakat_hauls`): `EXECUTE` revoked from `PUBLIC` and `anon`, granted only to `authenticated` and `service_role`. Both Zakat RPCs additionally enforce owner verification (`auth.uid() IS NOT NULL AND auth.uid() IS DISTINCT FROM p_user_id` raises), while a NULL uid (service_role / cron) is allowed for background jobs. Verified on the production project `ujwcvtpwsaidljecqbaa` on 2026-10-18 via `proacl`.
+- **Live RLS audit (2026-10-29):** Performed on the 5 prod-only tables (`user_stats`, `testimonials`, `saving_challenges`, `health_score_history`, `profiles`). All 5 have RLS enabled. 4 tables strictly enforce `auth.uid() = user_id` on all commands. `testimonials` has an intentional PUBLIC READ policy (`is_visible = true`) for the public testimonials page; all writes require owner verification.
 - `search_path = public` is pinned on all SECURITY DEFINER functions flagged by the Supabase linter.
 - Firebase Installation ID registration is enabled via the `firebase_messaging_installation_id_enabled` manifest meta-data.
 - BYOK keys are encrypted client-side (AES-256-GCM plus RSA-OAEP). The proxy receives an opaque envelope, not plaintext keys.
@@ -54,9 +55,18 @@ Please email the maintainer at `<TODO: add security contact email>`. Do not open
 ## Known gaps and backlog
 
 - Leaked Password Protection is disabled. Enabling it requires a paid Supabase tier; deferred for now.
-- Supabase anon key rotation is pending.
+- ✅ Anon key rotation deemed unnecessary after RLS verification (2026-10-29). Key is safe by design; RLS enforces data isolation across all tables.
 - No Point-In-Time Recovery (PITR) because the project is on the Free tier.
 - Recommend reviewing `supabase db lint` output monthly.
+
+## History Rewrite (2026-10-29)
+
+On 2026-10-29, the repository was made private and a Git history rewrite (`git filter-repo`) removed two sensitive internal audit documents from all commit history:
+
+- `DEEPSEEK_BRIEFING.md` — security backlog and attack surface analysis
+- `INVESTIGATION_REPORT.md` — 6-phase audit findings with P0/P1/P2 action items
+
+These documents were never meant for public exposure. Additionally, 891 local agent configuration files (`.agents/`, `.opencode/`, `.claude/`, `.cursor/`, `.gemini/`, `.continue/`, `.taskmaster/`, `.planning/`, `.trae/`, `.kilo/`, `.vscode/`, and build output directories) were untracked via `.gitignore` and removed from Git tracking. The Supabase anon key was verified secure via live RLS audit and was NOT rotated.
 
 ## Incident history
 
