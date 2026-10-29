@@ -44,6 +44,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const icons: Record<ToastType, string> = {
     success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️'
   }
+  const roles: Record<ToastType, 'status' | 'alert'> = {
+    success: 'status',
+    error: 'alert',
+    warning: 'status',
+    info: 'status',
+  }
 
   return (
     <>
@@ -56,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           width: 'min(92vw, 360px)', pointerEvents: 'none',
         }}>
           {toasts.map(t => (
-            <div key={t.id} onClick={() => remove(t.id)} style={{
+            <div key={t.id} onClick={() => remove(t.id)} role={roles[t.type]} style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               padding: '12px 16px', borderRadius: '14px',
               background: styles[t.type].bg,
