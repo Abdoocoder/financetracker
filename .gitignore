@@ -111,3 +111,8 @@ test-results/
 playwright-report/
 *.log
 *_err.txt
+
+# Internal sensitive docs & large files
+docs/internal/
+*.hprof
+public/*.apk

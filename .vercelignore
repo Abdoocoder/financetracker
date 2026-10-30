@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+mobile/fajrak_flutter/build
+mobile/fajrak_flutter/.dart_tool
+*.hprof
+brag-output*
+coverage
+playwright-report
+test-results
+docs/internal/
+SECURITY.md
+HANDOFF_REPORT.md
+public/*.apk
