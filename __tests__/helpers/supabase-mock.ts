@@ -43,6 +43,9 @@ export function createMockSupabase(tableResults: Record<string, unknown> = {}) {
       const result = tableResults[table] ?? { data: [], error: null }
       return createFluentQuery(result)
     }),
+    // RPC calls resolve to `{ data, error }` just like PostgREST. Tests override
+    // the implementation when they need per-argument return values.
+    rpc: jest.fn().mockResolvedValue({ data: 0, error: null }) as jest.Mock,
     auth: {
       getUser: jest.fn().mockResolvedValue({
         data: { user: null },

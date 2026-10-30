@@ -112,7 +112,7 @@ financetracker/
 | `api/exchange-rate/route.ts` | GET | Fetch live FX rates (JOD/USD) |
 | `api/gamification/route.ts` | POST | Cron: update achievements, levels, badges |
 | `api/health/route.ts` | GET | Health check (DB, Supabase, external APIs) |
-| `api/health-score-snapshot/route.ts` | POST | Cron: snapshot financial health score history |
+| `api/health-score-snapshot/route.ts` | GET | Manual/on-demand: snapshot financial health score history (not in `vercel.json`) |
 | `api/mcp/route.ts` | GET, POST, DELETE, OPTIONS | **Feature B** — MCP Server (3 tools, PAT auth, scope gates) |
 | `api/new-user-nudge/route.ts` | POST | Cron: nudge inactive users |
 | `api/push-send/route.ts` | POST | Send push notification (FCM + Web Push) |
@@ -465,7 +465,8 @@ financetracker/
 ### 12.7 Financial Health Score
 - **5 Factors:** Savings rate, Debt ratio, Emergency fund, Investment consistency, Tracking consistency
 - **Score:** 0–100, staged (Awareness → Control → Reserve → Building → Freedom)
-- **Snapshot:** `api/health-score-snapshot/route.ts` daily cron
+- **Snapshot:** `api/health-score-snapshot/route.ts` — manual/on-demand only
+  (GET + `CRON_SECRET`); it is **not** listed in `vercel.json` crons
 
 ### 12.8 Multi-Currency + Exchange Rates
 - **Base:** JOD (Jordanian Dinar)

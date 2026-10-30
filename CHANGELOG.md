@@ -5,6 +5,19 @@
 ### Changed
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
   sentry_flutter ^10.2.0. Drops ~1% of devices still on Android 7.x.
+- **Cron query load cut for the Supabase Free tier.** `/api/health-score-snapshot`
+  now reads `transactions`/`debts`/`investments`/`savings_goals` once for the whole
+  batch (`.in('user_id', …)`) and writes a single upsert instead of 4 reads + 1
+  upsert per user — 325 → 60 round trips at 54 users. The score itself is still
+  computed only by the `calculate_health_score` RPC (batched 10-wide), never in JS.
+  It also fails with `500` instead of silently persisting zeroed snapshots when a
+  query errors. `/api/budget-alerts` (real 04:00 cron) replaces its one-query-per-budget
+  loop with a single `(user_id, category)` aggregate and bounds push fan-out to 5.
+- **New perf indexes** (`supabase/migrations/20261030000000_perf_indexes_for_crons.sql`):
+  `debts(user_id, is_paid)`, `savings_goals(user_id)`, `investments(user_id)`,
+  `budgets(year, month)`, `accounts(user_id)`,
+  `recurring_transactions(user_id, is_active)`, `notification_history(fingerprint)`.
+  `transactions` already had `user_id`-leading indexes and was left alone.
 
 ### Fixed
 - **BYOK NVIDIA validation never validated anything.** NVIDIA's `GET /v1/models` is public — it answers `200` with no key and with a bogus key — so every string "passed". `POST /api/byok/validate` now probes a real one-token completion against `nvidia/nemotron-3.5-bolt-e4b` (`max_tokens: 1`, `temperature: 0`, never `max_completion_tokens`, which NVIDIA rejects). Verified live against `integrate.api.nvidia.com` on 2026-10-29.
