@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+- **Neon standby health probe** (`/api/health/db`). Read-only connectivity
+  check against the Neon restored copy of the Supabase database. Uses
+  `@neondatabase/serverless` with a 5s timeout, returns reachability +
+  latency to unauthenticated callers; profile count only to CRON_SECRET
+  holders. Never serves user data (bypasses RLS as table owner).
+- Tests for `/api/health/db` covering auth gating, timeout, missing config,
+  and error sanitization.
+
 ### Changed
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
   sentry_flutter ^10.2.0. Drops ~1% of devices still on Android 7.x.
