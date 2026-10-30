@@ -119,6 +119,19 @@ describe('GET /api/health-score-snapshot — query batching', () => {
     }
   })
 
+  it('excludes soft-deleted rows from every set-based query', async () => {
+    mockSupabase = createMockSupabase({
+      profiles: { data: [{ id: U1, monthly_income: 1000 }], error: null },
+    })
+
+    await GET(makeRequest('/api/health-score-snapshot', { secret: SECRET }))
+
+    for (const table of ['transactions', 'debts', 'investments', 'savings_goals']) {
+      const [query] = queriesFor(table)
+      expect(query.is).toHaveBeenCalledWith('deleted_at', null)
+    }
+  })
+
   it('writes every user in a single upsert', async () => {
     mockSupabase = createMockSupabase({
       profiles: {

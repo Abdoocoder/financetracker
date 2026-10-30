@@ -65,6 +65,13 @@ function setupMock({
   })
 }
 
+/** Fingerprints passed to sendPushToUser, in call order. */
+const fingerprints = () =>
+  (sendPushToUser as jest.Mock).mock.calls.map(call => call[6])
+
+/** Local "today" for the frozen clock used in these tests. */
+const TODAY = '2026-09-10'
+
 describe('GET /api/auto-recurring', () => {
   beforeEach(() => {
     mockGetLocalNow.mockReturnValueOnce(new Date('2026-09-10T10:00:00Z'))
@@ -97,5 +104,57 @@ describe('GET /api/auto-recurring', () => {
     const json = await res.json()
     expect(json.ok).toBe(true)
     expect(json.auto).toBeGreaterThanOrEqual(0)
+  })
+
+  // ── Fingerprints: `${userId}:${tag}:${date}` is identical for every recurring
+  // item of a user, so it would dedupe all but the first push. Each push must
+  // carry a per-item fingerprint.
+  it('passes a per-template fingerprint for legacy recurring transactions', async () => {
+    setupMock({
+      transactions: [
+        {
+          id: 't1', user_id: 'u1', type: 'expense', amount: 100,
+          category: 'Food', description: 'غداء', recurring_auto: true,
+        },
+        {
+          id: 't2', user_id: 'u1', type: 'expense', amount: 200,
+          category: 'Fuel', description: 'بنزين', recurring_auto: false,
+        },
+      ] as any[],
+    })
+
+    await GET(makeGetRequest())
+
+    const sent = fingerprints()
+    expect(sent).toHaveLength(2)
+    expect(new Set(sent).size).toBe(2)
+    expect(sent).toEqual([
+      `recurring:u1:t1:${TODAY}`,
+      `recurring:u1:t2:${TODAY}`,
+    ])
+  })
+
+  it('passes a per-item fingerprint for recurring_transactions', async () => {
+    setupMock({ transactions: [] })
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'transactions') return chain({ data: [], error: null })
+      if (table === 'recurring_transactions') {
+        return chain({ data: [
+          { id: 'r1', user_id: 'u9', type: 'expense', amount: 15, currency: 'JOD', category: 'Entertainment', name: 'Netflix', notes: null, frequency: 'monthly' },
+          { id: 'r2', user_id: 'u9', type: 'expense', amount: 10, currency: 'JOD', category: 'Entertainment', name: 'Spotify', notes: null, frequency: 'monthly' },
+        ], error: null })
+      }
+      return chain()
+    })
+
+    await GET(makeGetRequest())
+
+    const sent = fingerprints()
+    expect(sent).toHaveLength(2)
+    expect(new Set(sent).size).toBe(2)
+    expect(sent).toEqual([
+      `recurring:u9:r1:${TODAY}`,
+      `recurring:u9:r2:${TODAY}`,
+    ])
   })
 })

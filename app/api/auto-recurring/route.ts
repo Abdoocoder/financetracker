@@ -73,7 +73,9 @@ export async function GET(request: NextRequest) {
           tx.user_id,
           `✅ تم تسجيل ${tx.category} تلقائياً`,
           `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — تم التسجيل تلقائياً 🔄`,
-          '/dashboard/transactions', 'info'
+          '/dashboard/transactions', 'info',
+          undefined,
+          `recurring:${tx.user_id}:${tx.id}:${dateStr}`
         ))
         autoCount++
       } else {
@@ -81,7 +83,9 @@ export async function GET(request: NextRequest) {
           tx.user_id,
           `🔔 تذكير: ${tx.category} يستحق اليوم`,
           `${tx.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(tx.amount).toFixed(0)} JOD — هل قمت بالدفع؟ سجّله في التطبيق.`,
-          '/dashboard/transactions', 'warning'
+          '/dashboard/transactions', 'warning',
+          undefined,
+          `recurring:${tx.user_id}:${tx.id}:${dateStr}`
         ))
         reminderCount++
       }
@@ -136,7 +140,9 @@ export async function GET(request: NextRequest) {
         rec.user_id,
         `🔄 ${rec.name} — تم تسجيله تلقائياً`,
         `${rec.type === 'income' ? 'دخل' : 'مصروف'}: ${Number(rec.amount).toFixed(0)} ${rec.currency}`,
-        '/dashboard/transactions', 'info'
+        '/dashboard/transactions', 'info',
+        undefined,
+        `recurring:${rec.user_id}:${rec.id}:${dateStr}`
       ))
       autoCount++
     }

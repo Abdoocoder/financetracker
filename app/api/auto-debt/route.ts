@@ -43,13 +43,16 @@ async function processAutoDebts() {
       // إذا دفع بالفعل → لا ترسل إشعار (هنا لا نُدرج شيئاً فالتحقق للإشعار فقط)
       if ((existing ?? 0) > 0) continue
 
-      // أرسل إشعار تذكير
+      // أرسل إشعار تذكير — fingerprint لكل دين لمنع التصادم
+      const fingerprint = `debt-reminder:${debt.user_id}:${debt.id}:${dateStr}`
       await sendPushToUser(
         debt.user_id,
         `💳 قسط ${debt.name} يستحق اليوم`,
         `المبلغ: ${debt.monthly_payment.toFixed(0)} JOD — هل قمت بالدفع؟ افتح التطبيق لتسجيله.`,
         '/dashboard/debts',
-        'debt-reminder'
+        'debt-reminder',
+        undefined,
+        fingerprint
       )
     }
   }
@@ -102,7 +105,9 @@ async function processAutoDebts() {
       transaction_date: dateStr,
     })
 
-    // إشعار Push
+    // إشعار Push — fingerprint لكل دين لمنع التصادم
+    const tag = isPaid ? 'debt-paid' : 'debt-auto'
+    const fingerprint = `${tag}:${debt.user_id}:${debt.id}:${dateStr}`
     await sendPushToUser(
       debt.user_id,
       isPaid ? `🎉 تم سداد ${debt.name} بالكامل!` : `💳 تم خصم قسط ${debt.name}`,
@@ -110,7 +115,9 @@ async function processAutoDebts() {
         ? `مبروك! أنهيت سداد دين "${debt.name}" بالكامل. إنجاز رائع! 🏆`
         : `تم خصم ${payment.toFixed(0)} JOD تلقائياً. المتبقي: ${newRemaining.toFixed(0)} JOD`,
       '/dashboard/debts',
-      isPaid ? 'debt-paid' : 'debt-auto'
+      tag,
+      undefined,
+      fingerprint
     )
 
     count++

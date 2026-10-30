@@ -55,20 +55,24 @@ async function snapshotScores(userId?: string) {
       .from('transactions')
       .select('user_id,type,amount')
       .in('user_id', userIds)
-      .gte('transaction_date', firstDay),
+      .gte('transaction_date', firstDay)
+      .is('deleted_at', null),
     supabase
       .from('debts')
       .select('user_id,remaining_amount')
       .in('user_id', userIds)
-      .eq('is_paid', false),
+      .eq('is_paid', false)
+      .is('deleted_at', null),
     supabase
       .from('investments')
       .select('user_id,shares,current_price')
-      .in('user_id', userIds),
+      .in('user_id', userIds)
+      .is('deleted_at', null),
     supabase
       .from('savings_goals')
       .select('user_id,current_amount')
-      .in('user_id', userIds),
+      .in('user_id', userIds)
+      .is('deleted_at', null),
   ])
 
   // Fail loudly. Writing a zeroed snapshot silently would corrupt score history
@@ -102,6 +106,8 @@ async function snapshotScores(userId?: string) {
   const goalByUser = sumBy(goalRes.data, (g) => g.user_id, (g) => Number(g.current_amount))
 
   // The score itself stays owned by the database RPC — never recomputed in JS.
+  // TODO: calculate_health_score RPC also needs .is('deleted_at', null) filter on
+  // transactions, debts, investments, savings_goals. Add when Supabase recovers.
   const scores = await mapInBatches(profiles, RPC_BATCH_SIZE, async (profile) => {
     const { data, error } = await supabase.rpc('calculate_health_score', {
       p_user_id: profile.id,

@@ -26,7 +26,7 @@ jest.mock('../../lib/supabase/admin', () => ({
   createAdminClient: jest.fn(() => mockSupabaseInstance)
 }))
 
-import { sendPushToUser, getHHMMInTimeZone, isInQuietHours } from '../../lib/push-send'
+import { sendPushToUser, getHHMMInTimeZone } from '../../lib/push-send'
 
 describe('getHHMMInTimeZone', () => {
   it('returns UTC minutes at a fixed instant', () => {
@@ -42,19 +42,6 @@ describe('getHHMMInTimeZone', () => {
   it('handles hour 23 in an offset timezone (America/New_York = UTC-4, DST off)', () => {
     const d = new Date('2026-01-15T03:30:00Z')
     expect(getHHMMInTimeZone(d, 'America/New_York')).toBe(22 * 60 + 30)
-  })
-})
-
-describe('isInQuietHours', () => {
-  it('is true inside a normal window and false at its end (end-exclusive)', () => {
-    expect(isInQuietHours('12:00', '13:00', 12 * 60 + 30)).toBe(true)
-    expect(isInQuietHours('12:00', '13:00', 13 * 60)).toBe(false)
-  })
-
-  it('is true inside an overnight window and false outside it', () => {
-    expect(isInQuietHours('22:00', '07:00', 23 * 60)).toBe(true)
-    expect(isInQuietHours('22:00', '07:00', 3 * 60)).toBe(true)
-    expect(isInQuietHours('22:00', '07:00', 12 * 60)).toBe(false)
   })
 })
 

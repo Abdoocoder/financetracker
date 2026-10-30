@@ -86,21 +86,6 @@ export function getHHMMInTimeZone(date: Date, timeZone: string): number {
 }
 
 /**
- * Quiet-hours check. `quietStart`/`quietEnd` are "HH:MM" local wall-clock times
- * stored as `time without time zone`. Overnight windows (start > end) wrap.
- * The window is end-exclusive (`now === quietEnd` is NOT quiet).
- */
-export function isInQuietHours(quietStart: string, quietEnd: string, nowHHMM: number): boolean {
-  const [sh, sm] = quietStart.split(':').map(Number)
-  const [eh, em] = quietEnd.split(':').map(Number)
-  const start = sh * 60 + sm
-  const end   = eh * 60 + em
-  return start <= end
-    ? nowHHMM >= start && nowHHMM < end
-    : nowHHMM >= start || nowHHMM < end
-}
-
-/**
  * المدخل الوحيد لإرسال الإشعارات.
  * يكتب في notification_history فقط — Edge Function تتولى الإرسال الفعلي
  * (FCM + Web Push) والكتابة في alerts.

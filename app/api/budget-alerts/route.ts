@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
     .select('id, user_id, category, monthly_limit')
     .eq('month', month)
     .eq('year', year)
+    .is('deleted_at', null)
 
   if (budgetsError) {
     console.error('[budget-alerts] budgets query failed:', budgetsError.message)
@@ -58,6 +59,7 @@ export async function GET(request: NextRequest) {
     .eq('type', 'expense')
     .gte('transaction_date', firstDay)
     .lte('transaction_date', lastDay)
+    .is('deleted_at', null)
 
   if (txError) {
     console.error('[budget-alerts] transactions query failed:', txError.message)
