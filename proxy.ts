@@ -38,6 +38,20 @@ export function buildCspHeader(nonce: string): string {
 }
 
 export default clerkMiddleware(async (auth, request) => {
+  const { pathname } = request.nextUrl
+
+  // Early return for static/public pages — skip Clerk & Supabase to save CPU
+  const isProtectedPath =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/onboarding') ||
+    pathname.startsWith('/__clerk')
+
+  if (!isProtectedPath) {
+    return NextResponse.next()
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const cspHeader = buildCspHeader(nonce)
 
@@ -94,9 +108,11 @@ export default clerkMiddleware(async (auth, request) => {
 
 export const config = {
   matcher: [
-    // Next.js 16: proxy replaces middleware.ts.
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    '/(api|trpc)(.*)',
-    '/__clerk/(.*)',
+    '/dashboard/:path*',
+    '/api/:path*',
+    '/auth/:path*',
+    '/onboarding',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/__clerk/:path*'
   ],
 }
