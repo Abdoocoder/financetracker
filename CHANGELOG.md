@@ -10,6 +10,35 @@
   holders. Never serves user data (bypasses RLS as table owner).
 - Tests for `/api/health/db` covering auth gating, timeout, missing config,
   and error sanitization.
+- **Clerk-authenticated server Supabase client** (`createClerkClient()` in
+  `lib/supabase/server.ts`). Fetches the Clerk session token via `auth()` and
+  passes it to supabase-js as `accessToken`, so PostgREST receives
+  `Authorization: Bearer <clerk-jwt>` and RLS evaluates the Clerk `sub` claim.
+  Uses `createClient` from `@supabase/supabase-js`, not `createServerClient`
+  from `@supabase/ssr@0.5.2` — the latter calls `client.auth.onAuthStateChange()`
+  unconditionally, which throws whenever `accessToken` is configured. The legacy
+  cookie-based `createClient()` is unchanged for pages that still call
+  `supabase.auth.*`.
+- **`scripts/neon-clerk-schema.sql`** — one-way, manually-run migration for the
+  Neon standby: converts every uuid ownership column (`public.*.user_id`,
+  `profiles.id`, `user_stats.id`, plus any uuid column FK-linked to `auth.users`)
+  to `text`, replaces a uuid-returning `auth.uid()` with a text one backed by
+  `request.jwt.claims`, and rebuilds all RLS policies with `auth.uid()` rewritten
+  to `(auth.jwt() ->> 'sub')::text`. Backs up policies/views/FKs into a
+  `_clerk_migration` schema, is re-runnable, and rolls back as a single
+  transaction. Verified against PostgreSQL 16 with both a restored-Supabase
+  `auth.uid()` and a bare Neon database. **Not** a substitute for the identity
+  backfill: existing rows still hold Supabase UUIDs and will match no Clerk user
+  until `uuid -> sub` is mapped, and RPCs with `p_user_id uuid` must be redefined
+  as `text`.
+- **Neon preview branch per pull request** (`.github/workflows/neon-preview-branch.yml`).
+  Creates `preview/pr-<number>` in the Neon project when a PR opens, reuses it on
+  every push (expiry pushed to 14 days so abandoned PRs do not leak a copy of the
+  standby), and deletes it when the PR closes. Deliberately runs no migrations and
+  posts no schema diff: Neon is a restored standby copy, and
+  `supabase/migrations/` is not the schema of record (rule 8), so the diff would
+  be empty on every PR. Requires the `NEON_API_KEY` secret and the
+  `NEON_PROJECT_ID` variable added by the Neon GitHub integration.
 
 ### Changed
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support

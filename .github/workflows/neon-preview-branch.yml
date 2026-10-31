@@ -1,0 +1,97 @@
+name: Neon / preview branch per PR
+
+# Creates a Neon database branch when a pull request opens, and deletes it when
+# the pull request closes. This is the workflow the Neon GitHub integration
+# scaffolds; it is trimmed to what this repo actually needs.
+#
+# Context that shaped the trimmed version (see lib/db/neon.ts):
+#   - Neon holds a *restored standby copy* of the Supabase database. It has no
+#     GoTrue/PostgREST/Realtime, `auth.uid()` returns NULL there, and every query
+#     runs as `neondb_owner`, which skips RLS. A preview branch is therefore a
+#     diagnostics sandbox (run a query, inspect a schema, test a one-off SQL
+#     script) — never an app environment.
+#   - No migrations are applied to the branch and no schema diff is posted.
+#     `supabase/migrations/` is not the schema of record (CLAUDE.md rule 8: prod
+#     carries unmigrated tables/columns), so replaying it against a Neon branch
+#     would diff against a baseline this repo does not trust, and
+#     scripts/neon-clerk-schema.sql is deliberately a manual, human-run script.
+#     A branch with nothing applied to it would produce an empty diff on every
+#     PR — a comment that trains reviewers to ignore the bot.
+#   - The upstream template derives the branch name from a
+#     `tj-actions/branch-names` step. Not used here: the PR number alone is
+#     enough to name a branch, and it lets the delete job compute the same name
+#     without a checkout. It also drops a third-party action from the graph
+#     (tj-actions/changed-files was compromised in the March 2025 supply-chain
+#     attack).
+#
+# Secrets/variables: NEON_API_KEY is a repository *secret*; NEON_PROJECT_ID is a
+# repository *variable* (read via `vars.`, not `secrets.`). If the plan was
+# created before that split and the ID landed in secrets, the create step fails
+# with a missing project_id — move it to Variables, or swap the two references.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  create-branch:
+    name: Create Neon branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.action != 'closed'
+    # Repeated pushes to one PR must not race two create calls for the same
+    # branch name. The create action is idempotent (it returns the existing
+    # branch), but the concurrency group keeps the runs themselves from piling up.
+    concurrency:
+      group: neon-preview-create-${{ github.event.number }}
+      cancel-in-progress: true
+    outputs:
+      branch: ${{ steps.name.outputs.branch }}
+      db_url_pooled: ${{ steps.create.outputs.db_url_pooled }}
+    steps:
+      - name: Compute branch name
+        id: name
+        run: echo "branch=preview/pr-${{ github.event.number }}" >> "$GITHUB_OUTPUT"
+
+      # Expiry is a backstop, not the primary cleanup path. A PR that is never
+      # closed (abandoned, or this workflow disabled mid-flight) would otherwise
+      # leak a full copy of the standby database indefinitely. Re-running on each
+      # push simply pushes the expiry out while the PR is alive.
+      - name: Set branch expiry (14 days)
+        id: expires
+        run: echo "expires_at=$(date -u --date '+14 days' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      - name: Create branch
+        id: create
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_name: ${{ steps.name.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          expires_at: ${{ steps.expires.outputs.expires_at }}
+
+      # Never echo the connection string: it embeds the role password. Later jobs
+      # reach it through `needs.create-branch.outputs.db_url_pooled`.
+      - name: Summarize
+        run: |
+          echo "Neon branch ${{ steps.name.outputs.branch }} is ready (created=${{ steps.create.outputs.created }}, id=${{ steps.create.outputs.branch_id }})." >> "$GITHUB_STEP_SUMMARY"
+          echo "Pooled connection string: available as needs.create-branch.outputs.db_url_pooled, not printed." >> "$GITHUB_STEP_SUMMARY"
+
+  delete-branch:
+    name: Delete Neon branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.action == 'closed'
+    steps:
+      - name: Delete branch
+        uses: neondatabase/delete-branch-action@v3
+        # A branch past its expires_at is already gone, so the delete call 404s.
+        # Failing the run there would paint the PR red for correct behaviour.
+        continue-on-error: true
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/pr-${{ github.event.number }}
+          api_key: ${{ secrets.NEON_API_KEY }}
