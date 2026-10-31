@@ -63,6 +63,13 @@
     get_health_score, check_and_reserve_idempotency_key,
     complete_idempotency_key, get_debts, get_budgets, get_goals,
     get_recent_transactions, get_spending_breakdown.
+  - `scripts/neon-clerk-triggers.sql` — audits and fixes 7 trigger functions
+    for uuid→text migration. Drops `handle_new_user` + `on_auth_user_created`
+    (dead with Clerk). Updates `notify_user(p_user_id text)`, `check_budget_limits()`
+    (fires on transactions), `assign_default_account()` (fires on transactions).
+    Leaves `sync_debt_remaining_foreign`, `handle_updated_at`,
+    `update_updated_at_column` unchanged (safe). Must run after
+    `neon-clerk-rpc-migration.sql`.
   - `docs/guides/clerk-user-import.md` — step-by-step guide for the import
     process, password strategy, verification, loading map into Neon, and troubleshooting.
 
