@@ -29,6 +29,17 @@
   `transactions` already had `user_id`-leading indexes and was left alone.
 
 ### Fixed
+- **Vercel deploys failed instantly since 2026-10-30 07:11 UTC.** `051b6821` disabled the
+  proactive-agent cron by commenting the entry out inside `vercel.json`
+  (`// { "path": "/api/agent/proactive", ... }`). `vercel.json` is parsed as strict JSON,
+  so the whole file stopped parsing (`Couldn't parse JSON file .../vercel.json`) and every
+  deployment after that commit was rejected before a build started. The entry is now
+  removed rather than commented; the cron stays disabled. Note: `/api/agent/proactive`
+  is still absent from `crons` by design — do not re-add it without confirming the
+  Nano-tier DB exhaustion fix.
+- **CI `web` job failed on the test-count guard.** `PROJECT_CONTEXT.md` §4 documented
+  798 web tests / 85 suites while the tree had 834 / 87 (the health-probe suite added one
+  suite and 8 tests). Counts resynced to the measured totals.
 - **BYOK NVIDIA validation never validated anything.** NVIDIA's `GET /v1/models` is public — it answers `200` with no key and with a bogus key — so every string "passed". `POST /api/byok/validate` now probes a real one-token completion against `nvidia/nemotron-3.5-bolt-e4b` (`max_tokens: 1`, `temperature: 0`, never `max_completion_tokens`, which NVIDIA rejects). Verified live against `integrate.api.nvidia.com` on 2026-10-29.
 - **BYOK key errors told users the wrong thing.** `401`/`403` from the validate route is the *session*, not the provider key, and is now reported as "sign in again"; upstream `404` → model problem, `410` → model retired, `5xx` → provider outage. Both clients return i18n keys, so no provider/route English text reaches an Arabic UI. Web mapping lives in `lib/byok/validation.ts`, mobile in `lib/services/byok/error_keys.dart`.
 - **Chat swallowed actionable failures.** The agent route collapsed every upstream failure into a generic "Something went wrong". It now emits `model-not-found` (404), `gone` (410) and `provider-down` (5xx), and both clients render them (`chat_error_model_not_found`, `chat_error_provider_down`).
