@@ -1,28 +1,14 @@
+import { clerkMiddleware } from '@clerk/nextjs/server'
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
-// المسارات التي تتطلب تسجيل دخول
-const PROTECTED_PATHS = [
-  '/dashboard',
-  '/transactions',
-  '/debts',
-  '/investments',
-  '/alerts',
-  '/budgets',
-  '/goals',
-  '/settings',
-]
+// Phase 2: all routes are public while Clerk is being wired in.
+// Route protection will be enabled in a later phase.
 
 export function buildCspHeader(nonce: string): string {
   const isDev = process.env.NODE_ENV === 'development'
-  // In development, Next.js/Turbopack injects styles as inline <style> tags.
-  // When nonce is present in style-src, 'unsafe-inline' is ignored per CSP spec.
-  // So we allow 'unsafe-inline' for styles (dev and prod), reserving nonce for scripts only.
-  // Sentry Replay masks the DOM by mutating inline styles — nonce-only style-src breaks it.
   const styleSrc = "style-src 'self' 'unsafe-inline'"
 
-  // Allow localhost:11434 for Ollama direct connections in development
-  // Allow local Supabase (127.0.0.1:54321) for E2E tests
   const isE2E = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('127.0.0.1') === true
   const ollamaConnectSrc = isDev ? ' http://localhost:11434' : ''
   const localSupabaseConnectSrc = (isDev || isE2E) ? ' http://127.0.0.1:54321 ws://127.0.0.1:54321' : ''
@@ -35,7 +21,7 @@ export function buildCspHeader(nonce: string): string {
     "font-src 'self'",
     "worker-src 'self' blob:",
     "child-src 'self' blob:",
-    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io${ollamaConnectSrc}${localSupabaseConnectSrc}`,
+    `connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co wss://*.supabase.in https://va.vercel-scripts.com https://*.googleapis.com https://*.ingest.us.sentry.io https://*.clerk.accounts.dev https://*.clerk.dev${ollamaConnectSrc}${localSupabaseConnectSrc}`,
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
@@ -51,7 +37,7 @@ export function buildCspHeader(nonce: string): string {
   return directives.join('; ')
 }
 
-export async function proxy(request: NextRequest) {
+export default clerkMiddleware(async (auth, request) => {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const cspHeader = buildCspHeader(nonce)
 
@@ -65,6 +51,8 @@ export async function proxy(request: NextRequest) {
   })
   supabaseResponse.headers.set('Content-Security-Policy', cspHeader)
 
+  // Supabase server client is kept for backward compatibility: existing
+  // server components read the `x-user-id` header set below.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -83,20 +71,11 @@ export async function proxy(request: NextRequest) {
     }
   )
 
+  // Clerk auth state (all routes are public for now; nothing is enforced).
+  const { userId, sessionId } = await auth()
+
+  // Supabase user context for legacy server components.
   const { data: { user } } = await supabase.auth.getUser()
-  const { pathname } = request.nextUrl
-
-  const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p))
-
-  // مستخدم غير مسجّل يحاول الوصول لصفحة محمية
-  if (!user && isProtected) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  // مستخدم مسجّل يحاول الوصول لصفحة auth
-  if (user && (pathname === '/login' || pathname === '/register')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
 
   // تمرير user id في header لتجنب استدعاء getUser() في كل صفحة
   if (user) {
@@ -104,11 +83,20 @@ export async function proxy(request: NextRequest) {
     supabaseResponse.headers.set('x-user-email', user.email ?? '')
   }
 
+  // Clerk identity for new Clerk-based code.
+  if (userId) {
+    supabaseResponse.headers.set('x-clerk-user-id', userId)
+    supabaseResponse.headers.set('x-clerk-session-id', sessionId ?? '')
+  }
+
   return supabaseResponse
-}
+})
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon\\.ico|icon-.*\\.png|manifest\\.json|sw\\.js|firebase-messaging-sw\\.js|monitoring|api/cron).*)',
+    // Next.js 16: proxy replaces middleware.ts.
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
+    '/__clerk/(.*)',
   ],
 }

@@ -7,6 +7,7 @@ import QueryProvider from '@/components/providers/QueryProvider'
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { I18nProvider } from '@/lib/i18n'
 import { UserProvider } from '@/lib/user-context'
+import { ClerkProvider } from '@clerk/nextjs'
 import { getServerTranslation, getServerLang } from '@/lib/i18n-server'
 import { headers } from 'next/headers'
 
@@ -110,13 +111,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             });
           }
         ` }} />
-        <QueryProvider>
-          <UserProvider>
-            <I18nProvider>
-              <ThemeProvider>{children}</ThemeProvider>
-            </I18nProvider>
-          </UserProvider>
-        </QueryProvider>
+        <ClerkProvider appearance={{ cssLayerName: 'clerk' }}>
+          <QueryProvider>
+            <UserProvider>
+              <I18nProvider>
+                <ThemeProvider>{children}</ThemeProvider>
+              </I18nProvider>
+            </UserProvider>
+          </QueryProvider>
+        </ClerkProvider>
         <SpeedInsights />
       </body>
     </html>

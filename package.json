@@ -16,6 +16,7 @@
     "doctor": "npx next info && npm_config_allow_scripts= npm audit --omit=dev --audit-level=high && npm run lint && npm run typecheck && npm run test:coverage && npm run build"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.9.23",
     "@modelcontextprotocol/server": "^2.4.0",
     "@neondatabase/serverless": "^1.2.0",
     "@opentelemetry/api": "^1.9.1",

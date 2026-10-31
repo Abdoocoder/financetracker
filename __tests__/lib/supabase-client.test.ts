@@ -6,6 +6,12 @@ jest.mock('next/headers', () => ({
   cookies: jest.fn(),
 }))
 
+jest.mock('@clerk/nextjs', () => ({
+  useSession: jest.fn(() => ({
+    session: { getToken: jest.fn().mockResolvedValue('mock-clerk-token') },
+  })),
+}))
+
 describe('lib/supabase/client', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -14,34 +20,65 @@ describe('lib/supabase/client', () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key'
   })
 
-  it('creates a Supabase browser client', async () => {
-    const { createClient } = await import('@/lib/supabase/client')
-    const client = createClient()
-    expect(client).toEqual({ mocked: true })
+  describe('createClient (Supabase Auth client)', () => {
+    it('creates a Supabase browser client', async () => {
+      const { createClient } = await import('@/lib/supabase/client')
+      expect(createClient()).toEqual({ mocked: true })
+    })
+
+    it('returns singleton on subsequent calls', async () => {
+      const { createClient } = await import('@/lib/supabase/client')
+      expect(createClient()).toBe(createClient())
+    })
+
+    it('uses env vars and keeps Supabase auth options without accessToken', async () => {
+      const { createClient } = await import('@/lib/supabase/client')
+      createClient()
+      const { createBrowserClient } = require('@supabase/ssr')
+      const options = createBrowserClient.mock.calls[0][2]
+
+      expect(createBrowserClient).toHaveBeenCalledWith(
+        'https://test.supabase.co',
+        'test-anon-key',
+        expect.objectContaining({
+          auth: expect.objectContaining({
+            flowType: 'pkce',
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true,
+          }),
+        })
+      )
+      // Regression guard: supabase-js disables the `auth` namespace when
+      // `accessToken` is set. The shared Auth client must not set it.
+      expect(options.accessToken).toBeUndefined()
+    })
   })
 
-  it('returns singleton on subsequent calls', async () => {
-    const { createClient } = await import('@/lib/supabase/client')
-    const client1 = createClient()
-    const client2 = createClient()
-    expect(client1).toBe(client2)
-  })
+  describe('createClerkClient (Clerk token client)', () => {
+    it('passes the Clerk session token through the accessToken option', async () => {
+      const { createClerkClient } = await import('@/lib/supabase/client')
+      const getToken = jest.fn().mockResolvedValue('clerk-jwt-123')
 
-  it('uses NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY from env', async () => {
-    const { createClient } = await import('@/lib/supabase/client')
-    createClient()
-    const { createBrowserClient } = require('@supabase/ssr')
-    expect(createBrowserClient).toHaveBeenCalledWith(
-      'https://test.supabase.co',
-      'test-anon-key',
-      expect.objectContaining({
-        auth: expect.objectContaining({
-          flowType: 'pkce',
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: true,
-        }),
-      })
-    )
+      createClerkClient({ getToken })
+
+      const { createBrowserClient } = require('@supabase/ssr')
+      const options = createBrowserClient.mock.calls[0][2]
+
+      expect(typeof options.accessToken).toBe('function')
+      await expect(options.accessToken()).resolves.toBe('clerk-jwt-123')
+      expect(getToken).toHaveBeenCalled()
+    })
+
+    it('resolves null when there is no Clerk session', async () => {
+      const { createClerkClient } = await import('@/lib/supabase/client')
+
+      createClerkClient(null)
+
+      const { createBrowserClient } = require('@supabase/ssr')
+      const options = createBrowserClient.mock.calls[0][2]
+
+      await expect(options.accessToken()).resolves.toBeNull()
+    })
   })
 })
