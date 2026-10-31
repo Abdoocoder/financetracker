@@ -72,6 +72,17 @@
     `neon-clerk-rpc-migration.sql`.
   - `docs/guides/clerk-user-import.md` — step-by-step guide for the import
     process, password strategy, verification, loading map into Neon, and troubleshooting.
+  - **Clerk webhook for profile auto-creation** (`app/api/webhooks/clerk/route.ts`).
+    Receives `user.created` event from Clerk, verifies signature via `svix`,
+    and upserts a `profiles` row using the admin client. Idempotent (retries
+    ignored via `onConflict: 'id', ignoreDuplicates: true`). Maps Clerk `sub`
+    → `profiles.id`, email, full_name, defaults currency to `KWD`, lang to `ar`.
+    Includes `docs/guides/clerk-webhook-setup.md` for Clerk Dashboard + ngrok
+    setup. 10 new tests covering signature verification, missing secret, missing
+    email, upsert failures, and name/email variations.
+  - `docs/guides/clerk-webhook-setup.md` — step-by-step guide for creating the
+    webhook in Clerk Dashboard, configuring `CLERK_WEBHOOK_SECRET` in Vercel,
+    and testing locally with ngrok.
 
 ### Changed
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
