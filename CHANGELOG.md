@@ -39,6 +39,20 @@
   `supabase/migrations/` is not the schema of record (rule 8), so the diff would
   be empty on every PR. Requires the `NEON_API_KEY` secret and the
   `NEON_PROJECT_ID` variable added by the Neon GitHub integration.
+- **Clerk Identity Mapping Pipeline** (three new scripts):
+  - `scripts/export-supabase-users.ts` — exports `auth.users` (id, email) from
+    Neon to `scripts/users-to-migrate.csv`.
+  - `scripts/import-to-clerk.ts` — reads the CSV, creates users in Clerk via
+    Backend API (empty password, `skip_password_requirement: true`), maps
+    Supabase UUID → Clerk `external_id`, writes `scripts/identity-map.csv`
+    (`old_uuid,clerk_sub`).
+  - `scripts/neon-clerk-backfill.sql` — single-transaction backfill that
+    temporarily drops FKs, updates `profiles.id`, `user_stats.id`, and every
+    `user_id` column via the identity map, restores FKs, and verifies zero
+    unmapped rows. Designed to run *after* `neon-clerk-schema.sql` and the
+    identity map load.
+  - `docs/guides/clerk-user-import.md` — step-by-step guide for the import
+    process, password strategy, verification, and troubleshooting.
 
 ### Changed
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
