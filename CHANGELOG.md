@@ -39,7 +39,7 @@
   `supabase/migrations/` is not the schema of record (rule 8), so the diff would
   be empty on every PR. Requires the `NEON_API_KEY` secret and the
   `NEON_PROJECT_ID` variable added by the Neon GitHub integration.
-- **Clerk Identity Mapping Pipeline** (three new scripts):
+- **Clerk Identity Mapping Pipeline** (four new scripts):
   - `scripts/export-supabase-users.ts` — exports `auth.users` (id, email) from
     Neon to `scripts/users-to-migrate.csv`.
   - `scripts/import-to-clerk.ts` — reads the CSV, creates users in Clerk via
@@ -51,8 +51,20 @@
     `user_id` column via the identity map, restores FKs, and verifies zero
     unmapped rows. Designed to run *after* `neon-clerk-schema.sql` and the
     identity map load.
+  - `scripts/neon-clerk-rpc-migration.sql` — redefines all 19 SECURITY DEFINER
+    RPCs from `p_user_id uuid` / `user_id uuid` to `text`. Updates owner guards
+    to compare `auth.uid()` (text, from Clerk `sub` claim) directly to the text
+    parameter. Preserves SECURITY DEFINER, search_path, EXECUTE grants to
+    authenticated + service_role. Must run after `neon-clerk-schema.sql` +
+    `neon-clerk-backfill.sql`. Covers: get_account_balances, get_financial_dashboard,
+    get_monthly_financial_summary, get_zakat_summary, get_zakat_hauls,
+    sync_zakat_haul_state, delete_user_account, upsert_investment_cash,
+    get_changed_records, get_deleted_records, calculate_health_score,
+    get_health_score, check_and_reserve_idempotency_key,
+    complete_idempotency_key, get_debts, get_budgets, get_goals,
+    get_recent_transactions, get_spending_breakdown.
   - `docs/guides/clerk-user-import.md` — step-by-step guide for the import
-    process, password strategy, verification, and troubleshooting.
+    process, password strategy, verification, loading map into Neon, and troubleshooting.
 
 ### Changed
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
