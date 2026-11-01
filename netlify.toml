@@ -1,0 +1,4 @@
+[build]
+  # تخطي فحص الأسرار في ملفات التوثيق لأنها تحتوي على قيم توضيحية
+  SECRETS_SCAN_OMIT_PATHS = "CONFIGURATION.md,docs/DEPLOYMENT.md"
+  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PROJECT_ID"
