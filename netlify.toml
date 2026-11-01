@@ -1,4 +1,33 @@
-[build]
-  # تخطي فحص الأسرار في ملفات التوثيق لأنها تحتوي على قيم توضيحية
-  SECRETS_SCAN_OMIT_PATHS = "CONFIGURATION.md,docs/DEPLOYMENT.md"
-  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PROJECT_ID"
+# Netlify build configuration.
+#
+# Only build-environment flags live here. The build command, publish directory
+# and Next.js runtime are configured in the Netlify UI; unspecified keys here
+# fall back to those values.
+#
+# NOTE: these must live under [build.environment]. Netlify's [build] block only
+# recognizes base, publish, command, environment, processing and ignore — any
+# other key placed directly under [build] is ignored, not exported.
+#
+# CAVEAT: Netlify's secret-scanning docs say to set these "at the site or team
+# level"; they do not document netlify.toml support for them. This block is the
+# correct way to declare build env vars, but if a deploy still reports the keys
+# below, set the same value as a site environment variable in
+# Project configuration > Environment variables. Do not rely on this file alone.
+
+[build.environment]
+  # Netlify's Secrets Controller fails a build when the *value* of an
+  # environment variable marked secret is found anywhere in the repo or in build
+  # output. `FIREBASE_PROJECT_ID` / `FIREBASE_API_KEY` are public Firebase
+  # identifiers, not credentials — the same strings are hardcoded in files that
+  # ship to browsers and cannot read process.env:
+  #   - public/firebase-messaging-sw.js   (served as a static asset)
+  #   - lib/firebase.ts                   (authDomain / storageBucket)
+  #   - mobile/fajrak_flutter/{env.json,firebase.json,web/index.html}
+  # and Next.js inlines NEXT_PUBLIC_FIREBASE_* into the client bundle regardless.
+  # Redacting docs cannot remove them, so omit just these keys and keep scanning
+  # active for real secrets (FIREBASE_PRIVATE_KEY, SUPABASE_SERVICE_ROLE_KEY,
+  # VAPID_PRIVATE_KEY).
+  #
+  # Never set SECRETS_SCAN_ENABLED = false here: that disables the protection for
+  # every secret, not just these known-public values.
+  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PROJECT_ID,FIREBASE_API_KEY,NEXT_PUBLIC_FIREBASE_PROJECT_ID,NEXT_PUBLIC_FIREBASE_API_KEY"
