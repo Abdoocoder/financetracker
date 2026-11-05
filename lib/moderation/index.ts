@@ -151,6 +151,8 @@ let dompurify: any = null
 
 async function getDOMPurify(): Promise<any> {
   if (!dompurify) {
+    // WARNING: jsdom is a devDependency. If this is ever imported from a
+    // production route, add jsdom back to dependencies first.
     const { JSDOM } = await import('jsdom')
     const window = new JSDOM('').window
     const DOMPurify = (await import('dompurify')).default

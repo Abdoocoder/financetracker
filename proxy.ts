@@ -40,7 +40,9 @@ export function buildCspHeader(nonce: string): string {
 export default clerkMiddleware(async (auth, request) => {
   const { pathname } = request.nextUrl
 
-  // Early return for static/public pages — skip Clerk & Supabase to save CPU
+  // Defense-in-depth: the matcher below already excludes public pages, so this
+  // guard only fires if someone widens the matcher again. Skip Clerk & Supabase
+  // so a matcher regression cannot silently reintroduce auth calls on public routes.
   const isProtectedPath =
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/api') ||
@@ -107,12 +109,24 @@ export default clerkMiddleware(async (auth, request) => {
 })
 
 export const config = {
+  // Only the routes that actually need Clerk/Supabase work are matched.
+  //
+  // The previous catch-all `'/((?!_next/static|_next/image|favicon.ico|...).*)'`
+  // forced this Proxy function to be instantiated and executed for *every*
+  // request (marketing pages, blog, legal, sitemap, Sentry tunnel, ...), even
+  // though the function immediately returned `NextResponse.next()` for them.
+  // That early return did no work, so excluding those paths from the matcher is
+  // behaviour-identical for the response — it only stops the function from
+  // being billed/executed. Static assets were already handled by Next.
+  //
+  // `/auth-confirm` is listed explicitly because it is a route handler at
+  // `app/auth-confirm/route.ts` and does not fall under `/auth/:path*`.
   matcher: [
     '/dashboard/:path*',
     '/api/:path*',
     '/auth/:path*',
+    '/auth-confirm',
     '/onboarding',
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     '/__clerk/:path*'
   ],
 }

@@ -101,7 +101,51 @@
   `recurring_transactions(user_id, is_active)`, `notification_history(fingerprint)`.
   `transactions` already had `user_id`-leading indexes and was left alone.
 
+### Changed (CPU quota reduction)
+- **proxy.ts**: removed catch-all matcher; middleware only runs on
+  `/dashboard`, `/api`, `/auth`, `/auth-confirm`, `/onboarding`,
+  `/__clerk`. Public marketing pages bypass auth entirely.
+- **vercel.json**: 8 crons → 4. Disabled: `wealth-guidance`,
+  `receivable-debt-reminder`, `smart-nudge`, `cleanup-notifications`.
+  Handlers remain callable.
+- **app/(dashboard)/layout.tsx**: `getUser()` → `getClaims()` (local JWT
+  verification, no network round-trip).
+- **package.json**: moved `playwright`, `jsdom` to devDependencies;
+  removed unused `install` package.
+
+### Note
+- `jsdom` is still imported by `lib/moderation/index.ts:154` (dead code
+  today). If moderation is wired up, restore `jsdom` to `dependencies`.
+
 ### Fixed
+- **Netlify deploys failed the secrets scan** (`Secrets scanning found 8
+  instance(s)`) because the public Firebase identifiers `fajrak-f7df1` and the
+  web API key appear in files that ship to browsers (`lib/firebase.ts`,
+  `public/firebase-messaging-sw.js`, Flutter `web/` assets) and cannot read
+  `process.env`. `netlify.toml` now sets `SECRETS_SCAN_OMIT_KEYS` under
+  `[build.environment]` — the earlier placement directly under `[build]` is
+  ignored, because Netlify only reads `base`, `publish`, `command`,
+  `environment`, `processing` and `ignore` there. Scanning stays enabled for
+  real secrets. Not yet confirmed by a deploy; if it still fails, set the same
+  variable in Project configuration → Environment variables.
+- **Mobile release builds could ship empty credentials.** The Makefile read
+  `mobile/fajrak_flutter/.env`, but the only populated file was `.env.local`, so
+  `make setup` created an empty `.env` that shadowed it and `build-bundle` would
+  embed no Supabase/Firebase values — the failure mode behind the `[3.42.2+57]`
+  login incident. The Makefile now reads `.env` when present and falls back to
+  `.env.local`; `setup` only creates `.env` when neither exists. The unanchored
+  `grep` calls are unchanged (rule 9).
+- **`.env.example` files had drifted from the code.** The root template now
+  documents `BYOK_KEK_ID`, `BYOK_PREVIOUS_KEYS`, `SENTRY_DSN`,
+  `SENTRY_ORG`/`SENTRY_PROJECT`/`SENTRY_TUNNEL_ROUTE`, `CLERK_SECRET_KEY`,
+  `FIREBASE_API_KEY`, `FIREBASE_SERVICE_ACCOUNT_KEY`,
+  `OTEL_EXPORTER_OTLP_ENDPOINT` and the optional E2E knobs, and marks keys that
+  no code reads (`NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_EXCHANGE_RATE_KEY`,
+  `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) instead of implying they
+  work. The Flutter template gains the missing `FIREBASE_API_KEY`, `SENTRY_DSN`,
+  `API_BASE_URL` and `BYOK_*` entries and notes that `TWELVE_DATA_KEY` /
+  `PROXY_BASE_URL` are inert because `dotenv.load()` is never called.
+  `CONFIGURATION.md` updated to match.
 - **Vercel deploys failed instantly since 2026-10-30 07:11 UTC.** `051b6821` disabled the
   proactive-agent cron by commenting the entry out inside `vercel.json`
   (`// { "path": "/api/agent/proactive", ... }`). `vercel.json` is parsed as strict JSON,
