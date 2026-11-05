@@ -2,23 +2,29 @@
 
 .PHONY: help setup setup-linux run run-web run-proxy run-web-with-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
 
-# ── Shared --dart-define flags, read from .env at recipe run time ──
+# Which env file the recipes read. `.env` wins when both exist; `.env.local`
+# is the fallback so a locally wired file is never silently ignored and
+# `make setup` cannot shadow it with an empty `.env`.
+# Keep this recursive (`=`) and evaluated per recipe, not `:=`.
+ENV_FILE = $(if $(wildcard .env),.env,.env.local)
+
+# ── Shared --dart-define flags, read from $(ENV_FILE) at recipe run time ──
 # IMPORTANT: keep these as `=` (recursive expansion), NOT `:=`.
 # We use `grep -m1` and `tr -d` to handle messy .env files safely.
 # Split Supabase / Firebase so `run-web-with-proxy` can swap the Supabase
 # origin without dropping the Firebase defines (it used to lose them).
 SUPABASE_DEFINES = \
-	--dart-define=SUPABASE_URL=$$(grep -m1 '^SUPABASE_URL=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
+	--dart-define=SUPABASE_URL=$$(grep -m1 '^SUPABASE_URL=' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
 
 FIREBASE_DEFINES = \
-	--dart-define=FIREBASE_API_KEY=$$(grep -m1 'FIREBASE_API_KEY' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep -m1 'FIREBASE_AUTH_DOMAIN' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=FIREBASE_PROJECT_ID=$$(grep -m1 'FIREBASE_PROJECT_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep -m1 'FIREBASE_STORAGE_BUCKET' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep -m1 'FIREBASE_MESSAGING_SENDER_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=FIREBASE_APP_ID=$$(grep -m1 'FIREBASE_APP_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
-	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep -m1 'FIREBASE_MEASUREMENT_ID' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
+	--dart-define=FIREBASE_API_KEY=$$(grep -m1 'FIREBASE_API_KEY' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_AUTH_DOMAIN=$$(grep -m1 'FIREBASE_AUTH_DOMAIN' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_PROJECT_ID=$$(grep -m1 'FIREBASE_PROJECT_ID' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_STORAGE_BUCKET=$$(grep -m1 'FIREBASE_STORAGE_BUCKET' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_MESSAGING_SENDER_ID=$$(grep -m1 'FIREBASE_MESSAGING_SENDER_ID' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_APP_ID=$$(grep -m1 'FIREBASE_APP_ID' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ') \
+	--dart-define=FIREBASE_MEASUREMENT_ID=$$(grep -m1 'FIREBASE_MEASUREMENT_ID' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
 
 # Origin of the Next.js app that serves /api/* (read by
 # lib/services/api_base_url.dart). Production by default; the proxy
@@ -32,7 +38,7 @@ DART_DEFINES = $(SUPABASE_DEFINES) $(FIREBASE_DEFINES) \
 # Deliberately kept OUT of DART_DEFINES: web builds use their own Sentry
 # project (javascript-nextjs), not the mobile DSN. Keep this `=` recursive.
 SENTRY_DEFINE = \
-	--dart-define=SENTRY_DSN=$$(grep -m1 '^SENTRY_DSN=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
+	--dart-define=SENTRY_DSN=$$(grep -m1 '^SENTRY_DSN=' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ')
 
 # Default target
 help:
@@ -66,7 +72,7 @@ help:
 setup:
 	@echo "🔧 Setting up development environment..."
 	flutter pub get
-	@if [ ! -f .env ]; then \
+	@if [ ! -f .env ] && [ ! -f .env.local ]; then \
 		cp .env.example .env; \
 		echo "📝 Created .env from .env.example - please edit with your credentials"; \
 	fi
@@ -117,7 +123,7 @@ run-web-with-proxy:
 		--web-port=33963 \
 		--web-hostname=0.0.0.0 \
 		--dart-define=SUPABASE_URL=http://localhost:33964 \
-		--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' .env 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ' || echo "your-anon-key") \
+		--dart-define=SUPABASE_ANON_KEY=$$(grep -m1 '^SUPABASE_ANON_KEY=' $(ENV_FILE) 2>/dev/null | cut -d'=' -f2- | tr -d '\r" ' || echo "your-anon-key") \
 		--dart-define=API_BASE_URL=http://localhost:33964 \
 		$(FIREBASE_DEFINES)
 

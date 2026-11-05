@@ -18,7 +18,7 @@ if (typeof global.Response === 'undefined') {
   } catch {}
 }
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import ChatAssistant from '@/components/dashboard/chat-assistant'
 import { I18nProvider } from '@/lib/i18n'
@@ -66,7 +66,6 @@ jest.mock('@/lib/supabase/client', () => ({
           eq: () => chain,
           gte: () => chain,
           lte: () => Promise.resolve({ data: [], error: null }),
-          then: (resolve: any) => Promise.resolve({ data: [], error: null }).then(resolve),
         }
         return chain
       }
@@ -74,7 +73,6 @@ jest.mock('@/lib/supabase/client', () => ({
         select: () => chain,
         eq: () => chain,
         order: () => Promise.resolve({ data: [], error: null }),
-        then: (resolve: any) => Promise.resolve({ data: [], error: null }).then(resolve),
       }
       return chain
     },
@@ -136,11 +134,13 @@ describe('ChatAssistant component', () => {
     ])
     ;(byokAgent as jest.Mock).mockResolvedValue(res)
 
-    render(
-      <I18nProvider>
-        <ChatAssistant />
-      </I18nProvider>
-    )
+    act(() => {
+      render(
+        <I18nProvider>
+          <ChatAssistant />
+        </I18nProvider>
+      )
+    })
 
     const providerSelect = await screen.findByLabelText(/Provider/i)
     fireEvent.change(providerSelect, { target: { value: 'openai' } })
@@ -187,11 +187,13 @@ describe('ChatAssistant component', () => {
         new Response('{}', { status }) as any
       )
 
-      render(
-        <I18nProvider>
-          <ChatAssistant />
-        </I18nProvider>
-      )
+      act(() => {
+        render(
+          <I18nProvider>
+            <ChatAssistant />
+          </I18nProvider>
+        )
+      })
 
       const providerSelect = await screen.findByLabelText(/Provider/i)
       fireEvent.change(providerSelect, { target: { value: 'openai' } })

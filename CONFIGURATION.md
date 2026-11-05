@@ -19,37 +19,52 @@ This document covers all environment variables, configuration files, required se
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | — | Supabase project URL (e.g., `https://xxxxx.supabase.co`) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | — | Supabase anonymous/public key for client-side access |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes (server) | — | Service role key for admin/server operations (bypasses RLS) |
+| **Clerk Auth** |
+| `CLERK_WEBHOOK_SECRET` | Yes (webhook only) | — | `svix` signing secret (`whsec_…`) used by `app/api/webhooks/clerk/route.ts` to verify payloads |
+| `CLERK_SECRET_KEY` | No | — | Clerk Backend API key, read only by `scripts/import-to-clerk.ts`; the running app never uses it |
+| **Neon Standby (diagnostics only)** |
+| `DATABASE_URL` | No | — | Pooled Postgres URL for `/api/health/db`. Authenticates as table owner and **bypasses RLS** — never use for per-user data (`lib/db/neon.ts`). Empty disables the probe (503) |
 | **E2E Testing (Playwright)** |
 | `E2E_TEST_EMAIL` | E2E only | — | Dedicated test account email for authenticated E2E runs |
 | `E2E_TEST_PASSWORD` | E2E only | — | Password for the E2E test account |
+| `OLLAMA_URL` | E2E only | — | Local Ollama base URL; enables `e2e/byok-chat-flow.spec.ts` (skipped when unset) |
+| `E2E_MCP_PAT` / `E2E_MCP_READONLY_PAT` | E2E only | — | PATs for `e2e/mcp-auth-tool-audit.spec.ts` |
+| `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` | E2E only | Playwright bundle | Override the Chromium binary path |
 | **Firebase Config (Push Notifications)** |
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | Yes | — | Firebase web API key (client-side) |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Yes | — | Firebase project ID |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Yes | — | Firebase Cloud Messaging sender ID |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | Yes | — | Firebase web app ID |
 | `NEXT_PUBLIC_FIREBASE_VAPID_KEY` | Yes | — | VAPID public key for web push (FCM) |
-| `FIREBASE_CLIENT_EMAIL` | Yes (server) | — | Service account email for Firebase Admin SDK |
-| `FIREBASE_PRIVATE_KEY` | Yes (server) | — | Service account private key (newline-escaped) |
+| `FIREBASE_API_KEY` / `FIREBASE_PROJECT_ID` | Mobile only | — | Read by the Flutter Makefile; public identifiers, not secrets |
+| `FIREBASE_CLIENT_EMAIL` | No | — | Legacy/unused: the web app has no `firebase-admin` client. Push delivery runs in the `push-notification` Edge Function |
+| `FIREBASE_PRIVATE_KEY` | No | — | Legacy/unused, same reason. Kept in the template for compatibility |
+| `FIREBASE_SERVICE_ACCOUNT_KEY` | Edge Function only | — | Service-account JSON set with `supabase secrets set` for `push-notification`; not a Next.js variable |
 | **Web Push (VAPID)** |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Yes | — | VAPID public key for browser push subscriptions |
 | `VAPID_PRIVATE_KEY` | Yes (server) | — | VAPID private key for signing push messages |
 | `VAPID_EMAIL` | Yes | — | Contact email for VAPID (used in `mailto:` header) |
 | **Market Data & APIs** |
-| `TWELVE_DATA_KEY` | No | — | API key for Twelve Data (stock/crypto prices) |
-| `NEXT_PUBLIC_EXCHANGE_RATE_KEY` | No | — | Exchange rate API key for currency conversion |
+| `TWELVE_DATA_KEY` | No | — | API key for Twelve Data (stock/crypto prices), read by `/api/stock-price` |
+| `NEXT_PUBLIC_EXCHANGE_RATE_KEY` | No | — | Unreferenced by source code (checked 2026-11-01); exchange rates use the public Yahoo endpoint |
 | **Cron Job Security** |
 | `CRON_SECRET` | Yes | — | Shared secret for authenticating cron job requests (fail-closed if missing) |
 | **BYOK LLM Proxy (Feature A)** |
 | `BYOK_PRIVATE_KEY` | Yes (server) | — | RSA-OAEP-SHA256 private key (PKCS#8 PEM) for decrypting user provider keys |
 | `NEXT_PUBLIC_BYOK_PUBLIC_KEY` | Yes | — | RSA public key (SPKI PEM) distributed to clients for envelope encryption |
-| `NEXT_PUBLIC_BYOK_KEK_ID` | Yes | — | Key ID tag placed on every envelope for rotation support |
+| `NEXT_PUBLIC_BYOK_KEK_ID` | Yes | — | Key ID tag placed on every envelope for rotation support (client copy) |
+| `BYOK_KEK_ID` | Yes (server) | — | Server-side key ID; must match `NEXT_PUBLIC_BYOK_KEK_ID` or the proxy rejects the envelope |
+| `BYOK_PREVIOUS_KEYS` | No | `[]` | JSON array of deprecated keypairs still accepted during rotation (`lib/byok/key-rotation.ts`) |
 | `BYOK_PROXY_DEBUG` | No | `false` | Set to `true` for verbose per-request logging (dev only) |
 | **Monitoring (Sentry)** |
 | `NEXT_PUBLIC_SENTRY_DSN` | Yes | — | Sentry DSN (must match `org`/`project` in `next.config.mjs`) |
+| `SENTRY_DSN` | No | — | Server-only alias; `sentry.server.config.ts` / `sentry.edge.config.ts` read `SENTRY_DSN \|\| NEXT_PUBLIC_SENTRY_DSN` |
 | `SENTRY_AUTH_TOKEN` | No | — | Auth token for Sentry CLI (source map uploads) |
 | `SENTRY_ORG` | No | `abdoocoder-m2` | Sentry organization slug (override if DSN differs) |
 | `SENTRY_PROJECT` | No | `javascript-nextjs` | Sentry project slug (override if DSN differs) |
 | `SENTRY_TUNNEL_ROUTE` | No | `/monitoring` | Tunnel route for ad-blocker circumvention |
+| **Observability (OpenTelemetry)** |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | No | `http://localhost:4318` | OTLP/HTTP collector endpoint (`observability/otel/index.ts`) |
 | **Vercel System** |
 | `VERCEL_OIDC_TOKEN` | Auto | — | Injected automatically by Vercel at deploy time |
 
@@ -66,6 +81,15 @@ This document covers all environment variables, configuration files, required se
 | `FIREBASE_MESSAGING_SENDER_ID` | Yes | — | FCM sender ID |
 | `FIREBASE_APP_ID` | Yes | — | Firebase Android app ID |
 | `FIREBASE_MEASUREMENT_ID` | No | — | Firebase Analytics measurement ID |
+| `SENTRY_DSN` | No | — | Mobile Sentry DSN, forwarded as `--dart-define`; Sentry init is skipped when empty |
+| `API_BASE_URL` | No | `https://fajrak.com` | Next.js origin serving `/api/*`; a Makefile variable (not a `.env` key) — set it in the shell |
+| `BYOK_KEK_ID` / `BYOK_PUBLIC_KEY` | No | — | Read via `--dart-define` by `envelope.dart`; the Makefile does not forward them, so the app falls back to `GET /api/byok/config` |
+
+Mobile values reach a running build only through the Makefile's `--dart-define`
+flags. The Makefile reads `.env`, falling back to `.env.local` when `.env` is
+absent, so either filename works. `.env` is **not** a declared Flutter asset and
+`dotenv.load()` is never called — anything read via `flutter_dotenv` alone
+(`TWELVE_DATA_KEY`, `PROXY_BASE_URL`) is inert today.
 
 ---
 
@@ -173,7 +197,8 @@ The project uses explicit `.env.*` files for environment-specific configuration:
 Production and preview values are configured in the Vercel dashboard under **Project → Settings → Environment Variables**. These override `.env.local` at deploy time.
 
 ### Mobile (Flutter)
-- `.env` / `.env.local` in `mobile/fajrak_flutter/` (gitignored)
+- `.env` (preferred) or `.env.local` (fallback) in `mobile/fajrak_flutter/` — both gitignored
+- `make setup` copies `.env.example` → `.env` only when neither file exists
 - `google-services.json` in `android/app/` for Firebase (gitignored)
 - No per-environment `.env` files; uses `--dart-define` or flavor-specific builds for CI
 
