@@ -57,10 +57,10 @@ dependencies:
   # Cryptography
   encrypt: ^5.0.1
   pointycastle: ^3.7.3
+  crypto: ^3.0.3
 
   # Local Database (Drift/SQLCipher)
   drift: ^2.18.0
-  sqlite3_flutter_libs: ^0.6.0+eol
   sqlcipher_flutter_libs: ^0.7.0+eol
 
   # Environment Variables

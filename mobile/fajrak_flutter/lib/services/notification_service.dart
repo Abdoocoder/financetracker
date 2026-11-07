@@ -116,10 +116,17 @@ class NotificationService {
     }
 
     // الاستماع لحالة تسجيل الدخول لحفظ التوكن فوراً
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    // Debounce: only save if token actually changed to avoid concurrent refresh races.
+    String? lastSavedToken;
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) async {
       if (data.event == AuthChangeEvent.signedIn ||
           data.event == AuthChangeEvent.tokenRefreshed) {
-        saveToken();
+        // Await saveToken to prevent concurrent calls; debounce by checking if token changed
+        // Token is obtained via onRegistered stream; if not yet available, saveToken will use cached token
+        if (_cachedFcmToken != null && _cachedFcmToken != lastSavedToken) {
+          lastSavedToken = _cachedFcmToken;
+          await saveToken(newToken: _cachedFcmToken);
+        }
       }
     });
 

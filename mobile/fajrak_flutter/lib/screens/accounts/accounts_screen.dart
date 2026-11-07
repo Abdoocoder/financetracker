@@ -376,7 +376,12 @@ class _TransferSheetState extends State<_TransferSheet> {
   void initState() {
     super.initState();
     _fromId = widget.accounts.firstWhere((a) => a['is_default'] == true, orElse: () => widget.accounts[0])['id'] as String;
-    _toId   = widget.accounts.firstWhere((a) => a['id'] != _fromId, orElse: () => widget.accounts[1])['id'] as String;
+    if (widget.accounts.length < 2) {
+      // Can't transfer with only 1 account
+      _toId = _fromId;
+    } else {
+      _toId = widget.accounts.firstWhere((a) => a['id'] != _fromId, orElse: () => widget.accounts[1])['id'] as String;
+    }
   }
 
   @override
@@ -384,6 +389,17 @@ class _TransferSheetState extends State<_TransferSheet> {
 
   Future<void> _save() async {
     if (_saving) return;
+    if (widget.accounts.length < 2) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('accounts_need_two_to_transfer'.tr(),
+              style: const TextStyle(fontSize: 13)),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ));
+      }
+      return;
+    }
     final amount = double.tryParse(_amountCtrl.text);
     if (amount == null || amount <= 0 || _fromId == _toId) return;
     _saving = true;
@@ -432,10 +448,10 @@ class _TransferSheetState extends State<_TransferSheet> {
         ),
         const SizedBox(height: 10),
         DropdownButtonFormField<String>(
-          initialValue: avail.any((a) => a['id'] == _toId) ? _toId : avail.first['id'] as String,
+          initialValue: avail.any((a) => a['id'] == _toId) ? _toId : (avail.isNotEmpty ? avail.first['id'] as String : _fromId),
           decoration: inputDec('accounts_transfer_to'.tr()),
           items: avail.map((a) => DropdownMenuItem(value: a['id'] as String, child: Text('${a['icon']} ${a['name']}', style: const TextStyle()))).toList(),
-          onChanged: (v) => setState(() => _toId = v!),
+          onChanged: avail.isNotEmpty ? (v) => setState(() => _toId = v!) : null,
         ),
         const SizedBox(height: 10),
         TextField(controller: _amountCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: cs.onSurface), decoration: inputDec('accounts_transfer_amount'.tr())),

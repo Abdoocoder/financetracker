@@ -91,7 +91,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   Future<void> _triggerSync() async {
     // Web has no local sync queue — refresh straight from Supabase.
-    if (!kIsWeb) await SyncService.fullSync();
+    if (!kIsWeb) {
+      if (!SyncService.isInitialized) {
+        if (kDebugMode) debugPrint('[Transactions] SyncService not initialized, skipping fullSync');
+      } else {
+        await SyncService.fullSync();
+      }
+    }
     if (mounted) _load(reset: true);
   }
 
@@ -281,7 +287,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         await Clipboard.setData(ClipboardData(text: csvText));
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('CSV copied to clipboard — paste into a .csv file')),
+            SnackBar(content: Text('transactions_csv_copied'.tr())),
           );
         }
       } else {

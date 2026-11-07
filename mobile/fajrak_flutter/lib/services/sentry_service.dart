@@ -24,7 +24,7 @@ class SentryService {
 
   /// Fallback release tag when PackageInfo cannot be read in time.
   /// Keep in sync with `pubspec.yaml` version.
-  static const String _fallbackRelease = 'com.fajrak.app@3.45.0+64';
+  static const String _fallbackRelease = 'com.fajrak.app@3.47.7+73';
 
   static bool get isEnabled => shouldEnable(dsn);
 

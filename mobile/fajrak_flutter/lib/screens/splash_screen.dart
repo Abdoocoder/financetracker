@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/analytics_service.dart';
+import '../services/sync_service.dart';
 import '../utils/error_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -43,25 +45,57 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _checkUser() async {
     try {
       var user = Supabase.instance.client.auth.currentUser;
+      // Rely on GoTrue's auto-refresh (configured in main.dart). Explicit refreshSession()
+      // races with the background auto-refresh and can trigger "refresh_token_already_used".
       if (user == null) {
-        try {
-          final session = await Supabase.instance.client.auth.refreshSession();
-          user = session.session?.user ?? Supabase.instance.client.auth.currentUser;
-        } catch (_) {
-          // ignore refresh errors here
-        }
+        // No user — go to login
+        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+        return;
       }
-      if (mounted) {
-        if (user == null) {
-          Navigator.pushReplacementNamed(context, '/login');
-        } else {
+
+      // User exists — check onboarding status
+      try {
+        final res = await Supabase.instance.client
+            .from('profiles')
+            .select('onboarding_done')
+            .eq('id', user.id)
+            .maybeSingle();
+
+        // Initialize local database and sync service for this user
+        await SyncService.initializeForUser(user.id);
+
+        if (mounted) {
+          if (res != null && res['onboarding_done'] == true) {
+            Navigator.pushReplacementNamed(context, '/main');
+          } else {
+            Navigator.pushReplacementNamed(context, '/onboarding');
+          }
+        }
+      } catch (e) {
+        // If profile fetch fails (e.g., 401 after auth cascade), handle gracefully
+        final msg = e.toString().toLowerCase();
+        if (msg.contains('refresh_token_already_used') ||
+            msg.contains('permission denied') ||
+            msg.contains('401') ||
+            msg.contains('42501')) {
+          // Auth state may be stale; let GoTrue auto-refresh and re-check
+          if (kDebugMode) debugPrint('[Splash] Profile fetch failed, retrying after auth refresh: $e');
+          await Future.delayed(const Duration(seconds: 1));
+          if (!mounted) return;
+          
+          user = Supabase.instance.client.auth.currentUser;
+          if (user == null) {
+            if (mounted) Navigator.pushReplacementNamed(context, '/login');
+            return;
+          }
+          // Initialize local database and sync service for this user
+          await SyncService.initializeForUser(user.id);
           try {
             final res = await Supabase.instance.client
                 .from('profiles')
                 .select('onboarding_done')
                 .eq('id', user.id)
                 .maybeSingle();
-
             if (mounted) {
               if (res != null && res['onboarding_done'] == true) {
                 Navigator.pushReplacementNamed(context, '/main');
@@ -69,38 +103,12 @@ class _SplashScreenState extends State<SplashScreen>
                 Navigator.pushReplacementNamed(context, '/onboarding');
               }
             }
-          } catch (e) {
-            final msg = e.toString().toLowerCase();
-            if (msg.contains('refresh_token_already_used')) {
-              await Future.delayed(const Duration(seconds: 1));
-              if (!mounted) return;
-              try {
-                final session = await Supabase.instance.client.auth.refreshSession();
-                user = session.session?.user ?? Supabase.instance.client.auth.currentUser;
-                if (user == null) {
-                  if (mounted) Navigator.pushReplacementNamed(context, '/login');
-                  return;
-                }
-                final res = await Supabase.instance.client
-                    .from('profiles')
-                    .select('onboarding_done')
-                    .eq('id', user.id)
-                    .maybeSingle();
-                if (mounted) {
-                  if (res != null && res['onboarding_done'] == true) {
-                    Navigator.pushReplacementNamed(context, '/main');
-                  } else {
-                    Navigator.pushReplacementNamed(context, '/onboarding');
-                  }
-                }
-                return;
-              } catch (_) {
-                // fall through to outer catch
-              }
-            }
-            rethrow;
+            return;
+          } catch (_) {
+            // fall through to outer catch
           }
         }
+        rethrow;
       }
     } catch (e) {
       // Network error while user is already logged in → go to main (offline mode)

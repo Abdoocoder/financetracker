@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../database/app_database.dart';
+import '../../services/sync_service.dart';
 import '../../utils/app_colors.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -67,8 +69,8 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
       );
       if (mounted) {
         setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('CSV copied to clipboard — paste into a .csv file')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('transactions_csv_copied'.tr())));
       }
       return;
     }
@@ -105,6 +107,9 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
       await Supabase.instance.client
           .rpc('delete_user_account', params: {'user_id': user.id});
       await Supabase.instance.client.auth.signOut();
+      // Dispose local database and reset sync state
+      await AppDatabase.disposeInstance();
+      SyncService.resetSyncState();
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
@@ -125,6 +130,9 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
     } catch (_) {
       // Ignore network errors — local session is cleared regardless
     } finally {
+      // Dispose local database and reset sync state on logout
+      await AppDatabase.disposeInstance();
+      SyncService.resetSyncState();
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }

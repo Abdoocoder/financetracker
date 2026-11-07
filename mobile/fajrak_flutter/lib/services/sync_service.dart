@@ -1,11 +1,22 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../database/app_database.dart';
 import '../utils/error_handler.dart';
 import 'repositories/transaction_repository.dart';
+
+/// Derives a deterministic encryption key for the local SQLCipher database
+/// from the user's ID. Uses SHA-256 with a fixed app-specific salt.
+/// This key is unique per user and stable across sessions.
+String _deriveEncryptionKey(String userId) {
+  const appSalt = 'fajrak_offline_db_salt_v1';
+  final bytes = utf8.encode('$appSalt$userId');
+  final digest = sha256.convert(bytes);
+  return base64Encode(digest.bytes);
+}
 
 enum SyncDirection { pull, push }
 
@@ -51,10 +62,23 @@ class SyncService {
     _txRepo = TransactionRepository(localDb);
   }
 
+  /// Initializes both [AppDatabase] and [SyncService] for the given [userId].
+  /// Derives the encryption key from the user ID. Idempotent — safe to call
+  /// multiple times; returns the existing instance if already initialized.
+  static Future<AppDatabase> initializeForUser(String userId) async {
+    final encryptionKey = _deriveEncryptionKey(userId);
+    final db = await AppDatabase.initialize(encryptionKey: encryptionKey);
+    initialize(db);
+    return db;
+  }
+
   static AppDatabase get localDb {
     assert(_localDb != null, 'SyncService.initialize() must be called first');
     return _localDb!;
   }
+
+  /// Returns true if [initialize] or [initializeForUser] has been called.
+  static bool get isInitialized => _localDb != null;
 
   static Future<SyncResult> pullWithPagination({
     int pageSize = 1000,
@@ -152,7 +176,7 @@ class SyncService {
     String userId,
     DateTime since,
   ) async {
-    final tables = ['transactions', 'debts', 'savings_goals', 'budgets'];
+    final tables = ['transactions', 'debts', 'savings_goals', 'budgets', 'accounts', 'recurring_transactions'];
     final deleted = <Map<String, dynamic>>[];
 
     for (final table in tables) {
@@ -253,7 +277,14 @@ class SyncService {
         description: Value(data['description']),
         transactionDate: Value(DateTime.parse(data['transaction_date'])),
         isRecurring: Value(data['is_recurring']),
+        recurringDay: Value(data['recurring_day']),
         accountId: Value(data['account_id']),
+        transferToAccountId: Value(data['transfer_to_account_id']),
+        transferPairId: Value(data['transfer_pair_id']),
+        sourceRecurringId: Value(data['source_recurring_id']),
+        originalAmount: Value(data['original_amount']),
+        originalCurrency: Value(data['original_currency']),
+        exchangeRate: Value(data['exchange_rate']),
         syncStatus: const Value('synced'),
         localVersion: Value(remoteVersion),
       ));
@@ -325,6 +356,9 @@ class SyncService {
         priority: Value(data['priority']),
         notes: Value(data['notes']),
         isPaid: Value(data['is_paid']),
+        originalAmountForeign: Value(data['original_amount_foreign']),
+        remainingAmountForeign: Value(data['remaining_amount_foreign']),
+        currency: Value(data['currency']),
         syncStatus: const Value('synced'),
         localVersion: Value(remoteVersion),
       ));
@@ -475,6 +509,16 @@ class SyncService {
               ..where((t) => t.id.equals(id)))
             .go();
         break;
+      case 'accounts':
+        await (localDb.delete(localDb.accountsTable)
+              ..where((t) => t.id.equals(id)))
+            .go();
+        break;
+      case 'recurring_transactions':
+        await (localDb.delete(localDb.recurringTransactionsTable)
+              ..where((t) => t.id.equals(id)))
+            .go();
+        break;
     }
   }
 
@@ -546,8 +590,27 @@ class SyncService {
     }
   }
 
+  static String _tableNameForEntityType(String entityType) {
+    switch (entityType) {
+      case 'transaction':
+        return 'transactions';
+      case 'debt':
+        return 'debts';
+      case 'goal':
+        return 'savings_goals';
+      case 'account':
+        return 'accounts';
+      case 'budget':
+        return 'budgets';
+      case 'recurring':
+        return 'recurring_transactions';
+      default:
+        return entityType;
+    }
+  }
+
   static Future<void> _pushOperation(SyncQueueTableData item) async {
-    final table = item.entityType;
+    final table = _tableNameForEntityType(item.entityType);
     final id = item.entityId;
     final payload = jsonDecode(item.payload) as Map<String, dynamic>;
 

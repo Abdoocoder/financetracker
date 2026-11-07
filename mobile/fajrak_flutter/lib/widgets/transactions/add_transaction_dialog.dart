@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../services/currency_service.dart';
+import '../../services/repositories/transaction_repository.dart';
+import '../../services/sync_service.dart';
+import '../../database/app_database.dart';
+import '../../utils/app_colors.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:uuid/uuid.dart';
 
 class AddTransactionDialog extends StatefulWidget {
   final Map<String, dynamic>? existing;
@@ -135,16 +141,80 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     };
 
     try {
-      if (widget.existing != null) {
-        await Supabase.instance.client
-            .from('transactions')
-            .update(data)
-            .eq('id', widget.existing!['id']);
+      // Check connectivity
+      final connectivityResult = await Connectivity().checkConnectivity();
+      final isOnline = connectivityResult.any((r) => r != ConnectivityResult.none);
+
+      if (isOnline) {
+        try {
+          if (widget.existing != null) {
+            await Supabase.instance.client
+                .from('transactions')
+                .update(data)
+                .eq('id', widget.existing!['id']);
+          } else {
+            await Supabase.instance.client.from('transactions').insert(data);
+          }
+          widget.onSaved();
+          if (mounted) Navigator.pop(context);
+        } catch (e) {
+          // Network error during online operation — fall back to offline queue
+          if (mounted) {
+            try {
+              final db = AppDatabase.maybeInstance;
+              if (db != null && SyncService.isInitialized) {
+                final repo = TransactionRepository(db);
+                if (widget.existing != null) {
+                  await repo.enqueueUpdate(entityId: widget.existing!['id'] as String, payload: data);
+                } else {
+                  final newId = const Uuid().v4();
+                  await repo.enqueueCreate(entityId: newId, payload: {...data, 'id': newId});
+                }
+                widget.onSaved();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('toast_offline_queued'.tr()),
+                    backgroundColor: AppColors.warning,
+                  ));
+                  Navigator.pop(context);
+                }
+              } else {
+                rethrow; // Re-throw if offline queue not available
+              }
+            } catch (_) {
+              rethrow; // Re-throw original error if offline queue fails
+            }
+          }
+        }
       } else {
-        await Supabase.instance.client.from('transactions').insert(data);
+        // Offline mode — queue locally
+        final db = AppDatabase.maybeInstance;
+        if (db != null && SyncService.isInitialized) {
+          final repo = TransactionRepository(db);
+          if (widget.existing != null) {
+            await repo.enqueueUpdate(entityId: widget.existing!['id'] as String, payload: data);
+          } else {
+            final newId = const Uuid().v4();
+            await repo.enqueueCreate(entityId: newId, payload: {...data, 'id': newId});
+          }
+          widget.onSaved();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('toast_offline_queued'.tr()),
+              backgroundColor: AppColors.warning,
+            ));
+            Navigator.pop(context);
+          }
+        } else {
+          // Offline queue not available (e.g., not initialized yet)
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('toast_offline_unavailable'.tr()),
+              backgroundColor: AppColors.error,
+            ));
+          }
+        }
       }
-      widget.onSaved();
-      if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

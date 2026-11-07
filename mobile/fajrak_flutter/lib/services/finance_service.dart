@@ -38,12 +38,12 @@ class FinanceService {
   }) async {
     final uid = _uid;
     if (uid == null) return {};
-    final response = await _db.rpc('get_monthly_financial_summary', params: {
+    final response = await _rpcWithRetry<Map>('get_monthly_financial_summary', {
       'p_user_id': uid,
       'p_year': year,
       'p_month': month,
     });
-    return Map<String, dynamic>.from(response as Map);
+    return Map<String, dynamic>.from(response);
   }
 
   /// جلب ملخص لوحة المعلومات المالية باستخدام RPC المركزية
@@ -65,13 +65,13 @@ class FinanceService {
   }) async {
     final uid = _uid;
     if (uid == null) return {};
-    final response = await _db.rpc('get_zakat_summary', params: {
+    final response = await _rpcWithRetry<Map>('get_zakat_summary', {
       'p_user_id': uid,
       'p_gold_price_per_gram': goldPrice,
       'p_silver_price_per_gram': silverPrice,
       'p_usd_to_local_rate': usdToLocalRate,
     });
-    return Map<String, dynamic>.from(response as Map);
+    return Map<String, dynamic>.from(response);
   }
 
   /// جلب الحولات النشطة (استثمارات + ذهب/فضة) من RPC الموحد get_zakat_hauls.
@@ -79,7 +79,7 @@ class FinanceService {
   static Future<List<Map<String, dynamic>>> fetchZakatHauls() async {
     final uid = _uid;
     if (uid == null) return [];
-    final response = await _db.rpc('get_zakat_hauls', params: {'p_user_id': uid});
+    final response = await _rpcWithRetry<dynamic>('get_zakat_hauls', {'p_user_id': uid});
     if (response is List) {
       return response.map((e) => Map<String, dynamic>.from(e as Map)).toList();
     }

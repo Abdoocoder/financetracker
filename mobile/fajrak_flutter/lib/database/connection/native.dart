@@ -12,12 +12,19 @@ QueryExecutor buildDatabaseConnection(String encryptionKey) {
 
     return NativeDatabase.createInBackground(
       file,
-      setup: (rawDb) {
+      setup: (rawDb) async {
         rawDb.execute("PRAGMA key = '${encryptionKey.replaceAll("'", "''")}'");
         rawDb.execute('PRAGMA cipher_page_size = 4096');
         rawDb.execute('PRAGMA kdf_iter = 64000');
         rawDb.execute('PRAGMA cipher_hmac_algorithm = HMAC_SHA1');
         rawDb.execute('PRAGMA cipher_kdf_algorithm = PBKDF2_HMAC_SHA1');
+
+        // Verify SQLCipher is actually active (encryption working)
+        // rawDb is a sqlite3.Database; use select to run PRAGMA
+        final result = rawDb.select('PRAGMA cipher_version;');
+        if (result.isEmpty) {
+          throw Exception('CRITICAL: SQLCipher is not active. Database is unencrypted!');
+        }
       },
     );
   });

@@ -365,7 +365,7 @@ class _LearnScreenState extends State<LearnScreen> {
       );
       final titleBuilder = ui.ParagraphBuilder(titleParagraphStyle)
         ..pushStyle(ui.TextStyle(color: AppColors.warning))
-        ..addText('فجرك');
+        ..addText('learn_app_name'.tr());
       final titleParagraph = titleBuilder.build()
         ..layout(const ui.ParagraphConstraints(width: W));
       canvas.drawParagraph(titleParagraph, const Offset(0, 225));
@@ -428,7 +428,7 @@ class _LearnScreenState extends State<LearnScreen> {
       );
       final linkBuilder = ui.ParagraphBuilder(linkStyle)
         ..pushStyle(ui.TextStyle(color: AppColors.textSecondary))
-        ..addText('fajrak.com');
+        ..addText('learn_app_url'.tr());
       final linkParagraph = linkBuilder.build()
         ..layout(const ui.ParagraphConstraints(width: W));
       canvas.drawParagraph(linkParagraph, const Offset(0, H - 65));
@@ -448,7 +448,7 @@ class _LearnScreenState extends State<LearnScreen> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Lesson link copied to clipboard')),
+            SnackBar(content: Text('learn_link_copied'.tr())),
           );
         }
         return;

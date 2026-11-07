@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:async';
 
 import 'app_state.dart';
 import 'providers/dashboard_layout_provider.dart';
@@ -37,6 +39,7 @@ import 'screens/learn/learn_screen.dart';
 import 'utils/error_handler.dart';
 import 'services/notification_service.dart';
 import 'services/sentry_service.dart';
+import 'services/sync_service.dart';
 
 Future<void> main() async {
   // على الويب Sentry يشغّل appRunner داخل runZonedGuarded (منطقة جديدة لالتقاط
@@ -79,7 +82,18 @@ Future<void> _bootstrapApp() async {
       ),
     );
   } else {
-    await Firebase.initializeApp();
+    try {
+      await Firebase.initializeApp();
+    } catch (e, st) {
+      // If google-services.json is missing or invalid, log the error but continue booting.
+      // Push notifications will be disabled but the app remains functional.
+      debugPrint('[main] Firebase.initializeApp() failed: $e');
+      SentryService.captureReport(
+        e,
+        stackTrace: st,
+        screen: 'main.dart:_bootstrapApp',
+      );
+    }
   }
 
   // Initialize Supabase with timeout and retry for gateway 504 errors
@@ -128,11 +142,33 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+
   @override
   void initState() {
     super.initState();
     _setupErrorHandling();
     _setupFirebaseMessaging();
+    _setupConnectivityListener();
+  }
+
+  void _setupConnectivityListener() {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> results) {
+      final hasConnection = results.any((r) => r != ConnectivityResult.none);
+      if (hasConnection && SyncService.isInitialized) {
+        // Network restored — trigger background sync
+        SyncService.fullSync().catchError((e) {
+          if (kDebugMode) debugPrint('[Connectivity] Background sync failed: $e');
+          return SyncResult(error: e.toString());
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
   }
 
   void _setupErrorHandling() {
