@@ -49,7 +49,7 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
   }
 
   final _incomeCategories = ['راتب', 'عمل حر', 'استثمار', 'مكافأة', 'أخرى'];
-  final _expenseCategories = ['طعام', 'مواصلات', 'فواتير', 'صحة', 'ترفيه', 'تسوق', 'إيجار', 'اشتراكات', 'عناية', 'سفر', 'دين', 'أخرى'];
+  final _expenseCategories = ['طعام', 'مواصلات', 'فواتير', 'صحة', 'ترفيه', 'تسوق', 'إيجار', 'اشتراكات', 'عناية', 'سفر', 'تبرعات', 'أخرى'];
 
   List<String> get _currentCategories => 
       _txType == 'income' ? _incomeCategories : _expenseCategories;
@@ -70,7 +70,8 @@ class _DashboardQuickAddState extends State<DashboardQuickAdd> {
       case 'اشتراكات': return 'cat_subs'.tr();
       case 'عناية': return 'cat_personal'.tr();
       case 'سفر': return 'cat_travel'.tr();
-      case 'دين': return 'cat_debt_pay'.tr();
+      case 'تبرعات': return 'cat_charity'.tr();
+      case 'ديون': return 'cat_debt_pay'.tr();
       default: return 'cat_others'.tr();
     }
   }

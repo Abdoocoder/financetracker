@@ -83,6 +83,7 @@ export const arTransactions = {
     cat_travel: 'سفر وخروجات',
     cat_debt_pay: 'تسديد ديون',
     cat_others: 'أخرى',
+    cat_charity: 'تبرعات',
     debt_received_cat: 'قرض مستلم',
     debt_received_desc: 'استلام قرض: {}',
 } as const

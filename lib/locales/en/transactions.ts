@@ -76,6 +76,7 @@ export const enTransactions = {
     cat_travel: 'Travel & Trips',
     cat_debt_pay: 'Debt Repayment',
     cat_others: 'Others',
+    cat_charity: 'Donations',
     debt_received_cat: 'Loan Received',
     debt_received_desc: 'Loan received: {}',
 } as const

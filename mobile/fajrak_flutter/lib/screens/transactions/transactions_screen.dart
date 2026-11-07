@@ -342,7 +342,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           .fold(0.0, (a, t) => a + (t['amount'] as num).toDouble());
 
       await PdfReportService.shareMonthlyReport(
-        data: ReportData(
+        data: ReportData.legacy(
           userName: _userName,
           currency: _currency,
           month: month,

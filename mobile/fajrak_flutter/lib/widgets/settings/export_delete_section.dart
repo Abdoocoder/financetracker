@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:async';
 import 'settings_accordion.dart';
 import '../common/confirm_dialog.dart';
 
@@ -59,8 +60,15 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
     buffer.writeln('csv_header'.tr());
     for (final tx in data) {
       final type = tx['type'] == 'income' ? 'csv_income'.tr() : 'csv_expense'.tr();
+      final amount = (tx['amount'] as num? ?? 0).toStringAsFixed(2);
+      final originalAmount = (tx['original_amount'] as num? ?? 0).toStringAsFixed(2);
+      final originalCurrency = tx['original_currency'] ?? '';
+      final exchangeRate = (tx['exchange_rate'] as num? ?? 1.0).toStringAsFixed(4);
+      final desc = (tx['description'] as String?)?.replaceAll(',', ' ') ?? '';
+      final category = (tx['category'] as String?)?.replaceAll(',', ' ') ?? '';
+      
       buffer.writeln(
-          '${tx['transaction_date']},$type,${tx['amount']},${tx['category'] ?? ''},${tx['description'] ?? ''}');
+          '${tx['transaction_date']},$type,$amount,$originalAmount,$originalCurrency,$exchangeRate,$category,$desc');
     }
 
     if (kIsWeb) {
@@ -76,13 +84,14 @@ class _ExportDeleteSectionState extends State<ExportDeleteSection> {
     }
 
     final directory = await getTemporaryDirectory();
-    final file = File(
-        '${directory.path}/fajrak_export_${DateTime.now().millisecondsSinceEpoch}.csv');
+    final now = DateTime.now();
+    final filename = 'fajrak_transactions_${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour}${now.minute}.csv';
+    final file = File('${directory.path}/$filename');
     await file.writeAsString('\uFEFF${buffer.toString()}');
 
     await SharePlus.instance.share(
         ShareParams(
-          files: [XFile(file.path)],
+          files: [XFile(file.path, mimeType: 'text/csv')],
           subject: 'settings_export_msg'.tr(),
         ),
       );

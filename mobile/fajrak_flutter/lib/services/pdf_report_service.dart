@@ -19,6 +19,8 @@ class ReportData {
   final double debtPayments;
   final List<Map<String, dynamic>> transactions;
   final List<Map<String, dynamic>> debts;
+  final DateTime monthStart;
+  final DateTime monthEnd;
 
   const ReportData({
     required this.userName,
@@ -30,7 +32,38 @@ class ReportData {
     required this.debtPayments,
     required this.transactions,
     required this.debts,
+    required this.monthStart,
+    required this.monthEnd,
   });
+
+  /// Convenience factory for backward compatibility
+  factory ReportData.legacy({
+    required String userName,
+    required String currency,
+    required int month,
+    required int year,
+    required double income,
+    required double expenses,
+    required double debtPayments,
+    required List<Map<String, dynamic>> transactions,
+    required List<Map<String, dynamic>> debts,
+  }) {
+    final start = DateTime(year, month, 1);
+    final end = DateTime(year, month + 1, 0, 23, 59, 59);
+    return ReportData(
+      userName: userName,
+      currency: currency,
+      month: month,
+      year: year,
+      income: income,
+      expenses: expenses,
+      debtPayments: debtPayments,
+      transactions: transactions,
+      debts: debts,
+      monthStart: start,
+      monthEnd: end,
+    );
+  }
 }
 
 class PdfReportService {
@@ -39,6 +72,9 @@ class PdfReportService {
     'يناير','فبراير','مارس','أبريل','مايو','يونيو',
     'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر',
   ];
+
+  // Localized strings for PDF
+  static const _uncategorizedEn = 'Uncategorized';
 
   // Brand colors
   static const _green  = PdfColor.fromInt(0xFF10B981);
@@ -73,8 +109,11 @@ class PdfReportService {
     // Category breakdown (expenses only, excluding debts)
     final catMap = <String, double>{};
     for (final tx in data.transactions) {
-      if (tx['type'] == 'expense' && !debtCats.contains(tx['category'])) {
-        final cat = (tx['category'] as String?) ?? '—';
+      final type = (tx['type'] as String?) ?? 'expense';
+      final catRaw = (tx['category'] as String?)?.trim();
+      final cat = (catRaw != null && catRaw.isNotEmpty) ? catRaw : _uncategorizedEn;
+      
+      if (type == 'expense' && !debtCats.contains(cat)) {
         catMap[cat] = (catMap[cat] ?? 0) + (tx['amount'] as num).toDouble();
       }
     }
@@ -267,12 +306,14 @@ class PdfReportService {
                 ),
                 // Data rows
                 ...data.transactions.map((tx) {
-                  final isIncome = tx['type'] == 'income';
-                  final amount   = (tx['amount'] as num).toDouble();
+                  final isIncome = (tx['type'] as String?) == 'income';
+                  final amount   = (tx['amount'] as num? ?? 0).toDouble();
                   final amtStr   = '${isIncome ? '+' : '-'}${fmt(amount)} ${data.currency}';
-                  final date     = (tx['transaction_date'] as String? ?? '').replaceAll('-', '/');
-                  final desc     = (tx['description'] as String? ?? '—');
-                  final cat      = (tx['category']    as String? ?? '—');
+                  final date     = ((tx['transaction_date'] as String?) ?? '').replaceAll('-', '/');
+                  final descRaw  = (tx['description'] as String?)?.trim();
+                  final desc     = (descRaw != null && descRaw.isNotEmpty) ? descRaw : '—';
+                  final catRaw   = (tx['category'] as String?)?.trim();
+                  final cat      = (catRaw != null && catRaw.isNotEmpty) ? catRaw : '—';
 
                   return pw.TableRow(children: [
                     _tableCell(date, regular, color: _muted),
@@ -298,12 +339,13 @@ class PdfReportService {
               child: pw.Table(
                 border: const pw.TableBorder(
                   horizontalInside: pw.BorderSide(color: _border, width: 0.5),
+                  verticalInside: pw.BorderSide(color: _border, width: 0.5),
                 ),
                 columnWidths: {
-                  0: const pw.FlexColumnWidth(3),
+                  0: const pw.FlexColumnWidth(3.5),
                   1: const pw.FlexColumnWidth(2),
                   2: const pw.FlexColumnWidth(2),
-                  3: const pw.FlexColumnWidth(2),
+                  3: const pw.FlexColumnWidth(1.5),
                 },
                 children: [
                   pw.TableRow(
@@ -316,12 +358,15 @@ class PdfReportService {
                     final remaining = (d['remaining_amount'] as num? ?? 0).toDouble();
                     final monthly   = (d['monthly_payment']  as num? ?? 0).toDouble();
                     final auto      = d['auto_deduct'] == true ? '✓' : '—';
-                    return pw.TableRow(children: [
-                      _tableCell(d['name'] as String? ?? '—', regular),
-                      _tableCell('${fmt(remaining)} ${data.currency}', regular, color: _red),
-                      _tableCell(monthly > 0 ? '${fmt(monthly)} ${data.currency}' : '—', regular),
-                      _tableCell(auto, bold, color: auto == '✓' ? _green : _muted),
-                    ]);
+                    return pw.TableRow(
+                      decoration: const pw.BoxDecoration(color: PdfColors.white),
+                      children: [
+                        _tableCell(d['name'] as String? ?? '—', regular),
+                        _tableCell('${fmt(remaining)} ${data.currency}', regular, color: _red, align: pw.TextAlign.center),
+                        _tableCell(monthly > 0 ? '${fmt(monthly)} ${data.currency}' : '—', regular, align: pw.TextAlign.center),
+                        _tableCell(auto, bold, color: auto == '✓' ? _green : _muted, align: pw.TextAlign.center),
+                      ],
+                    );
                   }),
                 ],
               ),

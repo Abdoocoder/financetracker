@@ -25,11 +25,27 @@ class AddTransactionDialog extends StatefulWidget {
   State<AddTransactionDialog> createState() => _AddTransactionDialogState();
 }
 
-const _incomeCategories  = ['راتب','عمل حر','استثمار','مكافأة','هدية','أخرى'];
-const _expenseCategories = ['طعام','مواصلات','فواتير','صحة','تعليم','ترفيه','ملابس','إيجار','اشتراكات','عناية','سفر','دين','ديون','أخرى'];
+List<String> _expenseCategories(BuildContext context) => [
+  'طعام',
+  'مواصلات',
+  'فواتير',
+  'صحة',
+  'تعليم',
+  'ترفيه',
+  'ملابس',
+  'إيجار',
+  'اشتراكات',
+  'عناية',
+  'سفر',
+  'تبرعات', // Using hardcoded Arabic for now since it's the main locale; could use context.tr() if needed
+  'ديون',
+  'أخرى',
+];
 
-List<String> _categoriesFor(String type) =>
-    type == 'income' ? _incomeCategories : _expenseCategories;
+const _incomeCategories = ['راتب','عمل حر','استثمار','مكافأة','هدية','أخرى'];
+
+List<String> _categoriesFor(String type, BuildContext context) =>
+    type == 'income' ? _incomeCategories : _expenseCategories(context);
 
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
   late final ValueNotifier<String> _typeController;
@@ -56,12 +72,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
     // Only reset category for new transactions — when editing, keep the original value.
     if (widget.existing == null) {
-      final cats = _categoriesFor(_typeController.value);
+      final cats = _categoriesFor(_typeController.value, context);
       if (!cats.contains(_catController.text)) _catController.text = cats.first;
     }
 
     _typeController.addListener(() {
-      final cats = _categoriesFor(_typeController.value);
+      final cats = _categoriesFor(_typeController.value, context);
       if (!cats.contains(_catController.text)) {
         setState(() => _catController.text = cats.first);
       } else {
@@ -488,7 +504,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             ValueListenableBuilder<String>(
               valueListenable: _typeController,
               builder: (ctx, type, _) {
-                final base = _categoriesFor(type);
+                final base = _categoriesFor(type, context);
                 // Include existing category even if not in the standard list (e.g. auto-added 'ديون').
                 final categories = base.contains(_catController.text)
                     ? base
