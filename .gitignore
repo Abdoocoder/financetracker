@@ -116,3 +116,4 @@ playwright-report/
 docs/internal/
 *.hprof
 public/*.apk
+docs/_recon/
