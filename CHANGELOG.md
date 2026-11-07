@@ -173,6 +173,37 @@
 ### Test
 - **E2E flaky tests fixed**: `key-rotation.spec.ts` afterEach hook hardened with try/catch, Escape key, short timeouts. `byok-chat-flow.spec.ts` Ollama tests skipped when not configured. No flaky tests remain.
 
+# Changelog
+
+## [Unreleased]
+
+## [3.47.8+74] — 2026-11-07
+
+### Fixed (Critical)
+- **SyncService crash on pull-to-refresh** (`FAJRAK-MOBILE-R`): `SyncService.initializeForUser()` now called after auth in splash screen; `isInitialized` guard prevents crash when local DB not ready.
+- **Firebase init crash on Android** (`FAJRAK-MOBILE-D`): `Firebase.initializeApp()` wrapped in try-catch; missing `google-services.json` logs to Sentry but continues booting (push notifications disabled).
+- **Auth refresh token cascade** (`FAJRAK-MOBILE-8/J/N`): Removed explicit `refreshSession()` calls in splash; debounced `NotificationService.onAuthStateChange` listener with `await saveToken()` to prevent concurrent refresh races.
+- **504 Gateway Timeouts on unprotected RPCs** (`FAJRAK-MOBILE-F/E/Q/P`): Wrapped `fetchMonthlyFinancialSummary`, `fetchZakatSummary`, `fetchZakatHauls` in `_rpcWithRetry` (exponential backoff, 3 retries).
+- **SQLCipher native crash & unencrypted DB risk** (`FAJRAK-MOBILE-2`): Removed conflicting `sqlite3_flutter_libs`; added runtime `PRAGMA cipher_version` verification to fail fast if encryption inactive.
+
+### Fixed (Exports)
+- **PDF Transactions table missing Description/Category**: Added proper null/empty handling with `.trim()` and fallback to '—'.
+- **PDF Category Breakdown empty**: Fixed category aggregation to handle null/empty categories → 'Uncategorized'; proper debt category filtering.
+- **PDF Debt Table RTL Layout Broken**: Added vertical borders, center alignment for numeric columns, explicit `textDirection: rtl`.
+- **CSV Wrong File Extension/MIME Type**: Added `mimeType: 'text/csv'` to `XFile` for proper file type detection.
+- **CSV Unclear Filename**: Format now `fajrak_transactions_YYYYMMDD_HHMM.csv`.
+- **CSV Incomplete Data**: Added `original_amount`, `original_currency`, `exchange_rate` columns; proper CSV escaping.
+
+### Changed (UX)
+- **Category rename: 'دين' → 'تبرعات'**: Renamed expense category "Religion/Charity" to "Donations" across Mobile, Web, and DB to eliminate confusion with "ديون" (Debts). Migration script provided.
+
+### Fixed (Offline)
+- **Offline queue never fed**: Transaction dialog now queues operations via `TransactionRepository.enqueueCreate/Update` when offline or on network error; `Connectivity()` listener in `MyApp` triggers `SyncService.fullSync()` on network restore.
+
+### Documentation
+- Test counts updated: **347 Flutter tests** (up from 260 documented).
+- i18n parity: **1065 keys** in both `en.json` and `ar.json`.
+
 ## [3.47.7+73] — 2026-10-29
 
 ### Fixed

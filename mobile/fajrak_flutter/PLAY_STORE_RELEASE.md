@@ -1,3 +1,42 @@
+# Google Play Store Release Details - v3.47.8+74
+
+## Version Code: 74
+## Version Name: 3.47.8
+
+### 🛠️ Fixed (Critical)
+- **SyncService crash on pull-to-refresh**: `SyncService.initializeForUser()` now called after auth in splash screen; `isInitialized` guard prevents crash when local DB not ready.
+- **Firebase init crash on Android**: `Firebase.initializeApp()` wrapped in try-catch; missing `google-services.json` logs to Sentry but continues booting (push notifications disabled).
+- **Auth refresh token cascade**: Removed explicit `refreshSession()` calls in splash; debounced `NotificationService.onAuthStateChange` listener with `await saveToken()` to prevent concurrent refresh races.
+- **504 Gateway Timeouts on unprotected RPCs**: Wrapped `fetchMonthlyFinancialSummary`, `fetchZakatSummary`, `fetchZakatHauls` in `_rpcWithRetry` (exponential backoff, 3 retries).
+- **SQLCipher native crash & unencrypted DB risk**: Removed conflicting `sqlite3_flutter_libs`; added runtime `PRAGMA cipher_version` verification to fail fast if encryption inactive.
+
+### 🛠️ Fixed (Exports)
+- **PDF Transactions table missing Description/Category**: Added proper null/empty handling with `.trim()` and fallback to '—'.
+- **PDF Category Breakdown empty**: Fixed category aggregation to handle null/empty categories → 'Uncategorized'; proper debt category filtering.
+- **PDF Debt Table RTL Layout Broken**: Added vertical borders, center alignment for numeric columns, explicit `textDirection: rtl`.
+- **CSV Wrong File Extension/MIME Type**: Added `mimeType: 'text/csv'` to `XFile` for proper file type detection.
+- **CSV Unclear Filename**: Format now `fajrak_transactions_YYYYMMDD_HHMM.csv`.
+- **CSV Incomplete Data**: Added `original_amount`, `original_currency`, `exchange_rate` columns; proper CSV escaping.
+
+### 🔄 Changed (UX)
+- **Category rename: 'دين' → 'تبرعات'**: Renamed expense category "Religion/Charity" to "Donations" across Mobile, Web, and DB to eliminate confusion with "ديون" (Debts). Migration script provided.
+
+### 🔧 Fixed (Offline)
+- **Offline queue never fed**: Transaction dialog now queues operations via `TransactionRepository.enqueueCreate/Update` when offline or on network error; `Connectivity()` listener in `MyApp` triggers `SyncService.fullSync()` on network restore.
+
+### 📝 Updated
+- **Test Counts:** Updated to **347 Flutter tests** (from 260 previously documented).
+- **i18n Parity:** **1065 keys** in both `en.json` and `ar.json`.
+
+---
+
+**بالعربية:**
+تحديث جديد! تقارير PDF احترافية، تصدير CSV محسّن، وتغيير فئة "دين" إلى "تبرعات" لتجنب الالتباس مع "ديون". إصلاحات شاملة للاستقرار والعمل دون اتصال.
+
+**English:** New Update! Professional PDF reports, enhanced CSV export, and renamed "Religion" category to "Donations" to avoid confusion. Comprehensive stability and offline-first fixes.
+
+---
+
 # Google Play Store Release Details - v3.47.7+73
 
 ## Version Code: 73
