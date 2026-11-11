@@ -1,6 +1,6 @@
 # Fajrak Flutter Development Makefile
 
-.PHONY: help setup setup-linux run run-web run-proxy run-web-with-proxy build-web build-apk build-bundle test test-coverage clean deps analyze
+.PHONY: help setup setup-linux run run-web run-proxy run-web-with-proxy build-web check-secrets build-apk build-bundle test test-coverage clean deps analyze
 
 # Which env file the recipes read. `.env` wins when both exist; `.env.local`
 # is the fallback so a locally wired file is never silently ignored and
@@ -55,6 +55,7 @@ help:
 	@echo "  make run-web-with-proxy - Run Flutter web against the proxy (2 terminals)"
 	@echo ""
 	@echo "Building:"
+	@echo "  make check-secrets  - Verify release build inputs exist (google-services.json, key.properties, keystore)"
 	@echo "  make build-web      - Build production web bundle"
 	@echo "  make build-apk      - Build release APK"
 	@echo "  make build-bundle   - Build release App Bundle for Play Store"
@@ -131,14 +132,49 @@ run-web-with-proxy:
 build-web:
 	flutter build web --release $(DART_DEFINES)
 
+# ── Release build preflight ────────────────────────────────────────────────
+# Three gitignored files are required by the release build. Without them the
+# build fails several minutes in with "File google-services.json is missing"
+# (or a null keystore signing error) — long after the fix is obvious. Check first.
+# Only `build-apk` / `build-bundle` depend on this; the dart-define extraction
+# above is untouched and `build-web` / `run` are unaffected.
+# NOTE: the keystore path below is the repo's configured `storeFile` value
+# (android/key.properties: storeFile=upload-keystore.jks, resolved relative to
+# android/app). If that property is ever changed, update this list too.
+RELEASE_INPUTS = \
+	android/app/google-services.json \
+	android/key.properties \
+	android/app/upload-keystore.jks
+
+check-secrets:
+	@missing=0; \
+	for f in $(RELEASE_INPUTS); do \
+		if [ ! -f "$$f" ]; then \
+			echo "❌ Missing release build input: $$f"; \
+			missing=1; \
+		fi; \
+	done; \
+	if [ $$missing -ne 0 ]; then \
+		echo ""; \
+		echo "These files are gitignored and must be restored before building:"; \
+		echo "  android/app/google-services.json  <- Firebase Console > Project Settings > Your Android App"; \
+		echo "                                       (project fajrak-f7df1, package com.fajrak.app)"; \
+		echo "  android/key.properties           <- release signing config (keyAlias + storeFile=upload-keystore.jks)"; \
+		echo "  android/app/upload-keystore.jks  <- release upload keystore"; \
+		echo ""; \
+		echo "See docs/DEPLOYMENT.md > Environment Setup > Mobile, and docs/guides/getting-started.md > Android Setup."; \
+		exit 1; \
+	fi; \
+	echo "✅ Release build inputs present."
+
 # Build release APK
-build-apk:
+build-apk: check-secrets
 	flutter build apk --release $(DART_DEFINES) $(SENTRY_DEFINE)
 # Run on connected Android / mobile device (includes DART_DEFINES + SENTRY_DEFINE)
 run-device:
 	flutter run -d 1381970537000198 $(DART_DEFINES) $(SENTRY_DEFINE)
 # Build release App Bundle
-build-bundle:
+build-bundle: check-secrets
 	flutter build appbundle --release $(DART_DEFINES) $(SENTRY_DEFINE)
 
 # Run tests

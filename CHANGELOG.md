@@ -85,6 +85,13 @@
     and testing locally with ngrok.
 
 ### Changed
+- **Mobile release builds fail fast on missing inputs.** `make check-secrets` verifies
+  `android/app/google-services.json`, `android/key.properties`, and
+  `android/app/upload-keystore.jks` before `make build-bundle` / `make build-apk` start,
+  printing restore instructions instead of letting Gradle fail several minutes in.
+  `docs/DEPLOYMENT.md` also had the `google-services.json` path wrong (it lives under
+  `android/app/`, not the project root), told readers to build the mobile `.env` from the
+  root (web) template, and claimed no GitHub Actions workflows exist. All corrected.
 - **Android minSdkVersion**: bumped from 24 to 26 (Android 8.0) to support
   sentry_flutter ^10.2.0. Drops ~1% of devices still on Android 7.x.
 - **Cron query load cut for the Supabase Free tier.** `/api/health-score-snapshot`

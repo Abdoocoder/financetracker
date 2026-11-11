@@ -8,7 +8,7 @@
 | **Web App** | Vercel | `vercel.json`, `next.config.mjs` | Next.js 16 (App Router, React 19) production deployment at `https://fajrak.com` |
 | **Mobile App (Android)** | Google Play Store | `mobile/fajrak_flutter/Makefile`, `mobile/fajrak_flutter/pubspec.yaml` | Flutter 3.47.8 release App Bundle (`.aab`) built via Makefile with injected credentials |
 | **Database** | Supabase (PostgreSQL 17) | `supabase/config.toml` (local), Supabase Dashboard | Project `ujwcvtpwsaidljecqbaa` — Auth, Database, Realtime, Edge Functions, Storage |
-| **Push Notifications** | Firebase (FCM) | `mobile/fajrak_flutter/firebase.json`, `mobile/fajrak_flutter/google-services.json` | Android FCM via Firebase project `fajrak-f7df1`; Web Push via VAPID keys |
+| **Push Notifications** | Firebase (FCM) | `mobile/fajrak_flutter/firebase.json`, `mobile/fajrak_flutter/android/app/google-services.json` | Android FCM via Firebase project `fajrak-f7df1`; Web Push via VAPID keys |
 | **Monitoring** | Sentry, Vercel Analytics | `next.config.mjs`, `mobile/fajrak_flutter/lib/services/sentry_service.dart` | Error tracking, web vitals |
 
 ---
@@ -17,7 +17,16 @@
 
 ### CI/CD Workflows (GitHub Actions)
 
-No GitHub Actions workflows are currently configured in this repository (`.github/workflows/` does not exist). CI/CD is managed through:
+Four workflows live in `.github/workflows/`:
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `lint-test-build.yml` | push / PR to `main` | Web lint, typecheck, tests, build; Flutter analyze + test |
+| `supabase-validate.yml` | push to `main`, manual | Dry-run, prod-safe Supabase validation |
+| `neon-preview-branch.yml` | PR opened / closed | Creates and deletes a Neon preview branch (diagnostics sandbox only — no Auth/PostgREST, no RLS) |
+| `supabase-backup.yml` | daily 02:00 UTC, manual | Supabase daily backup |
+
+None of them publishes the mobile app. Deployment itself is host-managed or manual:
 - **Web**: Vercel auto-deploys on push to `main` (build: `npm run build`)
 - **Mobile**: Manual `make build-bundle` + Play Console upload
 - **Database**: Supabase Dashboard for migrations; backups via Supabase PITR
@@ -90,7 +99,14 @@ Configure in Vercel Dashboard → Project → Settings → Environment Variables
 
 ### Mobile (Flutter `.env`)
 
-File: `mobile/fajrak_flutter/.env` (copy from root `.env.example` and adapt for mobile variables)
+File: `mobile/fajrak_flutter/.env`, or `mobile/fajrak_flutter/.env.local` if that is the file
+you already have — the Makefile prefers `.env` and falls back to `.env.local`. `make setup`
+copies `mobile/fajrak_flutter/.env.example` to `.env` only when neither file exists.
+
+The root `.env.example` is not the template for this: it carries `NEXT_PUBLIC_*` web values plus
+only `FIREBASE_API_KEY` / `FIREBASE_PROJECT_ID`, and lacks the rest of the mobile key set
+(`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_STORAGE_BUCKET`,
+`FIREBASE_MESSAGING_SENDER_ID`, `FIREBASE_APP_ID`, `FIREBASE_MEASUREMENT_ID`).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -105,7 +121,17 @@ File: `mobile/fajrak_flutter/.env` (copy from root `.env.example` and adapt for 
 | `FIREBASE_MEASUREMENT_ID` | Yes | Firebase Analytics measurement ID |
 | `SENTRY_DSN` | No | Sentry DSN for mobile (crash reporting skipped if absent) |
 
-**Also required**: `google-services.json` in `mobile/fajrak_flutter/android/app/` (downloaded from Firebase Console).
+**Also required for a release build** — three gitignored files that are not in the repo:
+
+| File | Source |
+|------|--------|
+| `mobile/fajrak_flutter/android/app/google-services.json` | Firebase Console → Project Settings → Your Android App (`fajrak-f7df1`, package `com.fajrak.app`) |
+| `mobile/fajrak_flutter/android/key.properties` | Release signing config (`keyAlias`, `storeFile=upload-keystore.jks`) |
+| `mobile/fajrak_flutter/android/app/upload-keystore.jks` | Release upload keystore |
+
+`make build-bundle` and `make build-apk` depend on the `check-secrets` target, which aborts
+with restore instructions if any of the three is missing — otherwise the build fails late with
+`File google-services.json is missing` or a release signing-config error.
 
 ---
 
@@ -157,7 +183,7 @@ cd mobile/fajrak_flutter && make build-bundle
 
 **Manual Backup Restore** (see `docs/runbooks/database-backup.md`):
 ```bash
-# 1. Create a preview branch (or use PR preview DB from supabase-preview.yml)
+# 1. Create a preview branch (or use the PR preview DB from .github/workflows/neon-preview-branch.yml)
 # 2. Restore the backup
 psql "$PREVIEW_DB_URL" -f backup_critical_20261025_143000.sql
 
