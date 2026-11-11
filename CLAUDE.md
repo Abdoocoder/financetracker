@@ -46,7 +46,7 @@ A comprehensive personal finance tracking application with:
   /locales              # i18n — ALL user-facing text in en/ar subdirectories
   /errors               # Typed error rescue map
 /supabase               # Supabase config and migrations
-  /migrations           # Database migrations (60 files: legacy 001-041 + 18 dated/numbered)
+  /migrations           # Database migrations (76 files: 34 top-level + 42 legacy)
     /legacy             # Baseline migrations (001_initial.sql through 041_chats.sql)
   /functions            # Edge Functions (push-notification in Deno)
 /e2e                    # Playwright E2E tests (Page Object Model)
@@ -81,11 +81,11 @@ cd mobile/fajrak_flutter && make run   # or: flutter run
 cd mobile/fajrak_flutter && make test  # Flutter tests (347 tests)
 
 # Testing
-npm test                 # Run Jest tests (798 tests / 85 suites in __tests__/)
+npm test                 # Run Jest tests (832 tests / 86 suites in __tests__/)
 npm run test:e2e         # Run Playwright tests (e2e/, needs dev server)
 npm run test:coverage    # Coverage report (target 80%+, actual ~32-45%)
 
-# (Counts are current as of 2026-10-22 and verified in PROJECT_CONTEXT.md §4)
+# (Counts are current as of 2026-11-11 and verified in PROJECT_CONTEXT.md §4)
 # Re-measure with `npx jest --ci` and `flutter test`; both print the total.
 # Never copy these numbers into another doc — link to PROJECT_CONTEXT.md §4.
 
@@ -195,7 +195,7 @@ Trigger (Cron/Webhook) → Edge Function → FCM (mobile) + Web Push (browser)
    CREATE TABLE migration (`user_stats`, `testimonials`, `saving_challenges`,
    `health_score_history`, 25+ extra `profiles` columns). Never run `supabase db reset`
    against prod, and diff schema against prod before trusting migration output.
-   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key verified safe via RLS audit 2026-10-29).
+   See `PROJECT_CONTEXT.md` §3 + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key verified safe via RLS audit 2026-10-29).
 9. **Do NOT anchor the `grep` calls in `mobile/fajrak_flutter/Makefile`.** `.env` stores
    Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.

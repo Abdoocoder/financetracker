@@ -1,23 +1,40 @@
 # Domain: Data Model — Tables, RLS, Migrations, Cron Jobs
 
 > Layer 2 deep dive. Entry points: `AGENTS.md` → `PROJECT_CONTEXT.md` → this file.
-> Last verified 2026-10-20.
+> Last verified 2026-11-11 (prod schema introspected via Supabase MCP, project `fajrak` /
+> `ujwcvtpwsaidljecqbaa`).
 
 ## 1. The cardinal rule: migrations are NOT the source of truth
 
-Live production contains tables and columns that have **no CREATE TABLE migration**. Running
-`supabase db reset` or trusting a fresh `db push` as "the schema" would destroy prod reality —
-this caused the 2026-10-11 → 2026-10-17 production outage (post-mortem:
+Migrations were historically behind production: tables and columns existed in prod
+(`created via the SQL editor`) with **no CREATE TABLE migration**. Running `supabase db reset`
+or trusting a fresh `db push` as "the schema" would destroy prod reality — this class of
+mistake caused the 2026-10-11 → 2026-10-17 production outage (post-mortem:
 `mobile/fajrak_flutter/INCIDENT.md`).
 
-- Before any schema work: **diff the live schema against migrations** (e.g. via `proacl` /
-  schema introspection) and treat the diff as the backlog.
-- `20261013135653_add_prod_only_schema.sql` exists precisely because prod DDL was never
-  migrated — a patch on top of drift, not a fix for it.
-- The open owner decision (`HANDOFF_REPORT.md` §12 Q3): baseline-dump prod → squashed migration
-  so `db push` becomes safe. Until that happens, additive-only migrations are the norm.
+**Current drift state (measured 2026-11-11): the known drift is codified.** Prod and the
+migrations tree now agree on shape:
 
-## 2. The 29 tables (all with `ENABLE ROW LEVEL SECURITY` in migrations)
+| Measure | Prod (`public`) | Repo migrations |
+|---|---|---|
+| Base tables | 31 | 31 `create table` |
+| Tables with RLS enabled | 31 | 31 `enable row level security` |
+| `profiles` columns | 23 | 23 (8 in `001_initial.sql` + 15 alters) |
+
+`20260913135653_add_prod_only_schema.sql` is the file that closed the gap: it codifies
+`user_stats`, `testimonials`, `saving_challenges`, `health_score_history` and 15 extra
+`profiles` columns (`salary_day`, `asset_*`, `phone`, `job_title`, `birth_date`, `avatar_url`,
+`onboarding_done`, `lang`, `lesson_streak`, `last_lesson_date`, `opening_balance`) with
+`IF NOT EXISTS` / drop-then-create so applying it to prod is a no-op.
+
+- The rule still stands as **posture, not as a live gap**: parity was reached by *patching the
+  repo up to prod*, so nothing guarantees prod has not drifted again since. Before any schema
+  work: **diff the live schema against migrations** and treat the diff as the backlog.
+- The open owner decision (baseline-dump prod → squashed migration) is still the durable fix
+  that makes `db push` safe. Until then, additive-only migrations are the norm.
+- `db reset` remains destructive regardless of parity: it drops data, not just schema.
+
+## 2. The 31 tables (all with `ENABLE ROW LEVEL SECURITY` — verified in prod)
 
 | Group | Tables |
 |---|---|
@@ -27,10 +44,11 @@ this caused the 2026-10-11 → 2026-10-17 production outage (post-mortem:
 | BYOK / AI / API | `chats`, `messages`, `user_api_keys` (PATs), `user_byok_keys`, `proxy_usage`, `api_audit_log`, `idempotency_keys` |
 | Gamification / analytics | `user_stats`, `health_score_history`, `app_events`, `budget_alert_log`, `testimonials` |
 
-**Prod-only DDL (no CREATE TABLE migration):** `user_stats`, `testimonials`,
-`saving_challenges`, `health_score_history`, plus **25+ extra `profiles` columns**. Their live
-RLS state is **UNKNOWN from the repo** — policies reference them but the DDL is missing. Treat
-them as unverified until inspected in prod.
+**Previously prod-only DDL, now codified:** `user_stats`, `testimonials`, `saving_challenges`,
+`health_score_history` and the 15 extra `profiles` columns all have DDL in
+`20260913135653_add_prod_only_schema.sql`, and prod carries RLS on all 31 tables. Treat any
+*new* divergence you observe in prod as a fresh backlog item — do not assume the 2026-09 patch
+covered it.
 
 ## 3. RLS conventions
 
@@ -47,15 +65,27 @@ them as unverified until inspected in prod.
   `revoke_public_from_secdef_functions`, `verify_owner_in_user_rpcs`, `022`/`024` hardening,
   `20261018000000_linter_security_hardening` (revokes PUBLIC+anon EXECUTE on 7 internal RPCs,
   pins `search_path`).
-- Known drift detail: prod default currency is **JOD** (not KWD as older docs claim).
+- Currency default: prod `profiles.currency` default is **`KWD`**, set by
+  `20261025000002_profiles_currency_default_kwd.sql`. The legacy baseline
+  (`legacy/001_initial.sql`) said `JOD` with `Asia/Amman`; docs that still claim JOD are
+  reading the baseline instead of prod.
 
-## 4. Migrations layout (58 files)
+## 4. Migrations layout (76 files: 34 top-level + 42 legacy)
 
-- `legacy/` — `001_initial.sql` … `041_chats.sql` (baseline; duplicate numbers 003/029).
-- Dated files `2026xxxx…` — the current convention: `YYYYMMDDHHMMSS_name.sql`.
-- Numbering gaps at 020, 044–046 — expected, do not renumber.
+- `supabase/migrations/legacy/` — `001_initial.sql` … `041_chats.sql`, **42 files** (baseline;
+  duplicate numbers at 003 and 029, so 42 files cover 001–041).
+- `supabase/migrations/*.sql` — **34 files**: the short-runner `042`–`048` set
+  (`042`, `043`, `047`, `048`) and dated `2026xxxx…` files, which are the current convention:
+  `YYYYMMDDHHMMSS_name.sql`.
+- Numbering gaps at `020` (legacy) and `044`–`046` (top-level) — expected, do not renumber.
 - Key recent files: `20261019000000_zakat_engine_v2.sql`, `20261021000000_zakat_autopilot.sql`,
-  `20261017160000_zero_budget_trigger_guard.sql`, `20261016114425_restore_sync_and_health_rpcs.sql`.
+  `20261017160000_zero_budget_trigger_guard.sql`,
+  `20261016114425_restore_sync_and_health_rpcs.sql`,
+  `20260913135653_add_prod_only_schema.sql` (§1).
+- ⚠️ `20261107_rename_deen_to_tabarruat.sql` uses an **8-digit** prefix, which violates the
+  workflow's `supabase-validate.yml` filename rule and currently fails the
+  `Migration structure guard` job on `main`. Rename it in a follow-up; do not copy that format
+  for new files.
 - pgTAP fixtures: `supabase/tests/zakat_*.sql`. New RPC behavior ships with a fixture there.
 - Naming: numbered snake_case (legacy) or timestamped snake_case (current). Never edit an
   applied migration — add a new one.
@@ -71,7 +101,7 @@ Clients are input/display only; PostgreSQL functions own the math. Canonical set
 - BYOK/MCP support: `bump_proxy_usage` (30 req/min proxy limit), idempotency helpers.
 - Health-score thresholds were hardcoded and partially centralized by
   `20261017000000_dashboard_health_score_fix.sql`; non-Zakat metrics are still duplicated
-  5–7× across web/mobile/SQL (open risk, `HANDOFF_REPORT.md` §8 #4).
+  5–7× across web/mobile/SQL (open risk — `PROJECT_CONTEXT.md` §4 "Open risks").
 
 ## 6. Cron jobs (two schedulers — know both)
 
@@ -84,10 +114,11 @@ Clients are input/display only; PostgreSQL functions own the math. Canonical set
 | `/api/budget-alerts` | `0 4 * * *` |
 | `/api/zakat-autopilot` | `0 8 * * *` |
 
-**GitHub Actions** (`.github/workflows/smart-notifications.yml`, daily 03:00–15:00 UTC slots):
-morning alerts + due-debt reminders, salary + weekly report (Fri), debt deduction + recurring
-processing, Zakat reminder, inactive-user nudges, evening reminder, wealth-building nudge +
-daily lesson. Plus `supabase-backup.yml` — nightly `supabase db dump` → Cloudflare R2.
+**GitHub Actions** — there are no scheduled notification workflows left. `smart-notifications.yml`
+was deleted in `d4e306d0` (2026-10-31) with its route. The only scheduled workflow is
+`supabase-backup.yml` — nightly `supabase db dump` → Cloudflare R2 (currently failing, see
+`docs/domain/observability-and-security.md` §5). The four Vercel crons above are the only
+schedulers. Reminder routes exist and are callable manually.
 
 - Cron routes authenticate via `lib/cron-auth.ts` (`X-Cron-Secret`: `CRON_SECRET`,
   `SMART_NOTIFICATIONS_SECRET`, `ZAKAT_AUTOPILOT_SECRET`).
@@ -112,9 +143,12 @@ WHERE fingerprint IS NOT NULL;
 - **Write path**: All producers (cron routes, AI generator, achievement awards, proactive agent) call `sendPushToUser()` in `lib/push-send.ts`, which generates the fingerprint, checks `notification_preferences` (enabled, quiet hours), and inserts into `notification_history`. The unique index rejects races as `23505` (treated as success).
 - **Self-heal (F22, Edge Function v15)**: If a webhook payload omits `fingerprint` (custom Dashboard template), the Edge Function queries `notification_history` by `historyId` to recover it before delivery.
 
-### Proactive Agent Insights (v3.47.0)
+### Proactive Agent Insights — ⚠️ removed 2026-10-31
 
-The daily cron `/api/agent/proactive` generates insights via deterministic rules and writes them through the same `notification_history` path:
+> The `/api/agent/proactive` cron was deleted in `d4e306d0`; the table below is a design record.
+> `notification_history` itself is unchanged and still receives writes from the other producers.
+
+The daily cron `/api/agent/proactive` generated insights via deterministic rules and wrote them through the same `notification_history` path:
 
 | Rule Type | Trigger | Entity ID | Fingerprint Example |
 |---|---|---|---|

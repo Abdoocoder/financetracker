@@ -1,6 +1,6 @@
 # FinanceTracker (Fajrak)
 
-**Version:** 3.47.6+72
+**Version:** 3.47.8+74
 
 A comprehensive personal finance tracking application with:
 - **Next.js 16+ App Router** frontend (TypeScript, React 19, Tailwind CSS)
@@ -67,8 +67,14 @@ A comprehensive personal finance tracking application with:
 - **AI**: BYOK pattern for LLM integration, MCP server
 - **Push**: Firebase FCM (mobile), Web Push VAPID (browser)
 
+## Recent Updates (v3.47.8+74)
+- **Flutter stability (P0–P3)**: fixed the offline `SyncService` crash, the SQLCipher native crash (with a `PRAGMA cipher_version` guard so an unencrypted DB fails fast), the auth refresh-token cascade, and missing i18n. FCM token sync now degrades gracefully on network errors instead of surfacing them.
+- **Exports**: PDF transaction tables keep Description/Category, category breakdowns handle null/empty values, and debt tables render RTL correctly. CSV exports carry the right MIME type and `fajrak_transactions_YYYYMMDD_HHMM.csv` filename, plus `original_amount` / `original_currency` / `exchange_rate` columns.
+- **Category rename**: `دين` (Religion/Charity) → `تبرعات` (Donations) across mobile, web, and DB, so it no longer reads as `ديون` (Debts).
+- **DevEx**: `make check-secrets` now fails a release build immediately when any of the three gitignored build inputs (`google-services.json`, `key.properties`, `upload-keystore.jks`) is missing, instead of failing several minutes into Gradle. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#troubleshooting-build-failures).
+
 ## Recent Updates (v3.47.0)
-- **Proactive AI Agent (Agentic AI Phase 4)**: Daily cron `/api/agent/proactive` analyzes budgets (>90% threshold), debt due dates, and spending trends; generates deduplicated insights via `notification_history` fingerprints; pushes alerts via FCM/Web Push respecting quiet hours.
+- **Proactive AI Agent (Agentic AI Phase 4)** — ⚠️ **removed 2026-10-31** (`d4e306d0`): the daily cron `/api/agent/proactive` no longer exists. It analyzed budgets (>90% threshold), debt due dates, and spending trends, generating deduplicated insights via `notification_history` fingerprints.
 - **Smart BYOK UX**: Added `/api/byok/validate` for instant key validation; provider deep links in settings; free model badges; improved error handling.
 - **Agentic Tool Cards**: Chat now renders interactive tool cards with spinners and deep-link buttons ("Go to Debts", "Go to Budgets", etc.) when the agent fetches live data.
 - **Security Hardening**: Patched 14 critical + 41 high npm advisories; revoked `anon` write grants on all tables; hardened internal tables (`api_audit_log`, `idempotency_keys`, `proxy_usage`) against self-tampering; Sentry PII filtering enhanced.

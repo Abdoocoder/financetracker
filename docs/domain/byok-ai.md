@@ -11,7 +11,9 @@
 - **MCP server** — the same financial data exposed as 3 tools over Model Context Protocol
   (Streamable HTTP), authenticated with Personal Access Tokens (PATs), so external AI agents
   (Claude, etc.) can read balances and create transactions on the user's behalf.
-- **Proactive Agent** — daily cron (`/api/agent/proactive`) analyzes budgets, debts, and spending trends; generates deduplicated insights via `notification_history` fingerprints; pushes alerts via FCM/Web Push.
+- **Proactive Agent** — ⚠️ **removed 2026-10-31** (`d4e306d0`, CPU-quota reduction): the daily cron
+  route `/api/agent/proactive` no longer exists. §10 is kept as a design record only; do not
+  reference the endpoint as live.
 - All three share one server-side layer: `lib/unified-tools/index.ts` (balances, cashflow, create
   transaction, idempotency, audit logging, category validation) + `lib/agent/tools.ts` (agent-specific tools). **Business logic for AI goes
   there, once** — never inside the proxy, MCP route, or proactive cron.
@@ -105,7 +107,7 @@ loop** instead of relaying bytes:
 
 Store copy says "keys never sent to our servers," but the architecture POSTs an **RSA-OAEP
 envelope** to the proxy. Technically wrapped, not plaintext — but the copy needs legal review
-(open question in `HANDOFF_REPORT.md` §12). Do not strengthen the marketing claim in code
+(open owner decision — do not treat as resolved). Do not strengthen the marketing claim in code
 comments or UI strings without the owner's sign-off.
 
 ## 8. BYOK Validation Flow (`/api/byok/validate`)
@@ -141,9 +143,16 @@ comments or UI strings without the owner's sign-off.
   - NVIDIA NIM (free tier for development)
 - **Implementation**: `lib/byok/providers.ts` extended with `consoleUrl` and `hasFreeTier` fields; mobile mirrors in `lib/services/byok/providers.dart`. UI reads these fields to render badges and links.
 
-## 10. Proactive Agent (`/api/agent/proactive`)
+## 10. Proactive Agent — ⚠️ removed 2026-10-31 (`/api/agent/proactive`)
 
-**New in v3.47.0 (Agentic AI Phase 4)** — Daily automated financial insights.
+> **This section is a design record, not a description of current code.** The route
+> `app/api/agent/proactive/route.ts` was deleted in `d4e306d0` (CPU-quota reduction,
+> 2026-10-31) along with its tests; it is not in `vercel.json` and not in the repo. See
+> `PRE_DELETION_INVESTIGATION_REPORT.md`. The shared pieces (`lib/agent/tools.ts`,
+> `lib/unified-tools/`, `sendPushToUser`) remain and are used by the in-app agent and the other
+> push producers.
+
+**Shipped in v3.47.0 (Agentic AI Phase 4) and later removed** — daily automated financial insights.
 
 - **Endpoint**: `POST /api/agent/proactive` (Cron only — guarded by `verifyCronAuth` with `CRON_SECRET`)
 - **Schedule**: Daily 06:00 UTC via `vercel.json`

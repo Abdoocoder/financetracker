@@ -14,19 +14,34 @@ AI chat is BYOK: the user's own LLM key, encrypted on device — conversation co
 6. Test every multi-currency flow (`original_amount` / `original_currency`).
 7. Check `notification_preferences` quiet hours before any push.
 8. Migrations are NOT the schema of record — prod has unmigrated tables/columns. Diff against prod; never `supabase db reset` against prod.
-9. Leave the Flutter Makefile's Firebase `grep` unanchored — `.env` stores `FLUTTER_FIREBASE_*` keys; anchoring it silently breaks builds.
+9. Leave the Flutter Makefile's Firebase `grep` unanchored — `.env` stores `FLUTTER_FIREBASE_*` keys; anchoring it silently breaks builds. The Makefile now runs a `check-secrets` preflight before any release build; it aborts with the missing file name (e.g., `google-services.json`) instead of letting Gradle fail minutes later. See `docs/DEPLOYMENT.md` → Troubleshooting Build Failures.
 10. Zakat math lives only in RPCs `get_zakat_summary` / `get_zakat_hauls` — never compute Nisab or 2.5% in web or mobile code.
 11. Hawl state lives only in `sync_zakat_haul_state` / `zakat_haul_tracking` — the UI reads it, never computes it.
 12. Never send PII to Sentry — `beforeSend` filters on both clients; drop events carrying `Authorization`/`Cookie`.
 13. Verify mocks of external APIs against the live endpoint; paste the real response shape + verification date next to the fixture.
 14. **Never commit local agent configs or sensitive docs.** `.agents/`, `.opencode/`, `.claude/`, `.cursor/`, `.gemini/`, `.continue/`, `.taskmaster/`, `.planning/`, `.trae/`, `.kilo/`, `.vscode/`, `DEEPSEEK_BRIEFING.md`, `INVESTIGATION_REPORT.md`, and build outputs (`brag-output/`, `coverage/`, `playwright-report/`, `test-results/`) were scrubbed from Git history on 2026-10-29. These must never be committed.
 
+## Build gotchas (release builds)
+Three release inputs are **gitignored** and absent from a fresh clone, so a release build fails minutes in unless they are restored first:
+
+| File | Where it comes from |
+|---|---|
+| `mobile/fajrak_flutter/android/app/google-services.json` | Firebase Console → Project Settings → Your Android App (project `fajrak-f7df1`, package `com.fajrak.app`) |
+| `mobile/fajrak_flutter/android/key.properties` | Release signing config (`keyAlias` + `storeFile=upload-keystore.jks`) |
+| `mobile/fajrak_flutter/android/app/upload-keystore.jks` | Release upload keystore |
+
+`make build-apk` and `make build-bundle` depend on the `check-secrets` target, which aborts with the missing path name **before** Gradle starts. If you see `File google-services.json is missing` or a null-keystore signing error, you bypassed the Makefile.
+
+- **Always** build release artifacts with `make build-apk` / `make build-bundle`. Never run `flutter build appbundle --release` directly — it skips the `--dart-define` credentials and `check-secrets`, and previously shipped a build that could not log in.
+- `make check-secrets` is safe to run on its own; it only reads the three paths and exits non-zero when one is missing.
+- The keystore path is resolved relative to `android/app` (from `key.properties`). If `storeFile` ever changes, update `RELEASE_INPUTS` in the Makefile too.
+
 ## Reading order (mandatory before writing code)
 1. `PROJECT_CONTEXT.md` — architecture, subsystem router, gotchas, current state.
 2. The matching `docs/domain/*.md` for the subsystem you are touching (router below).
 3. `CLAUDE.md` — full commands, conventions, and rules.
 
-Need a file-level directory map? → `docs/REPO_INDEX.md`. Live project state, risks, release history? → `HANDOFF_REPORT.md`. Verifying a quote against a file before calling an agent wrong? → `docs/PROMPTS.md`. Initializing a fresh agent session or onboarding a new client (Cursor, Claude Code, ChatGPT)? → `docs/AGENT_BOOTSTRAP.md`.
+Need a file-level directory map? → `docs/REPO_INDEX.md`. Current project state, risks, release history? → `PROJECT_CONTEXT.md` + `docs/domain/observability-and-security.md` §4 (`HANDOFF_REPORT.md` and `SECURITY.md` were both deleted in the 2026-10-29 scrub/`92b8a123`; do not recreate them). Verifying a quote against a file before calling an agent wrong? → `docs/PROMPTS.md`. Initializing a fresh agent session or onboarding a new client (Cursor, Claude Code, ChatGPT)? → `docs/AGENT_BOOTSTRAP.md`.
 
 ## Subsystem router
 | If your task touches… | Read |
@@ -37,7 +52,7 @@ Need a file-level directory map? → `docs/REPO_INDEX.md`. Live project state, r
 | Flutter screens, UI components, Alerts, i18n | `docs/domain/ui-and-mobile.md` |
 | Crons, Push notifications, Offline Sync, Gamification | `docs/domain/background-and-jobs.md` |
 | Traces, Sentry, dashboards, runbooks, ACL posture | `docs/domain/observability-and-security.md` |
-| Release state, known risks, open questions | `HANDOFF_REPORT.md` |
+| Release state, known risks, open questions | `PROJECT_CONTEXT.md` §4, `docs/domain/observability-and-security.md` §4 |
 
 <!-- BEGIN:nextjs-agent-rules -->
 

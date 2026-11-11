@@ -81,6 +81,8 @@
 
 ## 4. Vercel Deployment Rollback
 
+> **⚠️ Project paused (2026-11-11):** `financetracker` is `live: false`; last production deployment 2026-10-31, resume target 2026-11-30. A push to `main` will not deploy while it is paused — confirm project state in the Vercel dashboard before relying on either rollback path below. See `docs/DEPLOYMENT.md`.
+
 ### When to Rollback
 - New deployment breaks core flow (login, transactions, zakat calculator)
 - Sentry spike correlates 1:1 with deployment timestamp

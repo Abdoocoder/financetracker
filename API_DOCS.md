@@ -1,4 +1,4 @@
-Last synced: 2026-10-18 · source: app/api/*/route.ts
+Last synced: 2026-11-11 · source: app/api/*/route.ts
 
 # توثيق واجهة برمجة التطبيقات (API Documentation) — مشروع فجرك
 
@@ -128,11 +128,14 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 - **الأمان:** المفتاح يستخدم في الذاكرة فقط لطلب الاختبار؛ لا يُسجّل أبداً، لا يُحفظ. التشفير بالغلاف يحدث *بعد* نجاح التحقق، في العميل.
 - **حد المعدل:** يشارك عداد `bump_proxy_usage` (30 طلب/دقيقة لكل مستخدم).
 
-### 11. الوكيل الاستباقي (`/api/agent/proactive`)
-مهمة يومية مؤتمتة تحلل الميزانيات والديون واتجاهات الإنفاق وتُرسل تنبيهات ذكية.
+### 11. الوكيل الاستباقي (`/api/agent/proactive`) — ⚠️ محذوف (2026-10-31)
+> حُذف المسار `app/api/agent/proactive/route.ts` في `d4e306d0` ولم يعد موجوداً ولا مُجدولاً في `vercel.json`.
+> هذا القسم سجل تصميم فقط. راجع `PRE_DELETION_INVESTIGATION_REPORT.md`.
+
+مهمة يومية مؤتمتة كانت تحلل الميزانيات والديون واتجاهات الإنفاق وتُرسل تنبيهات ذكية.
 - **الطريقة:** `POST`
 - **المصادقة:** `CRON_SECRET` عبر `verifyCronAuth` (مهمة Vercel Cron فقط)
-- **الجدول:** يومي 06:00 UTC (مُعرّف في `vercel.json`)
+- **الجدول:** ~~يومي 06:00 UTC (مُعرّف في `vercel.json`)~~ — لم يعد مُجدولاً
 - **قواعد التحليل** (حتمية، لا LLM):
   1. **الميزانية > 90%**: أي فئة ميزانية حيث `spent / limit > 0.9`
   2. **دَين مستحق**: أقساط ديون مستحقة خلال 3 أيام (`due_date <= now + 3 days`)
@@ -160,7 +163,7 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 | `/api/exchange-rate` | تحويل العملات (15+ عملة) |
 | `/api/gamification` | تحديث المستويات والشارات |
 | `/api/push-subscribe` | تسجيل توكنات Firebase FCM |
-| `/api/smart-notifications` | إرسال تنبيهات مخصصة بناءً على سلوك المستخدم |
+| ~~`/api/smart-notifications`~~ | **محذوف** (2026-10-31) — استخدم مسارات التذكير المنفصلة |
 | `/api/zakat-reminder` | التنبيه باقتراب "حول" الزكاة — يعتمد الآن على RPC `get_zakat_hauls` (بدون حساب TS محلي) |
 | `/api/zakat-autopilot` | cron يومي (08:00) — مزامنة آلة حالة الحول `sync_zakat_haul_state` لكل المستخدمين + إشعار Push عند اقتراب الموعد (≤ 7 أيام) |
 | `/api/api-keys/create` | إنشاء PAT `fjk_live_...` |
@@ -170,7 +173,7 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 | `/api/byok/proxy` | وكيل LLM BYOK الرفيع (Feature A) |
 | `/api/byok/agent` | حلقة وكيل خادمية بأدوات مالية + بوابة تأكيد للكتابة (المرحلة 2) |
 | `/api/byok/validate` | التحقق الفوري من مفتاح BYOK قبل الحفظ |
-| `/api/agent/proactive` | الوكيل الاستباقي — تحليل يومي للميزانيات/الديون/الإنفاق (Cron فقط) |
+| ~~`/api/agent/proactive`~~ | **محذوف** (2026-10-31) — سجل تصميم فقط |
 
 ---
 
@@ -196,7 +199,7 @@ Last synced: 2026-10-18 · source: app/api/*/route.ts
 
 ## 🔑 مصفوفة المصادقة لكل نقطة اتصال (Endpoint auth matrix)
 
-Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each route file (`verifyCronAuth`, `supabase.auth.getUser`, `verifyApiKey`); no parameters were invented.
+Last synced: 2026-11-11 · source: `app/api/*/route.ts`. Auth derived from each route file (`verifyCronAuth`, `supabase.auth.getUser`, `verifyApiKey`); no parameters were invented.
 
 | المسار (Path) | الطريقة (Method) | المصادقة (Auth) |
 |:--------------|:-----------------|:-----------------|
@@ -216,25 +219,27 @@ Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each 
 | `/api/byok/proxy` | POST | authenticated (Bearer session token) |
 | `/api/byok/agent` | POST | authenticated (Bearer session token) |
 | `/api/byok/validate` | POST | authenticated (Bearer session token) |
-| `/api/agent/proactive` | POST | cron (`CRON_SECRET` — `verifyCronAuth`) |
+| ~~`/api/agent/proactive`~~ | — | **محذوف** (2026-10-31, `d4e306d0`) — غير موجود في الشيفرة ولا في `vercel.json` |
 | `/api/confirm` | GET | public (email/sensitive-operation confirmation link) |
 | `/api/daily-reminder` | GET | cron (`CRON_SECRET`) |
 | `/api/evening-reminder` | GET | cron (`CRON_SECRET`) |
 | `/api/exchange-rate` | GET | authenticated (Bearer token; 401 without it) |
 | `/api/gamification` | GET, POST | authenticated (Bearer token) |
 | `/api/health` | GET | public (returns `{"ok":true}`) |
+| `/api/health/db` | GET | public (Neon reachability + latency; row count only with `CRON_SECRET`) |
 | `/api/health-score-snapshot` | GET | cron (`CRON_SECRET`) |
 | `/api/mcp` | GET, POST, DELETE | PAT (`fjk_live_...` via `verifyApiKey`) |
 | `/api/new-user-nudge` | GET | cron (`CRON_SECRET`) |
 | `/api/push-send` | POST | cron (`CRON_SECRET`) |
 | `/api/push-subscribe` | POST, DELETE | authenticated (Bearer session token) |
 | `/api/push-test` | POST | cron (`CRON_SECRET`) or authenticated session token |
-| `/api/smart-notifications` | GET | cron (`CRON_SECRET`) |
+| ~~`/api/smart-notifications`~~ | — | **محذوف** (2026-10-31, `d4e306d0`) — استخدم `/api/daily-reminder` + `/api/alerts` |
 | `/api/stock-price` | GET | authenticated (Bearer token) |
 | `/api/streak-alert` | GET | cron (`CRON_SECRET`) |
 | `/api/testimonials` | POST | authenticated (Bearer session token) |
 | `/api/testimonials` | GET | public (own testimonial via token, otherwise visible-only fields) |
 | `/api/webhook/transaction` | GET, POST | PAT (`fjk_live_...` via `verifyApiKey`) |
+| `/api/webhooks/clerk` | POST | Clerk webhook (svix signature via `CLERK_WEBHOOK_SECRET`; service-role client) |
 | `/api/weekly-report` | GET | cron (`CRON_SECRET`) |
 | `/api/zakat-autopilot` | GET | cron (`CRON_SECRET` — `verifyCronAuth`; `?userId=` اختياري للاختبار على مستخدم واحد) |
 | `/api/zakat/prices` | GET | authenticated (Bearer token) |
@@ -242,8 +247,8 @@ Last synced: 2026-10-21 · source: `app/api/*/route.ts`. Auth derived from each 
 
 **ملاحظات:**
 
-- كل نقطة اتصال مذكورة في هذا المستند موجودة أيضاً في الشيفرة; لم يُعلَّم أي بند `⚠️ REMOVED`.
-- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat-autopilot`, `/api/zakat/prices`, `/api/testimonials`, `/api/byok/validate`, `/api/agent/proactive`.
+- كل نقطة اتصال في هذا المستند موجودة فعلياً في `app/api/**/route.ts` **ما عدا** البنود المشطوبة: `/api/agent/proactive` و`/api/smart-notifications` (حُذفت في `d4e306d0` بتاريخ 2026-10-31).
+- نقاط أُضيفت حديثاً ولا تظهر في الأقسام القديمة أعلاه: `/api/auth/callback`, `/api/byok/config`, `/api/health`, `/api/evening-reminder`, `/api/new-user-nudge`, `/api/push-send`, `/api/push-test`, `/api/streak-alert`, `/api/weekly-report`, `/api/zakat-autopilot`, `/api/zakat/prices`, `/api/testimonials`, `/api/byok/validate`.
 
 ---
 

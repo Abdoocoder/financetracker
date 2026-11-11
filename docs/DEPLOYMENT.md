@@ -27,12 +27,16 @@ Four workflows live in `.github/workflows/`:
 | `supabase-backup.yml` | daily 02:00 UTC, manual | Supabase daily backup |
 
 None of them publishes the mobile app. Deployment itself is host-managed or manual:
-- **Web**: Vercel auto-deploys on push to `main` (build: `npm run build`)
+- **Web**: Vercel auto-deploys on push to `main` (build: `npm run build`). **⚠️ The Vercel project is currently paused** (`live: false`, last production deploy 2026-10-31) with an operator-stated resume target of **2026-11-30**. Pushes to `main` will not serve traffic until the pause is lifted — check Vercel before assuming a web deploy is live.
 - **Mobile**: Manual `make build-bundle` + Play Console upload
 - **Database**: Supabase Dashboard for migrations; backups via Supabase PITR
 - **Crons**: Vercel Cron Jobs (configured in `vercel.json`)
 
 ### Web Build (Vercel)
+
+> **Paused:** the `financetracker` Vercel project is paused (`live: false`). Its last production
+> deployment was 2026-10-31 and the operator-stated resume target is 2026-11-30. Verify the
+> project is live in the Vercel dashboard before treating a push to `main` as deployed.
 
 ```bash
 # Local production build verification
@@ -133,6 +137,27 @@ only `FIREBASE_API_KEY` / `FIREBASE_PROJECT_ID`, and lacks the rest of the mobil
 with restore instructions if any of the three is missing — otherwise the build fails late with
 `File google-services.json is missing` or a release signing-config error.
 
+### Troubleshooting Build Failures
+
+Run the preflight on its own at any time:
+
+```bash
+cd mobile/fajrak_flutter && make check-secrets
+# ✅ Release build inputs present.
+# ❌ Missing release build input: android/app/google-services.json   (exit 1)
+```
+
+| Error | Cause | Fix |
+|---|---|---|
+| `❌ Missing release build input: android/app/google-services.json` | Firebase config not restored after clone | Download it from Firebase Console → Project Settings → Your Android App (`fajrak-f7df1`, `com.fajrak.app`) |
+| `❌ Missing release build input: android/key.properties` | Signing config absent | Recreate with `storePassword`, `keyPassword`, `keyAlias`, `storeFile=upload-keystore.jks` |
+| `❌ Missing release build input: android/app/upload-keystore.jks` | Upload keystore absent | Restore the release keystore (never commit it) |
+| `File google-services.json is missing` after several minutes | You ran `flutter build appbundle --release` directly | Re-run through `make build-bundle` |
+| `Keystore file ... not found` / null signing config | `storeFile` path wrong or keystore missing | Confirm `key.properties` resolves relative to `android/app`, then run `make check-secrets` |
+
+If `storeFile` changes, update `RELEASE_INPUTS` in the Makefile as well. `make check-secrets`
+only reads the three paths — it never prints their contents.
+
 ---
 
 ## Rollback Procedure
@@ -230,11 +255,10 @@ psql "$SUPABASE_DB_URL" -f backup_critical_20261025_143000.sql
 ## Post-Release Checklist
 
 - [ ] `VERSION`, `mobile/fajrak_flutter/pubspec.yaml`, `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` aligned
-- [ ] `HANDOFF_REPORT.md` header updated with new version
-- [ ] `PROJECT_CONTEXT.md` §4 updated with new version and test counts
+- [ ] `PROJECT_CONTEXT.md` §4 updated with new version and test counts (the `HANDOFF_REPORT.md` it replaced is intentionally untracked since the 2026-10-29 scrub — do not recreate it)
 - [ ] `CHANGELOG.md` has `[x.y.z]` section with Fixed/Security/Internal entries
-- [ ] Mobile `README.md` version updated to match `pubspec.yaml` (currently 3.47.6+72)
-- [ ] Vercel deployment healthy (check Functions, Edge, Analytics tabs)
+- [ ] Mobile `README.md` version updated to match `pubspec.yaml` (currently 3.47.8+74)
+- [ ] Vercel deployment healthy (check Functions, Edge, Analytics tabs) — **currently paused until 2026-11-30**
 - [ ] Sentry receiving test events (trigger a test error in staging)
 - [ ] Cron jobs executed (check Vercel Cron Jobs dashboard)
 - [ ] Supabase backup completed (check Supabase Dashboard → Database → Backups)

@@ -180,9 +180,9 @@
 ### Test
 - **E2E flaky tests fixed**: `key-rotation.spec.ts` afterEach hook hardened with try/catch, Escape key, short timeouts. `byok-chat-flow.spec.ts` Ollama tests skipped when not configured. No flaky tests remain.
 
-# Changelog
-
-## [Unreleased]
+### Documentation
+- **Docs synced to `v3.47.8+74` (2026-11-11).** `PROJECT_CONTEXT.md`, `README.md`, `README.ar.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `docs/DEPLOYMENT.md`, `docs/guides/getting-started.md`, `docs/guides/development.md`, `docs/testing/testing.md`, `docs/ci-cd.md`, `docs/REPO_INDEX.md`, the Flutter `README.md`/`AGENTS.md`, and the `docs/domain/*` citations now agree on the release, the 832-web/86-suite and 347-Flutter test counts, the `check-secrets` preflight, and the paused Vercel deployment. Stale `HANDOFF_REPORT.md` and `SECURITY.md` citations were replaced or marked as deliberately absent. Verification also corrected three false claims: the web suite is **830 passing / 2 failing** (not all green), CI `web` fails at `Validate test counts (web)`, and nightly Supabase backups have been failing since 2026-11-03 on a stale `SUPABASE_DB_URL`. See `docs/doc-sync-2026-11-11.md`.
+- **Makefile preflight for build secrets**: `make check-secrets` now fails fast on missing `google-services.json`, `key.properties`, or `upload-keystore.jks` before Gradle starts. `docs/DEPLOYMENT.md` corrected the `google-services.json` path (`android/app/`, not project root), the Flutter `.env` template (root template is for web only), and added the missing GitHub Actions workflow reference.
 
 ## [3.47.8+74] — 2026-11-07
 

@@ -57,10 +57,12 @@ rclone copy backup_alerts_20261025_143000.sql r2:fajrak-backups/manual/
 
 ## Restore Procedure (If Migration Breaks Prod)
 
-**⚠️ Test restore on a Supabase Preview DB first.**
+**⚠️ Test restore on a throwaway database first.** There is no automated Supabase preview stack in
+this repo; use a local `supabase start` instance, or a Neon branch created by
+`.github/workflows/neon-preview-branch.yml` (diagnostics only — no Auth/PostgREST, RLS bypassed).
 
 ```bash
-# 1. Create a preview branch (or use the PR preview DB from supabase-preview.yml)
+# 1. Create a throwaway database (local `supabase start`, or a Neon branch from neon-preview-branch.yml)
 # 2. Restore the backup
 psql "$PREVIEW_DB_URL" -f backup_alerts_20261025_143000.sql
 

@@ -18,7 +18,7 @@ rulings encoded in the DB.
 
 Both engine RPCs enforce owner verification: an authenticated JWT with a mismatched
 `p_user_id` raises; a NULL uid (service_role / cron) is allowed for background jobs; `anon`
-has no EXECUTE at all (verified on prod 2026-10-18, see `SECURITY.md`).
+has no EXECUTE at all (verified on prod 2026-10-18; see `docs/domain/observability-and-security.md` §3).
 
 ## 2. Nisab and the 2.5% rate
 
@@ -101,7 +101,7 @@ Migration `20261021000000_zakat_autopilot.sql` encodes the fiqh Hawl rules as a 
   Lean/Normal/Fat modes; the simulation layer is `components/investments/wealth-simulator.tsx`
   (web) / `WealthSimulatorCard` (mobile). FIRE number math is display-side planning, not stored
   finance state — unlike Zakat, it has no RPC (deduplication of non-Zakat metrics is an open
-  risk, `HANDOFF_REPORT.md` §8).
+  risk — `PROJECT_CONTEXT.md` §4 "Open risks").
 - **Halal investing**: `investments.is_halal` flag tags holdings as halal; surfaced in the
   portfolio (web `dashboard/investments/`, mobile `investments/`) and in gamification badges
   ("Halal Investor"). It is a label only — no screening logic lives in the repo; do not add

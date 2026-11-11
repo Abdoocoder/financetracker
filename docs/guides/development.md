@@ -6,7 +6,7 @@
 
 ### Prerequisites
 - **Node.js 20 or newer** (no `.nvmrc` in repo; modern LTS works)
-- **Flutter 3.47.7** (stable channel, Dart 3.13.5)
+- **Flutter 3.47.8** (stable channel, Dart 3.13.7)
 - **Android SDK** (`targetSdk = flutter.targetSdkVersion` in `mobile/fajrak_flutter/android/app/build.gradle.kts`)
 - **Supabase CLI 2.116.0**
 - **JDK 17 or newer**
@@ -51,7 +51,7 @@ cd mobile/fajrak_flutter && flutter pub get
 | `npm run start` | Start production server (after `build`) |
 | `npm run lint` | Run ESLint (`eslint.config.mjs`) |
 | `npm run typecheck` | TypeScript strict check (`tsconfig.typecheck.json`) |
-| `npm run test` | Run Jest unit/integration tests (798 tests, 85 suites) |
+| `npm run test` | Run Jest unit/integration tests (832 tests, 86 suites) |
 | `npm run test:watch` | Jest in watch mode |
 | `npm run test:coverage` | Jest with coverage report |
 | `npm run test:e2e` | Playwright E2E tests (needs running dev server) |
@@ -69,7 +69,7 @@ cd mobile/fajrak_flutter && flutter pub get
 | `make build-web` | Build production web bundle |
 | `make build-apk` | Build release APK |
 | `make build-bundle` | Build release App Bundle for Play Store |
-| `make test` | Run Flutter tests (260 tests) |
+| `make test` | Run Flutter tests (347 tests) |
 | `make test-coverage` | Run tests with coverage (HTML report) |
 | `make clean` | Clean build artifacts |
 | `make deps` | Update dependencies (`flutter pub upgrade`) |
@@ -96,7 +96,7 @@ cd mobile/fajrak_flutter && flutter pub get
 
 ## Branch Conventions
 
-- **Main branch**: `main` (deploys to Vercel on push)
+- **Main branch**: `main` (deploys to Vercel on push — **but the Vercel project is paused as of 2026-11-11**, `live: false`, resume target 2026-11-30; a push does not serve traffic until it is unpaused)
 - **Branch prefixes**:
   - `feature/` — New features
   - `fix/` — Bug fixes

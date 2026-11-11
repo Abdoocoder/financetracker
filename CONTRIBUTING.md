@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Node.js 20 or newer.** This repo has no `.nvmrc`; any modern LTS works (environment check on 2026-10-18 ran Node v26.12.0).
-- **Flutter 3.47.7** (stable channel, Dart 3.13.5), as reported by `flutter --version` on 2026-10-18.
+- **Flutter 3.47.8** (stable channel, Dart 3.13.7), as reported by `flutter --version` on 2026-11-11.
 - **Android SDK.** `mobile/fajrak_flutter/android/app/build.gradle.kts` sets `targetSdk = flutter.targetSdkVersion` (Flutter-pinned; the migration to target SDK 35 is recorded in `CHANGELOG.md` under `[3.42.2+57]`).
 - **Supabase CLI 2.116.0** (`supabase --version` on 2026-10-18).
 - **JDK 17 or newer.**
@@ -38,12 +38,12 @@
 
 ## Tests
 
-- **Web unit and integration:** `npm test` (798 tests across 85 suites in `__tests__/`)
+- **Web unit and integration:** `npm test` (832 tests across 86 suites in `__tests__/`)
 - **Web end-to-end:** `npm run test:e2e` (Playwright, needs a running dev server)
 - **Mobile:** `cd mobile/fajrak_flutter && flutter test` (347 tests)
 - **Full health check:** `npm run doctor` (audit + lint + typecheck + test coverage + build)
 
-> Counts are current as of 2026-10-29 and verified in `PROJECT_CONTEXT.md` §4. This
+> Counts are current as of 2026-11-11 and verified in `PROJECT_CONTEXT.md` §4. This
 > paragraph deliberately does not cite `CLAUDE.md` as its source: cross-referencing two
 > docs let the numbers drift apart silently for weeks (592/177 vs 626/186 vs 636/206).
 > Re-measure with `npx jest --ci` and `flutter test`.
@@ -71,7 +71,7 @@ Copied verbatim from the `## Critical Rules` section of `CLAUDE.md`:
    CREATE TABLE migration (`user_stats`, `testimonials`, `saving_challenges`,
    `health_score_history`, 25+ extra `profiles` columns). Never run `supabase db reset`
    against prod, and diff schema against prod before trusting migration output.
-   See `HANDOFF_REPORT.md` + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key rotation still recommended).
+   See `PROJECT_CONTEXT.md` §3 + `mobile/fajrak_flutter/INCIDENT.md` (prod outage 2026-10-11 → RESOLVED 2026-10-17; anon key rotation still recommended).
 9. **Do NOT anchor the `grep` calls in `mobile/fajrak_flutter/Makefile`.** `.env` stores
    Firebase values under `FLUTTER_FIREBASE_*`; the unanchored `grep` is load-bearing.
    Anchoring it (e.g. `^FIREBASE_*`) would silently break web builds.
@@ -82,9 +82,9 @@ Copied verbatim from the `## Critical Rules` section of `CLAUDE.md`:
 
 ## Where to find what
 
-- **Current project state (authoritative):** `HANDOFF_REPORT.md`
+- **Current project state (authoritative):** `PROJECT_CONTEXT.md` §4 (+ `docs/domain/observability-and-security.md` §4 for the security backlog)
 - **Change history:** `CHANGELOG.md`
-- **Security posture and backlog:** `SECURITY.md`
+- **Security posture and backlog:** `docs/domain/observability-and-security.md` §3–§4; Arabic risk register: `RISK_REGISTER.md`
 - **API surface:** `API_DOCS.md`
 - **Historical audits (frozen):** `docs/archive/`
 - **Incident post-mortem:** `mobile/fajrak_flutter/INCIDENT.md`

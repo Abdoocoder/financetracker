@@ -15,11 +15,12 @@ describe('types/index', () => {
             expect(EXPENSE_CATEGORIES).toContain('ترفيه')
             expect(EXPENSE_CATEGORIES).toContain('صلة رحم')
             expect(EXPENSE_CATEGORIES).toContain('ملابس')
+            expect(EXPENSE_CATEGORIES).toContain('تبرعات')
             expect(EXPENSE_CATEGORIES).toContain('أخرى')
         })
 
-        it('should have 10 expense categories', () => {
-            expect(EXPENSE_CATEGORIES.length).toBe(10)
+        it('should have 11 expense categories', () => {
+            expect(EXPENSE_CATEGORIES.length).toBe(11)
         })
     })
 

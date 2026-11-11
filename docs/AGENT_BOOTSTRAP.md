@@ -32,7 +32,7 @@ Reply with this exact structured summary. DO NOT guess the numbers—extract the
 2. Makefile unanchored grep (load-bearing)
 3. Zakat centralization (RPCs only)
 4. Mock reality (verify APIs before mocking)
-5. Version drift (check HANDOFF_REPORT §9)
+5. Version drift (check `VERSION` / `pubspec.yaml` / `PLAY_STORE_RELEASE.md` directly)
 
 **Subsystem Router (I will read the relevant domain doc when needed):**
 - Islamic Finance → `docs/domain/islamic-finance.md`

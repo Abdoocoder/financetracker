@@ -55,15 +55,19 @@ All schedules are **UTC** (Amman is UTC+3; the workflow comments show local time
 | `vercel.json` | `0 3 * * *` | `/api/auto-recurring` |
 | `vercel.json` | `0 4 * * *` | `/api/budget-alerts` |
 | `vercel.json` | `0 8 * * *` | `/api/zakat-autopilot` |
-| `.github/workflows/smart-notifications.yml` | `0 3,5,6,7,9,15,16 * * *` (7 separate entries) | morning/evening reminders, auto-salary + weekly report, debt deduction + recurring, zakat reminder, new-user nudge, daily lesson + wealth tip |
-| `.github/workflows/supabase-backup.yml` | `0 2 * * *` | DB backup to Cloudflare R2 |
+| `.github/workflows/supabase-backup.yml` | `0 2 * * *` | DB backup to Cloudflare R2 — **failing nightly since 2026-11-03** (stale `SUPABASE_DB_URL`) |
+
+> **Removed 2026-10-31 (`d4e306d0`):** the GitHub-Actions notification crons
+> (`.github/workflows/smart-notifications.yml`) and the `app/api/smart-notifications` route
+> they called no longer exist. Four Vercel crons remain (the four rows above). Reminder routes
+> (`daily-reminder`, `evening-reminder`, `weekly-report`, …) still exist but are only callable
+> manually. See `PRE_DELETION_INVESTIGATION_REPORT.md`.
 
 - Cron-authenticated routes call `verifyCronAuth()` (`lib/cron-auth.ts`) and compare
   the `Bearer` token against `CRON_SECRET`. It **throws when `CRON_SECRET` is
   unset**, so a misconfigured deployment fails fast instead of opening the route.
-- Route-level flow: the workflow sends `Authorization: Bearer $CRON_SECRET`
-  (see `app/api/smart-notifications/route.ts`, which fans out to the reminder
-  routes with its own secret header).
+- Route-level flow: the caller sends `Authorization: Bearer $CRON_SECRET`; reminder
+  routes forward it with their own secret header.
 - **Zakat Autopilot (`/api/zakat-autopilot`):** fetches prices once per currency (KWD, JOD, SAR) via `lib/zakat-prices.ts` and passes live prices to `sync_zakat_haul_state`. If price fetching fails for a user, the cron **skips that user** (does not fall back to RPC defaults).
 - Adding a cron: add the schedule in `vercel.json` or the workflow **and** guard the
   route with `verifyCronAuth`; update the table above.
@@ -130,9 +134,9 @@ All schedules are **UTC** (Amman is UTC+3; the workflow comments show local time
 |---|---|
 | Push queue entry | `lib/push-send.ts` |
 | Delivery Edge Function | `supabase/functions/push-notification/index.ts` |
-| Cron guards | `lib/cron-auth.ts`, `app/api/smart-notifications/route.ts` |
+| Cron guards | `lib/cron-auth.ts` |
 | Vercel crons | `vercel.json` |
-| GitHub Actions crons | `.github/workflows/smart-notifications.yml`, `supabase-backup.yml` |
+| GitHub Actions crons | `supabase-backup.yml` only (`smart-notifications.yml` removed 2026-10-31) |
 | Sync engine | `mobile/fajrak_flutter/lib/services/sync_service.dart` |
 | Local DB + queue | `mobile/fajrak_flutter/lib/database/app_database.dart` |
 | Gamification | `app/api/gamification/route.ts`, `components/dashboard/GamificationCard.tsx`, mobile `utils/level_ladder.dart` |

@@ -12,7 +12,7 @@ This guide walks you through setting up the Fajrak (فجرك) finance tracker lo
 |------|------------------|-------|
 | **Node.js** | >= 20.0.0 | LTS recommended (tested on v26.12.0) |
 | **npm** | >= 10.0.0 | Bundled with Node.js |
-| **Flutter** | 3.47.7 (stable) | Dart 3.13.5; run `flutter --version` to verify |
+| **Flutter** | 3.47.8 (stable) | Dart 3.13.7; run `flutter --version` to verify |
 | **Android SDK** | API level 35 (targetSdk) | `flutter doctor -v` will flag missing components |
 | **Supabase CLI** | 2.116.0 | `supabase --version` |
 | **JDK** | 17 or newer | Required for Android builds |
@@ -131,7 +131,7 @@ make run
 flutter run $(DART_DEFINES) $(SENTRY_DEFINE)
 ```
 
-The `make run` command injects Supabase and Firebase credentials from the root `.env` via `--dart-define` flags. **Never run `flutter build appbundle --release` directly** — it bypasses the credential injection and produces a build that cannot authenticate (see `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` v3.42.2 and `HANDOFF_REPORT.md`). <!-- VERIFY: PLAY_STORE_RELEASE.md documents the credential injection fix -->
+The `make run` command injects Supabase and Firebase credentials from the root `.env` via `--dart-define` flags. **Never run `flutter build appbundle --release` directly** — it bypasses the credential injection and produces a build that cannot authenticate (see `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` v3.42.2, and `PROJECT_CONTEXT.md` → gotcha #2).
 
 **Run Flutter Web (for rapid iteration):**
 
@@ -154,7 +154,9 @@ make run-web-with-proxy
 |-------|-------|----------|
 | **Supabase connection fails** | Missing or incorrect `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Verify values in `.env` match your Supabase project dashboard (Settings → API). |
 | **Flutter build fails with "Could NOT find CURL"** | Missing `libcurl4-openssl-dev` (Linux desktop) | Run `make setup-linux`, then `rm -rf build/linux && flutter run -d linux`. |
-| **Firebase auth fails on mobile** | `google-services.json` missing or wrong package name | Ensure file is at `mobile/fajrak_flutter/android/app/google-services.json` and package name matches `com.fajrak.app` (or your configured ID). |
+| **Firebase auth fails on mobile** | `google-services.json` missing or wrong package name | Ensure file is at `mobile/fajrak_flutter/android/app/google-services.json` and package name matches `com.fajrak.app` (or your configured ID). Run `make check-secrets` to confirm it is present. |
+| **Release build aborts with `❌ Missing release build input`** | One of the three gitignored build inputs is absent (`google-services.json`, `key.properties`, `upload-keystore.jks`) | Restore the named file; `make check-secrets` lists all missing inputs at once. See `docs/DEPLOYMENT.md` → Troubleshooting Build Failures. |
+| **`flutter build appbundle --release` fails minutes in with `File google-services.json is missing`** | You bypassed the Makefile | Run `make build-bundle` from `mobile/fajrak_flutter` instead. |
 | **Push notifications don't arrive** | VAPID keys or Firebase config missing | Verify all `NEXT_PUBLIC_FIREBASE_*`, `VAPID_*`, and `NEXT_PUBLIC_VAPID_PUBLIC_KEY` are set. Check `notification_preferences` quiet hours in the app. |
 | **Zakat calculations show stale prices** | RPC defaults ($30/0.35/1.0) used instead of live prices | The app fetches live gold/silver/FX via `lib/zakat-prices.ts` (web) or `metal_price_service.dart` (mobile) and passes them to `sync_zakat_haul_state`. Ensure network access for price APIs. |
 | **TypeScript errors on `npm run typecheck`** | Generated types out of sync | Run `npx supabase gen types typescript --project-id <ref> > types/supabase.ts` (or pull from Supabase dashboard). <!-- VERIFY: types/supabase.ts is a generated file, not committed to repo --> |
@@ -188,5 +190,5 @@ After your first successful run:
 - [ ] `make run` (or `flutter run`) launches the mobile app on a device/emulator
 - [ ] You can sign up and sign in on both platforms
 - [ ] Supabase Realtime works: changes in web appear instantly on mobile (and vice versa)
-- [ ] `npm test` passes (798 tests / 85 suites)
+- [ ] `npm test` passes (832 tests / 86 suites) — **currently 830 pass / 2 fail** in `__tests__/types/index.test.ts`; see `PROJECT_CONTEXT.md` §4
 - [ ] `cd mobile/fajrak_flutter && flutter test` passes (347 tests)

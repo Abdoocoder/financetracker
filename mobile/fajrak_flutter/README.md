@@ -2,7 +2,7 @@
 
 A Flutter finance tracking app with Supabase backend and Firebase integration.
 
-**Version:** 3.45.0+64
+**Version:** 3.47.8+74
 
 ## 🚀 Quick Start
 

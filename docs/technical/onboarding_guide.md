@@ -82,7 +82,7 @@ lib/supabase/
 ## 6. Web surface map
 
 - **24 pages** (`app/**/page.tsx`): landing `/`, `download`, `privacy`, `terms`; 5 auth pages (`onboarding`, `login`, `register`, `forgot-password`, `reset-password`); 15 dashboard pages (`dashboard`, `transactions`, `debts`, `investments`, `goals`, `budgets`, `alerts`, `settings`, `accounts`, `zakat`, `chat`, `help`, `learn`, `fire`, `pdf-report`).
-- **29 API routes** under `app/api/` (Route Handlers): `alerts/`, cron jobs (`auto-debt`, `auto-recurring`, `auto-salary`, `budget-alerts`, `daily-reminder`, `evening-reminder`, `zakat-reminder`, `streak-alert`, `weekly-report`, `new-user-nudge`, `smart-notifications`), push (`push-send`, `push-subscribe`, `push-test`), `exchange-rate`, `stock-price`, `health`, `health-score-snapshot`, `gamification`, `testimonials`, `confirm`, `auth/callback`, `api-keys/{create,revoke}`, `byok/proxy`, `mcp`, `webhook/transaction`, `zakat/prices`.
+- **38 API routes** under `app/api/` (Route Handlers): `alerts/`, cron jobs (`auto-debt`, `auto-recurring`, `auto-salary`, `budget-alerts`, `daily-reminder`, `evening-reminder`, `zakat-reminder`, `streak-alert`, `weekly-report`, `new-user-nudge`, `zakat-autopilot`, `wealth-guidance`, `smart-nudge`, `receivable-debt-reminder`, `cleanup-notifications`), push (`push-send`, `push-subscribe`, `push-test`), `exchange-rate`, `stock-price`, `health`, `health/db`, `health-score-snapshot`, `gamification`, `testimonials`, `confirm`, `auth/callback`, `api-keys/{create,revoke}`, `byok/{config,agent,proxy,validate}`, `mcp`, `webhook/transaction`, `webhooks/clerk`, `zakat/prices`. `smart-notifications` was deleted 2026-10-31.
 - `proxy.ts` matcher excludes `_next/static`, `_next/image`, favicon/icons, `manifest.json`, `sw.js`, `api/cron`.
 
 ## 7. Mobile surface map (`mobile/fajrak_flutter/lib/`)
@@ -93,11 +93,16 @@ lib/supabase/
 
 ## 8. Database map
 
-19+ tables (verified against migrations). Migrations live in `supabase/migrations/` — **11 top-level files** (`042`, `043`, plus nine dated `2026-09xx` hardening migrations) plus a `legacy/` folder holding the older `001`–`041` set (**42 files**). Migrations are **sequentially numbered — add a new one, never edit existing**. Newer migrations use dated `YYYYMMDDHHMMSS_name.sql` names rather than the old `NNN_name.sql` scheme.
+31 tables (verified against prod via Supabase MCP on 2026-11-11; all 31 have RLS enabled, and the
+repo migrations create the same 31). Migrations live in `supabase/migrations/` — **34 top-level
+files** (the short-runner `042`/`043`/`047`/`048` set plus thirty dated `2026-*` migrations) plus a
+`legacy/` folder holding the older `001`–`041` set (**42 files**, duplicate numbers at 003 and 029) —
+**76 files** in total. Migrations are **sequentially numbered — add a new one, never edit existing**.
+Newer migrations use dated `YYYYMMDDHHMMSS_name.sql` names rather than the old `NNN_name.sql` scheme.
 
 ## 9. Testing
 
-- **Jest / jsdom** — 58 suites / 531 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). All passing. Coverage ≈48% statements / 31% branches.
+- **Jest / jsdom** — 86 suites / 832 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). 830 pass, **2 fail** in `__tests__/types/index.test.ts` (stale `zakat` category expectations, see `PROJECT_CONTEXT.md` §4). Coverage ≈48% statements / 31% branches.
 - **Playwright** — `e2e/` (smoke + auth-flow + `transaction-management` all passing). Authenticated specs need a test account via `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in `.env.local`; `globalSetup` builds `e2e/.auth/user.json` automatically.
 - **Flutter** — `make doctor` (analyze + test, zero issues required).
 - Shared Supabase mock: `chainProxy` pattern in `__tests__/hooks/`.
@@ -146,10 +151,11 @@ make doctor
 
 > The old layout doc `docs/technical/structure.md` was **removed** — it referenced `middleware.ts`, `lib/utils.ts`, and `001_initial.sql`, all of which were superseded (auth gate is now `proxy.ts`). Prefer this guide and `CLAUDE.md`.
 
-## 13. Testing & E2E (Sep 2026)
+## 13. Testing & E2E (counts re-measured 2026-11-11)
 
 ### Unit Tests (Jest)
-- 58 suites / 540 tests across `api/`, `hooks/`, `lib/`, `integration/`, `types/`
+- 86 suites / 832 tests across `api/`, `hooks/`, `lib/`, `integration/`, `types/` (830 passing,
+  2 failing in `__tests__/types/index.test.ts` — stale category list)
 - Run: `npm run test` (or `npm run test:coverage`)
 - Shared Supabase mock uses `chainProxy` pattern (`__tests__/hooks/`)
 - Coverage: ~48% statements, ~31% branches (dashboard pages/hooks at 0%)

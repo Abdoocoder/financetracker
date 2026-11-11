@@ -1,7 +1,7 @@
 > ⚠️ **HISTORICAL DOCUMENT (archived snapshot).**
 > This file describes the project as of the version or date it names and is kept
 > for reference only. Current state lives in
-> [`HANDOFF_REPORT.md`](HANDOFF_REPORT.md) and
+> [`PROJECT_CONTEXT.md`](PROJECT_CONTEXT.md) §4 and
 > [`CHANGELOG.md`](CHANGELOG.md).
 
 # هيكل المشروع — FinanceTracker (Fajrak)

@@ -3,7 +3,14 @@
 > **Version:** v3.47.0+ · **Last updated:** 2026-10-27
 > **Audience:** Engineers adding tools to the Fajrak Executive Assistant
 
-This guide covers how to add new tools to the agent, how the loop works, and how the proactive cron uses `notification_history`.
+> ⚠️ **§4 is historical, and so are the `/api/agent/proactive` references in §8–§9.** The proactive
+> cron entry point `app/api/agent/proactive/route.ts` was
+> **deleted in `d4e306d0` (2026-10-31, CPU-quota reduction)** and is no longer in the repo or in
+> `vercel.json`. Everything else here (loop, tool registry, providers, SSE events, the
+> `/api/byok/agent` route) is current. See `PRE_DELETION_INVESTIGATION_REPORT.md`.
+
+This guide covers how to add new tools to the agent, how the loop works, and (historically) how
+the proactive cron used `notification_history`.
 
 ---
 
@@ -170,9 +177,12 @@ export const agentTools: ToolDefinition[] = [
 
 ---
 
-## 4. Proactive Cron & notification_history
+## 4. Proactive Cron & notification_history — ⚠️ historical (route removed 2026-10-31)
 
-### Cron Entry Point (`app/api/agent/proactive/route.ts`)
+> `app/api/agent/proactive/route.ts` was deleted in `d4e306d0`. This section documents the
+> design; there is no cron entry point today.
+
+### Cron Entry Point (deleted: `app/api/agent/proactive/route.ts`)
 
 ```typescript
 // Runs daily 06:00 UTC via vercel.json
@@ -339,12 +349,6 @@ const mockNetWorthResponse = { ... };
 # Start web dev server
 npm run dev
 
-# Test proactive cron locally (bypass cron auth)
-curl -X POST http://localhost:3000/api/agent/proactive \
-  -H "Authorization: Bearer $CRON_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-
 # Test agent loop via BYOK agent route
 curl -X POST http://localhost:3000/api/byok/agent \
   -H "Authorization: Bearer $USER_SESSION_TOKEN" \
@@ -355,7 +359,7 @@ curl -X POST http://localhost:3000/api/byok/agent \
 ### Logs to Watch
 - **Agent loop**: `console.log` in `lib/agent/loop.ts` (trace events)
 - **Tool execution**: `lib/unified-tools/index.ts` (RPC calls)
-- **Proactive cron**: Vercel Functions logs for `/api/agent/proactive`
+- ~~**Proactive cron**: Vercel Functions logs for `/api/agent/proactive`~~ (route deleted 2026-10-31)
 - **Push delivery**: Supabase Edge Function logs (`push-notification`)
 - **Sentry**: All errors captured with PII filtering
 
@@ -371,7 +375,7 @@ curl -X POST http://localhost:3000/api/byok/agent \
 | `lib/agent/events.ts` | SSE event types |
 | `lib/unified-tools/index.ts` | Shared RPC wrappers |
 | `app/api/byok/agent/route.ts` | In-app agent endpoint |
-| `app/api/agent/proactive/route.ts` | Proactive cron endpoint |
+| ~~`app/api/agent/proactive/route.ts`~~ | ~~Proactive cron endpoint~~ — deleted in `d4e306d0` (2026-10-31) |
 | `app/api/mcp/route.ts` | MCP server |
 | `lib/push-send.ts` | Notification fingerprint + queue |
 | `supabase/functions/push-notification/index.ts` | Edge Function delivery |

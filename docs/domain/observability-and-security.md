@@ -45,7 +45,7 @@ request objects, and keep the mobile DSN out of web builds.
 
 | Credential | Where it lives | Posture |
 |---|---|---|
-| Supabase anon key | Embedded in both clients | **Rotation still pending** post-incident (open, `SECURITY.md`) — treat as public-by-design: RLS is the real boundary |
+| Supabase anon key | Embedded in both clients | **Rotation still pending** post-incident (open — see §4) — treat as public-by-design: RLS is the real boundary |
 | Service role key | Server env only | Crons/webhooks/migrations only (rule 5) |
 | PATs (`fjk_live_…`) | `api_keys` table (prefix + scopes + expiry) | User-created/revoked via `/api/api-keys/*`; per-key `rate_limit_per_min`, `expires_at`; every use audited in `api_audit_log` |
 | BYOK keys | `user_byok_keys` (envelope-encrypted, device-encrypted) | Never plaintext anywhere (see `docs/domain/byok-ai.md`) |
@@ -54,9 +54,12 @@ request objects, and keep the mobile DSN out of web builds.
 
 **DB-level ACL**: EXECUTE on internal RPCs is revoked from `PUBLIC` and `anon`, granted only
 to `authenticated` + `service_role` — verified on prod project `ujwcvtpwsaidljecqbaa` on
-2026-10-18 (`SECURITY.md`). Keep new RPCs in that pattern.
+2026-10-18 (verified against prod; see §4). Keep new RPCs in that pattern.
 
-## 4. Open security backlog (from `SECURITY.md` + `HANDOFF_REPORT.md` §8)
+## 4. Open security backlog
+
+> `SECURITY.md` was deleted in `92b8a123`; this section is now the canonical backlog. The
+> Arabic executive-level register lives in `RISK_REGISTER.md`.
 
 1. 🔴 **Anon key rotation** pending since the incident — the key ships in clients; rotation
    means coordinated web + mobile releases.
@@ -74,7 +77,10 @@ to `authenticated` + `service_role` — verified on prod project `ujwcvtpwsaidlj
 ## 5. Backups & incident history
 
 - Daily GitHub Actions `supabase db dump` → Cloudflare R2 (`fajrak-backups`), nightly 02:00
-  UTC; dumps retained (post-incident pipeline, live since 2026-10-14).
+  UTC; dumps retained (post-incident pipeline, live since 2026-10-14). **Currently broken:**
+  the workflow has failed nightly since 2026-11-03 with `pg_dump: … FATAL: password
+  authentication failed for user "postgres"` — the `SUPABASE_DB_URL` secret is stale. Fix the
+  secret and re-run before relying on a backup.
 - The 2026-10-11 → 2026-10-17 prod outage is **resolved**; post-mortem and the security
   hardening backlog live in `mobile/fajrak_flutter/INCIDENT.md`. Read it before touching
   schema, auth, or the anon key.

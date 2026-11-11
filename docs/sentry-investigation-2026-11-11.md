@@ -133,3 +133,35 @@ Monitor Sentry for the next release (`3.47.8+74` or later) to confirm:
 2. **FAJRAK-MOBILE-2** — No new SIGSEGV crashes on any device
 
 The defensive fix ensures that transient network interruptions (VPN, mobile handoff, errno 103) during background FCM token sync are handled gracefully without polluting Sentry, while genuine errors (RLS, schema) still surface for investigation.
+
+---
+
+## Update — 2026-11-11T08:01Z (post-release monitoring result)
+
+The monitoring above was carried out against the live Sentry project (`abdoocoder-m2`, org-level
+search on 2026-11-11). Result: **the `-2` verdict did not hold on build 74.**
+
+| Issue | Verdict at the time | What Sentry shows on 2026-11-11 |
+|---|---|---|
+| **FAJRAK-MOBILE-S** | Fixed | **Holds** — last event 2026-11-08T17:53:58Z (`3.47.7+73`); no new occurrences after the release |
+| **FAJRAK-MOBILE-2** | Confirmed fixed | **Did not hold** — status `regressed`, new **fatal** SIGSEGV at **2026-11-11T08:01:06Z** on `com.fajrak.app@3.47.8+74` (dist 74), OnePlus8Pro / Android 11, installed from Play (`com.android.vending`). 5 occurrences / 4 users total |
+| **FAJRAK-MOBILE-W** | — | **New** — `_Exception: Failed to generate alerts: 402` in `alerts_screen.dart` → `_AlertsScreenState._generateAlerts`, 2026-11-11T08:00:44Z, `3.47.8+74`, same device |
+| **FAJRAK-MOBILE-X** | — | **New** — `PostgrestException code: 504 (Gateway Timeout)` in `postgrest_builder.dart`, 2026-11-11T07:55:59Z, `3.47.8+74`, same device |
+
+Reading:
+
+- The `sqlite3_flutter_libs` removal (commit `3142ac4f`) is still the correct change and removed one
+  known cause of the native crash, but it did **not** eliminate SIGSEGV on build 74. One device
+  (OnePlus8Pro / Android 11, `device.class=low`, emulator-like stats) still produces a fatal crash
+  4 days after the release. Treat this as an **open P0** until a build with a native stack trace
+  symbolication confirms the remaining crash site.
+- The three 2026-11-11 events all come from the same device/OS within six minutes of each other,
+  which is consistent with one tester session on build 74 rather than a fleet-wide regression — but
+  it is the *current* build, so it cannot be dismissed as stale.
+- `-W` (402) and `-X` (504) are new signatures not covered by this investigation. The 402 is an
+  alerts-generation failure surfaced to the user; the 504 is a PostgREST gateway timeout. Neither
+  is the network-abort class that `-S` fixed, so the `notification_service.dart` change is not
+  expected to suppress them.
+
+Do not restate the "Confirmed Fixed" verdict for `-2` without re-checking Sentry; `PROJECT_CONTEXT.md`
+§4 carries the current status.

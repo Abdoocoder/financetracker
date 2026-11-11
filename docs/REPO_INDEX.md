@@ -16,7 +16,7 @@ financetracker/
 ├── mobile/
 │   └── fajrak_flutter/    # Flutter Mobile App (iOS/Android)
 ├── supabase/               # Database + Edge Functions
-│   ├── migrations/         # 60+ SQL migrations (legacy + current)
+│   ├── migrations/         # 76 SQL migrations (34 top-level + 42 legacy)
 │   └── functions/          # Deno Edge Functions (push notifications)
 ├── observability/          # OTel, Grafana dashboards, alerts, runbooks
 ├── docs/                   # Project documentation (PRDs, audit reports, plans, agent lessons)
@@ -118,7 +118,7 @@ financetracker/
 | `api/push-send/route.ts` | POST | Send push notification (FCM + Web Push) |
 | `api/push-subscribe/route.ts` | POST | Save push subscription (FCM token / VAPID) |
 | `api/push-test/route.ts` | POST | Test push notification |
-| `api/smart-notifications/route.ts` | POST | AI-generated smart notifications |
+| ~~`api/smart-notifications/route.ts`~~ | — | **Deleted 2026-10-31** (`d4e306d0`); individual cron routes remain |
 | `api/stock-price/route.ts` | GET | Fetch live stock/crypto prices |
 | `api/streak-alert/route.ts` | POST | Cron: streak reminders |
 | `api/weekly-report/route.ts` | POST | Cron: generate & email weekly report |
@@ -293,8 +293,8 @@ financetracker/
 
 ### 6.1 Migrations (`supabase/migrations/`)
 
-**Legacy (41 migrations, 001–041):** Initial schema, RLS, indexes, functions  
-**Current (12+ migrations, dated):** Performance, security, new features
+**Legacy (42 migrations, 001–041):** Initial schema, RLS, indexes, functions (duplicate numbers at 003 and 029)  
+**Current (34 migrations, dated):** Performance, security, new features
 
 | Migration | Purpose |
 |-----------|---------|
@@ -359,7 +359,11 @@ financetracker/
 | `lint-test-build.yml` | Push/PR to main | **web**: lint, typecheck, test, build<br>**mobile**: flutter analyze, test (Drift codegen) |
 | `supabase-validate.yml` | Push/PR | `supabase db lint`, migration squash check |
 | `supabase-backup.yml` | Schedule (daily) | `supabase db dump` → artifact |
-| `smart-notifications.yml` | Schedule (daily 7 AM) | Trigger `api/smart-notifications` cron |
+| `neon-preview-branch.yml` | PR | Neon preview branch for schema validation |
+
+> `smart-notifications.yml`, `ci.yml`, `flutter-ci.yml` and `supabase-preview.yml` no longer
+> exist. GitHub-Actions crons for notifications were removed in `d4e306d0` (2026-10-31);
+> web CI lives in `lint-test-build.yml` and the preview branch is `neon-preview-branch.yml`.
 
 ---
 
@@ -402,13 +406,13 @@ financetracker/
 | `README.ar.md` | Arabic README (full) |
 | `README.md` | English README (brief) |
 | `CONFIGURATION.md` | Configuration guide |
-| `SECURITY.md` | Security policy |
+| ~~`SECURITY.md`~~ | Deleted in `92b8a123` — use `docs/domain/observability-and-security.md` §4 |
 | `RISK_REGISTER.md` | Risk register |
 | `ZAKAT_AUDIT_REPORT.md` | Zakat calculation audit |
 | `FAJRAK_ACCOUNTING_ANALYSIS.md` | Accounting logic deep-dive |
 | `AUDIT_REPORT.md` | Code audit report |
 | `DEEP_PROJECT_ANALYSIS.md` | Full project analysis |
-| `HANDOFF_REPORT.md` | Team handoff document |
+| ~~`HANDOFF_REPORT.md`~~ | Intentionally untracked since the 2026-10-29 scrub — use `PROJECT_CONTEXT.md` §4 |
 | `AI_ASSISTANT_AUDIT.md` | AI assistant audit |
 | `API_DOCS.md` | API documentation |
 | `BCP.ar.md` | Business continuity plan (Arabic) |
@@ -545,11 +549,11 @@ financetracker/
 | Artifact | Version/Info |
 |----------|--------------|
 | **Web** | Next.js 16.3.5, React 19.2.4, TypeScript 5.x |
-| **Mobile** | Flutter 3.47.6, Dart 3.6, Drift 2.18, SQLCipher |
+| **Mobile** | Flutter 3.47.8, Dart 3.13.7, Drift 2.18, SQLCipher |
 | **Supabase** | PostgreSQL 17, PostgREST, Realtime, Storage, Edge Runtime (Deno 2) |
 | **Deploy** | Vercel (web), Play Store / TestFlight (mobile) |
 | **CI** | GitHub Actions (lint, typecheck, test, build, flutter analyze) |
-| **Current Version** | `VERSION` file: `3.45.0+64` (mobile), `3.42.0` (web) |
+| **Current Version** | `VERSION` file: `3.47.8+74` (mobile), `3.42.0` (web) |
 
 ---
 

@@ -64,7 +64,7 @@ test/
 
 | Command | Description |
 |---------|-------------|
-| `npm test` | Run all unit and integration tests (798 tests across 85 suites) |
+| `npm test` | Run all unit and integration tests (832 tests across 86 suites) |
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run test:coverage` | Run tests with coverage report |
 | `npm run test:e2e` | Run Playwright E2E tests (requires dev server on port 3000) |
@@ -83,7 +83,7 @@ test/
 
 | Command | Description |
 |---------|-------------|
-| `cd mobile/fajrak_flutter && make test` | Run all tests (260 tests) |
+| `cd mobile/fajrak_flutter && make test` | Run all tests (347 tests) |
 | `cd mobile/fajrak_flutter && make test-coverage` | Run tests with coverage (generates `coverage/html/index.html`) |
 | `cd mobile/fajrak_flutter && flutter test` | Run tests directly (same as `make test`) |
 
@@ -226,9 +226,12 @@ test('ar.json and en.json have identical keys', () {
 | Workflow File | Trigger | Description |
 |---------------|---------|-------------|
 | `lint-test-build.yml` | Push/PR to `main` | Main CI: web (lint, typecheck, test, build) + mobile (flutter analyze, test) |
-| `smart-notifications.yml` | Scheduled (cron, 7× daily) + manual | Triggers smart notifications API endpoint |
-| `supabase-backup.yml` | Daily at 02:00 UTC + manual | PostgreSQL 17 backup (schema + data) → Cloudflare R2 |
+| `neon-preview-branch.yml` | PR | Neon preview branch for schema validation |
+| `supabase-backup.yml` | Daily at 02:00 UTC + manual | PostgreSQL 17 backup (schema + data) → Cloudflare R2 — **failing nightly since 2026-11-03** |
 | `supabase-validate.yml` | Push to `main` + manual | Migration structure guard + isolated schema validation (local DB) |
+
+> `smart-notifications.yml` was deleted in `d4e306d0` (2026-10-31); there are no
+> GitHub-Actions notification crons left. There are exactly four workflow files.
 
 #### `lint-test-build.yml` — Main CI Pipeline
 
@@ -238,17 +241,20 @@ test('ar.json and en.json have identical keys', () {
    - Validate prompts (`scripts/validate_prompts.py`, `scripts/render_check_prompts.py`)
    - Validate test counts (web) — `scripts/validate_test_counts.py --web`
    - `npm ci` → `npm run lint` → `npm run typecheck` → `npm run test` → `npm run build`
-2. **`mobile`** (Flutter) — `ubuntu-latest`, Flutter 3.47.6 stable:
+2. **`mobile`** (Flutter) — `ubuntu-latest`, Flutter **3.47.6** (pinned in the workflow; the shipped release line is 3.47.8/Dart 3.13.7 — CI is one patch behind):
    - `flutter pub get` → `dart run build_runner build --delete-conflicting-outputs`
    - `flutter analyze` → `flutter test`
    - Validate test counts (mobile) — `scripts/validate_test_counts.py --flutter`
 
 **Concurrency:** Cancels superseded runs on same ref.
 
-#### `smart-notifications.yml` — Scheduled Notifications
+#### ~~`smart-notifications.yml`~~ — removed
 
-**Trigger:** 7 cron schedules daily (UTC times mapping to UTC+3 local) + `workflow_dispatch`  
-**Job:** Calls `https://fajrak.com/api/smart-notifications` with `CRON_SECRET` bearer token.
+Deleted in `d4e306d0` (2026-10-31, CPU-quota reduction) together with
+`app/api/smart-notifications/route.ts`. The individual reminder routes
+(`daily-reminder`, `evening-reminder`, `weekly-report`, `zakat-reminder`, …) still exist and are
+callable manually, but nothing schedules them from GitHub Actions. See
+`PRE_DELETION_INVESTIGATION_REPORT.md`.
 
 #### `supabase-backup.yml` — Daily Database Backup
 
@@ -289,15 +295,16 @@ The existing CI covers:
 6. **Migration Validation** — Isolated schema check ✅
 7. **Scheduled Operations** — Notifications cron, DB backup ✅
 
-### Test Counts (as of 2026-10-29)
+### Test Counts (as of 2026-11-11)
 
 | Platform | Test Type | Count |
 |----------|-----------|-------|
-| Web | Unit + Integration | 798 tests across 85 suites |
+| Web | Unit + Integration | 832 tests across 86 suites — **830 pass / 2 fail** in `__tests__/types/index.test.ts` (`صلاة رحم` typo + 11 categories); see `PROJECT_CONTEXT.md` §4 |
 | Web | E2E | 7 Playwright specs in `e2e/` |
-| Mobile | Unit + Widget | 347 tests |
+| Mobile | Unit + Widget | 347 tests (all passing) |
 
-> Re-measure with `npx jest --ci` and `flutter test` as counts may change.
+> Re-measure with `npx jest --ci` and `flutter test` as counts may change. The single source of
+> truth for counts *and* pass/fail status is `PROJECT_CONTEXT.md` §4.
 
 ## Quick Reference
 
