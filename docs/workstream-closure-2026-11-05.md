@@ -1,3 +1,16 @@
+> **⚠️ VERIFIED 2026-11-11 — two claims in this document are false.**
+> Evidence: `GIT_STATE_REPORT.md` (local, gitignored) §3 C-2 and C-3.
+> - "Recon docs: 1 deleted, 4 archived under `docs/_recon/`" (line 7, and the
+>   Step 3 transcript at lines 168–178) — that directory and all 4 files do
+>   not exist. Only the `.gitignore` entry survives, and `88ac7b0a` touched
+>   only `.gitignore` + this report, so the archive was never committed. Per
+>   the audit, those four docs were untracked and lost in the `92b8a123`
+>   history rewrite.
+> - The release gate at line 52 ("Do this ONLY after Vercel is restored") was
+>   violated — `main` was pushed at `92058498` while Vercel is still paused.
+>   (The audit cites `:57`; the gate statement is on `:52`, repeated on `:55`.)
+> Treat this document as a record of intent, not of what happened.
+
 # Workstream Closure — 2026-11-05
 
 ## Status Summary
