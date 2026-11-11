@@ -86,6 +86,7 @@ strix_runs/
 # Sensitive docs — security backlog + investigation findings
 DEEPSEEK_BRIEFING.md
 INVESTIGATION_REPORT.md
+GIT_STATE_REPORT.md
 
 # Agent configs — sys-prompts and skills are private
 .agents/
@@ -117,3 +118,10 @@ docs/internal/
 *.hprof
 public/*.apk
 docs/_recon/
+
+# Recon snapshots removed from the PUBLIC repo by 92b8a123 — local only.
+# Belt-and-suspenders: even if someone copies them back into docs/archive/,
+# git will not stage them.
+docs/archive/HANDOFF_REPORT.md
+docs/archive/SECURITY.md
+docs/archive/security-definer-audit.md
