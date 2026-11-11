@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -247,7 +248,52 @@ class NotificationService {
               'p256dh': 'fcm',
               'auth': 'fcm',
             }, onConflict: 'user_id,endpoint');
+      } on SocketException catch (e) {
+        // Network interruption (VPN disconnect, Errno 103, etc.) — log locally
+        // and return silently. This is a background sync that will retry on the
+        // next auth state change (signedIn/tokenRefreshed). Do NOT send to Sentry.
+        if (kDebugMode) {
+          debugPrint('[NotificationService] Network error saving FCM token (will retry): $e');
+        }
+        return;
+      } on PostgrestException catch (e) {
+        // PostgrestException can wrap network errors. Check if it's network-related.
+        final msg = e.toString().toLowerCase();
+        if (msg.contains('socketexception') ||
+            msg.contains('connection abort') ||
+            msg.contains('connection refused') ||
+            msg.contains('connection reset') ||
+            msg.contains('network is unreachable') ||
+            msg.contains('failed host lookup') ||
+            msg.contains('no address associated') ||
+            msg.contains('timeout')) {
+          if (kDebugMode) {
+            debugPrint('[NotificationService] Network error (Postgrest) saving FCM token (will retry): $e');
+          }
+          return;
+        }
+        // Non-network PostgrestException (e.g., RLS, schema) — report to Sentry.
+        ErrorHandler.handle(e,
+            developerMessage: '[NotificationService] Postgrest error saving FCM token: $e');
       } catch (e, st) {
+        // Check if it's a network error wrapped in another exception type.
+        final msg = e.toString().toLowerCase();
+        if (msg.contains('socketexception') ||
+            msg.contains('connection abort') ||
+            msg.contains('connection refused') ||
+            msg.contains('connection reset') ||
+            msg.contains('network is unreachable') ||
+            msg.contains('failed host lookup') ||
+            msg.contains('no address associated') ||
+            msg.contains('timeout') ||
+            msg.contains('clientexception')) {
+          if (kDebugMode) {
+            debugPrint('[NotificationService] Network error (wrapped) saving FCM token (will retry): $e');
+          }
+          return;
+        }
+        // Other unexpected errors (e.g., RLS policy, schema issues) — report via
+        // ErrorHandler so they surface in Sentry for investigation.
         ErrorHandler.handle(e,
             st: st,
             developerMessage: '[NotificationService] Supabase upsert error: $e');
