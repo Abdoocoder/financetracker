@@ -114,6 +114,10 @@ Clients are input/display only; PostgreSQL functions own the math. Canonical set
 | `/api/budget-alerts` | `0 4 * * *` |
 | `/api/zakat-autopilot` | `0 8 * * *` |
 
+> These crons only fire while the Vercel project is live — it is **paused** as of 2026-11-11
+> (`PROJECT_CONTEXT.md` §5). `netlify.toml` is a secrets-scan suppression file, not a second
+> deployment path, so there is no Netlify scheduler to fall back to.
+
 **GitHub Actions** — there are no scheduled notification workflows left. `smart-notifications.yml`
 was deleted in `d4e306d0` (2026-10-31) with its route. The only scheduled workflow is
 `supabase-backup.yml` — nightly `supabase db dump` → Cloudflare R2 (currently failing, see

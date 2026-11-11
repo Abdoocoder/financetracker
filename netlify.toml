@@ -1,4 +1,8 @@
-# Netlify build configuration.
+# ⚠️ SECRETS SCAN ONLY — THIS IS NOT A DEPLOYMENT CONFIG.
+# Vercel is the platform of record for the web app (see PROJECT_CONTEXT.md §5).
+# This file exists solely so Netlify's secrets scanner does not fail on public
+# Firebase identifiers. It declares no build command, no publish directory and
+# no redirects; https://fajrak.netlify.app returns 404.
 #
 # Only build-environment flags live here. The build command, publish directory
 # and Next.js runtime are configured in the Netlify UI; unspecified keys here

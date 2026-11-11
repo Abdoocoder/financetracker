@@ -62,6 +62,10 @@ All schedules are **UTC** (Amman is UTC+3; the workflow comments show local time
 > they called no longer exist. Four Vercel crons remain (the four rows above). Reminder routes
 > (`daily-reminder`, `evening-reminder`, `weekly-report`, …) still exist but are only callable
 > manually. See `PRE_DELETION_INVESTIGATION_REPORT.md`.
+>
+> **These schedules only run while the Vercel project is live.** It is paused as of 2026-11-11
+> (`PROJECT_CONTEXT.md` §5). `netlify.toml` is a secrets-scan suppression file, not a deployment
+> path — there is no Netlify or Firebase scheduler to fail over to.
 
 - Cron-authenticated routes call `verifyCronAuth()` (`lib/cron-auth.ts`) and compare
   the `Bearer` token against `CRON_SECRET`. It **throws when `CRON_SECRET` is

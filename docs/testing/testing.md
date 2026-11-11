@@ -299,7 +299,7 @@ The existing CI covers:
 
 | Platform | Test Type | Count |
 |----------|-----------|-------|
-| Web | Unit + Integration | 832 tests across 86 suites — **830 pass / 2 fail** in `__tests__/types/index.test.ts` (`صلاة رحم` typo + 11 categories); see `PROJECT_CONTEXT.md` §4 |
+| Web | Unit + Integration | 832 tests across 86 suites — **all passing**; see `PROJECT_CONTEXT.md` §4 |
 | Web | E2E | 7 Playwright specs in `e2e/` |
 | Mobile | Unit + Widget | 347 tests (all passing) |
 

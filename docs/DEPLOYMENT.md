@@ -11,6 +11,12 @@
 | **Push Notifications** | Firebase (FCM) | `mobile/fajrak_flutter/firebase.json`, `mobile/fajrak_flutter/android/app/google-services.json` | Android FCM via Firebase project `fajrak-f7df1`; Web Push via VAPID keys |
 | **Monitoring** | Sentry, Vercel Analytics | `next.config.mjs`, `mobile/fajrak_flutter/lib/services/sentry_service.dart` | Error tracking, web vitals |
 
+> **Vercel is the platform of record.** `netlify.toml` is **not** a deployment config — it exists
+> only to configure Netlify's secrets scanner (`SECRETS_SCAN_OMIT_KEYS`), declares no build command,
+> publish directory, or redirects, and `https://fajrak.netlify.app` returns 404. Firebase provides
+> FCM/Web Push only; there is no Firebase Hosting config in this repo. Full topology, including the
+> Vercel credential blocker: `PROJECT_CONTEXT.md` §5.
+
 ---
 
 ## Build Pipeline
@@ -255,7 +261,7 @@ psql "$SUPABASE_DB_URL" -f backup_critical_20261025_143000.sql
 ## Post-Release Checklist
 
 - [ ] `VERSION`, `mobile/fajrak_flutter/pubspec.yaml`, `mobile/fajrak_flutter/PLAY_STORE_RELEASE.md` aligned
-- [ ] `PROJECT_CONTEXT.md` §4 updated with new version and test counts (the `HANDOFF_REPORT.md` it replaced is intentionally untracked since the 2026-10-29 scrub — do not recreate it)
+- [ ] `PROJECT_CONTEXT.md` §4 updated with new version and test counts (the `HANDOFF_REPORT.md` it replaced is kept only in `docs/internal/`, gitignored and local-only — do not recreate it at the repo root)
 - [ ] `CHANGELOG.md` has `[x.y.z]` section with Fixed/Security/Internal entries
 - [ ] Mobile `README.md` version updated to match `pubspec.yaml` (currently 3.47.8+74)
 - [ ] Vercel deployment healthy (check Functions, Edge, Analytics tabs) — **currently paused until 2026-11-30**

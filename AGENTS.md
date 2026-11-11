@@ -41,7 +41,7 @@ Three release inputs are **gitignored** and absent from a fresh clone, so a rele
 2. The matching `docs/domain/*.md` for the subsystem you are touching (router below).
 3. `CLAUDE.md` — full commands, conventions, and rules.
 
-Need a file-level directory map? → `docs/REPO_INDEX.md`. Current project state, risks, release history? → `PROJECT_CONTEXT.md` + `docs/domain/observability-and-security.md` §4 (`HANDOFF_REPORT.md` and `SECURITY.md` were both deleted in the 2026-10-29 scrub/`92b8a123`; do not recreate them). Verifying a quote against a file before calling an agent wrong? → `docs/PROMPTS.md`. Initializing a fresh agent session or onboarding a new client (Cursor, Claude Code, ChatGPT)? → `docs/AGENT_BOOTSTRAP.md`.
+Need a file-level directory map? → `docs/REPO_INDEX.md`. Current project state, risks, release history? → `PROJECT_CONTEXT.md` + `docs/domain/observability-and-security.md` §4 (`HANDOFF_REPORT.md` and `SECURITY.md` were both deleted in the 2026-10-29 scrub/`92b8a123`; do not recreate them — the repository is **public**, so their frozen 2026-10-27 snapshots live only in `docs/internal/` (gitignored, local-only), which is not a recreation). Verifying a quote against a file before calling an agent wrong? → `docs/PROMPTS.md`. Initializing a fresh agent session or onboarding a new client (Cursor, Claude Code, ChatGPT)? → `docs/AGENT_BOOTSTRAP.md`.
 
 ## Subsystem router
 | If your task touches… | Read |

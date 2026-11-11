@@ -102,7 +102,7 @@ Newer migrations use dated `YYYYMMDDHHMMSS_name.sql` names rather than the old `
 
 ## 9. Testing
 
-- **Jest / jsdom** — 86 suites / 832 tests (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). 830 pass, **2 fail** in `__tests__/types/index.test.ts` (stale `zakat` category expectations, see `PROJECT_CONTEXT.md` §4). Coverage ≈48% statements / 31% branches.
+- **Jest / jsdom** — 86 suites / 832 tests, all passing (unit: `api/`, `hooks/`, `lib/`, `integration/`, `types/`). See `PROJECT_CONTEXT.md` §4. Coverage ≈48% statements / 31% branches.
 - **Playwright** — `e2e/` (smoke + auth-flow + `transaction-management` all passing). Authenticated specs need a test account via `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in `.env.local`; `globalSetup` builds `e2e/.auth/user.json` automatically.
 - **Flutter** — `make doctor` (analyze + test, zero issues required).
 - Shared Supabase mock: `chainProxy` pattern in `__tests__/hooks/`.
@@ -154,8 +154,7 @@ make doctor
 ## 13. Testing & E2E (counts re-measured 2026-11-11)
 
 ### Unit Tests (Jest)
-- 86 suites / 832 tests across `api/`, `hooks/`, `lib/`, `integration/`, `types/` (830 passing,
-  2 failing in `__tests__/types/index.test.ts` — stale category list)
+- 86 suites / 832 tests across `api/`, `hooks/`, `lib/`, `integration/`, `types/` — all passing
 - Run: `npm run test` (or `npm run test:coverage`)
 - Shared Supabase mock uses `chainProxy` pattern (`__tests__/hooks/`)
 - Coverage: ~48% statements, ~31% branches (dashboard pages/hooks at 0%)

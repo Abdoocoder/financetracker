@@ -377,7 +377,8 @@ financetracker/
 | `tsconfig.typecheck.json` | Strict typecheck config (CI) |
 | `tailwind.config.js` | Tailwind CSS v3 config |
 | `supabase/config.toml` | Local Supabase config (ports, auth, realtime, storage, edge runtime) |
-| `vercel.json` | Vercel deploy config (crons, headers) |
+| `vercel.json` | Vercel cron config — the 4 production crons (platform of record, see `PROJECT_CONTEXT.md` §5) |
+| `netlify.toml` | **Secrets-scan suppression only** (`SECRETS_SCAN_OMIT_KEYS`). No build command, no publish dir, no redirects — **not a deployment path** |
 | `playwright.config.ts` | E2E test config |
 | `jest.config.js` | Unit test config (jsdom, ts-jest) |
 | `.env.example` | Template for all required env vars |
@@ -406,13 +407,13 @@ financetracker/
 | `README.ar.md` | Arabic README (full) |
 | `README.md` | English README (brief) |
 | `CONFIGURATION.md` | Configuration guide |
-| ~~`SECURITY.md`~~ | Deleted in `92b8a123` — use `docs/domain/observability-and-security.md` §4 |
+| ~~`SECURITY.md`~~ | Deleted in `92b8a123`; snapshot kept only in `docs/internal/SECURITY.md` (gitignored, repo is public) — use `docs/domain/observability-and-security.md` §4 |
 | `RISK_REGISTER.md` | Risk register |
 | `ZAKAT_AUDIT_REPORT.md` | Zakat calculation audit |
 | `FAJRAK_ACCOUNTING_ANALYSIS.md` | Accounting logic deep-dive |
 | `AUDIT_REPORT.md` | Code audit report |
 | `DEEP_PROJECT_ANALYSIS.md` | Full project analysis |
-| ~~`HANDOFF_REPORT.md`~~ | Intentionally untracked since the 2026-10-29 scrub — use `PROJECT_CONTEXT.md` §4 |
+| ~~`HANDOFF_REPORT.md`~~ | Deleted in `92b8a123`; snapshot kept only in `docs/internal/HANDOFF_REPORT.md` (gitignored, repo is public) — use `PROJECT_CONTEXT.md` §4 |
 | `AI_ASSISTANT_AUDIT.md` | AI assistant audit |
 | `API_DOCS.md` | API documentation |
 | `BCP.ar.md` | Business continuity plan (Arabic) |
@@ -569,7 +570,7 @@ financetracker/
 | Test (mobile) | `cd mobile/fajrak_flutter && flutter test` |
 | E2E | `npm run test:e2e` |
 | Supabase local | `supabase start` (ports 54321-54327) |
-| Deploy web | `vercel --prod` |
+| Deploy web | **Dashboard only** — the Vercel project is paused and the agent MCP token cannot reach the team that owns `fajrak.com` (`PROJECT_CONTEXT.md` §5). `vercel --prod` will not work from this checkout |
 | Deploy mobile | `flutter build apk/ipa` + store upload |
 | Generate Drift code | `dart run build_runner build --delete-conflicting-outputs` |
 

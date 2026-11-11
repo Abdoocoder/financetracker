@@ -190,5 +190,5 @@ After your first successful run:
 - [ ] `make run` (or `flutter run`) launches the mobile app on a device/emulator
 - [ ] You can sign up and sign in on both platforms
 - [ ] Supabase Realtime works: changes in web appear instantly on mobile (and vice versa)
-- [ ] `npm test` passes (832 tests / 86 suites) — **currently 830 pass / 2 fail** in `__tests__/types/index.test.ts`; see `PROJECT_CONTEXT.md` §4
+- [ ] `npm test` passes (832 tests / 86 suites, all green); see `PROJECT_CONTEXT.md` §4
 - [ ] `cd mobile/fajrak_flutter && flutter test` passes (347 tests)

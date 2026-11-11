@@ -72,6 +72,7 @@ Migration `20261021000000_zakat_autopilot.sql` encodes the fiqh Hawl rules as a 
 ## 6. Cron and notification flow
 
 1. Daily Vercel cron `0 8 * * *` → `/api/zakat-autopilot` (secret: `ZAKAT_AUTOPILOT_SECRET`).
+   Only fires while the Vercel project is live — it is paused as of 2026-11-11 (`PROJECT_CONTEXT.md` §5).
 2. Route iterates users, calls `sync_zakat_haul_state` with **live** prices (never stale
    defaults), and composes a localized push (language from `profiles.lang`).
 3. Push is queued through `notification_history` → Edge Function (quiet hours + masking

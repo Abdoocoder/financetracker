@@ -7,8 +7,9 @@
 
 - **Traces/metrics**: OpenTelemetry SDK init in `observability/otel/index.ts` (Node) → OTLP
   HTTP exporter → Grafana Tempo/Prometheus. Env: `OTEL_EXPORTER_OTLP_ENDPOINT` + `_HEADERS`.
-  Known debt: mixed OTel major lines (`0.222.x` SDK/exporters beside `2.x` resources/metrics)
-  and 8 moderate transitive `@opentelemetry/*` npm advisories (pinned via `overrides`).
+  Known debt: mixed OTel major lines (`0.222.x` SDK/exporters beside `2.x` resources/metrics).
+  `npm audit --omit=dev` (2026-11-11) reports **9 moderate + 1 low**, all in the `@sentry/*`
+  and `google-gax` chains with fixes available — **no `@opentelemetry/*` advisories** remain.
 - **Errors**: Sentry on both clients (web: `@sentry/nextjs`; mobile: `sentry_flutter`).
 - **Dashboards** (`observability/dashboards/`): `byok-proxy.json`, `mcp-server.json`,
   `crypto-rate-limits.json`.
